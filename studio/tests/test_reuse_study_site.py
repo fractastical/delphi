@@ -24,6 +24,37 @@ class Ins:
         return json.loads(self.read(rel))
 
 
+def test_gallery_reuses_each_recording_and_its_project_context():
+    publication = A.build(Ins(), {}, ROOT)
+    cards = A.gallery_cards(publication)
+    assert len(cards) == 3
+    assert len({c["id"] for c in cards}) == 3
+    assert sum(c["id"].endswith("-control") for c in cards) == 1
+    for card in cards:
+        assert card["video_state"] == "present_verified"
+        assert card["video"]["sha256"] == sha256((ROOT / card["video_href"]).read_bytes()).hexdigest()
+        assert card["project_href"] in ("#/studio/tissue-microcarrier", "#/studio/epithelial-repair")
+        assert card["parameter_unknowns"] and card["numerical_checks"]
+    epithelial = next(c for c in cards if c["project_href"].endswith("epithelial-repair"))
+    assert "Morpheus" in epithelial["model"]["name"]
+    assert any("G1b incomplete" in s for s in epithelial["numerical_checks"])
+
+
+def test_public_record_links_require_exact_unreviewed_readback():
+    out = {}
+    links = A.record_links(Ins(), out)
+    assert links["count"] == 12
+    assert set(links["groups"]) == {"tissue-microcarrier", "epithelial-repair"}
+    assert all(any(r["ref"]["kind"] == "Problem" for r in group) for group in links["groups"].values())
+    path = "projects/reuse-studies/study-records/import/public-readback.json"
+    bad = json.loads((ROOT / path).read_bytes())
+    bad["records"][0]["status"] = "accepted"
+    out = {}
+    with pytest.raises(ValueError, match="exact unreviewed"):
+        A.record_links(Ins({path: json.dumps(bad).encode()}), out)
+    assert out == {}
+
+
 def test_builds_and_offers_only_verified_media():
     out = {}
     r = A.build(Ins(), out, ROOT)

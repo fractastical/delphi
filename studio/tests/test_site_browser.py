@@ -2357,3 +2357,47 @@ def test_project_navigation_resets_scroll_but_same_page_queries_preserve_it(brow
         assert 'observed fish' not in pg.locator('#foot').inner_text()
         assert _overflow(pg) <= 0 and not pg.errors
         pg.close()
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs(browser, base, width):
+    import hashlib
+
+    snapshot = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser, width, 900)
+    for study in ("tissue-microcarrier", "epithelial-repair"):
+        cards = [c for c in snapshot["reuse_studies"]["visuals"] if c["study"] == study]
+        assert cards, "Every published secondary study must have its own recorded artifact"
+        pg.goto(base + "#/studio/" + study)
+        pg.wait_for_selector("#rs-results")
+        assert pg.locator(".reuse-result").count() == len(cards)
+        assert pg.locator("#rs-rule").count() == 1
+        assert pg.locator("#main .katex").count() >= 1
+        assert pg.locator("#main .tex-fallback").count() == 0
+        text = pg.locator("#main").inner_text()
+        assert "unknown" in text and "does not establish tissue viability" in text
+        assert "Wing loading" not in text and "[object Object]" not in text
+        assert pg.locator('a[href="#/proofs?f=steady-oxygen-bound"]').count() == 1
+        if study == "tissue-microcarrier":
+            assert "45 g" in text and "50 × 30 × 30 mm" in text
+            pg.locator(".reuse-diagnostic").evaluate("e => e.open = true")
+            assert "15.574%" in pg.locator(".reuse-diagnostic").inner_text()
+        else:
+            assert "G1b" in text and "incomplete" in text
+            assert pg.locator(".reuse-pair video").count() == 2
+            assert pg.locator('.reuse-result a[href$="epithelial-card-errata.md"]').count() >= 1
+        for video in pg.locator(".reuse-video").all():
+            video.evaluate("v => { v.muted = true; return v.play(); }")
+            pg.wait_for_function("v => v.currentTime > 0.1 && !v.error", arg=video.element_handle())
+            video.evaluate("v => v.pause()")
+        for card in cards:
+            for file in card["media"].values():
+                response = pg.request.get(base + file["path"])
+                assert response.ok
+                assert hashlib.sha256(response.body()).hexdigest() == file["sha256"]
+            for file in card["downloads"]:
+                response = pg.request.get(base + file["href"])
+                assert response.ok
+                assert hashlib.sha256(response.body()).hexdigest() == file["sha256"]
+        assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+    assert pg.errors == []

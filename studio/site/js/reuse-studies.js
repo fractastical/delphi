@@ -5,6 +5,24 @@
   const DF = window.DF, { html } = DF, U = DF.ui;
   const cards = (snap, id) => ((snap.reuse_studies || {}).visuals || []).filter((v) => v.study === id);
   const num = (n) => Number.isFinite(n) ? n.toFixed(3) : "unknown";
+  const pct = (n) => Number.isFinite(n) ? (100 * n).toFixed(2) + "%" : "unknown";
+
+  function summary(s) {
+    if (!s) return "";
+    if (typeof s === "string") return html`<p>${s}</p>`;
+    const g = s.gates && s.gates.strict;
+    return html`${s.pair ? html`<div class="tablewrap"><table><caption>Gap closure within the recorded horizon (${s.pair.same})</caption><thead><tr><th>Condition</th><th>Gap fraction closed</th></tr></thead><tbody>
+      <tr><th>Protrusion enabled</th><td>${pct(s.pair.closes.closed_fraction)}</td></tr>
+      <tr><th>Protrusion disabled</th><td>${pct(s.pair.arrests.closed_fraction)}</td></tr>
+      ${s.passive_floor ? html`<tr><th>Separate control: both drives off</th><td>${pct(s.passive_floor.closed_fraction)}</td></tr>` : ""}</tbody></table></div>` : ""}
+      ${s.passive_floor ? html`<p class="small">${s.passive_floor.reading}</p>` : ""}
+      ${g ? html`<p class="small"><b>Reviewed checks:</b> ${g.pass} pass; ${g.fail} fail; ${(g.descriptive || []).join(", ")} descriptive; ${(g.incomplete_or_unevaluable || []).join(", ")} incomplete or unevaluable. The original reported statuses remain in the source history.</p>` : ""}
+      <details><summary>Threshold hypothesis, readout coverage and time limits</summary>
+        ${s.j_scaling ? html`<p class="small"><b>Held-out comparison.</b> Predicted interval (${s.j_scaling.predicted_interval.join(", ")}); observed threshold bracket (${s.j_scaling.observed_bracket.join(", ")}). ${s.j_scaling.scope}.</p>` : ""}
+        ${s.readout_check ? html`<p class="small">${s.readout_check.G1b}</p>` : ""}
+        ${s.gap_size_scaling ? html`<p class="small"><b>Gap-size scaling:</b> ${s.gap_size_scaling}</p>` : ""}
+        ${s.horizon ? html`<p class="small">${s.horizon}</p>` : ""}</details>`;
+  }
 
   function oxygen(snap, id) {
     const f = ((snap.lean_gallery || {}).families || []).find((x) => x.id === "steady-oxygen-bound");
@@ -15,8 +33,8 @@
     const live = p && ((snap.project_drafts || {})[p.draft_key] || {}).live_ref;
     if (!live || ["namespace", "kind", "id", "version"].some((k) => live[k] !== ctx.project_ref[k])) return "";
     return html`<section class="panel" aria-labelledby="rs-rule"><h2 id="rs-rule">A shared design constraint: oxygen transport</h2>
-      <p>${ctx.use}</p><p>${DF.texSpan("aR^2 \\leq 6DC_0 \\quad \\text{(sphere)}, \\qquad aL^2 \\leq 2DC_0 \\quad \\text{(slab)}", true)}</p>
-      <p class="small">Steady diffusion with uniform consumption and a fixed supplied boundary. R is sphere radius; L is the distance from a slab's centre to its supplied face. The bounds keep the model's centre concentration nonnegative.</p>
+      <p>${ctx.use}</p><div class="reuse-equations"><div>${DF.texSpan("aR^2 \\leq 6DC_0 \\quad \\text{(sphere)}", true)}</div><div>${DF.texSpan("aL^2 \\leq 2DC_0 \\quad \\text{(slab)}", true)}</div></div>
+      <p class="small">Steady diffusion with uniform positive consumption (a &gt; 0), D &gt; 0 and a fixed supplied boundary C₀ ≥ 0. R is sphere radius; L is the distance from a slab's centre to its supplied face. The bounds keep the model's centre concentration nonnegative.</p>
       <p class="note small">Project-specific diffusivity D, oxygen consumption a and boundary concentration C₀ are <b>unknown</b>. The proof is conditional mathematics; it does not establish tissue viability.</p>
       <p><a class="btn ghost" href="#/proofs?f=steady-oxygen-bound">Inspect Lean source and mutation checks</a></p>
       ${f.figure_href ? html`<details><summary>See the sphere and slab model</summary><img class="reuse-figure" src="${f.figure_href}" loading="lazy" alt="Idealised sphere and slab oxygen diffusion bounds"></details>` : ""}
@@ -37,7 +55,7 @@
     const files = Object.entries(v.media || {});
     return html`<article class="reuse-result" id="study-result-${v.id}"><h3>${v.title}</h3>
       <p class="small">${U.pill("recorded simulation", "grp")} ${v.evidence_kind}</p>
-      ${v.summary ? html`<p>${v.summary}</p>` : ""}
+      ${summary(v.summary)}
       <div class="reuse-media${v.video_arrest_href ? " reuse-pair" : ""}">
       ${v.video_href ? html`<figure>${v.video_arrest_href ? html`<figcaption>Baseline: protrusion enabled</figcaption>` : ""}<video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_href || ""}" aria-label="${v.title}"><source src="${v.video_href}" type="video/mp4">Your browser cannot play this video. <a href="${v.video_href}">Download the recording</a>.</video></figure>` : ""}
       ${v.video_arrest_href ? html`<figure><figcaption>Control: protrusion disabled</figcaption><video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_arrest_href || ""}" aria-label="Protrusion-disabled control for ${v.title}"><source src="${v.video_arrest_href}" type="video/mp4"><a href="${v.video_arrest_href}">Download the control recording</a>.</video></figure>` : ""}</div>
@@ -62,7 +80,10 @@
     const m = snap.reuse_studies;
     return html`<section class="panel reuse-results" aria-labelledby="rs-results"><h2 id="rs-results">Recorded computational studies</h2>
       <p>These experiments test mechanisms and numerical assumptions relevant to the proposal. Their outcomes and failed controls remain visible; transfer to living tissue is a separate question.</p>
-      ${vs.map(visual)}<p class="small"><a href="${m.manifest_href}">Recording manifest and source hashes</a> · ${U.sha(m.manifest_sha256)}</p></section>`;
+      ${vs.map(visual)}<p class="small"><a href="${m.manifest_href}">Recording manifest and source hashes</a> · ${U.sha(m.manifest_sha256)}</p>
+      ${m.record_links && m.record_links.groups[id] ? html`<h3>Explore the shared frontier</h3><p class="small">Related versioned claims, evidence and open problems. These records remain unreviewed; the recorded mathematics and numerical checks retain their stated scope.</p>
+        <ul class="small">${m.record_links.groups[id].map((r) => html`<li><a href="${DF.href("/entity/" + r.ref.kind + "/" + r.ref.id, {v: r.ref.version, ns: r.ref.namespace})}">${r.title}</a> ${U.pill(r.ref.kind, "grp")}</li>`)}</ul>
+        <p class="small"><a href="${m.record_links.receipt_href}">Exact public readback receipt</a></p>` : ""}</section>`;
   }
   DF.reuseStudies = { cards, render, oxygen };
 })();

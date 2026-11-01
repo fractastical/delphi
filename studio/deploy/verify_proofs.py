@@ -17,6 +17,9 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.client.streamable_http import streamable_http_client
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from frontier.proofs import FAMILY_IDS, MAX_SOURCE_CHARS  # noqa: E402
+
 
 @asynccontextmanager
 async def transport(url):
@@ -43,23 +46,27 @@ async def probe(url, out):
             summary = await session.call_tool("frontier_proofs", {})
             assert not summary.isError
             result = json.loads(summary.content[0].text)
-            assert len(result["families"]) == 3 and result["withheld"] == []
+            assert {f["id"] for f in result["families"]} == set(FAMILY_IDS) and result["withheld"] == []
             assert not result["compile_executed"] and not result["biological_validation"]
             assert all("source" not in f for f in result["families"])
-            full = await session.call_tool("frontier_proofs", {"family": "cantilever-guard", "include_source": True})
-            assert not full.isError
-            source = json.loads(full.content[0].text)["families"][0]["source"]
-            assert len(source["text"]) <= 6000 and not source["truncated"]
-            assert sha256(source["text"].encode()).hexdigest() == source["full_file_sha256"]
+            sources = {}
+            for family in FAMILY_IDS:
+                full = await session.call_tool("frontier_proofs", {"family": family, "include_source": True})
+                assert not full.isError
+                source = json.loads(full.content[0].text)["families"][0]["source"]
+                assert len(source["text"]) <= MAX_SOURCE_CHARS and not source["truncated"]
+                assert sha256(source["text"].encode()).hexdigest() == source["full_file_sha256"]
+                sources[family] = {"characters": len(source["text"]), "sha256": source["full_file_sha256"]}
     receipt = {"schema": "frontier.proofs.probe/1", "checked_at": datetime.now(timezone.utc).isoformat(),
                "transport": "anonymous HTTP" if url else "read-only stdio", "endpoint": url,
                "server": info.serverInfo.model_dump(), "tool_count": len(tools), "tool_schema": tool.inputSchema,
                "principal": None, "authorization_supplied": False, "summary": result,
                "optional_source_characters": len(source["text"]), "optional_source_SHA_matches": True,
+               "optional_sources": sources,
                "writes": 0, "compile_executed": False}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(receipt, indent=2) + "\n")
-    print({"families": 3, "tools": len(tools), "optional_source_SHA_matches": True, "writes": 0, "compile_executed": False})
+    print({"families": len(sources), "tools": len(tools), "optional_source_SHA_matches": True, "writes": 0, "compile_executed": False})
 
 
 if __name__ == "__main__":

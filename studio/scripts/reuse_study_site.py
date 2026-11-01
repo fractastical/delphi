@@ -93,3 +93,64 @@ def build(ins, out: dict, root, manifest_path: str = MANIFEST, expected_sha256: 
         raise ValueError("media exceed the byte bound")
     out.update(staged)
     return {"visuals": cards, "manifest_href": manifest_path, "manifest_sha256": sha256(raw).hexdigest()}
+
+
+def gallery_cards(publication: dict) -> list[dict]:
+    """Project recordings share the simulation gallery without changing their scope."""
+    cards = []
+    for visual in publication["visuals"]:
+        for role in ("video", "video_arrest"):
+            if not visual.get(role + "_href"):
+                continue
+            control = role == "video_arrest"
+            epithelial = visual["study"] == "epithelial-repair"
+            cards.append({
+                "id": visual["id"] + ("-control" if control else ""),
+                "title": visual["title"] + (" — protrusion-disabled control" if control else ""),
+                "scales": ["cellular", "tissue"] if epithelial else ["organism"],
+                "evidence_kind": visual["evidence_kind"],
+                "model": {"name": (visual.get("engine_benchmark") or {}).get("engine", visual["labels"]["kind"]), "context": visual["labels"]["kind"]},
+                "time": {"units": "model units" if epithelial else "s", "note": visual["labels"]["time"]},
+                "video_state": "present_verified", "video_href": visual[role + "_href"],
+                "poster_href": visual.get("poster_arrest_href" if control else "poster_href"),
+                "video": {"sha256": visual["media"][role]["sha256"], "note": "Recorded model states; see the project's paired controls and review qualifications."},
+                "numerical_checks": visual["records_kept"],
+                "parameter_unknowns": ["Biological calibration and transfer to the proposed design are not established."],
+                "open_questions": ["Which measured biological context would support this model's assumptions?"],
+                "limitations": visual["caveats"], "couplings": [], "equations": [],
+                "sources": [{"label": "Recording manifest and exact source hashes", "href": publication["manifest_href"], "locator": publication["manifest_sha256"]}],
+                "reports": visual.get("downloads", []), "manifest_href": publication["manifest_href"],
+                "project_href": "#/studio/" + visual["study"],
+            })
+    return cards
+
+
+def record_links(ins, out: dict) -> dict:
+    """Expose exact imported records only when the anonymous readback matches."""
+    base = "projects/reuse-studies/study-records/"
+    raw = ins.read(base + "records.json")
+    records = json.loads(raw)
+    readback_raw = ins.read(base + "import/public-readback.json")
+    receipt = json.loads(readback_raw)
+    if receipt["records_sha256"] != sha256(raw).hexdigest():
+        raise ValueError("study records changed since public readback")
+    checked = {r["ref"]["version"]: r for r in receipt["records"]}
+    if not records or len(checked) != len(records):
+        raise ValueError("study readback cardinality mismatch")
+    for r in records:
+        entry = checked.get(r["version"], {})
+        if entry.get("record") != r or entry.get("status") != "imported_unreviewed" or entry.get("is_head") is not True:
+            raise ValueError("study public readback does not match exact unreviewed record")
+    by_ref = {r["version"]: r for r in records}
+    common = [r for r in records if r["kind"] == "Claim" and r["id"].startswith("claim:oxygen-")]
+    groups = {}
+    for attachment in ins.json(base + "project-attachments.json"):
+        chosen = common + [by_ref[m["ref"]["version"]] for m in attachment["proposed_members"]]
+        groups[attachment["project"]["id"].removeprefix("project-")] = [
+            {"ref": {k: r[k] for k in ("namespace", "kind", "id", "version")},
+             "title": r["payload"].get("title", r["id"]), "status": "imported_unreviewed"}
+            for r in chosen]
+    href = "artifacts/reuse-study-visuals/record-readback.json"
+    out["@" + href] = readback_raw
+    return {"groups": groups, "count": len(records), "observed_at": receipt["observed_at"], "receipt_href": href,
+            "scope": "Related records, not an applied Project membership update; status at the recorded readback."}

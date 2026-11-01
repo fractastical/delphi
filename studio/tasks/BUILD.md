@@ -1,11 +1,46 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 11:34pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 11:56pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 11:34pm PDT
+## Current checkpoint — October 31, 2026, 11:56pm PDT
+
+- [x] Two secondary projects preserve the Flying Fish flagship. Existing public
+  release `33bc598` has their exact stored Project proposals. The next release
+  is being checked with actual voxel and paired epithelial recordings, source
+  downloads, contextual oxygen proofs and current genotype evidence.
+- [x] Imported and anonymously read back 12 exact records: 3 contextual Claims,
+  7 source/formal/numerical Evidence records and 2 open Problems. All remain
+  imported_unreviewed; zero forks; Project member updates were not applied.
+  Receipts: `projects/reuse-studies/study-records/import/`.
+- [x] Four fixed Lean families are current in the generated gallery/MCP. Oxygen
+  contributes 2 parametric equivalences and 4 boundary/limit identities, with
+  4 rejected controls for 2 wrong coefficients. It does not prove a PDE model's
+  biological applicability; formal use has D>0, a>0 and C0>=0.
+- [x] Independent reviews `130b3f4`, `6298621`, `ff76b7f` preserve scope and
+  failures. Epithelial 36-run / 1,476-frame audit yields 7 pass, 3 fail, G6 descriptive,
+  G1b incomplete,G8 unevaluable. Matching 756 frames agree; unpaired 720 frames
+  provide no agreement evidence. The 22.04% control is condition-specific.
+- [x] Genotype's missing manifest download fixed at `b74b9f0`; 13 finite files
+  now expose exact bytes. Reviewer reported 172 checks without findings on its
+  scratch snapshot; public-host verification remains part of this release.
+- [x] Root found and fixed mobile overflow in the new oxygen equations; both
+  study pages now pass desktop/mobile playback, hashes and rendered-math checks.
+- [ ] Finish exact-commit release checks, public read/playback/MCP verification,
+  and the additive private backup at this new database/source cutoff.
+- [ ] Google has 28/32 allocated vCPU at the 11:45pm snapshot. VLM extended
+  diagnostic returned 372 solves; owner audit pending. Epithelial 240-arm sweep
+  is active. Nebius one-H100 compatibility job is IMAGE_PULLING at11:54pm;
+  8.45GiB image and prior14.5–15.6min starts explain plausible delay, but no
+  kernel/device utilization has been observed. Infra owns dispatch/collection.
+
+- [x] Infrastructure reports the H100 probe reached CPU compilation and failed
+  after 39.1 seconds. Forty telemetry samples recorded zero GPU utilization;
+  no simulation cases ran. Exact logs are retained for the owner audit.
+
+## Previous checkpoint — October 31, 2026, 11:34pm PDT
 
 - [x] Release `33bc598` is live: two exact-version, unreviewed Project records
   and source-specific pages for tissue microcarrier and epithelial repair.

@@ -840,6 +840,18 @@ def fidelity_cards(ins: Inputs, out: dict) -> list[dict]:
     return module.build(ins, out, root=ROOT)
 
 
+def reuse_study_surface(ins: Inputs, out: dict) -> dict:
+    module_path = "scripts/reuse_study_site.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_reuse_study_site", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    result = module.build(ins, out, root=ROOT)
+    result["gallery_cards"] = module.gallery_cards(result)
+    result["record_links"] = module.record_links(ins, out)
+    return result
+
+
 def _demo_manifest(ins: Inputs, out: dict, directory: str, expected_cuts: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
     manifest_path = f"{directory}/manifest.json"
@@ -1808,11 +1820,13 @@ def build() -> dict[str, bytes]:
     extra: dict = {}
     proofs = lean_proofs(ins, extra)
     genotype = genotype_surface(ins, extra)
+    reuse_studies = reuse_study_surface(ins, extra)
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
     manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + fidelity_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
+    manifests += reuse_studies["gallery_cards"]
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     correction_path = "results/coordination/review-corrections.json"
@@ -1866,6 +1880,7 @@ def build() -> dict[str, bytes]:
         "lean_receipt": lean_receipt,
         "lean_gallery": proofs,
         "genotype": genotype,
+        "reuse_studies": reuse_studies,
         "simulation": simulation,
         "attestation_check": attestation,
         "simulation_manifests": manifests,
@@ -1910,7 +1925,7 @@ def build() -> dict[str, bytes]:
 
 
 def generated_artifact_families() -> list[str]:
-    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "genotype", "observed-allometry", *(path.name for path in print_families())]
+    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "genotype", "reuse-study-visuals", "voxel-actuation", "epithelial", "coordination", "observed-allometry", *(path.name for path in print_families())]
 
 
 def write(out: dict[str, bytes]) -> None:

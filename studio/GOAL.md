@@ -58,7 +58,7 @@ about a proposed action.
 
 ## Delivery checklist
 
-- [ ] Add two bounded reuse studies, tissue microcarrier and epithelial repair,
+- [x] Add two bounded reuse studies, tissue microcarrier and epithelial repair,
   preserving Flying Fish as the flagship. Give each exact source/model context,
   shared-frontier questions, a bounded computation and a validation plan; measure
   reuse separately from biological transfer (SPEC-007 and SPEC-017).
