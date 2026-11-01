@@ -1435,7 +1435,7 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     H = snap["fish_history"]
     # every edge is backed by the manifest field it names: re-read the manifests, do not trust the snapshot
     p2 = json.loads((ROOT / "artifacts/print-v2/manifest.json").read_text())["edition"]["supersedes"]
-    rev = {(e["from"], e["to"]) for e in H["edges"] if e["relation"] == "revision"}
+    rev = {(e["from"], e["to"]) for e in H["edges"] if e["relation"] == "revision" and not e["from"].startswith("glider-")}
     assert rev == set(p2.items()) and len(rev) == 6
     v3 = json.loads((ROOT / "artifacts/fish3d/v3-index.json").read_text())
     for vid in v3["candidates"]:
@@ -1444,13 +1444,23 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     props = json.loads((ROOT / "artifacts/print-v3/downloads.json").read_text())["forms"]
     for f in props:
         assert any(e["from"] == f["id"] and e["to"] == f["source_candidate"] and e["relation"] == "printed from" for e in H["edges"])
-    assert H["launch_prototype"]["exists"] is False
+    assert H["launch_prototype"]["exists"] is True and len(H["launch_prototype"]["revisions"]) == 5
+    gl = {m["id"]: json.loads((ROOT / f"artifacts/glider/{m['id']}/manifest.json").read_text()) for m in []}
+    import pathlib
+    man = {d.name: json.loads((d / "manifest.json").read_text()) for d in (ROOT / "artifacts/glider").iterdir() if (d / "manifest.json").exists()}
+    for rid, m in man.items():
+        edge = [e for e in H["edges"] if e["from"] == "glider-" + rid and e["relation"] == "revision"]
+        assert (not m["parent_revision"] and not edge) or (len(edge) == 1 and edge[0]["to"] == "glider-" + m["parent_revision"]), rid
+    known = json.loads((ROOT / "artifacts/glider/KNOWN_DEFECTS.json").read_text())
+    bad = set(known["right_hand_print_files_are_left_parts"]["revisions"])
+    flagged = {n["revision"] for n in H["nodes"] if n.get("known_defect")}
+    assert flagged == bad and "r4-daane-printfix" not in flagged
     pg = page(browser)
     pg.goto(base + "#/history"); pg.wait_for_selector("#fhgraph svg")
     t = pg.locator("#main").text_content()
-    assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "No launch-prototype artifact is in the tree" in t
+    assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "Launch glider print sets exist as manifests" in t and "untested" in t
     assert "not the date the design was made" in t or "not a design date" in t or "a repository fact" in t
-    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 18
+    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 23
     pg.goto(base + "#/history?sel=fish3d-v3a-fan-prop"); pg.wait_for_selector("#fhdetail h3")
     d = pg.locator("#fhdetail").text_content()
     assert "fish3d-v3a-fan-prop" in d and "printed from" in d and "fish3d-v3a-fan" in d and "artifacts/print-v3/downloads.json" in d
