@@ -2162,6 +2162,8 @@ def test_tables_keep_badges_on_one_line_stack_on_phones_and_say_when_they_scroll
             assert pg.evaluate("getComputedStyle(document.querySelector('table.matrix tbody tr > :first-child')).position") == "sticky" and pg.locator("table.matrix").evaluate("t => t.closest('.tablewrap').previousElementSibling.classList.contains('tablehint')")
             pg.goto(base + "#/frontier"); pg.wait_for_selector("#main table")
             assert pg.evaluate("[...document.querySelectorAll('#main .tablewrap')].every(w => w.scrollWidth <= w.clientWidth + 1)"), "no Frontier table hides a column on desktop"
+            split = pg.evaluate((pathlib.Path(__file__).parent / "_wordsplit.js").read_text())
+            assert split == [], ("plain words are split across lines in a table cell", split)
         pg.close()
 
 
