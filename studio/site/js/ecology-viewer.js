@@ -26,7 +26,8 @@ export const SCHEMA = "frontier.ecology.trajectory/1";
 const FISH_COLOR = [0x4f7fb0, 0x6a9a4a, 0xc08a3a, 0x8a6ab0, 0x3aa0a0, 0xb05a6a, 0x7a7a7a, 0x4a4ab0];
 const LOOK = { eye: 0x1c2630, fin: 0xdbe4ea };
 const DISCLOSURE = "Quasi-steady per-fin forces from the v3a VLM polar plus an assumed drag closure, integrated by MuJoCo; not CFD, not a validated flying fish. " +
-  "Assumed mass, centre of gravity, inertia, drag and control. A saved state with force_model_valid false is a domain exit or numerical failure, not physics.";
+  "Assumed mass, centre of gravity, inertia, drag and control. A saved state with force_model_valid false is a domain exit or numerical failure, not physics. " +
+  "Drawing: the decorative scales mesh is omitted for speed, and fins are rigid meshes rotated about their hinges (no fin bending, no rays moving).";
 const FORCE_KEYS = ["fluid_force_world_N", "force_world_N", "torque_world_Nm"];
 // fields shown first, in this order; anything else the file carries is listed after them, verbatim
 const FIELD_ORDER = ["position_m", "orientation_wxyz", "linear_velocity_m_s", "angular_velocity_body_rad_s", "fin_angle_rad", "fin_command_rad",

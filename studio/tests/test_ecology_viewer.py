@@ -238,6 +238,7 @@ def test_loads_saved_states_with_counts_from_the_file_and_fixed_labels(page, ser
     assert st["mode"] == "ready" and st["frames"] == 121 and st["fish"] == ["fish-00", "fish-01", "fish-02"], st
     assert "from the file: 121 saved states, 3 fish, 1.200 s" in page.locator(".ev-receipt").inner_text()
     assert page.locator(".ev-badge", has_text="ACTUAL SAVED STATES").count() == 1
+    assert "scales mesh is omitted for speed" in page.locator(".ev-disclosure").inner_text() and "rigid meshes rotated about their hinges" in page.locator(".ev-disclosure").inner_text()
     assert "not CFD" in page.locator(".ev-disclosure").inner_text() and "not a validated flying fish" in page.locator(".ev-disclosure").inner_text()
     assert "Showing saved states only" in page.locator(".ev-mode").inner_text()
     assert st["omitted"] == ["scales"] and "scales" not in str(st["meshComponents"])
