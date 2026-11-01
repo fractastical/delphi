@@ -38,11 +38,13 @@ MARK = {4: "o", 7: "s"}
 
 def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
     T = THEME[mode]
-    cells = []
+    # "groups" = parameter/seed combinations (gap, J, seed). Deliberately not "cells": in this
+    # card a cell is an epithelial cell, and the grid sense would read as the biological one.
+    groups = []
     for key, v in audit["brackets"].items():
         m = KEY.match(key)
-        cells.append(dict(k=int(m["k"]), s=int(m["s"]), J=float(m["J"]), **v))
-    gaps = sorted({c["k"] for c in cells})
+        groups.append(dict(k=int(m["k"]), s=int(m["s"]), J=float(m["J"]), **v))
+    gaps = sorted({c["k"] for c in groups})
 
     fig, ax = plt.subplots(1, 2, figsize=(12.4, 5.4), dpi=160, facecolor=T["surface"])
     for a in ax:
@@ -60,7 +62,7 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
     # ---- left: lambda_V brackets, against the predicted proportionality -------------------
     for k in gaps:
         c = T["series"][k]
-        sel = [x for x in cells if x["k"] == k]
+        sel = [x for x in groups if x["k"] == k]
         for x in sel:
             off = 1.0 + 0.055 * (x["s"] - 2)                 # seeds nudged apart, not stacked
             ax[0].plot([x["J"] * off] * 2, [x["lo"], x["hi"]], color=c, lw=2.0,
@@ -75,7 +77,7 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
         ax[0].annotate(f"gap k={k}", (Js[-1], max(x["hi"] for x in sel if x["J"] == Js[-1])),
                        textcoords="offset points", xytext=(9, -2), color=c, fontsize=10,
                        fontweight="bold", va="center")
-    lo0 = min(x["lo"] for x in cells) ; hi0 = max(x["hi"] for x in cells)
+    lo0 = min(x["lo"] for x in groups) ; hi0 = max(x["hi"] for x in groups)
     ax[0].set_ylim(lo0 / 1.6, hi0 * 9.0)          # headroom for the note, never over a mark
     ax[0].set_ylabel("closure threshold bracket in $\\lambda_V$", color=T["ink2"], fontsize=10)
     ax[0].set_title("Measured brackets vs the predicted proportionality",
@@ -87,7 +89,7 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
     # ---- right: ratio intervals against a band of the frozen tolerance -------------------
     for k in gaps:
         c = T["series"][k]
-        sel = [x for x in cells if x["k"] == k]
+        sel = [x for x in groups if x["k"] == k]
         for x in sel:
             off = 1.0 + 0.055 * (x["s"] - 2)
             lo, hi = x["ratio_interval"]
@@ -103,7 +105,7 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
                        f"{g['min_feasible_spread']:.0f}×   (tolerance {tol:.0f}×)",
                        (0.015, 0.955 - 0.062 * (gaps.index(k) + 1)), xycoords="axes fraction",
                        color=c, fontsize=9.5, fontweight="bold", va="top")
-    lo1 = min(x["ratio_interval"][0] for x in cells) ; hi1 = max(x["ratio_interval"][1] for x in cells)
+    lo1 = min(x["ratio_interval"][0] for x in groups) ; hi1 = max(x["ratio_interval"][1] for x in groups)
     ax[1].set_ylim(lo1 / 1.6, hi1 * 9.0)
     ax[1].set_ylabel("$\\lambda^*/J$  (the quantity the rule says is constant)",
                      color=T["ink2"], fontsize=10)
@@ -114,7 +116,7 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
                    va="top")
 
     handles = [Line2D([], [], color=T["series"][k], marker=MARK[k], lw=2.0, ms=5.5,
-                      label=f"gap k={k}  ({'2 124' if k == 4 else '3 717'} µm², 30 arms)")
+                      label=f"gap k={k}   (120 runs, 15 threshold brackets)")
                for k in gaps]
     handles.append(Line2D([], [], color=T["ink2"], ls=(0, (5, 3)), lw=1.8,
                           label="predicted $\\lambda^* \\propto J$ (drawn per gap, in that gap's colour)"))
@@ -126,8 +128,9 @@ def draw(audit: dict, mode: str, out_png: Path, out_svg: Path) -> None:
     fig.suptitle("Epithelial gap closure: measured threshold brackets over a ×16 range in J",
                  color=T["ink"], fontsize=13, x=0.012, ha="left", y=0.975)
     fig.text(0.012, 0.925,
-             "240 frozen CPM arms, 30 bracketed cells (2 gaps × 5 J × 3 seeds). Bars are the measured "
-             "brackets, not point estimates.\nClosure is defined by StopTime 1000; the long-horizon "
+             "240 frozen CPM runs; 30 threshold brackets over parameter/seed groups "
+             "(2 gaps × 5 J × 3 seeds), 120 runs and 15 brackets per gap.\nBars are the measured "
+             "brackets, not point estimates. Closure is defined by StopTime 1000; the long-horizon "
              "threshold is unknown. Model units throughout — no biological calibration.",
              color=T["ink2"], fontsize=9, ha="left", va="top", linespacing=1.5)
     fig.tight_layout(rect=[0, 0.055, 1, 0.855])

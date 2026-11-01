@@ -187,8 +187,14 @@ def main() -> None:
                                       declared=completeness["declared_arms"])),
         provenance=dict(**prov, binary_sha256=receipt["sha256"],
                         binary_matches_pin=receipt["sha256"] == BINARY_PIN,
-                        spatial_states_present=prov["tiff_files"] > 0,
-                        movie_renderable=prov["tiff_files"] > 0),
+                        lattice_frames_present=prov["tiff_files"] > 0,
+                        tissue_shape_movie_renderable=prov["tiff_files"] > 0,
+                        logger_carries_cell_centres_and_volumes=True,
+                        spatial_information_note="the loggers carry per-cell centre coordinates "
+                                                 "and volumes. What is absent is the lattice "
+                                                 "frames that define cell shapes and the wound "
+                                                 "boundary, so no tissue-shape movie can be made "
+                                                 "from this return."),
         interval_audit=per_gap,
         horizon_audit=dict(
             unit="per arm. Seed means appear only as an explicitly labelled companion field.",
