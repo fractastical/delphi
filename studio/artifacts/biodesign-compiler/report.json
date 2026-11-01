@@ -1,0 +1,693 @@
+{
+ "change_impact_example": {
+  "changed_layers": [
+   "genetic_blueprint"
+  ],
+  "hypothetical": "genetic_blueprint pin altered in memory only",
+  "invalidated_stages": [
+   "structural_refs",
+   "empirical",
+   "implementation"
+  ],
+  "kept_stages": [
+   "units_context",
+   "model_domain",
+   "numerical"
+  ],
+  "unchanged_inputs_reuse": {
+   "second_compile_reused_stages": [
+    "structural_refs",
+    "units_context",
+    "model_domain",
+    "numerical",
+    "empirical",
+    "implementation"
+   ]
+  }
+ },
+ "comparison": {
+  "matched_conditions": "alpha 4 deg, rho=1 |V|=1, horseshoe VLM, 48x16 lattice, isolated paired fins",
+  "note": "no feasibility score is given; an unconverged variant's CL is listed but flagged unusable",
+  "rows": [
+   {
+    "CL_paired_fins_alpha4_S_lattice": 0.24773443150327662,
+    "aero_status": "lattice 48x16; at 72x24 the CL change and pectoral/pelvic qu",
+    "assembly": "fish3d-v3a",
+    "refinement_CL_rel_change": 0.005141148714082444,
+    "usable_for_comparison": true
+   },
+   {
+    "CL_paired_fins_alpha4_S_lattice": 0.24568598974192488,
+    "aero_status": "NOT CONVERGED: do not use the lift or the per-quad dCp",
+    "assembly": "fish3d-v3b",
+    "refinement_CL_rel_change": 0.26047199382706365,
+    "usable_for_comparison": false
+   },
+   {
+    "CL_paired_fins_alpha4_S_lattice": 0.251094508546168,
+    "aero_status": "lattice 48x16; at 72x24 the CL change and pectoral/pelvic qu",
+    "assembly": "fish3d-v3c",
+    "refinement_CL_rel_change": 0.029282219448352964,
+    "usable_for_comparison": true
+   }
+  ]
+ },
+ "compiled": [
+  {
+   "assembly": "fish3d-v3a",
+   "assembly_sha256": "44f599a115a60f87b1ad21032b0f27a7def540983aa71386ad7b9d76c7533ed3",
+   "axes": {
+    "empirical": {
+     "calibrations_registered": [],
+     "reading": "no calibration is registered; behavior manifest: unknown; no measured trajectory/circuit or force calibration",
+     "status": "unresolved"
+    },
+    "implementation": {
+     "cell_program_binding_validation": {
+      "bp-1-regeneration-enhancer-reporter": "unknown",
+      "bp-2-development-versus-regeneration-contrast": "unknown",
+      "bp-3-endogenous-locus-knock-in": "unknown",
+      "bp-4-bac-carried-locus-reporter": "unknown"
+     },
+     "expression_kinetics": {
+      "bp-1-regeneration-enhancer-reporter": "UNKNOWN",
+      "bp-2-development-versus-regeneration-contrast": "UNKNOWN",
+      "bp-3-endogenous-locus-knock-in": "UNKNOWN",
+      "bp-4-bac-carried-locus-reporter": "UNKNOWN"
+     },
+     "reading": "proposals only; LEN coordinates and sequence null; no genome implied",
+     "status": "unresolved"
+    },
+    "model_domain": {
+     "model": "horseshoe VLM, zero-thickness isolated paired fins, no body; rays/membrane/thickness not resolved",
+     "reading": "lattice 48x16; at 72x24 the CL change and pectoral/pelvic quad dCp RMS change are in refinement (measured, no frozen threshold)",
+     "status": "unassessed"
+    },
+    "numerical": {
+     "CL_rel_change_48x16_to_72x24": 0.005141148714082444,
+     "frozen_threshold": null,
+     "pectoral_dCp_rms_change": 0.05113022550470738,
+     "status": "measured, no frozen threshold: not called converged"
+    },
+    "structural_refs": {
+     "failures": [],
+     "pinned_ok": [
+      "genetic_blueprint",
+      "cell_program",
+      "tissue_model",
+      "behavior",
+      "geometry",
+      "aero",
+      "geometry_panels",
+      "geometry_components"
+     ],
+     "status": "pass"
+    },
+    "units_context": {
+     "counts": {
+      "SCENARIO (assumption-level)": 5,
+      "composable": 4,
+      "refused": 4
+     },
+     "note": "the registry models are the flying-fish constraint/glide/fin-beam/Notch models, not these fish3d variants; geometry and aero artifacts are not typed ports there, so no variant-specific unit result exists",
+     "refused": [
+      {
+       "coupling": "c05_notch_to_fin_stiffness",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c06_notch_to_fin_stiffness_assumed",
+       "failed_checks": {
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c07_rd_wavelength_to_wing_span",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c08_fin_deflection_to_glide_speed",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale organ -> organism; regime 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      }
+     ],
+     "status": "mixed"
+    }
+   },
+   "no_single_badge": "axes are reported separately; an unresolved bridge is not a violated constraint and neither is hidden by a render",
+   "reused_from_cache": [],
+   "unresolved_bridges": [
+    {
+     "bridge": "expression->growth",
+     "reason": "no expression-to-growth model or mapping is registered; blueprint expression_kinetics are UNKNOWN",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "growth->EI",
+     "coupling_id": "c05_notch_to_fin_stiffness",
+     "coupling_label": "refused",
+     "reason": "no growth-to-flexural-rigidity mapping; the nearest registered coupling is refused",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "blueprint->cell_program",
+     "reason": "cell_program_binding validation_status is unknown in every design",
+     "status": "unresolved"
+    }
+   ]
+  },
+  {
+   "assembly": "fish3d-v3b",
+   "assembly_sha256": "82ff2ee9c829b9d444b90b9522626a14fa4ed832defd3bab8e387eb88c890a07",
+   "axes": {
+    "empirical": {
+     "calibrations_registered": [],
+     "reading": "no calibration is registered; behavior manifest: unknown; no measured trajectory/circuit or force calibration",
+     "status": "unresolved"
+    },
+    "implementation": {
+     "cell_program_binding_validation": {
+      "bp-1-regeneration-enhancer-reporter": "unknown",
+      "bp-2-development-versus-regeneration-contrast": "unknown",
+      "bp-3-endogenous-locus-knock-in": "unknown",
+      "bp-4-bac-carried-locus-reporter": "unknown"
+     },
+     "expression_kinetics": {
+      "bp-1-regeneration-enhancer-reporter": "UNKNOWN",
+      "bp-2-development-versus-regeneration-contrast": "UNKNOWN",
+      "bp-3-endogenous-locus-knock-in": "UNKNOWN",
+      "bp-4-bac-carried-locus-reporter": "UNKNOWN"
+     },
+     "reading": "proposals only; LEN coordinates and sequence null; no genome implied",
+     "status": "unresolved"
+    },
+    "model_domain": {
+     "model": "horseshoe VLM, zero-thickness isolated paired fins, no body; rays/membrane/thickness not resolved",
+     "reading": "NOT CONVERGED: do not use the lift or the per-quad dCp",
+     "status": "fail"
+    },
+    "numerical": {
+     "CL_rel_change_48x16_to_72x24": 0.26047199382706365,
+     "frozen_threshold": null,
+     "pectoral_dCp_rms_change": 0.3073911831596092,
+     "reason": "NOT CONVERGED: do not use the lift or the per-quad dCp",
+     "status": "fail (retained)"
+    },
+    "structural_refs": {
+     "failures": [],
+     "pinned_ok": [
+      "genetic_blueprint",
+      "cell_program",
+      "tissue_model",
+      "behavior",
+      "geometry",
+      "aero",
+      "geometry_panels",
+      "geometry_components"
+     ],
+     "status": "pass"
+    },
+    "units_context": {
+     "counts": {
+      "SCENARIO (assumption-level)": 5,
+      "composable": 4,
+      "refused": 4
+     },
+     "note": "the registry models are the flying-fish constraint/glide/fin-beam/Notch models, not these fish3d variants; geometry and aero artifacts are not typed ports there, so no variant-specific unit result exists",
+     "refused": [
+      {
+       "coupling": "c05_notch_to_fin_stiffness",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c06_notch_to_fin_stiffness_assumed",
+       "failed_checks": {
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c07_rd_wavelength_to_wing_span",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c08_fin_deflection_to_glide_speed",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale organ -> organism; regime 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      }
+     ],
+     "status": "mixed"
+    }
+   },
+   "no_single_badge": "axes are reported separately; an unresolved bridge is not a violated constraint and neither is hidden by a render",
+   "reused_from_cache": [],
+   "unresolved_bridges": [
+    {
+     "bridge": "expression->growth",
+     "reason": "no expression-to-growth model or mapping is registered; blueprint expression_kinetics are UNKNOWN",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "growth->EI",
+     "coupling_id": "c05_notch_to_fin_stiffness",
+     "coupling_label": "refused",
+     "reason": "no growth-to-flexural-rigidity mapping; the nearest registered coupling is refused",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "blueprint->cell_program",
+     "reason": "cell_program_binding validation_status is unknown in every design",
+     "status": "unresolved"
+    }
+   ]
+  },
+  {
+   "assembly": "fish3d-v3c",
+   "assembly_sha256": "f09157b8a865f5d7bec5d61063f3c115dfabb4dc5630fb7412ad0bc9f299adcd",
+   "axes": {
+    "empirical": {
+     "calibrations_registered": [],
+     "reading": "no calibration is registered; behavior manifest: unknown; no measured trajectory/circuit or force calibration",
+     "status": "unresolved"
+    },
+    "implementation": {
+     "cell_program_binding_validation": {
+      "bp-1-regeneration-enhancer-reporter": "unknown",
+      "bp-2-development-versus-regeneration-contrast": "unknown",
+      "bp-3-endogenous-locus-knock-in": "unknown",
+      "bp-4-bac-carried-locus-reporter": "unknown"
+     },
+     "expression_kinetics": {
+      "bp-1-regeneration-enhancer-reporter": "UNKNOWN",
+      "bp-2-development-versus-regeneration-contrast": "UNKNOWN",
+      "bp-3-endogenous-locus-knock-in": "UNKNOWN",
+      "bp-4-bac-carried-locus-reporter": "UNKNOWN"
+     },
+     "reading": "proposals only; LEN coordinates and sequence null; no genome implied",
+     "status": "unresolved"
+    },
+    "model_domain": {
+     "model": "horseshoe VLM, zero-thickness isolated paired fins, no body; rays/membrane/thickness not resolved",
+     "reading": "lattice 48x16; at 72x24 the CL change and pectoral/pelvic quad dCp RMS change are in refinement (measured, no frozen threshold)",
+     "status": "unassessed"
+    },
+    "numerical": {
+     "CL_rel_change_48x16_to_72x24": 0.029282219448352964,
+     "frozen_threshold": null,
+     "pectoral_dCp_rms_change": 0.08317530713316916,
+     "status": "measured, no frozen threshold: not called converged"
+    },
+    "structural_refs": {
+     "failures": [],
+     "pinned_ok": [
+      "genetic_blueprint",
+      "cell_program",
+      "tissue_model",
+      "behavior",
+      "geometry",
+      "aero",
+      "geometry_panels",
+      "geometry_components"
+     ],
+     "status": "pass"
+    },
+    "units_context": {
+     "counts": {
+      "SCENARIO (assumption-level)": 5,
+      "composable": 4,
+      "refused": 4
+     },
+     "note": "the registry models are the flying-fish constraint/glide/fin-beam/Notch models, not these fish3d variants; geometry and aero artifacts are not typed ports there, so no variant-specific unit result exists",
+     "refused": [
+      {
+       "coupling": "c05_notch_to_fin_stiffness",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c06_notch_to_fin_stiffness_assumed",
+       "failed_checks": {
+        "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c07_rd_wavelength_to_wing_span",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      },
+      {
+       "coupling": "c08_fin_deflection_to_glide_speed",
+       "failed_checks": {
+        "mapping": "fail",
+        "scope": "fail: scale organ -> organism; regime 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+       },
+       "label": "refused"
+      }
+     ],
+     "status": "mixed"
+    }
+   },
+   "no_single_badge": "axes are reported separately; an unresolved bridge is not a violated constraint and neither is hidden by a render",
+   "reused_from_cache": [],
+   "unresolved_bridges": [
+    {
+     "bridge": "expression->growth",
+     "reason": "no expression-to-growth model or mapping is registered; blueprint expression_kinetics are UNKNOWN",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "growth->EI",
+     "coupling_id": "c05_notch_to_fin_stiffness",
+     "coupling_label": "refused",
+     "reason": "no growth-to-flexural-rigidity mapping; the nearest registered coupling is refused",
+     "status": "unresolved"
+    },
+    {
+     "bridge": "blueprint->cell_program",
+     "reason": "cell_program_binding validation_status is unknown in every design",
+     "status": "unresolved"
+    }
+   ]
+  }
+ ],
+ "contract": {
+  "axes": [
+   "structural_refs",
+   "units_context",
+   "model_domain",
+   "numerical",
+   "empirical",
+   "implementation"
+  ],
+  "consumers": [
+   "gallery",
+   "history",
+   "experimentation"
+  ],
+  "files": {
+   "assemblies/<id>.json": "frontier.biodesign.assembly/1",
+   "report.json": "frontier.biodesign.report/1"
+  },
+  "must_display": [
+   "axes separately, never one badge",
+   "unresolved_bridges beside every variant",
+   "the retained v3b convergence failure"
+  ],
+  "must_not_say": [
+   "a whole genome was designed",
+   "a variant is biologically valid",
+   "an unresolved bridge is a violated constraint"
+  ],
+  "schema": "frontier.biodesign.contract/1"
+ },
+ "controls": {
+  "broken_hash": {
+   "expected": "fail",
+   "got": "fail",
+   "reason": [
+    {
+     "layer": "geometry",
+     "path": "artifacts/fish3d/fish3d-v3a-fan/candidate.json",
+     "reason": "sha256 changed: pinned 000000000000, found e8c2b666874a"
+    }
+   ]
+  },
+  "broken_unit": {
+   "expected": "refused",
+   "got": "refused",
+   "label": "refused: missing or inconsistent bridge; nothing was composed",
+   "reason": [
+    "dimension mismatch: Pa -> N/m not consistent with the mapping",
+    "dimension: fail"
+   ]
+  }
+ },
+ "git_note": "inputs are the pinned files at this commit",
+ "layer_revision_diff": [
+  {
+   "a": "fish3d-v3a",
+   "b": "fish3d-v3b",
+   "changed_layers": [
+    "aero",
+    "geometry",
+    "geometry_components",
+    "geometry_panels"
+   ],
+   "geometry_knob_changes": [
+    {
+     "fish3d-v3a": "fish3d-v3a-fan",
+     "fish3d-v3b": "fish3d-v3b-glide-pose",
+     "path": "id"
+    },
+    {
+     "fish3d-v3a": 0.0,
+     "fish3d-v3b": 0.06,
+     "path": "knobs.pectoral_camber.value"
+    },
+    {
+     "fish3d-v3a": 7.0,
+     "fish3d-v3b": 12.0,
+     "path": "knobs.pectoral_dihedral_deg.value"
+    },
+    {
+     "fish3d-v3a": 8.0,
+     "fish3d-v3b": 16.0,
+     "path": "knobs.pectoral_lead_angle_deg.value"
+    },
+    {
+     "fish3d-v3a": 0.0,
+     "fish3d-v3b": 0.04,
+     "path": "knobs.pelvic_camber.value"
+    },
+    {
+     "fish3d-v3a": 4.0,
+     "fish3d-v3b": 8.0,
+     "path": "knobs.pelvic_dihedral_deg.value"
+    },
+    {
+     "fish3d-v3a": 22.0,
+     "fish3d-v3b": 30.0,
+     "path": "knobs.pelvic_lead_angle_deg.value"
+    },
+    {
+     "fish3d-v3a": "v3a: ray-fan fins, Fish 1990 lengths and areas, flat spread",
+     "fish3d-v3b": "v3b: same fins as v3a, posed: more sweep and dihedral, cambered",
+     "path": "title"
+    },
+    {
+     "fish3d-v3a": "a-fan",
+     "fish3d-v3b": "b-glide-pose",
+     "path": "variant"
+    }
+   ],
+   "invalidated_stages": [
+    "structural_refs",
+    "units_context",
+    "model_domain",
+    "numerical"
+   ],
+   "kept_stages": [
+    "empirical",
+    "implementation"
+   ]
+  },
+  {
+   "a": "fish3d-v3a",
+   "b": "fish3d-v3c",
+   "changed_layers": [
+    "aero",
+    "geometry",
+    "geometry_components",
+    "geometry_panels"
+   ],
+   "geometry_knob_changes": [
+    {
+     "fish3d-v3a": "fish3d-v3a-fan",
+     "fish3d-v3c": "fish3d-v3c-daane-length",
+     "path": "id"
+    },
+    {
+     "fish3d-v3a": "fish1990",
+     "fish3d-v3c": "daane2021",
+     "path": "knobs.pectoral_length_source.value"
+    },
+    {
+     "fish3d-v3a": 0.55,
+     "fish3d-v3c": 0.48,
+     "path": "knobs.pelvic_x_over_sl.value"
+    },
+    {
+     "fish3d-v3a": "Fish 1990 span fit: (b - body width at fin) / 2 (N1)",
+     "fish3d-v3c": "median of n=12 specimens, range 0.600-0.750; recomputed from raw lengths",
+     "path": "pectoral_length_m.note"
+    },
+    {
+     "fish3d-v3a": "fish1990",
+     "fish3d-v3c": "daane2021",
+     "path": "pectoral_length_m.source"
+    },
+    {
+     "fish3d-v3a": "derived",
+     "fish3d-v3c": "sourced",
+     "path": "pectoral_length_m.status"
+    },
+    {
+     "fish3d-v3a": 0.0927763308042547,
+     "fish3d-v3c": 0.10753115406082511,
+     "path": "pectoral_length_m.value"
+    },
+    {
+     "fish3d-v3a": "v3a: ray-fan fins, Fish 1990 lengths and areas, flat spread",
+     "fish3d-v3c": "v3c: pectoral length from Daane S1A (C. furcatus), pelvics further forward",
+     "path": "title"
+    },
+    {
+     "fish3d-v3a": "a-fan",
+     "fish3d-v3c": "c-daane-length",
+     "path": "variant"
+    }
+   ],
+   "invalidated_stages": [
+    "structural_refs",
+    "units_context",
+    "model_domain",
+    "numerical"
+   ],
+   "kept_stages": [
+    "empirical",
+    "implementation"
+   ]
+  },
+  {
+   "a": "fish3d-v3b",
+   "b": "fish3d-v3c",
+   "changed_layers": [
+    "aero",
+    "geometry",
+    "geometry_components",
+    "geometry_panels"
+   ],
+   "geometry_knob_changes": [
+    {
+     "fish3d-v3b": "fish3d-v3b-glide-pose",
+     "fish3d-v3c": "fish3d-v3c-daane-length",
+     "path": "id"
+    },
+    {
+     "fish3d-v3b": 0.06,
+     "fish3d-v3c": 0.0,
+     "path": "knobs.pectoral_camber.value"
+    },
+    {
+     "fish3d-v3b": 12.0,
+     "fish3d-v3c": 7.0,
+     "path": "knobs.pectoral_dihedral_deg.value"
+    },
+    {
+     "fish3d-v3b": 16.0,
+     "fish3d-v3c": 8.0,
+     "path": "knobs.pectoral_lead_angle_deg.value"
+    },
+    {
+     "fish3d-v3b": "fish1990",
+     "fish3d-v3c": "daane2021",
+     "path": "knobs.pectoral_length_source.value"
+    },
+    {
+     "fish3d-v3b": 0.04,
+     "fish3d-v3c": 0.0,
+     "path": "knobs.pelvic_camber.value"
+    },
+    {
+     "fish3d-v3b": 8.0,
+     "fish3d-v3c": 4.0,
+     "path": "knobs.pelvic_dihedral_deg.value"
+    },
+    {
+     "fish3d-v3b": 30.0,
+     "fish3d-v3c": 22.0,
+     "path": "knobs.pelvic_lead_angle_deg.value"
+    },
+    {
+     "fish3d-v3b": 0.55,
+     "fish3d-v3c": 0.48,
+     "path": "knobs.pelvic_x_over_sl.value"
+    },
+    {
+     "fish3d-v3b": "Fish 1990 span fit: (b - body width at fin) / 2 (N1)",
+     "fish3d-v3c": "median of n=12 specimens, range 0.600-0.750; recomputed from raw lengths",
+     "path": "pectoral_length_m.note"
+    },
+    {
+     "fish3d-v3b": "fish1990",
+     "fish3d-v3c": "daane2021",
+     "path": "pectoral_length_m.source"
+    },
+    {
+     "fish3d-v3b": "derived",
+     "fish3d-v3c": "sourced",
+     "path": "pectoral_length_m.status"
+    },
+    {
+     "fish3d-v3b": 0.0927763308042547,
+     "fish3d-v3c": 0.10753115406082511,
+     "path": "pectoral_length_m.value"
+    },
+    {
+     "fish3d-v3b": "v3b: same fins as v3a, posed: more sweep and dihedral, cambered",
+     "fish3d-v3c": "v3c: pectoral length from Daane S1A (C. furcatus), pelvics further forward",
+     "path": "title"
+    },
+    {
+     "fish3d-v3b": "b-glide-pose",
+     "fish3d-v3c": "c-daane-length",
+     "path": "variant"
+    }
+   ],
+   "invalidated_stages": [
+    "structural_refs",
+    "units_context",
+    "model_domain",
+    "numerical"
+   ],
+   "kept_stages": [
+    "empirical",
+    "implementation"
+   ]
+  }
+ ],
+ "retained_failures": [
+  "fish3d-v3b"
+ ],
+ "schema": "frontier.biodesign.report/1"
+}

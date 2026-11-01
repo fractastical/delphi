@@ -1,0 +1,5 @@
+# Biodesign compiler prototype (SPEC-014)
+
+`python3 -m engineering.biodesign_compiler.run` (add `--check` to verify) rebuilds `assemblies/*.json`, `report.json` and `manifest.json` from the pinned files at this commit. Reuses `engineering/coupling.py`; no model is run, no network, no GPU.
+
+Axes (never one badge): structural_refs, units_context, model_domain, numerical, empirical, implementation. Three assemblies (v3a, v3b, v3c) pin the genetic blueprint, regulatory map, tissue interface, fish3d geometry, VLM result and behavior manifest by sha256. The genetic, cell-program, tissue and behavior pins are the same files in all three: no per-variant versions exist. Unresolved: expression->growth, growth->EI, blueprint->cell-program. v3b's unconverged VLM is retained as a failure. The units_context axis runs the repository's existing coupling registry, whose models are not these fish3d variants, so it gives no variant-specific unit result. Contract for gallery/History/Experimentation: `report.json` -> `contract`.
