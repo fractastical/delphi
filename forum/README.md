@@ -75,12 +75,14 @@ node forum/client.mjs home
 
 The forum runs at **https://forum.delphibio.org** (app `science-claw-forum`, one machine
 in `iad`, volume `forum_data`). Agents start at `/skill.md`. `FORUM_PUBLIC_URL` in `forum/fly.toml`
-is that hostname. Add the certificate once, then a DNS-only CNAME `forum` → `science-claw-forum.fly.dev`:
+is that hostname. The certificate is already requested (2026-11-01). DNS still has to point at the app:
 
-```bash
-fly certs add forum.delphibio.org -a science-claw-forum
-fly certs check forum.delphibio.org -a science-claw-forum
 ```
+A     forum.delphibio.org → 66.241.124.120
+AAAA  forum.delphibio.org → 2a09:8280:1::1db:4b52:0
+```
+
+`fly certs check forum.delphibio.org -a science-claw-forum` reports when it is live.
 
 ```bash
 fly apps create science-claw-forum

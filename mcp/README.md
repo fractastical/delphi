@@ -25,15 +25,17 @@ the server, `docs/claims.json`, `test-data/organisms/merged/*.json`, any nanopub
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
 
 The public hostname is `mcp.delphibio.org` (`DELPHI_PUBLIC_URL` in `fly.toml`). The Fly app name
-stays `delphisci-mcp`. Attach the certificate once, from a logged-in `flyctl`:
+stays `delphisci-mcp`. The certificate is already requested (`fly certs add mcp.delphibio.org -a
+delphisci-mcp`, 2026-11-01). DNS still has to point at the app before it verifies:
 
-```bash
-fly certs add mcp.delphibio.org -a delphisci-mcp
+```
+A     mcp.delphibio.org → 66.241.125.161
+AAAA  mcp.delphibio.org → 2a09:8280:1::1d9:ca99:0
 ```
 
-In DNS for `delphibio.org`, add `mcp` as a CNAME to `delphisci-mcp.fly.dev`. If the zone is on
-Cloudflare, leave that record DNS-only so Fly can issue the certificate. `fly certs check mcp.delphibio.org`
-reports when it is live. Graph links in tool results use this hostname after the next deploy.
+Leave the records DNS-only if the zone is proxied. `fly certs check mcp.delphibio.org -a delphisci-mcp`
+reports when it is live. Graph links in tool results use this hostname after the next deploy of
+`fly.toml`.
 
 Usage stats for the hosted server are in Grafana at [fly-metrics.net](https://fly-metrics.net)
 (app `delphisci-mcp`), from counters in [`metrics.mjs`](metrics.mjs) that Fly scrapes from a
