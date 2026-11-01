@@ -1,0 +1,264 @@
+{
+  "action_proposal": {
+    "alternatives": [
+      {
+        "description": "Two normalized deflection reads at different nominal force settings.",
+        "label": "deflection-only",
+        "tradeoff": "Same sensitivity row; cannot separate stiffness from load calibration."
+      },
+      {
+        "description": "One normalized deflection read and one independent load-scale read.",
+        "label": "mixed",
+        "tradeoff": "Assumes the load-scale read is available at equal declared cost."
+      }
+    ],
+    "analysis_plan": "Use exact linear-Gaussian covariance conditioning and compare the predeclared target variance reduction per equal assumed cost.",
+    "assumptions": [
+      "Dimensionless log-ratio prior and readout-noise values are assumed, not fitted.",
+      "This abstract cantilever calculation has no species calibration."
+    ],
+    "controls": [
+      "Repeated-force deflections have the same sensitivity row and remain rank one.",
+      "An independent load-scale readout supplies the second direction.",
+      "A zero-sensitivity readout has zero expected target-variance reduction."
+    ],
+    "decision_context": "Choose an illustrative readout design that makes stiffness identifiable under the stated linear model.",
+    "expected_information": "Expected reduction in variance of dimensionless log stiffness per assumed cost unit.",
+    "expected_outputs": [
+      "Prospective covariance, rank/nullspace diagnostics, and a frozen design comparison."
+    ],
+    "intent": "experiment",
+    "limitations": [
+      "No measurements, biological parameters, empirical posterior, or physical success probability are generated.",
+      "The local proposal is not linked/submitted until exact Problem/Project refs are supplied."
+    ],
+    "method": "Compare prospective Gaussian covariance under two equal assumed-cost readout plans; no response values are used.",
+    "outcomes": [
+      {
+        "criterion": "Mixed plan has full likelihood rank and greater target variance reduction per equal cost.",
+        "decision_consequence": "Retain as the selected prospective design under this assumed model only.",
+        "label": "mixed-rank-two"
+      },
+      {
+        "criterion": "Rank or expected target-variance comparison does not meet the predeclared relation.",
+        "decision_consequence": "Keep the design comparison unresolved and inspect assumptions.",
+        "label": "not-discriminating"
+      }
+    ],
+    "selection_basis": "declared_utility",
+    "selection_rationale": "Rank candidate plans by declared expected target-variance reduction per shared assumed cost unit."
+  },
+  "batch_effects": "The diagonal noise covariance assumes independent readout errors; shared-batch error is not modeled or measured.",
+  "blocking": "Not applicable to the abstract calculation; a physical study needs its executing lab's constraints and review.",
+  "context": {
+    "cell_state": "not_applicable",
+    "developmental_time": "not_applicable",
+    "eligibility": "abstract model only; no specimen or organism eligibility",
+    "environment": "not_applicable; static mathematical beam",
+    "genotype": "not_applicable",
+    "measurement_method": "prospective dimensionless readout model",
+    "open_gaps": [
+      "No biological calibration, species bridge, or source Claim pin is supplied."
+    ],
+    "species": "not_applicable_mathematical_cantilever"
+  },
+  "controls": [
+    "Two nominal-force deflections have identical normalized sensitivity [-1,+1].",
+    "Independent load-scale sensitivity is [0,+1].",
+    "No synthetic response or measurement table is included."
+  ],
+  "design_version": "cantilever-identifiability-v1",
+  "designs": [
+    {
+      "batch_count": 1,
+      "cost": {
+        "basis": "two reads at one assumed unit each; not a dollar cost",
+        "unit": "assumed_readout_cost_unit",
+        "value": 2.0
+      },
+      "id": "deflection_only",
+      "intervention": "Set nominal force ratios 1 and 2; normalize out their known offsets.",
+      "noise_covariance": [
+        [
+          0.01,
+          0.0
+        ],
+        [
+          0.0,
+          0.01
+        ]
+      ],
+      "observations": [
+        {
+          "batch": "one_assumed_batch",
+          "biological_replicate": "not_applicable_mathematical_example",
+          "condition": "nominal_force_ratio=1",
+          "readout_id": "normalized_log_deflection",
+          "technical_repeat": 1
+        },
+        {
+          "batch": "one_assumed_batch",
+          "biological_replicate": "not_applicable_mathematical_example",
+          "condition": "nominal_force_ratio=2",
+          "readout_id": "normalized_log_deflection",
+          "technical_repeat": 1
+        }
+      ],
+      "title": "Two deflection reads at different nominal force settings"
+    },
+    {
+      "batch_count": 1,
+      "cost": {
+        "basis": "two reads at one assumed unit each; not a dollar cost",
+        "unit": "assumed_readout_cost_unit",
+        "value": 2.0
+      },
+      "id": "mixed_load_deflection",
+      "intervention": "Acquire an independent load-scale read plus one normalized deflection read.",
+      "noise_covariance": [
+        [
+          0.01,
+          0.0
+        ],
+        [
+          0.0,
+          0.01
+        ]
+      ],
+      "observations": [
+        {
+          "batch": "one_assumed_batch",
+          "biological_replicate": "not_applicable_mathematical_example",
+          "condition": "load_scale_sensor",
+          "readout_id": "direct_log_load_scale",
+          "technical_repeat": 1
+        },
+        {
+          "batch": "one_assumed_batch",
+          "biological_replicate": "not_applicable_mathematical_example",
+          "condition": "nominal_force_ratio=1",
+          "readout_id": "normalized_log_deflection",
+          "technical_repeat": 1
+        }
+      ],
+      "title": "One direct load-scale and one deflection read"
+    }
+  ],
+  "equation": {
+    "applicability": "Euler-Bernoulli static small-deflection cantilever point-load model; mathematical demonstration only.",
+    "expression": "delta = F * L^3 / (3 * EI)",
+    "model_version": "engineering.fin_mechanics.beam/point-load/1",
+    "source_sha256": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+    "source_uri": "https://github.com/kganjam/delphi-frontier/blob/72df07cb22ec6458625fd01092ceccda8ea96271/engineering/fin_mechanics/beam.py",
+    "units": {
+      "EI": "N m^2",
+      "F": "N",
+      "L": "m",
+      "delta": "m",
+      "normalized_log_readout": "1",
+      "parameters": "dimensionless log-ratios"
+    }
+  },
+  "fit_method": "Analytic prospective Gaussian covariance update; no data fitting and no posterior mean update.",
+  "held_out_validation": [
+    "No observations or validation split exist; empirical fit/validation is blocked."
+  ],
+  "input_datasets": [],
+  "iteration": {
+    "iteration_number": 1,
+    "parent_versions": [],
+    "rationale": "Initial prospective identifiability demo, not a biological design iteration."
+  },
+  "links": {
+    "action_ref": null,
+    "problem_ref": null,
+    "project_ref": null
+  },
+  "model_discrepancy": "Unknown and unestimated; no simulator-to-beam or beam-to-biology discrepancy model is fitted.",
+  "parameters": {
+    "hypotheses": [
+      "Assumed Gaussian prior: SD(log_EI_ratio)=0.6, SD(log_load_scale)=0.5, correlation=0.6; covariance entry 0.18 is the declared product 0.6*0.5*0.6."
+    ],
+    "likelihood": "Linear Gaussian normalized log-readouts; each assumed noise variance is 0.01 (SD 0.1), not calibrated.",
+    "names": [
+      "log_EI_ratio",
+      "log_load_scale"
+    ],
+    "prior_covariance": [
+      [
+        0.36,
+        0.18
+      ],
+      [
+        0.18,
+        0.25
+      ]
+    ],
+    "prior_mean": [
+      0.0,
+      0.0
+    ],
+    "units": [
+      "1",
+      "1"
+    ]
+  },
+  "question": "At equal assumed measurement cost, does an independent load-scale readout resolve the stiffness/load degeneracy?",
+  "randomization": "Not applicable to deterministic mathematical design calculation; no observations assigned.",
+  "readouts": [
+    {
+      "censoring": "none_assumed",
+      "definition": "log(delta) minus known nominal geometry/load offset",
+      "detection_limit": "not_applicable_in_abstract_model",
+      "id": "normalized_log_deflection",
+      "missingness": "none_assumed; no observations exist",
+      "noise_variance": 0.01,
+      "sampling_times": "not_applicable_static_scalar",
+      "sensitivity": [
+        -1.0,
+        1.0
+      ],
+      "unit": "1"
+    },
+    {
+      "censoring": "none_assumed",
+      "definition": "Independent log load-calibration readout",
+      "detection_limit": "not_applicable_in_abstract_model",
+      "id": "direct_log_load_scale",
+      "missingness": "none_assumed; no observations exist",
+      "noise_variance": 0.01,
+      "sampling_times": "not_applicable_static_scalar",
+      "sensitivity": [
+        0.0,
+        1.0
+      ],
+      "unit": "1"
+    }
+  ],
+  "replicate_unit": "No biological replicate unit; two modeled readouts are not biological replicates.",
+  "resources": {
+    "capability": "local CPU; deterministic 2x2 linear algebra",
+    "concurrency": "1 local process",
+    "cost_unit": "assumed_readout_cost_unit",
+    "duration": "under 1",
+    "duration_unit": "second assumed",
+    "operator": "unassigned local proposal; no lab or cloud job",
+    "stop_limit": "one deterministic calculation"
+  },
+  "schema": "frontier.experimental-design.request/1",
+  "sensitivity_plan": "Report exact likelihood rank/nullspace and vary prior/noise assumptions only in a separately versioned protocol.",
+  "source_claims": [],
+  "stop_rules": [
+    "Stop if covariance is nonfinite, asymmetric, or not positive semidefinite.",
+    "Do not submit or execute a physical plan without exact context refs and executing-lab constraints."
+  ],
+  "target": {
+    "name": "log_EI_ratio",
+    "unit": "1",
+    "vector": [
+      1.0,
+      0.0
+    ]
+  },
+  "title": "Prospective cantilever stiffness identifiability comparison"
+}
