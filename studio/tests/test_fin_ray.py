@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from engineering.fin_ray.model import Parameters, analytic, compute, controls, unloaded_stiffness
+from engineering.fin_ray.model import Parameters, analytic, compute, controls, dump, unloaded_stiffness
 
 
 def test_printed_parameters_cancel_hyperbolic_term_not_make_S_curve():
@@ -27,3 +27,11 @@ def test_invalid_coefficients_and_unbounded_localization_refused():
         Parameters(B=0)
     with pytest.raises(ValueError):
         Parameters(G=1e12)
+
+
+def test_control_receipt_serializes_native_boolean_values(tmp_path):
+    import json
+
+    path = tmp_path / "controls.json"
+    dump(path, controls())
+    assert json.loads(path.read_text())["passed"] is True

@@ -151,6 +151,7 @@ def controls():
         "wrong_curvature_sign_rejected": float(np.max(abs(-trace["kappa"] - 1))) > cfg["closed_form_max_curvature_absolute_error"],
         "wrong_load_sign_rejected": float(np.max(abs(trace["phi"] - wrong_phi))) > cfg["closed_form_max_phi_absolute_error"],
     }
+    checks = {name: bool(value) for name, value in checks.items()}
     return {"checks": checks, "passed": all(checks.values()), "source_case": source, "circle_tip_error": float(circle_error), "scope": "Printed-equation numeric and mutation controls; not the inconsistent printed Fig8 curve or empirical ray reproduction"}
 
 
