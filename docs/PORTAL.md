@@ -9,8 +9,11 @@ The Delphi website. Two parts live side by side here:
   `.nojekyll`. That import matches the portal tree byte for byte. Edit these in the portal repo and
   copy them over; don't restyle them here.
 
-GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The homepage is
-the portal. The mission-control dashboard stays on its Cloudflare worker.
+GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The portal
+is served from `platform/`: `index.html`, `platform.html` (Lean for Biology), and `data/`.
+Relative links stay inside that folder (`/platform/data/…`, `/platform/platform.html`).
+`docs/index.html` only redirects to `/platform/`. The mission-control dashboard stays on its
+Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
   `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, plus `claims.json`,
   `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.
@@ -40,6 +43,7 @@ python3 scripts/site/build-team-page.py     # team.html
 
 ## Refresh the portal
 
-Copy `index.html`, `platform.html`, `data/` and `.nojekyll` from a fresh checkout of the portal repo,
-and record the new commit above. If the portal changes its tokens, update the matching values in
-`css/delphi.css`.
+Copy `index.html`, `platform.html` and `data/` from a fresh checkout of the portal repo into
+`docs/platform/` (so the site stays at `/platform/`), and record the new commit above. Leave
+`docs/index.html` as the redirect to `/platform/`. If the portal changes its tokens, update the
+matching values in `css/delphi.css`.
