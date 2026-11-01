@@ -140,6 +140,21 @@ REVISIONS = {
                                            "(its liner is the bay's rear wall)"},
                  "main_cavity_x_mm": {"value": [6.0, 150.0], "status": "assumed; the loft range, clipped in front by "
                                                                        "the forward slot's axis plane"}},
+    "r4-daane-printfix": {"parent": "r3-daane", "source_variant": "c-daane-length",
+                          "title": "r4 Daane print fix: r3-daane with correct right-hand print files (proper rotation, "
+                                   "mirrored right parts); geometry and parameters as r3",
+                 "body_wall_mm": {"value": 0.5, "status": "provisional"},
+                 "catch": {"value": {"x_mm": [20.0, 34.0], "seat_offsets_mm": [-1.5, 0.0, 1.5, 3.0], "slot_mm": 3.5,
+                                     "rake_deg": 30.0, "liner_mm": 2.0, "plug_clearance_mm": 0.1,
+                                     "nominal": {"slot_x_mm": 20.0, "offset_mm": 0.0}},
+                           "status": "claude-07 R3 correction: seat at -1.5/0/+1.5/+3.0 mm from the design CG "
+                                     "height, two arms ~15 mm apart (25 and 40 mm ahead of a CG near 60 mm); start "
+                                     "tests at 0 and +1.5; slot shape, rake and plug fit assumed"},
+                 "ballast_bay": {"value": {"x_mm": [6.0, 30.0], "port_diameter_mm": 5.0, "port_x_mm": 11.0},
+                                 "status": "assumed; the loft range, clipped behind by the forward slot's axis plane "
+                                           "(its liner is the bay's rear wall)"},
+                 "main_cavity_x_mm": {"value": [6.0, 150.0], "status": "assumed; the loft range, clipped in front by "
+                                                                       "the forward slot's axis plane"}},
 }
 PAIRED = ("pectoral", "pelvic")
 RIDGE_INSET_MM = 0.08     # a ridge's top sits this far inside the membrane (no tangent faces in the union)
@@ -204,6 +219,18 @@ def affine(m: mf.Manifold, A: np.ndarray) -> mf.Manifold:
 
 def mirror_y(A: np.ndarray) -> np.ndarray:
     return np.diag([1.0, -1.0, 1.0, 1.0]) @ A
+
+
+def right_pose(A_left: np.ndarray) -> np.ndarray:
+    """Print-to-fish transform for a right (-y) part whose left twin has print-to-fish A_left.
+
+    The right part is the left part mirrored in y.  Its frame is the mirrored frame with the normal flipped
+    (e_u' = M e_u, e_w' = M e_w, e_n' = -M e_n), so the transform is a PROPER rotation (det +1) and the flat print
+    of the right part is the left one's mirror image (z -> -z), as a mirror-image part must be.
+    Until r4 the exporter used mirror_y(A_left) (det -1): inverting a mirror on mirrored geometry cancels the
+    mirror, so every _R print STL of r1-r3 holds the LEFT part's vertices (found by reviewer claude-13 on r1 and by
+    root on r3; recorded in artifacts/glider/KNOWN_DEFECTS.json)."""
+    return mirror_y(A_left) @ np.diag([1.0, 1.0, -1.0, 1.0])
 
 
 def box(lo, hi) -> mf.Manifold:
@@ -736,7 +763,7 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
         for inc, rec in sorted(pr["settings"].items()):
             Ai = F @ incidence_matrix(pr["fan"], inc)  # print pose: the membrane flat, the tongue tilted by inc
             for side in ("L", "R"):
-                A = Ai if side == "L" else mirror_y(Ai)
+                A = Ai if side == "L" else right_pose(Ai)
                 fish = rec["fish"] if side == "L" else rec["fish"].mirror((0, 1, 0))
                 flat = affine(fish, np.linalg.inv(A))
                 key = "" if which == "pectoral" else f"-dec{v(p['pectoral_incidence_deg']) - inc:+.0f}"
@@ -801,6 +828,9 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
         "frame": {"units": "mm", "x": "snout tip -> tail", "z": "dorsal", "y": "towards the side v3 names _L",
                   "handedness": "right-handed Cartesian; with the snout facing -x and dorsal +z, +y is the fish's "
                                 "anatomical RIGHT side, so v3's _L suffix names the anatomical right"},
+        "export": {"right_parts": "proper rotation of the mirrored fish-frame part (det +1); the flat print is the "
+                                  "left part's mirror image", "print_to_fish_det": "+1 for every part",
+                   "fixed_in": "r4-daane-printfix (earlier revisions: artifacts/glider/KNOWN_DEFECTS.json)"},
         "parts": parts_rec, "nominal_assembly": {"parts": nominal_ids, "dry": dry,
                                                  "fin_body_overlap_mm3": overlap},
         "ballast": ballast, "hand_neutral_point": aero, "trim_speed_hand": trim, "launch_catch": hook,
@@ -966,12 +996,48 @@ def git_head() -> str:
         return "unknown"
 
 
+PRINT_SET = ["stl/body.stl", "stl/pectoral_L.stl", "stl/pectoral_R.stl", "stl/pelvic_L-dec+2.stl",
+             "stl/pelvic_R-dec+2.stl", "stl/catch_plug-x20-dz+0.0.stl"]
+
+
+def bundle(rev: str, out_root: Path) -> Path:
+    """One deterministic ZIP of a revision's nominal print set, its manifest, the assembly notes, the defect registry
+    and a SHA256SUMS list (fixed timestamps and permissions, so the same files give the same ZIP bytes)."""
+    import zipfile
+    d = out_root / rev
+    rels = [*PRINT_SET, "manifest.json", "ASSEMBLY.md", "img/assembled.png"]
+    files = [(rel, (d / rel).read_bytes()) for rel in rels]
+    files.append(("KNOWN_DEFECTS.json", (out_root / "KNOWN_DEFECTS.json").read_bytes()))
+    sums = "".join(f"{hashlib.sha256(b).hexdigest()}  {rel}\n" for rel, b in files)
+    files.append(("SHA256SUMS", sums.encode()))
+    path = d / f"print-set-{rev}.zip"
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+        for rel, b in files:
+            info = zipfile.ZipInfo(f"glider-{rev}/{rel}", date_time=(2026, 10, 31, 0, 0, 0))
+            info.external_attr = 0o644 << 16
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, b)
+    zb = path.read_bytes()
+    # sidecar outside the ZIP, so pinning the ZIP never edits a file the ZIP holds
+    side = {"schema": "frontier.glider.download/1", "revision": rev,
+            "path": f"artifacts/glider/{rev}/{path.name}", "bytes": len(zb), "sha256": hashlib.sha256(zb).hexdigest(),
+            "manifest_sha256": hashlib.sha256((d / "manifest.json").read_bytes()).hexdigest(),
+            "known_defects": "artifacts/glider/KNOWN_DEFECTS.json",
+            "label": "LAUNCH PROTOTYPE, UNTESTED, OVERWEIGHT; fit/balance test print; printer compatibility not claimed"}
+    (d / "download.json").write_text(json.dumps(side, indent=2) + "\n")
+    return path
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--out", default=str(ROOT / "artifacts/glider"))
     ap.add_argument("--only", choices=sorted(REVISIONS), action="append")
     ap.add_argument("--no-render", action="store_true")
+    ap.add_argument("--bundle", choices=sorted(REVISIONS), help="only write print-set-<rev>.zip for a built revision")
     a = ap.parse_args(argv)
+    if a.bundle:
+        print(bundle(a.bundle, Path(a.out)))
+        return 0
     for rev in a.only or sorted(REVISIONS):
         out = Path(a.out) / rev
         if (out / "manifest.json").exists() and Path(a.out).resolve() == (ROOT / "artifacts/glider").resolve():

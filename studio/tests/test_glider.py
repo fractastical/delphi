@@ -166,3 +166,80 @@ def test_earlier_artifacts_untouched():
         except (subprocess.CalledProcessError, FileNotFoundError):
             pytest.skip("commit 46e47a7 not in this clone")
         assert (ROOT / rel).read_bytes() == old, rel
+
+
+# ---------------------------------------------------------------- right-hand print files (fixed in r4)
+FIXED = [r for r in REVS if "export" in manifest(r)]
+DEFECTS = json.loads((OUT / "KNOWN_DEFECTS.json").read_text())
+
+
+def stl_mesh(rev, rel):
+    return VAL.read_stl((OUT / rev / rel).read_bytes())
+
+
+def vertex_set(V):
+    return {tuple(v) for v in np.round(V, 4)}
+
+
+def test_every_revision_before_the_fix_has_its_right_hand_defect_recorded():
+    """r1-r3 keep their bytes; their _R print files hold the LEFT part (the defect), and say so in the registry."""
+    assert FIXED and set(REVS) - set(FIXED) == set(DEFECTS["right_hand_print_files_are_left_parts"]["revisions"])
+    for rev in set(REVS) - set(FIXED):
+        V_l, _ = stl_mesh(rev, "stl/pectoral_L.stl")
+        V_r, _ = stl_mesh(rev, "stl/pectoral_R.stl")
+        assert vertex_set(V_l) == vertex_set(V_r), rev  # the recorded defect, reproduced
+
+
+@pytest.mark.parametrize("rev", FIXED)
+def test_right_print_parts_are_mirror_images_of_the_left(rev):
+    m = manifest(rev)
+    lefts = [r for r in m["parts"] if r["kind"] == "fin" and r["id"].split("-")[0].endswith("_L")]
+    assert lefts
+    for left in lefts:
+        rid = left["id"].replace("_L", "_R", 1)
+        V_l, _ = stl_mesh(rev, left["stl"])
+        V_r, _ = stl_mesh(rev, f"stl/{rid}.stl")
+        assert vertex_set(V_l) != vertex_set(V_r), rid                                   # not the left part again
+        assert vertex_set(V_l * [1, 1, -1]) == vertex_set(V_r), rid                       # its mirror image
+
+
+@pytest.mark.parametrize("rev", FIXED)
+def test_print_to_fish_is_a_proper_rotation_that_reproduces_the_assembled_part(rev):
+    """det +1 for every part, and the print STL moved by its transform has the fish-frame mass properties."""
+    m = manifest(rev)
+    for r in m["parts"]:
+        A = np.asarray(r["print_to_fish_transform"])
+        assert np.linalg.det(A[:3, :3]) == pytest.approx(1.0, abs=1e-9), r["id"]
+        V, T = stl_mesh(rev, r["stl"])
+        Vf = V @ A[:3, :3].T + A[:3, 3]
+        p = MP.properties(Vf, T, m["material"]["density_kg_m3"])
+        assert p["volume_mm3"] > 0, r["id"]                                               # winding stays outward
+        assert np.allclose(p["cg_mm"], r["mass_properties"]["cg_mm"], atol=1e-3), r["id"]
+        if r["id"].split("-")[0].endswith("_R"):
+            assert p["cg_mm"][1] < 0, r["id"]                                              # the right part sits at -y
+
+
+@pytest.mark.parametrize("rev", FIXED)
+def test_print_set_zip_holds_these_bytes(rev):
+    """The handoff ZIP is the nominal print set, the manifest, the assembly notes and the defect registry, byte for
+    byte, with a SHA256SUMS that lists each file; and it is reproducible from those files."""
+    import zipfile
+    z = zipfile.ZipFile(OUT / rev / f"print-set-{rev}.zip")
+    names = {n.split("/", 1)[1]: n for n in z.namelist()}
+    assert set(G.PRINT_SET) <= set(names) and {"manifest.json", "ASSEMBLY.md", "KNOWN_DEFECTS.json"} <= set(names)
+    assert {f"stl/{i}.stl" for i in manifest(rev)["nominal_assembly"]["parts"]} == set(G.PRINT_SET)
+    for rel, n in names.items():
+        if rel == "SHA256SUMS":
+            continue
+        src = OUT / rel if rel == "KNOWN_DEFECTS.json" else OUT / rev / rel
+        assert z.read(n) == src.read_bytes(), rel
+    sums = dict(line.split("  ")[::-1] for line in z.read(names["SHA256SUMS"]).decode().splitlines())
+    assert sums == {rel: hashlib.sha256(z.read(n)).hexdigest() for rel, n in names.items() if rel != "SHA256SUMS"}
+
+
+@pytest.mark.parametrize("rev", FIXED)
+def test_download_sidecar_pins_the_zip(rev):
+    d = json.loads((OUT / rev / "download.json").read_text())
+    z = ROOT / d["path"]
+    assert d["revision"] == rev and z.stat().st_size == d["bytes"] and sha(z) == d["sha256"]
+    assert d["manifest_sha256"] == sha(OUT / rev / "manifest.json")

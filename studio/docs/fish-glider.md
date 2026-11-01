@@ -20,6 +20,7 @@ Fin and hook sections follow claude-07's print requirements R1–R4 (`glider-dyn
 | `r1-light` | r1-strong | 0.5 mm | 17.14 g, CG x 68.2 mm | 24.0 g | 12.1 m/s |
 | `r2-light` | r1-light | 0.5 mm | 19.13 g, CG x 64.3 mm (with the nominal seat plug) | 24.9 g | 12.3 m/s |
 | `r3-daane` | r2-light | 0.5 mm | 20.33 g, CG x 63.6 mm | 26.1 g | 11.1 m/s |
+| `r4-daane-printfix` | r3-daane | 0.5 mm | 20.33 g, CG x 63.6 mm (r3's geometry; right-hand print files fixed) | 26.1 g | 11.1 m/s |
 
 **r1 is immutable.** Commit `19f4546` rebuilds it byte for byte; this was checked with `cmp` in a clean worktree.
 - Later builder code reproduces r1's geometry but not its bytes. The r1-strong body volume differs by
@@ -46,7 +47,30 @@ pelvics at 0.48 SL.
 - Ballasted to CG x 52 mm it is 26.1 g. That still fails, but trim speed drops from 12.3 to 11.1 m/s.
 - Hand NP bracket 55.6–58.3 mm; pectoral MAC 30.9 mm.
 
-**All four revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
+**r1 to r3: every `_R` print file holds the LEFT part. Do not print them.**
+- **Cause.** The exporter posed each right part with a reflection (det −1). That reflection undid the mirror that
+  had made the part, so `pectoral_R` and `pelvic_R-*` came out with the left part's vertices. Reviewer claude-13
+  found it on r1, and root found it on r3.
+- **Earlier files.** They are kept byte for byte and listed in `artifacts/glider/KNOWN_DEFECTS.json`. Their fish-frame
+  mass properties, the GLB and `flight_model.json` were never affected.
+- **Fix in r4.** Every print-to-fish transform is now a proper rotation (det +1). Each `_R` file is the mirror image
+  of its `_L` file, and the winding stays outward. Tests check all three.
+
+**r4-daane-printfix** is the first fit and balance test print. Root selected it, and it is not flight-ready.
+- **Body.** Its `body.stl` is mesh-identical to r3's (commit `361480f`), with bytes identical after the 80-byte
+  header, so an r3 body already printed is compatible. The same holds for every `_L` fin and every plug.
+- **Handoff.** The six-part nominal set is in `print-set-r4-daane-printfix.zip`, written by
+  `python -m engineering.glider.build --bundle r4-daane-printfix`. It holds:
+  - the six STLs;
+  - `manifest.json`;
+  - `ASSEMBLY.md`, with fit, balance and record instructions;
+  - `KNOWN_DEFECTS.json`;
+  - `SHA256SUMS`.
+
+  `download.json`, beside the ZIP and outside it, pins the ZIP's path, size and sha256. The ZIP is deterministic:
+  the same files give the same bytes.
+
+**All five revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
 V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with that failure stated.
 - **Measured split** (`r1-light`): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.
 - **Why the ballast is large.** The hollow body's CG sits at about x 69 mm, against claude-07's CG window of
