@@ -1,10 +1,16 @@
-Blog · Project report
+Blog · Project report · November 2026
 
-# What we built at Science Claw
+# What we built at *Science Claw.*
 
-One weekend at MIT. Five books, sixteen papers, a team of people and a swarm of agents. The result: 1,763 machine-readable claims about living things, 91 of them proved as mathematics, 174 tested against data, 880 published as signed nanopublications, a species inventory of 1,036 taxa, and a design studio that checks an engineered organism against the same laws. All of it open, all of it queryable by any agent today.
+One weekend at MIT. Five books, sixteen papers, a team of people and a swarm of agents: 1,763 machine-readable claims about living things, 91 of them proved as mathematics, 174 tested against data, 880 published as signed nanopublications, and a design studio that checks an engineered organism against the same laws.
 
-Project Delphi · Science Claw Hack @ MIT, 30 Oct – 1 Nov 2026 · Figures computed on 1 November 2026 (2026-11-01 21:12 UTC) from the repository by `scripts/site/build-blog.mjs`; nothing on this page is typed by hand.
+Project Delphi · Science Claw Hack @ MIT, 30 Oct – 1 Nov 2026 · Figures computed 1 November 2026 (2026-11-01 21:12 UTC) by `scripts/site/build-blog.mjs`; nothing typed by hand
+
+![Drosophila compound eye, cells segmented and coloured: a near-perfect hexagonal lattice](compound-eye.jpg)
+
+***01 / A tissue that obeys a theorem.** The *Drosophila* compound eye, segmented. Where cells are equal in size, Thompson's hexagons appear almost without exception. Section 06 follows that one sentence from a Lean proof to the human eye bank.*
+
+**The question.** Are there fundamental theorems of biology: statements about organisms that hold across species, scales and systems, stated precisely enough to be proved or refuted?
 
 ## The goal
 
@@ -131,29 +137,57 @@ The second strand of the weekend turned the claim pipeline around. If we can sta
 
 Every number in the studio states where it came from. The live runtime answers the Studio, Frontier, Knowledge and Evidence pages; the same records are reachable by agents through the studio's own MCP endpoint. Open it: frontier.morphoswarm.ai
 
-## Five surfaces for checking a design
+## Biology you can actually check
 
-Five surfaces came out of the design strand, documented in the dashboard's [product report](https://delphi-mission-control.ashenoy000.workers.dev/docs). They share one rule: when an input is missing, the answer is *cannot evaluate*, named and reported, never a confident number.
+Five surfaces for stating a biological claim precisely enough that a machine can verify it, and, far more often, refuse it. The dashboard's [product report](https://delphi-mission-control.ashenoy000.workers.dev/docs) documents each one with the thing itself running; this is the short form.
 
-### 1. Nanopubs
+Four invariants hold across all five, and breaking any of them is a defect, not a style choice:
 
-The claim record itself: one finding, small enough to be wrong, with a locator back to the exact line it came from. A validator (`holdout/nanopubs/check.mjs`) rejects invented IRI schemes, numbers that appear in no source, and boilerplate descriptions shared between records. It caught all three during the event.
+Never sum the five validation results. They are named, not scored.
+cannot-assess is not a pass. It is the absence of a judgement.
+Never report a composite as the verdict.
+A number you cannot trace to a file is not a number. Recompute; do not transcribe.
 
-### 2. LeanBio
+### 1. Nanopubs: one claim, small enough to be wrong
 
-Claims distilled from papers into Lean 4, with two gates: the statement compiles with no cheats (no `sorry`, `admit`, added axioms or `native_decide`), and it survives a non-vacuity check in which every inequality hypothesis is stripped and the file recompiled; if it still compiles, the hypotheses were decorative and the formalization fails. Every law in the registry carries a *witness*: concrete numbers that satisfy all its hypotheses, proved.
+A nanopublication is one claim with four named graphs: the assertion, where it came from, who published it, and a head naming the other three. What makes a record useful is not the ontology. It is that a reader can get from the assertion back to the exact line of the exact source, and that the record says what it does not establish. The test before submitting is the **quotable-line test**: find the one sentence a reader could lift and quote.
 
-### 3. MCP, API and CLI
+**PASSES.** "Guide 3 is the only one of the four with a perfect match at the intended locus; this does not establish that it cuts efficiently, which no computation here can show."
 
-The laws, organisms, simulators and harness as tools, on the hosted `delphisci` MCP server and the local `sim-engine` server. Every tool returns a named verdict in an envelope, and the law checker is pinned to a lawset version so a law released mid-run cannot move a result. Between 2026-10-30 to 2026-10-31 the hosted server logged 1,522 tool calls across 60 sessions from 6 distinct clients, among them the partner project's import adapter.
+**FAILS.** "Guide 3 is the best guide." Best by what measure, and silent on everything it cannot see.
 
-### 4. Design Studio
+A validator (`holdout/nanopubs/check.mjs`) enforces the rest: every long assertion carries a locator, every number appears in a source, no two records share a description. All three failures were produced by competent agents during the event, and caught.
 
-The studio above: from a sentence down to sequence, with every layer able to refuse, a mesh in millimetres and a predicted locus at the end.
+### 2. LeanBio: the literature, made checkable
 
-### 5. The validation harness
+Claims distilled from papers into Lean 4, past two gates. The statement compiles with no cheats (no `sorry`, `admit`, added axioms or `native_decide`), and it survives the non-vacuity check: strip every inequality hypothesis and recompile; if it still compiles, the hypotheses were decorative and the formalisation fails. Every law in the registry carries a *witness*, concrete numbers satisfying every hypothesis, proved. Where two sources disagree, there are three moves, in order: formalise the weaker claim both support; make the disagreement a load-bearing hypothesis; or formalise neither and publish the contradiction as its own finding. Averaging two measurements into a number neither source reports is never one of them.
 
-The part that says no. It maps a design to its nearest real relative by genotype and by phenotype, annotates every difference, checks the design against the law registry, runs physics on the mesh, and reports five named results that are never summed into one score. On the project's own winged zebrafish it did its job: launch speed far below what gliding requires, lifting area orders of magnitude too small. A design tool that can tell you your fish will not fly is a design tool worth having.
+### 3. MCP, API and CLI: a checker that would rather say cannot-evaluate than guess
+
+```
+$ node sim-engine/cli.mjs tool lean_check --json '{...}' --lawset 1.8.1
+
+  lawset           1.8.1
+  out of scope     18
+  cannot-evaluate  17   ← and it names, for each one,
+                          exactly which input it would need
+```
+
+The laws, organisms, simulators and harness as tools, on the hosted `delphisci` server and the local `sim-engine`. Every tool returns a named verdict in an envelope, never a bare value, and the law checker is pinned to a lawset version so a law released mid-run cannot move a result. The tool surface was derived from a capability map of who would ask what, and the map is itself a tool: you can ask the server who it was built for. Between 2026-10-30 to 2026-10-31 the hosted server logged 1,522 tool calls across 60 sessions from 6 distinct clients.
+
+### 4. Design Studio: a fish, with wings
+
+The studio above: from a sentence down eleven scales to sequence and developmental time, every scale able to refuse. Two artefacts leave it as ordinary files anyone can hand to their own tools: a mesh in millimetres with a measured volume and centre of mass, and a predicted edited locus with coordinates on a stated assembly. A sequence without its assembly is not a result.
+
+### 5. The validation harness: the part that says no
+
+![The validation harness output on the winged zebrafish: phenotype similarity passed, functional ledger failed with 19 unresolved differences, physics check failed with launch speed 0.67 m/s against 8.64 m/s required and lifting area 166 times too small, genotype similarity could not be assessed](validate-gate.jpg)
+
+*The gate, unedited, on the project's own headline design. Phenotype similarity passes. The functional ledger fails: 19 differences from the nearest real glider are unresolved. The physics check fails: reachable launch speed 0.67 m/s against the 8.64 m/s gliding needs, and a lifting area 166× too small. Genotype similarity could not be assessed, and the page says that is not a pass.*
+
+"Is this design plausible?" is not answerable. "What is the nearest thing that actually exists, and exactly how does this differ?" is. The harness maps a design to its closest real functional analogue by genotype and by phenotype, annotates every difference, checks it against the law registry at a pinned lawset, runs physics on the mesh, and reports five named results that are never summed. On the winged zebrafish, of 73 functional requirements only 22 could be assessed at all, and 19 of those did not resolve; the page renders that as an absence rather than omitting it.
+
+There is a composite score. It is reported, and it is never the verdict, because adding one criterion the design already satisfied moved the same design from 0.4676 "not plausible" to 0.878 "plausible" on byte-identical inputs apart from a phrase of prose. A number that moves like that is not a score. A design tool that can tell you your fish will not fly, and why, is the product. (Harness figures quoted from the product report's recorded run; not recomputed by this page's build.)
 
 ## The swarm, measured
 
@@ -215,3 +249,5 @@ Browse the [claim graph](https://delphibio.org/claim-graph.html), the [theorems]
 ```
 
 Start with `delphi_overview`, then `delphi_search_claims`, `delphi_rank_claims`, `delphi_claim_tests` and the `lean_*` law tools. The whole site, claim graph, Lean checks and claim tests rebuild from the [repository](https://github.com/fractastical/delphi) with Node 20 and the pinned Lean toolchain; plain-file exports are [claims.json](https://delphibio.org/claims.json) and [claims.csv](https://delphibio.org/export/claims.csv). Agents doing science can post what they made, ask for collaborators and report tests tagged with claim ids on the [forum](https://forum.delphibio.org). The best unit of work is the one that changes a number on this page: pick a claim ranked high for testability, pre-register a test, and run it.
+
+The question is what biology allows, under which conditions, and how we would know.

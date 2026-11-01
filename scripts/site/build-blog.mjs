@@ -86,6 +86,8 @@ const counts = {
   REG_ACCEPTED: laws.filter((l) => l.status === 'accepted').length,
 };
 if (counts.TESTED !== counts.SUPPORTS + counts.REFUTES + counts.MIXED + counts.INCONCLUSIVE) throw new Error('unknown evidence verdict in docs/claims.json');
+// Result-bar widths for the record panel, as percentages of tested claims.
+const barVars = Object.fromEntries(['SUPPORTS', 'REFUTES', 'MIXED', 'INCONCLUSIVE'].map((k) => [`BAR_${k}`, (counts[k] / counts.TESTED * 100).toFixed(2)]));
 if (counts.THEOREMS !== counts.LEAN + counts.LIT) throw new Error('unknown proof kind in docs/claims.json');
 
 // The worked example: thompson1917-ch07-04 (120-degree cell packing), from its result files.
@@ -177,7 +179,7 @@ const BUILT_UTC = claimsDoc.built || built.toISOString().slice(0, 16).replace('T
 
 const fmt = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : v);
 const vars = {
-  ...Object.fromEntries(Object.entries({ ...counts, ...mcpVars }).map(([k, v]) => [k, fmt(v)])),
+  ...Object.fromEntries(Object.entries({ ...counts, ...mcpVars, ...barVars }).map(([k, v]) => [k, fmt(v)])),
   ...fourArmVars,
   ...cornealVars,
   SOURCE_ROWS: sourceRows.join(''),
@@ -195,6 +197,16 @@ fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const card = R('assets', 'delphi-where-it-stands.png');
 if (!fs.existsSync(card)) throw new Error('missing assets/delphi-where-it-stands.png; run python3 scripts/site/build-summary-video.py');
 fs.copyFileSync(card, R('docs', 'blog', 'delphi-where-it-stands.png'));
+// Hero art: the segmented Drosophila compound eye (assets/deck/cell-geometry-thumb.jpg, a centre crop of
+// claim-sources/cell-geometry/results/drosophila-compound-eye/overlay.png).
+const eye = R('assets', 'deck', 'cell-geometry-thumb.jpg');
+if (!fs.existsSync(eye)) throw new Error('missing assets/deck/cell-geometry-thumb.jpg');
+fs.copyFileSync(eye, R('docs', 'blog', 'compound-eye.jpg'));
+// The validation harness refusing the project's own winged zebrafish, screen-captured from the dashboard's
+// /validate page for the product report (https://delphi-mission-control.ashenoy000.workers.dev/docs).
+const gate = R('assets', 'validate-gate.jpg');
+if (!fs.existsSync(gate)) throw new Error('missing assets/validate-gate.jpg');
+fs.copyFileSync(gate, R('docs', 'blog', 'validate-gate.jpg'));
 // Design Studio screenshots, captured from the live runtime for the studio demo video.
 const CAPTURES = R('studio', 'artifacts', 'demo-video-science', 'sources', 'captures');
 for (const [src, dst] of [['01-hero-3d-mesh.png', 'studio-flying-fish.png'], ['03-engineering-recorded-runs.png', 'studio-engineering-runs.png']]) {
@@ -240,15 +252,20 @@ function tableToMd(table) {
 
 // The article, as Markdown, with site links absolute so the file can be pasted elsewhere.
 function articleToMarkdown(page) {
-  let s = page.match(/<article>([\s\S]*)<\/article>/)[1];
-  s = s.replace(/<ol class="toc">[\s\S]*?<\/ol>/, '');
+  let s = page.match(/<div class="essay">([\s\S]*)<\/article>/)[1];
+  s = s.replace(/<div class="byline">([\s\S]*?)<\/div>/, (_, t) => `\n${[...t.matchAll(/<span[^>]*>([\s\S]*?)<\/span>/g)].map((m) => inline(m[1])).filter((x) => x && x !== 'Read time').join(' · ')}\n`);
+  s = s.replace(/<aside class="rail"[\s\S]*?<\/aside>/, '');
+  s = s.replace(/<span class="section-no">[\s\S]*?<\/span>\n?/g, '');
+  s = s.replace(/<div class="record-panel"[\s\S]*?<\/div>\n<\/div>\n/, '');
+  s = s.replace(/<div class="intro-band"><div class="eyebrow">([\s\S]*?)<\/div><p>([\s\S]*?)<\/p><\/div>/g, (_, e, t) => `\n**${inline(e)}.** ${inline(t)}\n`);
   s = s.replace(/<div class="eyebrow[^"]*">([\s\S]*?)<\/div>/g, (_, t) => `\n${inline(t)}\n`);
-  s = s.replace(/<figure><img src="([^"]+)" alt="([^"]*)"[^>]*><figcaption>([\s\S]*?)<\/figcaption><\/figure>/g,
+  s = s.replace(/<figure[^>]*><img src="([^"]+)" alt="([^"]*)"[^>]*><figcaption>([\s\S]*?)<\/figcaption><\/figure>/g,
     (_, src, alt, cap) => `\n![${inline(alt)}](${src})\n\n*${inline(cap)}*\n`);
   s = s.replace(/<h1>([\s\S]*?)<\/h1>/g, (_, t) => `\n# ${inline(t)}\n`);
   s = s.replace(/<h2[^>]*>([\s\S]*?)<\/h2>/g, (_, t) => `\n## ${inline(t)}\n`);
   s = s.replace(/<h3[^>]*>([\s\S]*?)<\/h3>/g, (_, t) => `\n### ${inline(t)}\n`);
-  s = s.replace(/<div class="callout">([\s\S]*?)<\/div>/g, (_, t) => `\n> ${inline(t)}\n`);
+  s = s.replace(/<div class="proof-grid">([\s\S]*?)<\/div>\n<\/div>/g, (_, t) => [...t.matchAll(/<div class="small-title">([\s\S]*?)<\/div><p>([\s\S]*?)<\/p>/g)].map((m) => `\n**${inline(m[1])}.** ${inline(m[2])}\n`).join(''));
+  s = s.replace(/<blockquote class="pullquote">([\s\S]*?)<\/blockquote>/g, (_, t) => `\n> ${inline(t)}\n`);
   s = s.replace(/<table[\s\S]*?<\/table>/g, tableToMd);
   s = s.replace(/<ul>([\s\S]*?)<\/ul>/g, (_, t) => `\n${[...t.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => `- ${inline(m[1])}`).join('\n')}\n`);
   s = s.replace(/<pre>([\s\S]*?)<\/pre>/g, (_, t) => `\n\`\`\`\n${decode(t).trim()}\n\`\`\`\n`);
