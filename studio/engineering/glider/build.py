@@ -111,6 +111,20 @@ REVISIONS = {
                   "body_wall_mm": {"value": 0.8, "status": "provisional default (conservative)"}},
     "r1-light": {"parent": "r1-strong", "title": "r1 light: as r1-strong with a 0.5 mm body shell",
                  "body_wall_mm": {"value": 0.5, "status": "provisional; first mass-reduction step"}},
+    "r2-light": {"parent": "r1-light", "title": "r2 light: r1-light with the adjustable catch claude-07's R3 "
+                                                "correction asks for (two slots x four seat heights)",
+                 "body_wall_mm": {"value": 0.5, "status": "provisional"},
+                 "catch": {"value": {"x_mm": [20.0, 34.0], "seat_offsets_mm": [-1.5, 0.0, 1.5, 3.0], "slot_mm": 3.5,
+                                     "rake_deg": 30.0, "liner_mm": 2.0, "plug_clearance_mm": 0.1,
+                                     "nominal": {"slot_x_mm": 20.0, "offset_mm": 0.0}},
+                           "status": "claude-07 R3 correction: seat at -1.5/0/+1.5/+3.0 mm from the design CG "
+                                     "height, two arms ~15 mm apart (25 and 40 mm ahead of a CG near 60 mm); start "
+                                     "tests at 0 and +1.5; slot shape, rake and plug fit assumed"},
+                 "ballast_bay": {"value": {"x_mm": [6.0, 30.0], "port_diameter_mm": 5.0, "port_x_mm": 11.0},
+                                 "status": "assumed; the loft range, clipped behind by the forward slot's axis plane "
+                                           "(its liner is the bay's rear wall)"},
+                 "main_cavity_x_mm": {"value": [6.0, 150.0], "status": "assumed; the loft range, clipped in front by "
+                                                                       "the forward slot's axis plane"}},
 }
 PAIRED = ("pectoral", "pelvic")
 RIDGE_INSET_MM = 0.08     # a ridge's top sits this far inside the membrane (no tangent faces in the union)
@@ -367,31 +381,98 @@ def build(rev: str) -> dict:
         pr[which] = {"fan": fan, "frame": frame, "F": F, "solid_flat": solid, "ridges": rr, "settings": per,
                      "tongue": tg}
 
-    def assemble_body(z_catch: float):
-        cavities = [loft_offset(body, -wall, bay["x_mm"][0], bay["x_mm"][1]),
-                    loft_offset(body, -wall, cav[0], cav[1])]
-        # catch slot: hull of two cylinders along y, seat at (x, z_catch), raked so the mouth is aft-below
-        r = 0.5 * cat["slot_mm"]
-        rk = math.radians(cat["rake_deg"])
-        low = (cat["x_mm"] + 20 * math.sin(rk), z_catch - 20 * math.cos(rk))
-
-        def slot_hull(rr):
-            cyl = mf.Manifold.cylinder(60.0, rr, rr, 32).rotate((90.0, 0.0, 0.0)).translate((0, 30.0, 0))
-            return mf.Manifold.batch_hull([cyl.translate((cat["x_mm"], 0, z_catch)), cyl.translate((low[0], 0, low[1]))])
-        liner = slot_hull(r + cat["liner_mm"]) ^ outer
+    def shell_body(cavities=None):
+        cavities = cavities or [loft_offset(body, -wall, bay["x_mm"][0], bay["x_mm"][1]),
+                                loft_offset(body, -wall, cav[0], cav[1])]
         shell = mf.Manifold.batch_boolean([outer, *median], mf.OpType.Add) - mf.Manifold.batch_boolean(cavities,
                                                                                                    mf.OpType.Add)
-        b = mf.Manifold.batch_boolean([shell, liner, *bosses], mf.OpType.Add)
         port = mf.Manifold.cylinder(30.0, 0.5 * bay["port_diameter_mm"], 0.5 * bay["port_diameter_mm"], 32) \
             .translate((bay["port_x_mm"], 0, -30.0))
         drains = [mf.Manifold.cylinder(30.0, 0.5 * v(p["drain_holes"])["diameter_mm"],
                                        0.5 * v(p["drain_holes"])["diameter_mm"], 24).translate((x, 0, -30.0))
                   for x in v(p["drain_holes"])["x_mm"]]
-        cut = mf.Manifold.batch_boolean([slot_hull(r), port, *drains, *slots], mf.OpType.Add)
-        # port and drains go through the floor only: clip them to below the body axis
+        return shell, [port, *drains]
+
+    r = 0.5 * cat["slot_mm"]
+    rk = math.radians(cat["rake_deg"])
+    down = np.array([math.sin(rk), -math.cos(rk)])          # along the slot from a seat towards its mouth
+
+    def slot_hull(x, z, rr, length=20.0):
+        """Hull of two cylinders along y: the seat circle at (x, z) and one `length` further down the raked axis."""
+        cyl = mf.Manifold.cylinder(60.0, rr, rr, 32).rotate((90.0, 0.0, 0.0)).translate((0, 30.0, 0))
+        lo = np.array([x, z]) + length * down
+        return mf.Manifold.batch_hull([cyl.translate((x, 0, z)), cyl.translate((float(lo[0]), 0, float(lo[1])))])
+
+    def assemble_body(z_catch: float):
+        """Fixed catch (r1): one slot whose seat is at (x, z_catch)."""
+        low = (cat["x_mm"] + 20 * math.sin(rk), z_catch - 20 * math.cos(rk))
+        liner = slot_hull(cat["x_mm"], z_catch, r + cat["liner_mm"]) ^ outer
+        shell, holes = shell_body()
+        b = mf.Manifold.batch_boolean([shell, liner, *bosses], mf.OpType.Add)
+        cut = mf.Manifold.batch_boolean([slot_hull(cat["x_mm"], z_catch, r), *holes, *slots], mf.OpType.Add)
         return b - cut, (low, r)
 
+    def assemble_adjustable(z_ref: float):
+        """Adjustable catch (r2 on): one slot per x position, its top seat at the highest offset above z_ref (the
+        design CG height); a plug pressed into the slot top lowers the seat to each other offset (the seat moves
+        down AND aft along the raked axis).  The band's pull seats the plug against the slot top."""
+        offs = sorted(cat["seat_offsets_mm"])
+        z_top = z_ref + offs[-1]
+        # the forward slot's liner is the bulkhead: the bay is everything ahead of the slot's axis plane less r, the
+        # main cavity everything behind it plus r (the liner fills the overlap), so no sealed pocket of resin is left
+        # between a flat bulkhead and a raked liner
+        nrm = np.array([math.cos(rk), 0.0, math.sin(rk)])   # normal of the slot's axis plane, pointing aft-up
+        a0 = np.array([cat["x_mm"][0], 0.0, z_top])
+
+        def half(sign, offset):
+            """The half-space n.(p - a0) >= offset (sign > 0) or <= offset (sign < 0), as a 200 mm slab along n."""
+            lo = offset if sign > 0 else offset - 200.0
+            slab = box((lo, -100, -100), (lo + 200.0, 100, 100))
+            # rotating about y by -atan2(n_z, n_x) carries +x onto n
+            return slab.rotate((0.0, -math.degrees(math.atan2(nrm[2], nrm[0])), 0.0)).translate(tuple(a0))
+        bay_cav = loft_offset(body, -wall, bay["x_mm"][0], bay["x_mm"][1]) ^ half(-1, -r)
+        main_cav = loft_offset(body, -wall, cav[0], cav[1]) ^ half(+1, r)
+        shell, holes = shell_body([bay_cav, main_cav])
+        liners = [slot_hull(x, z_top, r + cat["liner_mm"], 25.0) ^ outer for x in cat["x_mm"]]
+        b = mf.Manifold.batch_boolean([shell, *liners, *bosses], mf.OpType.Add)
+        cut = mf.Manifold.batch_boolean([*(slot_hull(x, z_top, r, 25.0) for x in cat["x_mm"]), *holes, *slots],
+                                        mf.OpType.Add)
+        inner = loft_offset(body, -cat["plug_clearance_mm"], 0.0, sl)
+        seats, plugs = [], {}
+        for x in cat["x_mm"]:
+            top = np.array([x, z_top])
+            for off in offs:
+                d = (offs[-1] - off) / math.cos(rk)
+                seat = top + d * down
+                seats.append({"slot_x_mm": x, "offset_from_design_cg_z_mm": off, "seat_mm": seat.tolist(),
+                              "plug": None if d == 0 else plug_id(x, off)})
+                if d > 0:
+                    rp = r - cat["plug_clearance_mm"]
+                    plug = mf.Manifold.batch_hull([
+                        mf.Manifold.cylinder(60.0, rp, rp, 32).rotate((90.0, 0.0, 0.0)).translate((0, 30.0, 0))
+                        .translate((float(q[0]), 0, float(q[1]))) for q in (top, seat)]) ^ inner
+                    plugs[plug_id(x, off)] = plug
+        return b - cut, {"z_top_mm": z_top, "seats": seats, "plugs": plugs, "radius_mm": r, "bay_cavity": bay_cav}
+
     nominal_dec = v(p["default_decalage_deg"])
+    if isinstance(cat["x_mm"], list):
+        nom_plug = plug_id(cat["nominal"]["slot_x_mm"], cat["nominal"]["offset_mm"])
+        z_ref, z_hist = 0.0, []
+        for _ in range(4):  # the seat heights are set from the assembled CG height, which the slots move slightly
+            body_part, catch = assemble_adjustable(z_ref)
+            parts = assembled_parts(body_part, pr, i_pect, i_pect - nominal_dec)
+            if nom_plug in catch["plugs"]:
+                parts["catch_plug"] = catch["plugs"][nom_plug]
+            props = {k: MP.properties(*arrays(m), MATERIAL["density_kg_m3"]) for k, m in parts.items()}
+            cg = MP.combine(list(props.values()))
+            z_hist.append(z_ref)
+            if abs(cg["cg_mm"][2] - z_ref) < 0.02:
+                break
+            z_ref = cg["cg_mm"][2]
+        return {"rev": rev, "params": p, "cand": cand, "csha": csha, "body": body, "fans": fans, "rep": rep,
+                "body_part": body_part, "paired": pr, "parts": parts, "props": props, "dry": cg, "z_catch": z_ref,
+                "z_catch_iterations": z_hist, "catch": catch, "outer": outer, "median": median}
+
     z_catch, z_hist = 0.0, []
     for _ in range(3):  # the catch seat sits a fixed distance below the assembled CG, which the slot moves slightly
         body_part, slot_geom = assemble_body(z_catch)
@@ -406,6 +487,10 @@ def build(rev: str) -> dict:
     return {"rev": rev, "params": p, "cand": cand, "csha": csha, "body": body, "fans": fans, "rep": rep,
             "body_part": body_part, "paired": pr, "parts": parts, "props": props, "dry": cg, "z_catch": z_catch,
             "z_catch_iterations": z_hist, "slot": slot_geom, "outer": outer, "median": median}
+
+
+def plug_id(x: float, off: float) -> str:
+    return f"catch_plug-x{x:.0f}-dz{off:+.1f}"
 
 
 def assembled_parts(body_part, pr, i_pect, i_pelv) -> dict:
@@ -429,7 +514,7 @@ def ballast_table(g: dict) -> dict:
     p = g["params"]
     bay = v(p["ballast_bay"])
     wall = v(p["body_wall_mm"])
-    cavity = loft_offset(g["body"], -wall, bay["x_mm"][0], bay["x_mm"][1])
+    cavity = g["catch"]["bay_cavity"] if "catch" in g else loft_offset(g["body"], -wall, bay["x_mm"][0], bay["x_mm"][1])
     rho_b = v(p["ballast_bulk_density_g_cm3"])
     dry = g["dry"]
     bay_vol = cavity.volume()
@@ -645,6 +730,14 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
                       "fragments_dropped_mm3": rec["dropped_mm3"]})
     nominal_ids = ["body", "pectoral_L", "pectoral_R",
                    f"pelvic_L-dec{v(p['default_decalage_deg']):+.0f}", f"pelvic_R-dec{v(p['default_decalage_deg']):+.0f}"]
+    if "catch" in g:  # adjustable catch: every seat plug is a part; the nominal one is in the nominal assembly
+        cat = v(p["catch"])
+        nom_plug = plug_id(cat["nominal"]["slot_x_mm"], cat["nominal"]["offset_mm"])
+        for pid, plug in sorted(g["catch"]["plugs"].items()):
+            emit(pid, plug, plug, "plug", I4, {"assembled_nominal": pid == nom_plug,
+                                               "note": "pressed into the top of its catch slot to lower the seat"})
+        if nom_plug in g["catch"]["plugs"]:
+            nominal_ids.append(nom_plug)
     by_id = {r["id"]: r for r in parts_rec}
     dry = MP.combine([by_id[i]["mass_properties"] for i in nominal_ids])
     # interference of the nominal assembly (fins must not overlap the body)
@@ -665,8 +758,9 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
             "mass_limit_g": MASS_LIMIT_G, "within_mass_limit": bool(loaded_mass <= v(MASS_LIMIT_G)),
             "method": "V = sqrt(2 m g / (rho S C_L)), rho 1.225, S = paired flat area; hand number, not claimed"}
     # catch geometry relative to the CG
-    seat = [v(p["catch"])["x_mm"], g["z_catch"]]
-    hook = {"seat_mm": seat, "contact_radius_mm": 0.5 * v(p["catch"])["slot_mm"],
+    hook = catch_record(g, dry, target) if "catch" in g else None
+    seat = [v(p["catch"])["x_mm"], g["z_catch"]] if hook is None else None
+    hook = hook or {"seat_mm": seat, "contact_radius_mm": 0.5 * v(p["catch"])["slot_mm"],
             "seat_below_dry_cg_mm": dry["cg_mm"][2] - g["z_catch"],
             "ahead_of_dry_cg_mm": dry["cg_mm"][0] - seat[0], "ahead_of_nominal_target_mm": target - seat[0],
             "slot": {"width_mm": v(p["catch"])["slot_mm"], "rake_deg_from_vertical": v(p["catch"])["rake_deg"],
@@ -709,7 +803,8 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
     files["web/assembled.glb"] = glb
     if render:
         from engineering.geometry import render as R
-        cols = {"body": (0.62, 0.66, 0.70), "pectoral": (0.35, 0.55, 0.80), "pelvic": (0.80, 0.55, 0.30)}
+        cols = {"body": (0.62, 0.66, 0.70), "pectoral": (0.35, 0.55, 0.80), "pelvic": (0.80, 0.55, 0.30),
+                "catch": (0.85, 0.25, 0.25)}
         (out / "img").mkdir(parents=True, exist_ok=True)
         R.render([(*arrays(m), cols[k.split("_")[0]]) for k, m in asm.items()], out / "img/assembled.png",
                  f"glider {rev}: launch prototype, untested ({dry['mass_g']:.1f} g dry)")
@@ -719,6 +814,29 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
     files["flight_model.json"] = sha(out / "flight_model.json")
     wjson(out / "manifest.json", manifest)
     return manifest
+
+
+def catch_record(g: dict, dry: dict, target: float) -> dict:
+    cat = v(g["params"]["catch"])
+    c = g["catch"]
+    seats = [{**st, "below_dry_cg_mm": dry["cg_mm"][2] - st["seat_mm"][1],
+              "ahead_of_dry_cg_mm": dry["cg_mm"][0] - st["seat_mm"][0],
+              "ahead_of_nominal_target_mm": target - st["seat_mm"][0]} for st in c["seats"]]
+    return {"adjustable": True, "design_cg_z_mm": g["z_catch"], "slot_top_z_mm": c["z_top_mm"],
+            "contact_radius_mm": c["radius_mm"] - cat["plug_clearance_mm"], "seats": seats,
+            "nominal": cat["nominal"],
+            "slot": {"width_mm": cat["slot_mm"], "rake_deg_from_vertical": cat["rake_deg"], "x_positions_mm": cat["x_mm"],
+                     "mouth": "aft and below the seat", "across": "full body width (band loop lies across the body)"},
+            "liner_wall_mm": cat["liner_mm"],
+            "plugs": "one part per (slot, lower offset); the top offset is the bare slot top; plug clearance "
+                     f"{cat['plug_clearance_mm']} mm a side (assumed); retain with tape or a drop of glue",
+            "kinematics": "a forward band pull drives the loop up the slot's aft (bearing) face into the seat (the "
+                          "slot top or a plug's rounded underside); when the model outruns the band the loop slides "
+                          "down that face and out of the mouth. The recessed form of a rear-raked hook; claude-07's "
+                          "D1 should check it.",
+            "boss_section": {"what": "liner walls round each slot", "thickness_mm": cat["liner_mm"],
+                             "spans": "the full shell width; bonded to the shell all round"},
+            "record_per_flight": "slot x, seat offset (plug id), ballast, pelvic key"}
 
 
 def outline_check(g: dict) -> dict:

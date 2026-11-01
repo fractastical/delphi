@@ -88,7 +88,7 @@ def test_assembly_is_interference_free_and_dry_mass_adds_up(rev):
     parts = {r["id"]: r for r in m["parts"]}
     total = sum(parts[i]["mass_properties"]["mass_g"] for i in na["parts"])
     assert na["dry"]["mass_g"] == pytest.approx(total, rel=1e-12)
-    assert len(na["parts"]) == 5
+    assert len(na["parts"]) == (6 if m["launch_catch"].get("adjustable") else 5)
 
 
 @pytest.mark.parametrize("rev", REVS)
@@ -99,10 +99,29 @@ def test_mass_limit_verdict_is_reported_not_hidden(rev):
 
 
 @pytest.mark.parametrize("rev", REVS)
-def test_catch_seat_sits_below_the_cg_inside_claude07s_band(rev):
-    h = manifest(rev)["launch_catch"]
-    assert 0.5 <= h["seat_below_dry_cg_mm"] <= 2.5
-    assert 17.0 <= h["seat_mm"][0] <= 32.0 and h["contact_radius_mm"] >= 1.5
+def test_catch_geometry_matches_the_rule_it_was_built_to(rev):
+    """r1: the fixed seat 0.5-2.5 mm below the CG (claude-07's first R3, since withdrawn; r1 keeps it, labelled).
+    r2 on: the corrected R3, four seat heights relative to the design CG on each of two slots, a plug part for
+    every seat but the slot top, and the nominal plug in the nominal assembly."""
+    m = manifest(rev)
+    h = m["launch_catch"]
+    if not h.get("adjustable"):
+        assert 0.5 <= h["seat_below_dry_cg_mm"] <= 2.5
+        assert 17.0 <= h["seat_mm"][0] <= 32.0 and h["contact_radius_mm"] >= 1.5
+        return
+    assert h["contact_radius_mm"] >= 1.5
+    ids = {r["id"] for r in m["parts"]}
+    for x in h["slot"]["x_positions_mm"]:
+        seats = [st for st in h["seats"] if st["slot_x_mm"] == x]
+        offs = sorted(st["offset_from_design_cg_z_mm"] for st in seats)
+        assert offs == [-1.5, 0.0, 1.5, 3.0]
+        for st in seats:
+            assert st["seat_mm"][1] - h["design_cg_z_mm"] == pytest.approx(st["offset_from_design_cg_z_mm"], abs=1e-6)
+            assert (st["plug"] is None) == (st["offset_from_design_cg_z_mm"] == 3.0)
+            assert st["plug"] is None or st["plug"] in ids
+    assert abs(h["design_cg_z_mm"] - m["nominal_assembly"]["dry"]["cg_mm"][2]) < 0.05
+    nom = h["nominal"]
+    assert f"catch_plug-x{nom['slot_x_mm']:.0f}-dz{nom['offset_mm']:+.1f}" in m["nominal_assembly"]["parts"]
 
 
 @pytest.mark.parametrize("rev", REVS)

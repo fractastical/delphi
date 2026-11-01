@@ -18,8 +18,27 @@ Fin and hook sections follow claude-07's print requirements R1–R4 (`glider-dyn
 |---|---|---|---|---|---|
 | `r1-strong` | none | 0.8 mm | 19.95 g, CG x 69.3 mm | 28.9 g | 13.2 m/s |
 | `r1-light` | r1-strong | 0.5 mm | 17.14 g, CG x 68.2 mm | 24.0 g | 12.1 m/s |
+| `r2-light` | r1-light | 0.5 mm | 19.13 g, CG x 64.3 mm (with the nominal seat plug) | 24.9 g | 12.3 m/s |
 
-**Both revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
+**r1 is immutable.** Commit `19f4546` rebuilds it byte for byte; this was checked with `cmp` in a clean worktree.
+- Later builder code reproduces r1's geometry but not its bytes. The r1-strong body volume differs by
+  3e-9 mm³, from floating-point operation order.
+- So the r1 files come from that commit. `main()` refuses to overwrite them.
+
+**r2-light makes the catch adjustable,** per claude-07's R3 correction (`glider-dynamics-to-fish-glider-r3-correction.md`).
+- **Slots:** two transverse slots, at x 20 and 34 mm.
+- **Seat heights:** −1.5, 0, +1.5 and +3.0 mm relative to the design CG height (the dry assembled CG,
+  z 3.44 mm).
+  - The top height is the bare slot top. Each lower seat is a `catch_plug-x<slot>-dz<offset>.stl`, pressed into
+    the slot top, with 0.1 mm clearance a side (assumed). Retain it with tape or glue.
+  - A raked slot moves the seat aft as it is lowered: 0.87 mm per 1.5 mm.
+- **Bulkheads:** each slot's 2 mm liner is the bulkhead. The bay and the main cavity are clipped by the forward
+  slot's axis plane. A flat bulkhead left a sealed 0.54 cm³ resin pocket against the raked liner, which the
+  connectivity check caught as a second shell. The nominal assembly uses the x 20 mm slot at offset 0.
+- **Mass:** the second liner adds mass forward. The dry CG moves 4 mm forward and the ballast needed falls, but the
+  ballasted total is about the same.
+
+**All three revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
 V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with that failure stated.
 - **Measured split** (`r1-light`): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.
 - **Why the ballast is large.** The hollow body's CG sits at about x 69 mm, against claude-07's CG window of
@@ -32,6 +51,13 @@ V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with t
   - moving the dense parts forward.
 
   Scale is not a lever (claude-07 §0).
+
+  Within the provisional 0.45 mm wall rule, these levers do not reach 10.5 g. The shell alone is about 5.9 g at
+  0.5 mm, and the printed fins are 6.2 g. Reaching it needs one of these decisions, none of them mine alone:
+  - the longer Daane/FAO pectoral (v3c, +28% fin area, which raises the limit to about 13.4 g);
+  - thinner walls, with evidence from this printer and resin;
+  - film-membrane fins (option B);
+  - accepting a faster launch.
 
 ## Parts (per revision: `stl/`, mm)
 - **`body.stl`**, a hollow shell in the fish frame. It has:
