@@ -111,7 +111,7 @@ the branch handoff; definitions alone are not a run.
 
 | | Default (`python -m frontier mcp ...`) | Opt-in (`... --allow-write`) |
 |---|---|---|
-| Tools | 16 read tools (all `readOnlyHint=true`; listed below) | the 16 above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
+| Tools | 18 read tools (all `readOnlyHint=true`; listed below) | the 18 above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
 | Resources | `frontier://capabilities`, `frontier://schema/{kind}` | same |
 | Acts as | nobody | the principal that owns `FRONTIER_TOKEN` |
 
@@ -132,7 +132,7 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-This implementation registers 17 read-only tools in both stdio and
+This implementation registers 18 read-only tools in both stdio and
 remote modes, including `frontier_plan_experiments`.
 Check `frontier_capabilities` on the actual server before relying on a tool,
 because subsequent deployment changes may differ from this dated record.
@@ -153,6 +153,7 @@ because subsequent deployment changes may differ from this dated record.
 | `frontier_artifact_inspect` | Exact-hash matching Evidence declarations, guarded local-media matches and optional text | `include_text=true` reads published UTF-8 JSON, plain text or CSV only, after rechecking the complete file digest. Maximum file size is 1,000,000 bytes; `max_chars` defaults to 8,000 and is bounded to 1–16,000. Truncation and unavailable/unsupported content are explicit. Remote URIs are never fetched. Declaration alone is not byte verification. |
 | `frontier_simulate` | One allowlisted bioelectric or mechanobiology preview | Fixed bounded local adapter; ephemeral `SimulationResult`, never accepted Evidence. No arbitrary code, cloud job or external inference. |
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
+| `frontier_proofs` | Three fixed recorded Lean theorem families, assumptions and source/receipt links | Checks current source/dependency pins and the exact published source/receipt bytes on every read. Optional fixed family and bounded Lean text; no compiler, arbitrary path or biological validity claim. |
 | `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |
 | `frontier_belief` | Existing finite scenario calculation | Conditional on declared inputs and explicitly uncalibrated; ephemeral and not accepted. |
 | `frontier_plan_experiments` | Prospective linear-Gaussian design comparison | Returns assumption-based covariance and rank diagnostics, no measurements or writes. Check the connected server's capabilities for availability. |
@@ -314,3 +315,31 @@ registered, principal check removed) each fail a test.
 * Quota: every write counts against the principal's `daily_write_limit`; a retry with the same key does not consume more.
 * A review tool is a separate decision. If wanted, it should be a distinct flag, require a reviewer-only token, and still go through `Store.review` unchanged.
 * `site/` and `specs/` still describe the MCP server as read-only; SPEC text is not updated here.
+
+
+## Share recorded Lean theorems
+
+`frontier_proofs()` returns compact summaries for `geometric-similarity`,
+`unit-algebra` and `cantilever-guard`. `family` accepts only one of those three
+names; `include_source` defaults to false. For example:
+
+```python
+await session.call_tool("frontier_proofs", {
+    "family": "cantilever-guard", "include_source": True
+})
+```
+
+This tool is anonymous wherever public claim reads are anonymous. It returns
+assumptions, theorem names, recorded positive/negative exits, toolchain/mathlib
+pins and per-file SHA256/byte counts with relative public artifact links.
+A safe configured public hostname also supplies HTTPS links. Optional theory
+text is bounded to 6,000 characters per family and explicitly reports truncation;
+the full-file digest and download link remain available.
+
+The three receipt digests are fixed in code. Original sources/checker dependencies
+are checked by the existing source-matched gallery helper; published copies must
+also match byte for byte. A missing, edited, symlinked or stale family is withheld
+rather than reported as compiled. No caller supplies a path, code or formula, and
+no Lean process, model, network fetch, Store write, review or acceptance occurs.
+`recorded_compile` names a past receipt; `compile_executed` is false. These are
+conditional mathematical statements, not proof of fish biology or feasibility.

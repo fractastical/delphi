@@ -20,9 +20,9 @@ from frontier.models import ref
 ROOT = Path(__file__).resolve().parents[1]
 INIT = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-03-26", "capabilities": {}, "clientInfo": {"name": "t", "version": "0"}}}
 RHEA = "test-only-reviewer-only-token-0000000"
-READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities",
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities", "frontier_proofs",
               "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
-              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
+              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief", "frontier_plan_experiments"}
 
 
 def free_port():
@@ -389,6 +389,11 @@ def test_public_reads_work_anonymously_but_every_write_needs_a_valid_bearer(publ
         async with streamable_http_client(public.url) as (read, write, _):                      # NO Authorization header
             async with ClientSession(read, write) as anon:
                 await anon.initialize()
+                proofs = val(await anon.call_tool("frontier_proofs", {"family": "unit-algebra", "include_source": True}))
+                assert len(proofs["families"]) == 1 and proofs["withheld"] == []
+                assert proofs["families"][0]["recorded_compile"] and not proofs["compile_executed"]
+                assert "convert_comp" in proofs["families"][0]["source"]["text"]
+
                 caps = val(await anon.call_tool("frontier_capabilities", {}))
                 assert caps["principal"] is None and caps["anonymous_reads"] is True and "Public reads need no credential" in caps["credentials"] and "Every write tool needs a valid bearer" in caps["credentials"]
                 got = val(await anon.call_tool("frontier_get", {"target": ref(seen)}))
