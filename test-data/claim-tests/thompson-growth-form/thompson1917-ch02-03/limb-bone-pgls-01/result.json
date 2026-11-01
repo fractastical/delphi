@@ -1,0 +1,49 @@
+{
+  "claim_id": "thompson1917-ch02-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch02-03",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "problem": "limb-bone-scaling-vs-mechanical-similarity",
+  "hypothesis": "If Thompson's square-cube argument describes real terrestrial mammals, geometric scaling of the limb skeleton would leave large animals under-strengthened, so they must compensate with disproportionately thick limb bones: the cross-sectional area A of the humerus scales with body mass M with an exponent greater than the geometric-similarity value 2/3 (A proportional to M^b with b > 2/3), as for the elephant's 'disproportionately thick limb bones'.",
+  "pass_criterion": "Pre-registered (claim supported). In the primary analysis (terrestrial species, Lifestyle code Te, humeral MeanArea against body mass BM, both log10-transformed, phylogenetic GLS on the supplied timetree with Pagel's lambda estimated by maximum likelihood on [0, 1]) the 95 % confidence interval of the slope b lies entirely above 2/3 and its point estimate is at least 0.70; and the ordinary least squares slope on the same species also has its 95 % interval entirely above 2/3.",
+  "fail_criterion": "Pre-registered (claim refuted). The PGLS 95 % confidence interval of b has an upper bound at or below 2/3 (isometry or negative allometry: no compensation by bone thickness). If the PGLS interval includes 2/3, or has a lower bound above 2/3 but a point estimate below 0.70, or PGLS and OLS disagree on whether the interval lies above 2/3, the verdict is 'mixed'. If fewer than 60 terrestrial species can be matched to the tree with a positive BM and MeanArea, or the downloaded files do not match the checksums recorded below, the verdict is 'inconclusive' with reason 'data-unavailable' or 'underpowered'.",
+  "planned_datasets": [
+    "amson-bibi-2021-humerus-figshare-12600440"
+  ],
+  "datasets": [
+    {
+      "id": "amson-bibi-2021-humerus-figshare-12600440",
+      "name": "Raw data for: Differing effects of size and lifestyle on bone structure in mammals (RawDataHumerusR1.csv and AlteredTimetree.nex)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.12600440.v3",
+      "doi": "10.6084/m9.figshare.12600440.v3",
+      "version": "v3",
+      "license": "CC BY 4.0",
+      "files": [
+        { "name": "RawDataHumerusR1.csv", "download_url": "https://ndownloader.figshare.com/files/25463282", "byte_size": 22529, "md5_expected": "baef70574d6bd1ad1d08003643ad9992" },
+        { "name": "AlteredTimetree.nex", "download_url": "https://ndownloader.figshare.com/files/23612879", "byte_size": 13150, "md5_expected": "dd1d0d9d2e7a92d09c9d998c483eb339" }
+      ],
+      "role": "body mass and humeral mean cross-sectional area of 159 mammal species, with the timetree used for the phylogenetic covariance"
+    }
+  ],
+  "test_contract": {
+    "expected_observation": "Humeral cross-sectional area of terrestrial mammals scales with body mass with an exponent clearly above 2/3, with a lower confidence bound above 2/3 and a point estimate of at least 0.70, under both phylogenetic and ordinary regression.",
+    "disconfirming_observation": "An exponent interval whose upper bound is at or below 2/3 under phylogenetic regression: the limb skeleton would then scale like the geometric-similarity case and not compensate for the square-cube penalty.",
+    "admissible_datasets": "Published, openly licensed measurements of limb-bone cross-sectional area and body mass of mammals, measured independently of Thompson's text, with a phylogeny that covers at least 90 % of the species. Terrestrial species only for the primary analysis (the claim's scope is terrestrial animals under gravity).",
+    "inference_method": "log10(MeanArea) regressed on log10(BM) by phylogenetic GLS under a Brownian-motion covariance scaled by Pagel's lambda (maximum likelihood on [0, 1], profile likelihood), slope and 95 % CI from the t distribution with n - 2 degrees of freedom; the same by ordinary least squares as a check. Thresholds as stated in pass_criterion and fail_criterion."
+  },
+  "secondary_analyses_descriptive": [
+    "Which of the three similarity exponents for area (2/3 geometric, 3/4 elastic, 1 stress similarity) fall inside the PGLS 95 % interval, for the terrestrial set and for all non-aquatic species (Te, Su and Ae), reported but not used for the verdict.",
+    "Standardized PGLS residuals of any Proboscidea species present, as a check on Thompson's remark about the elephant.",
+    "Order-level OLS slopes for orders with at least 8 terrestrial species, as a check on heterogeneity."
+  ],
+  "interpretation": "The test covers the empirical part of the claim, that large terrestrial animals need disproportionately thick limb bones, and not the existence of a definite maximum size, which the dataset cannot show (it contains no extinct giants). The claim's arithmetic (strength proportional to L^2, weight to L^3) is proved separately in Lean (ThompsonLaws.Magnitude) and is not tested here. MeanArea is the humeral mean cross-sectional area reported in the deposit; whether it is total or cortical area is as defined by the dataset's authors, and either is a bone cross-section relevant to crushing resistance. Exponents of area and of circumference are related by A proportional to C^2, so b = 2 x (circumference exponent): 2/3, 3/4 and 1 correspond to 1/3, 3/8 and 1/2.",
+  "caveats": [
+    "Before this registration was written the CSV header, the row count, the Lifestyle, Lineage and Order labels, the blank-cell counts for BM and MeanArea and the match of taxon names to the tree tips (159 of 159) were inspected, and the files' checksums were confirmed against figshare's. No values of BM or MeanArea were viewed and no regression of any kind was run.",
+    "The author of this registration knows from the literature that limb-bone dimensions of tetrapods are generally reported to scale with positive allometry relative to geometric similarity (for example Campione and Evans 2012, whose supplementary table could not be retrieved for this test). A pass is therefore the expected outcome, and the test is a replication on an independent mammal dataset more than a surprise.",
+    "The dataset contains small mammals mostly: whether the terrestrial set reaches large body masses is not known before analysis, and a positive-allometry result driven by a few large animals would be fragile; a leave-largest-species-out check is run and reported but is not part of the verdict.",
+    "Positive allometry of area does not show which mechanical similarity holds, nor that bone stress sets a maximum size.",
+    "Campione and Evans 2012 (BMC Biology 10:60) was planned as a second dataset and dropped before analysis because its data package (MASSTIMATE) has been archived from CRAN and the journal's supplementary file could not be retrieved within the session."
+  ],
+  "created": "2026-11-01",
+  "agent": { "kind": "local-agent", "model": "claude-sonnet-5-5", "run": "biomaterials design session", "date": "2026-11-01" }
+}
