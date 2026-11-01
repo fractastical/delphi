@@ -112,12 +112,41 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
     return rows
 
 
+def sweep_claims(S: dict) -> list[tuple[str, object, object]]:
+    """Section 10 numbers, pinned against the sweep audit rather than the results file."""
+    I, H, P = S["interval_audit"], S["horizon_audit"], S["provenance"]
+    rows = [
+        ("sweep: native verdict", "FAIL", S["native"]["verdict"]),
+        ("sweep: native completeness", 240, S["native"]["completeness"]["complete_arms"]),
+        ("sweep: arms exit 0", 240, P["exit_zero"]),
+        ("sweep: non-finite values", 0, P["nonfinite"]),
+        ("sweep: logger rows", 1442280, P["rows"]),
+        ("sweep: TIFF frames returned (no movie possible)", 0, P["tiff_files"]),
+        ("sweep: binary matches pin", True, P["binary_matches_pin"]),
+    ]
+    for k, exp_exp in (("4", 0.300), ("7", 0.133)):
+        v = I[k]
+        rows += [
+            (f"sweep k={k}: intervals disjoint", False, v["intervals_consistent_with_a_constant_ratio"]),
+            (f"sweep k={k}: J factor", 16.0, round(v["j_factor"], 1)),
+            (f"sweep k={k}: lambda* factor", 2.00, round(v["lambda_star_factor"], 2)),
+            (f"sweep k={k}: fitted exponent", exp_exp, round(v["fitted_exponent_lambda_star_vs_J"], 3)),
+        ]
+    need = H["highest_J_arms_proportionality_requires_to_close"]["4"]
+    rows.append(("sweep k=4 J=560: no arm proportionality needs is still closing", 0,
+                 sum(1 for v in need.values() if v["still_closing"])))
+    return rows
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--results", required=True)
     a = ap.parse_args()
     d = json.loads(Path(a.results).read_text())
     rows = claims(d["arms"], {g["id"]: g for g in d["gates"]}, d["closing_curve_shape"])
+    sweep = Path(a.results).parent / "sweep-audit.json"
+    if sweep.exists():
+        rows += sweep_claims(json.loads(sweep.read_text()))
     bad = [(n, c, g) for n, c, g in rows if c != g]
     for n, c, g in bad:
         print(f"  MISMATCH {n}: card says {c}, results say {g}")

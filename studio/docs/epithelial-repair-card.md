@@ -346,3 +346,65 @@ missing job, not a defaulted assumption.
 
 All 36 arms ran on CPU under `CPUQuota=200% MemoryMax=2G MemorySwapMax=0 TasksMax=256
 RuntimeMaxSec=600`, one thread each; the slowest arm took 31.3 s.
+
+---
+
+## 10. The 240-arm sweep: the J-dependence is refuted too
+
+*Added 2026-11-01. This evidence **postdates the `d87e5d1` release cutoff**. Infra ran the
+admitted `e2f74f2` packet on an owned 8-vCPU VM; 346.0 s wall, 2 627.2 CPU-seconds. I ran no
+cloud job and re-ran no arm.*
+
+**Native frozen verdict: FAIL** (`j-scaling-report.json`, criterion sha256 `5df249c4…`, which
+matches the analyzer shipped in the packet byte-for-byte). Completeness 240/240. **That
+verdict is preserved exactly as returned; everything below is a separately labelled
+re-reading of the same raw loggers.**
+
+**The first thing I checked was whether the FAIL was the error I had just made myself.** The
+native statistic is a spread of geometric-mean *summaries* — the statistic that produced the
+refutation I withdrew in §6. Re-derived on **intervals** instead:
+
+| | *k*=4 | *k*=7 |
+|---|---|---|
+| ratio intervals | **disjoint** | **disjoint** |
+| J range | ×16 | ×16 |
+| λ* actually moves | **×2.00** | **×2.00** |
+| fitted exponent of λ* vs J | **0.300** | **0.133** |
+| predicted exponent | 1.0 | 1.0 |
+
+The intersection of the 15 ratio intervals is **empty at both gap sizes** — at *k*=4 the
+largest lower bound, 0.011429, exceeds the smallest upper bound, 0.002857. So **no constant
+λ*/J fits**, and unlike my §6 claim this FAIL is interval-supported rather than a summary
+artifact.
+
+**Could the finite horizon be manufacturing it?** Proportionality needs a 16× rise in J to
+lift λ* 16×; it lifts it 2×. For that to be censoring, the high-J arms above the observed
+bracket would have to be closing-but-cut-off. They are not: at *k*=4, J=560 every such arm
+(λ_V = 1.6, 3.2, 6.4, 12.8) is **plateaued or re-opening**, and at *k*=7 the same holds from
+1.6 upward. Two *k*=7 arms at λ_V 0.4 and 0.8 were still closing, which could lift that
+bracket at most to (0.8, 1.6) — λ* ≈ 1.13, a factor of 4 over J=35's 0.283, still nowhere
+near 16. And the censoring is **biased toward low J** (at *k*=4, 3 of 5 arrested arms still
+closing at J=35 versus 0 of 4 at J=560), so correcting for it would flatten λ*(J) further.
+**The horizon strengthens the refutation rather than causing it.**
+
+**What this does to §6.** G9's local pass is *not* contradicted: between J=140 and J=280 the
+bracket really does roughly double here too. It was simply **not diagnostic** — one doubling
+inside a wide predicted interval cannot separate λ* ∝ J from λ* ∝ J^0.25. So the rule's
+**J-dependence, the one part that survived locally, is refuted at scale**, while its
+gap-size dependence remains untested (§6). Taken together, **the Φ group is not a usable
+control surface**, and the honest residue of §6 is the measured thresholds themselves, not
+the law proposed to organise them.
+
+**Provenance, independently checked:** 240/240 arm directories exit 0; **0 non-finite or
+unparseable values in 1 442 280 logger rows**; the solver's own receipt hashes to the pinned
+`3d9a6e5a…f0f94d5ad`.
+
+**No movie from this return, and none is claimed.** The packet deletes TIFF frames by design
+and the return contains **0** of them, so there are no spatial states to render. Logs alone
+cannot justify a spatial movie. The §9 movies remain the local 36-arm runs only.
+
+Audit: [`artifacts/epithelial/sweep-audit.json`](../artifacts/epithelial/sweep-audit.json),
+regenerable with `engineering/epithelial/audit_return.py`. Raw return:
+`/data/artifacts/delphi-evolve-rethink/gcp/epithelial-j-scaling-v1/frontier-cpu-20261031-02/final-ae15a56498cc4a0e80ad1b00a7e7fc0c`
+(971 files, 97 404 808 bytes, manifest sha256 `39f32c4d…6e116f7`).
+
