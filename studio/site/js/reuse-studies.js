@@ -6,6 +6,24 @@
   const cards = (snap, id) => ((snap.reuse_studies || {}).visuals || []).filter((v) => v.study === id);
   const num = (n) => Number.isFinite(n) ? n.toFixed(3) : "unknown";
 
+  function oxygen(snap, id) {
+    const f = ((snap.lean_gallery || {}).families || []).find((x) => x.id === "steady-oxygen-bound");
+    if (!f || f.status !== "current" || !f.contextual_reuse) return "";
+    const ctx = (f.contextual_reuse.contexts || []).find((x) => x.project_id === "project-" + id);
+    if (!ctx) return "";
+    const p = snap.projects.projects.find((x) => x.id === id);
+    const live = p && ((snap.project_drafts || {})[p.draft_key] || {}).live_ref;
+    if (!live || ["namespace", "kind", "id", "version"].some((k) => live[k] !== ctx.project_ref[k])) return "";
+    return html`<section class="panel" aria-labelledby="rs-rule"><h2 id="rs-rule">A shared design constraint: oxygen transport</h2>
+      <p>${ctx.use}</p><p>${DF.texSpan("aR^2 \\leq 6DC_0 \\quad \\text{(sphere)}, \\qquad aL^2 \\leq 2DC_0 \\quad \\text{(slab)}", true)}</p>
+      <p class="small">Steady diffusion with uniform consumption and a fixed supplied boundary. R is sphere radius; L is the distance from a slab's centre to its supplied face. The bounds keep the model's centre concentration nonnegative.</p>
+      <p class="note small">Project-specific diffusivity D, oxygen consumption a and boundary concentration C₀ are <b>unknown</b>. The proof is conditional mathematics; it does not establish tissue viability.</p>
+      <p><a class="btn ghost" href="#/proofs?f=steady-oxygen-bound">Inspect Lean source and mutation checks</a></p>
+      ${f.figure_href ? html`<details><summary>See the sphere and slab model</summary><img class="reuse-figure" src="${f.figure_href}" loading="lazy" alt="Idealised sphere and slab oxygen diffusion bounds"></details>` : ""}
+      <details><summary>Applicability and exact reuse context</summary><ul class="small">${(ctx.not_established || []).map((x) => html`<li>${x}</li>`)}</ul>
+        <p class="small"><a href="${f.rule_contract_href}">Rule contract and source context</a> · <a href="${f.reuse_context_href}">Exact Project attachment</a></p></details></section>`;
+  }
+
   function denominators(d) {
     if (!d) return "";
     return html`<details class="reuse-diagnostic"><summary>Resolution check: inspect both denominators</summary>
@@ -43,5 +61,5 @@
       <p>These experiments test mechanisms and numerical assumptions relevant to the proposal. Their outcomes and failed controls remain visible; transfer to living tissue is a separate question.</p>
       ${vs.map(visual)}<p class="small"><a href="${m.manifest_href}">Recording manifest and source hashes</a> · ${U.sha(m.manifest_sha256)}</p></section>`;
   }
-  DF.reuseStudies = { cards, render };
+  DF.reuseStudies = { cards, render, oxygen };
 })();

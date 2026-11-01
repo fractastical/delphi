@@ -83,7 +83,7 @@ about a proposed action.
   evidence-backed collaboration examples without claiming a pilot advantage.
 - [x] Refresh System participant counts from scoped harness and child transcripts,
   distinguishing historical contributors, active workers and capacity.
-- [ ] Build a source-grounded DNA-to-design ledger, compiler dependency graph,
+- [x] Build a source-grounded DNA-to-design ledger, compiler dependency graph,
   candidate-screening/experimental-design workflow and virtual-instrument
   contracts, preserving uncalibrated inter-layer connections and requiring
   functional testing before calling generated DNA a working implementation.

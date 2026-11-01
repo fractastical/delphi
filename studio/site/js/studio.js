@@ -242,6 +242,7 @@
           <details><summary>Scope and Project provenance</summary>${p.live_ref ? html`<p class="small">Project ${entityLink(p.live_ref)} was imported as an unreviewed proposal. This page combines the authored proposal with separately identified computational studies; storage does not establish biological validity.</p>` : html`<p class="note warn small"><b>An authored proposal, not a stored Project.</b> No Project record has been imported and no import receipt exists. ${PD ? html`The draft file <code>${PD.path}</code> (sha256 ${U.sha(PD.sha256)}) validates against the Project schema and has not been submitted. ` : ""}The design remains proposed.</p>`}
           <ul class="small">${p.context.not_this.map((x) => html`<li>${x}</li>`)}</ul></details></section>
         ${DF.reuseStudies ? DF.reuseStudies.render(snap, p.id) : ""}
+        ${DF.reuseStudies ? DF.reuseStudies.oxygen(snap, p.id) : ""}
         <section class="panel" aria-labelledby="rs-sc"><h2 id="rs-sc">Scales involved</h2><ol class="small">${p.scales.map((s) => html`<li><b>${sc(s.scale)}.</b> ${s.role}</li>`)}</ol></section>
         <section class="panel" aria-labelledby="rs-src"><h2 id="rs-src">Sources and what they report</h2>
           <ul>${p.sources.map((s) => html`<li>${s.cite} ${U.pill(s.read_level + " read", "rl")}<br><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.url}</a> <span class="small faint">PMID ${s.pmid} · doi ${s.doi}${s.license ? " · licence: " + s.license : ""}</span><br><span class="small faint">${s.note}</span></li>`)}</ul>

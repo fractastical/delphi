@@ -831,6 +831,15 @@ def genotype_surface(ins: Inputs, out: dict) -> dict | None:
     return module.build(ins, out, root=ROOT)
 
 
+def fidelity_cards(ins: Inputs, out: dict) -> list[dict]:
+    module_path = "scripts/fidelity_site.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_fidelity_site", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.build(ins, out, root=ROOT)
+
+
 def _demo_manifest(ins: Inputs, out: dict, directory: str, expected_cuts: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
     manifest_path = f"{directory}/manifest.json"
@@ -1803,7 +1812,7 @@ def build() -> dict[str, bytes]:
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + fidelity_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")

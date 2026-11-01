@@ -1,11 +1,57 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 11:04pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 11:34pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 11:04pm PDT
+## Current checkpoint — October 31, 2026, 11:34pm PDT
+
+- [x] Release `33bc598` is live: two exact-version, unreviewed Project records
+  and source-specific pages for tissue microcarrier and epithelial repair.
+  Flying Fish remains the sole featured project. Root checked 26 public Project
+  checks, 8 web checks and 39 MCP checks; no biological acceptance was inferred.
+- [x] Four normal-speed films remain live, with the earlier editions preserved.
+  The previous release's 103 media checks are dated evidence, not repeated here.
+- [x] Genotype/sequence/compiler/DOE surface integrated at `506f97a`: 36 sequence
+  artifacts, 44 contextual entries, five unknown biological interfaces and eight
+  uncalibrated instrument contracts. Root ran 40 focused integration checks.
+  Public deployment of this surface is pending the next integration release.
+- [x] Voxelyze CPU outputs integrated with independent review `130b3f4`:
+  24 simulation records (including one animation repeat), 11 analytic records,
+  seven replayed controls and 241×45 saved voxel centres. E still fails its frozen
+  bound; spatial convergence is unresolved. The toy is 50×30×30 mm, not tissue.
+- [ ] Publish source-checked voxel recordings, corrected epithelial studies and
+  the oxygen proof family on the two project pages. Owner06 publishes media;
+  resource_scaling owns the Lean/MCP adapter. Root owns integration and release.
+  Epithelial reviewer found gate-count, threshold-bracket and volume-accounting
+  reporting errors;09/06 must preserve raw results and correct their readings.
+- [x] Oxygen sphere/slab rule: six parametric/boundary theorems compiled, two
+  corrupted coefficient variants rejected, 22 numerical checks passed (owner
+  receipt `3b9d215`). This is a conditional transport bound; project-specific
+  uptake, diffusivity and supplied concentration remain unknown.
+- [ ] Integrate the audited 45-arm aeroelastic fidelity ladder and actual plots/
+  state recording. No effect magnitude converged; all three design decisions
+  remain undetermined. The posthoc rigid-solver diagnosis does not justify
+  blindly running a finer ladder.04 owns a bounded scheme diagnosis.
+- [x] Infra captured encrypted off-host backups with actual sb03 restoration:
+  561 files rehashed, plus a final additive DB cut with 3,936 versions and 1,976
+  events. All18 tables matched a scratch restore. Joined public-safe recovery
+  index is `results/resources/backup-recovery-four-film-20261101.json`.
+- [ ] Capture later genotype/proof/study outputs after the next release. The
+  existing backup covers its declared cutoff, not future changes.
+- [x] One bounded missing-only regulatory recovery ran on Google CPU at
+  11:25–11:27pm PDT. Infra rehashed all9 returned files;106 of165 missing windows
+  recovered, exit3 partial_data. Owner10's immutable-union audit is pending;
+  arithmetic totals are not treated as a checked merged dataset.
+- [ ] Voxcraft H100 compatibility/control probe remains unadmitted while15 fixes
+  return packaging. No running GPU job or GPU saturation is claimed. Infra is
+  the sole dispatcher; unrelated shared jobs remain untouched.
+- [ ] Add the retrospective review-correction trace to System/About, keeping
+  self-corrections distinct from separate-agent review. It cannot establish a
+  collective capability advantage without a controlled comparison.
+
+## Previous checkpoint — October 31, 2026, 11:04pm PDT
 
 - [x] Published immutable release `ac95c4c`: four new normal-speed films (Delphi
   and science, each 60/120 seconds), all older cuts preserved; actual Lean source
