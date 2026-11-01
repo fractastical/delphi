@@ -19,6 +19,7 @@ EP = "artifacts/epithelial"
 CARD = "docs/epithelial-repair-card.md"
 RESULTS = f"{EP}/results-r2.json"
 MEDIA = {"video": "A1-baseline.mp4", "poster": "A1-baseline_poster.png", "video_arrest": "A2-motility-off.mp4", "poster_arrest": "A2-motility-off_poster.png"}
+ERRATA = "artifacts/reuse-study-visuals/epithelial-card-errata.md"
 SOURCES = [CARD, f"{EP}/protocol.json", f"{EP}/protocol-r2.json", f"{EP}/results.json", RESULTS,
            *[f"{EP}/arms/{a}/{f}" for a in ("A1-baseline", "A2-motility-off", "F1-no-drive-NEGATIVE") for f in ("build.json", "run.json")]]
 RENDERER = ["engineering/epithelial/render.py", "engineering/epithelial/build_model.py", "engineering/epithelial/analyze.py"]
@@ -62,7 +63,7 @@ def epithelial() -> dict:
                     "Movie time axes are model units, never minutes or hours."],
         "records_kept": [f"{g['id']} {by[g['id']]}" + (f": {g['detail']}" if g["id"] in ("G4", "G10") and isinstance(g["detail"], str) else "") for g in gates if by[g["id"]] != "pass"]
                         + ["the doubling prediction passed one held-out test and is not a physical law"],
-        "media": {k: ent(f"{EP}/media/{v}") for k, v in MEDIA.items()},
+        "media": {k: ent(f"{EP}/media/{v}") for k, v in MEDIA.items()} | {"errata": ent(ERRATA)},
         "sources": [ent(p, download=True) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],
         "source_commit": "origin/work/epithelial-repair edc1e10 (files copied unchanged)"}
 

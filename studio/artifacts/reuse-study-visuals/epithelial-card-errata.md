@@ -1,0 +1,8 @@
+# Errata to docs/epithelial-repair-card.md (edc1e10), from independent review
+
+The card is owner 09's file and is shipped here byte-for-byte; this note sits beside it and does not edit it. Where the two differ, use this note and the manifest, which count from `artifacts/epithelial/results-r2.json`.
+
+1. **Gate counts.** The card and handoff say nine of thirteen gates pass. The results file has 8 pass (G1, G1b, G2, G3, G5, G7, G9, G11), 3 fail (G4, G10, G12), 1 descriptive (G6: three seeds of one model, no bound assigned) and 1 unevaluable (G8). G6 is not a pass.
+2. **Geometric floor arithmetic (card section 4).** The text takes 1875 nodes as filled to give a 25% floor. 1875 is the residual gap, 40000 - 61 x 625. With 61 surviving cells, 625 nodes are filled (25% of the 2500-node gap). The measured passive closure, 22.0% (arm F1-no-drive-NEGATIVE), is unaffected and stays beside every closure figure. No 25% figure is shown in the site cards until 09 corrects the card's labels.
+3. **G9 and the 1.414 value.** 1.414 is the geometric mean of the observed bracket (1, 2) at k=4, not an observed point threshold. One doubling of interface energy supports one conditional out-of-sample bracket check in this model; it does not establish J scaling at k=7 or exact proportionality, and the phrase "doubling must double the threshold" is a tested model hypothesis, not a physical law. Gap-size scaling is refuted in this model (G12 fail; G8 unevaluable).
+4. **Unchanged.** Model time and sweeps, not minutes; no tissue or biological validation; no purse-string closure is modelled.

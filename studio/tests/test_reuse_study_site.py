@@ -90,7 +90,7 @@ def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
     assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
     assert round(v["summary"]["passive_floor"]["closed_fraction"], 3) == 0.22
     assert "not minutes" in v["labels"]["time"] and v["labels"]["model_only"] is True
-    assert {m["path"].rsplit("/", 1)[0] for m in v["media"].values()} == {"artifacts/epithelial/media"}
+    assert {m["path"].rsplit("/", 1)[0] for k, m in v["media"].items() if k != "errata"} == {"artifacts/epithelial/media"}
 
 
 def test_card_contract_keys_and_strict_text_downloads():
@@ -115,3 +115,10 @@ def test_download_flag_on_non_text_and_wrong_source_prefix_are_refused():
     with pytest.raises(ValueError, match="allowlist"):
         A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
     assert "artifacts/oxygen-diffusion-rule/" in A.SOURCE_PREFIXES
+
+
+def test_card_errata_is_offered_beside_the_uncorrected_card():
+    ep = next(c for c in A.build(Ins(), {}, ROOT)["visuals"] if c["study"] == "epithelial-repair")
+    text = (ROOT / ep["errata_href"]).read_text()
+    assert ep["errata_href"].endswith("epithelial-card-errata.md")
+    assert "8 pass" in text and "625 nodes are filled" in text and "geometric mean" in text

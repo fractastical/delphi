@@ -21,7 +21,7 @@ SOURCE_PREFIXES = ("artifacts/voxel-actuation/", "artifacts/oxygen-diffusion-rul
 RENDERER_PREFIXES = ("engineering/reuse_visuals/", "engineering/epithelial/")
 DOWNLOAD_SUFFIXES = (".json", ".md", ".txt")                    # strict text: no csv, tarball or binary is offered as a source download
 MAX_DOWNLOAD_BYTES = 2_000_000
-MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json")
+MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json", ".md")
 MAX_MEDIA_BYTES = 20_000_000
 REQUIRED = ("id", "study", "title", "evidence_kind", "labels", "caveats", "media", "sources", "renderer")
 
