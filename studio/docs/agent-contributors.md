@@ -1,26 +1,28 @@
 # Hackathon contributor ledger: counting basis
 
-Data: `results/resources/agent-contributors.json`, built by `python3 scripts/agent_contributors.py` (read-only; observed 2026-11-01T02:50:57.712021Z, window start 2026-10-31T07:00:00Z). Tests: `tests/test_agent_contributors.py`.
+Data: `results/resources/agent-contributors.json` (built by `python3 scripts/agent_contributors.py`; observed 2026-11-01T03:01:44.096881Z, window start 2026-10-31T07:00:00Z), reviewed input `results/resources/agent-contributor-mapping.json`, tests `tests/test_agent_contributors.py`.
 
-## The answer, by unit (nothing is summed into one number)
+## Counts by unit (never summed)
 
-| Unit | Count | What it means |
+| Unit | Count | Meaning |
 |---|---|---|
-| Harness IDs with authored evidence in the window (**supported minimum**) | 4 (claude-05, claude-15, codex-03, dx-submit) | a handoff in the window whose filename or title names the ID as sender, or whose sender equals a session name |
-| Harness IDs probable, not counted | 5 (dx-collab, dx-corpus, dx-gpuops, dx-guilds, dx-market) | a role name matches the session once `dx-` is stripped; alias unproven |
-| Harness IDs named by other handoffs only | 9 | referenced, no evidence they authored anything |
-| tmux session names / after rename dedup | 34 / 33 | `dx-submit-retired-1` is a rename of `dx-submit` |
-| Sessions with a live claude/codex process now | 31 | a descendant process of the pane, checked at observation time; says nothing about contribution |
-| Roles in handoff filenames | 98 | topic or worker names, not assumed to be distinct harnesses |
-| Worker branches (`work/*`, `codex/*`) | 91 | jobs, not agents |
-| Own provider jobs | 42 | from `hackathon-usage.json`, jobs not agents |
-| Git identities in the window | 4 | `SciDEX Bot` is one shared identity for most commits; one is a human |
-| Models in commit trailers | 4 | a model is not an agent |
+| **Supported contributing harnesses (minimum)** | 11: claude-02, claude-04, claude-05, claude-06, claude-07, claude-10, claude-13, claude-14, claude-15, codex-03, dx-submit | authored handoff in the window, or a reviewed mapping whose named artifact resolves in the window |
+| Probable, not counted | 5 | `dx-*` session matches a bare role name; alias unproven |
+| Named by others only | 3 | referenced, no authorship evidence |
+| tmux session names, raw / after rename dedup | 34 / 33 | `dx-submit-retired-1` is a rename |
+| **Live harness processes now** | 31 | a claude/codex process under the pane. Not a measure of work |
+| Pane state (coarse class of the last lines) | {"auth_blocked": 13, "error_visible": 2, "idle": 6, "unknown": 11, "working": 1} | `idle` is an empty prompt; `auth_blocked` shows a login string; `error_visible` shows an API or hook error; `unknown` matched nothing |
+| Roles in handoff filenames | 81 | topic names, not harnesses |
+| Worker branches / own provider jobs | 93 / 42 | jobs, not agents |
+| Git identities / models in trailers | 4 / 4 | `SciDEX Bot` is one shared identity; a model is not an agent |
+| Native agents | not measured | separate unit; matched to a session only via the reviewed mapping |
 
-## Basis and limits
-- **Window:** handoff mtimes, commit times and job times from 2026-10-31 00:00 PDT. Earlier evidence is skipped.
-- **Dedup:** `claude13`, `claude-13` and `Claude 13` are one ID; `-retired-N` is a rename; `-rN` sessions stay distinct and are flagged.
-- **Not evidence:** tmux `session_activity` (one poller touched 18 sessions within 180 s, so it is ignored); a mention of an ID; document names such as `CODEX-21-...`.
-- **Undercount, by construction:** a worker that wrote a handoff with no ID in its name or title, and committed under the shared identity, is not in the supported minimum. This session's own handoffs are an example. So 4 is a floor, not an estimate.
-- **Unknowns:** role-to-harness mapping, unattributed workers, reuse of pre-window sessions, and the earlier "four native agents" figure (not reconstructed).
-- **Privacy:** private handoffs were read for IDs only; the output carries file names, sha256 and times, no text. Regenerate to refresh.
+Contribution activity is **unknown** for every session: a live process, an idle prompt or an auth block is not work.
+
+## Evidence basis
+- **Sender side of the title:** the text before the first arrow or ` to ` (or before `:`) decides who wrote a handoff, so a recipient ID is never taken as the author. `fish-glider (claude-05) → ...` and `# claude-07: ...` count; `BioModels to codex-03:` does not.
+- **Role labels:** a title `role (claude-NN) →` labels that role as that harness; the label applies to other handoffs whose filename sender is exactly that role. A role labelled with two harnesses is a conflict and is not used (0 now).
+- **Reviewed mapping:** 6 root-attested entries; each is checked against its commit, branch or handoff (resolves, in window, title names the harness) and counted only if it verifies. One git identity signs nearly all commits, so commit authorship cannot separate agents: a verified artifact shows the work exists and the harness link rests on the reviewed entry.
+- **Not evidence:** tmux `session_activity` (one poller touched 18 sessions within 180 s), mentions, document names like `CODEX-21-...`.
+- **Still a floor:** a worker with no ID in its titles and no mapping entry is missed. Unknowns: roles with no label, unattributed workers, reuse of pre-window sessions, the native-agent count.
+- **Privacy:** private handoffs and pane tails were read for IDs and state classes only; the output holds names, sha256, times and classes, no text.

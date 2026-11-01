@@ -19,7 +19,7 @@ def msg(body, t=IN):
 
 
 def run(files, sessions=("claude-05", "claude-13", "dx-submit", "dx-corpus", "claude-02")):
-    tm = {"sessions": {s: {"active_verified": True} for s in sessions}, "raw_session_names": len(sessions), "activity_poller_suspected": False, "max_sessions_active_within_180s": 0}
+    tm = {"sessions": {s: {"live_harness_process": True, "pane_state": "idle"} for s in sessions}, "raw_session_names": len(sessions), "activity_poller_suspected": False, "max_sessions_active_within_180s": 0}
     git = {"git_identities": {"SciDEX Bot": 5}, "models_in_trailers": {"Claude Sonnet 5.5": 5}, "commits_in_window": 5}
     return ac.build(files, tm, git, ["work/a", "codex/b", "main"], {"own_jobs": 3}, W, W + 7200)
 
@@ -50,7 +50,7 @@ def test_role_equal_to_session_is_supported_and_dx_alias_is_only_probable():
     assert out["counts"]["harness_ids_probable_not_counted"] == 1
 
 
-def test_title_sender_counts_when_filename_has_no_id():
+def test_title_sender_counts_when_filename_has_no_id():  # superseded by the table test below, kept as the simple case
     out = run({"handoff.md": msg("# claude-05 → codex-03 handoff\nbody")})
     assert out["supported_harnesses"]["claude-05"]["evidence"][0]["basis"] == "title sender"
 
@@ -66,7 +66,7 @@ def test_active_requires_a_live_harness_descendant_and_burst_activity_is_flagged
     panes = [{"session": "s1", "pid": 1, "activity": 100.0, "created": 0.0}, {"session": "s2", "pid": 9, "activity": 100.0, "created": 0.0}]
     ps = [(1, 0, "bash"), (2, 1, "node"), (3, 2, "claude"), (9, 0, "bash")]
     tm = ac.scan_tmux(panes, ps)
-    assert tm["sessions"]["s1"]["active_verified"] and not tm["sessions"]["s2"]["active_verified"]
+    assert tm["sessions"]["s1"]["live_harness_process"] and not tm["sessions"]["s2"]["live_harness_process"]
     burst = [{"session": f"c{i}", "pid": 100 + i, "activity": 1000.0 + 7 * i, "created": 0.0} for i in range(12)]
     assert ac.scan_tmux(burst, [])["activity_poller_suspected"] is True
     assert ac.scan_tmux(panes, ps)["activity_poller_suspected"] is False
@@ -94,3 +94,63 @@ def test_committed_ledger_is_consistent_and_hashes_match_available_files():
             if f.exists():
                 assert ac.sha(f.read_bytes()) == e["sha256"] or f.stat().st_mtime > ac.ts(o["window"]["observed_utc"].replace("Z", "+00:00")); checked += 1
     assert checked > 0
+
+
+@pytest.mark.parametrize("line,want", [
+    ("# fish-glider (claude-05): reviewer claude-13's thin-wall finding", ("claude-05", "fish-glider")),
+    ("# biological-fish-v3 (claude05) → cfd3d (claude-04): x", ("claude-05", "biological-fish-v3")),
+    ("# claude-07: r3/r4 evaluated", ("claude-07", None)),
+    ("# print v2 → codex-03 (from claude05)", ("claude-05", None)),
+    ("# BioModels to codex-03: Evidence v2", None),                      # recipient only
+    ("# critic -> claude02 (website)", None),                             # recipient only
+    ("# Experimental design MCP contract for claude-02", None),          # no sender part
+    ("> **Wording correction (claude-07):** every flown", ("claude-07", None)),  # id kept, junk role label dropped
+])
+def test_title_sender_takes_the_sender_side_only(line, want):
+    assert ac.title_sender(line) == want
+
+
+def test_role_label_from_one_title_attributes_a_role_named_file_and_conflicts_are_not_used():
+    out = run({"print-to-site.md": msg("# print → site\nno id here"), "x.md": msg("# print (claude-05) → codex-03: y"),
+               "a-to-b.md": msg("# dup (claude-02) → z"), "dup-to-c.md": msg("# dup (claude-05) → z")},
+              sessions=("claude-05", "claude-02"))
+    ev = {e["file"]: e["basis"] for e in out["supported_harnesses"]["claude-05"]["evidence"]}
+    assert ev["print-to-site.md"] == "role self-labelled in another handoff title"
+    assert "dup" in out["role_label_conflicts"] and "dup" not in out["role_to_harness_self_labelled"]
+
+
+def test_pane_state_is_a_class_not_text_and_idle_is_not_activity():
+    assert ac.classify_pane("x\n❯ \n") == "idle" and ac.classify_pane("Please run /login") == "auth_blocked"
+    assert ac.classify_pane("working (esc to interrupt)\n❯ ") == "working" and ac.classify_pane("Stop hook error: API Error") == "error_visible"
+    assert ac.classify_pane("nothing recognisable") == "unknown"
+    tm = ac.scan_tmux([{"session": "s", "pid": 1, "activity": 0.0, "created": 0.0}], [(2, 1, "claude")], {"s": "Please run /login"})
+    assert tm["sessions"]["s"]["pane_state"] == "auth_blocked" and tm["sessions"]["s"]["live_harness_process"]
+    out = run({})
+    assert out["contribution_activity"].startswith("unknown") and "live_harness_processes_now" in out["counts"] and "tmux_sessions_with_live_harness_process_now" not in out["counts"]
+
+
+def test_reviewed_mapping_counts_only_when_the_named_artifact_resolves_in_window(tmp_path):
+    import subprocess
+    r = tmp_path
+    subprocess.run(["git", "-C", str(r), "init", "-q"], check=True)
+    subprocess.run(["git", "-C", str(r), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "x"], check=True)
+    now = ac.dt.datetime.now().timestamp()
+    entries = [{"harness": "claude-14", "role": "r", "evidence": [{"kind": "commit", "ref": "HEAD"}]},
+               {"harness": "claude-02", "role": "r", "evidence": [{"kind": "commit", "ref": "deadbeef"}]},
+               {"harness": "claude-06", "role": "r", "evidence": [{"kind": "handoff", "ref": "h.md"}]},
+               {"harness": "claude-07", "role": "r", "evidence": [{"kind": "handoff", "ref": "h.md"}]}]
+    files = {"h.md": (b"# claude-06: x", now)}
+    got = {m["harness"]: m["verified"] for m in ac.verify_mapping(entries, str(r), now - 60, files)}
+    assert got == {"claude-14": True, "claude-02": False, "claude-06": True, "claude-07": False}  # unresolved ref; title names another harness
+    assert ac.verify_mapping(entries[:1], str(r), now + 3600, files)[0]["verified"] is False  # commit before window
+    ver = ac.verify_mapping(entries, str(r), now - 60, files)
+    out = ac.build({}, {"sessions": {h: {"live_harness_process": True, "pane_state": "idle"} for h in ("claude-14", "claude-02")}, "raw_session_names": 2, "activity_poller_suspected": False, "max_sessions_active_within_180s": 0},
+                   {"git_identities": {}, "models_in_trailers": {}, "commits_in_window": 0}, [], {"own_jobs": 0}, now - 60, now, ver)
+    assert list(out["supported_harnesses"]) == ["claude-14"]
+
+
+def test_committed_mapping_entries_are_all_verified_in_the_ledger():
+    o = json.loads((ROOT / "results/resources/agent-contributors.json").read_text())
+    assert o["reviewed_mapping"] and all(m["verified"] for m in o["reviewed_mapping"])
+    assert set(m["harness"] for m in o["reviewed_mapping"]) <= set(o["supported_harnesses"])
+    assert not (set(o["role_to_harness_self_labelled"]) & set(o["role_label_conflicts"]))
