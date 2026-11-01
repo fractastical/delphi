@@ -414,21 +414,22 @@ def collect(gcs: GCS, bucket: str, prefix: str, destination: Path,
     objects = gcs.list_objects(bucket, prefix + "/")
     by_name = {obj["name"]: obj for obj in objects}
     manifest_objects = [x for x in objects if "/manifests/" in x.get("name", "") and x["name"].endswith(".json")]
-    snapshots = []
-    for item in manifest_objects:
-        raw = gcs.download(bucket, item["name"], max_bytes=1024 * 1024)
-        _verify_remote_metadata(item, raw)
-        doc = json.loads(raw)
-        doc_prefix = doc.get("prefix")
-        if doc.get("schema") != SCHEMA or not isinstance(doc_prefix, str) or not (doc_prefix == prefix or doc_prefix.startswith(prefix + "/")):
-            raise ValueError(f"unexpected manifest contract at {item['name']}")
-        if doc.get("manifest_kind") not in {"progress", "final"} or not isinstance(doc.get("artifacts"), list):
-            raise ValueError(f"malformed manifest at {item['name']}")
-        snapshots.append((doc.get("created_utc", ""), item["name"], item, doc))
-    if not snapshots:
+    if not manifest_objects:
         raise ValueError("no progress or final manifests found under task prefix")
-    snapshots.sort(key=lambda row: (int(row[2].get("generation", 0)), row[0], row[1]))
-    _, manifest_name, manifest_item, manifest = snapshots[-1]
+    # The provider generation already determines which immutable snapshot is
+    # newest. Reading all historical per-file progress manifests made collection
+    # slower with every export. Validate the selected one completely; a corrupt
+    # newest snapshot must fail rather than silently falling back to older data.
+    manifest_item = max(manifest_objects, key=lambda row: (int(row.get("generation", 0)), row["name"]))
+    manifest_name = manifest_item["name"]
+    raw = gcs.download(bucket, manifest_name, max_bytes=1024 * 1024)
+    _verify_remote_metadata(manifest_item, raw)
+    manifest = json.loads(raw)
+    doc_prefix = manifest.get("prefix")
+    if manifest.get("schema") != SCHEMA or not isinstance(doc_prefix, str) or not (doc_prefix == prefix or doc_prefix.startswith(prefix + "/")):
+        raise ValueError(f"unexpected manifest contract at {manifest_name}")
+    if manifest.get("manifest_kind") not in {"progress", "final"} or not isinstance(manifest.get("artifacts"), list):
+        raise ValueError(f"malformed manifest at {manifest_name}")
     if require_complete and not manifest.get("complete"):
         raise ValueError("latest task manifest is partial; final marker is absent")
     job = validate_record(manifest["job"])

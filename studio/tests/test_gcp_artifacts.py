@@ -250,3 +250,28 @@ def test_cached_artifact_still_refuses_symlinks(tmp_path, ancestor):
     client = GCS(lambda: "test-token", lambda *args, **kwargs: pytest.fail("network accessed"))
     with pytest.raises(ValueError, match="symlink|linked"):
         client.download_to_path("bucket", "object", destination, len(payload), hashlib.sha256(payload).hexdigest())
+
+
+def test_only_newest_manifest_is_read_and_corrupt_newest_never_falls_back(tmp_path):
+    output = tmp_path / "output"
+    output.mkdir()
+    for i in range(5):
+        (output / f"result-{i}.json").write_text(str(i))
+    fake = FakeGCS()
+    client = GCS(lambda: "test-token", fake)
+    upload_run(client, "bucket", "jobs/job/task", output, run_record())
+    original = client.download
+    reads = []
+
+    def counted(bucket, name, **kwargs):
+        reads.append(name)
+        return original(bucket, name, **kwargs)
+
+    client.download = counted
+    receipt = collect(client, "bucket", "jobs/job/task", tmp_path / "durable")
+    assert reads == [receipt["manifest_object"]]
+    assert len(receipt["artifacts"]) == 5
+    fake.objects[receipt["manifest_object"]]["data"] = b"corrupt newest manifest"
+    with pytest.raises(ValueError, match="SHA mismatch"):
+        collect(client, "bucket", "jobs/job/task", tmp_path / "durable")
+    assert reads[-1] == receipt["manifest_object"]
