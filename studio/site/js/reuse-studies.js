@@ -83,15 +83,18 @@
   function followup(snap, id) {
     const f = (snap.reuse_studies || {}).sweep_followup;
     if (!f || f.study !== id) return "";
-    return html`<details class="reuse-followup note" id="rs-followup"><summary><b>Later experiment: ${f.complete_arms} runs challenge the proposed scaling rule</b></summary>
+    const proof = ((snap.lean_gallery || {}).families || []).find((x) => x.id === "scaled-threshold-intervals" && x.status === "current");
+    return html`<details class="reuse-followup note warn" id="rs-followup"><summary><b>Later experiment: ${f.complete_arms} runs challenge the proposed scaling rule</b></summary>
       <h3>A local pass did not generalise across the tested range</h3>
       <p>The earlier single-doubling comparison remains a local pass. A subsequent, wider sweep completed ${f.complete_arms} model runs and returned <b>${f.verdict}</b> against its frozen scaling criterion. Its result concerns closure observed at logged times through ${f.horizon} model-time units.</p>
       <p>The hypothesis was that the operational threshold λ*<sub>V</sub>/J stays within a factor of two. Independent review checked the full threshold intervals: even the closest compatible choices exceed that tolerance.</p>
+      <p class="small">In this two-dimensional model, J sets cell–medium contact energy and λ<sub>V</sub> penalises departures from target cell area. Mapping these parameters to a tissue intervention remains an open problem.</p>
       <div class="tablewrap"><table><caption>Recorded interval evidence; these are model results</caption><thead><tr><th>Gap setting k</th><th>Minimum feasible spread</th><th>Frozen tolerance</th><th>Original summary spread</th></tr></thead><tbody>
         ${f.rows.map((r) => html`<tr><th>${r.gap}</th><td>${r.minimum_spread}×</td><td>${r.tolerance}×</td><td>${r.native_summary_spread}×</td></tr>`)}</tbody></table></div>
+      ${proof ? html`<p><a class="btn ghost" href="#/proofs?f=scaled-threshold-intervals">Inspect the conditional Lean certificate</a></p><p class="small">The certificate checks the interval implication using source-bound endpoints. It does not prove the simulator, extraction of the intervals, or biological validity.</p>` : ""}
       <figure><a href="${f.figure_href}"><img class="reuse-figure" src="${f.figure_href}" loading="lazy" alt="Recorded threshold intervals across the tested adhesion settings, compared with proportional scaling"></a>
-        <figcaption class="small">Intervals from the returned simulation logs. The interval calculation is an additional review; it does not replace the frozen criterion.</figcaption></figure>
-      <p class="note small"><b>Design consequence:</b> do not use this proportional rule as a control knob over the tested range. Longer-horizon closure, untested parameter values, numerical refinement and transfer to living tissue remain unknown.</p>
+        <figcaption class="small"><a href="${f.figure_href}">Open full-size figure</a>. Intervals from the returned simulation logs. The interval calculation is an additional review; it does not replace the frozen criterion.</figcaption></figure>
+      <p class="small"><b>Design consequence:</b> do not use this proportional rule as a control knob over the tested range. Longer-horizon closure, untested parameter values, numerical refinement and transfer to living tissue remain unknown.</p>
       <p class="small">The videos below are the earlier 36-run study. This followup returned cell-centre and volume logs, but no lattice frames defining cell shapes or the wound boundary; no new tissue-shape movie is claimed.</p>
       <details><summary>Evidence, independent review and history</summary><p class="small">Source ${U.sha(f.source_commit)}. The independent review names ${U.sha(f.reviewed_source_commit)}; the published interval values were compared with that review. Later reporting corrections retain the original numerical result.</p>
         <ul class="small">${f.downloads.map((d) => html`<li><a href="${d.href}">${d.label}</a> · ${U.sha(d.sha256)}</li>`)}</ul>

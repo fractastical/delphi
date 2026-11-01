@@ -45,7 +45,7 @@
     const G = snap.lean_gallery;
     if (!G) return { html: html`<section class="pagehead"><h1>Lean proofs</h1><p class="empty">The Lean gallery is not in this snapshot, so no proof is shown.</p></section>` };
     return {
-      html: html`<section class="pagehead"><p class="eyebrow">Evidence</p><h1>Lean proofs</h1><p class="lede">Real Lean 4 source, the receipts of the runs that compiled it, and the mutated statements Lean refused. Four bounded families of mathematics with their assumptions and scope.</p></section>
+      html: html`<section class="pagehead"><p class="eyebrow">Evidence</p><h1>Lean proofs</h1><p class="lede">Real Lean 4 source, the receipts of the runs that compiled it, and the mutated statements Lean refused. ${G.families.length} bounded families of mathematics with their assumptions and scope.</p></section>
         <section class="panel"><p class="note warn small"><span class="pillrow">${U.pill("recorded runs", "warn")} ${U.pill("mathematics, not biology", "warn")}</span> ${G.kind}.</p><ul class="small">${G.scope.map((s) => html`<li>${s}</li>`)}</ul>
           ${G.toolchain ? html`<p class="small">Toolchain: ${G.toolchain.lean_version}; Mathlib revision ${G.toolchain.mathlib_rev}; ${G.toolchain.toolchain}.</p>` : ""}
           <p class="small">The <a href="${DF.href("/formalize")}">proposal checker</a> writes Lean text for a request but does not compile it; it is a separate path from these hand-written theorems.</p></section>

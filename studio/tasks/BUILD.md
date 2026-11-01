@@ -1,11 +1,44 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated November 1, 2026, 12:16am PDT.
+Coordinator: codex-03. Updated November 1, 2026, 12:47am PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — November 1, 2026, 12:16am PDT
+## Current checkpoint — November 1, 2026, 12:47am PDT
+
+- [x] Integrated the independently reviewed 240-arm epithelial followup with
+  source-bound intervals, the original frozen FAIL and corrected figure counts.
+  The later experiment remains distinct from the earlier 36-run movies. Cell
+  centres and volumes were returned; lattice frames for tissue-shape movies were
+  not. Source corrections retain the numerical result and per-arm counterexamples.
+- [x] Integrated a fifth recorded Lean family, scaled-threshold-intervals:
+  two generic implications, two parameterized recorded-bound instances, two
+  nonempty-premise checks and four rational counterexamples. Four false variants
+  were rejected. Exact source/witness changes withhold the family from the gallery
+  and MCP; Lean does not prove the simulation, data extraction or biological use.
+- [x] Corrected the System receipt pin after 11 controller manifests and 47
+  returned files matched. This restores dated mixed-outcome receipts, including
+  failed/cancelling outcomes; spend remains unknown, not zero.
+- [x] Integrated independently recovered d87/795 study backups and later CPU
+  checkpoints. The current source/static delta and 3,960-version database have
+  file/source checks and isolated PG replay. The earlier separate-host web/MCP
+  service drill used an older cutoff; a new full service drill remains open.
+- [x] Inverse-pattern H100 batch and corrected-collocation Google batch returned
+  exact files and command exit 0. Scientific owner reviews remain separate; a
+  returned batch is not acceptance. At 12:39am PDT all 94 Nebius records were
+  terminal (63 attributed to this team); Google VM03 alone retained 16 vCPU.
+- [ ] Publish this exact source/UI/proof cut after focused integration and public
+  read/playback/source checks; current live release is still 795f140.
+- [ ] Owner02 joins a pinned fish candidate, meaningful positive/negative checks,
+  input-change invalidation and a proposed next Action into one validation cycle.
+- [ ] Owner06 exposes bounded dated queue, resource and recovery projections in
+  System. Owner09 prepares a distinct horizon experiment; infra alone dispatches.
+- [ ] Delivery audit is recorded in docs/audits/completion-gap-audit-2026-11-01.md.
+  Broader acceptance remains open; do not infer biological validation or a measured
+  multi-agent advantage from the scoped checks or review corrections.
+
+## Previous checkpoint — November 1, 2026, 12:16am PDT
 
 - [x] Published `795f140` after scientific release `d87e5d1`: both secondary
   studies have actual recordings, exact downloads, shared oxygen proofs and

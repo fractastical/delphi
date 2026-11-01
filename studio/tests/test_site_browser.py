@@ -2394,7 +2394,10 @@ def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs
             assert "240 model runs" in followup and "FAIL" in followup
             assert "do not use this proportional rule" in followup
             assert "Longer-horizon closure" in followup and "remain unknown" in followup
+            assert pg.locator('#rs-followup a[href="#/proofs?f=scaled-threshold-intervals"]').count() == 1
             assert pg.locator("#rs-followup tbody tr").count() == 2
+            if width < 600:
+                assert pg.locator("#rs-followup caption").bounding_box()["width"] >= 0.9 * pg.locator("#rs-followup .tablewrap").bounding_box()["width"]
             pg.wait_for_function("document.querySelector('#rs-followup img').naturalWidth > 0")
             f = snapshot["reuse_studies"]["sweep_followup"]
             for file in f["downloads"] + [{"href": f["figure_href"], "sha256": f["figure_sha256"]}]:
