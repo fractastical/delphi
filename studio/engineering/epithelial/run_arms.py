@@ -25,9 +25,10 @@ def run_one(binary: Path, clone: Path, arm: dict, outdir: Path, runtime_max_s: i
         {"arm": arm, "edits": names, "model_sha256": build_model.sha(xml.encode()),
          "base_sha256": build_model.BASE_SHA256, "tag": build_model.TAG,
          "xml_path": build_model.XML_PATH, "binary_sha256": build_model.BINARY_SHA256}, indent=1))
+    # each arm runs with cwd=out, so the binary must be an absolute path
     cmd = ["systemd-run", "--user", "--scope", "-q", "-p", "CPUQuota=200%", "-p", "TasksMax=256",
            "-p", "MemoryMax=2G", "-p", "MemorySwapMax=0", "-p", f"RuntimeMaxSec={runtime_max_s}",
-           str(binary), "-f", "model.xml", "--no-gnuplot", "--num-threads", "1"]
+           str(binary.resolve()), "-f", "model.xml", "--no-gnuplot", "--num-threads", "1"]
     t0 = time.monotonic()
     r = subprocess.run(cmd, cwd=out, capture_output=True, text=True,
                        env={**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1"})
