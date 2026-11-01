@@ -10,6 +10,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -83,6 +84,10 @@ def now():
 def export_snapshot(spec, output, rc, started):
     """Copy an immutable tree before hashing; skip a concurrently changing file."""
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    (output / "host-sample.json").write_text(json.dumps({"observed_utc": now(),
+        "logical_cpus": os.cpu_count(), "load_1_5_15": os.getloadavg(),
+        "cpu_pressure": Path("/proc/pressure/cpu").read_text(),
+        "scope": "Instant worker host sample; allocation is not utilization."}, indent=2))
     with tempfile.TemporaryDirectory(prefix="export-", dir=ROOT) as temp:
         snapshot = Path(temp) / "out"
         snapshot.mkdir()
@@ -104,7 +109,8 @@ def export_snapshot(spec, output, rc, started):
             "skipped_mutable_files": skipped, "complete_collection_possible": rc is not None and not skipped}, indent=2))
         record = {"job_id": spec["vm"], "task_id": spec["task_id"], "source_commit": spec["source_commit"],
                   "source_sha256": spec["source_sha256"], "input_sha256": spec.get("input_sha256", {}),
-                  "parameters": spec.get("parameters", {}), "command": spec["argv"], "exit_code": rc}
+                  "parameters": spec.get("parameters", {}), "command": spec["argv"], "exit_code": rc,
+                  "started_utc": started, "finished_utc": now() if rc is not None else None}
         record_path = Path(temp) / "record.json"
         record_path.write_text(json.dumps(record))
         command = [sys.executable, str(ROOT / "gcp_artifacts.py"), "upload", "--bucket", spec["bucket"],
@@ -138,10 +144,14 @@ def run(spec):
     try:
         with (output / "console.log").open("w") as log:
             process = subprocess.Popen(systemd_argv(spec, source, output), stdout=log, stderr=subprocess.STDOUT)
-            next_export = time.monotonic() + spec["export_interval_s"]
+            # Confirm the attached-identity transport promptly during setup.
+            next_export = time.monotonic() + 30
             while process.poll() is None:
                 if time.monotonic() >= next_export:
-                    export_snapshot(spec, output, None, started)
+                    try:
+                        export_snapshot(spec, output, None, started)
+                    except (OSError, ValueError, subprocess.SubprocessError) as error:
+                        print(json.dumps({"event": "partial_export_failed", "error": str(error)[:500]}), flush=True)
                     next_export = time.monotonic() + spec["export_interval_s"]
                 time.sleep(5)
         rc = process.returncode

@@ -1,4 +1,5 @@
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -44,3 +45,24 @@ def test_packet_changed_after_freeze_never_becomes_bootable_metadata(tmp_path):
     assert receipt["startup_sha256"] == hashlib.sha256(dest.read_bytes()).hexdigest()
     assert receipt["bytes"] < 250000
     assert b"frozen packet" not in dest.read_bytes()
+
+
+def test_export_snapshot_labels_running_outputs_partial(monkeypatch, tmp_path):
+    monkeypatch.setattr(gcp_worker, "ROOT", tmp_path)
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "actual.json").write_text('{"measured": 3}')
+    request = {**spec(), "source_commit": "frozen-source", "bucket": "private-bucket"}
+    calls = []
+
+    def fake_run(argv, **kwargs):
+        calls.append(argv)
+        record = json.loads(Path(argv[argv.index("--record") + 1]).read_text())
+        assert record["exit_code"] is None and record["finished_utc"] is None
+        snapshot = Path(argv[argv.index("--output-dir") + 1])
+        assert (snapshot / "actual.json").read_bytes() == (out / "actual.json").read_bytes()
+        return type("Result", (), {"returncode": 0, "stderr": ""})()
+
+    monkeypatch.setattr(gcp_worker.subprocess, "run", fake_run)
+    assert gcp_worker.export_snapshot(request, out, None, "2026-11-01T00:00:00Z") == 0
+    assert "--partial" in calls[0]
