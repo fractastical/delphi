@@ -25,7 +25,7 @@ const dirty = sh("git status --porcelain").trim().split("\n").filter(Boolean).le
 const DOCS = [
   "README.md", "AGENTS.md", "BEST_PRACTICES.md", "COLLABORATIONS.md",
   "mcp/README.md", "forum/README.md", "plugins/agent/README.md", "plugins/fittest/README.md",
-  "swarm_coordination/README.md", "swarm_coordination/chats/README.md", "test-data/claim-tests/SUMMARY.md",
+  "chats/README.md", "chats/SWARM_COORDINATION.md", "test-data/claim-tests/SUMMARY.md",
   "test-data/organisms/README.md", "test-data/morpholib/README.md",
   "claim-sources/thompson-growth-form/lean/INSTRUCTIONS.md",
   "claim-sources/darwin-origin/assessment/INSTRUCTIONS.md",
@@ -37,10 +37,11 @@ const DOCS = [
   "scripts/release/agent-comparison/aristotle-ha06/RESULTS.md",
   "problems/README.md",
 ];
-// The four top-level documents and swarm_coordination/ sit at the repository root; everything else is under .
-const ROOT_DOCS = new Set(["README.md", "AGENTS.md", "BEST_PRACTICES.md", "COLLABORATIONS.md"]);
+// Every listed document lives in this repository. An earlier draft looked one
+// directory up for the root docs and for swarm_coordination/; those paths are
+// chats/ inside the repo (issue #80).
 for (const p of DOCS) {
-  const src = ROOT_DOCS.has(p) || p.startsWith("swarm_coordination/") ? join(REPO, "..", p) : join(REPO, p);
+  const src = join(REPO, p);
   if (!existsSync(src)) { console.warn(`missing ${p}`); continue; }
   mkdirSync(dirname(join(OUT, "repo", p)), { recursive: true });
   copyFileSync(src, join(OUT, "repo", p));
@@ -66,7 +67,7 @@ cap("git-stats.txt", `echo commits $(git rev-list --count HEAD); echo first $(gi
 cap("nanopub-manifests.txt", "for f in claim-sources/*/nanopubs/manifest.jsonl test-data/*/nanopubs/manifest.jsonl; do [ -f \"$f\" ] && echo \"$f $(wc -l < \"$f\") lines, production: $(grep -c '\"registry\":\"production\"' \"$f\"), test: $(grep -c '\"registry\":\"test\"' \"$f\")\"; done; true");
 cap("lean-reports.txt", "for f in claim-sources/*/lean/reports/*.json; do echo \"== $f\"; node -e \"const r=require('./'+process.argv[1]);const a=Array.isArray(r)?r:(r.results||r.claims||Object.values(r));console.log(JSON.stringify(a.reduce((m,x)=>{const s=x.status||x.result||'?';m[s]=(m[s]||0)+1;return m},{})))\" \"$f\" 2>/dev/null || echo unparsed; done; true");
 cap("tree.txt", "git ls-files | cut -d/ -f1-2 | sort | uniq -c | sort -rn");
-cap("subagent-sessions.txt", "ls ../swarm_coordination/chats/subagents | sed -E 's/_[0-9a-f]{8}\\.md$//' | sort | uniq -c | sort -rn");
+cap("subagent-sessions.txt", "ls chats/subagents | sed -E 's/_[0-9a-f]{8}\\.md$//' | sort | uniq -c | sort -rn");
 
 // 3. Manifest.
 const files = [];

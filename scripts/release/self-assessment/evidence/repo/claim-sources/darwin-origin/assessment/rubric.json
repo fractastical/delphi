@@ -1,0 +1,49 @@
+{
+  "id": "dataset-resolvability",
+  "version": "0.1.0",
+  "label": "Resolvability of a claim with currently available datasets, v0.1.0",
+  "description": "Scores how far a claim can be resolved, that is confirmed or refuted, by analysing scientific datasets that are publicly available today, without collecting new data. It scores testability with existing data, not whether the claim is true. Each dimension is a graded judgement in [0,1] (delphi:hasScore), never a probability. The overall score is the weighted mean of the five dimensions, computed by the pipeline from the assessor's dimension scores.",
+  "dimensions": [
+    {
+      "id": "operationalizability",
+      "label": "Operationalizability",
+      "weight": 0.20,
+      "question": "Can the claim be turned into measurable variables and an explicit decision criterion (what result would confirm it, what would refute it) without losing what Darwin meant?",
+      "anchors": {"0.0": "no measurable content: definitional, metaphysical or purely rhetorical", "0.5": "measurable only after substantial interpretation, or several competing operationalizations", "1.0": "maps directly onto standard measured variables with an obvious confirming and refuting result"}
+    },
+    {
+      "id": "data-existence",
+      "label": "Data existence",
+      "weight": 0.25,
+      "question": "Do specific, publicly accessible datasets exist today that contain the variables needed?",
+      "anchors": {"0.0": "no dataset known to contain the variables", "0.5": "data exist but are scattered across papers, supplements or restricted repositories and would have to be compiled", "1.0": "one or more named, openly downloadable datasets contain the variables directly"}
+    },
+    {
+      "id": "data-adequacy",
+      "label": "Data adequacy",
+      "weight": 0.20,
+      "question": "Do those datasets have the coverage, sample size, taxonomic, spatial and temporal scope and resolution that the claim's scope requires?",
+      "anchors": {"0.0": "available data cover a negligible or badly biased fraction of the claim's scope", "0.5": "adequate for a subset (some taxa, regions or periods) only", "1.0": "coverage and resolution match the claim's full stated scope"}
+    },
+    {
+      "id": "discriminating-power",
+      "label": "Discriminating power",
+      "weight": 0.20,
+      "question": "Would the analysis discriminate the claim from its plausible rivals, rather than being uninformative, confounded, or circular (for example testing descent with a tree built by assuming it)?",
+      "anchors": {"0.0": "every plausible outcome is compatible with both the claim and its rivals, or the test is circular", "0.5": "informative but with serious confounds or known biases (e.g. preservation or sampling bias)", "1.0": "a clean test whose outcome would clearly favour the claim or its rival"}
+    },
+    {
+      "id": "analysis-feasibility",
+      "label": "Analysis feasibility",
+      "weight": 0.15,
+      "question": "Could a small team with standard methods run the analysis on the existing data within weeks?",
+      "anchors": {"0.0": "would require years of compilation or methods that do not exist", "0.5": "months of data harmonization or specialist methods", "1.0": "standard analysis, days to weeks"}
+    }
+  ],
+  "verdicts": {
+    "resolvable-now": "existing open data and standard methods could confirm or refute the claim as stated",
+    "partially-resolvable": "existing data can test part of the claim, a restricted scope of it, or a proxy for it",
+    "needs-new-data": "testable in principle, but the necessary data do not exist yet",
+    "not-empirically-resolvable": "the claim is definitional, conceptual, or has no measurable consequence that distinguishes it from rivals"
+  }
+}

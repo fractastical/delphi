@@ -184,6 +184,7 @@ thread's status live.
 | [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
 | [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
 | [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
+| [Project overview deck](assets/deck/overview-deck.html) | Five slides (open the HTML locally): why Lean for biology, what Delphi uncovered, the flying-fish design across eight scales of evidence, applications and thanks. Counts are built from `docs/claims.json`, the organism inventory and the Lean registry by `node scripts/site/build-overview-deck.mjs`. |
 | [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
 
 **Where things live**
