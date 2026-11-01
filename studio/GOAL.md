@@ -63,6 +63,9 @@ about a proposed action.
   validation limits, and map the story to the judging rubric (SPEC-016).
 - [x] Publish the additive 90-second MiniMax narrated cut, preserve older cuts,
   and check actual public playback, downloads, captions and fullscreen.
+- [ ] Deliver new science-focused 60- and 120-second cuts: actual Lean source and
+  checks, multiscale design evidence, genetic-context limits and validation;
+  retain old cuts and feature the new pair after public playback checks.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.
