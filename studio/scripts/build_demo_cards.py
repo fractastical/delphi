@@ -41,6 +41,8 @@ def main() -> None:
     lean_path = ROOT / "artifacts/demo-video-90/sources/provenance/lean-receipt.json"
     benchmark_path = ROOT / "artifacts/demo-video-90/sources/provenance/capability-agency-results-card.md"
     summary_path = ROOT / "artifacts/demo-video-90/sources/provenance/capability-agency-results-card.md"
+    model_usage_path = ROOT / "artifacts/demo-video-90/sources/provenance/bio-model-usage.json"
+    genomics_path = ROOT / "artifacts/demo-video-90/sources/provenance/genomics-completion.json"
     receipt = json.loads(lean_path.read_text(encoding="utf-8"))
     if receipt.get("positive", {}).get("exit") != 0 or receipt.get("negative_corrupt_law", {}).get("exit") != 1:
         raise ValueError("Lean receipt does not contain the required positive and mutant outcomes")
@@ -80,6 +82,46 @@ def main() -> None:
               font=font(27), fill="#dceaf2")
     benchmark_out = OUT / "capability-agency-tie-summary.png"
     image.save(benchmark_out)
+
+    usage = json.loads(model_usage_path.read_text(encoding="utf-8"))
+    entries = {entry["id"]: entry for entry in usage["entries"]}
+    gemini = entries["gemini-discovery-embedding-index-20261031"]["usage"]
+    openfold = entries["openfold2-kcnj13-operation-op-5ba1d104dbbcd293"]
+    openmm = entries["openmm-collagen-900ps-conditional-branches-infra21"]["usage"]
+    assert gemini["requests"] == 49 and gemini["documents"] == 2444
+    assert openfold["status"] == "succeeded" and openfold["runtime_origin"] == "upstream-source-not-nim"
+    assert openmm["replicates"] == 3 and openmm["production_ps_each"] == 900
+    genomes = json.loads(genomics_path.read_text(encoding="utf-8"))
+    assert genomes["n_run"] == genomes["n_pinned"] == 23 and genomes["download_md5_all_ok"] is True
+    image, draw = base("Receipt-backed compute + model use")
+    rows = [
+        ("GOOGLE CLOUD", "23 public genome archives run and pinned; BETSE 8/8 cases completed."),
+        ("NEBIUS H100", "OpenMM collagen model: 3 independent 900 ps production runs; Evo2 scoring jobs recorded."),
+        ("GEMINI / OPENFOLD2", "49 embedding requests for 2,444 documents; one upstream OpenFold2 result, not NIM."),
+        ("BIOLOGY SERVICE STATUS", "BioNeMo/NIM and Brev are future integrations; execution is not established."),
+    ]
+    for idx, (label, text) in enumerate(rows):
+        y = 420 + idx * 86
+        draw.rounded_rectangle((180, y, 1740, y + 68), radius=14, fill="#18354a")
+        draw.text((205, y + 7), label, font=font(24, True), fill="#73eec2")
+        draw.text((530, y + 14), text, font=font(24), fill="#ffffff")
+    draw.text((205, 770), "Provider completion, scientific checks and biological validation are separate.",
+              font=font(26, True), fill="#ffdf9e")
+    provider_out = OUT / "provider-compute-use-summary.png"
+    image.save(provider_out)
+
+    image, draw = base("Public-genome survey · receipt")
+    draw.text((220, 435), f"{genomes['n_run']} run · {genomes['n_pinned']} pinned assemblies",
+              font=font(48, True), fill="#bfffe8")
+    draw.text((220, 510), "Downloaded checksums: all MD5 checks passed", font=font(34), fill="#ffffff")
+    draw.text((220, 580), f"{genomes['n_scored_a_type']} loci scored · {genomes['n_as_predicted']} matched expectation · 1 deviation",
+              font=font(32), fill="#ffffff")
+    draw.text((220, 650), f"Deviation retained: {genomes['deviations'][0]}", font=font(30), fill="#ffdf9e")
+    draw.text((220, 720), "Archive count, not species count or a complete genome; not organism validation.",
+              font=font(27), fill="#dceaf2")
+    genomics_out = OUT / "genomics-survey-receipt-summary.png"
+    image.save(genomics_out)
+
     provenance = {
         "schema": "frontier.demo-video-90.cards/1",
         "cards": [
@@ -90,6 +132,12 @@ def main() -> None:
              "source_path": "artifacts/demo-video-90/sources/provenance/capability-agency-post-run.json",
              "source_sha256": sha256(ROOT / "artifacts/demo-video-90/sources/provenance/capability-agency-post-run.json"),
              "source_kind": "actual benchmark post-run summary", "claim_scope": post.get("interpretation")},
+            {"path": provider_out.relative_to(ROOT).as_posix(), "sha256": sha256(provider_out),
+             "source_path": model_usage_path.relative_to(ROOT).as_posix(), "source_sha256": sha256(model_usage_path),
+             "source_kind": "scoped bio-model usage ledger and GCP task receipts", "claim_scope": usage.get("scope")},
+            {"path": genomics_out.relative_to(ROOT).as_posix(), "sha256": sha256(genomics_out),
+             "source_path": genomics_path.relative_to(ROOT).as_posix(), "source_sha256": sha256(genomics_path),
+             "source_kind": "completed public-genome survey receipt", "claim_scope": genomes.get("scope")},
         ],
         "renderer_inputs": {"benchmark_summary_markdown": str(benchmark_path.relative_to(ROOT)),
                              "summary_markdown_sha256": sha256(summary_path)},

@@ -61,14 +61,16 @@ def main() -> None:
             ],
         },
         "human_control": {
-            "badge": "Choose parameters · inspect equations · challenge exact versions · plan a test",
+            "badge": "Bounded examples: parameterized runs · equation · exact-version review · prospective planner",
             "shots": [
-                shot(2.5, "single", [source("artifacts/demo-video-90/sources/captures/04-studio-scale-navigation.png",
-                      "Studio scale navigation", "Captured Studio navigation across the represented model scales.")]),
-                shot(3.0, "single", [source("artifacts/demo-video-90/sources/captures/21z-experimentation-plan-zoom.png",
-                      "Prospective experiment planner · assumed costs", "Prospective Bayesian design under explicit assumed prior and noise; not measured biology.")]),
-                shot(2.5, "single", [source("artifacts/demo-video-90/sources/captures/05-studio-project-design-review.png",
-                      "Exact-version project challenges", "Captured Project design review; discussions remain attached to exact versions.")]),
+                shot(1.0, "single", [source("artifacts/demo-video-90/sources/captures/03-engineering-recorded-runs.png",
+                      "Engineering · saved parameterized runs", "Captured engineering page with bounded model runs and parameter variants; not an all-scales control.")]),
+                shot(1.0, "single", [source("artifacts/demo-video-90/sources/captures/07z-claim-equations-zoom.png",
+                      "Equation with source and assumptions", "Actual claim equation, provenance and applicability context.")]),
+                shot(1.0, "single", [source("artifacts/demo-video-90/sources/captures/05-studio-project-design-review.png",
+                      "Project challenge · exact version", "Captured Project review; challenges remain attached to exact versions.")]),
+                shot(1.0, "single", [source("artifacts/demo-video-90/sources/captures/21z-experimentation-plan-zoom.png",
+                      "Prospective experiment planner · assumed inputs", "Prospective Bayesian design under stated prior/noise/cost; no observed response values.")]),
             ],
         },
         "swarm": {
@@ -96,8 +98,9 @@ def main() -> None:
         "scales": {
             "badge": "Separate bounded models · no molecular-to-organism validation or parameter transfer",
             "shots": [
-                shot(3.0, "single", [source("artifacts/demo-video-90/sources/captures/11-blueprints-sources.png",
-                      "Genomic archive sources · retrieved inputs", "Captured curated genome archive view; 23 assemblies are retrieval inputs, not functional validation.")]),
+                shot(3.0, "single", [source("artifacts/demo-video-90/sources/cards/genomics-survey-receipt-summary.png",
+                      "23 public-genome archive runs · 23 pinned · MD5 checks passed",
+                      "Source-derived card from the completed GCP survey receipt; not 23 species, a complete genome or organism validation.")]),
                 shot(11.0, "grid-4", [
                     source("artifacts/demo-video-90/sources/simulations/openmm-collagen-fragment.mp4",
                            "OpenMM · collagen fragment · simulated", "CUDA OpenMM trajectory from a collagen-like experimental fragment; not native fish collagen.", "video"),
@@ -111,14 +114,12 @@ def main() -> None:
             ],
         },
         "ecosystem": {
-            "badge": "Used providers/models are receipt-pinned · future integrations are labeled separately",
+            "badge": "Provider job completion · model execution · scientific validation remain separate",
             "shots": [
-                shot(6.0, "single", [source("artifacts/demo-video-90/sources/captures/13-system-provider-outcomes.png",
-                      "USED · Nebius H100, Google Cloud CPU/L4, Gemini, Evo2, upstream OpenFold2", "Named provider and model receipts; OpenFold2 operation is upstream source, not NVIDIA NIM.")],
-                     "USED: Nebius H100 · Google Cloud · Gemini · Evo2 scoring · upstream OpenFold2 · local OpenResearch"),
-                shot(6.0, "single", [source("artifacts/demo-video-90/sources/captures/14-system-receipts.png",
-                      "FUTURE · NVIDIA BioNeMo/NIM and Brev", "Integration opportunities only; BioNeMo/NIM runtime is not established.")],
-                     "FUTURE INTEGRATIONS: NVIDIA BioNeMo/NIM and Brev · execution not established"),
+                shot(1.0, "single", [source("artifacts/demo-video-90/sources/cards/provider-compute-use-summary.png",
+                      "Used provider and model receipts · scoped summary",
+                      "Source-derived from the scoped model-usage ledger plus GCP genome and BETSE receipts; billing total remains unknown.")],
+                     "Used providers/models and future integrations are explicitly separated in the receipt summary"),
             ],
         },
         "close": {
@@ -148,6 +149,18 @@ def main() -> None:
     capture_manifest = OUT / "sources/source-index.json"
     source_index = json.loads(capture_manifest.read_text(encoding="utf-8"))
     indexed_paths = {row["path"] for row in source_index["files"]}
+    copied_origins = {
+        "artifacts/demo-video-90/sources/captures/03-engineering-recorded-runs.png": "artifacts/demo-video/sources/captures/03-engineering-recorded-runs.png",
+        "artifacts/demo-video-90/sources/provenance/bio-model-usage.json": "results/resources/bio-model-usage.json",
+        "artifacts/demo-video-90/sources/provenance/genomics-completion.json": "results/resources/gcp/genomics-completion.json",
+    }
+    for rel, origin in copied_origins.items():
+        if rel not in indexed_paths:
+            path = ROOT / rel
+            source_index["files"].append({"path": rel, "sha256": sha256(path), "bytes": path.stat().st_size,
+                                          "origin_path": origin, "origin_commit": None,
+                                          "note": "Copied receipt or capture pinned by SHA-256; source manifest records its capture/retrieval context."})
+            indexed_paths.add(rel)
     for scene_spec in media.values():
         for shot_spec in scene_spec["shots"]:
             for source_spec in shot_spec["sources"]:
