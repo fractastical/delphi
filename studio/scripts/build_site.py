@@ -1752,7 +1752,7 @@ def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, a
     return {"goal_checklist": goal, "spec005_acceptance": spec5, "specs": specs, "board": board, "measured": measured,
             "levels": {"author_report": "What the repository's own documents say: checkboxes, status text, owners, plans. Written by the people or agents doing the work.",
                        "measured": "What a receipt in this tree records: a run with its hash and result. A receipt covers only what it says it covers."},
-            "unknown": ["CPU and GPU job counts, utilisation and cost: no receipt in this tree; provider-billed spend is stated by the board as not yet known", "Which commit is deployed: not derivable from files"]}
+            "unknown": ["Provider-billed total spend remains unknown. Dated job counts and allocation/utilisation samples are recorded separately; they do not establish continuous or current saturation.", "Which commit is deployed: not derivable from files"]}
 
 
 def belief_example(ins: Inputs) -> dict | None:
@@ -1815,6 +1815,13 @@ def build() -> dict[str, bytes]:
     manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + fidelity_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
+    correction_path = "results/coordination/review-corrections.json"
+    correction_raw = ins.read(correction_path)
+    system["review_corrections"] = json.loads(correction_raw)
+    system["review_corrections"]["href"] = "artifacts/coordination/review-corrections.json"
+    system["review_corrections"]["sha256"] = digest_bytes(correction_raw)
+    extra["@artifacts/coordination/review-corrections.json"] = correction_raw
+    extra["@artifacts/coordination/collective-review-evidence.md"] = ins.read("docs/research/collective-review-evidence.md")
     design_review = ins.json("site/content/design-review.json")
     pr_path = "imports/2026-10-31-curated-v2/project-receipt.json"
     if (ROOT / pr_path).exists():

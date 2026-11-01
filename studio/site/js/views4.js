@@ -55,6 +55,10 @@
       <h3>Recorded counters (event window from ${T.event_window_start_utc.slice(0, 10)})</h3>
       ${counterTable(T.counters)}
       ${auditPanels(T.audits)}
+      ${snap.system.review_corrections ? html`<h3 id="review-corrections">Where review changed a decision</h3>
+        <p class="small">A retrospective trace of corrections across this team's agents: typed-input failures, stale evidence and overstated results. These examples show what review changed; they do not establish an advantage over a single agent.</p>
+        <ul class="small">${snap.system.review_corrections.entries.filter((e) => e.id !== "contributor-count-labels").map((e) => html`<li><b>${e.title}.</b> ${e.decision_changed}</li>`)}</ul>
+        <p class="small"><a href="${snap.system.review_corrections.href}">Exact submissions, reviews and corrected revisions</a> · <a href="artifacts/coordination/collective-review-evidence.md">Read the scope and provenance gaps</a> · ${U.sha(snap.system.review_corrections.sha256)}</p>` : ""}
       <p class="small">Counts cover use recorded inside the event window only. Earlier work is not narrated here; where a result rests on published sources or earlier data, its card cites them with their hashes and licences.</p>
       <h3>Reuse</h3>
       <p class="small">What others can take and check: the claims and evidence through the <a href="${DF.href("/work", { tab: "connect" })}">public read interface and MCP tools</a>, every simulation with its manifest and limits on the <a href="${DF.href("/simulations")}">simulations page</a>, printable models and the 3D mesh on <a href="${DF.href("/home")}">Home</a>, and exact record pins on each entity page. Reuse by anyone outside this team is not recorded. The one recorded example of versioned reuse is a <a href="${DF.href("/reuse")}">worked case</a>: two computations read one exact Claim, and an independent reviewer disputed both results; it is a count of uses, not a measured benefit.</p>

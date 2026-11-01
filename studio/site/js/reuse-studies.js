@@ -38,18 +38,21 @@
     return html`<article class="reuse-result" id="study-result-${v.id}"><h3>${v.title}</h3>
       <p class="small">${U.pill("recorded simulation", "grp")} ${v.evidence_kind}</p>
       ${v.summary ? html`<p>${v.summary}</p>` : ""}
-      ${v.video_href ? html`<video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_href || ""}" aria-label="${v.title}"><source src="${v.video_href}" type="video/mp4">Your browser cannot play this video. <a href="${v.video_href}">Download the recording</a>.</video>` : ""}
+      <div class="reuse-media${v.video_arrest_href ? " reuse-pair" : ""}">
+      ${v.video_href ? html`<figure>${v.video_arrest_href ? html`<figcaption>Baseline: protrusion enabled</figcaption>` : ""}<video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_href || ""}" aria-label="${v.title}"><source src="${v.video_href}" type="video/mp4">Your browser cannot play this video. <a href="${v.video_href}">Download the recording</a>.</video></figure>` : ""}
+      ${v.video_arrest_href ? html`<figure><figcaption>Control: protrusion disabled</figcaption><video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_arrest_href || ""}" aria-label="Protrusion-disabled control for ${v.title}"><source src="${v.video_arrest_href}" type="video/mp4"><a href="${v.video_arrest_href}">Download the control recording</a>.</video></figure>` : ""}</div>
       <p class="small faint">${v.labels.kind || ""} ${v.labels.time || ""}</p>
       ${v.labels.envelope_mm ? html`<p class="small">Toy envelope ${v.labels.envelope_mm.join(" × ")} mm; assumed mass ${v.labels.assumed_mass_g} g. These dimensions describe the numerical benchmark.</p>` : ""}
       ${v.biological_carrier ? html`<p class="note small"><b>Biological design: ${v.biological_carrier.status}.</b> ${v.biological_carrier.note}</p>` : ""}
       <ul class="small">${(v.caveats || []).map((s) => html`<li>${s}</li>`)}</ul>
       ${v.records_kept && v.records_kept.length ? html`<div class="note warn"><h4>Checks and unresolved results</h4><ul class="small">${v.records_kept.map((s) => html`<li>${s}</li>`)}</ul></div>` : ""}
+      ${v.errata_href ? html`<p class="note small"><b>Review corrections:</b> <a href="${v.errata_href}">Read the reporting and validation qualifications</a> alongside the original results.</p>` : ""}
       ${denominators(v.posthoc_denominators)}
       ${v.figure_href ? html`<details><summary>Compare trajectories and controls</summary><a href="${v.figure_href}"><img class="reuse-figure" src="${v.figure_href}" loading="lazy" alt="Recorded results and control comparisons for ${v.title}"></a></details>` : ""}
       <details><summary>Source files and recording provenance</summary><p class="small">Publication checked ${v.sources_verified} source files and ${v.renderer_verified} rendering files against the manifest. This establishes file identity, not biological validity.</p>
         ${v.engine_benchmark ? html`<p class="small">Engine: ${v.engine_benchmark.engine}. ${v.engine_benchmark.note || ""}</p>` : ""}
         <ul class="small">${files.map(([kind, f]) => html`<li><a href="${f.path}" download>${kind}</a> · ${f.bytes.toLocaleString()} bytes · ${U.sha(f.sha256)}</li>`)}</ul>
-        ${(v.documents || []).map((d) => html`<p class="small"><a href="${d.href}">${d.title || d.href}</a></p>`)}</details>
+        ${(v.downloads || []).map((d) => html`<p class="small"><a href="${d.href}">${d.label || d.href}</a> · ${U.sha(d.sha256)}</p>`)}</details>
       </article>`;
   }
 
