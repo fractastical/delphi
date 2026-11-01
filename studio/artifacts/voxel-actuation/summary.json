@@ -214,7 +214,7 @@
  },
  "arm_F_verdict": {
   "predeclared": "dtScale 0.25 and 0.125 within 20% of 0.5",
-  "observed": "0.15318 / 0.15189 / 0.15180 BL at dtScale 0.5 / 0.25 / 0.125; coarsest-to-finest difference 0.90%, and the successive differences fall 0.00129 then 0.00009, consistent with convergence",
+  "observed": "0.15318 / 0.15189 / 0.15180 BL at dtScale 0.5 / 0.25 / 0.125; coarsest-to-finest difference 0.00138 BL, which is 0.901% of the coarsest value and 0.909% of the finest; the successive differences fall 0.00129 then 0.00009, consistent with convergence. CORRECTION 2026-11-01: an earlier version of this field wrote '0.90%' without naming the denominator; both figures are now given.",
   "met": true
  },
  "arm_G_spatial": {
@@ -260,7 +260,12 @@
     "nx=6 (3|3 symmetric)": 0.0086,
     "nx=7 (3|4 asymmetric)": 0.07959
    },
-   "reading": "odd nx moves 7.7x to 17.8x further than its even neighbours at identical resolution, material, amplitude and duration. Arm G was therefore not a clean resolution test; most of its 8.2x gap is my own encoding."
+   "reading": "odd nx moves 7.6x to 17.8x further than its ADJACENT even neighbours at identical resolution, material, amplitude and duration (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25). Non-adjacent pairs are not part of this claim. Arm G was therefore not a clean resolution test; most of its 8.2x gap is my own encoding. CORRECTION 2026-11-01: an earlier version wrote '7.7x'; 0.15318/0.02003 = 7.6475, which rounds to 7.6.",
+   "adjacent_pair_ratios": {
+    "nx5_over_nx4": 7.6475,
+    "nx5_over_nx6": 17.8095,
+    "nx7_over_nx6": 9.2537
+   }
   },
   "clean_refinement_test": {
    "statement": "the travelling-wave pattern sets phase as a gradient 2*pi*x/nx and carries its own asymmetry at any nx, so it has no parity confound.",

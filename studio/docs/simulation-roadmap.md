@@ -306,7 +306,7 @@ as the cause is **refuted**: displacement rises with the damping ratio at both
 resolutions, and matching total drag widens the gap to 15x rather than closing it.
 Actuator-layout parity is **supported**: at fixed 10 mm resolution and fixed damping,
 `nx` = 4, 5, 6, 7 give 0.0200, 0.1532, 0.0086 and 0.0796 body lengths, so an odd
-voxel count moves 7.7x to 17.8x further than its even neighbours. The longitudinal
+voxel count moves 7.6x to 17.8x further than its adjacent even neighbours (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25; non-adjacent pairs are not part of the claim). The longitudinal
 pattern splits at `x < nx/2`, so the refinement arm confounded lattice resolution with
 actuator-layout asymmetry. That is an artefact of our encoding, not of the engine.
 
@@ -315,7 +315,7 @@ so carries its own asymmetry at any `nx` — the coarse and fine bodies give 0.3
 0.3744 body lengths, a 2.74% difference across a 2x refinement and an 8x voxel count.
 **That is a post-hoc observation on one pattern at two resolutions. It is not a
 convergence proof and must not be reported as one.** The timestep series does
-converge, 0.90% across a 4x range of `dt`, and that statement is about `dt` on that one
+converge, 0.9% of the coarsest value across a 4x range of `dt`, and that statement is about `dt` on that one
 arm.
 
 ### The cross-scale interface this adds

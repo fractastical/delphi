@@ -151,7 +151,7 @@ centre-of-mass x and y constant to nine decimals across all 241 samples while z 
 mass does not move.
 
 Timestep refinement: 0.15318 / 0.15189 / 0.15180 body lengths across a 4× dt range,
-a 0.90% spread. **This is a convergence observation about dt on this one arm. It is
+a spread of 0.0014 body lengths, 0.9% of the coarsest value. **This is a convergence observation about dt on this one arm. It is
 not a claim that the model converges in general**, and it is not a claim about arm G.
 
 Two analytic positive controls reproduce their closed forms at ratio **1.0000**
@@ -182,7 +182,7 @@ gap to 15× rather than closing it.
 
 Hypothesis 2, actuator-layout parity, **SUPPORTED**: at fixed 10 mm resolution and
 fixed zeta, nx = 4, 5, 6, 7 give 0.0200, 0.1532, 0.0086, 0.0796 body lengths. Odd nx
-moves 7.7×–17.8× further than its even neighbours. The `longitudinal` split at
+moves 7.6×–17.8× further than its adjacent even neighbours (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25; non-adjacent pairs are not part of the claim). The `longitudinal` split at
 `x < nx/2` confounded lattice resolution with layout asymmetry. **That is my own
 encoding, not the engine.**
 
