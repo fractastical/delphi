@@ -1,4 +1,6 @@
 import importlib.util
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -28,6 +30,12 @@ def test_gallery_retains_old_results_and_actual_curriculum_tradeoff():
     assert card["biological_success_probability"] is None
     assert "not this movie" in card["time"]["note"]
     assert "0 of 48" in cards["nca-pattern"]["title"] and "32 of 48" in cards["nca-seed-placement"]["title"]
+    index = json.loads((ROOT / "artifacts/nca-curriculum/index.json").read_text())
+    for source in card["sources"]:
+        key = source["label"].replace(" ", "_")
+        published = output["@" + source["href"]]
+        assert hashlib.sha256(published).hexdigest() == index["artifacts"][key]["sha256"]
+    assert json.loads(output["@" + card["manifest_href"]]) == index
 
 
 def test_gallery_rejects_changed_audit_before_publishing_new_result():

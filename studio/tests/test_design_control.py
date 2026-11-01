@@ -186,8 +186,10 @@ def test_real_site_route_desktop_and_mobile(amap):
             pg.on("pageerror", lambda e: errs.append(str(e)))
             # the app's own optional /api/health probe 404s on a static server on every route; any other 4xx/5xx is a failure
             pg.on("response", lambda r: errs.append(f"{r.status} {r.url}") if r.status >= 400 and not r.url.endswith("/api/health") else None)
-            pg.goto(base + "#/design-control")
+            pg.goto(base + "#/studio/flying-fish")
+            pg.get_by_role("link", name="Open the design-control map", exact=True).click()
             pg.wait_for_selector(".dc .dc-card")
+            assert pg.locator("nav[aria-label=Views] a[aria-current=page]").inner_text() == "Studio"
             out[name] = dict(
                 errs=errs, layers=pg.locator(".dc-layer").count(), cards=pg.locator(".dc-card").count(),
                 overflow=pg.evaluate("document.documentElement.scrollWidth - innerWidth"),

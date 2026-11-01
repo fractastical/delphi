@@ -1337,11 +1337,14 @@ def nca_cards(ins: Inputs, out: dict) -> list[dict]:
         if ix["counts"] != audit["counts"] or ix["paired_effects"] != audit["per_pair_effects"]:
             raise ValueError("Curriculum card differs from audited counts/pairs")
         hrefs, states = {}, {}
-        for key in ("video", "poster", "training_plot", "render_provenance"):
+        for key in ("video", "poster", "training_plot", "render_provenance", "protocol", "audit", "checkpoint_barrier", "question_outcome"):
             path = art[key]["path"]
             if not path.startswith(d + "/") or ".." in Path(path).parts:
                 raise ValueError("Curriculum media path escapes artifact directory")
             states[key], hrefs[key] = _vid(ins, out, cid, d, path[len(d) + 1:], art[key]["sha256"])
+            if states[key] != "present_verified":
+                raise ValueError("Curriculum result lacks a matching source/media artifact: " + key)
+        _, manifest_href = _vid(ins, out, cid, d, "index.json", ins.seen[f"{d}/index.json"]["sha256"])
         c = ix["counts"]
         regimes = {x["regime"]: x for x in ix["regime_counts"]}
         baseline, curriculum = regimes["damage-pool"], regimes["curriculum-pool"]
@@ -1349,18 +1352,18 @@ def nca_cards(ins: Inputs, out: dict) -> list[dict]:
         checks = [{"name": "declared design probes (erased controls separate)", "result": f"{c['design_passed']}/{c['design_declared']}; baseline {baseline['passed']}/{baseline['declared']}, curriculum {curriculum['passed']}/{curriculum['declared']}. No aggregate benefit in these probes."}]
         checks += [{"name": x["kind"].replace("-", " "), "result": "baseline {passed}/{executed}; curriculum ".format(**x["regimes"]["damage-pool"]) + "{passed}/{executed}".format(**x["regimes"]["curriculum-pool"])} for x in ix["by_kind"]]
         checks += [{"name": f"paired initialization {x['initialization_seed']}", "result": "baseline {passed}/{declared}; curriculum ".format(**x["regimes"]["damage-pool"]) + "{passed}/{declared}".format(**x["regimes"]["curriculum-pool"]) + "; shared-weight probes are dependent"} for x in ix["paired_effects"] if x["group"] == "all_design"]
-        checks += [{"name": "erased-state negative controls", "result": f"{c['negative_passed']}/{c['negative_declared']}; excluded from192"}, {"name": "metric reproduction", "result": f"bit-for-bit {audit['exact_metric_reproduction']}; separate fixed-roundoff {audit['fixed_roundoff_metric_reproduction']}; max difference {audit['max_metric_absolute_difference']:.3g}"}]
+        checks += [{"name": "erased-state negative controls", "result": f"{c['negative_passed']}/{c['negative_declared']}; excluded from 192"}, {"name": "metric reproduction", "result": f"bit-for-bit {audit['exact_metric_reproduction']}; separate fixed-roundoff {audit['fixed_roundoff_metric_reproduction']}; max difference {audit['max_metric_absolute_difference']:.3g}"}]
         cards.append({"id": cid, "title": f"NCA curriculum repair/persistence tradeoff: {c['design_passed']}/{c['design_declared']} design predicates",
             "scales": ["tissue", "developmental"], "evidence_kind": "computed trained local rule on a design raster, not tissue",
             "model": {"name": "Neural cellular automaton, 8336 shared local-rule weights per model", "context": f"Eight final 2000-step models, four matched initialization pairs. One of three circular training erasures is replaced by a staged prefix erasure. Fresh independently committed damage masks/update seeds. Prefix30/34 repair improves while persistence falls {persistence['damage-pool']['passed']}/12 to {persistence['curriculum-pool']['passed']}/12; aggregate {baseline['passed']}/96 to {curriculum['passed']}/96. No general benefit established."},
-            "time": {"units": f"Computational update steps; {len(provenance['frames'])} actual saved frames", "note": "Movie: all eight preselected prefix34 recovery histories through768updates. Separate2048-update persistence endpoints are in the table, not this movie."},
+            "time": {"units": f"Computational update steps; {len(provenance['frames'])} actual saved frames", "note": "Movie: all eight preselected prefix-34 recovery histories through 768 updates. Separate 2048-update persistence endpoints are in the table, not this movie."},
             "video": {"file": art["video"]["path"][len(d) + 1:], "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"},
             "video_state": states["video"], "video_href": hrefs["video"], "poster_href": hrefs["poster"], "plot_href": hrefs["training_plot"], "provenance_href": hrefs["render_provenance"],
             "numerical_checks": checks, "parameter_unknowns": ["Four paired training initializations are replicate units; mask/update probes share learned weights and are dependent.", "One previously fitted design target. Fresh cases do not establish new-target generalization.", "Twelve hidden channels, pixels and update counts have no measured biochemical/cell-size/time calibration."],
             "open_questions": ["Can a separately frozen comparison retain targeted repair gains without losing persistence? No new large job before review.", "No tissue regeneration, DNA/cell program or nervous-system implementation is established."],
-            "equations": [], "sources": [{"label": key.replace("_", " "), "locator": art[key]["path"] + " sha256 " + art[key]["sha256"]} for key in ("protocol", "audit", "checkpoint_barrier", "question_outcome")],
+            "equations": [], "sources": [{"label": key.replace("_", " "), "href": hrefs[key], "locator": art[key]["path"] + " sha256 " + art[key]["sha256"]} for key in ("protocol", "audit", "checkpoint_barrier", "question_outcome")],
             "limitations": list(ix["limits"]), "biological_success_probability": None, "empirical_validation": "unknown",
-            "couplings": [], "manifest": f"{d}/index.json", "native": True})
+            "couplings": [], "manifest": f"{d}/index.json", "manifest_href": manifest_href, "native": True})
     return cards
 
 
