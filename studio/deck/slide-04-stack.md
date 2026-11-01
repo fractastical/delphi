@@ -74,7 +74,7 @@ the win is multi-agent over single, not one topology over another.
 > *This is a sequence likelihood, not a functional enhancer and not a validated design.*
 
 ## Column 3 — Mechanistic simulators
-**Open source, every version pinned**
+**Open source · OpenResearch · every version pinned**
 
 - **OpenMM 8.4** molecular dynamics (CUDA) · **WaterLily 1.10** 3-D Navier–Stokes
 - **Morpheus 2.3.9** · **PhysiCell 1.14.2** cell-scale
@@ -82,8 +82,14 @@ the win is multi-agent over single, not one topology over another.
 - **libRoadRunner** SBML replay · **Zebrafish-GEM** (CC-BY-4.0)
 - **Neural cellular automata** · reaction–diffusion fields
 - **Lattice-Boltzmann** · vortex-lattice aerodynamics
+- **OpenResearch** (`orx 0.2.23`) — replay receipts, 2 exemplars
 
-> Plus **105 bio-database calls** (95 ok, 10 failed) — UniProt, Ensembl, NCBI E-utilities,
+> **OpenResearch** replayed the published Collier 1996 Delta-Notch model: exit 0, **all replay
+> checks passed**, and every output hash matched (`model_inventory.json`, `receipt_code_sha256`,
+> three trajectory CSVs). Its own scope line is honest: OpenResearch here is a **local recorder
+> of which code was run**, not a cloud dispatcher — no run used a remote backend.
+>
+> Plus **98 bio-database calls** (89 ok, 9 failed) — UniProt, Ensembl, NCBI E-utilities,
 > NCBI Datasets, BioModels, ZFIN, Europe PMC.
 
 ## Column 4 — Design to object
