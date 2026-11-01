@@ -2,7 +2,7 @@
   const out = [];
   document.querySelectorAll("#main table").forEach((t, i) => {
     const wrap = t.closest(".tablewrap") || t.parentElement; const wr = wrap.getBoundingClientRect(); const tr = t.getBoundingClientRect();
-    const stacked = getComputedStyle(t.querySelector("td,th") || t).display === "block";
+    const stacked = getComputedStyle(t.querySelector("tbody td") || t.querySelector("td,th") || t).display === "block";
     let pw = 0, clipped = 0, split = 0;
     t.querySelectorAll(".pill, [class*=pill]").forEach((p) => { const r = p.getClientRects(); if (r.length > 1 || p.getBoundingClientRect().height > parseFloat(getComputedStyle(p).lineHeight || 20) * 1.7) pw++; });
     if (!stacked) t.querySelectorAll("td,th").forEach((c) => { if (c.getBoundingClientRect().right > wr.right + 1) clipped++; });

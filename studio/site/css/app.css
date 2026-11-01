@@ -326,3 +326,12 @@ video:focus,video:focus-visible{outline:3px solid var(--teal);outline-offset:2px
   .tablewrap table.stackable td[data-label]:not(:first-child)::before{content:attr(data-label) ": ";font:600 .72rem var(--sans);color:var(--dim)}
   .tablewrap table.stackable td .pill{white-space:normal}
 }
+
+/* Frontier and tables, third pass: the question list gets the full width when a graph pane would squeeze it, and words in table cells are never split
+ * (links, code and the first id column may still break, since those can be very long). */
+@media (max-width:1500px){.graphsplit:has(> .tablewrap){grid-template-columns:minmax(0,1fr)}.graphsplit:has(> .tablewrap) > .detail-col{position:static;max-height:none}}
+main table td,main table th{overflow-wrap:break-word}main table td a,main table td code,main table td:first-child,main table th:first-child{overflow-wrap:anywhere}
+@media (max-width:700px){.tablewrap table.qtable td .pill{white-space:normal}}
+main table.qtable td{overflow-wrap:break-word}main table.qtable td a,main table.qtable td code,main table.qtable td:first-child{overflow-wrap:anywhere}
+.board table td:last-child{min-width:9.5em}
+.board table th,.board table td{padding-left:10px;padding-right:10px}

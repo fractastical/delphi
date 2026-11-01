@@ -50,7 +50,8 @@
           <p class="small"><b>Change impact (hypothetical, in memory only):</b> altering the ${R.change_impact_example.changed_layers.join(", ")} pin would invalidate ${R.change_impact_example.invalidated_stages.map((x) => AXIS_LABEL[x] || x).join(", ")} and keep ${R.change_impact_example.kept_stages.map((x) => AXIS_LABEL[x] || x).join(", ")}. An unchanged second compile reused every stage.</p></section>
         <section class="panel" aria-labelledby="as-ctl"><h2 id="as-ctl">Typed failure controls</h2><ul class="small">
           ${Object.entries(R.controls).map(([k, c]) => html`<li><b>${k.replace(/_/g, " ")}</b>: expected ${c.expected}, got ${c.got}. ${(c.reason || []).map((r) => typeof r === "string" ? r : r.reason).join("; ")}</li>`)}</ul>
-          <p class="small faint">Files: <a href="${B.report_path}">report.json</a> (sha256 ${U.sha(B.report_sha256)}) · ${ids.map((i) => html`<a href="${B.assemblies[i].path}">${short(i)}.json</a> `)}· <a href="${B.manifest}">manifest</a>${B.readme ? html` · <a href="${B.readme}">README</a>` : ""}</p></section>`
+          <p class="small faint">Files: <a href="${B.report_path}">report.json</a> (sha256 ${U.sha(B.report_sha256)}) · ${ids.map((i) => html`<a href="${B.assemblies[i].path}">${short(i)}.json</a> `)}· <a href="${B.manifest}">manifest</a>${B.readme ? html` · <a href="${B.readme}">README</a>` : ""}</p></section>
+        ${DF.genotype ? DF.genotype.panel(snap) : ""}`
     };
   };
 })();

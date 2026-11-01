@@ -368,7 +368,8 @@
         else if (!over && has) prev.remove();
       });
     };
-    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(enhance); } };
+    let late = 0;      // layout can settle after the DOM changes (fonts, media, wrapping), so look once more shortly after
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(enhance); } clearTimeout(late); late = setTimeout(enhance, 700); };
     window.addEventListener("resize", queue);
     new MutationObserver(queue).observe(document.documentElement, { childList: true, subtree: true });
   })();
