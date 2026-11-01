@@ -80,6 +80,14 @@ def main() -> None:
         ("Correction", "r4 regenerated right-side files as mirror images and checked side, rotation and center of gravity."),
         ("Limit", "This is a digital fit prototype. Nothing here establishes printing, flight or launch readiness."),
     ])
+    evo_path = provenance / "evo2-output-checks.json"
+    evo = json.loads(evo_path.read_text())
+    assert evo["new_model_calls"] == 0 and evo["biological_validation"] is False
+    evo_card = render("evo2-continuations-limit.png", "Sequence continuations are computational candidates", "SEPARATE EVO2 EXPLORATION · NOT A PROMOTER ASSAY", [
+        ("Stored outputs", "Sequence continuations and same-model likelihood checks were recorded in a separate exploration."),
+        ("Limit", "Likelihood and motif scores do not establish promoter activity, cell-specific expression, or flight."),
+        ("Independent audit", "Sequence hashes and saved score rows checked; no new model call or sequence generation for this card."),
+    ])
     cfd_path = provenance / "cfd3d-gpu-receipt.json"
     cfd_receipt = json.loads(cfd_path.read_text())
     assert "C1" in cfd_receipt["science"] and cfd_receipt["completion"] == "complete"
@@ -103,6 +111,7 @@ def main() -> None:
         (genetics, [str(genetics_path.relative_to(ROOT))], "Source-based summary from a fact-check note with the primary article citation."),
         (print_card, [str(print_path.relative_to(ROOT))], "Summary transcribed from the checked r4 assembly record; not evidence of physical printing."),
         (cfd_card, [str(cfd_path.relative_to(ROOT))], "Card reflects the C1 gate field in the recorded GPU receipt; no fish-flight validation claim."),
+        (evo_card, [str(evo_path.relative_to(ROOT))], "Derived from independently checked stored-output audit; no sequence bytes exposed and no new inference."),
         (mcp, [str(mcp_path.relative_to(ROOT))], "Derived from the tracked MCP usage documentation."),
     ]:
         rows.append({"path": str(path.relative_to(ROOT)), "sha256": sha(path), "bytes": path.stat().st_size,

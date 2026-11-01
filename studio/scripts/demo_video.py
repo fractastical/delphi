@@ -472,7 +472,7 @@ def validate_media_map(story: dict, media_map_path: Path) -> tuple[dict, list[di
                 if expected is None or not isinstance(shot_sources, list) or len(shot_sources) != expected:
                     raise ValueError(f"invalid layout/source count in {cut['id']}/{scene['id']}")
                 duration = shot.get("duration_s")
-                if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not 0 < duration <= scene["duration_s"]:
+                if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not 0 < duration <= scene["duration_s"] + 1e-6:
                     raise ValueError(f"invalid shot duration in {cut['id']}/{scene['id']}")
                 if len(shot.get("badge", "")) > 180:
                     raise ValueError("shot badge is too long")
