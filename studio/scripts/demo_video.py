@@ -327,8 +327,10 @@ def validate_media_map(story: dict, media_map_path: Path) -> tuple[dict, list[di
                     raise ValueError(f"invalid shot duration in {cut['id']}/{scene['id']}")
                 shot_total += float(duration)
                 for source in shot_sources:
-                    if not isinstance(source, dict) or set(source) != {"path", "sha256", "kind", "label", "provenance"}:
+                    if not isinstance(source, dict) or not {"path", "sha256", "kind", "label", "provenance"}.issubset(source) or set(source) - {"path", "sha256", "kind", "label", "provenance", "crop_y"}:
                         raise ValueError("source must declare path, sha256, kind, label and provenance")
+                    if "crop_y" in source and (source["kind"] != "image" or isinstance(source["crop_y"], bool) or not isinstance(source["crop_y"], int) or not 0 <= source["crop_y"] <= 500):
+                        raise ValueError("crop_y is supported only for images and must be an integer from 0 to 500")
                     path = Path(source["path"])
                     if not path.is_file() or path.is_symlink():
                         raise ValueError(f"missing or symlinked media source {path.name}")
@@ -421,7 +423,8 @@ def render_shot(shot: dict, scene_spec: dict, output: Path, overlay_path: Path, 
             # Screenshots are cropped to the central content band: the renderer
             # replaces the original site header with its own title, while the
             # exact table/graph pixels remain at native 1080p scale.
-            filters.append(f"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x07121f,crop=1920:580:0:190,pad=1920:1080:0:220:color=0x07121f,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration={duration},trim=duration={duration},setpts=PTS-STARTPTS[vbase]")
+            crop_y = source.get("crop_y", 190)
+            filters.append(f"[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x07121f,crop=1920:580:0:{crop_y},pad=1920:1080:0:220:color=0x07121f,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration={duration},trim=duration={duration},setpts=PTS-STARTPTS[vbase]")
         else:
             # Preserve all source-video pixels and their embedded axes/labels;
             # letterbox within the reserved media band below the title.
