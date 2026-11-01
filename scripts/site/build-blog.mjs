@@ -7,6 +7,7 @@
 //
 //   node scripts/site/build-blog.mjs
 import fs from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { withChrome } from './chrome.mjs';
@@ -87,6 +88,46 @@ const counts = {
 if (counts.TESTED !== counts.SUPPORTS + counts.REFUTES + counts.MIXED + counts.INCONCLUSIVE) throw new Error('unknown evidence verdict in docs/claims.json');
 if (counts.THEOREMS !== counts.LEAN + counts.LIT) throw new Error('unknown proof kind in docs/claims.json');
 
+// The worked example: thompson1917-ch07-04 (120-degree cell packing), from its result files.
+const ch0704Dir = R('test-data', 'claim-tests', 'thompson-growth-form', 'thompson1917-ch07-04');
+const ch0704 = JSON.parse(fs.readFileSync(path.join(ch0704Dir, 'result.json'), 'utf8'));
+const cornealPix = ch0704.measured.extra.per_tissue['human-corneal-endothelium'];
+const segBias = ch0704.revisions[0];
+const eyeBank = JSON.parse(fs.readFileSync(path.join(ch0704Dir, 'eye-bank-hexagonality', 'derived', 'summary.json'), 'utf8'));
+const eyeBankRun = JSON.parse(fs.readFileSync(path.join(ch0704Dir, 'eye-bank-hexagonality', 'result.json'), 'utf8'));
+const pct = (x, d = 0) => (100 * x).toFixed(d);
+const q5 = eyeBank.f6_by_cv_quintile;
+const cornealVars = {
+  CORNEA_JUNCTIONS: cornealPix.junctions_measured.toLocaleString('en-US'),
+  CORNEA_NEAR_TWENTY: pct(cornealPix.frac_all_within_15deg),
+  CORNEA_T: pct(cornealPix.frac_T_like),
+  CORNEA_SD: cornealPix.angle_sd.toFixed(1),
+  SEGBIAS_FROM: segBias.from.confidence.toFixed(2),
+  SEGBIAS_TO: segBias.to.confidence.toFixed(2),
+  SEGBIAS_AGENTS: segBias.prompted_by.map((p) => `<a href="${p.comment}">${esc(p.agent)}</a>`).join(', '),
+  EYEBANK_IMAGES: eyeBank.descriptives.images_total.toLocaleString('en-US'),
+  EYEBANK_CELLS: eyeBank.descriptives.rows.toLocaleString('en-US'),
+  EYEBANK_RHO: eyeBank.image_level.rho_cv_f6.toFixed(2),
+  EYEBANK_CI_LO: eyeBank.image_level.ci95[0].toFixed(2),
+  EYEBANK_CI_HI: eyeBank.image_level.ci95[1].toFixed(2),
+  EYEBANK_HEX_LOW_CV: pct(q5[0].f6_median, 1),
+  EYEBANK_HEX_HIGH_CV: pct(q5[q5.length - 1].f6_median, 1),
+  EYEBANK_SIDES: eyeBank.descriptives.mean_cell_sides_overall.toFixed(3),
+  EYEBANK_LEWIS: eyeBank.secondary_lewis_within_image.median_rho_area_sides.toFixed(2),
+  EYEBANK_DENSITY_RHO: eyeBank.secondary_density_f6_image.rho.toFixed(2),
+  EYEBANK_VERDICT: esc(eyeBankRun.verdict),
+  EYEBANK_PREREG_COMMIT: preregCommit(path.join(ch0704Dir, 'eye-bank-hexagonality', 'result.json')),
+  CORNEA_CLAIM_VERDICT: esc(ch0704.verdict),
+  CORNEA_CLAIM_CONF: ch0704.confidence.toFixed(2),
+};
+
+// The commit that added a pre-registration file, as recorded by git (first commit touching the path).
+function preregCommit(file) {
+  const out = execFileSync('git', ['log', '--diff-filter=A', '--format=%h', '--', path.relative(ROOT, file)], { cwd: ROOT, encoding: 'utf8' }).trim();
+  if (!out) throw new Error(`no commit adds ${file}; commit the pre-registration first`);
+  return out.split('\n').pop();
+}
+
 // The measured four-arm comparison (test-data/agent-comparison/four-arm.json).
 const fourArm = JSON.parse(fs.readFileSync(R('test-data', 'agent-comparison', 'four-arm.json'), 'utf8'));
 const ARMS = ['single', 'isolated', 'centralized', 'decentralized'];
@@ -138,6 +179,7 @@ const fmt = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : v);
 const vars = {
   ...Object.fromEntries(Object.entries({ ...counts, ...mcpVars }).map(([k, v]) => [k, fmt(v)])),
   ...fourArmVars,
+  ...cornealVars,
   SOURCE_ROWS: sourceRows.join(''),
   DATE_LONG, BUILT_UTC,
 };
@@ -153,6 +195,12 @@ fs.mkdirSync(path.dirname(OUT), { recursive: true });
 const card = R('assets', 'delphi-where-it-stands.png');
 if (!fs.existsSync(card)) throw new Error('missing assets/delphi-where-it-stands.png; run python3 scripts/site/build-summary-video.py');
 fs.copyFileSync(card, R('docs', 'blog', 'delphi-where-it-stands.png'));
+// Design Studio screenshots, captured from the live runtime for the studio demo video.
+const CAPTURES = R('studio', 'artifacts', 'demo-video-science', 'sources', 'captures');
+for (const [src, dst] of [['01-hero-3d-mesh.png', 'studio-flying-fish.png'], ['03-engineering-recorded-runs.png', 'studio-engineering-runs.png']]) {
+  if (!fs.existsSync(path.join(CAPTURES, src))) throw new Error(`missing studio capture ${path.relative(ROOT, path.join(CAPTURES, src))}`);
+  fs.copyFileSync(path.join(CAPTURES, src), R('docs', 'blog', dst));
+}
 fs.writeFileSync(OUT, html);
 fs.writeFileSync(OUT_MD, markdown);
 console.log(`wrote ${path.relative(ROOT, OUT)} (${(html.length / 1024).toFixed(0)} KB)`);

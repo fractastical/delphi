@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch07-04",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-04",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered": true,
   "preregistration_note": "This file is committed before Human_Corneal_Endothelium.csv is downloaded. The scouting record (test-data/dataset-scouting/thompson-growth-form/thompson1917-ch07-04/datasets.json) read only the Figshare API metadata and the column list; no row of the data has been seen.",
   "reading_under_test": "Thompson's 'irrespective of size' clause. The claim says walls meet three at a time at 120 degrees irrespective of cell size, and that relative sizes set only wall curvature. Read at the level of polygon sides (Lewis's law links side count to area, and in a three-way-vertex tiling the mean side count is six by Euler's formula), this predicts that in a settled, non-dividing epithelium the fraction of hexagonal cells does not depend on how variable the cell sizes are. The top-level result.json found 120-degree angles appear only once division stops; the human corneal endothelium does not divide in adults, so it is the tissue where the claim's condition is best met and the 'irrespective of size' clause gets its best chance.",
@@ -22,12 +22,14 @@
           "download_url": "https://ndownloader.figshare.com/files/9990307",
           "name": "Human_Corneal_Endothelium.csv",
           "byte_size_from_api": 105329539,
-          "retrieved_at": null,
-          "sha256": null
+          "retrieved_at": "2026-11-01T20:31:42Z",
+          "sha256": "33a3ba27d6cd47b03d5882d2bdfa8edca9f78b1210eae86659b20d5331018f8d",
+          "byte_size": 105329539
         }
       ],
       "role": "Homo sapiens, corneal endothelium, 354,998 cells in 2,000 images from 678 corneas of 351 donors, Voronoi-segmented after organ-culture storage",
-      "method_paper": "Brookes NH. Morphometry of organ-cultured corneal endothelium using Voronoi segmentation. Cell Tissue Bank 2017;18:167-183. doi 10.1007/s10561-017-9622-9 (cited in the dataset record; not fetched)"
+      "method_paper": "Brookes NH. Morphometry of organ-cultured corneal endothelium using Voronoi segmentation. Cell Tissue Bank 2017;18:167-183. doi 10.1007/s10561-017-9622-9 (cited in the dataset record; not fetched)",
+      "version": "Figshare file 9990307, published 2017-12-14"
     }
   ],
   "method": "Pre-registered. Load the CSV. Columns are per the record's field list: image-level fields (Dataset ID, Image Number, mean cell area, cell area CV, mean cell density, 4- to 9-sides cell counts, total cells, mean hexagonal regularity, number of pleomorphs, mean cell sides, cell sides CV, shape index) repeated on each per-cell row (cell area, number of sides, hexagonal regularity, shape index). Collapse to one row per image (Dataset ID + Image Number). Exclude images with fewer than 50 cells. Per image: f6 = 6-sides count / total cells; CV_area = the image's cell area CV as given; density = mean cell density. Primary statistic: Spearman rho between CV_area and f6 across images, with a 95% bootstrap CI (2,000 resamples). Repeat with images aggregated to one row per Dataset ID (mean of f6 and CV_area over that cornea's images) because images from the same cornea are not independent. Secondary, not deciding: Spearman rho between density and f6 (the clinical reading: cell loss goes with lost hexagonality); within-image Spearman rho between per-cell area and per-cell side count, median over images (Lewis's law, for comparison with ch07-09); sensitivity run restricted to images with density >= 2000 cells/mm^2 to check that the result is not driven by poor-quality or badly damaged tissue.",
@@ -73,9 +75,114 @@
     "date": "2026-11-01"
   },
   "idea": "decisions/ideas.json#idea-corneal-hex-clinical",
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "deviations": []
+  "measured": {
+    "value": -0.337,
+    "unit": "Spearman rho between per-image cell-area CV and per-image hexagonal fraction",
+    "n": "2,000 images, 354,998 cells (678 corneas per the record; not identifiable in the file)",
+    "uncertainty": "bootstrap 95% CI [-0.377, -0.297], 2,000 resamples",
+    "extra": {
+      "f6_median_by_cv_quintile": [
+        0.536,
+        0.517,
+        0.512,
+        0.497,
+        0.489
+      ],
+      "cv_quintile_ranges": [
+        [
+          0.127,
+          0.161
+        ],
+        [
+          0.161,
+          0.171
+        ],
+        [
+          0.171,
+          0.18
+        ],
+        [
+          0.18,
+          0.192
+        ],
+        [
+          0.192,
+          0.274
+        ]
+      ],
+      "sensitivity_density_ge_2000": {
+        "n_images": 1850,
+        "rho": -0.319,
+        "ci95": [
+          -0.36,
+          -0.276
+        ]
+      },
+      "secondary_density_vs_f6": {
+        "rho": 0.169,
+        "ci95": [
+          0.127,
+          0.211
+        ]
+      },
+      "secondary_density_vs_cv": {
+        "rho": -0.147,
+        "ci95": [
+          -0.191,
+          -0.105
+        ]
+      },
+      "secondary_lewis_within_image": {
+        "median_rho_area_sides": 0.464,
+        "iqr": [
+          0.429,
+          0.498
+        ],
+        "images_with_positive_rho": "2000 of 2000"
+      },
+      "mean_cell_sides_overall": 5.9982,
+      "descriptives": {
+        "f6": {
+          "median": 0.5104714912280701,
+          "p10": 0.44918825450702876,
+          "p90": 0.5751739405439595
+        },
+        "cv_area": {
+          "median": 0.1754,
+          "p10": 0.1548,
+          "p90": 0.20161
+        },
+        "density": {
+          "median": 2928.4594740000002,
+          "p10": 2116.8475775,
+          "p90": 3488.6159532
+        }
+      },
+      "summary_file": "derived/summary.json",
+      "figure": "derived/figure.png",
+      "per_image_table": "derived/images.csv"
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.55,
+  "caveats": [
+    "Cornea-level replication not possible: the file has no cornea or donor identifier (see deviations). Images from the same cornea are not independent, so the effective n is below 2,000; the CI is computed over images and is too narrow by an unknown factor. With 678 independent corneas the same rho would still clear the criterion, but that was not measured.",
+    "Voronoi segmentation (Brookes 2017) imposes straight walls and three-way vertices; it can report sides, not junction angles, and cannot test the 'by threes' half of the claim. Mean sides of 5.998 shows the tiling is trivalent by construction.",
+    "A measurement confound is possible in principle: a poorer image could inflate area CV and lower the hexagon count together. The sensitivity run restricted to density >= 2,000 cells/mm^2 (1,850 images) gives rho -0.32 [-0.36, -0.28], so the result does not depend on the most damaged tissue, but image quality itself is not in the file.",
+    "Eye-bank corneas are pre-screened for transplant suitability, so density and CV are range-restricted (density p10-p90: 2,117-3,489 cells/mm^2; CV 15.5-20.2%). The weak density-hexagonality correlation (0.17) says nothing about diseased or very old endothelium.",
+    "Side counts in a Voronoi tiling are a topological reading of 'packing'. The 120-degree force balance proved in ThompsonLaws.Cells.tripleJunction_120 is about angles and is untouched by this result; what is refuted is the claim that packing regularity is independent of cell size."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "The pre-registered cornea-level aggregation (one row per Dataset ID) was not computed.",
+      "why": "On opening the file, 'Dataset ID' turned out to be '<image>-<cell>' (354,998 unique values) and 'Image Number' runs 1..2000; no column identifies the cornea or donor. The decision was therefore made on the image-level statistic alone, with the loss of independence recorded as a caveat and the confidence lowered from what a two-level agreement would have earned.",
+      "criteria_changed": false
+    }
+  ],
+  "result_summary": "Even in the human corneal endothelium, a non-dividing sheet where Thompson's condition is best met, packing regularity depends on cell-size variation: across 2,000 eye-bank specular images the hexagonal fraction falls as the cell-area CV rises (Spearman rho -0.34, 95% CI -0.38 to -0.30; median hexagonal fraction 53.6% in the most size-uniform fifth of images, 48.9% in the least). The pre-registered refutation criterion (rho <= -0.30 with the upper CI bound below -0.15) is met at the image level. Mean cell sides is 5.998 (Euler's six), and in every one of the 2,000 images larger cells have more sides (Lewis's law, median rho 0.46), which is the mechanism: side count tracks area, so area variation becomes side variation and fewer hexagons. The dependence is real and modest (about five percentage points of hexagons across the observed CV range). The clinical reading was only weakly supported here: density and hexagonal fraction correlate at rho 0.17, below the 0.30 secondary threshold, in corneas pre-screened for transplant.",
+  "faithfulness": {
+    "status": "pending",
+    "note": "Not yet assessed by a non-Anthropic provider (A9). Builder: claude-fable-5.1."
+  }
 }
