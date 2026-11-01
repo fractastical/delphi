@@ -1,0 +1,166 @@
+{
+ "acceptance_criteria": [
+  "every species that ran has a recorded md5-ok download and a result file, or a line in failures.log; none is silently missing",
+  "shuffled-query alignments == 0 in both control genomes (summary.controls.shuffled_query_clean is true)",
+  "positive control: Oryzias latipes has exactly one scored slc43a2a-type locus reading T200 and F326 (the paper's O. latipes row, QSFMKSIFSPIFLLS at 319-333 in Ensembl medaka)",
+  "annotation consistency: the Hirundichthys speculiger genome read at the slc43a2a-type locus gives the same residue at 326 as annotation model GHS15055 (L), or the disagreement is reported",
+  "unscored loci carry a reason (ambiguous paralog, internal stop, partial coverage, position not aligned); a residue is never inferred for an unscored locus",
+  "predictions.json is not edited after the run; deviations are reported as observations, not corrected"
+ ],
+ "entry_point": {
+  "command": "BUNDLE_SHA256=<bundle sha256> [BUNDLE=/path/lat4a-survey-bundle.tar.gz | metadata attribute lat4a-bundle-b64] [OUT=/var/tmp/lat4a/out] bash bootstrap.sh",
+  "smoke_test_without_downloading_a_genome": "SELFCHECK_ONLY=1 BUNDLE_SHA256=... bash bootstrap.sh  (writes OUT/SELFCHECK_OK)",
+  "stages": [
+   "verify bundle sha256, then inputs.sha256",
+   "install biopython/numpy pins",
+   "download miniprot 0.18, verify its sha256, check --version",
+   "SELF-CHECK: the VM must reproduce both validation slices byte for byte, else STOP (version drift)",
+   "PROBE the flying-fish genome with the time/RAM gate, else STOP",
+   "run the other 22 genomes (3 workers x 2 threads)",
+   "summarize, write sha256sums.txt, touch DONE"
+  ]
+ },
+ "export": {
+  "deadline": "before the VM shutdown on Sunday night (2026-11-01); do not wait for it: upload as soon as the main run finishes",
+  "to": "the collector's prefix jobs/frontier-cpu-20261031-01/<task-id>/ in delphi-frontier-cpu-artifacts-20261031, then to /data/artifacts/delphi-evolve-rethink/gcp-out/lat4a-survey/ on the host",
+  "what": "OUT only; never the downloaded genomes (public, re-fetchable)"
+ },
+ "frozen_source": {
+  "bootstrap": {
+   "env_required": "BUNDLE_SHA256=<bundle sha256 above>",
+   "file": "bootstrap.sh",
+   "sha256": "830cc8e6e756405f07eed93e945e7a4481331914b76623f7ae034c83e93b195d",
+   "smoke_test": "SELFCHECK_ONLY=1 verifies the environment and the byte-for-byte self-check and stops before any genome download"
+  },
+  "branch": "work/genomics",
+  "bundle": {
+   "base64_bytes": 62192,
+   "bytes": 46643,
+   "contents": {
+    "connectors/genomics/__init__.py": "6a96f99f54dfd369128d2fe93e8a0d87d6f5c85e07c6185afc02960f9bc5bb34",
+    "connectors/genomics/lat4a_survey.py": "3195783954560130b15bde107db6b242cb259c62353c687267b02d5622ddfe70",
+    "connectors/genomics/lat4a_survey_job.py": "10bbed674aadd3d312eb073273f751699374d4e41ea161b443bb3dc3cb993d1a",
+    "data/genomics/artifacts/ensembl_protein_ENSDARP00000120945.fasta": "e4a913f92aeaacee014a31ee645b0e2227171d6c496968769700c704b20c4aeb",
+    "data/genomics/artifacts/ensembl_protein_ENSDARP00000156564.fasta": "81512398341ef4c66feae6e7e90230a396c9eca11dcd93f7218c0c6ec83c9876",
+    "data/genomics/lat4a_survey/accessions.json": "9fffc82ad7e220e85156450e17a3ea66c2c94f03f6f465e8ccf0e06c6a1a95fd",
+    "data/genomics/lat4a_survey/predictions.json": "e1d31befcc7bd14bfd716925a3b9b62c9fc8ee5e0fec5d7731111ec7abe23e6e",
+    "data/genomics/lat4a_survey/queries.faa": "d2273c39bd599841cfa6815d6163d10f465ec37fa96ad8fd8d0e203530e73c1f",
+    "data/genomics/lat4a_survey/queries_shuffled.faa": "552002944ab537b8917d807de95afb47ad60f7d67fd4434d4d5ecae86bc41536",
+    "data/genomics/lat4a_survey/validation_slice_chr10_result.json": "9ced3c3c95a4cbda6fbef020d80fbf4ed142306b6cd4ffe32fc863142dc0b64e",
+    "data/genomics/lat4a_survey/validation_slice_result.json": "8741fe4a086b0d3925917d8208975f34d96647b531cd1cb0c68b8bd67315ce69",
+    "data/genomics/lat4a_survey/validation_slice_zebrafish_chr10_24365000_24400000.fa": "1590d405c69785967fc222a2f58fbbc7f927519463d69136660b1110f98249f9",
+    "data/genomics/lat4a_survey/validation_slice_zebrafish_chr15_28360000_28420000.fa": "614e292a8cbd06ffde207a5e6f7979764cdcef28422bd4a6c8f958a62eb4f644"
+   },
+   "deterministic": "built twice from the commit's blobs and compared",
+   "file": "lat4a-survey-bundle.tar.gz",
+   "metadata_attribute": "lat4a-bundle-b64",
+   "metadata_value_limit_bytes": 262144,
+   "sha256": "cd5e9efce32b74b6e16aa5dc25c6b3def53b1d98b84c56ac380874d11fd0c114"
+  },
+  "commit": "9f70091f3dcb37e02bdebf62ec0d3ce40315dae2",
+  "repo": "kganjam/delphi-frontier (private)"
+ },
+ "inputs": {
+  "connectors/genomics/__init__.py": "6a96f99f54dfd369128d2fe93e8a0d87d6f5c85e07c6185afc02960f9bc5bb34",
+  "connectors/genomics/lat4a_survey.py": "3195783954560130b15bde107db6b242cb259c62353c687267b02d5622ddfe70",
+  "connectors/genomics/lat4a_survey_job.py": "10bbed674aadd3d312eb073273f751699374d4e41ea161b443bb3dc3cb993d1a",
+  "data/genomics/artifacts/ensembl_protein_ENSDARP00000120945.fasta": "e4a913f92aeaacee014a31ee645b0e2227171d6c496968769700c704b20c4aeb",
+  "data/genomics/artifacts/ensembl_protein_ENSDARP00000156564.fasta": "81512398341ef4c66feae6e7e90230a396c9eca11dcd93f7218c0c6ec83c9876",
+  "data/genomics/lat4a_survey/accessions.json": "9fffc82ad7e220e85156450e17a3ea66c2c94f03f6f465e8ccf0e06c6a1a95fd",
+  "data/genomics/lat4a_survey/predictions.json": "e1d31befcc7bd14bfd716925a3b9b62c9fc8ee5e0fec5d7731111ec7abe23e6e",
+  "data/genomics/lat4a_survey/queries.faa": "d2273c39bd599841cfa6815d6163d10f465ec37fa96ad8fd8d0e203530e73c1f",
+  "data/genomics/lat4a_survey/queries_shuffled.faa": "552002944ab537b8917d807de95afb47ad60f7d67fd4434d4d5ecae86bc41536",
+  "data/genomics/lat4a_survey/validation_slice_chr10_result.json": "9ced3c3c95a4cbda6fbef020d80fbf4ed142306b6cd4ffe32fc863142dc0b64e",
+  "data/genomics/lat4a_survey/validation_slice_result.json": "8741fe4a086b0d3925917d8208975f34d96647b531cd1cb0c68b8bd67315ce69",
+  "data/genomics/lat4a_survey/validation_slice_zebrafish_chr10_24365000_24400000.fa": "1590d405c69785967fc222a2f58fbbc7f927519463d69136660b1110f98249f9",
+  "data/genomics/lat4a_survey/validation_slice_zebrafish_chr15_28360000_28420000.fa": "614e292a8cbd06ffde207a5e6f7979764cdcef28422bd4a6c8f958a62eb4f644"
+ },
+ "os_requirements": {
+  "credentials": "none read or written; public data only",
+  "image": "Debian 12 or Ubuntu 22.04+, x86_64, systemd (for the memory scope), run as root",
+  "inbound": "none",
+  "outbound_https": [
+   "pypi.org",
+   "files.pythonhosted.org",
+   "github.com (the pinned miniprot release asset)",
+   "ftp.ncbi.nlm.nih.gov"
+  ],
+  "packages_if_missing": [
+   "python3",
+   "python3-venv",
+   "curl",
+   "bzip2",
+   "tar",
+   "ca-certificates",
+   "coreutils"
+  ]
+ },
+ "outputs": {
+  "controls": "<accession>.shuffled.json for the first two species",
+  "directory": "OUT (default /var/tmp/lat4a/out); the collector uploads this directory only",
+  "expected_size": "under 20 MB",
+  "failures": "failures.log if any species failed",
+  "integrity": "sha256sums.txt over every other file; check it after upload",
+  "per_species": "<accession>.json: loci, reads, residues at 74/106/200/326, the codon and genomic coordinate at 326, miniprot version",
+  "progress": "progress.jsonl (bytes, md5_ok, seconds, peak child RSS per species)",
+  "status_files": "STOPPED.txt (a gate or check stopped the run; says why), SELFCHECK_OK, DONE",
+  "summary": "summary.json and summary.csv"
+ },
+ "partial_results": "valid at any time: every <accession>.json is complete or absent. If budget runs out, upload OUT as it stands and run summarize; summary.json marks unfinished species 'not run'.",
+ "pinned_assemblies": "data/genomics/lat4a_survey/accessions.json: accession, assembly name, URL and the md5 NCBI publishes; the job refuses any download whose md5 differs",
+ "python": {
+  "install": "python3 -m venv VENV; VENV/bin/pip install biopython==1.88 numpy==2.4.4 (done by bootstrap.sh; pins are versions, not hashes)",
+  "no_other_dependencies": true,
+  "packages": {
+   "biopython": "1.88",
+   "numpy": "2.4.4"
+  },
+  "version": ">=3.11 (the bootstrap checks and installs python3 + python3-venv from apt if missing)"
+ },
+ "question": "Do independent public genomes show the paper's convergent F326L in lat4a (slc43a2a) in flying fishes and F in non-gliding relatives, and do both paralogs score on the same assemblies?",
+ "reading_the_result": "A match to the predictions supports the paper's pattern on independent genomes; a deviation is an observation about that assembly (check assembly level and N50 first: contig-level assemblies with N50 under ~20 kb may split the gene). Flying halfbeaks, where the paper reports L, have no public genome in the NCBI listing, so that half of the claim is not tested. Nothing here says what F326L does.",
+ "resource_request": {
+  "disk_gb": 5,
+  "disk_note": "only one compressed genome (about 0.3-0.4 GB) per worker is on disk at a time and is deleted after its species; outputs are under 20 MB",
+  "estimates_are_unmeasured": "no full-size genome has been run. Wall time (about 1-2 h for all 23) and per-worker RAM (about 4-6 GB) are estimates from the tool's design and the validation slices (68 MB peak on a 60 kb slice). The probe measures them first and the job records peak child RSS per species.",
+  "gpu": 0,
+  "idempotent": "each finished species writes its own result file, which is the checkpoint; rerunning bootstrap.sh skips finished species, so a preempted or stopped run resumes",
+  "max_runtime": {
+   "main_seconds": 9000,
+   "note": "hard caps through RuntimeMaxSec on the scopes; the probe gate stops everything if the flying-fish genome takes more than 900 s (download + align) or 8000 MB",
+   "probe_seconds": 1800,
+   "total_wall_cap_hours": 2.75
+  },
+  "preemptible_ok": true,
+  "ram_gb_cap": 24,
+  "ram_note": "enforced by a systemd scope MemoryMax=24G with MemorySwapMax=0; the probe gate stops the run if one genome needs more than 8000 MB",
+  "vcpu": 6,
+  "vcpu_note": "3 workers x 2 threads = 6 of the 8 vCPU; the probe uses 1 worker x 4 threads",
+  "vm": "DEDICATED genomics VM, 8 vCPU / 32 GB (authorized by infra); the job itself uses at most 6 vCPU and a 24 GB scope cap, so there is headroom and no co-tenancy is assumed"
+ },
+ "safety": {
+  "deletes": "only <ROOTDIR>/work/<accession>.fna.gz files the job itself downloaded",
+  "no_gpu": true,
+  "no_inbound": true,
+  "no_secrets": true,
+  "public_data_only": true
+ },
+ "schema": "lat4a-survey-packet-0.2",
+ "title": "lat4a / slc43a2b residue survey across public Beloniformes genomes",
+ "tools": {
+  "miniprot": {
+   "note": "verify the sha256 before running the binary; build from source if the VM is not x86_64 Linux",
+   "source_sha256": "307428a8da5854fa4c2f078ff0ca07756143b28e1598b8247c727ca2b87b15b1",
+   "source_url": "https://github.com/lh3/miniprot/releases/download/v0.18/miniprot-0.18.tar.bz2",
+   "version": "0.18",
+   "x64_linux_sha256": "794397d918c85cd55f42cd905350abe0528ceb09f6a1430c3a3d6650309ac28e",
+   "x64_linux_url": "https://github.com/lh3/miniprot/releases/download/v0.18/miniprot-0.18_x64-linux.tar.bz2"
+  }
+ },
+ "what_was_already_done_on_the_host_and_is_not_repeated": [
+  "full-length Ensembl residue verification (seconds; work/genomics d16d03c7418f)",
+  "annotation-level read of the mirrorwing flying fish models: GHS15055 is slc43a2a-type with L326 (data/genomics/flyingfish_annotation_lat4a_v1.json)",
+  "pipeline validation on a 60 kb zebrafish chr15 slice (plus strand) and a 35 kb chr10 slice (minus strand), 5 queries each, controls pass"
+ ],
+ "why_not_host": "23 assemblies, 18.85 Gb of sequence and roughly 5-6 GB of compressed downloads, against the host rule of no genome over 200 MB without sizing. Per genome the work is minutes, so this is a small, download-bound job and not a use of the 32-vCPU ceiling."
+}
