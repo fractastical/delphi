@@ -19,6 +19,7 @@ from pathlib import Path, PurePosixPath
 import re
 import subprocess
 import tempfile
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -127,6 +128,28 @@ def _bounded_response_bytes(opener, request, max_bytes: int, timeout=300):
         return getattr(response, "status", 200), dict(response.headers.items()), body
 
 
+def _cached_local_token(provider, lifetime_s=30, clock=None):
+    """Avoid one gcloud subprocess per artifact; never persist tokens to disk.
+
+    This is deliberately brief: gcloud's print command supplies no expiry metadata.
+    Failed refreshes are never cached or replaced by an expired cached credential.
+    """
+    clock = clock or time.monotonic
+    token, expires = None, 0.0
+
+    def read():
+        nonlocal token, expires
+        if token is None or clock() >= expires:
+            token = None
+            fresh = provider()
+            if not isinstance(fresh, str) or not fresh:
+                raise RuntimeError("local authentication returned no access token")
+            token, expires = fresh, clock() + lifetime_s
+        return token
+
+    return read
+
+
 class GCS:
     """Small JSON API client; token and opener injection keep tests credential-free."""
 
@@ -156,7 +179,7 @@ class GCS:
             if result.returncode != 0 or not result.stdout.strip():
                 raise RuntimeError("gcloud could not obtain an access token")
             return result.stdout.strip()
-        return cls(token_provider, opener)
+        return cls(_cached_local_token(token_provider), opener)
 
     def _auth_headers(self, extra=None):
         headers = {"Authorization": "Bearer " + self.token_provider()}
