@@ -1620,3 +1620,35 @@ def test_session_limit_shows_a_retry_state_and_public_reads_stay_available(brows
     assert pg.locator("h1").count() >= 1, "pages still draw while the session is limited"
     pg.click("#sessbanner button")
     pg.wait_for_function("!document.querySelector('#sessbanner')", timeout=15000)
+
+
+def test_blueprints_show_actors_claim_ledger_cell_programs_and_filters_that_are_not_validation(browser, base):
+    src = json.loads((ROOT / "artifacts/genetic-blueprints/blueprints.json").read_text())
+    G = json.loads((ROOT / "site/data/snapshot.json").read_text())["genetic_blueprints"]
+    assert len(G["actors"]["actors"]) == len(src["regulatory_actors"]["actors"]) > 0 and len(G["claim_ledger"]["rows"]) == len(src["claim_use_ledger"]["rows"]) > 0 and len(G["cell_programs"]) == len(src["cell_program_blueprints"]) > 0
+    pg = page(browser)
+    pg.goto(base + "#/blueprints"); pg.wait_for_selector("section[aria-labelledby=bp-act]")
+    t = pg.locator("#main").text_content()
+    assert pg.locator("section[aria-labelledby=bp-act] tbody tr").count() == len(G["actors"]["actors"])
+    assert pg.locator("section[aria-labelledby=bp-led] tbody tr").count() == len(G["claim_ledger"]["rows"])
+    assert pg.locator("section[aria-labelledby=bp-cpb] article").count() == len(G["cell_programs"])
+    assert "NONE identified" in t and "A marker or an inferred network role is not a validated driver" in t and "UNDECLARED" in t
+    roles = set(pg.locator("section[aria-labelledby=bp-act] td[data-label=Role]").all_inner_texts())
+    assert {"TF", "marker"} <= {r.strip() for r in roles}
+    d1 = "bp-1-regeneration-enhancer-reporter"
+    pg.goto(base + f"#/blueprints?design={d1}"); pg.wait_for_selector(".bpdesign")
+    t = pg.locator("#main").text_content()
+    assert pg.locator(".bpdesign").count() == 1 and "Filtered view" in t and "not validated expression" in t and "nothing here shows measured expression of any construct" in t
+    n_led = pg.locator("section[aria-labelledby=bp-led] tbody tr").count()
+    assert 0 < n_led < len(G["claim_ledger"]["rows"])
+    pg.goto(base + "#/blueprints?region=pectoral"); pg.wait_for_selector(".bptools")
+    t = pg.locator("#main").text_content()
+    assert "Filtered view" in t and ("No design in this package binds that region" in t or pg.locator(".bpdesign").count() >= 1)
+    pg.goto(base + "#/blueprints?cls=measured"); pg.wait_for_selector(".bptools")
+    assert set(pg.locator("section[aria-labelledby=bp-act] td[data-label='Evidence class']").all_inner_texts()) <= {"measured"}
+    pg.goto(base + "#/home"); pg.wait_for_selector("#regctx")
+    hrefs = pg.locator("#regctx a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert any(h.startswith("#/blueprints?region=") for h in hrefs) and "#/regulatory" in hrefs
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/blueprints"); pg2.wait_for_selector(".bptools")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
