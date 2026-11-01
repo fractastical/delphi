@@ -1,6 +1,6 @@
 {
   "schema": "frontier.compute-queue/1",
-  "observed_at_utc": "2026-10-31T23:26:01.517271Z",
+  "observed_at_utc": "2026-11-01T00:07:33.979840Z",
   "owner": "infra_director",
   "tasks": [
     {
@@ -134,9 +134,9 @@
       "job_id": "aijob-e00qazx6sby3vav47b",
       "task": "DDPM default-vs-explicitFP32 control and conditional training",
       "owner": "infra_director",
-      "provider_state": "RUNNING",
-      "result": "results/infra/diffusion-v2/manifest-infra23.json",
-      "scope": "Originalsource/config/tolerances fixed; backendpolicy preregistered; trainingonlyafterunchangedstrictcontrolpasses."
+      "provider_state": "FAILED",
+      "result": "results/infra/diffusion-v2/partial-primary.json",
+      "scope": "Original1800s timeout/full-runFAIL. Exact30k-step finitecheckpoint and301logs recovered; no evaluation/examples. Training loss is not held-outperformance."
     },
     {
       "job_id": "aijob-e00qzdzsh5mj8pvbd2",
@@ -145,28 +145,50 @@
       "provider_state": "COMPLETED",
       "result": "artifacts/rd-numerics/artifact-manifest.json",
       "scope": "Five training-only configs,960rows returned. Independent full metric reproduction FAILED at66near-uniform power ratios; original ratios/modes retained; no convergence PASS."
+    },
+    {
+      "task": "Exact-checkpoint evaluation-only recovery",
+      "job_id": "aijob-e00fb6jhvdt12fgsje",
+      "owner": "infra_director",
+      "provider_state": "STARTING",
+      "protocol": "artifacts/rd-diffusion/recovery-protocol.json",
+      "source_commit": "7729292",
+      "scope": "Exact failed-primary weights; no retraining; original full-primary FAIL retained; original evaluator/controls and new1800s evaluation bound"
     }
   ],
   "preparation": [
     {
+      "task": "Exact-weight evaluation recovery",
+      "owner": "dx-market-r1 source / infra_director admission",
+      "priority": 1,
+      "state": "source_packet_preparation_public_runtime_release_pending",
+      "authorization": "Root explicitly authorized after verified partialcheckpoint; original primaryFAIL permanent",
+      "runtime_inputs": "artifacts/rd-diffusion/primary-runtime-inputs.json",
+      "runtime_archive_sha256": "4c43b04106469764c1d24450a29c1e200914e3b7952c417bb62508fd52862a5d",
+      "checkpoint_sha256": "1a0a185cdacd49e8a65aa77ece1cd8f51033533c996025b3f4da907cd2b2ae76",
+      "budget": "oneH100;1800s evaluation-only; no optimizer/training",
+      "next_acceptance": "Freeze new recovery protocol/source; original evaluate/marginals/timings unchanged; exactcheckpoint/config/source/splits/seeds, sameFP32+CUDAcontrols; original160conditions/allmethods/marginals/completeness criteria. Label regeneratedtrainingbaseline data asregenerated, require exactnormalizationmatch; stage receipts. PublicGET size/SHA/member gate beforeadmission.",
+      "stop_gate": "No change to originalfailure, originalscientificcriteria, weights oroptimizer; missing/nonfiniteoutputs andtimeouts remain failures."
+    },
+    {
       "task": "Collect primary trained RD model",
       "owner": "infra_director / dx-market-r1",
       "priority": 1,
-      "state": "running",
+      "state": "collected_partial_primary_failed",
       "job_id": "aijob-e00qazx6sby3vav47b",
       "packet": "inputs/items_infra_diffusion_v2.json",
       "earliest_next_action": "On return, or original hard1800s deadline around16:39:38PDT; estimate excludes provider transport",
-      "next_acceptance": "Run shared strict auditor4700a78 against returned checkpoint/evaluation and separate same-allocation control;301loggedsteps ending30000;160unique conditions, all5methods, exactsource/config/checkpoint hashes, no missing/nonfiniteholdouts",
+      "next_acceptance": "Completedtrainingcheckpoint checked; originalfullrunFAIL remains, noheldoutperformanceclaim",
       "stop_gate": "Any missing file, timeout, failed/control/nonfinite/completeness check remains failed/partial; no threshold change or retraining on holdouts"
     },
     {
       "task": "Secondary exact empirical W1 and full ensemble retention",
       "owner": "dx-market-r1 prepares / infra_director dispatches",
       "priority": 2,
-      "state": "source_preregistered_waiting_primary_checkpoint",
+      "state": "source_frozen_waiting_valid_evaluation_recovery",
       "source": "engineering/rd_diffusion/AMENDMENT_1.md; engineering/rd_diffusion/secondary_eval.py; exact_w1.py",
-      "prepared_source_commit": "0f79f603",
-      "earliest_next_action": "Within30min of a valid primary return, subject to frozen packet and actualCPUcontrol; estimate",
+      "prepared_source_commit": "396bd0bb",
+      "earliest_next_action": "After exact-weight evaluation-recovery passes original completeness criteria; no blindretry",
       "budget": "oneH100,initial30min hardbound, no additionaltraining",
       "next_acceptance": "Exact checkpoint SHA/public transport gate; source hashes frozen before secondary outputs; explicit FP32 flags matching actualprimary; fixedseeds; exactW1softwarefixture; fullgenerated+referenceensembles retained; unchanged primarymetrics compared and differences reported",
       "stop_gate": "Invalidprimary checkpoint, missingprimaryidentity, failedcontrol, changedweights, nonfinite/truncatedoutput, or sharedforeignqueueddemand => do notadmit/stopasprotocolspecifies"
@@ -247,9 +269,40 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-10-31T23:28:04.655084+00:00",
+  "updated_at_utc": "2026-11-01T00:07:33.979840Z",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
-  ]
+  ],
+  "gcp": {
+    "project": "scienceclaw26bos-3016",
+    "global_cpu_limit": 32,
+    "observed_instances": 0,
+    "gpu_quota_granted": 0,
+    "gpu_quota_requested": 1,
+    "state": "isolated network, dedicated bucket-only identity and private artifact bucket ready; awaiting frozen scientific CPU packets and exporter",
+    "plan": [
+      {
+        "vm": "frontier-cpu-20261031-01",
+        "vcpu": 16,
+        "work": "CFD controlled cylinder/domain/mutant",
+        "ready": false
+      },
+      {
+        "vm": "frontier-cpu-20261031-02",
+        "vcpu": 8,
+        "work": "23public-genome residue survey",
+        "ready": false
+      },
+      {
+        "vcpu": 8,
+        "work": "reserved glider design sweeps",
+        "ready": false
+      }
+    ],
+    "network": "frontier-workers-20261031",
+    "ingress": "explicit priority0 deny-all",
+    "credentials": "short-lived metadata identity; no embedded key",
+    "expiry": "user states account deletes Sunday night2026-11-01; export promptly, exact UTC cutoff unknown"
+  }
 }

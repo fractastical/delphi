@@ -1,0 +1,31 @@
+{
+  "run_tag": "infra25",
+  "items": [
+    {
+      "id": "rd-ddpm-evaluation-recovery",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch:25.12-py3",
+      "args": [
+        "inputs/warm_queue_infra_diffusion_recovery.json"
+      ],
+      "files": [
+        "frontier_compute/__init__.py",
+        "frontier_compute/portable_entry.py",
+        "frontier_compute/secondary_entry.py",
+        "artifacts/rd-diffusion/packet/rd_recovery_packet.tar.gz",
+        "inputs/warm_queue_infra_diffusion_recovery.json",
+        "inputs/diffusion-recovery.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2"
+      },
+      "timeout": "45m",
+      "inner_timeout_s": 2250,
+      "max_result_bytes": 1000000,
+      "priority": 1
+    }
+  ]
+}
