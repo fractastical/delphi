@@ -7,6 +7,7 @@
 
   DF.views.graph = function (snap, route) {
     const kind = route.parts[1] || "", id = route.parts.slice(2).join("/");
+    if (!kind || !id) return { html: html`<section class="pagehead"><h1>Neighbourhood graph</h1><p class="lede">A neighbourhood graph belongs to one exact record. Open a record from <a href="${DF.href("/knowledge")}">Knowledge</a> or the <a href="${DF.href("/search", { tab: "catalog" })}">catalog</a> and choose its neighbourhood from there. No record is selected, so no graph is drawn.</p></section>` };
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/entity/" + kind + "/" + id, { v: route.params.v, ns: route.params.ns })}">${kind} ${id}</a> / neighbourhood</p><h1>Neighbourhood graph</h1><div id="gwrap" role="status">Loading…</div></section>`,
       async after(root) {
