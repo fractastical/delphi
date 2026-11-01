@@ -550,7 +550,8 @@ def render_cut(cut: dict, cut_map: dict, tts_cut: dict, output_root: Path, work_
     filter_parts.append(f"{previous}{subtitle_expr},format=yuv420p[vout]")
     graph = ";".join(filter_parts)
     voice_wav = work_root / f"{cut['id']}-voice.wav"
-    audio_duration, audio_timing = _build_cut_audio(cut, tts_cut, voice_wav)
+    audio_track_duration, audio_timing = _build_cut_audio(cut, tts_cut, voice_wav)
+    spoken_duration = sum(row["voice_duration_s"] for row in audio_timing)
     final_path = output_root / f"{cut['id']}.mp4"
     args = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-filter_complex_threads", "1", "-threads", "2"]
     for path in scene_paths:
@@ -577,7 +578,8 @@ def render_cut(cut: dict, cut_map: dict, tts_cut: dict, output_root: Path, work_
         files[role] = {"path": str(path.relative_to(output_root)), "sha256": sha256_file(path), "bytes": path.stat().st_size}
     return {"id": cut["id"], "title": "Two-minute tour" if cut["duration_s"] == 120 else "One-minute tour",
             "duration_s": round(duration, 3), "files": files,
-            "narration_duration_s": round(audio_duration, 3), "audio_timing": audio_timing,
+            "narration_duration_s": round(spoken_duration, 3),
+            "audio_track_duration_s": round(audio_track_duration, 3), "audio_timing": audio_timing,
             "subtitle_cues": subtitle["cues"], "video_size_limit_bytes": MAX_VIDEO_BYTES}
 
 
