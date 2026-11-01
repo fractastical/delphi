@@ -48,12 +48,12 @@ def _inst(i, kind, observable, unit, section, forward, calibration, reference, u
 INSTRUMENTS = [
     _inst("V1-saved-deflection-section", "virtual_simulation_readout", "w(x)/L at fixed sections of a saved FEM profile", "1 (m/m)",
           "x/L in {0.25,0.5,0.75,1.0}; one beam, one load shape per saved case",
-          "y = w_saved(x)/L, deterministic; no noise sampled", "none needed: reads a saved simulated field; context = the saved draw's assumed latents",
+          "y = w_saved(x)/L, deterministic; no noise sampled", "no empirical calibration was performed (none is applicable to a saved simulated field); the instrument model is NOT calibrated to any biological system; context = the saved draw's assumed latents",
           "closed-form analytic deflection of the same inputs; coarse/fine FEM difference stored with each case",
           "numerical discretisation only (stored grid difference); no biological uncertainty",
           "max |w_saved - w_analytic|/L <= 1e-4", "simulation_derived"),
     _inst("V2-saved-tip-and-slope", "virtual_simulation_readout", "tip/L and max slope of a saved case", "1; rad", "tip station and max over saved stations",
-          "y = saved summary value, deterministic", "none; saved draw context", "the assurance predicate's analytic residual field",
+          "y = saved summary value, deterministic", "no empirical calibration performed; instrument model not calibrated to biology; saved draw context", "the assurance predicate's analytic residual field",
           "numerical only", "analytic_tip_relative_error <= 1e-7 (assurance protocol tolerance)", "simulation_derived"),
     _inst("R1-ray-bending", "physical_measurement_proposal", "excised-ray clamped bending compliance", "ln(m/N) offset removed", "clamp-to-tip, one load level per read",
           "ln y = -ln EI + 3 ln L + e, e~N(0, 0.04) ASSUMED", "needs clamp compliance and load-cell calibration; ex vivo", "known-stiffness reference beam in the same clamp",
@@ -72,6 +72,61 @@ INSTRUMENTS = [
           "undefined: expression->growth->EI coupling unresolved", "needs staged imaging and density calibration", "untreated sibling", "unknown",
           "not definable until the coupling is calibrated", "proposed_uncalibrated", "unresolved expression->growth->EI bridges in the design-control map"),
 ]
+
+
+# Fields compiler02's genotype layer requires of an instrument contract (genotype.py INSTRUMENT_FIELDS, branch
+# work/genotype-compiler @ 2dfc9b7). Slot interfaces below are claude-14 PROPOSALS for compiler02 to confirm.
+COMPILER_FIELDS = ["instrument id and version", "input schema with units", "observation schema with units",
+                   "noise or uncertainty model", "replicate unit", "cost and duration units"]
+CONTRACT_EXTRAS = {
+    "V1-saved-deflection-section": dict(slot=("I4", "virtual"), inp="saved case: L_m (m), EI_Nm2 (N m^2), q_N_m (N/m), load_shape", obs="w(x)/L at x/L sections (1)", rep="one saved simulated case (a draw x candidate x load shape); not a biological replicate", cost="CPU-seconds (reads saved fields; the whole run is ~95 s)", dur="seconds, deterministic"),
+    "V2-saved-tip-and-slope": dict(slot=("I4", "virtual"), inp="saved case: L_m (m), EI_Nm2 (N m^2), q_N_m (N/m), load_shape", obs="tip/L (1); max slope (rad)", rep="one saved simulated case; not a biological replicate", cost="CPU-seconds", dur="seconds, deterministic"),
+    "R1-ray-bending": dict(slot=("I3", "physical"), inp="excised ray; applied load F (N, known); clamped length L (m)", obs="ln(delta/F) offset removed (1)", rep="one ray from one fish (biological replicate = fish); repeats on one ray share clamp/setup error", cost="assumed_readout_cost_unit = 2 (not dollars)", dur="not defined (prospective)"),
+    "R2-inflow-tip": dict(slot=("I4", "physical"), inp="ray in flow at target speed (m/s)", obs="tip deflection / L (1)", rep="one fish; repeated flows on one fish are technical repeats sharing the model discrepancy", cost="assumed_readout_cost_unit = 3 (not dollars)", dur="not defined (prospective)"),
+    "R3-load": dict(slot=("I4", "physical"), inp="flow condition (m/s)", obs="distributed load (N/m)", rep="one flow condition", cost="assumed_readout_cost_unit = 2 (not dollars)", dur="not defined (prospective)"),
+    "R4-length": dict(slot=("I3", "physical"), inp="ray image or specimen", obs="length (m)", rep="one ray", cost="assumed_readout_cost_unit = 0.5 (not dollars)", dur="not defined (prospective)"),
+    "P1-reporter-expression": dict(slot=("I1", "physical"), inp="pinned construct sequence artifact in a stated cell state/stage (units undefined)", obs="reporter output (relative units; mapping to expression undefined)", rep="undefined until the design states it", cost="undefined", dur="undefined"),
+    "P2-growth-to-EI": dict(slot=("I2", "physical"), inp="expression perturbation in a stated cell state (units undefined)", obs="segment growth (m) and density (kg/m^3) vs stage", rep="undefined until the design states it", cost="undefined", dur="undefined"),
+}
+
+
+def instrument_contracts(protocol_sha256: str) -> dict:
+    out = []
+    for inst in INSTRUMENTS:
+        x = CONTRACT_EXTRAS[inst["id"]]
+        out.append({
+            "instrument id and version": f"{inst['id']}@1",
+            "input schema with units": x["inp"], "observation schema with units": x["obs"],
+            "noise or uncertainty model": f"{inst['forward_noise_model']}; uncertainty: {inst['uncertainty']}",
+            "replicate unit": x["rep"], "cost and duration units": f"{x['cost']}; duration: {x['dur']}",
+            "evidence_type": "computed" if inst["status"] == "simulation_derived" else "proposed",
+            "status": inst["status"], "kind": inst["kind"], "calibration_context": inst["calibration_context"],
+            "reference_control": inst["reference_control"], "acceptance": inst["acceptance"], "blocked_on": inst["blocked_on"],
+            "proposed_compiler_slot": {"interface": x["slot"][0], "kind": x["slot"][1],
+                                       "state": "claude-14 proposal; compiler02 confirms the interface mapping"}})
+    return {"schema": "frontier.crossscale-doe.instrument-contracts/1", "protocol_sha256": protocol_sha256,
+            "compiler_required_fields": COMPILER_FIELDS, "contracts": out,
+            "rule": "contract_ref for a compiler slot = {path: artifacts/crossscale-doe/instrument-contracts.json, sha256: manifest files entry, pointer: /contracts/<index>}. A contract does not calibrate anything; no contract carries response data."}
+
+
+def validate_contract(c: dict) -> list:
+    """Return a list of problems; an empty list means the contract is internally consistent, nothing more."""
+    probs = [f"missing or empty: {f}" for f in COMPILER_FIELDS if not str(c.get(f, "")).strip()]
+    if c.get("status") == "simulation_derived":
+        if c.get("kind") != "virtual_simulation_readout" or c.get("evidence_type") != "computed":
+            probs.append("simulation_derived must be a computed virtual_simulation_readout")
+        if "deterministic" not in c.get("noise or uncertainty model", ""):
+            probs.append("a saved-field readout must declare its deterministic forward model")
+        if "NOT calibrated" not in c.get("calibration_context", "") and "not calibrated" not in c.get("calibration_context", ""):
+            probs.append("a virtual readout must say its instrument model is not calibrated to biology")
+    else:
+        if c.get("evidence_type") != "proposed":
+            probs.append("a non-simulated instrument must be evidence_type proposed")
+        if not c.get("blocked_on"):
+            probs.append("a proposed instrument must name what blocks it")
+    if c.get("kind") in ("sequence_expression_proposal", "cell_growth_proposal") and c.get("status") != "proposed_uncalibrated":
+        probs.append("a sequence/growth instrument without a calibrated mapping must stay proposed_uncalibrated")
+    return probs
 
 
 def build_protocol() -> dict:
@@ -121,8 +176,9 @@ def build_protocol() -> dict:
             "objective": "expected reduction of target posterior variance, divided by cost; ties by information nats",
             "baseline": "equal-budget naive plan: all budget on in-flow tip deflection replicates (R2 x2), the most direct-looking readout",
             "sensitivity_grid": {"noise_scale_per_readout": [0.5, 1.0, 2.0], "cost_scale_per_readout": [0.5, 1.0, 2.0],
-                                 "note": "every combination of per-readout scales (3^8 = 6561); report how often each plan ranks first"},
-            "expected_misclassification": "Monte Carlo over the Gaussian prior and the linear likelihood: probability that the sign of the posterior-mean margin disagrees with the true margin sign; seed 20261101, 20000 draws",
+                                 "note": "every combination of per-readout scales (3^8 = 6561). The FULL replicate-count grid (max_replicates_per_readout) is enumerated once, so plans that a price cut makes affordable are considered; a discounted-cost case (all prices x0.5) must show at least one newly feasible plan considered. Noise scale multiplies independent and shared variance. Baseline-not-beaten is counted only over scenarios in which the baseline is affordable; baseline-ineligible scenarios are reported separately.",
+                                 "dependence": "Nominal model: repeats of R1, R3 and R4 are treated as independent (OPTIMISTIC for repeats on one ray or setup); only R2 carries a shared discrepancy. A dependence sensitivity gives every readout a shared term equal to its independent variance and reports the best plan again."},
+            "decision_exercise": "Model-based exercise, not an observed error rate. True margin = m0 + theta.target where m0 is the FINALIST's actual log margin ln(0.3) - (ln q + 3 ln L - ln EI) at the sample mean of the recorded draws, and theta ~ N(0, prior). Each plan decides by the sign of the posterior-mean margin; no-measurement decides by sign(m0). Reports sign-misclassification probability; seed 20261101, 20000 draws. The earlier centered (m0 = 0) version is superseded.",
         },
         "instruments": INSTRUMENTS,
         "virtual_validation": {
@@ -305,7 +361,7 @@ def _evaluate(prior, target, readouts, counts, budget_cost=None, **scales):
     return m, H, R, cost
 
 
-def measurement(protocol, draws, seed):
+def measurement(protocol, draws, seed, finalist):
     meas = protocol["measurement"]
     readouts = meas["readouts"]
     prior = _prior(draws)
@@ -335,57 +391,102 @@ def measurement(protocol, draws, seed):
     # zero-sensitivity control
     z = [{"id": "Z", "sensitivity": [0, 0, 0], "independent_noise_variance": 0.04, "shared_discrepancy_variance": 0.0, "cost": 1.0}]
     zm, *_ = _evaluate(prior, target, z, [1])
-    # sensitivity to noise and cost scales
+    # Sensitivity: the full replicate-count grid is enumerated ONCE (no nominal-budget filter), because a price
+    # cut makes plans affordable that the nominal budget excluded. Variance reduction depends on the noise scale
+    # only; cost scales only decide which plans are affordable.
     ids = [r["id"] for r in readouts]
-    first = {}
-    wins_vs_base = 0
-    total = 0
+    all_plans = _enumerate(readouts, float("inf"), meas["max_replicates_per_readout"])
+    counts_arr = np.array(all_plans, float)
+    nominal_cost = counts_arr @ np.array([r["cost"] for r in readouts])
+    base_idx = all_plans.index(tuple(base_counts))
     scales = meas["sensitivity_grid"]
+    budget = meas["budget"]
+    first, comparable, base_ineligible, base_not_beaten, scenarios = {}, 0, 0, 0, 0
+    newly_feasible_seen = 0
     for ns in itertools.product(scales["noise_scale_per_readout"], repeat=len(ids)):
         nsd = dict(zip(ids, ns))
+        red = np.array([_evaluate(prior, target, readouts, c, noise_scale=nsd)[0]["expected_target_variance_reduction"]
+                        for c in all_plans])
         for cs in itertools.product(scales["cost_scale_per_readout"], repeat=len(ids)):
-            csd = dict(zip(ids, cs))
-            best = None
-            for c in plans:
-                _, _, cost = _plan(readouts, c, noise_scale=nsd, cost_scale=csd)
-                if cost > meas["budget"] + 1e-9:
-                    continue
-                m, *_ = _evaluate(prior, target, readouts, c, noise_scale=nsd, cost_scale=csd)
-                v = (m["expected_target_variance_reduction"], -cost)
-                if best is None or v > best[0]:
-                    best = (v, c, m["expected_target_variance_reduction"])
-            bm_s, *_ = _evaluate(prior, target, readouts, base_counts, noise_scale=nsd, cost_scale=csd)
-            _, _, base_cost = _plan(readouts, base_counts, noise_scale=nsd, cost_scale=csd)
-            if best is None:
+            cost = counts_arr @ (np.array([r["cost"] for r in readouts]) * np.array(cs))
+            ok = cost <= budget + 1e-9
+            scenarios += 1
+            if not ok.any():
                 continue
-            total += 1
-            lab = _label(readouts, best[1])
+            best = max(np.flatnonzero(ok), key=lambda i: (red[i], -cost[i]))
+            lab = _label(readouts, all_plans[best])
             first[lab] = first.get(lab, 0) + 1
-            if base_cost <= meas["budget"] + 1e-9 and best[2] <= bm_s["expected_target_variance_reduction"] + 1e-12:
-                wins_vs_base += 1
-    # Monte Carlo decision check at nominal assumptions
+            newly_feasible_seen += int(np.any(ok & (nominal_cost > budget + 1e-9)))
+            if ok[base_idx]:
+                comparable += 1
+                base_not_beaten += int(red[best] <= red[base_idx] + 1e-12)
+            else:
+                base_ineligible += 1
+    # discounted-cost case: every price halved; plans costing up to 2x the budget at nominal prices are affordable
+    half = {i: 0.5 for i in ids}
+    cost_half = counts_arr @ (np.array([r["cost"] for r in readouts]) * 0.5)
+    red_nom = np.array([_evaluate(prior, target, readouts, c)[0]["expected_target_variance_reduction"] for c in all_plans])
+    ok_half = cost_half <= budget + 1e-9
+    new_idx = [i for i in np.flatnonzero(ok_half) if nominal_cost[i] > budget + 1e-9]
+    best_half = max(np.flatnonzero(ok_half), key=lambda i: (red_nom[i], -cost_half[i]))
+    discount_case = {"cost_scale": half, "plans_in_grid": len(all_plans), "affordable_at_discount": int(ok_half.sum()),
+                     "newly_feasible_plans_considered": len(new_idx),
+                     "example_newly_feasible": [_label(readouts, all_plans[i]) for i in new_idx[:3]],
+                     "best_plan_at_discount": _label(readouts, all_plans[best_half]),
+                     "best_variance_reduction_at_discount": float(red_nom[best_half]),
+                     "best_variance_reduction_nominal_budget": best_at_budget["variance_reduction"],
+                     "best_at_discount_is_newly_feasible": bool(best_half in new_idx)}
+    # Dependence sensitivity: R1, R3, R4 repeats are independent in the nominal model (optimistic for repeats on
+    # one ray/setup). Here each also carries a shared term equal to its independent variance.
+    dep = [{**r, "shared_discrepancy_variance": r["independent_noise_variance"] if r["shared_discrepancy_variance"] == 0 else r["shared_discrepancy_variance"]}
+           for r in readouts]
+    dep_red = np.array([_evaluate(prior, target, dep, c)[0]["expected_target_variance_reduction"] for c in all_plans])
+    ok_nom = nominal_cost <= budget + 1e-9
+    dbest = max(np.flatnonzero(ok_nom), key=lambda i: (dep_red[i], -nominal_cost[i]))
+    dependence = {"assumption": "every readout shares a discrepancy equal to its independent variance across repeats",
+                  "best_plan": _label(readouts, all_plans[dbest]), "best_variance_reduction": float(dep_red[dbest]),
+                  "nominal_selected_plan_variance_reduction_under_dependence": float(dep_red[all_plans.index(tuple(best_at_budget["counts"]))]),
+                  "baseline_variance_reduction_under_dependence": float(dep_red[base_idx])}
+    # Decision exercise: the TRUE margin is m0 + theta.target, with m0 the finalist's actual log margin at the sample
+    # mean of the recorded draws (not a centered perturbation).
+    ln = np.log
+    means = np.array([np.mean([ln(d["EI_Nm2"]) for d in draws]),
+                      np.mean([ln(0.5 * d["rho_kg_m3"] * d["speed_m_s"] ** 2 * d["CL"] * d["tributary_width_m"]) for d in draws]),
+                      np.mean([ln(d["length_multiplier"]) for d in draws])])
+    m0 = float(ln(0.3) - (means[1] + 3 * (ln(finalist["ray_length_m"]) + means[2]) - (means[0] + ln(finalist["EI_multiplier"]))))
+    sd_t = float(np.sqrt(target @ prior @ target))
+    from math import erf, sqrt
+    gaussian_p_inside = 0.5 * (1 + erf(m0 / (sd_t * sqrt(2))))
     rng = np.random.default_rng(seed)
     mis = {}
     n = 20000
     theta = rng.multivariate_normal(np.zeros(3), prior, size=n)
+    true_margin = m0 + theta @ target
     for name, counts in (("selected", best_at_budget["counts"]), ("baseline", base_counts), ("no_measurement", None)):
-        if counts is None:  # guesses 'inside the linear regime' for every draw
-            mis[name] = float(np.mean(np.sign(theta @ target) != 1.0))
+        if counts is None:  # decide from the prior mean margin m0
+            mis[name] = float(np.mean(np.sign(true_margin) != np.sign(m0)))
             continue
         H, R, _ = _plan(readouts, counts)
         y = theta @ H.T + rng.multivariate_normal(np.zeros(len(H)), R, size=n)
         K = prior @ H.T @ np.linalg.inv(H @ prior @ H.T + R)
-        post = y @ K.T
-        mis[name] = float(np.mean(np.sign(post @ target) != np.sign(theta @ target)))
+        mis[name] = float(np.mean(np.sign(m0 + (y @ K.T) @ target) != np.sign(true_margin)))
     return {
         "prior_covariance": prior.tolist(), "prior_sd": np.sqrt(np.diag(prior)).tolist(), "target_vector": target.tolist(),
         "n_plans_enumerated": len(rows), "ranked_by_reduction_per_cost": rows[:8],
         "best_at_budget": best_at_budget, "best_per_cost": best_per_cost, "baseline_equal_budget": baseline,
         "ratio_selected_over_baseline_variance_reduction": best_at_budget["variance_reduction"] / baseline["variance_reduction"],
         "zero_sensitivity_control": {"variance_reduction": zm["expected_target_variance_reduction"], "ok": zm["expected_target_variance_reduction"] == 0.0},
-        "sensitivity": {"scenarios": total, "plans_ranked_first_at_budget": dict(sorted(first.items(), key=lambda kv: -kv[1])),
-                        "scenarios_where_baseline_is_not_beaten": wins_vs_base, "note": "count of scenarios in which no affordable plan reduces margin variance more than the baseline"},
-        "misclassification_probability_of_sign_of_margin": {**mis, "note": "no_measurement guesses 'inside regime'; selected/baseline use the Gaussian posterior mean; model-based, not empirical"},
+        "sensitivity": {"scenarios": scenarios, "plans_in_full_grid": len(all_plans),
+                        "plans_ranked_first_at_budget": dict(sorted(first.items(), key=lambda kv: -kv[1])),
+                        "scenarios_with_newly_feasible_plan_affordable": newly_feasible_seen,
+                        "baseline_comparable_scenarios": comparable, "baseline_ineligible_scenarios": base_ineligible,
+                        "baseline_not_beaten_among_comparable": base_not_beaten,
+                        "note": "comparable = baseline affordable under that scenario's prices; not-beaten = no affordable plan reduces margin variance more"},
+        "discounted_cost_case": discount_case, "dependence_sensitivity": dependence,
+        "decision_exercise": {"finalist_margin_offset_m0": m0, "gaussian_p_inside_regime": gaussian_p_inside,
+                              "recorded_pass_fraction_finalist": finalist["fem"]["fraction"],
+                              "sign_misclassification": mis,
+                              "note": "model-based exercise under the assumed Gaussian latent law: true margin = m0 + theta.target; the no-measurement arm decides from sign(m0). Gaussian P(inside) differs from the recorded pass fraction because the recorded draws are uniform, not Gaussian. Not an observed fish error rate."},
         "target_prior_sd": float(np.sqrt(target @ prior @ target)),
     }
 
@@ -418,7 +519,18 @@ def virtual_validation(protocol, doc):
     ok = all(v <= 1e-4 for v in worst.values())
     return {"cases_read": n, "worst_abs_error_over_L_by_section": worst, "acceptance": spec["acceptance"], "accepted": ok,
             "control_unit_mislabel": {"worst_error": bad_units, "rejected_by_acceptance": bad_units > 1e-4},
-            "control_off_grid_refused": True, "status": spec["status"], "response_rows_created": 0}
+            "control_off_grid_refused": off_grid_control(protocol, doc), "status": spec["status"], "response_rows_created": 0}
+
+
+def off_grid_control(protocol, doc):
+    """Execute the negative arm: a section absent from the saved grid must raise the specific refusal."""
+    bad = json.loads(json.dumps(protocol))
+    bad["virtual_validation"]["sections_x_over_L"] = [0.2512]
+    try:
+        virtual_validation(bad, doc)
+    except ValueError as exc:
+        return {"executed": True, "refused": "off the saved grid" in str(exc), "error_type": "ValueError", "message": str(exc)}
+    return {"executed": True, "refused": False, "error_type": None, "message": "no error raised"}
 
 
 def hypothesis_discrimination(doc, sd=0.2):
@@ -475,7 +587,7 @@ def run(protocol_path: Path = PROTOCOL, out: Path = OUT):
         raise RuntimeError(f"control failed: {ctrl}")
     rows = screen_candidates(protocol, draws)
     finalist = refine(rows, draws, assurance_protocol)
-    meas = measurement(protocol, draws, protocol["seed"])
+    meas = measurement(protocol, draws, protocol["seed"], next(r for r in rows if r["id"] == finalist))
     if not meas["zero_sensitivity_control"]["ok"]:
         raise RuntimeError("zero-sensitivity control failed")
     virt = virtual_validation(protocol, draws_doc)
@@ -494,10 +606,15 @@ def run(protocol_path: Path = PROTOCOL, out: Path = OUT):
     (out / "candidates.json").write_text(_canon({"schema": "frontier.crossscale-doe.candidates/1", "evidence_kind": "simulated", "rows": rows}))
     (out / "result.json").write_text(_canon(result))
     (out / "interface-map.json").write_text(_canon(interface_map()))
+    contracts = instrument_contracts(result["protocol_sha256"])
+    problems = {c["instrument id and version"]: validate_contract(c) for c in contracts["contracts"]}
+    if any(problems.values()):
+        raise RuntimeError(f"instrument contract problems: {problems}")
+    (out / "instrument-contracts.json").write_text(_canon(contracts))
     _plot(rows, meas, out / "selection.png")
     (out / "instrument-flow.svg").write_text(_flow_svg())
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
-    names = ("protocol.json", "candidates.json", "result.json", "interface-map.json", "selection.png", "instrument-flow.svg")
+    names = ("protocol.json", "candidates.json", "result.json", "interface-map.json", "instrument-contracts.json", "selection.png", "instrument-flow.svg")
     manifest = {"schema": "frontier.crossscale-doe.manifest/1", "code_commit": commit,
                 "code_sha256": {f: _sha256_file(ROOT / f) for f in CODE_FILES},
                 "input_sha256": {"artifacts/assurance-experiments/all-simulations.json": SIMS_SHA256,

@@ -48,7 +48,7 @@
     {
       "acceptance": "max |w_saved - w_analytic|/L <= 1e-4",
       "blocked_on": null,
-      "calibration_context": "none needed: reads a saved simulated field; context = the saved draw's assumed latents",
+      "calibration_context": "no empirical calibration was performed (none is applicable to a saved simulated field); the instrument model is NOT calibrated to any biological system; context = the saved draw's assumed latents",
       "forward_noise_model": "y = w_saved(x)/L, deterministic; no noise sampled",
       "id": "V1-saved-deflection-section",
       "kind": "virtual_simulation_readout",
@@ -62,7 +62,7 @@
     {
       "acceptance": "analytic_tip_relative_error <= 1e-7 (assurance protocol tolerance)",
       "blocked_on": null,
-      "calibration_context": "none; saved draw context",
+      "calibration_context": "no empirical calibration performed; instrument model not calibrated to biology; saved draw context",
       "forward_noise_model": "y = saved summary value, deterministic",
       "id": "V2-saved-tip-and-slope",
       "kind": "virtual_simulation_readout",
@@ -164,7 +164,7 @@
     "budget": 6.0,
     "budget_unit": "assumed_readout_cost_unit (not dollars)",
     "decision": "Whether the finalist stays inside the declared linear regime (margin > 0) at the target load: keep the linear model, or stop and use a nonlinear/larger-deformation model.",
-    "expected_misclassification": "Monte Carlo over the Gaussian prior and the linear likelihood: probability that the sign of the posterior-mean margin disagrees with the true margin sign; seed 20261101, 20000 draws",
+    "decision_exercise": "Model-based exercise, not an observed error rate. True margin = m0 + theta.target where m0 is the FINALIST's actual log margin ln(0.3) - (ln q + 3 ln L - ln EI) at the sample mean of the recorded draws, and theta ~ N(0, prior). Each plan decides by the sign of the posterior-mean margin; no-measurement decides by sign(m0). Reports sign-misclassification probability; seed 20261101, 20000 draws. The earlier centered (m0 = 0) version is superseded.",
     "max_replicates_per_readout": 3,
     "objective": "expected reduction of target posterior variance, divided by cost; ties by information nats",
     "parameters": [
@@ -237,12 +237,13 @@
         1.0,
         2.0
       ],
+      "dependence": "Nominal model: repeats of R1, R3 and R4 are treated as independent (OPTIMISTIC for repeats on one ray or setup); only R2 carries a shared discrepancy. A dependence sensitivity gives every readout a shared term equal to its independent variance and reports the best plan again.",
       "noise_scale_per_readout": [
         0.5,
         1.0,
         2.0
       ],
-      "note": "every combination of per-readout scales (3^8 = 6561); report how often each plan ranks first"
+      "note": "every combination of per-readout scales (3^8 = 6561). The FULL replicate-count grid (max_replicates_per_readout) is enumerated once, so plans that a price cut makes affordable are considered; a discounted-cost case (all prices x0.5) must show at least one newly feasible plan considered. Noise scale multiplies independent and shared variance. Baseline-not-beaten is counted only over scenarios in which the baseline is affordable; baseline-ineligible scenarios are reported separately."
     },
     "target": "ln_margin = ln(0.3) - (ln_q + 3 ln_L - ln_EI), the finalist's log distance to the linear-validity limit; deviations from the draw-sample mean (prior mean 0)"
   },
