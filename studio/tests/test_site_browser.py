@@ -1719,3 +1719,30 @@ def test_experimentation_renders_the_planner_result_prospective_only(browser, ba
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_ecology_page_plays_published_saved_states_and_keeps_limits(browser, base):
+    run = ROOT / "artifacts/ecology/run-refined"
+    summ = json.loads((run / "summary.json").read_text())
+    rec = {f["path"]: f["sha256"] for f in json.loads((run / "receipt.json").read_text())["files"]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900); errs = []
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        pg.on("response", lambda r: errs.append(f"{r.status} {r.url}") if r.status >= 400 and "/api/" not in r.url else None)
+        pg.goto(base + "#/ecology"); pg.wait_for_selector("#eco-host .ev-cases button", timeout=20000)
+        assert pg.locator("#eco-host .ev-cases button").count() == 4
+        pg.locator("#eco-host canvas").first.wait_for(timeout=20000)
+        t = pg.locator("#main").text_content()
+        assert "computed reduced model" in t and "empirical validation: unknown" in t and "not stated" not in t.split("What each run ended on")[1].split("Rendered movies")[0]
+        for cid, s in summ.items():
+            row = pg.locator(f"#eco-{cid}").text_content()
+            assert s["main"]["termination_reason"] in row and str(float(f"{s['main']['last_time_s']:.4g}")) in row, cid
+        assert pg.locator("section[aria-labelledby=eco-m] video").count() == 2
+        assert not errs, errs
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+    for a in ("glide-passive", "escape-neighbors"):
+        b = (ROOT / f"site/artifacts/ecology/run-refined/{a}/trajectory.json").read_bytes()
+        import hashlib
+        assert hashlib.sha256(b).hexdigest() == rec[f"artifacts/ecology/run-refined/{a}/trajectory.json"]
