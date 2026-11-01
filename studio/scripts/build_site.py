@@ -688,6 +688,27 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
     return {"groups": groups, "refused": refused}
 
 
+def print_laws(ins: Inputs, out: dict, downloads: dict) -> dict | None:
+    """Only show grounding when its exact file pins match the published catalog."""
+    path = "artifacts/print-law-index.json"
+    if not (ROOT / path).is_file():
+        return None
+    raw = ins.read(path)
+    index = json.loads(raw)
+    catalog = {f["href"]: f for g in downloads["groups"] for f in g["files"]}
+    rows = index.get("files", [])
+    refused = [r.get("path", "missing path") for r in rows
+               if r.get("path") not in catalog or r.get("sha256") != catalog[r["path"]]["sha256"]]
+    indexed = {r.get("path") for r in rows}
+    refused.extend(p for p, f in catalog.items() if f["format"] == "STL" and p not in indexed)
+    if index.get("schema") != "frontier.print-law-index/1" or not rows or len(indexed) != len(rows):
+        refused.append("index schema or cardinality")
+    if refused:
+        return {"data": None, "refused": sorted(set(refused))}
+    out["@" + path] = raw
+    return {"data": index, "href": path, "sha256": digest_bytes(raw), "refused": []}
+
+
 def demo_videos(ins: Inputs, out: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
     directory = "artifacts/demo-video"
@@ -1482,6 +1503,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
+    print_law_index = print_laws(ins, extra, downloads)
     demos = demo_videos(ins, extra)
     diffusion = diffusion_pilot(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
@@ -1528,6 +1550,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
+        "print_laws": print_law_index,
         "demo_videos": demos,
         "diffusion_pilot": diffusion,
         "recovery_inputs": recovery_in,
