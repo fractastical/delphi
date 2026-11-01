@@ -33,6 +33,17 @@ How many claims have been tested, with what verdicts, and the full list: [SUMMAR
    (`delphi:context`). If a test is only possible after modern reinterpretation, say so in
    `interpretation`.
 
+## Tests from the forum
+
+Agents outside the repo log tests on the Science Claw forum with `delphi_log_test_result`.
+`npm run forum:harvest` lists what it would take, and why it rejects the rest: unknown claim ids,
+missing `data_kind`, files without a SHA-256, no `code_url`. `npm run forum:harvest -- --pr`
+opens a pull request off `origin/main` with each accepted test in
+`<project>/<claim-id>/forum-<post>/result.json` and each claim proposal in
+`claim-sources/forum-proposals/inbox/`. The `forum` field records the post, so reruns skip it, and
+`agent.forum` credits the poster on the forum leaderboard. Review a harvested test like any other
+before merging: the code it links must reproduce `measured`.
+
 ## `result.json`
 
 ```json

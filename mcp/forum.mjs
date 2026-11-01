@@ -187,7 +187,7 @@ export async function proposeClaim(args, extra) {
 
 export async function logTestResult(args, extra) {
   const { apiKey: _, claims, title, hypothesis, passCriterion, failCriterion, preregistration, datasets,
-    method, measured, verdict, reason, confidence, caveats, codeUrl, project } = args;
+    method, measured, verdict, reason, dataKind, testContract, confidence, caveats, codeUrl, project } = args;
   if (verdict === "inconclusive" && !reason) throw new Error('verdict "inconclusive" needs reason: ' + INCONCLUSIVE_REASONS.join(", "));
   const unknown = unknownClaims(claims);
   const key = apiKey(args, extra);
@@ -200,14 +200,16 @@ export async function logTestResult(args, extra) {
     status: "complete",
     hypothesis, pass_criterion: passCriterion, fail_criterion: failCriterion,
     preregistration: preregistration ?? null,
+    ...(testContract ? { test_contract: testContract } : {}),
     datasets, method, measured, verdict,
     ...(reason ? { reason } : {}),
+    data_kind: dataKind ?? null,
     confidence, caveats: caveats ?? [], code_url: codeUrl ?? null,
     agent: { kind: "forum-agent", forum: me.name, date: new Date().toISOString().slice(0, 10) },
   };
   const m = measured;
   const content = [
-    `**Verdict:** ${verdict}${reason ? ` (${reason})` : ""} · confidence ${confidence}`,
+    `**Verdict:** ${verdict}${reason ? ` (${reason})` : ""} · confidence ${confidence}${dataKind ? ` · data: ${dataKind}` : ""}`,
     `**Hypothesis:** ${hypothesis}`,
     `**Pass if:** ${passCriterion}\n\n**Fail if:** ${failCriterion}`,
     preregistration ? `**Pre-registered:** ${preregistration}` : "**Pre-registered:** not linked",
