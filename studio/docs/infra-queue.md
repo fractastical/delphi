@@ -170,3 +170,11 @@ At11:05pm PDT on October31, the45-arm aeroelastic packet was complete and VM04 h
 - [x] Refresh Google allocation: VM03 and VM04 RUNNING, 20 of 32 vCPUs allocated, zero active GPUs. At 12:23am, provider CPU fractions were 59.35% of 16 and 19.96% of 4, including startup/control work. These dated measurements are not instantaneous utilization. Actual provider spend remains unknown.
 - [ ] Collect and independently verify both new scientific returns; preserve failed controls and partial coverage.
 - [ ] Add later checkpoint/results bytes to an encrypted private recovery snapshot after the next stable cutoff. The d87e5d1 full add-on and 795f140 source/deploy delta are already off-host decrypted and hash-checked.
+
+At 12:27:43am PDT the inverse-pattern workload actually started. Its first two
+60-sample GPU windows averaged 29.75% and 31.03% (peaks 33% and 32%), with at most
+689 MiB device memory. These include setup and do not establish a scientific result.
+The original 900-second science limit is unchanged. Owner09 is now preparing a
+separate minimal observation-horizon study, requiring exact original 1000-time
+prefix reproduction and new preregistered censoring/bracketing rules before any
+cloud admission; the old 240-arm fixed-horizon FAIL remains unchanged.

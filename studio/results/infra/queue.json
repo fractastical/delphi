@@ -270,10 +270,11 @@
       "job_id": "aijob-e00grxtt94bh26a9c0",
       "task": "Six synthetic-target inverse Schnakenberg comparison",
       "owner": "infra_director",
-      "provider_state": "IMAGE_PULLING",
-      "provider_state_observed_utc": "2026-11-01T07:26:41.862530Z",
+      "provider_state": "RUNNING",
+      "provider_state_observed_utc": "2026-11-01T07:31:09.149849+00:00",
       "packet": "inputs/items_infra_rd_inverse.json",
-      "scope": "One H100, six synthetic targets; two methods with equal 64 actual solver evaluations each. Same-job numerical gates precede endpoints; no biological claim."
+      "scope": "One H100, six synthetic targets; two methods with equal 64 actual solver evaluations each. Same-job numerical gates precede endpoints; no biological claim.",
+      "live_progress_receipt": "results/resources/rd-inverse-live-progress.json"
     }
   ],
   "preparation": [
@@ -658,13 +659,14 @@
     {
       "task": "Six synthetic-target inverse Schnakenberg comparison",
       "owner": "claude-14 science; infra_director admission/collection",
-      "state": "admitted_image_pulling",
+      "state": "running_actual_GPU_samples_returned_outcomes_pending",
       "job_id": "aijob-e00grxtt94bh26a9c0",
       "source_commit": "841b6e9",
       "packet_commit": "24fb18e",
       "budget": "One H100; 900 s science; 40 min provider; 48 MiB compressed return",
       "receipt": "results/resources/rd-inverse-admission.json",
-      "stop_gate": "Actual CUDA and original CPU/CUDA/analytic/mutation controls; invalid-target failures and partials retained; no automatic retry."
+      "stop_gate": "Actual CUDA and original CPU/CUDA/analytic/mutation controls; invalid-target failures and partials retained; no automatic retry.",
+      "live_progress_receipt": "results/resources/rd-inverse-live-progress.json"
     },
     {
       "task": "Paired corrected-collocation aeroelastic comparison",
@@ -677,6 +679,17 @@
       "receipt": "results/resources/gcp/coupled-collocation-admission.json",
       "progress": "results/resources/gcp/coupled-collocation-progress.json",
       "stop_gate": "51 arms and five lattice-control groups; fixed numerical/mutation/domain gates; original production solver and 45-arm results unchanged."
+    },
+    {
+      "task": "Minimal time-resolved epithelial threshold comparison",
+      "owner": "claude-09 prepares; infra_director sole dispatcher",
+      "state": "source_and_protocol_preparation_only",
+      "brief": "/data/artifacts/delphi-evolve-rethink/messages/infra-to-epithelial-horizon-protocol.md",
+      "brief_sha256": "07048a6c95620195046353df9d1945b333bf9be19a4c6ef3a00759e78c3b34fa",
+      "scientific_question": "How does the operational interval threshold change with observation horizon in the same frozen model?",
+      "budget": "Candidate 4\u20138 vCPU, <=12 GiB, <=1800 s science, <=100 MB outputs; owner must first measure and freeze exact smaller scope.",
+      "stop_gate": "Exact original 1000-time trajectory/prefix reproduction before interpretation; new hypothesis/arms/horizons/censoring rules frozen before outcomes; old 240-arm FAIL unchanged; no automatic repeat of all240 arms.",
+      "cloud_admitted": false
     }
   ],
   "policies": {
@@ -687,7 +700,7 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T07:28:48.829736+00:00",
+  "updated_at_utc": "2026-11-01T07:35:55.996170+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
@@ -856,15 +869,14 @@
       {
         "task": "original_CPU_cylinder_controls",
         "vm": "frontier-cpu-20261031-03"
-      }
-    ],
-    "starting": [
+      },
       {
         "task": "inverse_Schnakenberg_six_targets",
         "job_id": "aijob-e00grxtt94bh26a9c0",
-        "provider_state": "IMAGE_PULLING"
+        "live_progress_receipt": "results/resources/rd-inverse-live-progress.json"
       }
     ],
+    "starting": [],
     "new_gpu_ready": false,
     "cost": null,
     "scope": "Image pulling is not GPU utilization. No other frozen admissible packet currently ready."
