@@ -191,21 +191,23 @@
       "task": "Complete two unstarted ecology scenario pairs",
       "owner": "mechanobio_sim freezes / infra_director dispatches",
       "priority": 1,
-      "state": "missing_only_packet_preparation",
+      "state": "admitted_vm_running",
       "prior_result": "results/resources/gcp/ecology-completion.json",
       "budget": "Reuse stopped 4-vCPU VM04 with existing exact dependencies; fresh task prefix and output directory",
       "next_acceptance": "Frozen two original scenario IDs, same original code/seed/settings and dt/actuator gates; rerun only missing two pairs, 4 simulations",
-      "stop_gate": "Original 26 pairs and partial receipt immutable; no threshold relaxation or invented endpoints"
+      "stop_gate": "Original 26 pairs and partial receipt immutable; no threshold relaxation or invented endpoints",
+      "packet": "inputs/gcp-ecology-missing.json"
     },
     {
       "task": "L4 same-state parity and runtime calibration then conditional R2",
       "owner": "claude-04 science / infra_director dispatch and collection",
       "priority": 1,
-      "state": "running_restart_controls_passed",
+      "state": "initial_no_go_then_restart_stockout",
       "packet": "inputs/gcp-cfd-r2-l4.json",
       "budget": "One L4, 4 vCPU, 10800s science; 14400s VM stop",
-      "next_acceptance": "Frozen same-state CPU/CUDA and shifted-time negative control, measured300step calibration, conservative340kstep projection and memory gates before R2",
-      "stop_gate": "No-go retains controls and exits11; no runtime criterion relaxation; C1 physical sphere failure remains"
+      "next_acceptance": "Numerical controls passed; initial 3-hour budget no-go preserved. Separate12-hour envelope frozen, alternate eligible-region capacity admission pending.",
+      "stop_gate": "No-go retains controls and exits11; no runtime criterion relaxation; C1 physical sphere failure remains",
+      "result": "results/resources/gcp/l4-calibration-completion.json"
     },
     {
       "task": "Collect existing CPU cylinder R1/R3/M1",
@@ -332,14 +334,14 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T01:31:20.467248Z",
+  "updated_at_utc": "2026-11-01T01:38:47.734237+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T01:27:40.060899+00:00",
+    "observed_at_utc": "2026-11-01T01:38:47.734237+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
     "gpu_vm_created": true,
@@ -369,7 +371,7 @@
         "id": "946761909192569249",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
         "name": "frontier-cpu-20261031-04",
-        "status": "TERMINATED",
+        "status": "RUNNING",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
@@ -382,13 +384,13 @@
         "id": "4266786588371661074",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
         "name": "frontier-gpu-20261031-01",
-        "status": "RUNNING",
+        "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
       }
     ],
     "active_allocated_vcpus": 20,
     "instantaneous_cpu_utilization": null,
-    "state": "VM03 runs three CPU cylinder cases. L4 CUDA environment and CPU/CUDA restart controls passed; platform and timing gates pending. Ecology exported 26 computed pairs and two not-started statuses; VM04 stopped.",
+    "state": "VM03 runs three CPU cylinder cases; VM04 restarted successfully for exactly two missing ecology pairs. L4 first run passed numerical controls then stopped at time-calibration NO-GO; subsequent restart failed central1-c stockout. Alternate eligible-region admission is being prepared.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -415,13 +417,13 @@
     "network": "frontier-workers-20261031",
     "ingress": "explicit priority0 deny-all",
     "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
-    "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+    "expiry": "Exact lab cutoff unknown after project metadata read; user reports Sunday night Nov1. New R2 provider STOP fixed2026-11-01T16:00:00Z, 08:00 PST, with periodic exports.",
     "cost": null,
     "failure_receipts": [
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
     ],
-    "status_update_utc": "2026-11-01T01:27:40.060899+00:00",
+    "status_update_utc": "2026-11-01T01:38:47.734237+00:00",
     "genomics_completed": "results/resources/gcp/genomics-completion.json",
     "automatic_collection": {
       "service": "frontier-cfd-collector",
@@ -432,8 +434,12 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "Original26pairs complete,2not-started arms; missing-only packet being prepared with original gates",
-      "receipt": "results/resources/gcp/ecology-completion.json"
+      "state": "RUNNING after successful provider start operation",
+      "task": "ecology-missing-only-continuation",
+      "source_sha256": "b9f99c0c0bb7439e9635ed2c78d2ce84831dc26eca4df0ae84695f3da791ed53",
+      "original_receipt": "results/resources/gcp/ecology-completion.json",
+      "operation_receipt": "results/resources/gcp/ecology-missing-operation-result.json",
+      "result": "pending"
     },
     "l4_admission": {
       "id": "4266786588371661074",
@@ -450,15 +456,13 @@
       "seconds_after_start": 735.4,
       "actual_device": "NVIDIA L4",
       "canonical_pins_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
-      "scientific_platform_gate": null,
-      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json"
+      "scientific_platform_gate": true,
+      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json",
+      "scope": "Previous completed controls allocation only; no R2 case started"
     },
-    "l4_restart_controls": {
-      "passed": true,
-      "cuda_bit_identical": true,
-      "steps": 198,
-      "receipt": "results/resources/gcp/l4-controls-progress.json"
-    }
+    "active_allocated_gpus": 0,
+    "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
+    "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json"
   },
   "next_ready_dispatch": "NCA admitted; native owner preparing2missing ecology pairs without rerunning26completed pairs; CFD and L4 controlled runs active."
 }

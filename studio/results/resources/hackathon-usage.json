@@ -1,10 +1,10 @@
 {
   "schema": "frontier.hackathon-usage/1",
-  "observed_at_utc": "2026-11-01T01:31:20.467248Z",
-  "observed_at_seattle": "2026-10-31 18:31:20 PDT",
+  "observed_at_utc": "2026-11-01T01:37:41.376668Z",
+  "observed_at_seattle": "2026-10-31 18:37:41 PDT",
   "provider_window_utc": [
-    "2026-11-01T01:31:18.145140+00:00",
-    "2026-11-01T01:31:20.467248+00:00"
+    "2026-11-01T01:37:39.646453+00:00",
+    "2026-11-01T01:37:41.376668+00:00"
   ],
   "scope": "Actual Delphi Frontier hackathon job records created October31,2026; own prefixes only. Shared16H100 capacity is not usage.",
   "own_jobs": [
@@ -1094,8 +1094,8 @@
     "interpretation": "Instant host reading, not per-agent usage."
   },
   "team_attribution": {
-    "observed_at_utc": "2026-11-01T01:31:20.467248+00:00",
-    "observed_at_seattle": "2026-10-31 18:31:20 PDT",
+    "observed_at_utc": "2026-11-01T01:37:41.376668+00:00",
+    "observed_at_seattle": "2026-10-31 18:37:41 PDT",
     "classification": "Current Frontier prefixes plus exact historical team IDs verified against preserved source records. Remaining jobs are unattributed, not asserted to belong to another team. Cancellation permissions unchanged.",
     "listed_total": 85,
     "today_start_utc": "2026-10-31T07:00:00+00:00",
@@ -1266,8 +1266,8 @@
     "owner_field_names_present": [],
     "historical_attribution_ledger": "results/resources/team-job-ownership.json",
     "request_window_utc": [
-      "2026-11-01T01:31:18.145140+00:00",
-      "2026-11-01T01:31:20.467248+00:00"
+      "2026-11-01T01:37:39.646453+00:00",
+      "2026-11-01T01:37:41.376668+00:00"
     ],
     "current_frontier_jobs": 40,
     "historical_team_jobs": 15,
@@ -1328,7 +1328,7 @@
   },
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T01:27:40.060899+00:00",
+    "observed_at_utc": "2026-11-01T01:38:47.734237+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
     "gpu_vm_created": true,
@@ -1358,7 +1358,7 @@
         "id": "946761909192569249",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
         "name": "frontier-cpu-20261031-04",
-        "status": "TERMINATED",
+        "status": "RUNNING",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
@@ -1371,13 +1371,13 @@
         "id": "4266786588371661074",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
         "name": "frontier-gpu-20261031-01",
-        "status": "RUNNING",
+        "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
       }
     ],
     "active_allocated_vcpus": 20,
     "instantaneous_cpu_utilization": null,
-    "state": "VM03 runs R1/R3/M1 cylinder controls; L4 pinned environment and actual CUDA.functional passed, restart/platform controls pending. Ecology exported26computed scenario pairs plus2not-started statuses; VM04 stopped. Genomics23/23 exported; VM01/02 stopped.",
+    "state": "VM03 runs three CPU cylinder cases; VM04 restarted successfully for exactly two missing ecology pairs. L4 first run passed numerical controls then stopped at time-calibration NO-GO; subsequent restart failed central1-c stockout. Alternate eligible-region admission is being prepared.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -1404,13 +1404,13 @@
     "network": "frontier-workers-20261031",
     "ingress": "explicit priority0 deny-all",
     "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
-    "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+    "expiry": "Exact lab cutoff unknown after project metadata read; user reports Sunday night Nov1. New R2 provider STOP fixed2026-11-01T16:00:00Z, 08:00 PST, with periodic exports.",
     "cost": null,
     "failure_receipts": [
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
     ],
-    "status_update_utc": "2026-11-01T01:27:40.060899+00:00",
+    "status_update_utc": "2026-11-01T01:38:47.734237+00:00",
     "genomics_completed": "results/resources/gcp/genomics-completion.json",
     "automatic_collection": {
       "service": "frontier-cfd-collector",
@@ -1421,8 +1421,12 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "Original26pairs complete,2not-started arms; missing-only packet being prepared with original gates",
-      "receipt": "results/resources/gcp/ecology-completion.json"
+      "state": "RUNNING after successful provider start operation",
+      "task": "ecology-missing-only-continuation",
+      "source_sha256": "b9f99c0c0bb7439e9635ed2c78d2ce84831dc26eca4df0ae84695f3da791ed53",
+      "original_receipt": "results/resources/gcp/ecology-completion.json",
+      "operation_receipt": "results/resources/gcp/ecology-missing-operation-result.json",
+      "result": "pending"
     },
     "l4_admission": {
       "id": "4266786588371661074",
@@ -1439,9 +1443,13 @@
       "seconds_after_start": 735.4,
       "actual_device": "NVIDIA L4",
       "canonical_pins_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
-      "scientific_platform_gate": null,
-      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json"
-    }
+      "scientific_platform_gate": true,
+      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json",
+      "scope": "Previous completed controls allocation only; no R2 case started"
+    },
+    "active_allocated_gpus": 0,
+    "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
+    "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json"
   },
   "measured_terminal_container_work": {
     "gpu": {
