@@ -26,7 +26,7 @@ across a room (catapult or slingshot). Range is **provisional, 5–8 m**, until 
 ladder, in order:
 
 1. designed;
-2. mass properties measured from the part meshes;
+2. mass properties calculated from the part meshes;
 3. stability predicted (VLM plus a body estimate);
 4. printed;
 5. trimmed by hand-glide;
@@ -38,7 +38,7 @@ Only steps that have actually been done get claimed. "Flight-tested" waits for s
 dihedral, are the main wing. Its pelvics, at 0.55 SL, are a rear tandem wing. The caudal, dorsal and anal fins are
 vertical surfaces. That is already a tandem-wing glider layout, so no non-biological tailplane is added.
 
-## 2. Measured starting point (v3a candidate `e8c2b666…`, 1:1; read from its meshes)
+## 2. Starting point (v3a candidate `e8c2b666…`, 1:1; calculated from its meshes)
 | quantity | value |
 |---|---|
 | SL / total length / span | 158.8 / 191 / 199 mm |
@@ -48,7 +48,7 @@ vertical surfaces. That is already a tandem-wing glider layout, so no non-biolog
 | caudal / dorsal / anal flat area | 6.7 / 1.4 / 0.9 cm² |
 | real fish mass (Fish 1990 fit) | 50 g, so 9.5 kg/m² on paired-fin area |
 
-## 3. First-pass budget (ESTIMATE, to be replaced by measured mesh volumes)
+## 3. First-pass budget (ESTIMATE, to be replaced by volumes calculated from the part meshes)
 Shell volume is approximated as area × wall. Densities are post-cure values as root reported them from Formlabs'
 density page: Grey V5 1.21 g/cm³ (liquid 1.11, which is not used), and Tough 1500 1.15 g/cm³ with the version
 unspecified (not assumed to be V2; root is fetching TDS 1901266).
@@ -102,7 +102,7 @@ These are hand estimates and are not claimed. The 5–8 m target is plausible, n
 - **Pitch.**
   - claude-04 runs the VLM on the tandem configuration (pectoral plus pelvic), with per-panel forces, giving
     C_Lα, C_mα, the neutral point and trim C_L against decalage.
-  - I add a slender-body (Munk) destabilising term from the measured body volume, labelled an estimate.
+  - I add a slender-body (Munk) destabilising term from the mesh body volume, labelled an estimate.
   - Target static margin is 10–20% of pectoral MAC (about 24 mm), which puts the CG near x ≈ 50 mm (provisional).
   - The hollow body's own CG sits near x ≈ 70 mm, so nose ballast closes the gap. That is why the bay is adjustable.
 - **Yaw and roll.** Vertical-tail volume comes from the caudal, dorsal and anal fins against body side area ahead
