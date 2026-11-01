@@ -122,3 +122,19 @@ The initial DB replay was exercised independently against fresh socket-only PG16
 including real application health/catalog reads. This establishes dump compatibility; a full
 fresh-host service rollout remains a separate operational check. Do not equate archive checksum
 verification with a complete service recovery.
+
+## First recovered snapshot
+
+`20261101T0350` was captured from 8:49:35–8:51:13pm PDT on October31,2026. The
+1,440,390,756-byte encrypted archive is stored under the corresponding unique S3 prefix.
+Its SHA256 is `100e8bbbad91c1219b1489199d3d20c11b5a1dbe93656b78a98ac6fb165f3b94`.
+An actual S3 download matched that digest. The downloaded object was copied to sb03, decrypted
+using its existing private key, and all 14,677 files / 3,099,904,825 logical bytes passed
+hash/size verification at 8:57:23pm PDT. A mirror clone and Git bundle verification passed
+on sb03. `results/resources/backup-recovery-20261101.json` joins these separate receipts.
+
+The first receipt lists two missing selected files. Both were tracked deletions in the
+`nca-flow` worktree's `pilot_tmp` directory: original contents remain in the source bundle,
+and deletion state remains in the binary patch. This is explicitly distinguished from missing
+untracked evidence; subsequent tooling fails publication for an unexplained missing selection.
+The final corrected film remains deferred until its publication manifest is ready.

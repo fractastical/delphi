@@ -69,7 +69,8 @@ def publish(snapshot, name, verification):
               'anonymous_http_status': public_status, 'public_access_block': block,
               'server_encryption': get.get('ServerSideEncryption'), 'create_only': True,
               'put_etag': put.get('ETag'), 'download_etag': get.get('ETag'),
-              'credentials_uploaded': False, 'full_restore_verified': False}
+              'runtime_credential_files_uploaded': False,
+              'historical_private_material_client_encrypted': True, 'full_restore_verified': False}
     path = verification / 'storage-receipt.json'
     path.write_text(json.dumps(result, indent=2) + '\n')
     # Only non-secret summary accompanies the ciphertext. The private manifest stays encrypted.

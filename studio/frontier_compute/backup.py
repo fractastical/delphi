@@ -114,7 +114,9 @@ def configured_files(config):
         if path.is_symlink():
             reason = 'symlink file'
         elif not path.is_file():
-            reason = 'missing or nonregular selected file'
+            reason = ('Tracked deletion retained in binary patch and source bundle'
+                      if row.get('expected_tracked_deletion') and not path.exists()
+                      else 'MissingFileError: missing or nonregular selected file')
         yield (None if reason else path), logical, reason
 
 
@@ -161,7 +163,7 @@ def create_snapshot(config, output):
                         seen.add(item['sha256'])
                     rows.append({'path': logical, **item})
                 manifest.update(finished_utc=utc(), file_count=len(rows), unique_blob_count=len(seen),
-                                logical_bytes=total, capture_errors=[x for x in excluded if x['reason'].startswith(('OSError:', 'ValueError:'))])
+                                logical_bytes=total, capture_errors=[x for x in excluded if x['reason'].startswith(('OSError:', 'ValueError:', 'MissingFileError:'))])
                 if not rows:
                     raise ValueError('No files captured')
                 add_bytes(archive, 'manifest.json', json.dumps(manifest, indent=2).encode())

@@ -3,7 +3,7 @@ import subprocess
 
 import pytest
 
-from frontier_compute.backup import create_snapshot, exclusion, restore_snapshot, safe_relative, stable_copy
+from frontier_compute.backup import configured_files, create_snapshot, exclusion, restore_snapshot, safe_relative, stable_copy
 
 
 @pytest.mark.parametrize('path', ['credentials/key', 'gcp/upload-capabilities/x.json', 'a/_inject/part-000', '.env', 'a/key.pem', 'a/token.token'])
@@ -57,3 +57,11 @@ def test_file_bound_and_link_refused(tmp_path):
     linked.symlink_to(source)
     with pytest.raises(OSError):
         stable_copy(linked, tmp_path / 'copy', 10)
+
+
+def test_expected_tracked_deletion_is_distinct_from_missing_input(tmp_path):
+    base = {'path': str(tmp_path / 'gone'), 'logical': 'worktrees/one/gone'}
+    missing = list(configured_files({'roots': [], 'files': [base]}))[0]
+    assert missing[2].startswith('MissingFileError:')
+    deletion = list(configured_files({'roots': [], 'files': [{**base, 'expected_tracked_deletion': True}]}))[0]
+    assert deletion[2] == 'Tracked deletion retained in binary patch and source bundle'

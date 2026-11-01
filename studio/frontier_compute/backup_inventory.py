@@ -44,7 +44,12 @@ def prepare(repo, staging, recipients):
         for rel in sorted(x for x in selected if x):
             logical = f'worktrees/{name}/{rel}'
             if not exclusion(logical):
-                files.append({'path': str(path / rel), 'logical': logical})
+                row = {'path': str(path / rel), 'logical': logical}
+                if not (path / rel).exists():
+                    tracked = subprocess.run(['git', 'cat-file', '-e', f'HEAD:{rel}'], cwd=path,
+                                             capture_output=True, timeout=30)
+                    row['expected_tracked_deletion'] = tracked.returncode == 0
+                files.append(row)
         trees.append(values)
     (metadata / 'worktrees.json').write_text(json.dumps(trees, indent=2)+'\n')
     command(['git', 'show-ref'], cwd=repo, destination=metadata / 'source-refs.txt')
