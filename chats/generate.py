@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Rebuild the swarm_coordination/chats/ folder from Cursor agent transcripts.
+"""Rebuild the chats/ folder from Cursor agent transcripts.
 
-Usage: python3 swarm_coordination/chats/generate.py
+Usage: python3 chats/generate.py
 """
 import json
 import os
@@ -241,7 +241,7 @@ def main():
         "# Chat log\n",
         "Record of the Cursor agent chats used to build this project, generated from the agent transcripts.",
         f"All times are local, {TZ}. Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}.",
-        "Rebuild with `python3 swarm_coordination/chats/generate.py`.\n",
+        "Rebuild with `python3 chats/generate.py`.\n",
         "Each chat file lists every user message with its timestamp, the assistant's written replies,",
         "and a summary of tools used. Subagent runs launched by a chat are in `subagents/` and linked from their parent.\n",
         "## Chats (by start time)\n",
