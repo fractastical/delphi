@@ -818,6 +818,58 @@ LATER["md_continuation"] = md_continuation_chain
 ALL_CHAINS = {**CHAINS, **LATER}
 
 
+# ---------------------------------------------------------------------------------------------------------------- manufacturer material cards
+MAT = "data/materials"
+MAT_PROPS = ("solid_density_kg_m3", "liquid_density_kg_m3_not_for_part_mass", "tensile_modulus_Pa", "flexural_modulus_Pa", "ultimate_tensile_strength_Pa", "elongation_at_break_fraction")
+
+
+def materials_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """Manufacturer-reported photopolymer properties as CONDITIONAL source claims. Source assessments, no Action: Frontier measured nothing.
+
+    The three Alpha cards carry a recorded sha256 of the manufacturer HTML the producer downloaded; those bytes are not in the repository, so the hashes are
+    carried, not recomputed. The Tough 1500 V2 card has NO source hash and is Form 4 data of unestablished applicability to Form Studio 1.
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "materials")
+    cards = c.jblob(f"{MAT}/formlabs-studio-2026-10-31.json")
+    chk = c.jblob(f"{MAT}/source-cell-check.json")
+    c.check("cards.schema", cards["schema"] == "frontier.manufacturing.material-cards/1" and cards["evidence_kind"] == "manufacturer_reported_material_tests", f"schema {cards['schema']!r}")
+    c.check("check.binds_cards", chk["material_cards_sha256"] == hashlib.sha256(c.blob(f"{MAT}/formlabs-studio-2026-10-31.json")).hexdigest(), "source-cell-check names these exact cards bytes")
+    by = {m["id"]: m for m in cards["materials"]}
+    alpha = [m for m in cards["materials"] if m["source_sha256"]]
+    c.check("hashed_sources", len(alpha) == 3 and all(m["id"].startswith("alpha-") for m in alpha) and by["tough1500-v2-form4-reference-only"]["source_sha256"] is None, f"hashed {[m['id'] for m in alpha]}")
+    c.check("cells", len(chk["checks"]) == 18 and {x["material"] for x in chk["checks"]} == {m["id"] for m in alpha}, f"{len(chk['checks'])} cells over {sorted({x['material'] for x in chk['checks']})}")
+    for x in chk["checks"]:
+        c.check(f"cell.{x['material']}.{x['property']}", x["property"] in MAT_PROPS and by[x["material"]][x["property"]] == x["converted_value"], f"card {by[x['material']].get(x['property'])!r} vs converted {x['converted_value']!r}")
+    c.check("no_measurements", all(m["measured_print_mass_kg"] is None and m["thin_fin_coupon_result"] is None for m in cards["materials"]), "no measured print mass or fin coupon recorded in any card")
+    lim_all = [em.IMPORT_NOTE, cards["scope"]] + cards["limitations"]
+    art = lambda: [c.artifact("input", f"{MAT}/formlabs-studio-2026-10-31.json", c.blob(f"{MAT}/formlabs-studio-2026-10-31.json"), "material cards"),  # noqa: E731
+                   c.artifact("log", f"{MAT}/source-cell-check.json", c.blob(f"{MAT}/source-cell-check.json"), "18 source cells and their unit conversions")]
+    def mpa(v):
+        return f"{v/1e6:g} MPa"
+    for m in cards["materials"]:
+        tough = m["source_sha256"] is None
+        short = m["id"].split("-v")[0]
+        stmt = (f"{m['name']} ({m['material_code']}, source revision {m['source_revision']}): the manufacturer reports solid density {m['solid_density_kg_m3']} kg/m3, tensile modulus {mpa(m['tensile_modulus_Pa'])}, flexural modulus {mpa(m['flexural_modulus_Pa'])}, "
+                f"ultimate tensile strength {mpa(m['ultimate_tensile_strength_Pa'])} and elongation at break {m['elongation_at_break_fraction']*100:g}% under: {m['test_conditions']}")
+        cond = ("Conditional on the manufacturer's test conditions (" + m["printer"] + "). " + ("Studio applicability is NOT established: " + m["studio_applicability"]["reason"] if tough else "Form Studio 1 data sheet default post-cure column."))
+        asm = [f"Methods: density {m['methods']['density']}, tensile {m['methods']['tensile']}, flexural {m['methods']['flexural']}.", f"Liquid resin density {m['liquid_density_kg_m3_not_for_part_mass']} kg/m3 is recorded and excluded from part mass."]
+        cl = _claim(c, f"run-materials-claim-{short}", f"{m['name']}: manufacturer-reported properties under stated cure conditions" + (" (Form 4 reference only)" if tough else ""), stmt, cond, asm, lim_all + ["No Frontier measurement of a coupon, fin, print mass or flight exists for this material."],
+                    f"{MAT}/formlabs-studio-2026-10-31.json", c.blob(f"{MAT}/formlabs-studio-2026-10-31.json"), "Material card.")
+        src_hash = ("NO source sha256 recorded: the PDF text was read through a web tool and no local byte hash was collected" if tough else f"source sha256 {m['source_sha256']} recorded by the producer; the manufacturer HTML bytes are retained outside the repository, so this adapter did not recompute it")
+        _evidence(c, SRC, f"run-materials-evidence-{short}", cl, kind="source_assessment", relation=("qualifies" if tough else "supports"), produced_by=None,
+                  source=em._source(c, f"{MAT}/formlabs-studio-2026-10-31.json", c.blob(f"{MAT}/formlabs-studio-2026-10-31.json"), "Material card."),
+                  method=(f"The producer read the manufacturer data sheet ({m['source_url']}) at {m['source_locator']}. " + ("" if tough else "Six named cells were checked against the card and their unit conversions recomputed by this adapter. ") + src_hash + ". No simulator or test ran."),
+                  context="A manufacturer-reported source assessment, not a Frontier measurement and not a specimen-level distribution. " + em.IMPORT_NOTE, assumptions=asm,
+                  provenance=_prov(c, material=m["id"], source_url=m["source_url"], source_sha256=m["source_sha256"], source_bytes_in_repository=False, cells_checked=0 if tough else 6, studio_applicability=m.get("studio_applicability"), read_date=cards["read_date"]),
+                  limitations=lim_all, artifacts=art(), uncertainty="No interval is given by the source for these cells; specimen variability is not available.")
+    return c
+
+
+LATER["materials"] = materials_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- bundles
 # Root is making the repository public after a credential/history audit: no curated output may carry a presigned URL or a secret-looking field.
 SECRETISH = re.compile(r"X-Amz|Signature=|Expires=|presign|[?&]token=|access[_-]?key|secret|passw(?:or)?d|api[_-]?key|bearer|authorization|AKIA[0-9A-Z]{8}|sk-[A-Za-z0-9]{16}|BEGIN [A-Z ]*PRIVATE|\.credentials|https?://[^\"\s]*\?", re.I)
