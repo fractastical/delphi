@@ -1,0 +1,88 @@
+{
+  "schema": "frontier.ecology.uncertainty-protocol/1",
+  "scientific_question": "How do assumed mass, local reaction delay and hinge stiffness alter the paired effect of neighbor cues on actual airborne motion and bounded actuator work?",
+  "status": "frozen before batch results; dispatch requires baseline controls and numerical checks",
+  "settings": [
+    {
+      "id": "baseline",
+      "overrides": {}
+    },
+    {
+      "id": "mass-low",
+      "overrides": {
+        "mass_kg": 0.04
+      }
+    },
+    {
+      "id": "mass-high",
+      "overrides": {
+        "mass_kg": 0.06
+      }
+    },
+    {
+      "id": "delay-fast",
+      "overrides": {
+        "reaction_delay_s_range": [
+          0.02,
+          0.06
+        ]
+      }
+    },
+    {
+      "id": "delay-slow",
+      "overrides": {
+        "reaction_delay_s_range": [
+          0.08,
+          0.16
+        ]
+      }
+    },
+    {
+      "id": "hinge-soft",
+      "overrides": {
+        "fin_stiffness_Nm_rad": 0.1
+      }
+    },
+    {
+      "id": "hinge-stiff",
+      "overrides": {
+        "fin_stiffness_Nm_rad": 0.3
+      }
+    }
+  ],
+  "design": "seven-point axial sensitivity design; no interaction estimates",
+  "seeds": [
+    20261031,
+    20261101
+  ],
+  "neighbor_modes": [
+    true,
+    false
+  ],
+  "scenario_count": 28,
+  "simulations_per_scenario": 2,
+  "dt_s": 0.000125,
+  "half_dt_s": 6.25e-05,
+  "endpoint_time_s": 0.6,
+  "fixed_model_horizon_s": 1.2,
+  "endpoint_predicate": "Only use actual saved state at0.60000000s within1e-7s; if stopped earlier, endpoint absent and metrics null. Never use final state as substitute.",
+  "metrics": [
+    "response count at0.6s",
+    "mean lateral displacement at0.6s",
+    "sum positive actuator work at0.6s",
+    "min saved center separation (not mesh collision clearance)",
+    "time of first/last saved response flag",
+    "all model-domain exits and numerical/actuator failures"
+  ],
+  "gate": "same frozen max position0.01m and orientation0.03rad at common actual saved times; all bounded actuation checks; no criterion change",
+  "uncertainty_basis": "All varied envelopes are hand-set engineering assumptions, not measured flying-fish priors. Seeds draw assigned Uniform reaction delays, not biological replicate samples.",
+  "dependence": "Same v3a geometry/polar and common seed reused across parameter settings and neighbor ablations. Paired comparisons are not independent source confirmations.",
+  "source_and_transfer_limits": "No CFD/wake/collision model; no water phase; no calibrated nervous system or fish phenotype probability.",
+  "runtime_bound_s": 1200,
+  "soft_no_new_work_deadline_s": 900,
+  "workers_max": 6,
+  "numeric_threads_per_worker": 1,
+  "output_bound_bytes": 104857600,
+  "partial_policy": "Keep every completed scenario, failed numerical case, model-domain exit and unfinished scenario. No replacement settings or adaptive tuning.",
+  "frozen_model_protocol_path": "artifacts/ecology/protocol-refinement.json"
+}

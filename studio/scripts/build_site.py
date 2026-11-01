@@ -457,6 +457,54 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
     return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], "candidates": candidates, "shared": shared, **state}
 
 
+ECO = "artifacts/ecology"
+
+
+def ecology_block(ins: Inputs, out: dict) -> dict | None:
+    """Ecology saved-state scenarios for the trajectory viewer. Files are published only when their bytes equal the hash declared by the run receipt,
+    render receipt or v3a build record; refusals are listed. Nothing here is a measurement or a validated flying fish."""
+    ix = ROOT / ECO / "index.json"
+    if not ix.exists():
+        return None
+    index = json.loads(ins.read(f"{ECO}/index.json")); run = index["canonical_run"]
+    rec = json.loads(ins.read(f"{run}/receipt.json")); declared = {f["path"]: f["sha256"] for f in rec["files"]}
+    summary = json.loads(ins.read(f"{run}/summary.json")); iface = json.loads(ins.read(f"{ECO}/interface.json")); geo = json.loads(ins.read(f"{ECO}/geometry-manifest.json"))
+    state = {"copied": [], "refused": []}
+    def put(rel, want, root_rel=None):
+        f = ROOT / rel
+        b = ins.read(rel) if f.is_file() else None
+        if b is None or not want or digest_bytes(b) != want:
+            state["refused"].append(rel); return None
+        dest = (root_rel or rel)
+        out["@" + dest] = b; state["copied"].append(rel); return dest
+    cases = []
+    for c in iface["canonical_cases"]:
+        t = c["trajectory"]; ok = put(t, declared.get(t))
+        cases.append({"id": c["id"], "trajectory": ok, "trajectory_sha256": declared.get(t), "half_step_trajectory": None, "summary": summary.get(c["id"])})
+        half = t.replace(c["id"] + "/", c["id"] + "-dt-half/")
+        cases[-1]["half_step_declared"] = half in declared
+    receipts = {k: put(f"{run}/{k}.json", declared.get(f"{run}/{k}.json")) for k in ("controls", "summary")}
+    receipts["receipt"] = f"{run}/receipt.json"; out["@" + receipts["receipt"]] = ins.read(receipts["receipt"]); state["copied"].append(receipts["receipt"])
+    media = []
+    for m in index["media"]:
+        prov = json.loads(ins.read(m["video"].replace(".mp4", ".provenance.json")))
+        files = {}
+        for key in ("video", "poster"):
+            rel = m[key]; want = prov.get(key + "_sha256")
+            files[key] = put(rel, want)
+        out["@" + m["video"].replace(".mp4", ".provenance.json")] = ins.read(m["video"].replace(".mp4", ".provenance.json"))
+        media.append({"id": m["id"], "frames": prov.get("video_frames"), "frame_method": prov.get("frame_method"), "geometry": prov.get("geometry"), **files, "provenance": m["video"].replace(".mp4", ".provenance.json")})
+    v3 = "artifacts/fish3d/fish3d-v3a-fan"; bj = json.loads(ins.read(f"{v3}/build.json"))
+    pins = {p["path"]: p["sha256"] for p in geo["candidate_and_panel_pins"]}
+    mesh = put(f"{v3}/fish.glb", (bj.get("files") or bj.get("sha256") or bj).get("fish.glb") if isinstance(bj, dict) else None)
+    panels = put(f"{v3}/panels.json", pins.get(f"{v3}/panels.json"))
+    for rel in (f"{ECO}/geometry-manifest.json", f"{ECO}/interface.json", f"{ECO}/index.json", f"{ECO}/RESULTS.md"):
+        out["@" + rel] = ins.read(rel)
+    return {"index": index, "cases": cases, "receipts": receipts, "media": media, "mesh": mesh, "panels": panels, "status": iface["status"], "engine": iface["engine"],
+            "limits": iface.get("limits"), "biological_success_probability": iface.get("biological_success_probability"), "empirical_validation": index.get("empirical_validation"),
+            "history": index.get("history"), "geometry": {k: geo.get(k) for k in ("source", "source_component_units", "mesh_to_body", "cg_from_nose_m")}, **state}
+
+
 def formalize_examples(ins: Inputs) -> dict | None:
     """Fixtures from engineering/formalize/cases.py and the recorded Gemini extraction runs, for the proposal checker page. Nothing is run here:
     the site only offers these requests to the node's POST /api/formalize/propose."""
@@ -756,6 +804,36 @@ def openresearch_exemplars(ins: Inputs) -> dict | None:
     return {"exemplars": ex, "scope": "OpenResearch is a local recorder of which code was run. It is not a cloud dispatcher and none of these runs used a remote backend. A completed run is evidence that this code at this commit exited 0 and printed this, not that the science is right.", "report": "OpenResearch integration note (corpus session, single reader, not independently reviewed)"}
 
 
+def planner_plan(ins: Inputs, base: Path, d: str) -> dict | None:
+    """Structured projection of the planner's result.json: values copied, hashes checked against the planner's own manifest. Prospective calculation only."""
+    rp, mp = base / "result.json", base / "manifest.json"
+    if not rp.is_file():
+        return None
+    r = json.loads(ins.read(f"{d}/result.json")); declared = {}
+    if mp.is_file():
+        declared = (json.loads(ins.read(f"{d}/manifest.json")).get("files") or {}).get("result.json", {}).get("sha256")
+    got = ins.seen[f"{d}/result.json"]["sha256"]; aa = r.get("action_artifact") or {}; ap = aa.get("action_proposal") or {}
+    designs = []
+    for x in r.get("designs", []):
+        i = x.get("identifiability") or {}
+        designs.append({"id": x["id"], "intervention": x.get("intervention"), "cost": x.get("cost"), "cost_unit": x.get("cost_unit"), "cost_basis": x.get("cost_basis"),
+                        "rank": i.get("rank"), "parameter_count": i.get("parameter_count"), "full_rank": i.get("full_rank"), "nullspace_basis": i.get("nullspace_basis"),
+                        "singular_values": i.get("singular_values"), "target_prior_variance": x.get("target_prior_variance"),
+                        "target_posterior_variance": x.get("expected_target_posterior_variance"), "variance_reduction": x.get("expected_target_variance_reduction"),
+                        "reduction_per_cost": x.get("expected_target_variance_reduction_per_cost"), "posterior_covariance": x.get("expected_posterior_covariance"),
+                        "observations": x.get("observations"), "measurement_rows": len(x.get("measurement_rows") or [])})
+    designs.sort(key=lambda z: -(z["reduction_per_cost"] or 0))
+    for n, z in enumerate(designs, 1):
+        z["objective_order"] = n
+    return {"result_path": f"{d}/result.json", "result_sha256": got, "declared_sha256": declared or None, "hash_matches_manifest": bool(declared) and declared == got,
+            "schema": r.get("schema"), "status": r.get("status"), "design_version": r.get("design_version"), "protocol_sha256": r.get("protocol_sha256"),
+            "selected_design_id": r.get("selected_design_id"), "objective": r.get("selection_objective"), "target": r.get("target"), "equation": r.get("equation"),
+            "parameters": r.get("parameters"), "designs": designs, "measurement_rows": len(r.get("measurement_rows") or []), "controls": r.get("controls"),
+            "assumptions": ap.get("assumptions"), "limitations": ap.get("limitations"), "link_blockers": aa.get("link_blockers"), "state": aa.get("state"),
+            "links": aa.get("links"), "context": r.get("context"), "model_discrepancy": r.get("model_discrepancy"), "held_out_validation": r.get("held_out_validation"),
+            "replicate_unit": r.get("replicate_unit"), "batch_effects": r.get("batch_effects"), "stop_rules": r.get("stop_rules"), "observed_result": aa.get("observed_result")}
+
+
 def experimentation_block(ins: Inputs) -> dict | None:
     """SPEC-013's bridge table (parsed from the spec, not retyped) and the planner's artifacts when they exist. Measurement categories are not experiments run; no observation is invented."""
     sp = "specs/SPEC-013-adaptive-experimentation.md"
@@ -789,7 +867,7 @@ def experimentation_block(ins: Inputs) -> dict | None:
                     except Exception:
                         schema = None
                 listing.append({"path": rel, "sha256": digest_bytes(b), "bytes": len(b), "schema": schema})
-            out["planner"] = {"dir": d, "files": listing}
+            out["planner"] = {"dir": d, "files": listing, "plan": planner_plan(ins, base, d)}
             break
     return out
 
@@ -1295,6 +1373,7 @@ def build() -> dict[str, bytes]:
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
+    ecology = ecology_block(ins, extra)
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
@@ -1338,6 +1417,7 @@ def build() -> dict[str, bytes]:
         "home_biology": home_biology_block,
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
+        "ecology": ecology,
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
