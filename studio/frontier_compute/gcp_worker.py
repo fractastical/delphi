@@ -81,6 +81,39 @@ def now():
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
+def extract_source(archive, source, output):
+    members = archive.getmembers()
+    for member in members:
+        if not (member.isfile() or member.isdir()) or Path(member.name).is_absolute() or ".." in Path(member.name).parts:
+            raise ValueError("Unsafe packet member")
+        target = source / member.name
+        for part in [target, *target.parents]:
+            if part == source.parent:
+                break
+            if part.is_symlink():
+                raise ValueError("Packet target traverses a symlink")
+    try:
+        archive.extractall(source, filter="data")
+    except TypeError as error:
+        if "filter" not in str(error) or "unexpected keyword" not in str(error):
+            raise
+        # Debian's older Python3.11 can lack the extraction-filter backport.
+        # All members were checked before extraction; copy regular bytes only,
+        # never applying archive modes, ownership, links or special-file types.
+        receipt = {"utc": now(), "python": sys.version, "observed_exception": repr(error),
+                   "repair": "Validated regular-file copying; traversal/link/special-file refusals retained"}
+        (output / "tar-extraction-compatibility.json").write_text(json.dumps(receipt, indent=2))
+        print("FRONTIER_TAR_COMPATIBILITY " + json.dumps(receipt), flush=True)
+        for member in members:
+            target = source / member.name
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with archive.extractfile(member) as incoming, target.open("wb") as outgoing:
+                    shutil.copyfileobj(incoming, outgoing)
+
+
 def export_snapshot(spec, output, rc, started):
     """Copy an immutable tree before hashing; skip a concurrently changing file."""
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
@@ -135,10 +168,7 @@ def run(spec):
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
     with tarfile.open(packet) as archive:
-        for member in archive.getmembers():
-            if not (member.isfile() or member.isdir()) or Path(member.name).is_absolute() or ".." in Path(member.name).parts:
-                raise ValueError("Unsafe packet member")
-        archive.extractall(source, filter="data")
+        extract_source(archive, source, output)
     started = now()
     (output / "dispatch.json").write_text(json.dumps({"spec": spec, "started_utc": started}, indent=2))
     try:
