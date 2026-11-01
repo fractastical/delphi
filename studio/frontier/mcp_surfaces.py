@@ -189,6 +189,12 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
                 "result": propose(request),
                 "scope": "A formalization result is a computation/proposal; no Evidence is created or independently reviewed by this tool."}
 
+    def frontier_proofs(family: Literal["geometric-similarity", "unit-algebra", "cantilever-guard"] | None = None,
+                        include_source: bool = False) -> dict:
+        """Read three fixed recorded Lean theorem families, assumptions and verified public source/receipt pins; never compile or execute code."""
+        from .proofs import ProofCatalog
+        return ProofCatalog().read(family, include_source, public_host)
+
     def frontier_belief(scenario: Annotated[dict, Field(description="Finite scenario in frontier.beliefs.api/1; only the existing scenario grammar is accepted.")]) -> dict:
         """Run the bounded finite-scenario belief solver; consequences are conditional on declared inputs and remain uncalibrated."""
         from .beliefs_api import solve_scenario
@@ -214,5 +220,5 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
 
     for tool in (frontier_discover, frontier_graph, frontier_catalogue, frontier_project_inspect, frontier_design_context,
                  frontier_artifact_inspect, frontier_simulate, frontier_engineer, frontier_formalize,
-                 frontier_belief, frontier_plan_experiments):
+                 frontier_belief, frontier_plan_experiments, frontier_proofs):
         register(tool, read_annotations, "read", None)
