@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch08-02",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch08-02",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-10-31T21:40:00Z",
   "hypothesis": "In recently divided plant cells, the new wall between two sister cells has close to the least area of any planar cut that divides the reconstructed mother cell in the same volume ratio, and much less area than a cut of random orientation.",
   "pass_criterion": "Pre-registered. Data: the 8 alphabetically first meristem archives of Zenodo record 18711581 (Yates et al. 2026, Arabidopsis inflorescence shoot apices, 3D confocal, watershed-segmented). For each wall marked in *_new_walls.tif, the two cells it separates are sisters; the mother is their union (including the wall voxels between them). Both sisters must have volume >= 40 um^3 and must not touch the image border. Observed area A_obs = area of the voxel faces shared between the two sister regions in the mother mask (anisotropic voxel face areas from Metadata.txt). For 500 plane orientations spread uniformly over the hemisphere (Fibonacci lattice), the plane offset is set so the smaller side holds the observed smaller-sister volume fraction, and the cut area A(n) is measured with the same voxel-face rule. A_min = min over orientations; q = A_obs / A_min; percentile p = fraction of orientations with A(n) < A_obs. SUPPORTS if the median p over all divisions is <= 0.10 AND at least 50% of divisions have q <= 1.10.",
@@ -33,5 +33,165 @@
     "model": "claude-opus-5.5",
     "run": "cursor local subagent",
     "date": "2026-10-31"
-  }
+  },
+  "verdict": "mixed",
+  "confidence": 0.55,
+  "data_kind": "biological",
+  "completed_at": "2026-10-31T23:30:00Z",
+  "datasets": [
+    {
+      "id": "zenodo-18711581-yates-2026-arabidopsis-sam-segmentations",
+      "name": "Image processing data for manuscript: Control of plant organ growth through cell division orientation in inner tissues (Yates & Sablowski)",
+      "landing_url": "https://zenodo.org/records/18711581",
+      "doi": "10.5281/zenodo.18711581",
+      "version": "published 2026-02-20",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_260_t0_40x.zip?download=1",
+          "byte_size": 805340231,
+          "md5_published": "7381ba1a5c503a553d4d51469f1c3943"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_263_t0_40x.zip?download=1",
+          "byte_size": 631275566,
+          "md5_published": "d1b96007579f5359cc905d6537cb4553"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_274_t0_40x.zip?download=1",
+          "byte_size": 584391104,
+          "md5_published": "a3d6b3acfa90d31b398d26ee94ff5282"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_280_t0_40x.zip?download=1",
+          "byte_size": 581548177,
+          "md5_published": "ddb8a4e114614262840cf07b9d2a16f5"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_289_t0_40x.zip?download=1",
+          "byte_size": 614552191,
+          "md5_published": "416654b69fbdb8a765af640707d02b78"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_291_t0_40x.zip?download=1",
+          "byte_size": 198570454,
+          "md5_published": "8a99b73f4bd21c7a3e7305439124945b"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_301_t0_40x.zip?download=1",
+          "byte_size": 512847315,
+          "md5_published": "f4b9760193f3bd385cd8d88eb098dc47"
+        },
+        {
+          "download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_311_t0_40x.zip?download=1",
+          "byte_size": 430061980,
+          "md5_published": "001111b69f749dc9023a91bcb9320901"
+        }
+      ],
+      "files_note": "The archives (4.4 GB together) were not downloaded whole. From each, five members (Metadata.txt, *_seg.tif, *_new_walls.tif, *_walls_data.csv, *_cell_data.csv; 304 MB in total) were read by HTTP range requests and checked against their ZIP CRC-32. Each member's SHA-256, byte size and retrieval time (2026-10-31T21:55Z-22:22Z, all after the pre-registration commit) are in derived/fetch_log.csv. The members were first fetched by thompson1917-ch08-02's analysis.py and reused here after a CRC check. Whole-archive SHA-256s were not computed; the MD5s are Zenodo's published checksums.",
+      "role": "watershed segmentations of 3D confocal stacks of Arabidopsis inflorescence shoot apices (voxel 0.1832 x 0.1832 x 0.334 um), the dataset's own flags for recently formed walls (New wall filter = 1, the labels in *_new_walls.tif) and their two flanking cells"
+    }
+  ],
+  "measured": {
+    "value": 0.062,
+    "unit": "median over divisions of the percentile of the observed new-wall area among 500 planar cuts of the mother at the observed volume ratio (voxel-face areas)",
+    "n": 27249,
+    "uncertainty": "27249 divisions in 8 shoot apices; IQR of percentile 0.016-0.156",
+    "extra": {
+      "fraction_q_le_1.10": 0.247,
+      "median_q": 1.2475,
+      "q_quartiles": [
+        1.1016,
+        1.4306
+      ],
+      "median_small_sister_fraction": 0.4314,
+      "median_A_obs_over_median_random_cut": 0.6824,
+      "excluded": {
+        "touches_border": 3990,
+        "missing_cell": 7,
+        "small_sister": 1
+      },
+      "control_not_preregistered_old_walls": {
+        "note": "up to 150 randomly sampled walls per apex not flagged as new, union of the two flanking cells analysed identically",
+        "n": 1013,
+        "median_p": 0.0,
+        "fraction_q_le_1.10": 0.8885,
+        "median_q": 0.9584,
+        "median_p_corrected": 0.0
+      },
+      "per_archive": [
+        {
+          "archive": "20230922_mPS-PI_Meristem_260_t0_40x",
+          "n": 3913,
+          "median_q": 1.2168,
+          "median_p": 0.052,
+          "frac_q_le_tol": 0.2765
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_263_t0_40x",
+          "n": 3796,
+          "median_q": 1.2308,
+          "median_p": 0.054,
+          "frac_q_le_tol": 0.2545
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_274_t0_40x",
+          "n": 3824,
+          "median_q": 1.27,
+          "median_p": 0.072,
+          "frac_q_le_tol": 0.2173
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_280_t0_40x",
+          "n": 3432,
+          "median_q": 1.2177,
+          "median_p": 0.054,
+          "frac_q_le_tol": 0.2689
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_289_t0_40x",
+          "n": 4749,
+          "median_q": 1.2644,
+          "median_p": 0.066,
+          "frac_q_le_tol": 0.2365
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_291_t0_40x",
+          "n": 2481,
+          "median_q": 1.4059,
+          "median_p": 0.116,
+          "frac_q_le_tol": 0.1346
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_301_t0_40x",
+          "n": 2647,
+          "median_q": 1.2309,
+          "median_p": 0.056,
+          "frac_q_le_tol": 0.2626
+        },
+        {
+          "archive": "20230922_mPS-PI_Meristem_311_t0_40x",
+          "n": 2407,
+          "median_q": 1.1929,
+          "median_p": 0.046,
+          "frac_q_le_tol": 0.3224
+        }
+      ],
+      "sensitivity_not_preregistered_orientation_corrected": {
+        "note": "voxel-face area divided by |n_z|+|n_y|+|n_x| of the cut normal (observed wall: normal of its interface face centres)",
+        "median_p": 0.026,
+        "fraction_q_le_1.10": 0.6537,
+        "median_q": 1.043
+      }
+    }
+  },
+  "method": "analysis.py: for each wall flagged in *_new_walls.tif, the mother is the union of the two sisters; the observed interface area (anisotropic voxel faces) is compared with planar cuts at 500 Fibonacci-lattice orientations at the observed volume fraction. Per-division rows in derived/divisions.csv (regenerated by analysis.py, not committed); per-archive figures in derived/summary.json.",
+  "caveats": [
+    "Mixed by the pre-registered thresholds: median percentile 0.062 passes (<= 0.10), but only 24.7% of divisions have q <= 1.10 (needs >= 50%; refutes below 20%). New walls are far smaller than random cuts (median 0.68 of the median random-cut area) but usually 10-40% above the least-area plane.",
+    "The q criterion is sensitive to how area is measured. The voxel-face rule inflates staircase surfaces that are oblique to the voxel grid. A sensitivity analysis that was not pre-registered (dividing face area by |n_x|+|n_y|+|n_z|) gives median q 1.04 and 65% within 1.10, which would pass. The pre-registered verdict stands.",
+    "Old walls (not flagged as new, analysed identically, not pre-registered) give median q 0.96 and 89% within 1.10. Either established walls relax towards least area after division, or the new-wall flags from the dataset pipeline pick thin, irregular walls that are measured less accurately.",
+    "Sisters are identified from the dataset flag for recently formed walls, not from lineage tracking; 3990 divisions touching the image border were excluded.",
+    "One tissue (Arabidopsis inflorescence shoot apex, 8 apices, 27,249 divisions); the minimum is taken over planes only.",
+    "Completed by the parent agent from the tester run output after the tester subagent stopped; the analysis ran unmodified."
+  ]
 }
