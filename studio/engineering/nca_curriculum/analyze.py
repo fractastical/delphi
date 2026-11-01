@@ -141,6 +141,19 @@ def compare_metrics(actual, stored, identity, checks, selector):
         })
 
 
+def validate_summary_counts(summary, counts, checkpoints):
+    if (
+        summary["training_models_expected"] != 8
+        or summary["training_models_completed"] != checkpoints
+        or summary["evaluation_runs_expected"] != 200
+        or summary["evaluation_runs_executed"]
+        != counts["design_executed"] + counts["negative_executed"]
+        or summary["design_target_tests"]["declared_expected"] != 192
+        or summary["all_erased_negative_controls"]["declared_expected"] != 8
+    ):
+        raise ValueError("Native summary expected/completed/executed counts disagree")
+
+
 def audit(root, out, inputs=ART):
     cfg = load(inputs / "runtime-protocol.json")
     receipt = verify_receipt(root)
@@ -211,6 +224,8 @@ def audit(root, out, inputs=ART):
         raise ValueError("Summary models differ from checkpoint barrier")
     checkpoints = []
     for model in models.values():
+        if model["id"] != f"{model['regime']}-s{model['initialization_seed']}":
+            raise ValueError("Model ID disagrees with regime/seed")
         if model["status"] == "complete":
             if (
                 model["training_steps"] != 2000 or model["heldout_data_read"]
@@ -257,6 +272,8 @@ def audit(root, out, inputs=ART):
             raise ValueError("Evaluation trajectory changed")
         with np.load(path, allow_pickle=False) as data:
             visible = data["final_rgba"].astype(np.float64)
+            if visible.shape != (4, 64, 64):
+                raise ValueError("Raw visible state has wrong shape")
             final = visible_metrics(visible, goal, ray) if np.isfinite(visible).all() else None
             if final is not None:
                 compare_metrics(final, item["final"], identity, result["checks"], "final_rgba")
@@ -299,6 +316,20 @@ def audit(root, out, inputs=ART):
                             data["full_state"], strict=True
                         )
                     }
+                    if (
+                        set(full) != {(0, "seed"), (256, "before-damage"),
+                                      (256, "after-damage"), (257, "recovery"),
+                                      (768, "recovery")}
+                        or len(data["full_state"]) != 5
+                    ):
+                        raise ValueError("Complete selected whole-state schedule changed")
+                    for (step, phase), state in full.items():
+                        if state.shape != (16, 64, 64) or not np.isfinite(state).all():
+                            raise ValueError("Complete selected whole state invalid")
+                        values = visible_metrics(state[:4].astype(np.float64), goal, ray)
+                        values["max_abs_state"] = float(np.max(abs(state)))
+                        compare_metrics(values, history[(step, phase)], identity,
+                                        result["checks"], f"full_state[{step},{phase}]")
                     masks = np.load(inputs / "evaluation-masks.npz", allow_pickle=False)
                     before, after = (full[(256, p)] for p in ["before-damage", "after-damage"])
                     if not np.array_equal(after, before * ~masks[identity[1]][None]):
@@ -311,6 +342,7 @@ def audit(root, out, inputs=ART):
         "negative_declared": 8, "negative_executed": len(negatives),
         "negative_passed": sum(x["recomputed_passed"] for x in negatives),
     }
+    validate_summary_counts(summary, counts, len(checkpoints))
     if (
         summary["design_target_tests"]["executed"] != counts["design_executed"]
         or summary["design_target_tests"]["passed"] != counts["design_passed"]

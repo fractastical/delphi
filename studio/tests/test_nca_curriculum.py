@@ -7,6 +7,7 @@ from engineering.nca_curriculum.analyze import (
     expected_identities,
     paired_effects,
     predicate,
+    validate_summary_counts,
 )
 from engineering.nca_pattern.analyze import load
 from engineering.nca_pattern.model import ROOT
@@ -84,3 +85,17 @@ def test_recovery_requires_predamage_and_persistence_all_saved_checkpoints():
     assert not predicate(item, good, np.ones((4, 64, 64)))
     item["metrics"][-1].update(good)
     assert predicate(item, good, np.ones((4, 64, 64)))
+
+
+def test_summary_does_not_count_not_started_placeholders_as_executed():
+    summary = {
+        "training_models_expected": 8, "training_models_completed": 8,
+        "evaluation_runs_expected": 200, "evaluation_runs_executed": 199,
+        "design_target_tests": {"declared_expected": 192},
+        "all_erased_negative_controls": {"declared_expected": 8},
+    }
+    counts = {"design_executed": 191, "negative_executed": 8}
+    validate_summary_counts(summary, counts, 8)
+    summary["evaluation_runs_executed"] = 200
+    with pytest.raises(ValueError, match="counts disagree"):
+        validate_summary_counts(summary, counts, 8)
