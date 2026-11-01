@@ -2,7 +2,8 @@
 and the checks run on its bytes.
 
 Covers what the site's model_downloads publishes: every file a print manifest pins (artifacts/print, print-v2,
-print-v3, glider/<revision>) with an .stl, .glb or .zip suffix, plus the ZIP a download.json sidecar pins.
+print-v3, print-v4, glider/<revision>) with an .stl, .glb or .zip suffix, plus the ZIP a download.json sidecar pins.
+(print-v4 is new; the site lists it once root adds it to model_downloads.)
 
 Everything about a file is recomputed here from its bytes: sha256, mesh validity, volume, centroid, the mass at the
 card density, the build-envelope fit, the left/right mirror pairs, and each glider revision's nominal assembly. What
@@ -30,15 +31,18 @@ from pathlib import Path
 
 import numpy as np
 
+from engineering.fishprop import build as FP
 from engineering.geometry import validate as VAL
 from engineering.glider import mass as MP
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "artifacts/print-law-index.json"
 DOC = ROOT / "docs/print-law-index.md"
-CODE_PATHS = ["engineering/print_law_index.py", "engineering/glider/mass.py", "engineering/geometry/validate.py"]
+CODE_PATHS = ["engineering/print_law_index.py", "engineering/glider/mass.py", "engineering/geometry/validate.py",
+              "engineering/fishprop/build.py"]
 
-FAMILIES = [("print-v3", "artifacts/print-v3"), ("print-v2", "artifacts/print-v2"), ("print-v1", "artifacts/print")]
+FAMILIES = [("print-v4", "artifacts/print-v4"), ("print-v3", "artifacts/print-v3"), ("print-v2", "artifacts/print-v2"),
+            ("print-v1", "artifacts/print")]
 GLIDER = ROOT / "artifacts/glider"
 
 # root's material card: not in this branch's tree, read from the commit claude-07's runs pin
@@ -244,13 +248,18 @@ def laws(card: dict, dyn_ev: list, rev_ev: list) -> list:
          "scope": "Global self-intersection is not checked.",
          "evidence": [dict(idx, what="every STL re-read and re-checked"), *sel(rev_ev, "closed")]},
         {"id": "min_wall_sampled", "title": "Minimum wall thickness, sampled", "kind": "manufacturing_rule",
-         "latex": r"t_{\min}\ge t_{\mathrm{rule}}\quad(\text{glider }0.45\text{ mm; props }1.0\text{ mm})",
+         "latex": r"t_{\min}\ge t_{\mathrm{rule}}\quad(\text{glider }0.45\text{ mm; props }1.0\text{ mm; "
+                  r"reinforced v4 prop }1.5\text{ mm})",
          "source_urls": [], "code_paths": ["engineering/glider/build.py", "engineering/geometry/validate.py"],
          "scope": "Provisional rules, not printer-certified. Inward rays from sampled faces; a thinner region between "
                   "samples can be missed. The glider builder classes a reading whose exit face does not oppose its "
                   "entry face as edge-limited and reports it without gating; that is how the catch-slot feather "
                   "edges passed its gate (findings).",
-         "evidence": [builder("wall sampler (3000 samples, seed 7)"), *sel(rev_ev, "wall")]},
+         "evidence": [builder("wall sampler (3000 samples, seed 7)"), *sel(rev_ev, "wall"),
+                      {"by": "prop builder (claude-05), recorded in each print-v4 design record",
+                       "what": "second, denser wall sample on every print-v4 STL (12,000 samples, seed 11)",
+                       "artifact_path": "artifacts/print-v4/design/<prop>.json", "artifact_sha256": None,
+                       "commit": None, "recomputed_in_this_index": False}]},
         {"id": "build_envelope_fit", "title": "Fits the declared build volume", "kind": "manufacturing_rule",
          "latex": r"\mathrm{sort}(\text{extent})\le\mathrm{sort}(\text{envelope})-2m",
          "source_urls": [], "code_paths": ["engineering/print_law_index.py"],
@@ -262,9 +271,20 @@ def laws(card: dict, dyn_ev: list, rev_ev: list) -> list:
          "latex": r"\{\mathbf{v}_R\}=\{\mathbf{v}_L\,\mathrm{diag}(1,1,-1)\}\neq\{\mathbf{v}_L\},\qquad "
                   r"\det R_{\mathrm{print}\to\mathrm{fish}}=+1",
          "source_urls": [], "code_paths": ["engineering/print_law_index.py", "engineering/glider/build.py"],
-         "scope": "Glider paired fins. A print cannot be reflected, so a right file holding the left part prints a "
-                  "second left fin.",
-         "evidence": [dict(idx, what="vertex-set comparison of every _L/_R print pair"), *sel(rev_ev, "pair")]},
+         "scope": "Glider paired fins: a print cannot be reflected, so a right file holding the left part prints a "
+                  "second left fin. print-v4 props (one solid each): the solid equals its own y-mirror, "
+                  r"vol(M \ mirror_y M) / vol(M) <= 1e-3, so the right fins are the left fins mirrored.",
+         "evidence": [dict(idx, what="vertex-set comparison of every _L/_R print pair"), *sel(rev_ev, "pair"),
+                      dict(idx, what="y-mirror symmetric difference of every print-v4 STL")]},
+        {"id": "extremity_stoutness", "title": "No extremity thinner than the wall rod (no needle tips)",
+         "kind": "manufacturing_rule",
+         "latex": r"\mathrm{vol}\left(\Omega\cap B_R(\mathbf{h})\right)\ge\pi\left(\tfrac{t_{\mathrm{rule}}}{2}"
+                  r"\right)^{2}R\quad\forall\,\mathbf{h}\in\text{hull extremities},\ R=3\text{ mm}",
+         "source_urls": [], "code_paths": ["engineering/fishprop/build.py", "engineering/print_law_index.py"],
+         "scope": "A design rule (not a printer limit): at every convex-hull vertex cluster (2 mm), the material within "
+                  "3 mm is at least a rod of wall-rule diameter and 3 mm length. Extremities inside the hull, such as "
+                  "the caudal fork's inner corner, are not tested. Run on print-v4 only.",
+         "evidence": [dict(idx, what="extremity test recomputed on every print-v4 STL")]},
         {"id": "source_outline_fidelity", "title": "Fin rays follow the source candidate", "kind": "design_assumption",
          "latex": r"\{\ell_i,\mathbf{r}_i\}_{\mathrm{print}}=\{\ell_i,\mathbf{r}_i\}_{\mathrm{rays.json}}",
          "source_urls": [], "code_paths": ["engineering/glider/build.py"],
@@ -335,7 +355,7 @@ def prop_files(card: dict) -> tuple[list, list]:
                             "sha256": sha((ROOT / d / "design" / f"{form['id']}.json").read_bytes()),
                             "role": "prop design record"})
             row = {"path": path, "sha256": sha(b), "bytes": len(b), "family": family,
-                   "revision": man.get("edition", {}).get("id") or ("v3" if family == "print-v3" else "v1"),
+                   "revision": man.get("edition", {}).get("id") or {"print-v3": "v3", "print-v4": "v4"}.get(family, "v1"),
                    "kind": kind, "part_id": form["id"] if form else None, "withdrawn": None,
                    "introduced_in_commit": introduced_in(path), "source_artifacts": src,
                    "material": {"id": None, "density_kg_m3": None,
@@ -373,6 +393,12 @@ def prop_files(card: dict) -> tuple[list, list]:
                                   f"builder record: sampled minimum {r(rec.get('min_sampled_wall_mm'), 3)} mm against "
                                   f"{rec.get('min_wall_mm_required')} mm, {rec.get('wall_samples')} samples; a "
                                   "thinner region between samples can be missed"))
+            v4 = family == "print-v4"
+            design = json.loads((ROOT / d / "design" / f"{form['id']}.json").read_text()) if v4 else {}
+            if v4:
+                checks += v4_checks(b, kind, rec, design)
+            else:
+                checks.append(chk("extremity_stoutness", "unknown", "not run on this family (added with print-v4)"))
             if family == "print-v1":
                 checks.append(chk("edition_status", "unresolved",
                                   "superseded by print-v2 (edition v2 corrects the body half-width at single "
@@ -386,15 +412,25 @@ def prop_files(card: dict) -> tuple[list, list]:
                 rel("rigid_body_mass_properties", "governing", "print-pose volume centroid computed from these bytes"),
                 rel("closed_oriented_manifold", "checked", "recomputed here"),
                 rel("min_wall_sampled", "checked" if kind != "stl_prop_relief" else "not_applicable",
-                    "builder's sampled 1.0 mm rule" if kind != "stl_prop_relief" else
+                    f"builder's sampled {rec.get('min_wall_mm_required')} mm rule" if kind != "stl_prop_relief" else
                     "relief texture is not gated by design"),
+                *([rel("extremity_stoutness", "checked", "recomputed here"),
+                   rel("chirality_mirror_pair", "checked" if kind != "stl_prop_relief" else "not_applicable",
+                       "y-mirror symmetric difference recomputed here" if kind != "stl_prop_relief" else
+                       "the scale lattice need not be mirror symmetric; the smooth file carries the fin chirality "
+                       "check")] if v4 else []),
                 rel("build_envelope_fit", "checked", "120 mm box, recomputed here"),
                 rel("source_outline_fidelity", "inspired_only" if kind != "stl_stand" else "not_applicable",
                     "shaped from a source design or candidate; not checked against it here"
                     if kind != "stl_stand" else "a stand, not a fish form"),
                 *[rel(lid, "not_applicable", not_fly) for lid in
                   ("level_flight_lift", "drag_equation", "static_margin_hand_np", "launch_acceleration",
-                   "euler_bernoulli_fin_root", "catch_bond_shear", "ballast_lever")]]
+                   "catch_bond_shear", "ballast_lever")],
+                rel("euler_bernoulli_fin_root", "inspired_only",
+                    "the root gusset thickens each fin where a root-clamped cantilever's bending moment is largest; "
+                    "no beam check is computed for this prop") if design.get("lineage") and form["id"].endswith(
+                    "-reinforced") and kind != "stl_stand" else rel("euler_bernoulli_fin_root", "not_applicable",
+                                                                     not_fly)]
             if form and form.get("solver") is not None:
                 checks.append(chk("source_design_solver", "not_applicable",
                                   f"the z3 constraint solver reported '{form['solver']}' for the 1:1 source design, "
@@ -402,11 +438,49 @@ def prop_files(card: dict) -> tuple[list, list]:
                                   f"'{form.get('glide_sim')}'"))
             row.update(law_ids=[x["law_id"] for x in law_relations if x["relation"] != "not_applicable"],
                        law_relations=law_relations, checks=checks, mass_g=None,
-                       mass_basis="unknown: resin not chosen; volume calculated from the mesh",
+                       mass_basis="unknown: resin not chosen; volume calculated from the mesh"
+                       + ("; the conditional mass uses the Alpha Grey V1 cured density from root's card "
+                          f"({CARD['path']} @ {CARD['commit']})" if v4 else ""),
                        conditional_mass_g_at_1220_kg_m3=r(p["volume_mm3"] * 1220e-6, 9),
                        volume_mm3=r(p["volume_mm3"]), cg_mm_print_pose=[r(v, 4) for v in p["cg_mm"]])
             files.append(row)
     return files, findings
+
+
+def v4_checks(b: bytes, kind: str, rec: dict, design: dict) -> list:
+    """print-v4 manufacturing checks: extremities and mirror symmetry recomputed from the bytes; the dense wall
+    sample read from the builder record (not re-run: 12,000 rays per file)."""
+    V, T = VAL.read_stl(b)
+    m = FP.as_manifold(V, T)
+    wall = design["wall_rule"]["min_wall_mm"]
+    ex = FP.extremities(m, wall)
+    out = [chk("extremity_stoutness", "pass" if ex["ok"] else "fail",
+               f"recomputed: least material {ex['min_material_mm3']:.3f} mm3 within {ex['ball_radius_mm']} mm of an "
+               f"extremity (at {ex['min_at_mm']}) against a {wall:g} mm rod's {ex['rod_reference_mm3']:.3f} mm3; "
+               f"{ex['extremities_tested']} extremities")]
+    mf_ = FP.mirror_fraction(m)
+    if kind == "stl_prop_relief":
+        out.append(chk("chirality_mirror_pair", "not_applicable",
+                       f"y-mirror fraction {mf_:.2e} reported; the scale lattice need not be mirror symmetric"))
+    else:
+        out.append(chk("chirality_mirror_pair", "pass" if mf_ <= FP.MIRROR_MAX_FRACTION else "fail",
+                       f"recomputed: y-mirror symmetric difference {mf_:.2e} of the volume (limit "
+                       f"{FP.MIRROR_MAX_FRACTION:g})"))
+    dw = (rec.get("manufacturing") or {}).get("dense_wall") or {}
+    if kind == "stl_prop_relief":
+        out.append(chk("min_wall_dense", "not_applicable",
+                       f"texture file: dense sampled minimum {r(dw.get('min_mm'), 3)} mm reported, not gated"))
+    else:
+        out.append(chk("min_wall_dense", "pass" if dw.get("ok") else ("fail" if dw.get("ok") is False else "unknown"),
+                       f"builder record: {dw.get('samples')} samples (seed {dw.get('seed')}), minimum "
+                       f"{r(dw.get('min_mm'), 3)} mm against {wall:g} mm; a thinner region between samples can be "
+                       "missed"))
+    sl = (rec.get("manufacturing") or {}).get("slivers") or {}
+    out.append(chk("sliver_triangles", "pass" if sl.get("count") == 0 else "unresolved",
+                   f"builder record: {sl.get('count')} triangles under {sl.get('area_below_mm2')} mm2 (minimum "
+                   f"{sl.get('min_area_mm2')} mm2, least angle {r(sl.get('min_angle_deg'), 4)} deg); degenerate "
+                   "triangles (area < 1e-10 mm2) are gated separately and are zero"))
+    return out
 
 
 # ---------------------------------------------------------------- glider
@@ -841,7 +915,7 @@ def doc(idx: dict) -> str:
          ("- **Ballast:** the dry assembly plus nose ballast from the frozen manifest's 52 mm row, at an assumed "
          "4.7 g/cm³."),
          ("- **Display props:** the resin is not chosen, so their mass is unknown. A conditional mass, assuming a "
-         "fully dense print at 1220 kg/m³, is given separately."),
+         "fully dense print at 1220 kg/m³ (the Alpha Grey V1 card value), is given separately."),
          "- **Nothing was weighed.** Every figure here is calculated from a mesh.",
          "",
          "## Why every glider revision fails its mass budget",

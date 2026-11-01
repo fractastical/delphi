@@ -1,0 +1,153 @@
+{
+  "comparison": [
+    {
+      "bounds_mm": [
+        106.2201,
+        110.869,
+        30.6969
+      ],
+      "display_scale": 0.55,
+      "id": "fish3d-v3a-fan-prop",
+      "set": "fish3d-v3-props",
+      "smooth_mass_g_at_1220": 14.426737232727252,
+      "smooth_volume_mm3": 11825.194453055125,
+      "source": "artifacts/print-v3/manifest.json (frozen)",
+      "wall_rule_mm": 1.0
+    },
+    {
+      "bounds_mm": [
+        106.2201,
+        104.0393,
+        32.7996
+      ],
+      "display_scale": 0.55,
+      "id": "fish3d-v3b-glide-pose-prop",
+      "set": "fish3d-v3-props",
+      "smooth_mass_g_at_1220": 14.352637080828293,
+      "smooth_volume_mm3": 11764.456623629749,
+      "source": "artifacts/print-v3/manifest.json (frozen)",
+      "wall_rule_mm": 1.0
+    },
+    {
+      "bounds_mm": [
+        96.6656,
+        114.8701,
+        28.0808
+      ],
+      "display_scale": 0.5,
+      "id": "fish3d-v3c-daane-length-prop",
+      "set": "fish3d-v4-props",
+      "smooth_mass_g_at_1220": 12.001153646863614,
+      "smooth_min_wall_sampled_mm": 1.199992662795896,
+      "smooth_volume_mm3": 9837.011185953766,
+      "source": "design/fish3d-v3c-daane-length-prop.json",
+      "wall_rule_mm": 1.0
+    },
+    {
+      "bounds_mm": [
+        97.2256,
+        115.6642,
+        29.0409
+      ],
+      "display_scale": 0.5,
+      "id": "fish3d-v3c-daane-length-prop-reinforced",
+      "set": "fish3d-v4-props",
+      "smooth_mass_g_at_1220": 15.499682354111702,
+      "smooth_min_wall_sampled_mm": 1.7999969500321846,
+      "smooth_volume_mm3": 12704.657667304744,
+      "source": "design/fish3d-v3c-daane-length-prop-reinforced.json",
+      "wall_rule_mm": 1.5
+    }
+  ],
+  "files": {
+    "design/fish3d-v3c-daane-length-prop-reinforced.json": "cff9e7a520593a18428151356197b7f337871dbe2aea83dcf2985c418b7d31c7",
+    "design/fish3d-v3c-daane-length-prop.json": "8c0f684ce7444571a12eac118c3156b759e5f6845d57b4ea6faee5317ba880e0",
+    "downloads.json": "ca9cf1b6c3f36d122bbc223a2bd6b335e5f91218064527f7c66971800431fadf",
+    "img/fish3d-v3c-daane-length-prop-on-stand.png": "48878cfbea3a015d6f65b10eca8668a6333016cb351980fcc1a929b57b45ba18",
+    "img/fish3d-v3c-daane-length-prop-reinforced-on-stand.png": "b55f5cb0285e9b93ce34fa44c84ba5402d5af22b33be8f95bdbc98cc86dcac2a",
+    "img/fish3d-v3c-daane-length-prop-reinforced-scales.png": "7d233872f65fb9bc067c37b4449c70e51575df71582f86499b1b9048cba8ede9",
+    "img/fish3d-v3c-daane-length-prop-scales.png": "b98c1902559308c7387ac14dbb4bffc8c7ee2b16a4ce112cba412a5a63f6926e",
+    "stl/fish3d-v3c-daane-length-prop-reinforced-scales.stl": "4d3d1a21b6342dc6e2aec733db6352d94a687ab214c9b7a4a5554652dd8609bf",
+    "stl/fish3d-v3c-daane-length-prop-reinforced-stand.stl": "a586447294e53e0f46a0e4179032b5854fd913b92f298917442d81434ed0be44",
+    "stl/fish3d-v3c-daane-length-prop-reinforced.stl": "3b019f60fd74ee02ff2fd5e849b975f9a3a6893ac67c3ca57dbdadb556f926aa",
+    "stl/fish3d-v3c-daane-length-prop-scales.stl": "bebbc97fd1913cd7ca1ae54b10c8e89a529ac43ee9e74bca404a544d41eae2c4",
+    "stl/fish3d-v3c-daane-length-prop-stand.stl": "175e9b9f968a5fa7ba93218018508ef9748af1b1faaa296ebb5e294295384f02",
+    "stl/fish3d-v3c-daane-length-prop.stl": "589f20ead4c7c9d1bf0b784ea4f02b88e3ceb291b386fa80d107f8631fa6b385",
+    "web/fish3d-v3c-daane-length-prop-reinforced-scales.glb": "707b781e6a50c369d891a1a527002b374011a71a8b156024919f6039f7b2b35e",
+    "web/fish3d-v3c-daane-length-prop-scales.glb": "300526e4958a7b78014a8bf4540b40b0abdc1c21d952389971c41ababd9c9798"
+  },
+  "findings": [
+    {
+      "detail": "The first v4 build (not committed) wrote scale-relief STLs that FAILED the validator: 3 triangles each under the 1e-10 mm2 degenerate cut (edges ~1e-5 mm, left by the 1e-5 mm grid snap), and the build did not gate relief validity. Fixes: the relief file is now gated on the validator, and every v4 export is simplified at 1e-4 mm after the snap and snapped again (volume change recorded per file). The v3 relief files were not re-exported; their smallest triangle is 1.07e-10 mm2, just above the cut.",
+      "id": "relief_degenerate_triangles_before_cleanup",
+      "status": "fixed in these bytes, kept on record"
+    },
+    {
+      "detail": "fish3d-v3c-daane-length-prop-glide-pose (v3b's assumed glide pose on v3c, membrane 1.2 x wall) was built and FAILED the 12,000-sample wall gate: minimum 0.975 mm against the 1.0 mm rule on its cambered fins (its 3,000-sample minimum was 1.066 mm, a pass). The camber is a vertical offset, so a membrane of thickness t measures t cos(slope) across its surface. It is not published. A thicker membrane (1.5 x wall) is proposed in V4_PENDING and will be built and checked as an additive revision. The frozen v3b prop uses the same camber with a 1.2 x membrane; its own 3,000-sample minimum is 1.079 mm.",
+      "id": "glide_pose_prop_failed_dense_wall",
+      "status": "withheld from this set; unresolved"
+    }
+  ],
+  "label": "Engineered illustrative flying-fish display prop from a source-conditioned v3 candidate, at display scale with listed manufacturing alterations. Not an organism, not a validated aerodynamic shape, print preparation unvalidated (printer and resin unknown).",
+  "printer_resin": {
+    "layer_height": "unknown",
+    "note": "not chosen by the user yet; Formlabs minimums read here are stated for Form 2, Clear, 100 um and are not assumed to apply; run the docs/printing.md checklist in PreForm",
+    "printer": "unknown",
+    "resin": "unknown"
+  },
+  "props": {
+    "fish3d-v3c-daane-length-prop": {
+      "bounds_mm": [
+        96.6656,
+        114.8701,
+        28.0808
+      ],
+      "display_scale": 0.5,
+      "manufacturing_ok": {
+        "relief": true,
+        "smooth": true,
+        "stand": true
+      },
+      "mesh_sha256": "0220872b2367d677f35220a865fa0b9ba5f7ede096462aa507fb92ec70e05e6b",
+      "source_candidate_sha256": "a6455a3ddfcb16cb956b6ee2355397a430a4660019666f7bb06c1d60bb90046d",
+      "stand_valid": true,
+      "valid": true,
+      "volume_mm3": 9837.011185953766,
+      "wall_rule_mm": 1.0
+    },
+    "fish3d-v3c-daane-length-prop-reinforced": {
+      "bounds_mm": [
+        97.2256,
+        115.6642,
+        29.0409
+      ],
+      "display_scale": 0.5,
+      "manufacturing_ok": {
+        "relief": true,
+        "smooth": true,
+        "stand": true
+      },
+      "mesh_sha256": "32c68d469a8e1c27c0a2268608302aa11a4f785d3af684521726e0a629ee8025",
+      "source_candidate_sha256": "a6455a3ddfcb16cb956b6ee2355397a430a4660019666f7bb06c1d60bb90046d",
+      "stand_valid": true,
+      "valid": true,
+      "volume_mm3": 12704.657667304744,
+      "wall_rule_mm": 1.5
+    }
+  },
+  "run": {
+    "box_mm": 120.0,
+    "code_sha256": "cfe4b21a0d33b272ed730d0e184df41ebba4c29880450111fb5a212c5f21f90d",
+    "command": "python -m engineering.fishprop.build --set v4",
+    "display_scale": 0.5,
+    "libraries": {
+      "manifold3d": "3.5.4",
+      "matplotlib": "3.11.2",
+      "numpy": "2.4.4",
+      "trimesh": "5.2.0",
+      "z3-solver": "5.3.3.0"
+    },
+    "min_wall_mm": 1.0
+  },
+  "schema": "frontier.print.v4prop-manifest/1"
+}
