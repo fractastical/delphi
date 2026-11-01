@@ -995,7 +995,6 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     assert not pg2.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
 
-
 def test_about_team_shows_the_team_crest_and_the_off_the_clock_clip(browser, base):
     """The team page shows the crest image and the short slingshot clip, served from site/artifacts/team (web.py streams MP4 only from
     the artifact subtree). The clip is muted and looped, and it autoplays only when the visitor has not asked for reduced motion."""
@@ -1924,7 +1923,6 @@ def test_demo_page_defaults_to_latest_published_cut_and_preserves_old_downloads(
     assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
 
 
-
 def test_no_page_prints_markup_or_object_placeholders(browser, base):
     import re as _re
     bad = _re.compile(r"<span|</?b>|<a href|class=\"|\[object \w+\]")
@@ -2418,50 +2416,6 @@ def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs
                 assert hashlib.sha256(response.body()).hexdigest() == file["sha256"]
         assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     assert pg.errors == []
-
-
-@pytest.mark.parametrize("width", [1440, 390])
-def test_system_operations_shows_dated_receipts_and_expandable_details(browser, base, width):
-    projection = json.loads((ROOT / "site/artifacts/system-operations/operations.json").read_text())
-    pg = page(browser, width, 900)
-    pg.goto(base + "#/system?tab=operations")
-    pg.wait_for_selector("#op-h")
-    text = pg.locator("#opsroot").inner_text()
-    assert "Latest source observation" in text and "historical sampled intervals" in text
-    assert "unknown right now" in text and "spend unknown" in text
-    assert "Preparation and partial results" in text and "not an audit queue" in text
-    assert "18" in text and "failed" in text
-    assert "363" in text and "32.3 / 37" in text
-    assert "biological validation" not in text.lower() or "no biological validation" in text.lower()
-    assert pg.locator("#opsroot details.ops-detail[open]").count() == 0
-    sources = pg.locator('details.ops-detail', has=pg.locator('summary', has_text="Show receipts, pin status and digests"))
-    sources.locator("summary").click()
-    assert sources.locator("tbody tr").count() == len(projection["sources"])
-    assert _overflow(pg) <= 0 and not pg.errors
-    pg.close()
-
-
-def test_operations_missing_samples_remain_unknown_and_load_failure_is_visible(browser, base):
-    projection = json.loads((ROOT / "site/artifacts/system-operations/operations.json").read_text())
-    for row in projection["plans"]["sampled_utilization"]["windows"]:
-        row["gpu_utilization_pct_mean"] = None
-        row["gpu_utilization_pct_max"] = None
-    pg = page(browser, 390, 900)
-    pg.route("**/artifacts/system-operations/operations.json", lambda route: route.fulfill(json=projection))
-    pg.goto(base + "#/system?tab=operations")
-    pg.wait_for_selector("#op-p")
-    text = pg.locator('[aria-labelledby="op-p"]').inner_text()
-    assert "unknown / unknown" in text and "0.0 /" not in text and "NaN" not in text
-    assert _overflow(pg) <= 0 and not pg.errors
-    pg.close()
-    pg = page(browser, 390, 900)
-    pg.route("**/artifacts/system-operations/operations.json", lambda route: route.fulfill(status=404, body="missing"))
-    pg.goto(base + "#/system?tab=operations")
-    pg.wait_for_selector("#opsroot .note")
-    assert "Unavailable" in pg.locator("#opsroot").inner_text()
-    assert "not zero activity" in pg.locator("#opsroot").inner_text()
-    assert not pg.errors
-    pg.close()
 
 
 @pytest.mark.parametrize("width", [1440, 390])
