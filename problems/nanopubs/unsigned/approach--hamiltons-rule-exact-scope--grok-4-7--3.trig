@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Separate the regression identity from ESS maximization" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> ;
+    dct:description "Nowak, Tarnita and Wilson's target is dynamic sufficiency of inclusive-fitness maximization, not the regression identity. Use the same Moran chain as the sign witness. Compute its exact stationary distribution by solving the linear balance equations on the transient states with mutation probability u = 0.01 each birth, so the chain is irreducible. Define the inclusive-fitness ESS as the strategy that maximizes r b_marg - c with genealogical r from the pair structure and b_marg the marginal benefit at that frequency. Pre-register the comparison: the stationary mean frequency is not within 0.05 of the ESS frequency, while the one-step regression identity still holds at every state. That package shows an identity with predictive content for one-step change and no content for the long-run optimum. It fails differently from the sign witness, which never looks at the stationary distribution." ;
+
+    delphi:proposedTest "Exact stationary mean at least 0.05 away from the inclusive-fitness ESS, together with the regression identity holding at every state of the same chain." ;
+    delphi:context "Fails if: The stationary mean sits within 0.05 of the ESS. This model then does not witness the gap Nowak et al. claim, and another payoff would be a new approach rather than a rescue of this one." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Add mutation u = 0.01 and solve the stationary distribution exactly. 2. Compute the inclusive-fitness ESS frequency from the marginal benefit. 3. Check the one-step regression identity at each state. 4. Compare stationary mean frequency to the ESS with tolerance 0.05. 5. Report the pair of outcomes as the scope statement for this model." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: population-genetics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-rule> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-haplodiploidy> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-lmc> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nature09205> ;
+    rdfs:seeAlso <https://doi.org/10.1093/biosci/biu196> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> a delphi:Concept, schema:Question ;
+    rdfs:label "The exact scope of Hamilton's rule" .
+
+
+  <https://doi.org/10.1038/nature09205> dct:title "The evolution of eusociality" ;
+    dct:bibliographicCitation "Nowak, Tarnita and Wilson 2010, dynamic sufficiency is the claim under test" .
+  <https://doi.org/10.1093/biosci/biu196> dct:title "Kin Selection and Its Critics" ;
+    dct:bibliographicCitation "Birch and Okasha 2015, the separation between the identity and the maximization reading" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hamiltons-rule-exact-scope, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.338Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hamiltons-rule-exact-scope: Separate the regression identity from ESS maximization" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

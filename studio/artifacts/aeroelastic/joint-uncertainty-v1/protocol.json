@@ -1,0 +1,122 @@
+{
+  "schema": "frontier.aeroelastic.joint-uncertainty-protocol/1",
+  "status": "frozen-before-assay",
+  "base_commit": "97d85471b60bef320345352d9e18ebdf14feae9d",
+  "question": "Across a bounded assumed joint design envelope, what paired fixed-reference-area CL and rigidized point-mass descent range changes arise among rigid, one-way frozen-load, and static feedback arms, and between frozen-rigid and updated-deformed structural pressure distributions?",
+  "evidence_kind": "deterministic computed scenario envelope; not a probability distribution, fish calibration, or empirical validation",
+  "model_chain": [
+    "existing Euler-Bernoulli FEM response in engineering.fin_mechanics.beam via engineering.aeroelastic.model",
+    "existing VLM in engineering.cfd3d.vlm",
+    "existing RK4 point-mass glide in engineering.simulation.glide; final elastic shape rigidized"
+  ],
+  "scenario_axes": {
+    "EI_scale": "multiplies all equivalent-fin EI values; dimensionless assumed design perturbation",
+    "aerodynamic_load_scale": "uniformly scales VLM force vectors after pressure solve; also scales reported fixed-area CL; dimensionless assumed pressure/load perturbation",
+    "mass_scale": "multiplies assumed point-mass flight mass; dimensionless",
+    "CD0_scale": "multiplies assumed parasite drag coefficient CD0; dimensionless"
+  },
+  "shared_scenarios": [
+    {
+      "id": "low-demand",
+      "EI_scale": 1.25,
+      "aerodynamic_load_scale": 0.8,
+      "mass_scale": 0.9,
+      "CD0_scale": 0.85
+    },
+    {
+      "id": "nominal",
+      "EI_scale": 1.0,
+      "aerodynamic_load_scale": 1.0,
+      "mass_scale": 1.0,
+      "CD0_scale": 1.0
+    },
+    {
+      "id": "high-demand",
+      "EI_scale": 0.75,
+      "aerodynamic_load_scale": 1.2,
+      "mass_scale": 1.1,
+      "CD0_scale": 1.15
+    }
+  ],
+  "correlation_scope": "Three paired stress-envelope rows encode co-varying assumptions; they do not define marginals, a joint probability law, confidence intervals, or population variation.",
+  "arms": [
+    "rigid",
+    "one-way-frozen-load",
+    "two-way-static-feedback"
+  ],
+  "pressure_policies": {
+    "frozen-rigid-distribution": "Use the undeformed rigid-geometry VLM panel-force distribution for structural load transfer at every iteration; transfer it onto the current structural lattice. This is an explicit frozen-pressure alternative.",
+    "updated-deformed-distribution": "Recompute VLM panel forces on the current deformed geometry at each existing solver iteration; this is the existing feedback policy."
+  },
+  "meshes": [
+    "main",
+    "fine"
+  ],
+  "paired_estimands": [
+    "signed delta_CL = arm CL - same-scenario, same-pressure-policy, same-mesh rigid CL",
+    "signed delta_range_m = arm main-dt descent range - paired rigid main-dt descent range",
+    "main-vs-fine discrepancy of the paired delta_CL and delta_range_m; descriptive mesh-resolution estimate, not a validated error bound",
+    "existing feedback residual/iteration history and main-vs-half-dt range discrepancy; descriptive fixed-point/time-resolution estimates, not independent biological validation"
+  ],
+  "resolution_warning": "Do not treat force/moment/virtual-work identities as independent validation. Do not use the existing 3% absolute-CL mesh threshold to validate tiny paired effects. Fixed-point stopping tolerance and mesh/time discrepancies are reported as resolution diagnostics only.",
+  "unmodeled_or_unknown": [
+    "finite fin torsion and anisotropy",
+    "measured fish fin EI, aerodynamic pressure/polar coefficients, mass, drag, or calibration",
+    "continuous aeroelastic motion during descent",
+    "body aerodynamic contribution",
+    "bioelectric, genetic, or cellular mapping into any mechanical parameter"
+  ],
+  "failure_policy": "Preserve every failed, partial, unconverged, invalid-domain, and missing scenario-arm-policy-mesh row. Do not replace or interpolate failed outputs, relax gates, or promote domain exits as valid estimates.",
+  "resources": {
+    "cpu_workers": 1,
+    "threads": 1,
+    "memory_max_bytes": 4294967296,
+    "runtime_max_seconds": 1200,
+    "output_cap_bytes": 50000000,
+    "gpu": 0,
+    "cloud_provider_calls": 0
+  },
+  "inputs": [
+    {
+      "path": "artifacts/aeroelastic/protocol.json",
+      "sha256": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+      "bytes": 9658
+    },
+    {
+      "path": "artifacts/fish3d/fish3d-v3a-fan/panels.json",
+      "sha256": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+      "bytes": 143735
+    },
+    {
+      "path": "engineering/aeroelastic/run.py",
+      "sha256": "9dbb06629178529c93208d617a9ecbaae9e3e994cd5ea8016cc63c451c0d4aa4",
+      "bytes": 16290
+    },
+    {
+      "path": "engineering/aeroelastic/model.py",
+      "sha256": "7eb236b82e66a782d9b40b51e2bed9ccd663cbfce0dd29f2e4ed91dfea03a001",
+      "bytes": 8465
+    },
+    {
+      "path": "engineering/aeroelastic/flight.py",
+      "sha256": "269964fe7b6240fcb5a23c7c1a4c92d6191d908061f9bf9f3078de0839d50880",
+      "bytes": 2069
+    },
+    {
+      "path": "engineering/fin_mechanics/beam.py",
+      "sha256": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+      "bytes": 8191
+    },
+    {
+      "path": "engineering/cfd3d/vlm.py",
+      "sha256": "f9dd43a97243234880fef5c4d99e77ee34458980c6246a284762763a12acb6d3",
+      "bytes": 21367
+    },
+    {
+      "path": "engineering/simulation/glide.py",
+      "sha256": "1f6a04baaf5a7cda589f80907ba00ac93f5b20fd458211a2340f3ec44de79fa7",
+      "bytes": 4371
+    }
+  ],
+  "output_contract": "results.json, per-arm existing solver result/state/flight artifacts, receipt.json, and output-ports.json. All hashes recorded. Output ports are computed scenario contrasts, not measurements."
+}

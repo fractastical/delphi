@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered SLA print-and-crush protocol on 60 specimens via external test bureau" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    dct:description "Execute the full physical acceptance test by generating a locked, pre-registered CAD/STL and mechanical testing package for 60 specimens (3 load cases: block compression, three-point bending, and femoral-head loading x 2 architectures: principal-stress-aligned vs equal-mass, equal-strut-count uniform octet lattice x 10 replicates) and dispatching it to an ISO/ASTM-certified additive manufacturing and mechanical testing bureau. Both designs in each load case are constrained to identical solid volume (measured dry mass within +/- 1%), identical total strut count, identical minimum strut diameter (>= 0.8 mm), and randomized build-plate placement across two SLA print batches in a tough photopolymer resin.\n\nEach printed specimen is weighed, micro-CT or optically gauge-checked before testing, and loaded to failure under displacement control (1 mm/min) on a universal testing machine. Peak load F_max and integrated energy to failure W_fail (area under the force-displacement curve up to 40% load drop) are evaluated by a pre-registered script computing Hedges' g and a two-one-sided equivalence / superiority test against the replicate-to-replicate and batch-to-batch print variability." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--3#n_specimens> ;
+    delphi:proposedTest "Across the 60 specimens, stress-aligned lattices exceed equal-mass, equal-strut-count uniform lattices in peak load F_max and energy to failure W_fail by at least 2x the replicate standard deviation (Mann-Whitney p < 0.005) in all three load cases." ;
+    delphi:context "Fails if: Stress-aligned lattices fail to beat the uniform lattice by more than the print-to-print standard deviation in any load case, or the ranking reverses between compression, three-point bending, and femoral-head loading." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Generate and commit the 6 watertight STL lattice files, monolithic fixture adapters, and randomized SLA build-plate layout for 60 specimens. 2. Pre-register the mechanical test protocol, mass-normalization correction, and superiority threshold (mean gain > 2x pooled replicate SD and one-sided Mann-Whitney p < 0.005 in all three load cases). 3. Dispatch the build package to an external SLA printing and universal testing facility and ingest the raw force-displacement CSVs and dry-mass logs. 4. Run the locked analysis script to compute peak load F_max, energy to failure W_fail, and batch-variance decomposition." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: The swarm has no SLA 3D printer, tough resin, post-curing line, or universal testing machine, and cannot procure physical lab testing without human budget and operator execution." ;
+    skos:note "Tool: generative-design" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nature23911> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s00158-016-1420-7> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" .
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--3#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 60 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+
+  <https://doi.org/10.1038/nature23911> dct:title "Giga-voxel computational morphogenesis for structural design" ;
+    dct:bibliographicCitation "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design" .
+  <https://doi.org/10.1007/s00158-016-1420-7> dct:title "On the (non-)optimality of Michell structures" ;
+    dct:bibliographicCitation "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to printed-stress-aligned-lattice-beats-uniform, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.317Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to printed-stress-aligned-lattice-beats-uniform: Pre-registered SLA print-and-crush protocol on 60 specimens via external test bureau" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

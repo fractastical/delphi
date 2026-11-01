@@ -1,0 +1,75 @@
+{
+  "claim_id": "levin-2024-collective-11",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:26:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "her1/Her/Hes reporter time series (period, amplitude) for presomitic mesoderm cells cultured singly versus in groups",
+    "her1 expression and cycling in wild-type cells grafted into non-cycling mutant hosts",
+    "phase of grafted cells relative to host after heterochronic grafting",
+    "culture density / substrate conditions"
+  ],
+  "datasets": [
+    {
+      "id": "gene-expression-omnibus",
+      "name": "Gene Expression Omnibus (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=segmentation+clock+presomitic+mesoderm&retmode=json&retmax=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:16:30Z", "method": "eutils esearch db=gds and esummary of the first 8 hits", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["single-cell versus group live-reporter traces", "graft phase data"],
+      "scope": "17 GEO records match 'segmentation clock presomitic mesoderm'. The first 8 are sequencing series of zebrafish, mouse, human or pig material (e.g. GSE244768 zebrafish Tbx6, GSE181295 mouse CLOCK/BMAL1 organoids, GSE132811 mouse in vitro PSM); titles only were inspected. None is titled as an isolated-versus-grouped cell time series or a graft experiment.",
+      "evidence": "esearch count 17; esummary titles listed for GSE244768, GSE227985, GSE220563, GSE194214, GSE181295, GSE132811, GSE116935, GSE116934.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "biostudies-s-bsst1653",
+      "name": "BioStudies S-BSST1653: segmentation clock drives segmentation by stabilizing Dusp phosphatases (zebrafish)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BSST1653",
+      "access_url": null,
+      "doi": null,
+      "license": "CC0 (BioStudies attribute)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:17:00Z", "method": "GET BioStudies study JSON", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["not about cell isolation, grafting or phase entrainment, judged from the title and description only"],
+      "scope": "Danio rerio study with 5 files listed; contents not inspected.",
+      "evidence": "Study JSON attributes: Title, Organism Danio rerio, License CC0.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "webb-2016-autonomous-oscillators-zebrafish",
+      "name": "Persistence, period and precision of autonomous cellular oscillators from the zebrafish segmentation clock (eLife 2016)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22persistence%2C%20period%20and%20precision%20of%20autonomous%20cellular%20oscillators%22&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.7554/elife.08438",
+      "license": "cc by (Europe PMC licence field)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:17:30Z", "method": "Europe PMC REST search by title", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["a paper, not a deposited dataset; Europe PMC flags hasSuppl Y and hasData Y but I did not open any supplementary or source-data file"],
+      "scope": "Open-access zebrafish paper (PMC4803185, 2016) on dissociated segmentation-clock cells. Listed as a lead for source data, not as a verified dataset.",
+      "evidence": "Europe PMC record only. A download of the paper's supplementary-files archive was started by mistake and stopped after about 25.9 MB; it was deleted and not used.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "GEO (eutils db=gds)", "query": "segmentation clock presomitic mesoderm", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=segmentation+clock+presomitic+mesoderm&retmode=json&retmax=8", "hits": 17, "note": "titles inspected for first 8; none about isolated versus grouped cells or grafts" },
+    { "source": "Zenodo", "query": "\"segmentation clock\" oscillation single cells", "url": "https://zenodo.org/api/records?q=%22segmentation%20clock%22%20oscillation%20single%20cells&size=6", "hits": 327523, "note": "loose match; relevant-looking top hits are mouse gastrulation signalling (10.5281/zenodo.6770487) and a Notch repository (10.5281/zenodo.14873344); not inspected" },
+    { "source": "Dryad", "query": "segmentation clock", "url": "https://datadryad.org/api/v2/search?q=segmentation%20clock", "hits": 10, "note": "top hit 'Imaging the onset of oscillatory signaling dynamics during mouse embryo gastrulation' (doi:10.5061/dryad.ht76hdrj2); others unrelated; not about PSM cell isolation" },
+    { "source": "BioStudies", "query": "segmentation clock", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=segmentation%20clock&pageSize=6", "hits": 20497, "note": "mostly Europe PMC paper records (S-EPMC...); one native submission S-BSST1653" },
+    { "source": "BioStudies", "query": "presomitic mesoderm oscillation", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=presomitic%20mesoderm%20oscillation&pageSize=6", "hits": 6438, "note": "paper record titled 'Substrate Rigidity Modulates Segmentation Clock Dynamics in Isolated Presomitic Mesoderm Cells' (S-EPMC11244955) noted by title only" },
+    { "source": "DataCite", "query": "presomitic mesoderm oscillations time-lapse", "url": "https://api.datacite.org/dois?query=%22presomitic%20mesoderm%22%20oscillations%20time-lapse&page%5Bsize%5D=6", "hits": 1, "note": "a thesis, 10.5075/epfl-thesis-10961" },
+    { "source": "Dryad", "query": "zebrafish segmentation clock single cell oscillators", "url": "https://datadryad.org/api/v2/search?q=zebrafish%20segmentation%20clock%20single%20cell%20oscillators", "hits": 0, "note": "none" }
+  ],
+  "status": "gap",
+  "summary": "No repository dataset with isolated-versus-grouped presomitic-mesoderm reporter traces, mutant-host grafts or heterochronic grafts was found. GEO holds 17 segmentation-clock expression series but none was titled as such an experiment; leads are source data attached to individual papers (e.g. the 2016 eLife zebrafish single-cell paper, 'Substrate Rigidity ... Isolated PSM Cells'), which I did not open.",
+  "next_step": "Open the source data of the individual papers behind each of the three experiments, compile reporter traces into one table, and pre-register oscillation and phase-locking criteria.",
+  "obstacles_confirmed": [
+    "The three component experiments span species and labs and are not in one downloadable time-series table.",
+    "No deposited graft-phase data located."
+  ]
+}

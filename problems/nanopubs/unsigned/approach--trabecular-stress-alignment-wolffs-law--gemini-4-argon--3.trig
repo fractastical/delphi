@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Single-trabecula shear-resorption test on longitudinal in vivo micro-CT scans" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Test the causal core of `thompson1917-ch16-06` and `thompson1917-ch16-07` directly at the single-strut level by registering baseline (t_0) and follow-up (t_1) 3D micro-CT volumes from altered-loading or malunited-fracture cohorts. For each individual trabecular strut segmented at t_0, compute its axial unit tangent vector n_strut and solve the whole-bone micro-FE problem under the experimental load vector to obtain the local resolved shear stress tau_s = ||sigma . n_strut - (n_strut . sigma . n_strut) n_strut|| and normal axial strain energy density U_n.\n\nOverlay the registered t_1 scan to classify every surface voxel into formation, quiescence, or resorption (Christen et al. 2014). Fit a pre-registered logistic mixed-effects model testing whether oblique struts with high shear-to-normal ratio tau_s / |sigma_n| experience selective osteoclastic resorption on their shear-loaded flanks and apposition rotating n_strut toward the nearest principal stress eigenvector e_1(sigma), compared against a scalar strain-energy remodeling model that ignores stress obliquity." ;
+
+    delphi:proposedTest "The directional shear-to-normal stress ratio tau_s / |sigma_n| predicts strut resorption and angular rotation Delta_theta toward e_1(sigma) with AUROC >= 0.65 and beats the scalar strain-energy model by Delta_BIC > 10." ;
+    delphi:context "Fails if: Remodeling probability depends only on scalar strain magnitude (or proximity to marrow surfaces) with no statistically significant partial effect of strut-to-principal-stress obliquity angle." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Locate and retrieve paired time-lapse in vivo micro-CT volumes (baseline and post-loading follow-up) of loaded trabecular bone from public repositories or author depositions. 2. Perform rigid and bone-boundary landmark registration between t_0 and t_1 scans to map surface formation and resorption sites at voxel resolution. 3. Decompose the micro-FE stress tensor on each t_0 strut into axial normal stress sigma_n and transverse shear stress tau_s. 4. Compare predictive log-likelihood (AUROC) of the directional shear-removal model (`thompson1917-ch16-06`) against the isotropic scalar strain-energy density model." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Raw registered time-lapse in vivo micro-CT voxel pairs from load-redirection experiments (such as the sheep calcaneus or bird knee cohorts) are not openly deposited in public repositories, and the swarm has no animal facility or micro-CT scanner to generate them." ;
+    skos:note "Tool: micro-ct-morphometry" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://www.morphosource.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms5855> ;
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01971> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2011.08.020> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+  <https://www.morphosource.org/> dct:title "MorphoSource 3D skeletal micro-CT repository" ;
+    dct:description "Search target for comparative and pathological/healed-fracture trabecular bone scans" .
+  <https://doi.org/10.1038/ncomms5855> dct:title "Bone remodelling in humans is load-driven but not lazy" ;
+    dct:bibliographicCitation "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy" .
+  <https://doi.org/10.1242/jeb.01971> dct:title "Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" ;
+    dct:bibliographicCitation "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" .
+  <https://doi.org/10.1016/j.bone.2011.08.020> dct:title "A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" ;
+    dct:bibliographicCitation "Barak et al. 2011, A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.313Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Single-trabecula shear-resorption test on longitudinal in vivo micro-CT scans" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

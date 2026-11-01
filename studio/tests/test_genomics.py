@@ -1,0 +1,479 @@
+"""Genomics connector: fetch bounds, hash integrity, record validity, and regressions for flaws found while reading the output.
+
+Offline: it reads the committed data under data/genomics/ and re-derives what it can. Live fetching is exercised by running the fetch modules,
+not by this file.
+"""
+
+import csv
+import hashlib
+import json
+import re
+import sys
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from connectors.genomics import sources as S  # noqa: E402
+from connectors.genomics import fetch_flyingfish as FF  # noqa: E402
+from connectors.genomics import build_index as BI  # noqa: E402
+
+D = ROOT / "data" / "genomics"
+SIGNED_QUERY = "X-Am" "z-Signa" "ture=SECRET&X-Am" "z-Creden" "tial=KEYID"      # assembled so this file holds no credential-shaped string
+
+
+def J(name):
+    return json.loads((D / name).read_text())
+
+
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+# ---- fetch bounds ---------------------------------------------------------------------------
+
+
+def test_urls_outside_the_allow_list_or_over_http_are_refused():
+    for bad in ("http://zfin.org/downloads/gene.txt", "https://evil.example/x", "https://zfin.org.evil.example/x", "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/1/x"):
+        with pytest.raises(S.FetchRefused):
+            S._check(bad)
+    S._check("https://zfin.org/downloads/gene.txt")
+
+
+def test_the_s3_hop_is_allowed_only_from_the_figshare_downloader():
+    url = "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/28029993/x.gff?" + SIGNED_QUERY
+    S._check(url, "ndownloader.figshare.com")
+    for via in (None, "zfin.org", "api.figshare.com"):
+        with pytest.raises(S.FetchRefused):
+            S._check(url, via)
+    with pytest.raises(S.FetchRefused):
+        S._check("https://s3-eu-west-1.amazonaws.com/other-bucket/x", "ndownloader.figshare.com")
+
+
+def test_refusal_messages_do_not_leak_signed_query_strings():
+    with pytest.raises(S.FetchRefused) as e:
+        S._check("https://evil.example/x?" + SIGNED_QUERY)
+    assert "SECRET" not in str(e.value) and SIGNED_QUERY not in str(e.value)
+
+
+# ---- manifest -------------------------------------------------------------------------------
+
+
+def test_every_manifest_file_exists_with_the_pinned_hash_and_size():
+    man = J("manifest.json")
+    assert len(man["files"]) == man["counts"]["files"] >= 10
+    for f in man["files"]:
+        p = ROOT / f["path"]
+        assert p.is_file() and sha(p) == f["sha256"] and p.stat().st_size == f["bytes"], f["path"]
+    assert len({f["path"] for f in man["files"]}) == len(man["files"])
+
+
+def test_manifest_obeys_its_schema_and_the_schema_rejects_violations():
+    jsonschema = pytest.importorskip("jsonschema")
+    schema, man = J("manifest.schema.json"), J("manifest.json")
+    v = jsonschema.Draft202012Validator(schema)
+    assert not list(v.iter_errors(man))
+
+    def broken(edit):
+        m = json.loads(json.dumps(man))
+        edit(m)
+        return list(v.iter_errors(m))
+    assert broken(lambda m: m["files"][0].update(sha256="xyz"))
+    assert broken(lambda m: m["unresolved"].clear())
+    assert broken(lambda m: m["display_rules"].update(show_species_on_every_row=False))
+    assert broken(lambda m: m["files"][0].update(evidence_class="made_up"))
+    assert broken(lambda m: m.update(extra=1))
+    assert broken(lambda m: m["files"][0].update(path="/etc/passwd"))
+
+
+def test_a_tampered_file_is_detected_by_the_manifest_check(tmp_path):
+    man = J("manifest.json")
+    f = next(x for x in man["files"] if x["path"].endswith("genes.csv"))
+    copy = tmp_path / "genes.csv"
+    copy.write_bytes((ROOT / f["path"]).read_bytes() + b"x")
+    assert sha(copy) != f["sha256"]
+
+
+# ---- records --------------------------------------------------------------------------------
+
+
+def test_records_are_valid_frontier_records_with_exact_target_versions_and_a_clean_licence_gate():
+    from frontier import models, store
+    recs = J("records/records.json")["records"]
+    assert 10 <= len(recs) <= 25
+    by = {r["id"]: r for r in recs}
+    for r in recs:
+        models.Record.model_validate(r)
+        if r["kind"] == "Evidence":
+            t = r["payload"]["target"]
+            assert by[t["id"]]["version"] == t["version"] and by[t["id"]]["kind"] == t["kind"]
+            assert r["payload"]["evidence_kind"] != "observed" and r["payload"]["limitations"]
+    assert not store._unlicensed_available_content(recs)
+    assert {r["kind"] for r in recs} == {"Claim", "Evidence", "Problem"}
+    assert all(r["payload"]["completeness"] == "recorded" for r in recs if r["kind"] == "Problem")
+
+
+def test_negative_control_the_licence_gate_does_flag_unlicensed_available_content():
+    from frontier import store
+    rec = json.loads(json.dumps(next(r for r in J("records/records.json")["records"] if r["kind"] == "Claim")))
+    rec["payload"]["source"]["content_available"] = True
+    rec["payload"]["source"]["license"] = None
+    assert store._unlicensed_available_content([rec])
+
+
+def test_species_and_evidence_class_are_explicit_and_the_transfer_claim_is_a_hypothesis():
+    by = {r["id"]: r for r in J("records/records.json")["records"]}
+    for r in by.values():
+        text = json.dumps(r["payload"])
+        if r["kind"] == "Claim":
+            assert "[species:" in text and "evidence_class:" in text, r["id"]
+    assert by["gx-transfer-hypothesis-zebrafish-to-flyingfish"]["payload"]["origin"] == "hypothesis"
+    assert "proposed_transfer" in by["gx-transfer-hypothesis-zebrafish-to-flyingfish"]["payload"]["context"]
+    assert by["gx-problem-lat4a-identity"]["payload"]["original"]["status"] == "unresolved"
+    assert not [r["id"] for r in by.values() if r["kind"] == "Claim" and "lat4a" in r["id"] and r["id"] != "gx-daane-lat4a-kcnh2a-source"]
+
+
+def test_authors_in_statements_match_the_stored_europe_pmc_record():
+    by = {r["id"]: r for r in J("records/records.json")["records"]}
+    meta = json.loads((D / "artifacts" / "europepmc_PMC8294118.json").read_text())["resultList"]["result"][0]["authorString"]
+    assert meta.startswith("Xu P") and "Xu et al." in by["gx-mirrorwing-assembly-annotation"]["payload"]["statement"]
+    assert "Ding" not in json.dumps(by)
+
+
+# ---- data invariants ------------------------------------------------------------------------
+
+
+def test_genes_ids_come_from_the_stored_zfin_files_and_lat4a_is_not_a_row():
+    rows = list(csv.DictReader(open(D / "genes.csv")))
+    assert len(rows) == 22 and "lat4a" not in {r["symbol"] for r in rows}
+    gene_txt = (D / "artifacts" / "zfin_gene_selected.tsv").read_text()
+    for r in rows:
+        assert r["zfin_id"] in gene_txt and re.fullmatch(r"ZDB-GENE-\d{6}-\d+", r["zfin_id"]) and re.fullmatch(r"ENSDARG\d{11}", r["ensembl_gene"])
+
+
+def test_missing_values_stay_missing_in_the_expression_table():
+    rows = list(csv.DictReader(open(D / "zfin_expression_selected.csv")))
+    assert len(rows) == 2266
+    assert sum(1 for r in rows if r["sub_structure"] == "") > 1000, "empty source fields must stay empty, not become 0 or 'None'"
+    assert not [r for r in rows if r["sub_structure"] in ("0", "None", "nan")]
+
+
+def test_kcnh2a_facts_match_the_stored_rows():
+    exp = [r for r in csv.DictReader(open(D / "zfin_expression_selected.csv")) if r["symbol"] == "kcnh2a"]
+    ph = [r for r in csv.DictReader(open(D / "zfin_phenotype_selected.csv")) if r["symbol"] == "kcnh2a"]
+    assert len(exp) == 19 and {r["assay"] for r in exp} == {"Reverse transcription PCR"} and not ph
+    assert {"fin", "regenerating fin"} <= {r["structure"] for r in exp}
+
+
+def test_plot_manifest_hashes_match_files_and_inputs():
+    pm = J("plots/plot_manifest.json")
+    assert len(pm["plots"]) == 4
+    for p in pm["plots"]:
+        assert sha(ROOT / p["file"]) == p["sha256"]
+        for i in p["inputs"]:
+            assert sha(ROOT / i["path"]) == i["sha256"], i["path"]
+    assert pm["plots_code_sha256"] == sha(ROOT / "connectors/genomics/plots.py")
+
+
+def test_flyingfish_files_matched_figshare_and_the_id_mapping_beats_its_controls():
+    f = J("flyingfish_receipts.json")
+    assert all(v["md5_and_size_match"] for v in f["files"].values()) and f["annotation_totals"]["mRNA_in_gff"] == 23611
+    t = f["id_mapping_test"]
+    assert t["strict_hypothesis"]["rate"] > 0.85 and t["control_offset_plus1"]["rate"] < 0.1 and t["control_offset_minus1"]["rate"] < 0.1
+    assert t["strict_hypothesis"]["rate"] > 8 * max(t["control_offset_plus1"]["rate"], t["control_offset_minus1"]["rate"])
+
+
+def test_usable_gene_models_are_length_consistent_and_paralog_compatible():
+    f = J("flyingfish_receipts.json")
+    usable = [g for g in f["selected_genes"] if g["usable"]]
+    assert usable and all(0.95 <= g["alignment_covers_fraction"] <= 1.05 and g["paralog_compatible"] for g in usable)
+    not_used = {g["query"]: g for g in f["selected_genes"] if not g["usable"]}
+    assert any("zebrafish paralog" in g["paralog_note"] for g in not_used.values()), "a shhb best hit must not count for shha"
+    assert not [g for g in usable if g["raw_gn"].lower() in ("shhb", "fgf8a", "fgf8b")]
+    seqs = (D / "artifacts" / "flyingfish_selected_proteins.faa").read_text().count(">")
+    assert seqs == len(usable)
+
+
+# ---- regressions for flaws found by reading the output --------------------------------------
+
+
+def test_canon_accepts_zebrafish_paralog_suffixes_and_rejects_others():
+    assert FF.canon("kcnh2a") == "KCNH2" and FF.canon("KCNH2") == "KCNH2" and FF.canon("Piezo1") == "PIEZO1" and FF.canon("fgf8a") == "FGF8"
+    assert FF.canon("kcnh7") is None and FF.canon(None) is None and FF.canon("notagene") is None
+
+
+def test_fin_pattern_is_word_bounded_so_definitive_is_not_a_fin():
+    assert BI.FIN.search("pectoral fin") and BI.FIN.search("median fin fold") and BI.FIN.search("fin") and BI.FIN.search("fin bud")
+    assert not BI.FIN.search("definitive hemopoiesis") and not BI.FIN.search("finger") and not BI.FIN.search("final")
+
+
+def test_assembly_reading_states_offsets_and_that_ncbi_gene_is_a_different_assembly():
+    a = J("assembly_check.json")
+    for g, v in a["genes_checked_against_ucsc"].items():
+        assert any(h["overlap_bp"] > 0 for h in v["ucsc_danrer11_refseq_matches"]), g
+        assert v["ncbi_current_overlaps_zfin_span"] is False, g
+        assert not v["ncbi_gene_current"]["chraccver"].startswith("NC_0070"), g      # GRCz11 chromosomes are NC_007112-NC_007132
+    assert "NOT identical" in a["reading"] and "different assembly" in a["reading"]
+
+
+# ---- no signed links or credentials in anything committed ----------------------------------
+
+
+def _credential_hits(text):
+    from connectors.genomics.scrub_receipts import CRED
+    return CRED.findall(text)
+
+
+def test_no_file_under_data_or_connectors_or_tests_carries_a_signed_url_or_credential():
+    offenders = []
+    for base in ("data/genomics", "connectors/genomics", "tests/test_genomics.py"):
+        root = ROOT / base
+        for p in ([root] if root.is_file() else sorted(q for q in root.rglob("*") if q.is_file())):
+            if "__pycache__" in p.parts:
+                continue
+            try:
+                text = p.read_text(errors="ignore")
+            except OSError:
+                continue
+            if _credential_hits(text):
+                offenders.append(str(p.relative_to(ROOT)))
+    assert not offenders, f"signed URL or credential pattern in: {offenders}"
+
+
+def test_negative_control_the_scanner_does_flag_a_signed_url():
+    assert _credential_hits("https://s3-eu-west-1.amazonaws.com/b/x?" + SIGNED_QUERY)
+    assert not _credential_hits("https://ndownloader.figshare.com/files/28029993")
+
+
+def test_public_url_withholds_signed_links_and_keeps_ordinary_ones():
+    assert S.public_url("https://s3-eu-west-1.amazonaws.com/b/x?" + SIGNED_QUERY) is None
+    assert S.public_url("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=1") == "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=gene&id=1"
+    assert S.public_url("https://ndownloader.figshare.com/files/28029993") == "https://ndownloader.figshare.com/files/28029993"
+
+
+def test_figshare_receipts_keep_the_public_url_and_hashes_and_withhold_the_signed_hop():
+    f = J("flyingfish_receipts.json")["files"]
+    assert len(f) == 3
+    for name, v in f.items():
+        r = v["receipt"]
+        assert r["url"].startswith("https://ndownloader.figshare.com/files/") and "?" not in r["url"], name
+        assert r["final_url"] is None and r["redirect_host"] == "s3-eu-west-1.amazonaws.com", name
+        assert re.fullmatch(r"[0-9a-f]{64}", r["sha256"]) and re.fullmatch(r"[0-9a-f]{32}", r["md5"]) and v["md5_and_size_match"] and r["md5"] == v["figshare_md5"]
+
+
+def test_every_receipt_final_url_is_public_or_null():
+    for name in ("receipts.json", "flyingfish_receipts.json", "extra_receipts.json"):
+        def walk(n):
+            if isinstance(n, dict):
+                for k, v in n.items():
+                    if k == "final_url":
+                        assert v is None or S.public_url(v) == v, (name, v[:60] if v else v)
+                    walk(v)
+            elif isinstance(n, list):
+                for v in n:
+                    walk(v)
+        walk(J(name))
+
+
+def test_zfin_ensembl_ids_agree_across_two_zfin_files_and_the_check_says_it_is_not_independent():
+    c = J("id_crosscheck.json")
+    assert c["agree"] == c["of"] == 22 and "not an independent source" in c["limits"]
+    rows = {r["symbol"]: r for r in csv.DictReader(open(D / "genes.csv"))}
+    for sym, v in c["genes"].items():
+        assert rows[sym]["ensembl_gene"] == v["ensembl_1_to_1"] and v["ensembl_1_to_1"] in v["ensembl_in_zfin_gff_alias"], sym
+    # negative control: a wrong id must not count as agreeing
+    assert "ENSDARG00000000000" not in c["genes"]["kcnh2a"]["ensembl_in_zfin_gff_alias"]
+
+
+# ---- Daane 2021 layer (the paper was read in full; its PDF is not stored) -----------------------
+
+
+def test_daane_pins_are_verified_quotes_with_pdf_pages_and_the_pdf_is_not_in_the_repo():
+    p = J("daane2021_pins.json")
+    assert len(p["quotes"]) >= 30
+    for q in p["quotes"].values():
+        assert q["verified_verbatim"] is True and len(q["quote"].split()) <= 25
+        assert q["pdf_page"] is None or 1 <= q["pdf_page"] <= 19
+    assert {k: v["pdf_page"] for k, v in p["figures"].items()} == {"Figure 1": 3, "Figure 2": 5, "Figure 3": 6, "Figure 4": 7}
+    assert p["pdf"]["stored_in_repo"] is False and re.fullmatch(r"[0-9a-f]{64}", p["pdf"]["sha256"]) and p["pdf"]["pages"] == 19
+    assert not [x for x in ROOT.rglob("*.pdf") if "node_modules" not in x.parts and ".git" not in x.parts]
+    assert "THE PIN" in p["figures"]["Figure 4"]["what"] and "fig4_title" in p["figures"]["Figure 4"]["quotes"]
+
+
+def test_supplement_is_located_but_not_claimed_as_read():
+    s = J("daane2021_pins.json")["supplement"]
+    assert s["in_the_19_page_pdf"] is False and s["retrieved"] is False and "doi.org/10.1016/j.cub.2021.08.054" in s["where"]
+    assert {"Table S1", "Table S2", "Table S3", "Data S1A", "Data S1B", "Data S1C-S1N"} <= set(s["items"])
+    assert all("description_basis" in v for v in s["items"].values()), "each description says how it was derived"
+    assert "dx-submit" in s["items"]["Data S1A"]["status"]
+    acc = J("daane2021_pins.json")["accessions"]
+    assert {"PRJNA743939", "10.5281/zenodo.5082978", "ERX1428166"} <= set(acc)
+
+
+def test_chain_quotes_exist_and_the_chain_states_its_limits():
+    d = J("daane2021_chain.json")
+    qs = J("daane2021_pins.json")["quotes"]
+    ch, cp = d["chain"], d["perturbations"]
+    def ids(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k in ("quotes", "mechanism_quotes") and isinstance(v, list):
+                    yield from v
+                elif k.endswith("_quote") and isinstance(v, str):
+                    yield v
+                else:
+                    yield from ids(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from ids(v)
+    used = set(ids(d))
+    assert used and used <= set(qs), used - set(qs)
+    assert [s["step"] for s in ch["chain"]] == [1, 2, 3] and "NOT a validated mechanism" in ch["status"] and "NOT a prescription" in ch["status"]
+    text = json.dumps(ch["context"])
+    assert "flight" in text and "genomes_available_is_not_a_mutation_map" in ch["context"]
+    assert "not shown to be REQUIRED" in json.dumps(ch["chain"][1]) and "gain-of-function" in json.dumps(ch["chain"][1]).lower() or "gain of function" in json.dumps(ch["chain"][1]).lower()
+    assert "INFERRED" in json.dumps(ch["chain"][0])
+    assert "NOT" in cp["status"] or "Not" in cp["status"]
+    for c in cp["candidate_perturbations"]:
+        assert "unknown" in c and c["why"] and c["quotes"], c["id"]
+    assert any(c["id"] == "cp2" and "not tested" in c["status"] for c in cp["candidate_perturbations"])
+    assert "not_a_prescription" in cp and any("disagree" in json.dumps(a) for a in cp["zebrafish_alleles_in_the_paper"])
+
+
+def test_lat4a_resolution_is_probable_not_confirmed_and_keeps_the_conflicting_evidence():
+    r = J("lat4a_resolution_v2.json")
+    assert r["status"].startswith("PROBABLE slc43a2a") and "NOT confirmed" in r["status"] and r["evidence_against_or_unresolved"]
+    g = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    assert g["slc43a2a"]["zfin_gff_chr"] == "15" and g["slc43a2b"]["zfin_gff_chr"] == "10"
+    ra = r["residue_check"]
+    assert ra["slc43a2a"]["length"] == 153 and ra["slc43a2a"]["aa200"] is None and ra["slc43a2a"]["verdict"].startswith("INCONCLUSIVE")
+    assert (ra["slc43a2b"]["aa200"], ra["slc43a2b"]["aa326"]) == ("M", "D")
+    seqb = "".join((D / "artifacts" / "ncbi_NP_001008585.1_slc43a2b.faa").read_text().splitlines()[1:])
+    assert (seqb[199], seqb[325], len(seqb)) == ("M", "D", 592), "the recorded residues are what the stored protein says"
+    assert "supersedes" in r and "unchanged" in r["supersedes"]
+
+
+def test_daane_records_validate_pin_exact_versions_and_leave_the_first_24_unchanged():
+    from frontier import models, store
+    recs = J("daane2021_records.json")["records"]
+    assert len(recs) == 16
+    by = {r["id"]: r for r in recs}
+    for r in recs:
+        models.Record.model_validate(r)
+        if r["kind"] == "Evidence":
+            t = r["payload"]["target"]
+            assert by[t["id"]]["version"] == t["version"] and r["payload"]["evidence_kind"] != "observed" and r["payload"]["limitations"]
+        if r["kind"] == "Claim":
+            assert "[species:" in json.dumps(r["payload"]) and "evidence_class:" in json.dumps(r["payload"])
+    assert not store._unlicensed_available_content(recs)
+    assert all(r["payload"]["completeness"] == "recorded" for r in recs if r["kind"] == "Problem")
+    old = J("records/records.json")["records"]
+    assert len(old) == 24 and next(r for r in old if r["id"] == "gx-problem-lat4a-identity")["payload"]["original"]["status"] == "unresolved"
+    assert not (set(by) & {r["id"] for r in old}), "no id is reused: records are append-only"
+    assert by["gx-lat4a-is-probably-slc43a2a"]["payload"]["origin"] == "derived" and "Inference (probable, not confirmed)" in by["gx-lat4a-is-probably-slc43a2a"]["payload"]["title"]
+
+
+def test_record_contexts_quote_the_pinned_sentences_exactly():
+    qs = J("daane2021_pins.json")["quotes"]
+    recs = J("daane2021_records.json")["records"]
+    cites = []
+    for r in recs:
+        for m in re.finditer(r'\[([a-z0-9_]+)\] p\.(\d+|None): "([^"]+)"', json.dumps(r["payload"], ensure_ascii=False).replace('\\"', '"')):
+            cites.append(m.groups())
+    assert len(cites) >= 15
+    for qid, page, text in cites:
+        assert qs[qid]["quote"] == text and str(qs[qid]["pdf_page"]) == page, qid
+
+
+def test_manifest_v03_marks_lat4a_supported_not_author_stated_and_pins_the_new_files():
+    m = J("manifest.json")
+    assert m["manifest_schema"].startswith("genomics-manifest-0.3") and m["inferred"] and "SUPPORTED" in m["inferred"][0] and "not an author-stated zebrafish accession" in m["inferred"][0]
+    assert m["unresolved"][0].startswith("lat4a zebrafish accession") and m["counts"]["records_daane2021"] == {"Claim": 7, "Evidence": 6, "Problem": 3}
+    assert m["counts"]["records_supplement"] == {"Claim": 2, "Evidence": 2, "Problem": 1}
+    paths = {f["path"] for f in m["files"]}
+    assert {"data/genomics/daane2021_pins.json", "data/genomics/daane2021_chain.json", "data/genomics/lat4a_resolution_v2.json", "data/genomics/lat4a_resolution_v3.json", "data/genomics/daane2021_records.json",
+            "data/genomics/daane2021_supplement_records.json", "data/genomics/daane2021_supplement_sheets.json", "data/genomics/artifacts/ncbi_NP_956545.1_slc43a2a.faa",
+            "data/genomics/artifacts/ensembl_homology_ENSORLG00000009715.json", "data/genomics/artifacts/ensembl_homology_ENSORLG00000005019.json"} <= paths
+    assert "not an author-stated" in m["display_rules"]["unresolved_rule"] and "lat4a_resolution_v3.json" in m["display_rules"]["unresolved_rule"]
+    assert any("by the authors or by a residue check" in x for x in m["display_rules"]["must_not_say"]) and any("proven mutation map" in x for x in m["display_rules"]["must_not_say"])
+
+
+def test_a_manifest_that_overclaims_lat4a_is_rejected_by_the_schema():
+    jsonschema = pytest.importorskip("jsonschema")
+    v = jsonschema.Draft202012Validator(J("manifest.schema.json"))
+    m = J("manifest.json")
+    assert not list(v.iter_errors(m))
+    m["inferred"] = ["lat4a = slc43a2a, confirmed by the authors"]
+    assert list(v.iter_errors(m)), "the old 'probable' wording and an overclaim must both fail the 0.3 contract"
+
+
+def test_lat4a_supplement_rows_chain_and_control():
+    r, sh = J("lat4a_resolution_v3.json"), J("daane2021_supplement_sheets.json")
+    A, B = "ENSORLG00000009715", "ENSORLG00000005019"
+    cells = {s: [x["cells"] for x in v["rows"]] for s, v in sh["lat4a_rows"].items()}
+    assert [A, "lat4a", "F326L"] == next(c for c in cells["G - conv. aa subst."] if A in c)[:3]
+    assert next(c for c in cells["H - fin and limb genes"] if A in c)[:2] == [A, "lat4a"] and next(c for c in cells["H - fin and limb genes"] if B in c)[:2] == [B, "lat4b"]
+    assert next(c for c in cells["J - Exocoeidae phylop"] if A in c) == [A, "slc43a2a", "acc", 0.00837]
+    assert next(c for c in cells["I - Glider RER genes"] if B in c)[1] == "slc43a2b"
+    assert sh["workbook"]["sha256"] == "1ac98650f493036218837d235ed4451ff096d926fa50b797dcea4fc7fca52279" and sh["workbook"]["stored_in_repo"] is False
+    assert not [q for q in D.rglob("*.xlsx")], "the workbook is not stored"
+    assert r["status"].startswith("SUPPORTED") and "not author" not in r["status"] and "state no ZFIN accession" in r["status"]
+    z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    def hom(f):
+        return [h["id"] for h in json.loads((D / "artifacts" / f).read_text())["data"][0]["homologies"] if h["type"] == "ortholog_one2one"]
+    assert hom(f"ensembl_homology_{A}.json") == [z["slc43a2a"]["ensembl_gene"]] == ["ENSDARG00000036848"]
+    assert hom(f"ensembl_homology_{B}.json") == [z["slc43a2b"]["ensembl_gene"]] and r["negative_control"]["distinct_from_lat4a"] is True
+    assert z["slc43a2a"]["zfin_gff_chr"] == "15" and z["slc43a2b"]["zfin_gff_chr"] == "10"
+    import hashlib
+    for st in r["chain"]:
+        if "sha256" in st:
+            assert hashlib.sha256((D / "artifacts" / st["artifact"]).read_bytes()).hexdigest() == st["sha256"]
+    assert len(r["still_not_established"]) == 4 and any("inconclusive" in x for x in r["still_not_established"])
+
+
+def test_the_chain_check_fails_if_the_ortholog_or_the_label_is_changed(tmp_path):
+    """negative controls: the comparison used above must flag a swapped ortholog and a swapped sheet label."""
+    z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    hom = json.loads((D / "artifacts" / "ensembl_homology_ENSORLG00000009715.json").read_text())
+    def ids(h):
+        return [x["id"] for x in h["data"][0]["homologies"]]
+    assert ids(hom) == [z["slc43a2a"]["ensembl_gene"]]
+    hom["data"][0]["homologies"][0]["id"] = z["slc43a2b"]["ensembl_gene"]
+    assert ids(hom) != [z["slc43a2a"]["ensembl_gene"]], "a swapped ortholog is detected"
+    sh = J("daane2021_supplement_sheets.json")["lat4a_rows"]["J - Exocoeidae phylop"]["rows"]
+    assert [x for x in sh if "ENSORLG00000009715" in x["cells"]][0]["cells"][1] == "slc43a2a" != "slc43a2b"
+
+
+def test_the_earlier_lat4a_records_are_unchanged_and_the_new_ones_supersede_status_only():
+    old = {r["id"]: r for r in J("daane2021_records.json")["records"]}
+    new = J("daane2021_supplement_records.json")
+    ids = {r["id"] for r in new["records"]}
+    assert {"gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"} <= set(old) and not ({"gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"} & ids)
+    # Versions copied from the committed file at 1dc2aaa, deliberately independent of the data: an edit to a superseded record must fail here (they are append-only).
+    assert old["gx-lat4a-is-probably-slc43a2a"]["version"] == "218c2a7e5f10bf647bde0410c158ef5f3effe4e021e96b3a3e2b29fc776c6c1e"
+    assert old["gx-problem-lat4a-accession"]["version"] == "cd52c6d53994908fa1afc7187a0b3e5496c86890ce34c26f2dd059cd554993f9"
+    assert old["gx-lat4a-is-probably-slc43a2a"]["payload"]["title"].startswith("Inference (probable, not confirmed): the paper's lat4a is zebrafish slc43a2")
+    models_ = pytest.importorskip("frontier.models")
+    for rid in ("gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"):     # the stored version must still be the digest of the stored content
+        r = old[rid]
+        assert models_.make_record(models_.Draft.model_validate({k: r[k] for k in ("namespace", "kind", "id", "issuer", "source_uri", "visibility", "predecessor", "payload")}), created_at=r["created_at"])["version"] == r["version"], rid
+    assert len(old) == 16 and len(new["records"]) == 5 and ids == {"gx-daane-datas1-names-lat4a-as-slc43a2a", "gx-lat4a-is-slc43a2a-supported", "gx-problem-lat4a-residues", "gx-ev-datas1-lat4a-rows", "gx-ev-ensembl-ortholog"}
+    assert "append_only_note" in new and "kept" in new["append_only_note"] or "keep their versions" in new["append_only_note"]
+    claim = next(r for r in new["records"] if r["id"] == "gx-lat4a-is-slc43a2a-supported")["payload"]
+    assert "not author-stated" in claim["title"] and any("authors print no zebrafish accession" in x for x in claim["limitations"]) and any("inconclusive" in x for x in claim["limitations"])
+    by = {}
+    for r in new["records"]:
+        by[r["id"]] = r
+    for r in new["records"]:
+        if r["kind"] == "Evidence":
+            assert r["payload"]["target"]["version"] == by[r["payload"]["target"]["id"]]["version"], "evidence pins its exact target version"
+
+
+def test_corrected_sheet_descriptions_replace_the_guesses_without_editing_the_pins():
+    sh = J("daane2021_supplement_sheets.json")["sheets"]
+    assert "copy number" in sh["E - CNV"] and "contig" not in sh["E - CNV"] and "heterozygous" in sh["D - heterozygosity"] and "phyloP" in sh["J - Exocoeidae phylop"] and "noncoding" in sh["K - accel CNEs Exocoet."] and "contig" not in sh["E - CNV"]
+    assert len(sh) == 14
+    old = J("daane2021_pins.json")["supplement"]["items"]["Data S1C-S1N"]
+    assert "contigs (E)" in old["what"], "the pins file is left unchanged as the record of the earlier guess"

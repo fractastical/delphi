@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--pupal-wing-vein-intervein> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch07-08 (pupal-wing-vein-intervein): refutes, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If hexagons become irregular or elongated where growth adds directional traction, then in the late pupal wing (about 30-32 h APF) the cells of the longitudinal veins L3 and L4, which Etournay et al. 2016 showed undergo convergent extension and differ in shape from their neighbours, must be less often six-sided and more elongated than the cells of the adjoining inter-vein regions L2-L3, L3-L4 and L4-L5, within the same wing and frame." ;
+    delphi:passCriterion "Pre-registered. In each of WT_1, WT_2, WT_3, take the user-drawn frame-200 ROI polygons (Segmentation/UserFrameRoi.txt: distL3, distL4, distInterL2-L3, distInterL3-L4, distInterL4-L5) and assign each interior cell at frame 200 (and each frame from the last 2 h, by tracking the same cell ids and, for cells that divided, their descendants) to vein or inter-vein by the polygon containing its centre. Per wing, over the last 2 h: f6 and mean elongation magnitude for vein cells and for inter-vein cells. Supported if in at least two of three wings f6(inter-vein) - f6(vein) >= 0.05 and vein cells have the higher mean elongation (the premise that the vein is under directional traction). If vein cells are not more elongated, the premise fails and the force clause is not tested in that wing (counted as neither)." ;
+    delphi:failCriterion "Pre-registered. Refuted if in at least two of three wings vein cells are more elongated but f6(inter-vein) - f6(vein) <= 0, i.e. directional traction does not reduce hexagons. Differences in (0, 0.05) or wings split are 'mixed'. Inconclusive (underpowered) if fewer than 100 vein cells per frame are available. Diagnostic: the same comparison in the first 2 h (before veins are morphologically distinct), where no difference is expected; and area CV in vein versus inter-vein cells, to check that the size clause is not what separates them." ;
+    delphi:expectedObservation "Within one tissue at one time, the region under directional traction (vein, more elongated cells) has a lower six-sided fraction than the adjoining regions under more isotropic conditions (inter-vein), by at least 0.05." ;
+    delphi:disconfirmingObservation "Vein cells are more elongated but at least as often six-sided as inter-vein cells." ;
+    delphi:admissibleDatasets "Expert-segmented, tracked epithelia with author-defined regions of known different mechanical state and a per-cell shape tensor; not produced by a segmenter shown in this repo to round junctions." ;
+    delphi:inferenceMethod "Per wing, last 2 h: f6 and mean elongation per region class (vein vs inter-vein); difference thresholds as above, majority of wings; early-window comparison as the within-wing control." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Interior cells (no bond with the margin cell) were listed per frame with neighbour number, area and elongation magnitude sqrt(elong_xx^2+elong_xy^2) from the TissueMiner cells table. Each cell at frame 200 was assigned to vein (distL3, distL4) or inter-vein (distInterL2-L3, L3-L4, L4-L5) by the author-drawn polygon containing its centre (1,644-1,787 cells per wing, 19-33 conflicts dropped); earlier frames were assigned by cell id, and mother cells by their daughters' region through cell_histories when the daughters agreed. Per wing, for the last 2 h and the first 2 h: f6, mean neighbour number, mean elongation and area CV of vein and inter-vein cells, the difference f6(inter) - f6(vein), and whether vein cells were the more elongated." ;
+    rdfs:comment "Measured: -0.0685 median over wings of f6(inter-vein) - f6(vein) in the last 2 h (negative = vein cells more often hexagonal) (n = 83859, per wing -0.010, -0.086, -0.069; first 2 h median -0.023). Interpretation: Thompson's second condition, 'uniform forces', had only a weak within-disc test (elongation deciles in the wing-disc-timelapse run). The pupal wing offers author-defined regions that differ in mechanical history: Etournay et al. 2016 (eLife 5:e14334) showed convergent extension in veins and shape differences between vein and inter-vein cells in exactly these ROIs. Vein identity is used as the proxy for directional traction and cell elongation as the check that the proxy holds. The region polygons are drawn by the dataset authors at frame 200; earlier frames are assigned through TissueMiner cell ids and lineage. Data are already on disk from the pupal-wing-timelapse run of ch07-09; no vein/inter-vein statistics had been computed before this pre-registration." ;
+    delphi:evidenceAgainst "Pre-registered refutation criterion met in 3 of 3 wings: in the last 2 h vein cells are 1.5-1.8 times more elongated than inter-vein cells (premise holds) yet are at least as often six-sided: f6 0.75/0.84/0.83 in veins against 0.74/0.76/0.76 in inter-veins (difference -0.01 to -0.09). In the first 2 h, before veins are distinct, vein cells are not more elongated (ratio 0.8-1.0) and f6 differs by -0.03 to +0.02, as expected for the control window." ;
+    delphi:evidenceAgainst "Thompson's sentence says hexagons under directional traction become 'irregular or elongated'. This run operationalised 'irregular' as a lower six-sided fraction and finds the opposite; the 'elongated' half is literally what the data show: convergent extension stretches vein cells without breaking six-fold topology, and the stretched cells are if anything better ordered (SD of neighbour number 0.40-0.51 in veins against 0.49-0.51; area CV 0.24-0.25 against 0.27-0.31). Readers who take the disjunction at face value will count this as confirming the 'elongated' arm; the pre-registered reading, that traction disrupts hexagonal packing, is refuted." ;
+    delphi:evidenceAgainst "Part of the vein advantage may be the size clause rather than the force clause: vein cells have lower area CV, which the top-level RPE run associates with more hexagons. The two conditions are confounded here in the direction opposite to Thompson's expectation for traction." ;
+    delphi:evidenceAgainst "Region membership is defined at frame 200 by the authors' polygons and propagated backwards by cell identity and lineage; cells that moved across a boundary over 17 h keep their final label. Vein ROIs cover 134-171 interior cells per frame in the last 2 h (above the 100 pre-registered minimum) and 37-79 in the first 2 h, so the early control is less powered." ;
+    delphi:evidenceAgainst "Historical claim, one tissue, one lab; the within-disc elongation-decile result (wing-disc-timelapse run) went the other way (weakly fewer hexagons where cells are more elongated), so the force clause is unsettled across the two tissue states rather than refuted outright. Data were on disk before pre-registration (commit fa08361f); no vein/inter-vein statistic had been computed before it." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--pupal-wing-vein-intervein--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/pupal-wing-vein-intervein/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--pupal-wing-vein-intervein--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: TissueMiner example datasets WT_1, WT_2, WT_3: the three wild-type E-cadherin-GFP Drosophila pupal wing time-lapses of Etournay et al. 2015 (eLife 4:e07090), as TissueMiner SQLite databases with the authors' frame-200 region-of-interest polygons (Etournay et al. 2016, eLife 5:e14334)" ;
+    dct:description "three wild-type pupal wings, about 16-33 h APF; author-drawn ROI polygons for veins L3, L4 and inter-veins L2-L3, L3-L4, L4-L5 at frame 200" ;
+    delphi:hasChecksum "sha256:994779314e39a906b9e171c7f2da0b12cacd94708bb09d6a70236ca62cec53ae" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_1.tar.gz> ;
+    delphi:hasChecksum "sha256:119d0facc43b480a7673ef4b8e0405368cccca28fc9456ed0a8767d77c4792dd" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_2.tar.gz> ;
+    delphi:hasChecksum "sha256:db5de2a3b6a1547eac5a19227c90cd7408de4b54db6a8992847963996faa8df8" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_3.tar.gz> ;
+    prov:wasDerivedFrom <https://github.com/mpicbg-scicomp/tissue_miner#datasets> ;
+    dct:license "not stated for the data files; TissueMiner repository BSD-licensed (MPI-CBG), archives offered for public download" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--pupal-wing-vein-intervein> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/pupal-wing-vein-intervein/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor local session, hexagon follow-up)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.981Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch07-08 (pupal-wing-vein-intervein): refutes, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--pupal-wing-vein-intervein> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

@@ -1,0 +1,31 @@
+{
+  "run_tag": "infra36",
+  "items": [
+    {
+      "id": "voxcraft-modern-cuda-probe",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+      "args": [
+        "inputs/warm_queue_infra_voxcraft.json"
+      ],
+      "files": [
+        "frontier_compute/__init__.py",
+        "frontier_compute/portable_entry.py",
+        "frontier_compute/probe_entry.py",
+        "artifacts/voxcraft-probe/packet/source.tar.gz",
+        "artifacts/voxcraft-probe/packet/portable.json",
+        "inputs/warm_queue_infra_voxcraft.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2"
+      },
+      "timeout": "40m",
+      "inner_timeout_s": 1200,
+      "max_result_bytes": 1000000,
+      "priority": 1
+    }
+  ]
+}

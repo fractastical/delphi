@@ -1,0 +1,91 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Matched permutation test of GO/HPO morphogenesis–learning overlap via INDRA CoGEx" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    dct:description "Gene sets: M = human genes annotated (experimental evidence codes only, to limit annotation-cascade bias) to GO 'anatomical structure morphogenesis' (GO:0009653) or descendants, or to HPO 'abnormality of body morphology'-type branches; L = genes annotated to GO 'learning or memory' (GO:0007611) or descendants, or to HPO memory and learning phenotypes. Retrieve via INDRA CoGEx (GO and HPO edges are in the graph). Statistic: observed |M ∩ L| over the expected value under a matched null. Null: 10^5 permutations drawing gene sets of the same sizes in which each gene is replaced by a random gene from the same stratum of (number of distinct GO biological-process annotations: pleiotropy, in deciles; publication count from CoGEx literature edges: annotation bias, in deciles; GTEx expression breadth τ: housekeeping, in tertiles). Pre-registered 'wide overlap': observed/expected ≥ 1.5 with permutation p < 0.001. Refuted: observed/expected ≤ 1.1 or p > 0.05. Repeat on the bioelectric subset (ion channels and gap junctions: HGNC groups for voltage-gated channels, K2P, connexins, innexins, pannexins)." ;
+
+    delphi:proposedTest "Observed/expected overlap with permutation p under a null matched for pleiotropy, annotation depth and expression breadth, for all genes and for ion-channel and gap-junction genes, with pre-registered thresholds for 'wide overlap'." ;
+    delphi:context "Fails if: Strata are so collinear (highly studied genes are also highly pleiotropic and broadly expressed) that the matched null has too few genes per stratum to permute, making p-values unstable." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with GO and HPO identifiers, evidence-code filter, strata, threshold and the bioelectric subset definition. 2. Query INDRA CoGEx for annotations and publication counts; fetch GTEx breadth; record query hashes. 3. Run the stratified permutation test for all genes and for the bioelectric subset. 4. Compare with the repo's existing levin-2022-tame-19 verdict and record a revision if the verdict changes." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: indra-cogex" ;
+    skos:note "Tool: gene-set-statistics" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://discovery.indra.bio/> ;
+    rdfs:seeAlso <https://geneontology.org/> ;
+    rdfs:seeAlso <https://hpo.jax.org/> ;
+    rdfs:seeAlso <https://gtexportal.org/> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fnsys.2022.768201> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pone.0017258> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41598-018-19333-x> ;
+    rdfs:seeAlso <https://github.com/gyorilab/indra_cogex> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" .
+
+  <https://discovery.indra.bio/> dct:title "INDRA CoGEx" ;
+    dct:description "GO and HPO annotations and literature evidence counts" .
+  <https://geneontology.org/> dct:title "Gene Ontology" ;
+    dct:description "Term definitions and evidence codes" .
+  <https://hpo.jax.org/> dct:title "Human Phenotype Ontology" ;
+    dct:description "Phenotype annotations" .
+  <https://gtexportal.org/> dct:title "GTEx portal" ;
+    dct:description "Tissue expression for breadth (tau) stratification" .
+  <https://doi.org/10.3389/fnsys.2022.768201> dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:bibliographicCitation "Levin 2022, TAME" .
+  <https://doi.org/10.1371/journal.pone.0017258> dct:title "The Impact of Multifunctional Genes on \"Guilt by Association\" Analysis" ;
+    dct:bibliographicCitation "Gillis and Pavlidis 2011, The impact of multifunctional genes on guilt-by-association analysis" .
+  <https://doi.org/10.1038/s41598-018-19333-x> dct:title "Gene annotation bias impedes biomedical research" ;
+    dct:bibliographicCitation "Haynes, Tomczak and Khatri 2018, Gene annotation bias impedes biomedical research" .
+  <https://github.com/gyorilab/indra_cogex> dct:bibliographicCitation "INDRA CoGEx source" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to morphogenesis-cognition-gene-overlap, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.303Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to morphogenesis-cognition-gene-overlap: Matched permutation test of GO/HPO morphogenesis–learning overlap via INDRA CoGEx" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

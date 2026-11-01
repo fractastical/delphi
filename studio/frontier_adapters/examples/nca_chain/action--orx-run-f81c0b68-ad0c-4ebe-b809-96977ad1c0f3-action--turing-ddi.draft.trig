@@ -1,0 +1,50 @@
+@prefix this: <http://purl.org/nanopub/temp/delphi-evolve/frontier/action-orx-run-f81c0b68-ad0c-4ebe-b809-96977ad1c0f3-action--turing-ddi-7976c5c4628f> .
+@prefix sub: <http://purl.org/nanopub/temp/delphi-evolve/frontier/action-orx-run-f81c0b68-ad0c-4ebe-b809-96977ad1c0f3-action--turing-ddi-7976c5c4628f/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix de: <urn:x-delphi-evolve:vocab#> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  sub:action a de:FrontierAction ;
+    rdfs:label "Executed analysis (supervisor-reported done): Preregistered nonlinear-sweep analysis" ;
+    de:frontierRecord "node-a/Action/orx-run-f81c0b68-ad0c-4ebe-b809-96977ad1c0f3-action--turing-ddi@7976c5c4628fc7254a185fc44dc82ca9253c44ef7a9accdf6418a141d6568af6" ;
+    de:targetRecord "node-a/Claim/turing-ddi@7678f6c63e79dd1ddd976c2f972ab7c2ba11ee91099213e2ce7c6aeb88f6512f" ;
+    de:costStopBounds "Actual: 6 s wall on one local CPU host; no GPU, no paid model calls. Stop bound: the run's own completion; there was no separate budget." ;
+    de:environmentRecorded "NOT RECORDED by OpenResearch (interpreter, package versions, hardware unrecorded)" ;
+    de:epistemicStatus "a record of an action: it does not by itself show the action ran or that reuse helped" ;
+    de:usesRecord "node-a/Claim/turing-ddi@7678f6c63e79dd1ddd976c2f972ab7c2ba11ee91099213e2ce7c6aeb88f6512f" ;
+    de:acceptanceCriterion "A clean re-execution from the recorded code and the digest-pinned inputs reproduces the recorded output byte-for-byte." ;
+    de:acceptanceCriterion "Every link check between the run log, its inputs and its outputs passes, with a mutation control that changes the output." .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo sub:softwareAgent ;
+    prov:wasGeneratedBy sub:generation .
+  sub:softwareAgent a prov:SoftwareAgent ;
+    rdfs:label "frontier_adapters (software; model Claude Sonnet 5.5 authored the adapter)" .
+  sub:generation a prov:Activity ;
+    prov:wasAssociatedWith sub:softwareAgent ;
+    rdfs:comment "frontier_adapters.nanopub_draft 0.1.0; record sha256 of canonical payload 50cdde69963e785cbeb5bb107ee22e8b97dabf9957c59445f40e33c4e5d598b9" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:41:13.273544+00:00"^^xsd:dateTime ;
+    rdfs:label "Draft: Frontier Action orx-run-f81c0b68-ad0c-4ebe-b809-96977ad1c0f3-action--turing-ddi" ;
+    npx:hasNanopubType de:FrontierAction ;
+    de:publicationLimit "Draft only: unsigned, no trusty URI, not published to any nanopub network, not accepted, not independently reviewed." ;
+    de:publicationLimit "single-reader, not Codex-reviewed." ;
+    de:publicationLimit "Content held: NO. Only a digest and locator are carried; no source bytes or quote text." ;
+    de:signatureStatus "UNSIGNED DRAFT: no trusty URI assigned, not published to any nanopub network" .
+}

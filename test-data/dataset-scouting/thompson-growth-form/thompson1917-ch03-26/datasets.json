@@ -1,0 +1,131 @@
+{
+  "claim_id": "thompson1917-ch03-26",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:52:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "abdomen length and cephalothorax (or total) length per individual Artemia",
+    "salinity (or water density) of the rearing or sampling water for each individual",
+    "population / lineage, sex and age or instar as covariates",
+    "temperature and food as covariates"
+  ],
+  "datasets": [
+    {
+      "id": "dryad",
+      "name": "Dryad Digital Repository (search API)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=Artemia&per_page=20",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:44:00Z", "method": "HEAD landing_url (200); GET search API for 'Artemia' (30 hits), 'Artemia salinity morphology' (0), 'brine shrimp morphology salinity' (0)", "http_status": 200 },
+      "variables_present": [
+        "30 Artemia datasets, mostly genetics, parasites, taphonomy and thermal tolerance; one salinity-tolerance experiment (dryad.366nd) with survival, not morphometrics"
+      ],
+      "variables_missing": [
+        "no dataset pairing abdomen/cephalothorax lengths with salinity"
+      ],
+      "scope": "Repository-wide; Artemia content is not morphometric",
+      "evidence": "API total 30 for q=Artemia; titles listed in search_log; 0 hits for the two salinity-morphology queries",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-366nd-artemia-gut-microbiota-salinity",
+      "name": "Data from: Niche limits of symbiotic gut microbiota constrain the salinity tolerance of brine shrimp",
+      "landing_url": "https://datadryad.org/stash/dataset/doi:10.5061/dryad.366nd",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.366nd",
+      "doi": "10.5061/dryad.366nd",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:46:00Z", "method": "GET Dryad dataset JSON", "http_status": 200 },
+      "variables_present": [
+        "Artemia reared experimentally across a salinity series (sterile vs with microbiota); storageSize 73,481 bytes"
+      ],
+      "variables_missing": [
+        "abstract reports survival at each salinity; no mention of body-part lengths or allometry"
+      ],
+      "scope": "One lab experiment on salinity tolerance; also mirrored on Zenodo as record 4973087",
+      "evidence": "Dataset JSON abstract: 'in sterile conditions, Artemia had low survival at all salinities...'; license https://spdx.org/licenses/CC0-1.0.html; storageSize 73481",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo",
+      "name": "Zenodo (records API)",
+      "landing_url": "https://zenodo.org/",
+      "access_url": "https://zenodo.org/api/records?q=Artemia%20AND%20(morphometric%20OR%20morphology%20OR%20abdomen)&type=dataset&size=10",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:45:00Z", "method": "HEAD landing_url (200); GET records API for 'Artemia salinity morphometric' type=dataset (5360 loose hits, none morphometric Artemia) and 'Artemia AND (morphometric OR morphology OR abdomen)' type=dataset (1 hit, a stickleback dataset)", "http_status": 200 },
+      "variables_present": [
+        "Dryad mirrors of Artemia genetics / tolerance datasets (4973087, 4938751, 4972782, 5011223, 4950997)"
+      ],
+      "variables_missing": [
+        "no Artemia body-proportion-by-salinity table; 4950997 'ontogeny of tolerance curves' holds only Survival time.txt (30,193 bytes) and a Mathematica notebook"
+      ],
+      "scope": "Repository-wide",
+      "evidence": "hits.total 5360 and 1 for the two queries; record 4950997 files: Survival time.txt 30193 bytes, Survival Analysis.nb 961490 bytes",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-1074413-artemia-urmiana-cyst-biometry",
+      "name": "Biometrical Comparison of Artemia urmiana Cysts Between Rainy and Drought Years (Zenodo text record, via DataCite)",
+      "landing_url": "https://doi.org/10.5281/zenodo.1074413",
+      "access_url": "https://api.datacite.org/dois?query=Artemia%20salinity%20morphometric&page%5Bsize%5D=10",
+      "doi": "10.5281/zenodo.1074413",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:47:00Z", "method": "GET DataCite DOI search (record appears as resourceTypeGeneral Text); landing page not fetched", "http_status": 200 },
+      "variables_present": [
+        "cyst diameter biometry of Artemia urmiana in rainy vs drought (different-salinity) years, as a paper"
+      ],
+      "variables_missing": [
+        "cysts, not adult abdomen/cephalothorax proportions; a paper PDF, not a data table"
+      ],
+      "scope": "Lake Urmia only",
+      "evidence": "DataCite attributes: title 'Biometrical Comparison Of Artemia Urmiana Günther, 1899 (Crustacea: Anostraca) Cysts Between Rainy And Drought...', resourceTypeGeneral 'Text'",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-artemia-occurrences",
+      "name": "GBIF occurrences for genus Artemia (usageKey 2235232)",
+      "landing_url": "https://www.gbif.org/species/2235232",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2235232&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:48:00Z", "method": "GET species/match (EXACT, usageKey 2235232); GET occurrence count and basisOfRecord facet", "http_status": 200 },
+      "variables_present": [
+        "6,233 occurrence records (3,182 material samples, 1,681 preserved specimens, 937 living specimens, 386 human observations) with localities that could be joined to lake salinity"
+      ],
+      "variables_missing": [
+        "no body-part measurements; no salinity field"
+      ],
+      "scope": "Global genus-level occurrences",
+      "evidence": "count 6233; facet BASIS_OF_RECORD: MATERIAL_SAMPLE 3182, PRESERVED_SPECIMEN 1681, LIVING_SPECIMEN 937, HUMAN_OBSERVATION 386, OCCURRENCE 33, MATERIAL_CITATION 14",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "Artemia salinity morphology", "url": "https://datadryad.org/api/v2/search?q=Artemia%20salinity%20morphology", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "Artemia", "url": "https://datadryad.org/api/v2/search?q=Artemia&per_page=20", "hits": 30, "note": "resurrection ecology (td0g3), gut microbiota salinity tolerance (366nd), automixis, phylogeography, taphonomy, thermal tolerance; none morphometric" },
+    { "source": "Dryad", "query": "brine shrimp morphology salinity", "url": "https://datadryad.org/api/v2/search?q=brine%20shrimp%20morphology%20salinity", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "Artemia salinity morphometric, type=dataset", "url": "https://zenodo.org/api/records?q=Artemia%20salinity%20morphometric&type=dataset&size=15", "hits": 5360, "note": "loose matching; Artemia hits are Dryad mirrors of genetics/tolerance data and an Emiliania huxleyi salinity-morphology set (11186906)" },
+    { "source": "Zenodo", "query": "Artemia AND (morphometric OR morphology OR abdomen), type=dataset", "url": "https://zenodo.org/api/records?q=Artemia%20AND%20(morphometric%20OR%20morphology%20OR%20abdomen)&type=dataset&size=10", "hits": 1, "note": "the hit (5003628) is a stickleback plasticity dataset that feeds Artemia" },
+    { "source": "DataCite", "query": "Artemia salinity morphometric", "url": "https://api.datacite.org/dois?query=Artemia%20salinity%20morphometric&page%5Bsize%5D=10", "hits": 6, "note": "only Artemia hit is the A. urmiana cyst biometry paper (10.5281/zenodo.1074413)" },
+    { "source": "Figshare", "query": "Artemia salinity morphometric", "url": "https://api.figshare.com/v2/articles/search (POST search_for)", "hits": 1, "note": "a spiny-lobster thesis; irrelevant" },
+    { "source": "GBIF", "query": "species/match name=Artemia; occurrence count taxonKey=2235232", "url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2235232&limit=0", "hits": 6233, "note": "occurrences only" }
+  ],
+  "status": "gap",
+  "summary": "No public repository dataset pairs Artemia abdomen and cephalothorax lengths with rearing or habitat salinity; Dryad and Zenodo hold Artemia genetics, parasite, taphonomy and salinity-survival tables, GBIF holds 6,233 occurrences without measurements, and the classic morphometric series (Schmankewitsch 1875, Gilchrist 1960, Amat 1980s, Triantaphyllidis et al. 1997) remain in paper tables.",
+  "next_step": "Digitize the per-salinity morphometric tables from the Artemia literature (e.g. Triantaphyllidis et al. 1997 'International study on Artemia' and Amat's Spanish population series) into one table with salinity, population, sex and abdomen/cephalothorax lengths, or rear one population across a salinity series and measure.",
+  "obstacles_confirmed": [
+    "Morphometrics sit in paper tables rather than one open archive.",
+    "Morphometric data paired with exact salinity are scattered."
+  ]
+}

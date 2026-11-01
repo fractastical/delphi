@@ -1,0 +1,103 @@
+{
+  "claim_id": "darwin1859-ch02-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch02-13",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Among seed plant species, those that split most recently from their closest sampled relative (shortest terminal branch on a dated molecular phylogeny) have smaller native ranges than their congeners with longer terminal branches.",
+  "pass_criterion": "Pre-registered: tips of the GBMB tree of Smith & Brown 2018 (dated seed plant phylogeny built from GenBank sequences only) are matched exactly (binomial, underscores to spaces) to WCVP accepted non-hybrid species. Nearest-relative distance d = terminal branch length (Myr). Range size r = number of TDWG level-3 regions with a non-doubtful native, non-extinct WCVP record (species with r = 0 dropped). Genera qualify if >= 5 matched species and matched species >= 50% of the genus's WCVP accepted species. Within each qualifying genus, Spearman rho_g between d and r; the summary is the mean of Fisher-z(rho_g) weighted by (n_g - 3), back-transformed, with a two-sided combined z test. SUPPORTS if the weighted mean rho >= 0.10, combined p < 0.01 and rho_g > 0 in more than half of qualifying genera with at least one non-tied variable.",
+  "fail_criterion": "Pre-registered: REFUTES if the weighted mean rho <= 0. Any other outcome (0 < rho < 0.10, or not significant, or positive in at most half of genera) is MIXED. Fewer than 30 qualifying genera: inconclusive (underpowered). Tree or WCVP unobtainable: inconclusive (data-unavailable). Descriptive secondary statistics: the same weighted rho restricted to species native to Great Britain (GRB) genera with >= 3 matched species, and the pooled Spearman rho without genus stratification.",
+  "planned_datasets": [
+    "smith-brown-2018-gbmb",
+    "wcvp-kew-checklist"
+  ],
+  "interpretation": "'Very closely allied to other species, and in so far resemble varieties' is read as a short phylogenetic distance to the nearest relative, measured as the terminal branch length on a dated tree (half the patristic distance to the sister lineage). 'Much restricted ranges' is read as the number of botanical-country (TDWG level-3) units in which the species is native, a coarse range measure. Stratifying by genus controls clade differences in range size and rate; the sampling threshold limits inflation of terminal branches by unsampled relatives. Darwin's scope began with the British flora and extended to species generally; the global seed plant test is the general reading and the British subset is descriptive. Molecular divergence is a modern stand-in for Darwin's morphological closeness.",
+  "test_contract": {
+    "expected_observation": "Within genera, species with shorter terminal branches (closer nearest relatives) occupy fewer native regions.",
+    "disconfirming_observation": "Within genera, range size is unrelated to or larger for species with the closest relatives.",
+    "admissible_datasets": "A dated phylogeny of a broad plant clade built from sequence data (not from range data) and an independent expert-curated native-range checklist; open access; genera adequately sampled in the tree.",
+    "inference_method": "Within-genus Spearman correlation between terminal branch length and number of native level-3 regions, combined across genera by weighted Fisher z; thresholds rho >= 0.10 with p < 0.01 and positive in most genera for support, rho <= 0 for refutation."
+  },
+  "datasets": [
+    {
+      "id": "smith-brown-2018-gbmb",
+      "name": "Smith & Brown 2018, Constructing a broadly inclusive seed plant phylogeny (GBMB: GenBank-only dated tree with Magallón et al. 2015 backbone), release v0.1",
+      "landing_url": "https://github.com/FePhyFoFum/big_seed_plant_trees",
+      "doi": "10.1002/ajb2.1019",
+      "version": "v0.1 (GBMB.tre)",
+      "license": "public GitHub release accompanying the article",
+      "files": [
+        {
+          "download_url": "https://github.com/FePhyFoFum/big_seed_plant_trees/releases/download/v0.1/v0.1.zip",
+          "retrieved_at": "2026-10-31T21:14:08Z",
+          "byte_size": 11288503,
+          "sha256": "286d15e1ee13ea65998827f883fb642aa67f6976bd7d43c5646a81addcbdaf1e"
+        }
+      ],
+      "role": "terminal branch lengths (Myr) of 79,874 seed plant species: distance to the nearest sampled relative"
+    },
+    {
+      "id": "wcvp-kew-checklist",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv",
+      "landing_url": "https://sftp.kew.org/pub/data-repositories/WCVP/",
+      "doi": null,
+      "version": "release dated 2026-06-04 (Last-Modified of wcvp.zip)",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+          "retrieved_at": "2026-10-31T21:22:51Z",
+          "byte_size": 88179649,
+          "sha256": "d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa"
+        }
+      ],
+      "role": "accepted species, genus sizes and native TDWG level-3 ranges"
+    }
+  ],
+  "method": "Tip labels and terminal branch lengths were read from GBMB.tre (79,874 tips) and matched exactly to WCVP accepted non-hybrid species binomials; range size was the number of TDWG level-3 regions with a non-doubtful, native, non-extinct record (63,306 tips matched with a range). Genera with >= 5 matched species covering >= 50% of the genus's accepted species qualified (783 genera, 16,223 species; 716 with variation in both variables). Within each genus the Spearman correlation between terminal branch length and range size was computed, and the correlations were combined by Fisher z weighted by n - 3 with a two-sided z test; species of genera with a native British species were analysed the same way as a descriptive secondary.",
+  "measured": {
+    "value": 0.0264,
+    "unit": "weighted mean within-genus Spearman rho between terminal branch length (Myr) and number of native TDWG level-3 regions",
+    "n": 716,
+    "uncertainty": "combined two-sided p=0.00232; species in qualifying genera=16223",
+    "extra": {
+      "combined_p_two_sided": 0.00231617698853968,
+      "share_genera_rho_positive": 0.5125698324022346,
+      "n_genera_qualifying_incl_ties": 783,
+      "n_species_in_qualifying_genera": 16223,
+      "n_tree_tips": 79874,
+      "n_tips_matched_with_range": 63306,
+      "median_range_shortest_quartile_within_genus": 2.0,
+      "median_range_longest_quartile_within_genus": 2.0,
+      "pooled_spearman_rho_all_matched": 0.06280606472020447,
+      "british_genera_weighted_rho": 0.053044911800792516,
+      "british_genera_combined_p": 6.959972102728765e-10,
+      "british_genera_n": 317
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.65,
+  "caveats": [
+    "The association runs in Darwin's direction and is statistically detectable (weighted within-genus rho = 0.026, p = 0.002; 51% of genera positive; pooled rho without stratification 0.063; genera with British natives rho = 0.053), but it is far below the pre-registered support threshold of 0.10 and the median number of native regions is the same (2) in the quarter of species with the shortest and the quarter with the longest terminal branches within their genus. Hence MIXED: close relatedness explains almost none of the variation in range size.",
+    "Terminal branch length measures time since splitting from the closest sampled relative, not morphological closeness or 'variety-like' status, which is what Darwin observed; unsampled relatives lengthen terminal branches despite the 50% sampling threshold.",
+    "Range size is counted in TDWG level-3 botanical countries, a coarse unit: most species occupy 1-3 units, producing many ties that weaken rank correlations and cannot capture restriction within a country (Darwin's British examples).",
+    "GBMB dates rely on a backbone and secondary calibrations; terminal branches in poorly resolved genera are imprecise.",
+    "Name matching is exact on binomials; tree names that are synonyms in WCVP were dropped (about 21% of tips were unmatched or had no native range)."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  },
+  "preregistration": {
+    "tree_url": "https://github.com/FePhyFoFum/big_seed_plant_trees/releases/download/v0.1/v0.1.zip",
+    "tree_file": "GBMB.tre",
+    "wcvp_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+    "min_species_per_genus": 5,
+    "min_sampling_fraction": 0.5,
+    "min_genera": 30,
+    "rho_support": 0.1,
+    "alpha": 0.01
+  }
+}

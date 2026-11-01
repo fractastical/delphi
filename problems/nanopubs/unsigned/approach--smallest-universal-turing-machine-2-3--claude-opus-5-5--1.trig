@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Decidability route: regular invariants for the (2,3) machine on periodic backgrounds" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    dct:description "Fix the decision problem first, since the (2,3) machine has no halt state: say 'does the head ever reach cell n' or 'does the tape ever contain word v within distance n of the origin', which is how Smith's emulation reads off computation. Restrict to eventually periodic tapes u^ω · w · v^ω. Use the bbchallenge decider family, adapted to non-halting machines: closed tape languages, finite-automata reduction (FAR) and translated-cycler detection. They search for a regular language L of configurations that contains the initial configuration, is closed under the step relation, and implies the property or its negation. Enumerate background pairs (u, v) with |u|, |v| ≤ 8 and windows |w| ≤ 12. If a uniform regular invariant family appears (for example, the machine reduces on every periodic background to a counter or pushdown system whose reachability is decidable), state and prove it in Lean as a decidability theorem. Systematic non-existence of small invariants, together with growth patterns resembling Smith's system 0, is evidence in the other direction and identifies the hardest background classes." ;
+
+    delphi:proposedTest "A Lean-checked theorem that the chosen predicate is decidable for all eventually periodic initial tapes, which refutes universality under that definition. Short of that, a census giving, for each background up to the bound, either a verified regular invariant or an explicit undecided configuration." ;
+    delphi:context "Fails if: Many small backgrounds, including the blank one, resist all regular invariants up to large state counts, while showing irregular, nested head motion; the decidability route then probably cannot succeed." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Write the (2,3) rule table and a reference simulator; fix the observable (head-position or word-occurrence predicate) as the decision problem. 2. Port FAR and closed-tape-language deciders to non-halting predicates; validate on machines whose behaviour is known. 3. Run the enumeration over (u, w, v) and record which configurations admit regular invariants and with how many states. 4. If invariants follow a pattern, generalize by hand and formalize the decidability proof in Lean 4; otherwise publish the census of undecided cases." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Mathematics beyond current automation if the machine is in fact universal on periodic backgrounds; adapting halting-oriented deciders to observables is new work." ;
+    skos:note "Tool: turing-machine-enumeration" ;
+    skos:note "Tool: automata-theory" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.29.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.tcs.2008.09.051> ;
+    rdfs:seeAlso <https://bbchallenge.org/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.29.1.1> dct:title "Universality of Wolfram’s 2, 3 Turing Machine" ;
+    dct:bibliographicCitation "Smith 2020, Universality of Wolfram's 2,3 Turing machine (non-periodic background)" .
+  <https://doi.org/10.1016/j.tcs.2008.09.051> dct:title "The complexity of small universal Turing machines: A survey" ;
+    dct:bibliographicCitation "Woods and Neary 2009, survey defining standard, semi-weak and weak universality" .
+  <https://bbchallenge.org/> dct:bibliographicCitation "Busy Beaver Challenge: decider methods (FAR, closed tape languages) for proving non-halting via regular invariants" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to smallest-universal-turing-machine-2-3, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.295Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to smallest-universal-turing-machine-2-3: Decidability route: regular invariants for the (2,3) machine on periodic backgrounds" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,146 @@
+{
+  "claim_id": "thompson1917-ch03-21",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "growth or development rate measured at three or more temperatures within the normal (sub-optimal) range, per species or population",
+    "the temperature of each measurement, so the interval for Q10 can be declared",
+    "species identity and the rate type (growth vs development vs metabolic)",
+    "optionally a fitted temperature parameter (Arrhenius temperature or activation energy) per species as a secondary source"
+  ],
+  "datasets": [
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection of DEB parameters",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/species_list.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:08:00Z", "method": "HEAD landing_url (200); GET species_list.html with --compressed (200, 309,638 bytes); GET entries_web/Daphnia_magna/Daphnia_magna_par.html (200)", "http_status": 200, "bytes": 309638 },
+      "variables_present": [
+        "fitted Arrhenius temperature T_A per species (Daphnia magna entry shows 'T_A 6400 K Arrhenius temperature')",
+        "species identity and taxonomy per entry"
+      ],
+      "variables_missing": [
+        "raw growth-rate-by-temperature measurements in a single downloadable table (the per-entry data files hold the underlying observations but must be harvested entry by entry)",
+        "the temperature interval each T_A was fitted over"
+      ],
+      "scope": "7,451 distinct species entry links (onclick lnk('...')) in species_list.html; animals only",
+      "evidence": "species_list.html table rows carry phylum/class/order/family and model fields; the Daphnia magna parameter page lists T_A = 6400 K labelled 'Arrhenius temperature'. The collection is a fitted-parameter database, not a raw-rate table.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bionumbers",
+      "name": "BioNumbers (Harvard)",
+      "landing_url": "https://bionumbers.hms.harvard.edu/",
+      "access_url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&log=y&trm=Q10+growth",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:09:00Z", "method": "HEAD landing_url (200); GET search page for 'Q10 growth' (200, 21,927 bytes)", "http_status": 200, "bytes": 21927 },
+      "variables_present": ["isolated published Q10 values with source, e.g. 'Characteristic Q10 for growth and respiration processes', 'Q10 (temperature coefficient) for growth of E. coli B/r (21-37°C)', 'Q10 non-enzymatic 3.4: Q10 enzymatic 1.8'"],
+      "variables_missing": ["raw rates by temperature", "systematic species coverage (search returned about 20 entries, several on ion channels and circadian rhythm, not growth)"],
+      "scope": "Curated single numbers; search 'Q10 growth' returned roughly 20 result ids, only a few about growth",
+      "evidence": "Search HTML lists result titles including 'Characteristic Q10 for growth and respiration processes' and 'Q10 (temperature coefficient) for growth of E. coli B/r (21-37°C'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "biotime",
+      "name": "BioTIME",
+      "landing_url": "https://biotime.st-andrews.ac.uk/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:08:30Z", "method": "HEAD landing_url", "http_status": 200, "bytes": null },
+      "variables_present": ["assemblage abundance time series (per the site's stated content)"],
+      "variables_missing": ["individual or population growth rate", "development rate", "controlled temperatures"],
+      "scope": "Ecological community time series; not organismal growth-vs-temperature experiments",
+      "evidence": "Landing page reachable (200). BioTIME holds species abundance/biomass time series, which do not contain growth rate at declared temperatures; only HEAD was made.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository, as named by the assessor)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=Q10%20temperature%20growth%20rate&per_page=7",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:11:00Z", "method": "HEAD landing_url (200); GET search API", "http_status": 200, "bytes": null },
+      "variables_present": ["individual deposits with growth or development rates across temperatures (see the two Dryad datasets listed separately)"],
+      "variables_missing": ["Dryad itself is a repository, not a dataset"],
+      "scope": "Search 'Q10 temperature growth rate' returned 4 datasets",
+      "evidence": "Search JSON total 4: dryad.s0p50 (Drosophila embryogenesis across temperature), dryad.69p8cz993, dryad.q573n5tkw, dryad.4541m.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-forster-growth-development-thermal",
+      "name": "Data from: Growth and development rates have different thermal responses (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.87v26",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.87v26/download",
+      "doi": "10.5061/dryad.87v26",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:13:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 90589 },
+      "variables_present": ["compiled growth-rate and development-rate thermal responses across species (per the title and abstract, which contrast the two rate types and the temperature-size rule)"],
+      "variables_missing": ["column list not inspected (download not performed); exact temperature intervals unknown"],
+      "scope": "Multi-species compilation (abstract refers to intraspecific temperature-size rule across organisms); storageSize 90,589 bytes",
+      "evidence": "Dryad API: identifier doi:10.5061/dryad.87v26, publicationDate 2011-07-13, license CC0-1.0, storageSize 90589.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-thermodynamic-effect-rates-domains",
+      "name": "Data from: A widespread thermodynamic effect, but maintenance of biological rates through space across life's major domains (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.56s5d84",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.56s5d84/download",
+      "doi": "10.5061/dryad.56s5d84",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:13:30Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 258539 },
+      "variables_present": ["thermal response curves of biological rates (including growth) for species across bacteria, plants and animals, with the temperature of each measurement (per abstract)"],
+      "variables_missing": ["column list not inspected; which rows are growth vs other rates must be filtered after download"],
+      "scope": "Cross-domain compilation; storageSize 258,539 bytes",
+      "evidence": "Dryad API: identifier doi:10.5061/dryad.56s5d84, publicationDate 2018-10-10, license CC0-1.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-drosophila-embryogenesis-temperature",
+      "name": "Data from: Drosophila embryogenesis scales uniformly across temperature in developmentally diverse species (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.s0p50",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.s0p50/download",
+      "doi": "10.5061/dryad.s0p50",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:11:00Z", "method": "record returned in Dryad search API response (not fetched individually)", "http_status": 200, "bytes": null },
+      "variables_present": ["embryonic development timing at several temperatures for several Drosophila species"],
+      "variables_missing": ["growth rate (development only)", "taxa beyond Drosophila"],
+      "scope": "Several Drosophila species",
+      "evidence": "Listed in Dryad search JSON with license CC0-1.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "Q10 temperature growth rate", "url": "https://datadryad.org/api/v2/search?q=Q10%20temperature%20growth%20rate&per_page=7", "hits": 4, "note": "dryad.s0p50 relevant" },
+    { "source": "Zenodo", "query": "\"thermal performance curve\" growth rate database", "url": "https://zenodo.org/api/records?q=%22thermal%20performance%20curve%22%20growth%20rate%20database&size=7&sort=bestmatch", "hits": 397104, "note": "top hits are Dryad-mirrored TPC datasets (dryad.63xsj3tzv phytoplankton, dryad.9pc85c0, dryad.82p6d2j, dryad.pk0p2ngk9 Neurospora)" },
+    { "source": "Zenodo", "query": "\"Biotraits\" OR \"thermal responses\" database metabolic growth", "url": "https://zenodo.org/api/records?q=%22Biotraits%22%20OR%20%22thermal%20responses%22%20database%20metabolic%20growth&size=5&sort=bestmatch", "hits": 308442, "note": "surfaced dryad.87v26 and dryad.56s5d84" },
+    { "source": "DataCite", "query": "\"thermal performance\" growth rate temperature database (datasets)", "url": "https://api.datacite.org/dois?query=%22thermal%20performance%22%20growth%20rate%20temperature%20database&page%5Bsize%5D=7&resource-type-id=dataset", "hits": 5, "note": "single-taxon studies (crop pests, seeds, intertidal crustacean, frogs)" },
+    { "source": "BioNumbers", "query": "Q10 growth", "url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&log=y&trm=Q10+growth", "hits": 20, "note": "approximate count of result ids in page" }
+  ],
+  "status": "partial",
+  "summary": "No single open table gives raw growth rate at declared temperatures across many species. Add-my-Pet holds a fitted Arrhenius temperature for 7,451 animal species entries (a derived parameter, interval not declared); BioNumbers has a handful of published Q10 values; two Dryad compilations (dryad.87v26 growth vs development thermal responses, 2011; dryad.56s5d84 rates across life's domains, 2018) and many single-taxon thermal-performance deposits hold rate-by-temperature data from which Q10 over a declared sub-optimal interval can be computed.",
+  "next_step": "Download dryad.56s5d84 and dryad.87v26, filter rows to growth/development rates below the optimum, and declare the 10 °C intervals before computing; use AmP T_A as a secondary, derived comparison.",
+  "obstacles_confirmed": [
+    "Relevant experiments require compilation from many deposits.",
+    "Fitted temperature parameters (AmP T_A) are not the same object as a raw rate ratio, and tabulated Q10 values (BioNumbers) are a sparse sample."
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "claim_id": "darwin1859-ch12-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-04",
+  "project": "darwin-origin",
+  "problem": "species-area-exponent",
+  "approaches_run": [
+    "claude-opus-5-5--2 (sampling-only null)",
+    "grok-4-7--2 (logseries null, adapted)",
+    "grok-4-7--1 (power law vs METE-type on GIFT, adapted)"
+  ],
+  "status": "complete",
+  "hypothesis": "Native vascular plant richness of oceanic islands (GIFT islands >= 500 km from the mainland) lies far below the mainland species-area prediction at equal area; and, for the problem it belongs to, the island species-area relationship is a power law with a near-universal exponent around 0.25.",
+  "pass_criterion": "Pre-registered (PREREG.md, sha256 6573bfe3e5e1d4b9692910d12b74fbd67547131856c21a0fd1bee38272a6c6a2): claim supported if the median observed/predicted richness ratio of oceanic-proxy islands against a negative-binomial mainland power law is <= 0.5, at least 70% lie below the prediction and a one-sided Wilcoxon test of log ratios gives p < 0.01. Problem-level: universal power law if pooled z in [0.15, 0.35], bootstrap CI width < 0.1, all qualifying 60x30 degree groups' z intervals overlap the pooled one, DerSimonian-Laird tau < 0.05, and no alternative form beats the power law by AIC > 10 and held-out ELPD > 10.",
+  "fail_criterion": "Claim refuted if the median ratio >= 1. Universality refuted if any two qualifying groups have disjoint 95% z intervals or any group interval misses the pooled one.",
+  "planned_datasets": [
+    "gift-island-checklists-weigelt2020"
+  ],
+  "test_contract": {
+    "expected_observation": "GIFT native vascular richness of far-offshore islands is a small fraction of what mainland units of equal area hold, and island z clusters near one value.",
+    "disconfirming_observation": "Island richness at or above the mainland prediction (median ratio >= 1); or island exponents whose group-level intervals are disjoint.",
+    "admissible_datasets": "Public GIFT checklists of Tracheophyta (type Flora or Checklist, native status indicated, suitable for geographic analysis), one list per geographic entity (largest native richness); island areas from GIFT. Independent of the WCVP data used by the existing test of this claim.",
+    "inference_method": "Negative-binomial (NB2) maximum likelihood for every model; mainland power law predicts islands; group z by Wald; pooled z by bootstrap over islands; model selection by AIC and leave-one-group-out ELPD; thresholds fixed in PREREG.md."
+  },
+  "interpretation": "Darwin's 'oceanic islands' are proxied by GIFT entity_class Island with distance_to_mainland >= 500 km (fixed before inspecting data); 'equal continental areas' are GIFT mainland political units, botanical countries and regions (random subset of at most 400, seed 20261101). No physical-condition covariate (latitude, climate) is used in this test, unlike the WCVP test, so the 'not explained by physical conditions' clause is not tested. 'Island groups' are mechanical 60x30 degree cells, not archipelagos, because GIFT returns no group field.",
+  "datasets": [
+    {
+      "id": "gift-island-checklists-weigelt2020",
+      "name": "GIFT, Global Inventory of Floras and Traits (public API)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "doi": "10.1111/jbi.13623",
+      "version": "live API, retrieved 2026-11-01",
+      "license": "not verified here; see the GIFT terms of use",
+      "files": [
+        {
+          "download_url": "https://gift.uni-goettingen.de/api/index.php?query=geoentities",
+          "retrieved_at": "2026-11-01T09:47:30Z",
+          "byte_size": 1371719,
+          "sha256": "d2b0108030e625fc985439989bf1f182c2f580036149a1cbc65a8b7ce5c95773"
+        },
+        {
+          "download_url": "https://gift.uni-goettingen.de/api/extended/index.php?query=lists",
+          "retrieved_at": "2026-11-01T09:47:29Z",
+          "byte_size": 1074688,
+          "sha256": "344e2c4f4412ba08c9d315991b9f3820f8e1a9468459de558043382d744a4213"
+        },
+        {
+          "download_url": "https://gift.uni-goettingen.de/api/extended/index.php?query=checklists&listid=<id>",
+          "retrieved_at": "see derived/gift_manifest.csv.gz",
+          "byte_size": 343623794,
+          "sha256": "3ccf565e5d8845d8182d0da5abae7bb152f1599072051d668a70da135170ce78",
+          "note": "1533 per-list files; per-file URL, time, bytes and SHA-256 in derived/gift_manifest.csv.gz (the sha256 here is that manifest file's)"
+        }
+      ],
+      "role": "island and mainland native vascular plant richness and area"
+    }
+  ],
+  "method": "Part 2: 1,124 GIFT islands and 232 mainland entities, native richness per entity from the largest eligible checklist; NB2 fits of power, power+curvature, Gleason, Lomolino-type and logseries-placement (METE-type surrogate) forms; group, pooled, CV and island-versus-mainland analyses as pre-registered. Part 1: Coleman random-placement null on 5,130 grid cells (lognormal and logseries pools) with stochastic replicates, Preston canonical lognormal. See RESULTS.md.",
+  "measured": {
+    "value": 0.21601291362136876,
+    "unit": "median observed / mainland-predicted native vascular richness, GIFT islands >= 500 km from the mainland",
+    "n": 440,
+    "uncertainty": "share below prediction 0.891; one-sided Wilcoxon p = 5.53e-67",
+    "extra": {
+      "ch12_04": {
+        "mainland_n": 232,
+        "mainland_area_range_km2": [
+          2.499091,
+          4328183.204664
+        ],
+        "mainland_z": 0.2003366884070781,
+        "mainland_z_se": 0.019859837876326475,
+        "oceanic_proxy_n": 440,
+        "median_ratio": 0.21601291362136876,
+        "share_below_prediction": 0.8909090909090909,
+        "wilcoxon_p_one_sided": 5.525212643511411e-67,
+        "n_in_mainland_area_range": 243,
+        "median_ratio_in_range": 0.28251558441009317,
+        "share_below_in_range": 0.8600823045267489,
+        "verdict": "supports",
+        "all_islands_median_ratio": 0.2825672817737588
+      },
+      "island_sar_pooled_power": {
+        "b0": 4.55471026532382,
+        "z": 0.3069437307737165,
+        "z_se_wald": 0.00643016477201256,
+        "nb_alpha": 0.8366113314585779
+      },
+      "pooled_z_bootstrap_ci95": [
+        0.29546699875227267,
+        0.31904364465286156
+      ],
+      "pooled_quad": {
+        "z": 0.31156170657004223,
+        "q": -0.0047448335840264404,
+        "q_se_wald": 0.0010237018557368721,
+        "q_ci95": [
+          -0.00675128922127071,
+          -0.002738377946782171
+        ],
+        "local_z_at_min_area": 0.41523763754746923,
+        "local_z_at_median_area": 0.31096734065718584,
+        "local_z_at_max_area": 0.18330635560322822
+      },
+      "n_groups_qualifying": 16,
+      "groups_overlapping_pooled": 9,
+      "n_disjoint_group_pairs": 46,
+      "n_group_pairs": 120,
+      "tau_DL": 0.0543226681464641,
+      "group_z_range": [
+        0.13688764922217533,
+        0.48671764794339756
+      ],
+      "aic_advantage_over_pow": {
+        "quad": 17.75330161191414,
+        "gle": -835.028147735462,
+        "lom": 7.984717336155882,
+        "ls": -409.19471336222523
+      },
+      "cv_dELPD_vs_pow": {
+        "pow": 0.0,
+        "quad": 14.933417235007255,
+        "gle": -574.6812527014154,
+        "lom": 4.3378934167021725,
+        "ls": -143.22446676115396
+      },
+      "universal_rule": {
+        "U1_pooled_z_in_0.15_0.35": true,
+        "U2_ci_width_lt_0.1": true,
+        "U3_all_groups_overlap": false,
+        "U4_tau_lt_0.05": false,
+        "U5_no_alt_beats_pow": false
+      },
+      "universality_refuted": true,
+      "scale_dependent_supported": false,
+      "mete_type_rule": {
+        "aic_win": false,
+        "resid_win": false,
+        "outcome": "no win"
+      },
+      "island_sar_classification": "neither",
+      "robustness": {
+        "ols_log10_z": 0.3066016491153237,
+        "ols_log10_r2": 0.6211461453639766,
+        "nb_z_area_ge_1km2": 0.2560706904865301,
+        "n_area_ge_1km2": 570,
+        "z_by_isolation": {
+          "<100km": {
+            "n": 571,
+            "z": 0.33731876326784127,
+            "ci95": [
+              0.3214236795973633,
+              0.35321384693831925
+            ]
+          },
+          "100-1000km": {
+            "n": 242,
+            "z": 0.22521476005424815,
+            "ci95": [
+              0.19071629667708467,
+              0.2597132234314116
+            ]
+          },
+          ">1000km": {
+            "n": 311,
+            "z": 0.25290974458656607,
+            "ci95": [
+              0.2278209808125483,
+              0.2779985083605838
+            ]
+          }
+        }
+      },
+      "grok_n2": {
+        "calibration_island": "Borneo",
+        "A_cal": 740635.113921,
+        "S_cal": 7534,
+        "n_test": 1123,
+        "z_empirical": 0.30677764712302796,
+        "densities_feasible": 8,
+        "densities_inside": 0,
+        "outcome": "fail",
+        "no_discriminating_power_flag": false
+      },
+      "grok_n2_fine_exploratory": {
+        "z_empirical": 0.30677764712302796,
+        "log10_rho_matching_empirical_z": 4.468194078961855,
+        "rho_matching": 29389.627319789444,
+        "null_z_at_rho_1e6": 0.16132290024823198,
+        "null_z_at_rho_1e7": 0.11477789042186094,
+        "null_z_range_over_grid": [
+          0.07079053769147997,
+          0.8068521391074839
+        ]
+      },
+      "part1_null": {
+        "n_plausible": 1705,
+        "plausible_z_quantiles": {
+          "0": -1.989030609503441e-16,
+          "0.05": 0.01676090453262545,
+          "0.25": 0.17540030799022072,
+          "0.5": 0.4024879222870605,
+          "0.75": 0.6561670575441207,
+          "0.95": 0.9140651989491273,
+          "1": 0.9937370586959411
+        },
+        "plausible_z_sd": 0.28358098629063844,
+        "H1A_share_in_0.15_0.35": 0.22639296187683283,
+        "H1A": false,
+        "H1B": false,
+        "H1C": false,
+        "H1C_share_q_below_-0.01": 0.9442815249266863,
+        "plausible_median_z_by_amax": {
+          "1e-05": 0.7455137128938978,
+          "0.0001": 0.591142080868574,
+          "0.001": 0.41571503013736066,
+          "0.01": 0.2417285613414474,
+          "0.1": 0.1260548886829571
+        },
+        "plausible_median_z_by_D": {
+          "2": 0.2611652953519402,
+          "3": 0.38156968087125864,
+          "4": 0.48187958930426494,
+          "5": 0.5007549642622375
+        },
+        "plausible_median_z_by_J": {
+          "1e+07": 0.5797952139909792,
+          "1e+09": 0.24146110048264932
+        },
+        "H1C_stochastic": {
+          "n_cells": 518,
+          "share_ls_beats_pow_by_10": 0.6447876447876448,
+          "share_quad_beats_pow_by_10": 0.7065637065637066,
+          "share_gle_beats_pow_by_10": 0.3108108108108108,
+          "median_dAIC_pow_minus_ls": 39.053295075511926
+        },
+        "claude_n2_outcome": "fail"
+      },
+      "preston_isolate_z": 0.2639884728321965,
+      "preston_isolate_z_local_range": [
+        0.25932782144032984,
+        0.2736654072770377
+      ],
+      "preston_stochastic_isolate_z": 0.27194745701321954,
+      "preston_sample_z_a0.2": 0.3270167545326397
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.7,
+  "data_kind": "biological",
+  "caveats": [
+    "Verdict is for the claim's island-versus-mainland comparison on GIFT; the problem-level results (power law, universality, METE-type, sampling null) are in measured.extra and RESULTS.md.",
+    "GIFT 'Island' entities are heterogeneous (continental shelf islands, oceanic islands, differing checklist effort); distance_to_mainland >= 500 km is only a proxy for 'oceanic'.",
+    "No latitude or climate control in this test; the existing WCVP test of this claim has one.",
+    "The METE-type form is a logseries-placement surrogate (alpha ln(1 + A/A*)), not meteR/METE, which needs abundance totals and nested cells that island checklists do not give.",
+    "The 'group' unit is a mechanical longitude-latitude cell, not an archipelago; heterogeneity between cells mixes archipelago effects with sampling and taxonomy effects.",
+    "The grok-4-7 n=2 null was adapted (richness only, density as nuisance parameter) and its coarse pre-registered grid missed the density window; the fine sweep is post hoc.",
+    "Not run: claude-opus-5-5 n=1 and n=3, gpt-5-6-sol n=1 and n=2 (no GBIF/nested-survey/meta-analytic data pulled), grok-4-7 n=3 (Lean), and the Triantis et al. observed-z comparison of claude-opus-5-5 n=2."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-sonnet-5-5",
+    "run": "problems/runs/species-area-exponent",
+    "date": "2026-11-01"
+  },
+  "code": {
+    "fetch": "fetch_gift.py",
+    "part1": "part1_null.py",
+    "part2": "part2_analysis.py",
+    "fine": "part2_grok_fine.py",
+    "build": "build_result.py",
+    "run_all": "run_all.sh",
+    "dir": "problems/runs/species-area-exponent"
+  },
+  "preregistration": {
+    "file": "PREREG.md",
+    "sha256": "6573bfe3e5e1d4b9692910d12b74fbd67547131856c21a0fd1bee38272a6c6a2",
+    "timestamp_file": "PREREG.sha256"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "claim_id": "darwin1859-ch12-14",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:43:10Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.87,
+  "variables": {
+    "claim_asserts": "Forms that become naturalised are not generally closely allied to the aboriginal inhabitants, but are very distinct species, belonging in a large proportion of cases to distinct genera (de Candolle). The recorded statement adds that closely allied species tend to keep separate.",
+    "test_measures": "For 24 TDWG level-3 regions, odds ratio of genus novelty (genus absent from native genera G_R) among naturalised species N_R versus a pool P_R of species introduced in at least one other level-3 unit and with no record in the region. The verdict statistic is the fraction of regions with OR < 1 and one-sided Fisher p < 0.05: 23/24, median OR 0.601. Refutes if that fraction is at least two thirds. Median frac_novel_naturalised is 0.557 and does not enter the verdict.",
+    "match": "different"
+  },
+  "modality": {
+    "appropriate": false,
+    "note": "WCVP native versus introduced status is the right kind of data for whether a naturalised plant's genus is already native. The pass/fail comparison is not to the aboriginal inhabitants. It is to other introduced species that have no record in the region. A flora can meet 'a large proportion ... distinct genera' and still fail this test."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "interpretation treats the claim as comparative against a colonist pool 'rather than with zero', and says the novel-genus fraction does not enter the verdict. The quote's standard is that proportion: not generally closely allied, and in a large proportion of cases distinct genera. regions.csv shows the proportion can be high while OR is below 1: New Zealand North 0.723 of naturalised species in novel genera versus 0.820 of the pool (OR 0.574); Hawaii 0.765 versus 0.818 (OR 0.723). Both count as the opposite direction. The pool is not climate-matched; the caveat says that inflates pool novelty. That null is the modern naturalisation hypothesis, not de Candolle's proportion."
+  },
+  "scope": {
+    "claim_scope": "Naturalised plants and animals in new countries: their alliance to the native inhabitants, at genus level in a large proportion of cases.",
+    "test_scope": "Vascular plants in 24 pre-registered TDWG regions, all with at least 457 naturalised species. Genus absence is the alliance proxy. Animals are excluded. The comparative pool is global introduced species absent from the region.",
+    "narrower": true
+  },
+  "reasons": [
+    "Darwin's stated criterion, cited from de Candolle, is an absolute share: a large proportion of naturalised forms belong to distinct genera, and they are not generally closely allied to the natives. The test computes that share (median novel_nat 0.557; range in the result from 0.404 in Japan to 0.765 in Hawaii) and then excludes it from pass/fail.",
+    "The refutation is 23/24 regions with OR < 1. In those regions naturalised species are more likely than the external pool to fall in a genus that already has a native species. That can be true where most naturalised species are still in genera absent from the flora (New Zealand, Hawaii, Tasmania 0.674, Mauritius 0.695). Those outcomes satisfy the quote and are scored as refutations.",
+    "Genus membership is the level the quote names, so it would be a fair proxy if the verdict used frac_novel_naturalised. Plants-only would then be a declared narrowing. The quantity that actually produces 'refutes' is the excess over P_R, which the author did not assert. Germany (novel_nat 0.419) and Japan (0.404) would be relevant to 'not generally' and 'a large proportion'; they are not separated from regions where the proportion holds."
+  ],
+  "what_would_change_it": "Make the verdict the share of naturalised species whose genus has no native species in the region, against 'a large proportion' and 'not generally' (for example a majority of regions with novel_nat above one half), and do not require an excess over species introduced elsewhere. A climate-matched null would still be a different claim unless the recorded wording stated that comparison.",
+  "files_read": ["result.json", "analysis.py", "derived/regions.csv", "derived/summary.json", "derived/fetch_log.json"]
+}

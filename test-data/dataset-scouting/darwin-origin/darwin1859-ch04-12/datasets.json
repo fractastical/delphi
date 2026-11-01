@@ -1,0 +1,121 @@
+{
+  "claim_id": "darwin1859-ch04-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:55:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "mating system / selfing vs outcrossing status per species or lineage (incl. hermaphrodites)",
+    "genomic evidence of recombination or outcrossing (heterozygosity, LD, allele divergence, meiosis genes) in candidate long-term selfers/asexuals",
+    "age (divergence time) of putatively asexual or strictly selfing lineages"
+  ],
+  "datasets": [
+    {
+      "id": "tree-of-sex-database",
+      "name": "Tree of Sex database (Tree of Sex Consortium 2014), plant/invertebrate/vertebrate sexual-system tables",
+      "landing_url": "https://www.treeofsex.org/",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.v1908",
+      "doi": "10.5061/dryad.v1908",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T07:40:00Z", "method": "GET Dryad API dataset metadata for doi:10.5061/dryad.v1908 (the Dryad deposit of the data paper doi 10.1038/sdata.2014.15, which resolved 200 via doi.org); GET treeofsex.org landing -> 200", "http_status": 200, "bytes": 11171435 },
+      "variables_present": ["sexual system per species, incl. hermaphroditic / monoecious classes (literature-compiled)"],
+      "variables_missing": ["outcrossing or selfing rate per species", "genomic recombination evidence", "lineage ages"],
+      "scope": "Abstract states sexual-system data for 11038 plant, 709 fish, 173 amphibian, 593 non-avian reptile, 195 bird, 479 mammal and 11556 invertebrate species; files plant.data19may2014.zip, invert.data-may19.csv, vert.data-may19.csv; storageSize 11171435 bytes.",
+      "evidence": "Dryad API returned title 'Data from: Tree of sex: a database of sexual systems', publicationDate 2015-06-13, license CC0-1.0, file list in usageNotes. Records sexual system, not a selfing rate.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank-assembly-bdelloidea",
+      "name": "NCBI GenBank / Assembly records for bdelloid rotifers (candidate ancient asexuals)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=Bdelloidea[Organism]&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok", "gpt"],
+      "checked": { "at": "2026-11-01T07:36:00Z", "method": "GET NCBI E-utilities esearch db=assembly term=Bdelloidea[Organism]; landing GET -> 200", "http_status": 200 },
+      "variables_present": ["genome assemblies of bdelloid rotifers (91 assembly records)"],
+      "variables_missing": ["outcrossing/mating-system annotation", "lineage age", "genomes for most hermaphroditic selfers"],
+      "scope": "Only the Bdelloidea taxon was queried; esearch returned count 91 assemblies. Not queried for other hermaphrodites or other asexual clades.",
+      "evidence": "esearchresult.count = '91' for db=assembly; sequence data only, with no outcrossing field.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-sra-bdelloidea",
+      "name": "NCBI Sequence Read Archive: Bdelloidea runs",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Bdelloidea[Organism]&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T07:37:00Z", "method": "GET NCBI E-utilities esearch db=sra term=Bdelloidea[Organism]; landing GET -> 200", "http_status": 200 },
+      "variables_present": ["raw sequencing reads for bdelloid rotifers (600 SRA records)"],
+      "variables_missing": ["processed heterozygosity/LD statistics", "population samples of selfing hermaphrodites were not queried"],
+      "scope": "Bdelloidea only; 600 SRA records (474 + 126 across two organism IDs per the query translation).",
+      "evidence": "esearchresult.count = '600'. Raw reads are open; analysis requires variant calling.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-synthetic-tree",
+      "name": "Open Tree of Life synthetic tree",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T07:38:00Z", "method": "POST /v3/tree_of_life/about (API, 200); GET landing page returned 503 at the same time", "http_status": 200 },
+      "variables_present": ["topological placement of taxa (about: 2,385,875 tips, 1931 source studies, created 2025-12-20)"],
+      "variables_missing": ["divergence ages", "reproductive-mode annotation"],
+      "scope": "Synthetic tree of all life; no branch ages or reproduction traits are in the about response.",
+      "evidence": "about response: root cellular organisms, num_tips 2385875, num_source_studies 1931, num_source_trees 2064. The landing page returned HTTP 503 (web UI), the API worked.",
+      "verdict": "partial"
+    },
+    {
+      "id": "try-plant-trait-database",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:30:00Z", "method": "GET landing page", "http_status": 200, "bytes": 96 },
+      "variables_present": [],
+      "variables_missing": ["not verified: trait list was not inspected"],
+      "scope": "Plant traits only; the page body fetched was a 96-byte meta-refresh to TryWeb/Home.php, so no trait or access terms were read.",
+      "evidence": "Landing returns an HTML meta refresh to TryWeb/Home.php; no data fetched. Cannot say whether a selfing/mating-system trait is included.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-selfing-rate-variation-within-species-2021",
+      "name": "Selfing rate variation within species is unrelated to life-history traits or geographic range position (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3j9kd51jw",
+      "access_url": null,
+      "doi": "10.5061/dryad.3j9kd51jw",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T07:41:00Z", "method": "GET Dryad API dataset metadata", "http_status": 200, "bytes": 489873 },
+      "variables_present": ["population-level selfing rates for plant species (from a database of plant species)"],
+      "variables_missing": ["animals", "age of selfing lineages", "genomic recombination evidence"],
+      "scope": "Plants only; storageSize 489873 bytes; published 2021-10-05.",
+      "evidence": "Dryad API: abstract says a database of plant species is used to test whether life-history traits predict selfing rate variation among populations. Found by DataCite search 'selfing rate outcrossing mating system database plants'.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "tree of sex selfing hermaphrodite", "url": "https://datadryad.org/api/v2/search?q=tree%20of%20sex%20selfing%20hermaphrodite", "hits": 0, "note": "no results for this long query" },
+    { "source": "DataCite", "query": "\"tree of sex\"", "url": "https://api.datacite.org/dois?query=%22tree%20of%20sex%22&page%5Bsize%5D=5", "hits": 20, "note": "found Dryad v1908 deposits (Plant/Invertebrate/Vertebrate data - Final) and the Tree of Sex consortium paper" },
+    { "source": "DataCite", "query": "obligate selfing hermaphrodite outcrossing genome", "url": "https://api.datacite.org/dois?query=obligate%20selfing%20hermaphrodite%20outcrossing%20genome&page%5Bsize%5D=1", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "selfing outcrossing rate species", "url": "https://datadryad.org/api/v2/search?q=selfing%20outcrossing%20rate%20species", "hits": 63, "note": "first five hits are single-species or plant studies, incl. the bimodal self-incompatibility dataset doi:10.5061/dryad.qt3m8jv7 (205959 bytes, CC0, 2011; angiosperm index of self-incompatibility, plants only)" },
+    { "source": "Dryad", "query": "bdelloid rotifer genome", "url": "https://datadryad.org/api/v2/search?q=bdelloid%20rotifer%20genome", "hits": 1, "note": "one hit: RepeatModeler/RepeatMasker output files, not a genomic recombination dataset" },
+    { "source": "DataCite", "query": "selfing rate outcrossing mating system database plants", "url": "https://api.datacite.org/dois?query=selfing%20rate%20outcrossing%20mating%20system%20database%20plants&page%5Bsize%5D=4", "hits": 4, "note": "found Dryad/Zenodo deposit 10.5061/dryad.3j9kd51jw" },
+    { "source": "NCBI E-utilities", "query": "Bdelloidea[Organism] in assembly and sra", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=Bdelloidea[Organism]&retmode=json", "hits": 91, "note": "SRA query returned 600" },
+    { "source": "Zenodo", "query": "\"tree of sex\"", "url": "https://zenodo.org/api/records?q=%22tree%20of%20sex%22&size=3", "hits": null, "note": "HTTP 403 (unusual-traffic block); not searched" }
+  ],
+  "status": "partial",
+  "summary": "Sexual-system data for ~23,000 species (Tree of Sex, Dryad CC0), plant selfing-rate compilations and tens of bdelloid genome/read records are public, but none records outcrossing frequency over geological time and no repository holds lineage ages with recombination evidence for putative long-term selfers or asexuals.",
+  "next_step": "Compile a list of candidate long-term selfers/asexuals from Tree of Sex and the literature, pull their genome assemblies/reads from NCBI, and add divergence ages from TimeTree or the source papers before pre-registering any test.",
+  "obstacles_confirmed": [
+    "'Unlimited generations' cannot be observed; rare outcrossing is hard to exclude from finite genomic samples.",
+    "Tree of Sex records sexual system classes, not selfing rates or outcrossing frequency.",
+    "Genomes for most hermaphroditic lineages were not located; only bdelloid counts were queried."
+  ]
+}

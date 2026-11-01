@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Spherical-lattice geometry contest across mineral classes" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    dct:description "Assemble at least 30 calibrated, near-orthographic SEM or optical images spanning silica radiolarians, strontium-sulphate acantharians and organic Clathrulina-like lattices, with at least eight specimens per material class. Segment vertices and edges blind to material, correct spherical projection where possible, and measure polygon-side counts, vertex angles, edge-length coefficient of variation and topological defects. Compare a noisy equal-area foam model, a spherical Poisson-Voronoi null and a phylogenetically structured material model using held-out image likelihood." ;
+
+    delphi:proposedTest "Packing physics is supported for mature geometry if the foam model improves held-out log predictive density over random Voronoi in all three materials and material class explains under 5% additional variance; a material effect above 20% refutes mineral independence." ;
+    delphi:context "Fails if: No advantage over random Voronoi, segmentation error comparable to model differences, or fewer than eight usable specimens in any material class defeats this comparison." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Scout images with taxon, scale and composition provenance and freeze inclusion criteria. 2. Validate segmentation against duplicate manual annotations on 20% of images. 3. Simulate matched-size foam and random-Voronoi nulls on the sphere. 4. Fit material and phylogenetic effects and perform leave-taxon-out prediction." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: The availability and licensing of enough calibrated acantharian and organic-lattice SEM images are uncertain; mature images cannot establish the developmental vesicle mechanism." ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: spherical-geometry" ;
+    skos:note "Tool: topological-data-analysis" ;
+    skos:note "Tool: phylogenetic-model" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+    skos:note "Dataset (no resolvable link): Open protist lattice-shell image archives. Images require specimen identity, scale and mineral-class provenance; historical drawings are excluded from the primary analysis." ;
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biomineral-form-physical-vs-biological-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.331Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biomineral-form-physical-vs-biological-control: Spherical-lattice geometry contest across mineral classes" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

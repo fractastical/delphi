@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 proof of coaxiality at Cowin remodeling equilibrium and shear-remodeling PDE" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Extend `ThompsonLaws/Mechanics.lean` (which already proves `principalDirections_orthogonal` for `thompson1917-ch16-05`) to formalize Cowin's (1986) continuum fabric-evolution law and Thompson's shear-removal mechanism (`thompson1917-ch16-06`). In Lean 4, define a symmetric positive-definite fabric tensor H, an orthotropic elasticity fourth-rank tensor C(H) coaxial with H, and an alignment evolution law dH/dt = f(sigma, H) driven by the deviatoric stress-fabric commutator [sigma, H] = sigma H - H sigma (which measures off-axis shear stress in the principal fabric frame).\n\nProve machine-checked theorems establishing that: (1) any stationary equilibrium dH/dt = 0 under non-degenerate principal stresses implies [sigma, H] = 0, so the eigenvectors of H and sigma are coaxial and trabecular trajectories cross orthogonally; and (2) couple this in a 3D numerical PDE simulation (`frontier_simulate`) to published altered-loading parameters from bird knee and sheep tarsal experiments (Pontzer et al. 2006; Barak et al. 2011) to test whether a pure shear-rejection law predicts the observed 10-to-18 degree trabecular reorientation within the experimental 4-to-6 week window." ;
+
+    delphi:proposedTest "A Lean 4 module compiling with zero `sorry` that proves coaxiality and Lyapunov stability of the zero-shear fabric equilibrium, paired with a numerical trajectory matching the published in vivo reorientation angles (Pontzer 2006; Barak 2011) within 3 degrees." ;
+    delphi:context "Fails if: Discovery of stable non-coaxial equilibria under positive-definite orthotropic elasticity in the formal analysis, or a simulated reorientation rate that misses published in vivo remodeling timescales by more than an order of magnitude under physiologically bounded bone apposition rates." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define symmetric 3x3 stress and fabric matrices and the commutator [sigma, H] in Lean 4 on top of Mathlib's matrix spectrum API. 2. Prove with zero sorry that vanishing of the off-diagonal shear components in the fabric frame is equivalent to [sigma, H] = 0 and implies shared orthogonal eigenvectors. 3. Prove Lyapunov stability of the aligned fixed point under the dissipative remodeling flow dH/dt = -k [H, [H, sigma]]. 4. Run a 3D numerical integration of the formalized remodeling law under a 20-degree load-axis rotation matched to the published sheep and bird joint-redirection protocols and compare predicted vs reported Δtheta." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Raw longitudinal in vivo micro-CT time series of experimentally load-redirected joints are not deposited in full 3D voxel form, so the causal reorientation comparison relies on published summary tables from Pontzer et al. (2006) and Barak et al. (2011) rather than raw voxel re-registration." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1115/1.3138584> ;
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01971> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2011.08.020> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1115/1.3138584> dct:title "Wolff’s Law of Trabecular Architecture at Remodeling Equilibrium" ;
+    dct:bibliographicCitation "Cowin 1986, Wolff's Law of Trabecular Architecture at Remodeling Equilibrium" .
+  <https://doi.org/10.1242/jeb.01971> dct:title "Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" ;
+    dct:bibliographicCitation "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" .
+  <https://doi.org/10.1016/j.bone.2011.08.020> dct:title "A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" ;
+    dct:bibliographicCitation "Barak et al. 2011, A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.313Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Lean 4 proof of coaxiality at Cowin remodeling equilibrium and shear-remodeling PDE" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

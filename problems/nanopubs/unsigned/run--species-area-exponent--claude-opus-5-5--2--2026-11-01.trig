@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01> a prov:Activity ;
+    rdfs:label "Run of approach species-area-exponent--claude-opus-5-5--2 (2026-11-01): partial, did not settle its target" ;
+    dct:description "The Coleman random-placement null was computed on 1,618 feasible grid cells (lognormal, log-series and Preston canonical pools): median null z 0.134, 5th to 95th percentile 0 to 0.925, 7.0% of cells in [0.20, 0.30]; total abundance J explains 79% of the null variance. The comparison with observed exponents was not run: the Triantis, Guilhaumon and Whittaker 2012 compilation is closed and no open copy was found. Claim-level verdict inconclusive (data-unavailable). The approach's own failure signature holds: with J free the null sits almost anywhere in (0, 1), so it does not discriminate." ;
+
+    dct:subject <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    prov:qualifiedAssociation <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#plan> ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    schema:actionStatus schema:ActiveActionStatus ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#settled>, <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#solves_problem> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/run-reports/species-area-exponent--claude-opus-5-5--2.md> ;
+    prov:generated <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/overnight-sar-null/result.json>, <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--overnight-sar-null> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json> .
+  <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#plan> a prov:Association ;
+    prov:hadPlan <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--2> .
+  <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--2> a prov:Plan ;
+    rdfs:label "Sampling-only null: do lognormal SADs and random placement reproduce z?" .
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" .
+  <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#settled> a schema:PropertyValue ;
+    schema:propertyID "settled" ;
+    schema:value false ;
+    schema:description "Whether the run settled the piece of the problem its approach names (forecasts/INSTRUCTIONS.md)" .
+  <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01#solves_problem> a schema:PropertyValue ;
+    schema:propertyID "solves_problem" ;
+    schema:value false ;
+    schema:description "Whether the logged artifacts meet the problem's acceptance criteria or hit one of its falsifiers definitively" .
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--overnight-sar-null> a delphi:Assessment ;
+    rdfs:label "Claim test produced by this run (test-data/claim-tests/darwin-origin/darwin1859-ch12-04/overnight-sar-null/result.json)" .
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/run-reports/species-area-exponent--claude-opus-5-5--2.md> ;
+    prov:wasGeneratedBy sub:logging .
+  sub:logging a prov:Activity ;
+    rdfs:label "Logging what the swarm ran against species-area-exponent--claude-opus-5-5--2 in problems/forecasts/runs.json, following problems/forecasts/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach runner (grok-4.7), executing a proposed approach and logging the result" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4.7" ;
+    dct:identifier "grok-4.7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.351Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Run of approach species-area-exponent--claude-opus-5-5--2 (2026-11-01): partial, did not settle its target" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Activity ;
+    npx:introduces <https://w3id.org/delphi/resource/run/species-area-exponent--claude-opus-5-5--2--2026-11-01> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

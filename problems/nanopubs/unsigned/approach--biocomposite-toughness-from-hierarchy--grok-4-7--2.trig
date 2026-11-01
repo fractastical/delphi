@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Self-similar hierarchy sweep of toughness against level count" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Transcribe the quasi-self-similar tension-shear recurrence of Zhang, Zhang and Gao 2011 from the paper's equations, not from memory of their plotted optimum. Sweep mineral volume fraction from 0.05 to 0.95 and the matrix failure shear strain over the factor-of-two box around the values printed in that paper. At each point compute stiffness, strength and toughness at hierarchy levels N = 1 through 8 under the equal-strength closure, and again with a weakest-link flaw inserted at the largest level. The compounding claim is that toughness keeps rising with N. The pre-registered window is N = 2 through 7 and mineral fraction 0.30 to 0.95. Compounding survives this model only if toughness is increasing throughout that window for every parameter point in the box." ;
+
+    delphi:proposedTest "The curve of toughness against N, and the set of volume fractions for which the first difference changes from positive to negative inside N = 2 through 7. Compounding is supported only if no such sign change occurs anywhere in the pre-registered box." ;
+    delphi:context "Fails if: No stationary point of toughness exists for any volume fraction in [0.05, 0.95], or the sign pattern reverses when the equal-strength closure is replaced by the weakest-link flaw, so the monotone-or-not answer is an artefact of one closure." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Code the recurrence so that it matches the paper's equations line by line, with a unit test against one printed numerical example if the paper gives one. 2. Sweep volume fraction and matrix failure strain. 3. Record toughness against N and the smallest N at which the first difference becomes negative. 4. Repeat with the weakest-link flaw at the top level. 5. Archive the curves and the parameter box." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.2010.1093> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0631609100> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1098/rspb.2010.1093> dct:title "On optimal hierarchy of load-bearing biological materials" ;
+    dct:bibliographicCitation "Zhang, Zhang and Gao 2011, On optimal hierarchy of load-bearing biological materials" .
+  <https://doi.org/10.1073/pnas.0631609100> dct:title "Materials become insensitive to flaws at nanoscale: Lessons from nature" ;
+    dct:bibliographicCitation "Gao, Ji, Jäger, Arzt and Fratzl 2003, Materials become insensitive to flaws at nanoscale: lessons from nature" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.346Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Self-similar hierarchy sweep of toughness against level count" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

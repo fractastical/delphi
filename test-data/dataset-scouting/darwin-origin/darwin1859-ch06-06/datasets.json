@@ -1,0 +1,97 @@
+{
+  "claim_id": "darwin1859-ch06-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:32:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "foraging stratum / habitat use per bird species (water, ground, canopy, ...)",
+    "locomotor or foot morphology per species (webbing, toe arrangement, tarsus length)",
+    "a time-calibrated bird phylogeny to place mismatches"
+  ],
+  "datasets": [
+    {
+      "id": "eltontraits-bird",
+      "name": "EltonTraits 1.0 (BirdFuncDat), Wilman et al. 2014",
+      "landing_url": "https://wiley.figshare.com/articles/dataset/Data_Paper_Data_Paper/3559887",
+      "access_url": "https://ndownloader.figshare.com/files/5631081",
+      "doi": "10.6084/m9.figshare.3559887.v1",
+      "license": "CC0",
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T12:31:30Z", "method": "Figshare API article 3559887 file list + ranged GET of first 1500 bytes of BirdFuncDat.txt", "http_status": 206, "bytes": 2199507 },
+      "variables_present": ["ForStrat-watbelowsurf, -wataroundsurf, -ground, -understory, -midhigh, -canopy, -aerial (percent use per species)", "Diet-* percentages", "BodyMass-Value", "Nocturnal"],
+      "variables_missing": ["foot webbing or toe morphology", "habit change over time"],
+      "scope": "BirdFuncDat.txt (2,199,507 bytes) is tab-separated with one row per bird species; MamFuncDat.txt (579,107 bytes) covers mammals. Row count not determined.",
+      "evidence": "Header row read: SpecID, PassNonPass, IOCOrder, BLFamilyLatin, Scientific, ForStrat-* columns, BodyMass-Value, etc. First rows are Struthio camelus, Rhea americana, ... Note the figshare collection DOI 10.6084/m9.figshare.c.3306933 resolved (HTTP 202 via doi.org) to the EltonTraits collection with one article.",
+      "verdict": "partial"
+    },
+    {
+      "id": "avonet",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al.)",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "access_url": null,
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T12:31:00Z", "method": "Figshare API article 16586228 (file list); spreadsheets not downloaded (over 1 MB)", "http_status": 200, "bytes": 21524673 },
+      "variables_present": ["bird morphological measurements and ecological data (per article title; column names not inspected)"],
+      "variables_missing": ["foot webbing as such (not verified)"],
+      "scope": "Files: AVONET Supplementary dataset 1.xlsx (21,524,673 bytes), Supplementary dataset 2.xlsx (1,241,301 bytes), ELEData.zip (17,758,930 bytes), ELECode.zip (38,817 bytes). Species counts not read.",
+      "evidence": "File names and sizes and licence returned by the API; spreadsheets too large to fetch under the 1 MB rule so columns are unverified.",
+      "verdict": "partial"
+    },
+    {
+      "id": "birdtree",
+      "name": "BirdTree",
+      "landing_url": "https://birdtree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:30:30Z", "method": "HEAD landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["bird phylogeny (not inspected)"],
+      "variables_missing": ["traits"],
+      "scope": "Landing page only.",
+      "evidence": "HTTP 200 on HEAD.",
+      "verdict": "partial"
+    },
+    {
+      "id": "vertlife",
+      "name": "VertLife",
+      "landing_url": "https://vertlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:30:30Z", "method": "HEAD landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["vertebrate phylogenies (not inspected)"],
+      "variables_missing": ["traits"],
+      "scope": "Landing page only.",
+      "evidence": "HTTP 200 on HEAD.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ebird",
+      "name": "eBird data products",
+      "landing_url": "https://ebird.org/science/download-ebird-data-products",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:30:30Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["bird occurrence and habitat records (not inspected)"],
+      "variables_missing": ["morphology"],
+      "scope": "Redirects to https://science.ebird.org/use-ebird-data/download-ebird-data-products.",
+      "evidence": "HTTP 200 after redirect; page contents not read.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Figshare API", "query": "article 16586228 and collection 3306933/articles", "url": "https://api.figshare.com/v2/articles/16586228", "hits": null, "note": "AVONET file list and EltonTraits article id 3559887 found" },
+    { "source": "Dryad", "query": "bird foraging behaviour foot morphology webbed", "url": "https://datadryad.org/api/v2/search?q=bird%20foraging%20behaviour%20foot%20morphology%20webbed&per_page=3", "hits": 0, "note": "no results" },
+    { "source": "DataCite", "query": "bird foraging ecology morphology traits database (type dataset)", "url": "https://api.datacite.org/dois?query=bird%20foraging%20ecology%20morphology%20traits%20database&resource-type-id=dataset&page%5Bsize%5D=3", "hits": 7, "note": "top hits unrelated to habit-structure mismatch (e.g. 10.5061/dryad.51c59zwmp ground-dwelling mammal and bird abundant-centre patterns, not inspected)" }
+  ],
+  "status": "partial",
+  "summary": "EltonTraits (CC0) gives per-species percent foraging stratum for all birds and AVONET gives per-species morphology (CC BY 4.0), so both sides of a habit-versus-structure comparison exist at species level; foot webbing or toe arrangement was not confirmed in either, and temporal order of change is not in any trait table.",
+  "next_step": "Download AVONET Supplementary dataset 1 and list its columns; check for a toe or webbing field, otherwise code webbing from taxonomy; join to BirdFuncDat.txt on Scientific name.",
+  "obstacles_confirmed": ["AVONET columns could not be verified without a 21 MB download.", "Habit-before-structure ordering needs a phylogeny with ancestral state reconstruction; BirdTree and VertLife landing pages were only checked for reachability."]
+}

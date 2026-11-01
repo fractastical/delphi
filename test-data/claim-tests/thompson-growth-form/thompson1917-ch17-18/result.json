@@ -1,0 +1,92 @@
+{
+  "claim_id": "thompson1917-ch17-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch17-18",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "preregistered_at": "2026-10-31T21:32:12Z",
+  "hypothesis": "Among related teleost species (same family), relative body depth (depth/length) and relative body width (width/length) vary inversely, so that the length-weight coefficient k = W/L^3, a proxy for volume at a given length, varies less across species than either relative transverse dimension.",
+  "pass_criterion": "Pre-registered. Species means from FishShapes v1 specimens (standard length SL, maximum body depth BD, maximum fish width FW, mass M; specimens with all four > 0). Variables per species: d = ln(BD/SL), w = ln(FW/SL), k = ln(M/SL^3). Families with >= 5 species are kept and each variable is centred on its family mean. (A) Spearman rho between family-centred d and w is < 0 with one-sided p < 0.05. (B) the SD of family-centred k is smaller than the SDs of family-centred d and of family-centred w. SUPPORTS if A and B both hold.",
+  "fail_criterion": "Pre-registered. REFUTES if the Spearman rho between family-centred d and w is >= 0 AND the SD of family-centred k is >= the smaller of the SDs of family-centred d and w. Any other outcome is MIXED. Fewer than 20 qualifying families or 200 species: inconclusive (underpowered).",
+  "planned_datasets": [
+    "fishshapes-v1-dryad-vt4b8gtvf"
+  ],
+  "interpretation": "Thompson's 'expansion in one transverse dimension compensated by compression in the other' is read as negative covariation of depth and width at a given length among related fishes; 'related' is operationalized as the same family (FishBase family names used in FishShapes). Length is standard length; 'thickness' is maximum fish width; 'volume at a given length' is mass/SL^3 (Thompson's k uses weight, so mass is the direct quantity). Family-centring removes between-family differences so that the comparison is among related species, as Thompson's haddock/plaice and shark/skate examples are. Because ln k is approximately d + w + ln(density x shape factor), condition B can hold only if d and w covary negatively; it is the 'volume less affected than the linear dimensions' clause. Secondary, reported but not part of the verdict: Thompson's named pair, plaice (Pleuronectes platessa) vs haddock (Melanogrammus aeglefinus), if both are in the data: depth ratio expected ~2, width ratio ~0.5, k ratio ~1. Note they are in different orders, so this pair is not 'related' by the family criterion.",
+  "test_contract": {
+    "expected_observation": "Within fish families, species that are relatively deeper are relatively narrower (negative family-centred correlation of ln(depth/SL) and ln(width/SL)), and ln(mass/SL^3) varies less than either.",
+    "disconfirming_observation": "Relative depth and width covary positively or not at all within families, and mass/SL^3 varies at least as much as the less variable of the two transverse dimensions.",
+    "admissible_datasets": "Measurements of standard length, maximum body depth, maximum body width and mass taken on the same fish specimens, across many species in many families, by a source independent of Thompson; species identified to FishBase taxonomy; public licence.",
+    "inference_method": "Species means, family-centring for families with >= 5 species, Spearman correlation of centred ln depth ratio vs ln width ratio (one-sided test for negative), and comparison of the SDs of centred ln k vs centred ln depth and width ratios, against the pre-registered thresholds."
+  },
+  "preregistration": {
+    "min_species_per_family": 5,
+    "min_families": 20,
+    "min_species": 200,
+    "alpha_one_sided": 0.05,
+    "species_mean": "geometric mean over specimens of each measurement",
+    "pair_check": {"plaice": "Pleuronectes platessa", "haddock": "Melanogrammus aeglefinus", "expected": {"depth_ratio": [1.5, 2.7], "width_ratio": [0.35, 0.7], "k_ratio": [0.8, 1.25]}}
+  },
+  "datasets": [
+    {
+      "id": "fishshapes-v1-dryad-vt4b8gtvf",
+      "name": "FishShapes v1: functionally relevant measurements of teleost shape and size on three dimensions (Price et al. 2022)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.vt4b8gtvf",
+      "doi": "10.5061/dryad.vt4b8gtvf",
+      "version": "Dryad version 183047 (published 2022-06-14)",
+      "license": "CC0 1.0 (Dryad); the README asks users to cite Price et al. 2022, Ecology 103:e3829",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/api/v2/versions/183047/download",
+          "retrieved_at": "2026-10-31T21:33:44Z",
+          "byte_size": 1705101,
+          "sha256": "c190a553be92d7985b6ead2dee503273b10601ea77b1b4293820234b80798bf6"
+        }
+      ],
+      "files_note": "Version zip containing FishShapes_specimensv1.csv (1,662,135 bytes, sha256 7447fdc92c5fd5c9ecf1d9713bbd4207d2de7ab4b2ea0e320871041da8e34264, matching Dryad's published digest; analysis.py checks it) and README.txt.",
+      "role": "standard length, maximum body depth, maximum fish width and mass of 16,523 museum specimens (Smithsonian NMNH), 1-3 per species"
+    }
+  ],
+  "method": "analysis.py downloads the Dryad version zip, verifies the specimen CSV against Dryad's SHA-256 digest, keeps the 16,377 specimens with positive mass, SL, depth and width, and takes geometric species means (6,091 species). For the 5,670 species in the 195 families with >= 5 species it computes d = ln(depth/SL), w = ln(width/SL) and k = ln(mass/SL^3), centres each on its family mean, and computes the Spearman correlation of centred d and w and the SDs of centred d, w and k. Per-family correlations and SDs are written to derived/families.csv; the plaice/haddock ratios are reported separately.",
+  "measured": {
+    "value": 0.5274,
+    "unit": "Spearman rho between family-centred ln(body depth/SL) and ln(body width/SL) across teleost species",
+    "n": 5670,
+    "uncertainty": "one-sided p (rho<0) = 1; 195 families with >= 5 species",
+    "extra": {
+      "pearson_r_d_w_centred": 0.5953,
+      "sd_centred_ln_depth_ratio": 0.2165,
+      "sd_centred_ln_width_ratio": 0.1777,
+      "sd_centred_ln_k": 0.3467,
+      "condition_A_negative_covariation": false,
+      "condition_B_k_less_variable": false,
+      "fraction_families_rho_negative": 0.0974,
+      "median_family_rho": 0.5574,
+      "n_specimens_used": 16377,
+      "n_species_all": 6091,
+      "n_families": 195,
+      "pair_check_plaice_vs_haddock": {
+        "depth_ratio": 2.093,
+        "width_ratio": 0.6447,
+        "k_ratio": 1.4389,
+        "plaice": {"depth_over_SL": 0.505, "width_over_SL": 0.0923, "k_g_per_mm3": 1.611e-05},
+        "haddock": {"depth_over_SL": 0.2413, "width_over_SL": 0.1432, "k_g_per_mm3": 1.12e-05}
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "caveats": [
+    "Within families, relatively deep species are also relatively wide, not narrower: the family-centred correlation is +0.53, positive in 90% of the 195 families (median +0.56). As a result ln k varies more (SD 0.35) than ln depth/SL (0.22) or ln width/SL (0.18), the opposite of Thompson's 'volume less affected than the linear dimensions'.",
+    "Both ratios are divided by standard length, so overall elongation (slender vs stocky species) makes them covary positively. The pre-registered test follows Thompson's own framing ('at a given length'), but it does not isolate depth-width compensation at fixed cross-sectional area; an analysis that removes elongation (e.g. using depth/width directly or a cross-section measure) was not pre-registered and was not run.",
+    "Thompson's named pair is partly borne out: plaice is 2.09 times as deep relative to length as haddock (expected ~2) and 0.64 times as wide (expected ~0.5, inside the pre-registered 0.35-0.7 band), but its k is 1.44 times haddock's, outside the pre-registered 0.8-1.25 'nearly equal' band. This pair is descriptive only and not part of the verdict.",
+    "Specimens are preserved museum fish; mass and width can change with fixation and ethanol storage, and specimens were chosen as adult-sized, not at matched length. These add noise to k but are unlikely to reverse the sign of a +0.53 correlation across 5,670 species.",
+    "Species means rest on 1-3 specimens; intraspecific variation and measurement error inflate all three SDs, and k (three measurements combined) gets the most.",
+    "preregistered_at is the time of the pre-registration commit (78fafafa); the committed pre-registration carried an estimated time (21:40Z) written before committing. The data were first downloaded after that commit; criteria are unchanged."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}

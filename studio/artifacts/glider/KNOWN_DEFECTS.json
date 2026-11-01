@@ -1,0 +1,12 @@
+{
+  "schema": "frontier.glider.known-defects/1",
+  "right_hand_print_files_are_left_parts": {
+    "revisions": ["r1-light", "r1-strong", "r2-light", "r3-daane"],
+    "files": "every stl/*_R*.stl (pectoral_R, pelvic_R-dec*)",
+    "what": "each _R print STL holds the LEFT part's vertices: the exporter laid the mirrored part flat with the mirrored frame (det -1), and the two mirrors cancel. Printing it gives a second left fin.",
+    "not_affected": "body, plugs and _L files; manifest/flight_model mass properties and the assembled GLB (they use the fish-frame parts, which were correct)",
+    "found_by": "reviewer claude-13 (r1) and root (r3, vertex sets identical)",
+    "fixed_in": "r4-daane-printfix (engineering.glider.build.right_pose: proper rotation, det +1; tests/test_glider.py checks mirror image and transform)",
+    "frozen_files_kept": "the affected revisions are immutable and were not edited; do not print their _R files"
+  }
+}

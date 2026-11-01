@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Modular Lean proof of Cook's construction via a light-cone splicing lemma" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> ;
+    dct:description "Formalize Rule 110 as a map on configurations ℤ → Bool and prove Cook's emulation of cyclic tag systems (CTS) as a stack of independent layers. The load-bearing general lemma is locality (light-cone splicing): the restriction of step^[t] x to the interval [a+t, b−t] depends only on x restricted to [a, b]. With it, any finite pattern embedded in the periodic ether can be checked on a finite window by kernel computation (`decide` or `rfl` on List Bool, never `native_decide`), and the result transfers to the infinite configuration. Layers: (1) the ether is spacetime-periodic: it returns to a spatial shift of itself after its temporal period (Cook gives horizontal period 14 and vertical period 7); (2) each glider Cook uses (A through H and the variants in his construction) is a finite word that, spliced into ether, reappears translated after its period; (3) each collision in Cook's table, at each phase and offset the construction uses, produces the stated outgoing gliders, checked on a finite window; (4) a glider calculus: an abstract configuration (a list of glider type, phase and gap triples), an interpretation map into Rule 110 configurations, and a simulation theorem saying that for gaps above a stated threshold the CA evolution realizes the abstract collision rules; (5) Cook's encoding of CTS tape, appendants and the periodic right-hand program stream, with a theorem that one CTS step corresponds to a bounded number of abstract collision rounds." ;
+
+    delphi:proposedTest "A Lean 4 module whose main theorem states: for every cyclic tag system and input word there is an initial Rule 110 configuration (ether plus a finite perturbation on the left and a periodic glider stream on the right) and a decoding map such that the CA evolution encodes every CTS step. It must compile with no sorry and only the three standard axioms, with every glider and collision fact a proved lemma." ;
+    delphi:context "Fails if: A collision required by the encoding that the kernel check refutes at the phase or gap the construction needs (a gap in Cook's table, itself a publishable finding), or kernel computations on the required windows that are too large to complete without native_decide, forcing the project to stall at layer 3." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define `rule110`, `step`, shift, and prove the light-cone splicing lemma by induction on t. 2. Encode the ether word and prove its spacetime periodicity on a finite window; lift to ℤ with the splicing lemma. 3. Transcribe Cook's glider catalogue and collision table from the open-access Complex Systems paper into Lean data; prove each entry by bounded kernel computation. 4. Define the abstract glider-list semantics and prove the simulation theorem for well-separated configurations. 5. Define cyclic tag systems in Lean and Cook's encoding; prove the one-step correspondence and the main theorem by induction on CTS steps. 6. Check `#print axioms` lists only propext, Classical.choice and Quot.sound; write a report in the format of the Thompson Lean reports." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Proof-engineering volume rather than new mathematics: Cook's construction has many glider spacings and timing constraints, and kernel-only evaluation of large windows may be slow. A month is likely enough for layers 1 to 3, not the full chain." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: cellular-automaton-simulation" ;
+    skos:note "Tool: proof-engineering" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch01-07> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.15.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1007/11786986_13> ;
+    rdfs:seeAlso <https://github.com/leanprover-community/mathlib4> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> a delphi:Concept, schema:Question ;
+    rdfs:label "Machine-check the universality of Rule 110" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.15.1.1> dct:title "Universality in Elementary Cellular Automata" ;
+    dct:bibliographicCitation "Cook 2004, Universality in elementary cellular automata" .
+  <https://doi.org/10.1007/11786986_13> dct:title "P-completeness of Cellular Automaton Rule 110" ;
+    dct:bibliographicCitation "Neary and Woods 2006, P-completeness of cellular automaton Rule 110" .
+  <https://github.com/leanprover-community/mathlib4> dct:bibliographicCitation "Mathlib 4; Mathlib.Computability provides Turing machine and partial-recursive definitions to which CTS universality can later be connected" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule110-universality-machine-checked, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.295Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule110-universality-machine-checked: Modular Lean proof of Cook's construction via a light-cone splicing lemma" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

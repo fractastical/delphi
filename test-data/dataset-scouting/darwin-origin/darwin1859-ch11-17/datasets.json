@@ -1,0 +1,124 @@
+{
+  "claim_id": "darwin1859-ch11-17",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "dated fossil plant occurrences from Antarctica (pre-glacial: Cretaceous to Eocene/Oligocene)",
+    "time-calibrated phylogenies of southern-hemisphere disjunct genera (e.g. Nothofagus)",
+    "modern distributions of those genera in South America, Australia and New Zealand",
+    "paleoclimate / palaeogeography for Antarctica and southern land connections"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database-antarctic-plant-occurrences",
+      "name": "Paleobiology Database: Antarctic fossil plant occurrences",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Plantae&cc=ATA&limit=1&rowcount",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T09:00:00Z", "method": "GET PBDB data1.2 occs/list.json with rowcount: base_name=Plantae cc=ATA (all), with interval=Cretaceous, interval=Paleogene; base_name=Nothofagus (all and cc=ATA)", "http_status": 200 },
+      "variables_present": [
+        "Antarctic plant fossil occurrences with age bounds (Plantae cc=ATA: 2130 records; overlapping Cretaceous: 1461; overlapping Paleogene: 314)",
+        "Nothofagus occurrences: 370 worldwide, 35 in Antarctica (cc=ATA)",
+        "taxon name, rank, age bounds in Ma (e.g. Nothofagus indet., Maastrichtian-Paleocene, 72.2-56 Ma)"
+      ],
+      "variables_missing": ["divergence-dated molecular phylogenies", "paleoclimate proxies"],
+      "scope": "Counts are of records overlapping the named interval, not strictly inside it. Many Antarctic records are indeterminate to genus (e.g. Plantae indet.).",
+      "evidence": "records_found values in API responses quoted above; the Nothofagus Antarctic record shown has eag 72.2 and lag 56.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank-nothofagus",
+      "name": "NCBI GenBank nucleotide records (Nothofagus example)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Nothofagus%5BOrganism%5D&retmode=json&retmax=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T09:03:00Z", "method": "GET E-utilities esearch db=nuccore term Nothofagus[Organism]; landing -> 200", "http_status": 200 },
+      "variables_present": ["DNA sequences for one genus (count 21,982) from which phylogenies can be built"],
+      "variables_missing": ["ready-made dated phylogeny", "other disjunct genera not queried"],
+      "scope": "One genus queried.",
+      "evidence": "esearchresult.count = '21982'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-occurrences-nothofagus",
+      "name": "GBIF occurrence records (modern distributions, Nothofagus example)",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Nothofagus&limit=0&hasCoordinate=true",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T09:04:00Z", "method": "GET GBIF occurrence search limit=0 hasCoordinate=true scientificName=Nothofagus (www.gbif.org returns 403 to curl; API works)", "http_status": 200 },
+      "variables_present": ["georeferenced modern occurrences (Nothofagus: 88,705 with coordinates)"],
+      "variables_missing": ["fossil data", "phylogeny"],
+      "scope": "One genus queried; the claim covers many genera.",
+      "evidence": "count = 88705.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-api",
+      "name": "Open Tree of Life (taxonomy and synthetic tree API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T09:06:00Z", "method": "POST tnrs/match_names names=[Nothofagus]; web landing returned 503 earlier", "http_status": 200 },
+      "variables_present": ["taxon matching and tree topology (Nothofagus matched ott_id 272015, rank genus)"],
+      "variables_missing": ["branch lengths / divergence times (not checked in the synthetic tree)", "geography of nodes"],
+      "scope": "Topology of relationships; not dated.",
+      "evidence": "API response listed ott_id 272015 for Nothofagus. Landing page web UI returned 503 when first probed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "plants-of-the-world-online",
+      "name": "Plants of the World Online (Kew)",
+      "landing_url": "https://powo.science.kew.org/",
+      "access_url": "https://powo.science.kew.org/api/2/search?q=Nothofagus&perPage=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T09:07:00Z", "method": "GET landing and API search", "http_status": 403, "note": "landing returned 403 and the API call returned a Cloudflare 'Just a moment' challenge page to curl" },
+      "variables_present": [],
+      "variables_missing": ["not verified"],
+      "scope": "Distribution data by region (per assessors); inaccessible to scripted requests here.",
+      "evidence": "HTTP 403 / challenge page.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "dryad-diversification-patterns-boeckella",
+      "name": "Diversification patterns in Boeckella (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/search?q=southern%20hemisphere%20biogeography%20Antarctica%20dispersal%20divergence%20time",
+      "access_url": null,
+      "doi": "10.5061/dryad.w9ghx3fpv",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T09:05:00Z", "method": "Dryad search result listing only (title and DOI); metadata not fetched", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["plants (Boeckella is a copepod genus)", "content not inspected"],
+      "scope": "Southern hemisphere animal genus; not relevant to a plant claim.",
+      "evidence": "Search hit title only.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB", "query": "occs base_name=Plantae cc=ATA", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Plantae&cc=ATA&limit=1&rowcount", "hits": 2130, "note": "Cretaceous-overlapping 1461, Paleogene-overlapping 314 from interval filters" },
+    { "source": "PBDB", "query": "occs base_name=Nothofagus", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Nothofagus&limit=1&rowcount", "hits": 370, "note": "35 with cc=ATA" },
+    { "source": "DataCite", "query": "Nothofagus phylogeny biogeography divergence dating", "url": "https://api.datacite.org/dois?query=Nothofagus%20phylogeny%20biogeography%20divergence%20dating&page%5Bsize%5D=5", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "southern hemisphere biogeography Antarctica dispersal divergence time", "url": "https://datadryad.org/api/v2/search?q=southern%20hemisphere%20biogeography%20Antarctica%20dispersal%20divergence%20time", "hits": 1, "note": "Boeckella (copepod), irrelevant" },
+    { "source": "DataCite", "query": "Antarctica Eocene fossil plants pollen dataset", "url": "https://api.datacite.org/dois?query=Antarctica%20Eocene%20fossil%20plants%20pollen%20dataset&page%5Bsize%5D=5", "hits": 2, "note": "Whale Fossils and Glossopterids in Malta; irrelevant" },
+    { "source": "GBIF", "query": "occurrence Nothofagus with coordinates", "url": "https://api.gbif.org/v1/occurrence/search?scientificName=Nothofagus&limit=0&hasCoordinate=true", "hits": 88705, "note": "count" }
+  ],
+  "status": "partial",
+  "summary": "PBDB holds dated Antarctic fossil plants (2,130 records, 35 Nothofagus), and GenBank/GBIF/OTL supply sequences, modern ranges and topology, but no dated phylogenies or paleoclimate data for the disjunct genera were found as repository datasets, so the ancestral-area test needs those compiled from papers.",
+  "next_step": "Pick 5-10 disjunct genera, pull PBDB Antarctic occurrences at genus level, assemble dated phylogenies from published supplements, and state the vicariance versus Antarctic-source predictions in the pre-registration.",
+  "obstacles_confirmed": [
+    "Antarctic plant fossils in PBDB are mostly indeterminate or higher-taxon records.",
+    "No repository deposit of dated southern-hemisphere plant phylogenies was found (DataCite hits 0).",
+    "POWO blocks scripted access."
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "claim_id": "thompson1917-ch07-13",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "3D segmentation of cells in plant parenchyma (or other near-equal-sized cell aggregates) at cell-wall resolution",
+    "per-cell face (neighbour) count and face shape for interior cells, with surface cells identifiable",
+    "cell-size uniformity per tissue so near-equal cells can be selected",
+    "tissue type labelled as parenchyma"
+  ],
+  "datasets": [
+    {
+      "id": "arabidopsis-embryo-image-collection",
+      "name": "A collection of 3D images of Arabidopsis thaliana embryos (INRAE)",
+      "landing_url": "https://doi.org/10.15454/HIIBKW",
+      "access_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.15454/HIIBKW",
+      "doi": "10.15454/HIIBKW",
+      "license": "etalab-2.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "HEAD doi.org (200, redirects to entrepot.recherche.data.gouv.fr); GET Dataverse API and DataCite API for the DOI",
+        "http_status": 200,
+        "bytes": 3184394240
+      },
+      "variables_present": [
+        "~100 3D confocal stacks of Arabidopsis thaliana embryos with cell walls stained (mPS-PI), voxel 0.17 x 0.17 x 0.35 um, 8-bit"
+      ],
+      "variables_missing": [
+        "no cell segmentation or face/neighbour counts in the record: raw image stacks only",
+        "embryo cells are a young growing subset, not mature parenchyma",
+        "no tension, adhesion or growth measurement"
+      ],
+      "scope": "One species, embryos from the one-cell stage upward (description says stages vary; text truncated in my output)",
+      "evidence": "Dataverse JSON: versionState RELEASED, 1 file at-embryo-collection.tar of 3,184,394,240 bytes (not downloaded), licence etalab-2.0; DataCite title 'A collection of 3D images of Arabidopsis thaliana embryos', publisher Portail Data INRAE, 2022.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "arabidopsis-shoot-meristem-segmentations",
+      "name": "Research data supporting 'Cell size and growth regulation in the Arabidopsis thaliana apical stem cell niche' (Apollo, Cambridge)",
+      "landing_url": "https://www.repository.cam.ac.uk/handle/1810/262530",
+      "access_url": "https://www.repository.cam.ac.uk/items/f7cdcf20-e8ca-4cf5-b7ab-90350a8d00b2",
+      "doi": "10.17863/CAM.7793",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET handle URL (200, redirected to the items/ page); read item metadata",
+        "http_status": 200
+      },
+      "variables_present": [
+        "confocal membrane stacks, segmentation data and cell lineage information for cells of the shoot apical meristem (6 plants)"
+      ],
+      "variables_missing": [
+        "plants were NPA-treated (per description), so not an untreated reference",
+        "not parenchyma and not equal-sized cells",
+        "no tension or independent mechanical measurement"
+      ],
+      "scope": "6 Arabidopsis thaliana shoot apical meristems",
+      "evidence": "Item page: files README.txt (1.66 KB) and PNAS.zip (4.89 GB, not downloaded); repository DOI https://doi.org/10.17863/CAM.7793; description 'Confocal membrane data, segmentation data, and cell lineage information for cells in the shoot apical meristem of 6 NPA-treated Arabidopsis plants'; licence CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=parenchyma",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET BioStudies search 'parenchyma' (5 hits) and 'plant cell 3D segmentation meristem' (2,382 hits); GET study JSON for S-BSST734",
+        "http_status": 200
+      },
+      "variables_present": [
+        "S-BSST734 'Dataset for annotation and analysis of complex 3D plant organs using 3DCoordX' (1 file, released 2021-12-31) is a plant 3D annotation dataset"
+      ],
+      "variables_missing": [
+        "the 5 'parenchyma' hits are human/animal tissue studies (lung, placenta, brain, joint), none plant",
+        "no study identified that is plant parenchyma with cell-level 3D segmentation"
+      ],
+      "scope": "Archive-wide",
+      "evidence": "totalHits 5 for 'parenchyma', top titles: Xenium prime on healthy human lung samples; HAPPY placenta histology; extracellular matrix phenotyping...; chronic meningeal inflammation; FPR2 in arthritis. 2,382 hits for the plant-segmentation query are an unranked broad match; top titles include Go-Nuclear (nuclei segmentation), S-BSST734, S-BIAD1800 (barley meristem CLAVATA).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "s-bsst734-3dcoordx-plant-organs",
+      "name": "Dataset for annotation and analysis of complex 3D plant organs using 3DCoordX",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BSST734",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BSST734",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET BioStudies study JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D plant-organ images annotated for analysis (title); authors from TUM, MPIPZ, JIC"
+      ],
+      "variables_missing": [
+        "species, cell types and whether cell-level segmentations are included were not visible in the study JSON I read",
+        "licence not shown in the fields I read"
+      ],
+      "scope": "Plant organs (ovule work per author list is not confirmed by the record)",
+      "evidence": "Study JSON attributes: Title as given, ReleaseDate 2021-12-31, AttachTo BioImages; the search listing gave 1 file.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "HEAD landing page (302 to the web client login URL); GET /api/v0/m/projects/ and /api/v0/m/screens/ with limit=1 (200)",
+        "http_status": 200,
+        "note": "Landing page redirects to a login URL, but the JSON API answered 200 without credentials."
+      },
+      "variables_present": [
+        "public API answers without login: 147 projects and 105 screens (totalCount)"
+      ],
+      "variables_missing": [
+        "I did not identify a plant-parenchyma, cell-aggregate-segmentation or early-embryo study inside IDR within my request budget"
+      ],
+      "scope": "Archive-wide; mostly cell-culture screens and tissue imaging",
+      "evidence": "Landing page HEAD returned 302 to https://idr.openmicroscopy.org/webclient/login/?url=%2Fwebclient%2F%3Fexperimenter%3D-1; https://idr.openmicroscopy.org/api/v0/m/projects/?limit=1 returned meta totalCount 147, .../screens/?limit=1 totalCount 105.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "unet3d-arabidopsis-ovules-zenodo-7772553",
+      "name": "3D UNet Arabidopsis Ovules ds1x (trained model)",
+      "landing_url": "https://zenodo.org/api/records/7772553",
+      "access_url": null,
+      "doi": "10.5281/zenodo.7772553",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET Zenodo record API",
+        "http_status": 200,
+        "bytes": 16345313
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "it is trained network weights, not images or segmentations"
+      ],
+      "scope": "Model trained to predict cell boundaries in confocal stacks of Arabidopsis ovules",
+      "evidence": "Files: config_train.yml (7,664 bytes) and unet3d-arabidopsis-ovules-confocal-ds1x.pytorch (16,345,313 bytes); licence cc-by-4.0; description says it was trained on stacks published at https://elifesciences.org/articles/57613 (that dataset itself not located by me).",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive",
+      "query": "parenchyma",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=parenchyma&pageSize=5",
+      "hits": 5,
+      "note": "none plant"
+    },
+    {
+      "source": "BioImage Archive",
+      "query": "plant cell 3D segmentation meristem",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=plant%20cell%203D%20segmentation%20meristem&pageSize=5",
+      "hits": 2382,
+      "note": "unranked broad match; S-BSST734 and S-BIAD1800 relevant-looking"
+    },
+    {
+      "source": "DataCite",
+      "query": "shoot apical meristem cell segmentation 3D",
+      "url": "https://api.datacite.org/dois?query=shoot%20apical%20meristem%20cell%20segmentation%203D&page[size]=5",
+      "hits": 3,
+      "note": "workshop slides and an arXiv paper, no dataset"
+    },
+    {
+      "source": "DataCite",
+      "query": "parenchyma cell polyhedron topology",
+      "url": "https://api.datacite.org/dois?query=parenchyma%20cell%20polyhedron%20topology&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "Arabidopsis ovule 3D cell segmentation",
+      "url": "https://api.datacite.org/dois?query=Arabidopsis%20ovule%203D%20cell%20segmentation&page[size]=5",
+      "hits": 1,
+      "note": "a conference talk only"
+    },
+    {
+      "source": "Zenodo",
+      "query": "3D cell segmentation plant tissue",
+      "url": "https://zenodo.org/api/records?q=3D%20cell%20segmentation%20plant%20tissue&size=5",
+      "hits": 454175,
+      "note": "unranked broad match; top hits include 3D UNet Arabidopsis Ovules model and a 3.9 GB 'bootstrapping dense 3D segmentations' dataset (not inspected)"
+    }
+  ],
+  "status": "partial",
+  "summary": "No repository record I could open holds 3D segmented plant parenchyma. Two plant datasets exist with raw cell-wall volumes (Arabidopsis embryos, ~100 stacks, 3.18 GB tar) or segmentations and lineages (shoot apical meristem, 6 NPA-treated plants, 4.89 GB zip), but both are young growing tissue, not bulk parenchyma, and neither is documented to carry face counts. The BioImage Archive has no plant 'parenchyma' study.",
+  "next_step": "Download one of the two Arabidopsis sets (both over 1 MB, not fetched here), check what segmentation labels exist for the meristem set, and decide whether interior meristem cells are an acceptable stand-in; otherwise scout a segmented mature-tissue volume (e.g. pith or storage parenchyma).",
+  "obstacles_confirmed": [
+    "Few datasets resolve complete cell faces over large parenchyma volumes.",
+    "Meristem and embryo cells are a young, growing subset of the symmetrical parenchyma the claim is about."
+  ]
+}

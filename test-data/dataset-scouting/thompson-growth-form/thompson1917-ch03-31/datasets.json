@@ -1,0 +1,98 @@
+{
+  "claim_id": "thompson1917-ch03-31",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:45:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "regenerate length (or mass) vs time since amputation, sampled densely enough to see the latent period and the velocity maximum, per individual or cohort",
+    "whole-organism size vs age from fertilisation/birth to cessation for the same or a matched species",
+    "species and tissue identity, temperature",
+    "time origin for both curves (amputation vs start of growth)"
+  ],
+  "datasets": [
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection – raw age–length / age–weight series in mydata_*.m files",
+      "landing_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/entries/Danio_rerio/mydata_Danio_rerio.m",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T01:40:00Z", "method": "HEAD -L landing_url; GET mydata_Danio_rerio.m (33,317 B) in the ch03-09 pass of this run", "http_status": 200, "bytes": 33317 },
+      "variables_present": ["ordinary-growth side: literature-transcribed age–length and age–weight series per species (e.g., Danio rerio tL_Schi2002 'time since fertilization (d), total length (cm)'; tL_EatoFarl1974), with units and bibkeys", "entries for regeneration-capable species (zebrafish, salamanders, planarians where present)"],
+      "variables_missing": ["any regeneration time series"],
+      "scope": "Collection-wide (>1000 entries per the about page; exact count not parsed); zero-origin growth data only",
+      "evidence": "mydata file lines: 'data.tL_Schi2002 = [... % time since birth (day), TL (mm) at 28.5 C', 'units.tL_Schi2002 = {d, cm}; label.tL_Schi2002 = {time since fertilization, total length}'. Covers the whole-organism curve from (near) zero.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=(fin%20OR%20limb%20OR%20planarian%20OR%20axolotl)%20regeneration&collection=bioimages",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:38:00Z", "method": "GET BioStudies search API: 'regeneration time-lapse' and '(fin OR limb OR planarian OR axolotl) regeneration' in collection bioimages", "http_status": 200 },
+      "variables_present": ["fixed-tissue gene-expression images of regenerating axolotl limbs (S-BIAD2250, 126 files), planarian wnt1/notum mRNA images (S-BIAD4214, 253 files), limb-bud HCR (S-BIAD1925/1926)"],
+      "variables_missing": ["regenerate length vs time (no time-lapse of outgrowth found)", "matched whole-organism growth images"],
+      "scope": "157 hits for 'regeneration time-lapse' (cell-biology time-lapses, none of regenerating appendages); 80 for appendage regeneration, all fixed molecular imaging",
+      "evidence": "Search totals 157 and 80; top titles S-BIAD326, S-BIAD1474 (chick embryo), S-BIAD2250 'Canonical Wnt signaling and … Fgf8 expression in axolotl limb', S-BIAD4214 'visualization and quantification of mRNA expression of wnt1 and notum' (planarian). No dataset describes regenerate-length measurements over time.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=regeneration",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:38:00Z", "method": "HEAD landing_url; GET search API (5 queries)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Repository, not a dataset; 803 hits for 'regeneration' broadly, dominated by forest regeneration and tissue-level molecular studies; specific queries for regenerate-length time courses returned 0",
+      "evidence": "Searches: 'regeneration length time course tail OR limb OR fin' 0; 'axolotl limb regeneration growth rate measurements' 0; 'fin regeneration zebrafish length' 0; 'tail regeneration lizard OR salamander length' 0; 'regeneration' 803 (e.g., dryad.f7m0cfxv9 'Tail regeneration alters the digestive performance of lizards', CC0, 68,453 B, physiology not growth curve; dryad.jdfn2z3sm zebrafish regeneration mutagenesis, 11.4 GB).",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-f7m0cfxv9-lizard-tail-regeneration",
+      "name": "Tail regeneration alters the digestive performance of lizards (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.f7m0cfxv9",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.f7m0cfxv9",
+      "doi": "10.5061/dryad.f7m0cfxv9",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:42:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 68453 },
+      "variables_present": ["digestive-performance measurements of lizards during tail regeneration (per abstract)"],
+      "variables_missing": ["regenerate length vs time (not described in abstract; file not opened)"],
+      "scope": "One lizard study; physiology of regenerating animals",
+      "evidence": "Abstract: 'lizards that can regenerate their entire tail … To provide the required energy and materials for caudal tissue building, lizards are expected to undergo a number of ph[ysiological changes]'. storageSize 68,453 B, CC0. Not a growth-curve dataset on its face.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "regeneration length time course tail OR limb OR fin", "url": "https://datadryad.org/api/v2/search?q=regeneration%20length%20time%20course%20tail%20OR%20limb%20OR%20fin", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "axolotl limb regeneration growth rate measurements", "url": "https://datadryad.org/api/v2/search?q=axolotl%20limb%20regeneration%20growth%20rate%20measurements", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "fin regeneration zebrafish length", "url": "https://datadryad.org/api/v2/search?q=fin%20regeneration%20zebrafish%20length", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "tail regeneration lizard OR salamander length", "url": "https://datadryad.org/api/v2/search?q=tail%20regeneration%20lizard%20OR%20salamander%20length", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "regeneration", "url": "https://datadryad.org/api/v2/search?q=regeneration", "hits": 803, "note": "sanity check that the API works; mostly forest/tissue-molecular; dryad.f7m0cfxv9 lizard tail; dryad.d51c59zzw ancestral-state reconstruction of regeneration in arthropods and reptiles" },
+    { "source": "Zenodo", "query": "regeneration AND (\"fin length\" OR \"regenerate length\" OR \"blastema length\"), type dataset", "url": "https://zenodo.org/api/records?q=(regeneration%20AND%20(%22fin%20length%22%20OR%20%22regenerate%20length%22%20OR%20%22blastema%20length%22))&type=dataset&size=8", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "zebrafish fin regeneration length measurements, type dataset", "url": "https://zenodo.org/api/records?q=zebrafish%20fin%20regeneration%20length%20measurements&type=dataset&size=8", "hits": 44835, "note": "loose; top hits are retinal regeneration GRNs and Plazi taxonomy tables, no outgrowth time series" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "regeneration time-lapse", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=regeneration%20time-lapse&collection=bioimages", "hits": 157, "note": "none of appendage outgrowth" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "(fin OR limb OR planarian OR axolotl) regeneration", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=(fin%20OR%20limb%20OR%20planarian%20OR%20axolotl)%20regeneration&collection=bioimages", "hits": 80, "note": "fixed molecular imaging only" },
+    { "source": "DataCite", "query": "regeneration growth curve length measurements days post amputation (datasets)", "url": "https://api.datacite.org/dois?query=regeneration%20growth%20curve%20length%20measurements%20days%20post%20amputation&resource-type-id=dataset&page[size]=8", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "zebrafish fin regeneration length (datasets)", "url": "https://api.datacite.org/dois?query=zebrafish%20fin%20regeneration%20length&resource-type-id=dataset&page[size]=8", "hits": 2, "note": "dryad.jdfn2z3sm (mutagenesis screen, 11.4 GB), dryad.kprr4xhmc (ECM knock-in lines); neither a length time series" }
+  ],
+  "status": "partial",
+  "summary": "The ordinary-growth side is available from Add-my-Pet (raw age–length/age–weight series per species, including zebrafish). The regeneration side is not in any repository found: Dryad, Zenodo, DataCite and BioImage Archive searches for regenerate length vs time since amputation (fin, limb, tail, planarian) returned either nothing or molecular/physiological datasets without outgrowth measurements. Regeneration growth curves exist only in paper figures and would have to be digitised.",
+  "next_step": "Digitise regenerate-length time courses from classic and modern papers (e.g., zebrafish caudal fin, axolotl limb, lizard tail) into one table with time since amputation and temperature; pair with AmP age–length series for the same species, then pre-register the curve-shape comparison.",
+  "obstacles_confirmed": [
+    "Matched regeneration and zero-origin ontogeny data are rare.",
+    "Regeneration lengths are scattered across papers and start after a latent period that is poorly sampled."
+  ]
+}

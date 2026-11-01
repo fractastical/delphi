@@ -1,0 +1,165 @@
+{
+  "claim_id": "thompson1917-ch11-18",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "brachidium (spiralium) form and direction per species or specimen",
+    "shell outline: transverse elongation, roundness, flattening per species",
+    "taxonomy (Spiriferida, Atrypida, Athyridida etc.) for phylogenetic control"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Brachiopoda",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET media API q=Brachiopoda",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no media record matches 'Brachiopoda'"
+      ],
+      "scope": "3D specimen repository",
+      "evidence": "pages.total_count 0 for q=Brachiopoda.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Spiriferida&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET taxa/single.json for Spiriferida and Atrypida (occurrences counted as noc)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxonomy and occurrence counts: Spiriferida 20,024, Atrypida 7,641 occurrences"
+      ],
+      "variables_missing": [
+        "no spiral-direction or shell-outline fields",
+        "no measurement table"
+      ],
+      "scope": "Fossil occurrences, all brachiopod orders",
+      "evidence": "taxa/single: Spiriferida (txn:29043) noc 20024; Atrypida (txn:29764) noc 7641. occs/list.json with &count returned HTTP 400, not retried.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pbdb-occurrences-brachiopoda-2026-10-31"
+    },
+    {
+      "id": "digital-atlas-of-ancient-life",
+      "name": "Digital Atlas of Ancient Life",
+      "landing_url": "https://www.digitalatlasofancientlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [
+        "illustrated fossil field guides and a digital encyclopedia"
+      ],
+      "variables_missing": [
+        "spiralia coverage not verified",
+        "no downloadable measurement table seen"
+      ],
+      "scope": "Illustrated fossils, North American focus",
+      "evidence": "Homepage text lists Field Guides, Digital Encyclopedia, Virtual Collection and a Devonian atlas of over 200 species; no spire or brachidium information read.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-brachiopod-sets",
+      "name": "Dryad: brachiopod datasets with spiralia or spire-bearing taxa",
+      "landing_url": "https://datadryad.org/api/v2/search?q=brachiopod%20shell%20morphology",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.7vm65",
+      "doi": "10.5061/dryad.7vm65",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET Dryad search 'brachiopod shell morphology' (11 hits) and dataset records 128p6 and 7vm65",
+        "http_status": 200
+      },
+      "variables_present": [
+        "10.5061/dryad.7vm65 Sinathyris crassa, an athyridide with a double spiralium (116,914 bytes, CC0)",
+        "10.5061/dryad.128p6 Permian neospiriferine brachiopods (26.5 MB, CC0)",
+        "10.5061/dryad.687q0 Givetian athyridid from 3D reconstruction of shell morphology (553 MB)"
+      ],
+      "variables_missing": [
+        "each covers one clade or one question; no cross-group table of spire direction against shell outline",
+        "file contents not opened"
+      ],
+      "scope": "Individual brachiopod studies",
+      "evidence": "API abstracts and storageSize values as listed; licences CC0-1.0 for 128p6 and 7vm65.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "MorphoSource",
+      "query": "Brachiopoda",
+      "url": "https://www.morphosource.org/api/media?q=Brachiopoda",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "brachiopod shell morphology",
+      "url": "https://datadryad.org/api/v2/search?q=brachiopod%20shell%20morphology&per_page=5",
+      "hits": 11
+    },
+    {
+      "source": "DataCite",
+      "query": "brachiopod shell shape spiralia brachidium",
+      "url": "https://api.datacite.org/dois?query=brachiopod%20shell%20shape%20spiralia%20brachidium&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "brachiopod spiralium micro-CT",
+      "url": "https://zenodo.org/api/records?q=brachiopod%20spiralium%20micro-CT&size=5",
+      "hits": 37238,
+      "note": "unranked broad match; top hits are figures from taxonomic papers on spire-bearing brachiopods and a Dryad athyridide set"
+    },
+    {
+      "source": "Paleobiology Database",
+      "query": "Spiriferida / Atrypida taxon summaries",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Spiriferida&show=attr",
+      "hits": 2,
+      "note": "two taxon records"
+    }
+  ],
+  "status": "partial",
+  "summary": "No dataset pairs brachidial spiral direction with shell outline across spire-bearing groups. Dryad holds a few clade-specific studies (athyridide spiralia, Permian neospiriferines, Givetian athyridid 3D reconstructions), the PBDB gives taxon and occurrence counts (Spiriferida 20,024; Atrypida 7,641), and MorphoSource has no brachiopod media. Spire direction would have to be coded from the Treatise or taxonomic papers and joined to outlines.",
+  "next_step": "Code spiralium direction (outward, inward, discoid) by genus from taxonomic literature, then take outline measures from the Dryad shape datasets or illustrations; check what the three Dryad records actually contain before relying on them.",
+  "obstacles_confirmed": [
+    "Internal brachidia are incompletely preserved.",
+    "Shell shape and arm direction are strongly confounded with phylogeny."
+  ]
+}

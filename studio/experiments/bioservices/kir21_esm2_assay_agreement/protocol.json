@@ -1,0 +1,102 @@
+{
+  "acceptance": {
+    "A1": "all four pilot controls behave as specified",
+    "A2": "at least 200 of 256 subset variants carry a finite score and both measured outcomes",
+    "A3": "all six reference checks pass inside the run",
+    "A4": "point estimates and bootstrap intervals exist for rho_surface, rho_function and delta_rho",
+    "A5": "combined wall clock at most 60 minutes"
+  },
+  "analysis": {
+    "bootstrap_resamples": 10000,
+    "bootstrap_seed": 0,
+    "ci": 0.95,
+    "correlation": "spearman",
+    "paired_statistic": "delta_rho = rho_surface - rho_function",
+    "pairing": "the same resampled variant indices are used for both assays",
+    "permutation_resamples": 10000,
+    "permutation_seed": 0
+  },
+  "baselines": [
+    "blosum62_substitution_score",
+    "permutation_null"
+  ],
+  "data": {
+    "archive_sha256": "3a83766254ac9ac9984ec25cb73c6e010ea4418f5e35f143933e6b6e6473b921",
+    "archive_size_bytes": 43021128,
+    "archive_url": "https://marks.hms.harvard.edu/proteingym/ProteinGym_v1.3/DMS_ProteinGym_substitutions.zip",
+    "assays": {
+      "function": {
+        "id": "KCNJ2_MOUSE_Coyote-Maestas_2022_function",
+        "rows": 6963,
+        "sha256": "75f07fa60b83f41d92ac42738cc6a3dfc7605cde6605add499efd400f4882b92"
+      },
+      "surface": {
+        "id": "KCNJ2_MOUSE_Coyote-Maestas_2022_surface",
+        "rows": 6917,
+        "sha256": "9d36f57185d11ad98aa3f69ca014c15682dbdb33c4c3c0d1ec0b3ea28ed8c92d"
+      }
+    },
+    "license": "MIT (ProteinGym curation); measurements belong to the source publication",
+    "version": "ProteinGym v1.3 DMS substitutions"
+  },
+  "external_reference": {
+    "delta_rho_implied": -0.030,
+    "note": "read from ProteinGym's published table over the FULL datasets with their own pipeline; a lead, not a verified input, and not reproduced here",
+    "proteingym_esm2_650M_spearman_function": 0.382,
+    "proteingym_esm2_650M_spearman_surface": 0.352
+  },
+  "falsifier": {
+    "falsified_if": "95% CI for delta_rho lies entirely at or below 0",
+    "hypothesis": "ESM-2 masked-marginal ranking agrees better with Kir2.1 surface expression than with channel function on matched variants",
+    "supported_if": "95% CI for delta_rho lies entirely above 0",
+    "undetermined_if": "CI spans 0; reported as undetermined, never as support"
+  },
+  "frozen": true,
+  "leakage_rules": [
+    "model frozen and zero-shot; nothing trained, fitted or calibrated",
+    "scorer API cannot accept an assay value",
+    "subset selected by hash of the variant name alone",
+    "no threshold, weight or model choice depends on a measured outcome",
+    "analysis runs once; every run is reported if repeated"
+  ],
+  "model": {
+    "batch_positions": 4,
+    "device": "cpu",
+    "operation": "masked_marginal = log p(mut | x_masked at i) - log p(wt | x_masked at i)",
+    "precision": "fp32",
+    "seed": 0,
+    "step_down_checkpoint": "facebook/esm2_t30_150M_UR50D",
+    "step_down_rule": "if projected scoring time exceeds 25 minutes, step down and record which checkpoint produced the numbers; depends only on wall-clock latency",
+    "target_checkpoint": "facebook/esm2_t33_650M_UR50D",
+    "threads": 2
+  },
+  "pilot": {
+    "N1": "declared wild-type residue wrong for the position -> must raise ReferenceMismatch",
+    "N2": "position outside 1..428 -> must raise ReferenceMismatch",
+    "P1": "wild-type substitution X{i}X -> score exactly 0.0",
+    "P2": "a real matched variant -> finite score and reconstructed sequence equals the CSV mutated_sequence"
+  },
+  "protocol_id": "delphi-frontier/kir21-esm2-assay-agreement/v1",
+  "reference": {
+    "accession": "P35561",
+    "entry": "KCNJ2_MOUSE",
+    "length": 428,
+    "sha256": "88bfbcddd595e33da25f5ab224ce2b41cfaeacf488c7a7a51178d24d24e3b575",
+    "verified_identical_to_uniprot": true
+  },
+  "resource_limits": {
+    "combined_wall_minutes": 60,
+    "max_retries_per_fetch": 1,
+    "raw_gpu": "none submitted from this harness; a GPU need would be requested from dx-gpuops-r1 by file and the protocol amended first",
+    "scope": "systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600",
+    "threads": 2
+  },
+  "subset": {
+    "matched_distinct_positions": 391,
+    "matched_position_range": [2, 392],
+    "matched_variants": 6789,
+    "rule": "first 256 matched variants sorted by (sha256(f'{salt}|{mutant}').hexdigest(), mutant)",
+    "salt": "delphi-frontier/kir21-esm2-assay-agreement/v1",
+    "size": 256
+  }
+}

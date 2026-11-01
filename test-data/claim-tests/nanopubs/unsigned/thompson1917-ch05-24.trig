@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch05-24--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch05-24: inconclusive, confidence 0.3" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.3"^^xsd:double ;
+    delphi:hypothesis "Measured red blood cells have a biconcave thickness profile whose upper surface has mean curvature of opposite sign at the central dimple and at the rim crest, so the cell surface is not of constant mean curvature (not a liquid-drop equilibrium figure), whereas rigid spheres imaged and analysed the same way show no such sign change." ;
+    delphi:passCriterion "Pre-registered. Data: ground-truth quantitative phase maps of red blood cells (gt_phase1.mat ... gt_phase100.mat, red_blood_cell/train) and of 3 um polystyrene beads (gt_phase1.mat ... gt_phase50.mat, polystyrene_bead/train) from Figshare 21378744. Phase is proportional to optical thickness; the upper surface is taken as z = t/2 (cell symmetric about its mid-plane). Isolated objects are segmented by thresholding the background-subtracted phase, keeping connected components not touching the patch border, with aspect ratio <= 1.3 and footprint diameter >= 12 px. For each object the azimuthally averaged profile t(r) is computed about its centroid; r_crest = radius of maximum t; the centre curvature sign is the sign of b in a fit t(r) = a + b r^2 over r <= 0.3 r_crest. On the upper surface the mean curvature at the crest is negative (convex, since t'(r_crest) = 0 and t'' < 0) and at the centre it is positive (concave) when b > 0 and r_crest >= 0.25 r_edge; that sign change does not depend on the lateral or phase-to-height calibration. SUPPORTS if >= 70% of analysable RBCs show the sign change and <= 10% of analysable beads do." ;
+    delphi:failCriterion "Pre-registered. REFUTES if <= 30% of analysable RBCs show the sign change while <= 10% of beads do (RBCs are dome-like, consistent with a drop). MIXED if between 30% and 70%. INCONCLUSIVE (underpowered) if fewer than 30 analysable RBCs or 10 analysable beads; INCONCLUSIVE (other) if > 10% of beads show a sign change (the method manufactures dimples)." ;
+    delphi:expectedObservation "Most isolated red cells in quantitative phase maps have a central thickness minimum and a rim maximum, giving opposite-sign mean curvature at centre and rim on the same face; spheres analysed identically do not." ;
+    delphi:disconfirmingObservation "Red cells have dome-like (centrally maximal) thickness profiles like the spheres, i.e. no centre-rim sign change in mean curvature, consistent with a constant-mean-curvature drop." ;
+    delphi:admissibleDatasets "Quantitative thickness or phase maps, or 3D reconstructions, of individual unfixed or lightly fixed mammalian red cells at a resolution of >= 12 pixels across a cell, together with a sphere control imaged on the same instrument; public licence; independent of Thompson." ;
+    delphi:inferenceMethod "Segmentation of isolated objects, azimuthal thickness profile, sign of the central quadratic coefficient vs the crest curvature, fraction of cells with a sign change compared with the bead control against the pre-registered 70%/30%/10% thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py range-extracts 100 RBC and 50 bead ground-truth phase maps, subtracts each map's median, thresholds at 0.25 x the 99th percentile, labels 8-connected components, fills holes, and keeps objects not touching the border with aspect ratio <= 1.3 and footprint diameter >= 12 px. For each object it builds a 1-px radial profile about the centroid, takes r_crest at the profile maximum, fits t = a + b r^2 over pixels with r <= 0.3 r_crest (at least 4 pixels needed), and scores a centre-rim sign change when b > 0 and r_crest >= 0.25 r_edge. Fractions with a sign change in RBCs and beads are judged against the pre-registered thresholds. A sensitivity run with a 4 px bead diameter minimum (not pre-registered) is reported. Per-object rows are in derived/objects.csv, the summary in derived/summary.json." ;
+    rdfs:comment "Measured: 0.7317 fraction of analysable red cells whose upper-surface mean curvature changes sign between the central dimple and the rim crest (n = 1148, 1148 RBC profiles from 100 unique phase maps; pre-registered bead control: 41 analysable beads). Interpretation: Thompson's argument is that a fluid drop held by surface tension alone must have constant mean curvature 1/r1 + 1/r2 everywhere, and the biconcave corpuscle does not. We test the geometric premise on measured cells: a closed surface whose upper face is concave at the centre and convex at the rim cannot have constant mean curvature. The thickness map from quantitative phase imaging is used with the standard mid-plane symmetry assumption. The second clause, that corpuscles become spherical in diluted blood, and the suggested osmotic or fluid-crystal causes are not tested here. Species of the donor blood is taken from the data source's description; scope is mammalian red cells." ;
+    delphi:evidenceAgainst "The bead control failed: 38 of the 41 analysable bead objects (93%) show the same centre-rim sign change as the red cells, with a similar central dip (median 51% of the crest). Under the pre-registered rule this means the method manufactures dimples, so the 73% of red cells showing a sign change (1148 profiles; 70% was the pass mark) cannot be counted as support." ;
+    delphi:evidenceAgainst "Why the control fails: single 3 um beads are only ~7.6 px across in these maps, too small to give the 4 central pixels the centre fit needs, so none of them is analysable. The beads that pass the 12 px size cut are 12-16 px objects with ring-shaped phase profiles, probably clusters or reconstruction artefacts rather than single spheres. The control therefore tests a different object class from the one intended, and a sphere control at red-cell scale (>= 12 px) would be needed. The 4 px sensitivity run changes nothing, because the extra beads are still too small for the centre fit." ;
+    delphi:evidenceAgainst "The pre-registration listed bead files as gt_phase{1..50}.mat; in the archive they are named bead_gt_phase{1..50}.mat, which were used. It listed RBC files gt_phase{1..100}.mat; the archive numbers RBC files in blocks of 50 (1-50, 501-550, 1001-1050, ...), so the first 100 in numeric order (1-50 and 501-550) were used. Both are naming deviations, not changes of criteria." ;
+    delphi:evidenceAgainst "Descriptively, most red cells do have a central thickness minimum and a rim maximum, as Thompson says. This test only fails to separate that from what the method finds in non-cell objects." ;
+    delphi:evidenceAgainst "The dataset description does not state the donor species of the red cells; scope is assumed to be human or mammalian blood. Phase maps are network-training ground truths from one instrument; mid-plane symmetry (z = t/2) is assumed." ;
+    delphi:evidenceAgainst "The sphering-in-diluted-blood clause and Thompson's suggested causes are not tested." ;
+    delphi:evidenceAgainst "preregistered_at is the time of the pre-registration commit (0db9ed6a); the committed pre-registration carried an estimated time (21:40Z) written before committing. Data were first fetched after that commit (21:42Z); criteria are unchanged." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch05-24--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch05-24/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch05-24--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: 3um polystyrene bead & red blood cell & histological slide datasets (Lee, Song, Kim, Ye, Jang), shared for the study 'Deep learning based on parameterized physical forward model for adaptive holographic imaging with unpaired data'" ;
+    dct:description "ground-truth quantitative phase maps of red blood cells (256x256 patches, cells ~21 px across) and of 3 um polystyrene beads (224x224 patches) from one holographic microscope" ;
+    prov:atLocation <https://ndownloader.figshare.com/files/38008803> ;
+    prov:wasDerivedFrom <https://figshare.com/articles/dataset/21378744> ;
+    dct:license "Apache 2.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch05-24> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch05-24--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch05-24/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.977Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch05-24: inconclusive, confidence 0.3" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch05-24--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

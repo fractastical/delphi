@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Theory: memory as multistability or slow manifolds, predicted by CRNT" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> ;
+    dct:description "Explain which networks can show which memory, so the result is a theorem plus a prediction rather than only a rate comparison. Step 1 (proof): show that, for the protocol's definitions, persistent UCS-based memory over a test window T after stimulus removal requires either (i) multistability, with the stimulus switching basins, or (ii) a slow variable with relaxation time ≥ T. The argument: if the system is monostable with all eigenvalues at the steady state having real part ≤ −λ and the steady state is globally attracting with exponential rate λ, the response returns within ε after time log(C/ε)/λ, so memory beyond that is impossible. Formalize the linear-stability core in Lean. Step 2 (prediction): for mass-action models, Chemical Reaction Network Theory (deficiency zero and deficiency one theorems) certifies that some networks cannot be multistable for any rates. Classify all 35 models and the random ensemble by CRNT before simulation; predict that CRNT-certified monostable networks show long-window memory only if they have slow eigenvalues (computed). Compare with approach 1's observed memory calls." ;
+
+    delphi:proposedTest "A proved necessary condition for persistent memory, and the accuracy with which the CRNT plus slowest-timescale classification predicts observed memory across biological and random networks. High accuracy (≥ 85%) shows memory is explained by generic dynamical features, whatever the biological enrichment." ;
+    delphi:context "Fails if: Many networks show memory the classification rules out, which would mean the protocol's memory criterion picks up transient effects within the test window, a finding about the protocol itself; or most models use non-mass-action kinetics outside CRNT's scope." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. State and prove the exponential-relaxation lemma for monostable systems in Lean (linear case; nonlinear case by citation of standard Lyapunov results with stated hypotheses). 2. Run CRNT analysis (deficiency computation) on mass-action-convertible models; compute slowest eigenvalues at steady state. 3. Pre-register predicted memory or no-memory per model from (multistability possible, slowest timescale). 4. Compare predictions with observed memory calls; report sensitivity and specificity." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Many BioModels use non-mass-action rate laws; CRNT results cover only a subset." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: chemical-reaction-network-theory" ;
+    skos:note "Tool: ode-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-16> ;
+    rdfs:seeAlso <https://www.ebi.ac.uk/biomodels/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0009-2509(87)80099-4> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.isci.2021.102131> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> a delphi:Concept, schema:Question ;
+    rdfs:label "Is memory in gene regulatory network models generic or a biological signature?" .
+
+  <https://www.ebi.ac.uk/biomodels/> dct:title "BioModels" ;
+    dct:description "Models to classify" .
+  <https://doi.org/10.1016/0009-2509(87)80099-4> dct:title "Chemical reaction network structure and the stability of complex isothermal reactors—I. The deficiency zero and deficiency one theorems" ;
+    dct:bibliographicCitation "Feinberg 1987, Chemical reaction network structure and the stability of complex isothermal reactors I (deficiency zero and one theorems)" .
+  <https://doi.org/10.1016/j.isci.2021.102131> dct:title "Gene regulatory networks exhibit several kinds of memory: Quantification of memory in biological and random transcriptional networks" ;
+    dct:bibliographicCitation "Biswas et al. 2021, memory definitions" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to grn-memory-generic-or-biological, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.304Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to grn-memory-generic-or-biological: Theory: memory as multistability or slow manifolds, predicted by CRNT" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean bounds: hierarchy cannot raise stiffness past the Voigt bound" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Separate what hierarchy can and cannot do. Formalize the tension-shear chain effective modulus 1/E = 4(1 - phi)/(G_p phi^2 rho^2) + 1/(phi E_m) (Gao et al. 2003, with rho the aspect ratio, G_p the matrix shear modulus and E_m the mineral modulus) and prove: (i) E is increasing in rho and bounded above by phi E_m; (ii) applying the formula recursively, with level n using the level n-1 modulus as its 'mineral', the modulus at every level is bounded by the Voigt bound of the total mineral fraction, so stiffness cannot compound with levels; (iii) the strength of the level-n composite is bounded by the mineral strength times the total volume fraction under the same chain model. The result sharpens the problem: any compounding must be in toughness (energy dissipation), which is where the data test and the simulation should look, and claims of compounding stiffness or strength are refuted by the model itself." ;
+
+    delphi:proposedTest "Compiled Lean module with no sorry stating the stiffness and strength bounds for arbitrary numbers of levels." ;
+    delphi:context "Fails if: The recursive bound requires assumptions (e.g. matrix shear modulus scaling across levels) that cannot be stated without making the theorem vacuous." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Write ThompsonLaws/Biocomposite.lean defining the chain modulus and the recursive hierarchy. 2. Prove monotonicity in rho and the upper bound phi E_m (field_simp, positivity, div_le_iff). 3. Prove the recursive bound by induction on the level, with total fraction the product of per-level fractions. 4. Prove the strength bound under the stated load-transfer assumptions. 5. Record in lean/reports and link to thompson1917-ch16-02 as a supporting formal statement, not as a proof of the claim." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0631609100> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2004.03.006> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1073/pnas.0631609100> dct:title "Materials become insensitive to flaws at nanoscale: Lessons from nature" ;
+    dct:bibliographicCitation "Gao et al. 2003, Materials become insensitive to flaws at nanoscale: lessons from nature" .
+  <https://doi.org/10.1016/j.jmps.2004.03.006> dct:title "Mechanical properties of nanostructure of biological materials" ;
+    dct:bibliographicCitation "Ji and Gao 2004, Mechanical properties of nanostructure of biological materials" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.308Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Lean bounds: hierarchy cannot raise stiffness past the Voigt bound" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

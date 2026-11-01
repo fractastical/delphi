@@ -44,10 +44,9 @@ def main():
     u, wt, aaa = constructs()
     client = Client()
     runs_path = HERE / "derived" / "runs.json"
-    known = json.loads(runs_path.read_text()) if runs_path.exists() else {}
     ops = {}
     for tag, fi in jobs(wt, aaa).items():
-        ops[tag] = (known.get(tag) or {}).get("operation_id") or submit_alphafold3(client, f"hcn2-{tag}", fi, data / "tmp")
+        ops[tag] = submit_alphafold3(client, f"hcn2-{tag}", fi, data / "tmp")
         print(f"{tag}: {ops[tag]}", flush=True)
     runs_path.parent.mkdir(exist_ok=True)
     runs_path.write_text(json.dumps({t: {"operation_id": o} for t, o in ops.items()}, indent=1))

@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" ;
+    dct:description "Is Wolfram's 2-state 3-color Turing machine universal when the initial tape is required to be finite-support or eventually periodic, rather than the non-periodic infinite background used in Smith's prize proof?" ;
+
+    skos:historyNote "Known state: Smith's 2007 proof (published 2020) uses an infinite, non-periodic but computable initial tape, which several authors argue smuggles computation into the input. Standard small-universal-machine results (Neary and Woods) use blank or periodic backgrounds. Whether the (2,3) machine is universal under those definitions is open." ;
+    dct:subject "mathematics" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: Either a construction with a finite-support or eventually periodic initial tape that emulates a universal system, formalized in Lean 4, or a proof that no such construction exists (for example by showing the machine's behaviour on all eventually periodic tapes is decidable)." ;
+    skos:scopeNote "Refuted if: A decidability proof for eventually periodic inputs would refute universality under that definition." ;
+    skos:note "Data access: None needed; the machine is a 6-entry table." ;
+    skos:note "Requires: lean4" ;
+    skos:note "Requires: turing-machine-enumeration" ;
+    skos:note "Requires: computability-theory" ;
+
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.29.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.tcs.2008.09.051> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.25088/ComplexSystems.29.1.1> dct:title "Universality of Wolfram’s 2, 3 Turing Machine" ;
+    dct:bibliographicCitation "Smith 2020, Universality of Wolfram's 2, 3 Turing Machine" .
+  <https://doi.org/10.1016/j.tcs.2008.09.051> dct:title "The complexity of small universal Turing machines: A survey" ;
+    dct:bibliographicCitation "Woods and Neary 2009, The complexity of small universal Turing machines: a survey" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.289Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Settle whether the (2,3) Turing machine is universal under a conventional definition" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

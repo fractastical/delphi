@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Clock period over elongation time versus vertebral counts" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/somite-number-control> ;
+    dct:description "Pre-register the clock-and-wavefront prediction N = T_elongation / T_clock. A species enters only when a published time-lapse study reports both the segmentation-clock period and the duration of axis elongation, and an independent count of vertebrae or somites exists. Gomez et al. 2008 is the seed list, not a cap: later papers enter under the same measurement rule. The tolerance is |log(N_predicted / N_observed)| < log(1.25), that is, within 25 percent. The claim is supported only if every qualifying species meets the tolerance. If fewer than 6 species qualify, the verdict is inconclusive, underpowered, and is not converted into support by relaxing the tolerance. Vertebral counts and clock measurements must come from different publications so the count is not the number the clock paper already compared." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--1#n_species> ;
+    delphi:proposedTest "Every qualifying species within 25 percent, with at least 6 species. Otherwise the comparative prediction is not supported at the pre-registered bar." ;
+    delphi:context "Fails if: Two or more qualifying species miss the 25 percent tolerance. A single miss with at least 6 species is a mixed result, not support. Fewer than 6 species is underpowered." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze the 25 percent tolerance and the 6-species floor. 2. Admit a species only with both clock measurements and an independent vertebral count. 3. Compute N_predicted = T_elongation / T_clock. 4. Apply the log-ratio tolerance to each species. 5. Support the claim only if every qualifying species passes and at least 6 qualify." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Clock period and elongation duration are published for only a handful of species. The test is expected to hit the underpowered floor, and that is an acceptable outcome." ;
+    skos:note "Tool: developmental-biology" ;
+    skos:note "Tool: comparative-data" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch17-04> ;
+    rdfs:seeAlso <https://www.fishbase.se/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/S0022-5193(76)80131-2> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature07020> ;
+    rdfs:seeAlso <https://doi.org/10.1242/dev.063735> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/somite-number-control> a delphi:Concept, schema:Question ;
+    rdfs:label "What sets vertebrate somite number?" .
+  <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--1#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 6 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://www.fishbase.se/> dct:title "FishBase" ;
+    dct:description "Vertebral counts for fishes, used only when a clock measurement also exists and the count's source is not the clock paper." .
+  <https://doi.org/10.1016/S0022-5193(76)80131-2> dct:title "A clock and wavefront model for control of the number of repeated structures during animal morphogenesis" ;
+    dct:bibliographicCitation "Cooke and Zeeman 1976, the clock-and-wavefront model" .
+  <https://doi.org/10.1038/nature07020> dct:title "Control of segment number in vertebrate embryos" ;
+    dct:bibliographicCitation "Gomez et al. 2008, Control of segment number in vertebrate embryos" .
+  <https://doi.org/10.1242/dev.063735> dct:title "Patterning embryos with oscillations: structure, function and dynamics of the vertebrate segmentation clock" ;
+    dct:bibliographicCitation "Oates, Morelli and Soroldoni 2012, Patterning embryos with oscillations" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to somite-number-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.341Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to somite-number-control: Clock period over elongation time versus vertebral counts" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

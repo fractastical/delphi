@@ -1,0 +1,99 @@
+[
+  {
+    "claim_id": "darwin1859-ch04-18",
+    "status": "formalized",
+    "label": "Favoured forms make less favoured forms rare, and rarity precedes extinction",
+    "notation": "w_A < w_B \\Rightarrow p' < p,\\ p_t \\to 0\\ \\text{(less favoured)};\\quad N_t \\le N_{t+1} + 1,\\ N_a \\ge 1,\\ N_{a+d} = 0 \\Rightarrow \\exists t \\in [a, a+d],\\ N_t = 1",
+    "lean_declaration": "DarwinLaws.Succession.UnitStepsDown",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.selectedFrequency_lt",
+      "DarwinLaws.Struggle.selectedTrajectory_tendsto_one",
+      "DarwinLaws.Succession.rarity_precedes_extinction"
+    ],
+    "assumptions": "First half: constant-fitness haploid selection as in darwin1859-ch04-01, the less favoured form having fitness w_A < w_B, so its frequency falls every generation and the favoured form's tends to one. Second half: the count of individuals of the less favoured form falls by at most one per period (no instantaneous wipe-out).",
+    "scope_note": "Two halves from two models. Selection: the less favoured variant's frequency decreases monotonically and tends to zero, which is read as 'becomes rare'; this is frequency, not number, and the full-stocking premise ('every area is already fully stocked', which is what turns a frequency change into a decline in numbers) is not modelled. Rarity before extinction: given a decline of at most one individual per period, the count must pass through 1. The unit-step hypothesis does the work and excludes catastrophic extinction by assumption; see darwin1859-ch10-09. Neither half is an empirical result."
+  },
+  {
+    "claim_id": "darwin1859-ch10-02",
+    "status": "not-formalized",
+    "label": "Species of different genera and classes change at different rates",
+    "notation": "\\mu_1 < \\mu_2 \\Rightarrow 1 - e^{-\\mu_1 D} < 1 - e^{-\\mu_2 D}\\ \\text{(consequence, not the claim)}",
+    "reason": "The claim is an empirical statement that turnover rates differ between groups (supported by the data test). The module proves only its consequence for the clock of darwin1859-ch14-07: under a constant-hazard model a higher hazard gives strictly more turnover in the same time (DarwinLaws.Succession.expectedTurnover_strictMono_in_hazard). Taking 'hazards differ' as a hypothesis would restate the claim."
+  },
+  {
+    "claim_id": "darwin1859-ch10-04",
+    "status": "not-formalized",
+    "label": "A species that has gone extinct never reappears",
+    "notation": "\\text{range}(L) = [\\text{first}_L, \\text{last}_L]\\ \\text{(used as a hypothesis)}",
+    "reason": "The module uses this claim as its modelling assumption, not as a theorem: each lineage is given a single stratigraphic interval (DarwinLaws.Succession.Lineage, fauna), which encodes no reappearance after extinction. Darwin's argument for it (a replacement would inherit different characters from different progenitors) is about inheritance, not something provable here. Everything in the faunal-similarity results of ch10-16 and ch10-13 is conditional on it."
+  },
+  {
+    "claim_id": "darwin1859-ch10-06",
+    "status": "not-formalized",
+    "label": "Groups rise gradually in species number to a maximum, then gradually decline",
+    "notation": "N_{t+1} \\le N_t + 1,\\ N_t \\le N_{t+1} + 1,\\ N_a = 1,\\ N_p = M,\\ N_e = 0 \\Rightarrow \\forall m \\in [1, M]\\ \\exists t \\in [a,p], t' \\in [p,e]:\\ N_t = N_{t'} = m\\ \\text{(lemma only)}",
+    "reason": "The lemma DarwinLaws.Succession.gradual_rise_and_fall takes gradualness (unit steps up and down) and the rise-peak-extinction shape as hypotheses and concludes that every intermediate species count is attained; it is a discrete intermediate-value theorem. Gradualness and the shape are the entire content of the claim (the data test returns 'mixed' precisely because many groups do not follow this curve), so a report marking the claim formalized would present the hypothesis as the proved result. Kept as a lemma, not as a formalization of this claim."
+  },
+  {
+    "claim_id": "darwin1859-ch10-07",
+    "status": "not-formalized",
+    "label": "Species and groups disappear gradually, place by place, not by global catastrophes",
+    "notation": "\\text{(gradual decline is the hypothesis of } \\text{gradual\\_rise\\_and\\_fall)}",
+    "reason": "Gradual, non-catastrophic extinction is what the unit-step hypothesis of DarwinLaws.Succession.gradual_rise_and_fall and rarity_precedes_extinction asserts, so it cannot also be their conclusion. The spatial part ('first from one place, then another') has no representation in the module. The data test is 'mixed' (mass extinctions exist), which is the empirical question."
+  },
+  {
+    "claim_id": "darwin1859-ch10-09",
+    "status": "formalized",
+    "label": "Rarity precedes extinction",
+    "notation": "\\forall t,\\ N_t \\le N_{t+1} + 1;\\ N_a \\ge 1;\\ N_{a+d} = 0 \\Rightarrow \\exists t \\in [a, a+d],\\ N_t = 1",
+    "lean_declaration": "DarwinLaws.Succession.UnitStepsDown",
+    "lean_theorems": [
+      "DarwinLaws.Succession.exists_eq_of_unitStepsDown",
+      "DarwinLaws.Succession.rarity_precedes_extinction"
+    ],
+    "assumptions": "The number of individuals of a species (or of species in a group) per period is a natural-number sequence that never falls by more than one per period; the species is present (N ≥ 1) at some period and extinct (N = 0) at a later one.",
+    "scope_note": "A discrete intermediate-value argument: under a decline of at most one per period the count must equal 1 (the extreme of rarity) at some period before extinction. Model-dependent in the strongest sense: the hypothesis (no sudden wipe-out) is itself a gradualist premise, and it is exactly what catastrophic extinctions violate, so the theorem cannot distinguish Darwin's view from Cuvier's; it only shows that gradual decline logically entails prior rarity. 'Rare' is rendered as a single survivor, not as Darwin's 'rare' relative to other species; the step size 1 is a normalisation, and any bounded step size with a suitably coarser notion of rarity gives the same result. Darwin's evidence (Tertiary shells, human exterminations) is empirical."
+  },
+  {
+    "claim_id": "darwin1859-ch10-13",
+    "status": "formalized",
+    "label": "The more ancient a form, the more it differs from living forms",
+    "notation": "i \\le j \\le \\text{now} \\Rightarrow |F_i \\cap F_{\\text{now}}| \\le |F_j \\cap F_{\\text{now}}|,\\quad F_t = \\{L : \\text{first}_L \\le t \\le \\text{last}_L\\}",
+    "lean_declaration": "DarwinLaws.Succession.shared",
+    "lean_theorems": [
+      "DarwinLaws.Succession.shared_antitone_left",
+      "DarwinLaws.Succession.olderFauna_shares_fewer_with_living"
+    ],
+    "assumptions": "Each lineage has a single stratigraphic range (darwin1859-ch10-04, no reappearance); the fauna of a stage is the set of lineages whose range covers it; 'difference from living forms' is measured by the number of lineages a fauna shares with the living fauna (lower shared count = greater difference).",
+    "scope_note": "Proves that an older fauna shares no more lineages with the living fauna than a younger one does (weak inequality). This is a combinatorial consequence of interval ranges and is faithful only if 'differs more' means 'shares fewer lineages'; Darwin's claim is about degree of morphological difference of individual fossil forms, which range-through counting does not measure. The inequality is not strict (two stages can share the same lineages with the present), and the 'as a general rule' is empirical. Darwin's own caveats (living fossils, long-persisting forms) are compatible with the weak inequality."
+  },
+  {
+    "claim_id": "darwin1859-ch10-16",
+    "status": "formalized",
+    "label": "Fossils from consecutive formations are more alike than those from remote ones",
+    "notation": "i \\le j \\le k \\Rightarrow F_i \\cap F_k \\subseteq F_j,\\ |F_i \\cap F_k| \\le |F_i \\cap F_j|,\\ |F_i \\cap F_k| \\le |F_j \\cap F_k|;\\quad \\text{Markov: } p^n < p^m\\ (0 < p < 1,\\ m < n)",
+    "lean_declaration": "DarwinLaws.Succession.fauna",
+    "lean_theorems": [
+      "DarwinLaws.Succession.shared_subset_fauna_between",
+      "DarwinLaws.Succession.shared_antitone_right",
+      "DarwinLaws.Succession.shared_antitone_left",
+      "DarwinLaws.Succession.persistence_strictAnti"
+    ],
+    "assumptions": "Range-through model: each lineage occupies a single stage interval [first, last] (darwin1859-ch10-04), the fauna of a stage is the set of lineages covering it, and similarity between two stages is the number of shared lineages. For the strict version: each lineage persists across a stage boundary independently with constant probability 0 < p < 1 (Markov turnover), and expected similarity k stages apart is p^k.",
+    "scope_note": "Proves (1) intermediacy: any lineage common to two stages is present in every stage between them, so the intermediate fauna is intermediate; (2) decay: shared-lineage counts are weakly antitone in stratigraphic distance, a purely combinatorial fact needing no rates; (3) under the constant-rate Markov idealisation the expected similarity strictly decreases with separation. The combinatorial part is faithful to Darwin's wording provided 'closely related' means 'shares lineages', which the data test also uses (Jaccard-type similarity on PBDB genera). It does not address morphological relatedness of non-shared lineages, and the weak inequality allows plateaus; strictness is model-dependent. The range-through assumption is Darwin's own ch10-04 and is not proved."
+  },
+  {
+    "claim_id": "darwin1859-ch14-07",
+    "status": "formalized",
+    "label": "Amount of fossil change between formations measures elapsed time",
+    "notation": "T(D) = 1 - e^{-\\mu D};\\ \\mu > 0,\\ D_1 < D_2 \\Rightarrow T(D_1) < T(D_2);\\quad D = -\\frac{\\log(1 - T)}{\\mu};\\quad \\mu_1 < \\mu_2 \\Rightarrow T_{\\mu_1}(D) < T_{\\mu_2}(D)",
+    "lean_declaration": "DarwinLaws.Succession.expectedTurnover",
+    "lean_theorems": [
+      "DarwinLaws.Succession.expectedTurnover_strictMono",
+      "DarwinLaws.Succession.elapsedTime_expectedTurnover",
+      "DarwinLaws.Succession.expectedTurnover_strictMono_in_hazard"
+    ],
+    "assumptions": "Constant-hazard (Poisson) extinction: each lineage goes extinct independently at a constant rate μ > 0, so the expected fraction of lineages lost over a duration D is 1 − e^{−μD}; μ is known when reading time from turnover.",
+    "scope_note": "Model-dependent (constant hazard). Proves that expected turnover is a strictly increasing function of elapsed time, that it inverts exactly to recover D when μ is known, and, as Darwin's 'imperfect' qualification and darwin1859-ch10-02 require, that the same elapsed time gives more turnover in a group with higher hazard, so the clock is only valid within a group of constant rate. It does not prove that extinction is Poisson, that rates are constant through time (pulsed turnover and mass extinctions violate this), or that the clock is 'fair' in practice: the truth score for this claim is low (0.34) because rates vary, which the theorem on hazard explicitly concedes rather than refutes. Expected values only; variance of the clock is not treated."
+  }
+]

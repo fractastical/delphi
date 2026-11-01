@@ -1,0 +1,190 @@
+{
+  "claim_id": "darwin1859-ch02-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "species occurrences per genus per stratigraphic time bin",
+    "first and last appearance of each genus",
+    "sampling-effort covariates per bin (collections or occurrences) for standardization"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount",
+        "http_status": 200
+      },
+      "variables_present": [
+        "species-level and genus-level fossil occurrences with age bounds",
+        "per-genus first/last appearance and occurrence count",
+        "collection records for sampling standardization"
+      ],
+      "variables_missing": [
+        "pre-computed subsampled richness curves"
+      ],
+      "scope": "Phanerozoic animals; Cambrian alone: occs/list.json?base_name=Animalia&taxon_reso=genus&interval=Cambrian records_found 45972; with idreso=species 27904 (parameters as queried)",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s). Cambrian counts: occs/list.json?base_name=Animalia&taxon_reso=genus&interval=Cambrian records_found 45972; idreso=species 27904.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "neotoma-paleoecology",
+      "name": "Neotoma Paleoecology Database (API v2.0)",
+      "landing_url": "https://www.neotomadb.org/",
+      "access_url": "https://api.neotomadb.org/v2.0/data/datasets?limit=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET landing; GET api.neotomadb.org/v2.0/data/datasets?limit=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated Quaternary/late Cenozoic fossil assemblages by site and dataset"
+      ],
+      "variables_missing": [
+        "Phanerozoic-wide coverage",
+        "genus-level richness trajectories spanning geological stages"
+      ],
+      "scope": "Late Cenozoic sites",
+      "evidence": "Landing HTTP 200. datasets?limit=1 returned status 'success' with site 1 ('15/1', Lake) and a datasets list carrying DOIs. No record counts were retrieved.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "world-register-of-marine-species",
+      "name": "World Register of Marine Species (WoRMS REST)",
+      "landing_url": "https://www.marinespecies.org/",
+      "access_url": "https://www.marinespecies.org/rest/AphiaRecordByAphiaID/2",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET landing; GET rest/AphiaRecordByAphiaID/2",
+        "http_status": 200
+      },
+      "variables_present": [
+        "accepted marine taxon names and ranks"
+      ],
+      "variables_missing": [
+        "occurrences",
+        "ages"
+      ],
+      "scope": "Marine taxonomy; no time dimension",
+      "evidence": "Landing HTTP 200. AphiaRecordByAphiaID/2 returned Animalia (kingdom, status accepted).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-global-phanerozoic-biodiversity-2280gb621",
+      "name": "Data and R code from: Global Phanerozoic biodiversity, can variation be explained by spatial sampling intensity (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.2280gb621",
+      "access_url": null,
+      "doi": "10.5061/dryad.2280gb621",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.2280gb621 and its version files list",
+        "http_status": 200,
+        "bytes": 1172515963
+      },
+      "variables_present": [
+        "PBDB occurrence extract (Dataset1_edited)",
+        "a Phanerozoic time series file (phanerozoic_ts.csv)"
+      ],
+      "variables_missing": [
+        "genus-level trajectories (not seen)"
+      ],
+      "scope": "Phanerozoic generic richness vs sampling; files over 1 MB were not opened",
+      "evidence": "Dryad API HTTP 200; publicationDate 2024-07-27; abstract concerns variation in observed global generic richness over the Phanerozoic and sampling. Files listed by the API: obis_subset_no_decapoda.csv (575014981 B), PBDB_Dataset1_edited_v2_forR.csv (597483313 B), phanerozoic_ts.csv (8280 B), README.md (9389 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-bedrock-map-fossil-occurrences-vhhmgqnxt",
+      "name": "Data from: Bedrock geological map predictions for Phanerozoic fossil occurrences (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.vhhmgqnxt",
+      "access_url": null,
+      "doi": "10.5061/dryad.vhhmgqnxt",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.vhhmgqnxt and its version files list",
+        "http_status": 200,
+        "bytes": 283230210
+      },
+      "variables_present": [
+        "fossil collections",
+        "genus list (unique_genus.csv)"
+      ],
+      "variables_missing": [
+        "richness through time per genus"
+      ],
+      "scope": "Phanerozoic fossil occurrences matched to bedrock map data",
+      "evidence": "Dryad API HTTP 200; publicationDate 2022-12-02. Files listed by the API: fossil_collections.csv (19810303 B), map_data.zip (250317738 B), README.md (2977 B), unique_genus.csv (13099192 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "genus diversity through time Phanerozoic fossil subsampled",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=genus%20diversity%20through%20time%20Phanerozoic%20fossil%20subsampled",
+      "hits": 0,
+      "note": "nothing (429 on first attempt)"
+    },
+    {
+      "source": "Dryad",
+      "query": "genus richness trajectory fossil",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=genus%20richness%20trajectory%20fossil",
+      "hits": 1,
+      "note": "10.5061/dryad.2280gb621"
+    },
+    {
+      "source": "DataCite",
+      "query": "Phanerozoic genus diversity curve fossil occurrences subsampling",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Phanerozoic%20genus%20diversity%20curve%20fossil%20occurrences%20subsampling",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Phanerozoic genus diversity subsampling fossil occurrences dataset",
+      "url": "https://zenodo.org/api/records?size=5&q=Phanerozoic%20genus%20diversity%20subsampling%20fossil%20occurrences%20dataset",
+      "hits": 977831,
+      "note": "full-text noise; relevant dataset hits 10.5061/dryad.96c20 (fishes sampling biases), 10.5061/dryad.280gb5mmv (land vertebrates), 10.5061/dryad.bt651 (metatherians)"
+    }
+  ],
+  "status": "data-ready",
+  "summary": "PBDB holds species- and genus-resolved fossil occurrences with age bounds, per-genus first/last appearance and occurrence counts, plus collection records for subsampling; the genus-trajectory test is buildable from it. Neotoma covers only the late Cenozoic and WoRMS has no time dimension, so both are partial; no ready-made subsampled richness-by-genus table was found.",
+  "next_step": "Pre-register a PBDB extraction (marine animal genera, stage bins, shareholder-quorum or similar subsampling) and the definition of 'small' vs 'large' genus and of peak/decline; consider restricting to well-sampled marine invertebrate groups.",
+  "obstacles_confirmed": [
+    "PBDB is dominated by shelly marine animals; plants and terrestrial genera are a thin remainder (not quantified here).",
+    "Unrestricted PBDB count queries (all occurrences for Animalia) timed out at 25 s; extractions should be chunked by interval or taxon."
+  ]
+}

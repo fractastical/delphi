@@ -1,0 +1,37 @@
+{
+  "claim_id": "darwin1859-ch10-10",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:33:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "dated fossil occurrences per taxon (genus or species) in later geological intervals",
+    "per-interval origination and extinction counts or rates",
+    "sampling-standardized standing diversity through the Cenozoic and later Phanerozoic"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service 1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/diversity.csv?base_name=Metazoa&count=genera&min_ma=0&max_ma=66&time_reso=stage",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:32:30Z", "method": "GET PBDB diversity.csv endpoint for Metazoa genera, 0-66 Ma, stage resolution; GET taxa/single.json name=Metazoa", "http_status": 200, "bytes": 1847 },
+      "variables_present": ["per-stage counts of genera (columns X_Ft, X_bL, X_FL, X_bt, sampled_in_bin, implied_in_bin, n_occs) with interval ages", "occurrence-level data via occs/list for subsampling", "first/last appearances through taxonomic hierarchy"],
+      "variables_missing": ["pre-computed sampling-standardized rates (must be computed by the user)", "global species-level completeness"],
+      "scope": "The taxa record for Metazoa reports noc 1,361,166 occurrences. The diversity endpoint returned 22 rows (Greenlandian to the 66 Ma boundary) with columns interval_no, interval_name, max_ma, min_ma, X_Ft, X_bL, X_FL, X_bt, sampled_in_bin, implied_in_bin, n_occs; e.g. Late Pleistocene n_occs 40,842 and Piacenzian n_occs 20,263.",
+      "evidence": "Both API calls returned HTTP 200 with the fields above. Download is open without authentication. Licence not read.",
+      "verdict": "holds"
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB", "query": "taxa/single name=Metazoa", "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Metazoa&show=attr", "hits": 1, "note": "noc 1361166 occurrences" },
+    { "source": "PBDB", "query": "occs/diversity Metazoa genera 0-66 Ma stage", "url": "https://paleobiodb.org/data1.2/occs/diversity.csv?base_name=Metazoa&count=genera&min_ma=0&max_ma=66&time_reso=stage", "hits": 22, "note": "22 stage-level rows with boundary-crosser style counts" },
+    { "source": "DataCite", "query": "phanerozoic marine diversity origination extinction rates fossil (type dataset)", "url": "https://api.datacite.org/dois?query=phanerozoic%20marine%20diversity%20origination%20extinction%20rates%20fossil&resource-type-id=dataset&page%5Bsize%5D=4", "hits": 1, "note": "10.5061/dryad.wdbrv15xw brachiopod diversity and palaeobiogeography; regional clade, not inspected" }
+  ],
+  "status": "data-ready",
+  "summary": "The PBDB open API serves per-stage genus counts, boundary-crosser style origination/extinction inputs and raw occurrences (about 1.36 million for Metazoa), so the variables for a later-Phanerozoic origination-versus-extinction comparison are obtainable; sampling standardization has to be done by the tester.",
+  "next_step": "Pre-register the interval scheme and subsampling method, pull occs/list for Cenozoic marine invertebrates, and compute per-interval rates in a script (not done here).",
+  "obstacles_confirmed": ["Raw PBDB counts do not remove the Pull of the Recent; standardization is not provided by the API."]
+}

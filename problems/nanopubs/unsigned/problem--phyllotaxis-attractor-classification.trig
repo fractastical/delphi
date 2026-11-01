@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" ;
+    dct:description "In the Douady-Couder class of models (new primordium placed at the point of least repulsion from existing ones on a growing cylinder or disc), what is the complete set of attractors and their basins as the growth parameter varies, and does the golden-angle Fibonacci branch have full-measure basin for small growth parameter?" ;
+
+    skos:historyNote "Known state: Douady and Couder (1992) showed numerically and experimentally that the Fibonacci branch is selected; Levitov (1991) explained the energetics; Atela, Golé and Hotton (2002) proved convergence to Fibonacci lattices for a cylindrical model under restrictions. Pennybacker, Shipman and Newell (2015) review the gap: no rigorous classification covering Lucas and bijugate branches, basin boundaries, or the disc geometry. Thompson's phyllotaxis claims (ch14) sit on this." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: A theorem characterizing the attractors for the cylindrical Douady-Couder map over a stated parameter range, including the Lucas branch, with proof (Lean 4 or rigorous computer-assisted interval proof)." ;
+    skos:scopeNote "Resolved when: Numerical basin maps matching the theorem." ;
+    skos:scopeNote "Refuted if: Numerical discovery of an attractor outside the classified set." ;
+    skos:note "Data access: None needed; sunflower and cone parastichy counts in the repo (thompson1917-ch14-05/06 tests) can check predictions." ;
+    skos:note "Requires: dynamical-systems" ;
+    skos:note "Requires: interval-arithmetic" ;
+    skos:note "Requires: lean4" ;
+    skos:note "Requires: simulation" ;
+    skos:note "Scale: organ" ;
+    skos:note "Scale: developmental" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevLett.68.2098> ;
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevLett.66.224> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.physd.2015.05.003> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1103/PhysRevLett.68.2098> dct:title "Phyllotaxis as a physical self-organized growth process" ;
+    dct:bibliographicCitation "Douady and Couder 1992, Phyllotaxis as a physical self-organized growth process" .
+  <https://doi.org/10.1103/PhysRevLett.66.224> dct:title "Phyllotaxis of flux lattices in layered superconductors" ;
+    dct:bibliographicCitation "Levitov 1991, Phyllotaxis of flux lattices in layered superconductors" .
+  <https://doi.org/10.1016/j.physd.2015.05.003> dct:title "Phyllotaxis: Some progress, but a story far from over" ;
+    dct:bibliographicCitation "Pennybacker, Shipman and Newell 2015, Phyllotaxis: some progress, but a story far from over" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.290Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Rigorous classification of attractors in dynamical phyllotaxis" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

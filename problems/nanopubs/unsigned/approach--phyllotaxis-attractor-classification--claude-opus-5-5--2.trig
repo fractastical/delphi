@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean: lattice parastichy theorems from continued fractions" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "Formalize the static half of the theory, which every dynamical claim refers to and which is classical. For the lattice of points (kα mod 1, k·h), k ∈ ℤ, on a cylinder, with divergence α and rise h, prove: (a) the visible opposed parastichy pairs, the two shortest lattice vectors forming a basis and pointing in opposite directions, have numbers (q_j, q_{j+1}) given by consecutive denominators of convergents or intermediate fractions of α; (b) as h decreases, the visible pair changes exactly at the h-values where three vectors have equal length (triangular lattice points), and the sequence of pairs is the convergent sequence; (c) for α = the golden angle fraction (3 − √5)/2, all visible pairs are consecutive Fibonacci numbers, for α = 1/(3 + 1/φ) (the Lucas angle) consecutive Lucas numbers, and bijugate lattices give 2× Fibonacci pairs. Mathlib has generalized continued fractions (GenContFract) and Fibonacci (Nat.fib), so most groundwork exists." ;
+
+    delphi:proposedTest "A Lean module proving that the visible opposed parastichy numbers of the golden-angle lattice are consecutive Fibonacci numbers for every rise h, with the Lucas and bijugate analogues. It does not classify dynamical attractors, but certifies the lattice side that approach 1's fixed points are identified by." ;
+    delphi:context "Fails if: Mathlib's best-approximation lemmas for continued fractions are not in the form needed, and proving them from scratch exceeds the time budget." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the cylindrical lattice, visible parastichy pairs and the shortest-vector basis in Lean. 2. Prove the convergent characterization using Mathlib's continued-fraction API and best-approximation lemmas. 3. Specialize to golden, Lucas and bijugate cases; prove the Fibonacci and Lucas statements. 4. Write a report linking each theorem to Thompson's ch14 claims in the repo." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: number-theory" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.physd.2015.05.003> ;
+    rdfs:seeAlso <https://doi.org/10.1209/0295-5075/14/6/006> ;
+    rdfs:seeAlso <https://github.com/leanprover-community/mathlib4> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+  <https://doi.org/10.1016/j.physd.2015.05.003> dct:title "Phyllotaxis: Some progress, but a story far from over" ;
+    dct:bibliographicCitation "Pennybacker, Shipman and Newell 2015, review of phyllotaxis theory and open gaps" .
+  <https://doi.org/10.1209/0295-5075/14/6/006> dct:title "Energetic Approach to Phyllotaxis" ;
+    dct:bibliographicCitation "Levitov 1991, Energetic approach to phyllotaxis (Europhysics Letters). The DOI 10.1103/PhysRevLett.66.224 in problems.json is Levitov's flux-lattice PRL paper." .
+  <https://github.com/leanprover-community/mathlib4> dct:bibliographicCitation "Mathlib: GenContFract and Nat.fib" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.298Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Lean: lattice parastichy theorems from continued fractions" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

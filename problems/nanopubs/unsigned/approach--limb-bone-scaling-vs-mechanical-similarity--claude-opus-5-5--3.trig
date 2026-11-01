@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean derivation of similarity exponents and the posture-compensation identity" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "Formalize the three hypotheses as power-law assumptions and derive the exponents, extending Magnitude.lean (which already proves the strength/weight argument for thompson1917-ch02-03). Geometric similarity: all lengths proportional to M^(1/3), so area M^(2/3). Elastic similarity (McMahon): diameter d proportional to l^(3/2) and M proportional to l d^2, so d proportional to M^(3/8), area M^(3/4), length M^(1/4). Stress similarity with posture: peak bone stress sigma proportional to M / (A times EMA) up to a bone-geometry factor; if A proportional to M^a and EMA proportional to M^e then sigma proportional to M^(1 - a - e), so constant stress (flat safety factor if strength is size-independent) requires a + e = 1. Prove these as theorems over real exponents. Then plug in the published estimates of a (from approach 1) and of e (Biewener 1989) to state the implied stress exponent with propagated uncertainty, giving a numerical test of whether the safety factor is flat." ;
+
+    delphi:proposedTest "Compiled Lean module with no sorry for the derivations and the identity, plus the stress-exponent estimate with 95% CI and whether it includes 0." ;
+    delphi:context "Fails if: The data step: if EMA estimates exist for too few species to give a CI on e narrower than 0.1, the safety-factor question stays open even though the formal part completes." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define power-law scaling relations as functions f(M) = c M^p with Real.rpow and prove the composition lemmas. 2. Prove the three exponent derivations and the stress identity sigma exponent = 1 - a - e. 3. Prove that a + e = 1 is necessary and sufficient for size-independent stress under the stated model. 4. Record in lean/reports; compute 1 - a - e with delta-method or bootstrap CIs using approach 1's a and Biewener's e, labelled as a data-dependent corollary, not a theorem." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Effective mechanical advantage data across many species are limited to a few published compilations." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+
+
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.309Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Lean derivation of similarity exponents and the posture-compensation identity" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

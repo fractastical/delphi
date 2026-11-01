@@ -1,0 +1,176 @@
+{
+  "claim_id": "darwin1859-intro-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "sequences (several loci) for congeneric species, or a phylogeny containing them",
+    "genus membership per species (classification)",
+    "fossil occurrences and ages of extinct congeners / relatives",
+    "divergence age of the genus-level ancestral node"
+  ],
+  "datasets": [
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree opentree16.1, taxonomy OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://files.opentreeoflife.org/synthesis/opentree16.1/opentree16.1_tree.tgz",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:01Z",
+        "method": "GET landing; POST https://api.opentreeoflife.org/v3/tree_of_life/about and /v3/taxonomy/about; HEAD access_url",
+        "http_status": 200,
+        "bytes": 41608973
+      },
+      "variables_present": [
+        "synthetic phylogeny and taxonomy covering genus membership and tree topology across animals and plants"
+      ],
+      "variables_missing": [
+        "fossil ages for extinct relatives",
+        "per-locus gene trees (only the synthesized tree is distributed)"
+      ],
+      "scope": "Synthetic tree of 2,385,875 tips from 1,931 source studies / 2,064 source trees (synth_id opentree16.1, taxonomy_version 3.7draft3, created 2025-12-20); root 'cellular organisms'. Taxonomy_version 3.7draft3; NCBI genus-rank entries 133,688 (see GenBank record).",
+      "evidence": "POST /v3/tree_of_life/about returned HTTP 200 with num_tips 2385875, num_source_studies 1931, num_source_trees 2064, synth_id opentree16.1. POST /v3/taxonomy/about returned ott3.7draft3. HEAD of opentree16.1_tree.tgz returned 200 with Content-Length 41608973 (not downloaded; over 1 MB). POST /v3/tnrs/match_names, /v3/tree_of_life/mrca and /v3/tree_of_life/node_info returned 200 JSON.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil occurrences with ages for extinct genera and species",
+        "genus/family classification and first/last appearance per genus"
+      ],
+      "variables_missing": [
+        "molecular data",
+        "explicit ancestor-descendant relationships"
+      ],
+      "scope": "Animal fossils worldwide; 91,043 genus records of which extant=no 72,445 and extant=yes 17,981 (parameter values as queried)",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank / nuccore (via Entrez E-utilities)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET landing; GET esearch.fcgi db=nuccore term=Mammalia[Organism] retmax=0; esearch db=nuccore Insecta[Organism] AND cytochrome oxidase subunit I[Title]; esearch db=taxonomy genus[Rank]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "homologous sequences for taxa across the tree (Mammalia 92,326,294 nuccore records; NCBI taxonomy genus-rank entries 133,688)"
+      ],
+      "variables_missing": [
+        "pre-built trees",
+        "fossil ages"
+      ],
+      "scope": "All organisms; sequences only; the queue lists 'GenBank' and 'NCBI GenBank' as two entries, merged here",
+      "evidence": "Landing page HTTP 200. esearch (retmax=0) for Mammalia[Organism] in nuccore returned count 92326294; Insecta[Organism] AND 'cytochrome oxidase subunit I'[Title] returned count 264281 (Insecta alone 45339269, the title term alone 621034 in the translation stack); esearch db=taxonomy genus[Rank] returned count 133688. One further esearch was rate-limited (HTTP 429, limit 3 requests/s) and not retried.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree (timetree.org)",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:50Z",
+        "method": "GET https://timetree.org/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "divergence-time estimates between species pairs (per its title 'The Timescale of Life'; only the landing page was fetched)"
+      ],
+      "variables_missing": [
+        "not inspected: download terms, row counts"
+      ],
+      "scope": "landing page only",
+      "evidence": "HTTP 200, page title 'TimeTree :: The Timescale of Life'. No API call or data file was fetched, so coverage and licence are unknown.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "congeneric species phylogeny multilocus gene tree concordance",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=congeneric%20species%20phylogeny%20multilocus%20gene%20tree%20concordance",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "shared endogenous retrovirus insertions phylogeny",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=shared%20endogenous%20retrovirus%20insertions%20phylogeny",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "timetree divergence times species pairs database",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=timetree%20divergence%20times%20species%20pairs%20database",
+      "hits": 5,
+      "note": "five hits, none a divergence-time compilation across genera (first: 10.4231/gydx-9711 genomic divergence between species)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "TimeTree divergence time database species",
+      "url": "https://zenodo.org/api/records?size=5&q=TimeTree%20divergence%20time%20database%20species",
+      "hits": 1670835,
+      "note": "full-text noise: figures and single-taxon papers"
+    },
+    {
+      "source": "PBDB",
+      "query": "taxa/list.json?base_name=Animalia&rank=genus (+extant filters)",
+      "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Animalia&rank=genus&extant=no&limit=1&rowcount",
+      "hits": 72445,
+      "note": "extinct genera count; extant=yes gave 17981"
+    }
+  ],
+  "status": "partial",
+  "summary": "Each ingredient is open but they live in separate resources: genus membership and a synthesized tree (Open Tree of Life), raw multi-locus sequences (GenBank), and extinct genera with ages (PBDB, 72,445 extinct vs 17,981 extant animal genera as returned by the extant filter). No resource distributes per-locus gene trees for congeneric sets or links living congeners to a dated extinct ancestor.",
+  "next_step": "Choose several well-sampled genera with multi-locus data (e.g. via GenBank gene queries), build or take per-locus trees, and compare against OTL topology and PBDB first appearances of the genus; freeze a pre-molecular genus list to avoid circularity.",
+  "obstacles_confirmed": [
+    "No ready table of per-locus gene trees for congeners.",
+    "Fossil ancestors cannot be identified from PBDB alone.",
+    "TimeTree was only checked at landing-page level."
+  ]
+}

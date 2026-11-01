@@ -1,0 +1,93 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered test of R/t ratios against Brazier buckling across 120 specimens" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "Assemble a pre-registered dataset of 120 specimens spanning four biological hollow structure types: vertebrate long bones (avian wing humeri/ulnae and terrestrial mammalian femora from Dryad and MorphoSource), grass and reed stems, bamboo culms, and avian feather rachises, paired with Currey and Alexander's (1985) 220-bone tabular compilation. For each specimen, extract mid-shaft outer radius R, wall thickness t, effective internal core density rho_core / rho_solid (accounting for marrow, trabecular foam, or parenchymatous pith), and longitudinal tissue modulus and yield strain (sigma_y / E).\n\nTest three competing mechanical predictions for the dimensionless ratio k = R/t: (1) pure empty-tube stiffness-per-mass maximization, which is unbounded unless regularized by core mass (predicting k_opt = [(3/2)(rho_solid / rho_core - 1)]^(1/2)); (2) the Brazier ovalization and local shell-buckling limit under bending, which caps k at k_buckling = C_B * (E / sigma_y) with C_B approx 0.3; and (3) constant minimum wall thickness for impact resistance. Compare residuals across the four structure types and test allometric scaling of k with body or organ size." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--1#n_specimens> ;
+    delphi:proposedTest "Across the 120 specimens, a Bayes factor > 10 (or AIC difference > 10) decisively separating the core-mass-regularized stiffness-per-mass optimum k_opt from the Brazier local-buckling ceiling k_buckling within each of the four structure classes." ;
+    delphi:context "Fails if: Observed R/t ratios across the four biological classes show high variance uncorrelated with either rho_solid / rho_core or E / sigma_y (R^2 < 0.15), refuting both mechanical optimality models." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Compile and checksum 120 specimens across long bones (including Dryad 10.5061/dryad.7vf4004 and 10.5061/dryad.9ct2f), plant stems, bamboo culms, and feather rachises with matched tissue E, sigma_y, and core density. 2. Pre-register the predicted loci k_opt(rho_core / rho_solid) and k_buckling(E / sigma_y) and a tolerance band of +/- 25% in log(R/t). 3. Compute the log-ratio deviation from both boundaries for each structure class and fit a phylogenetic/taxonomic mixed model testing size dependence. 4. Compare marrow-filled terrestrial bones against pneumatized avian wing bones and foam-filled plant stems to test whether core density quantitatively explains the shift in R/t." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: morphometry" ;
+    skos:note "Tool: mechanics-modelling" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.7vf4004> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.9ct2f> ;
+    rdfs:seeAlso <https://www.morphosource.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1927.0125> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--1#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 120 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://datadryad.org/dataset/doi:10.5061/dryad.7vf4004> dct:title "Dryad long-bone cross-sectional morphology dataset (10.5061/dryad.7vf4004)" ;
+    dct:description "Cross-sectional geometric properties and cortical dimensions of mammalian long bones" .
+  <https://datadryad.org/dataset/doi:10.5061/dryad.9ct2f> dct:title "Dryad vertebrate long-bone FE and beam theory dataset (10.5061/dryad.9ct2f)" ;
+    dct:description "Morphologically diverse sample of vertebrate long bones with CT cross-sectional geometry" .
+  <https://www.morphosource.org/> dct:title "MorphoSource 3D vertebrate skeletal CT archive" ;
+    dct:description "Open micro-CT scans of avian pneumatized wing bones and terrestrial femora" .
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts" .
+  <https://doi.org/10.1098/rspa.1927.0125> dct:title "On the flexure of thin cylindrical shells and other \"thin\" sections" ;
+    dct:bibliographicCitation "Brazier 1927, On the flexure of thin cylindrical shells and other thin sections" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.314Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Pre-registered test of R/t ratios against Brazier buckling across 120 specimens" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

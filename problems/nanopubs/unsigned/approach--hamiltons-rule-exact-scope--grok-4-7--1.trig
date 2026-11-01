@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Three Lean theorems for the three readings of rb > c" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> ;
+    dct:description "Formalize the Birch–Okasha separation as three theorems with disjoint hypotheses. Price's identity first: the change in mean breeding value equals the covariance of fitness and breeding value divided by mean fitness, plus the expected fitness-weighted transmission term. Under fair meiosis the transmission term is zero, so the sign of allele-frequency change is the sign of that covariance. Regression form: define r as the least-squares regression of partner genotype on actor genotype, and b, c as the partial regressions of fitness on partner and actor genotype. Prove that r b - c equals the covariance ratio by the normal equations, so the regression form predicts the sign of frequency change whenever the transmission term vanishes. This is an identity, and the theorem should say so. Additive form: fitness is exactly 1 - c x + b y with b, c constant and y the partner phenotype. Prove the same sign prediction with genealogical relatedness in place of the regression. Counterexample theorem: with fitness 1 - c x + b x y, b and c frozen at one frequency do not preserve the sign at another frequency. State the 2010–2011 correspondence in the module docstring: Nowak, Tarnita and Wilson attack dynamic sufficiency of inclusive-fitness maximization; Gardner, West and Wild defend the regression identity; those are different theorems." ;
+
+    delphi:proposedTest "Three no-sorry theorems with explicit hypotheses, plus a short map from those theorems onto the 2010–2011 dispute." ;
+    delphi:context "Fails if: A model inside the regression theorem's hypotheses where the regression form has the wrong sign of allele-frequency change. That would refute the identity and the formalization together." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Prove Price's identity and the fair-meiosis corollary. 2. Prove the regression form from the normal equations, labeled as an identity. 3. Prove the additive constant-b, constant-c form with genealogical relatedness. 4. Prove a frequency-dependent counterexample to the frozen additive predictor. 5. Map each theorem onto the 2010 and 2011 claims in the module documentation." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: population-genetics" ;
+    skos:note "Tool: price-equation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-rule> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-haplodiploidy> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-lmc> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/227520a0> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0022-5193(64)90038-4> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature09205> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1420-9101.2011.02236.x> ;
+    rdfs:seeAlso <https://doi.org/10.1093/biosci/biu196> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> a delphi:Concept, schema:Question ;
+    rdfs:label "The exact scope of Hamilton's rule" .
+
+
+  <https://doi.org/10.1038/227520a0> dct:title "Selection and Covariance" ;
+    dct:bibliographicCitation "Price 1970, Selection and covariance" .
+  <https://doi.org/10.1016/0022-5193(64)90038-4> dct:title "The genetical evolution of social behaviour. I" ;
+    dct:bibliographicCitation "Hamilton 1964, The genetical evolution of social behaviour I" .
+  <https://doi.org/10.1038/nature09205> dct:title "The evolution of eusociality" ;
+    dct:bibliographicCitation "Nowak, Tarnita and Wilson 2010, The evolution of eusociality" .
+  <https://doi.org/10.1111/j.1420-9101.2011.02236.x> dct:title "The genetical theory of kin selection" ;
+    dct:bibliographicCitation "Gardner, West and Wild 2011, The genetical theory of kin selection" .
+  <https://doi.org/10.1093/biosci/biu196> dct:title "Kin Selection and Its Critics" ;
+    dct:bibliographicCitation "Birch and Okasha 2015, Kin selection and its critics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hamiltons-rule-exact-scope, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.337Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hamiltons-rule-exact-scope: Three Lean theorems for the three readings of rb > c" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

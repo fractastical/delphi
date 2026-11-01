@@ -1,0 +1,82 @@
+{
+  "claim_id": "darwin1859-ch02-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch02-09",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If Darwin's geological generalization holds in the fossil record, then among well-sampled marine animal genera (a) genera that start small (1 or 2 valid species in their oldest 10-Myr bin) often grow to many species, and (b) extinct genera that become large (peak of 10 or more species) often peak and then decline before they vanish, and both patterns are more frequent than when the same genus's richness values are shuffled in time (so that they are not just an artifact of how range-through counts are built).",
+  "pass_criterion": "Pre-registered (claim supported). Primary analysis, with parts A and B defined in method_definitions: (A) at least 50 eligible small-start genera, the fraction P_A of them with a growth event is at least 0.20, and P_A is above the 95th percentile of the within-genus time-shuffled null (1000 shuffles); (B) at least 50 eligible large extinct genera, the fraction P_B with a peak-and-decline event is at least 0.20, and P_B is above the 95th percentile of its shuffled null. Both A and B must pass in the primary analysis AND in the sampling-robustness analysis (species with at least 2 occurrences only, same thresholds).",
+  "fail_criterion": "Pre-registered (claim refuted). In the primary analysis both parts fail, where a part fails if its fraction is below 0.05 or is not above the 95th percentile of its shuffled null. Mixed: all other outcomes with adequate n, including one part passing and the other not, a part with a fraction between 0.05 and 0.20, or both parts passing in the primary analysis but not in the robustness analysis; the per-part results are then reported as separate statements. Inconclusive (reason 'underpowered'): fewer than 50 eligible genera in part A or in part B in the primary analysis, or fewer than 20000 retained species records. Inconclusive (reason 'data-unavailable'): the fetched records are fewer than 99 % of the records_found count reported by PBDB for the same query on the day of retrieval, or the service cannot be reached.",
+  "planned_datasets": [
+    "paleobiology-database-taxa-list-1.2"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database-taxa-list-1.2",
+      "name": "Paleobiology Database, data service 1.2, taxa/list (species records with first and last appearance ages and occurrence counts)",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "PBDB data service 1.2, live database; no versioned release, so the snapshot is identified by retrieval time and by the SHA-256 of each fetched page",
+      "license": null,
+      "license_note": "The scout record (test-data/dataset-scouting/darwin-origin/darwin1859-ch02-09/datasets.json) has license null for PBDB, and none was verified for this registration; record the licence stated by PBDB at retrieval time in the completed result.",
+      "files": [
+        {
+          "name": "taxa/list.json pages (about 22 pages, limit=5000, offset=0, 5000, 10000, ...)",
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Brachiopoda,Bivalvia,Gastropoda,Trilobita,Cephalopoda,Anthozoa,Echinoidea,Crinoidea,Bryozoa,Ostracoda&rank=species&status=valid&show=app,parent&limit=5000&offset=0&rowcount",
+          "retrieved_at": null,
+          "byte_size": null,
+          "sha256": null,
+          "note": "Not yet fetched in full: byte size, SHA-256 and retrieval time are recorded per page by analysis.py. The offset parameter is increased by 5000 until records_returned is 0. Page-size check before registration: a 2000-record Brachiopoda page was 412,986 bytes, so a 5000-record page is about 1 MB and the total is tens of MB; these files are not committed, only their checksums and the script."
+        }
+      ],
+      "role": "species-level fossil taxa of ten largely marine animal groups, each with first-appearance (fea, fla) and last-appearance (lea, lla) ages in Ma, occurrence count (noc), extant flag (ext) and parent genus name (prl); used to build species richness per genus per 10-Myr bin",
+      "metadata_checked_before_registration": [
+        "taxa/list.json?base_name=Brachiopoda&rank=species&show=app,parent&limit=1&rowcount: records_found 15467; fields oid, rnk, nam, par, prl, rid, ext, noc, fea, fla, lea, lla, tei (and tli where present).",
+        "taxa/list.json?base_name=<ten groups>&rank=species&limit=1&rowcount: records_found 108472; some records carry tdf (e.g. 'nomen dubium') or acc (accepted name) and have no fea/lea.",
+        "same with status=valid: records_found 108019; with status=valid&extant=no: records_found 96115.",
+        "same base_name with rank=genus: records_found 36668.",
+        "offset parameter works (Brachiopoda, offset=5 returned a different record).",
+        "one 2000-record Brachiopoda page was downloaded to /dev/null only to measure its size (412,986 bytes, HTTP 200); it was not read."
+      ]
+    }
+  ],
+  "method_definitions": {
+    "species_filter": "Keep records with rnk 'species', no 'acc' field (not a junior synonym), no 'tdf' field (not nomen dubium or similar), numeric fea, fla, lea, lla, and noc of at least 1; de-duplicate on oid. Genus is the first word of nam (prl is recorded as a check; mismatches are counted and reported, and rows are kept by the first word of nam).",
+    "ages": "Species first appearance FA = (fea + fla) / 2 and last appearance LA = (lea + lla) / 2, in Ma. FA is set to at most 541 and LA to at least 0.",
+    "bins": "Fixed 10-Myr bins, bin k covers [10k, 10k + 10) Ma for k = 0..53. A species is counted in every bin that its range [LA, FA] overlaps (range-through).",
+    "genus_trajectory": "S_g(k) is the number of retained species of genus g counted in bin k. The trajectory runs from the oldest occupied bin to the youngest occupied bin of the genus; span is the number of bins in it; S0 is S_g in the oldest bin; peak is max S_g; the final bin is the youngest.",
+    "genus_extinct": "A genus is extinct if none of its retained species has ext = 1 and its youngest occupied bin has k of at least 1 (last appearance older than 10 Ma). Genera with any extant species, or reaching the youngest bin k = 0, are excluded from part B (this removes the 'pull of the Recent' from the declines).",
+    "part_A": "Eligible: span of at least 3 bins, at least 2 retained species in total, and 1 <= S0 <= 2. Growth event: peak >= 5 and peak >= 4 x S0 (so 5 or more species from one, 8 or more from two). P_A = growth events / eligible.",
+    "part_B": "Eligible: extinct genus, span of at least 5 bins, peak >= 10. Peak-and-decline event: the peak is not reached in the final bin and S_g in the final bin is at most 0.5 x peak. P_B = events / eligible.",
+    "shuffled_null": "For each genus, S_g is permuted at random across the bins of its own span (same values, same span), 1000 times with numpy default_rng(20261101); eligibility for A is recomputed on the shuffled series (because S0 changes), eligibility for B is shuffle-invariant. The null distribution is that of P_A and P_B over the 1000 shuffles; the observed value passes if it exceeds the 95th percentile (one-sided).",
+    "robustness_analysis": "The whole analysis repeated keeping only species with noc >= 2 (a coarse control for singleton species that give artificially short ranges), same thresholds.",
+    "descriptive_only_not_used_for_verdict": [
+      "P_A and P_B separately for each of the ten groups, and with 20-Myr bins in place of 10-Myr bins.",
+      "Observed counts of eligible genera, events, and the shuffled-null mean and 95th percentile.",
+      "Fraction of PBDB records excluded by each filter, and the number of rows where the first word of nam differs from prl.",
+      "P_B with the threshold on peak lowered to 5 (large genera) and raised to 20."
+    ]
+  },
+  "test_contract": {
+    "expected_observation": "Among well-sampled marine animal genera, at least one in five genera that begin with one or two valid species later reach five or more species (and at least four times their start), and at least one in five extinct genera that reach ten or more species peak before their last 10-Myr bin and fall to half their peak or less; both fractions exceed what time-shuffled richness values of the same genera give, and both persist when single-occurrence species are removed.",
+    "disconfirming_observation": "Fewer than one in twenty small-start genera grow to five or more species and fewer than one in twenty large extinct genera show a peak followed by decline, or neither fraction exceeds the time-shuffled null: genus richness trajectories would then be flat, monotonic or not distinguishable from random order.",
+    "admissible_datasets": "Openly accessible, stratigraphically dated species-level fossil records with per-species first and last appearance and an occurrence count, compiled independently of Darwin's text, covering at least ten animal groups and 50 or more eligible genera per part. Marine shelly invertebrates are admissible as a stated subset of 'genera in the fossil record'; datasets without time resolution (e.g. WoRMS) or restricted to the late Cenozoic (Neotoma) are not.",
+    "inference_method": "Range-through species richness per genus in fixed 10-Myr bins; two event fractions P_A (growth from a small start) and P_B (peak then decline in large extinct genera); each compared with a fixed frequency threshold (0.20 for 'often', 0.05 as the floor below which the pattern counts as absent) and with the 95th percentile of 1000 within-genus time shuffles; repeated on species with at least 2 occurrences. Verdict by the rules in pass_criterion and fail_criterion."
+  },
+  "interpretation": "Darwin's terms mapped as follows. 'Genera' are taxonomic genera as currently recorded in PBDB (modern taxonomy, not Darwin's); 'size' of a genus is its number of valid species, counted as range-through in a 10-Myr bin; 'small genera have often increased greatly in size' is read as: of the genera that start with one or two species, a fraction of at least 0.20 later reach five or more species (and at least four times the start); 'large genera have often come to their maxima, declined and disappeared' is read as: of the extinct genera that reach ten or more species, a fraction of at least 0.20 peak before their last bin and end at half the peak or less. 'Often' has no number in Darwin; 0.20 (one in five) and 0.05 are fixed here from the plain meaning of the word and are not tuned to any expected result. The 10-species and 5-species cut-offs are conventional round numbers, not Darwin's. This is a modern reinterpretation in terms of species counts in time bins, with a shuffle null added because range-through counts produce rise-and-fall shapes by construction. What the test does not cover: plants, vertebrates, insects and microfossils other than ostracods (the ten groups chosen are brachiopods, bivalves, gastropods, trilobites, cephalopods, corals, echinoids, crinoids, bryozoans and ostracods); the claim's stated scope 'genera in the fossil record' is therefore tested only on a shelly marine subset; the causal story (genera as strongly marked varieties) is not tested; true diversity is not estimated, since no occurrence-level subsampling is applied (only the noc >= 2 check), so sampling and taxonomic-effort bias remain; whether the same pattern holds for living genera in a country (the context of the Chapter II section) is not addressed.",
+  "caveats": [
+    "Before this registration was written, only metadata was inspected: record counts (records_found) for the queries listed under datasets, the field names of the taxa/list.json records, and the single first record returned by three limit=1 requests (one species record each, whose age values were incidental and were not used). One 2000-record Brachiopoda page was downloaded to /dev/null to measure its size and was not read. No genus trajectory was built and no statistic was computed. About 7 requests were made in all, slightly above the planned cap of 6.",
+    "The author's prior knowledge: the literature on the waxing and waning of clades (for example the 'hat-shaped' and symmetric clade-diversity trajectories studied by Foote and others) suggests that many clades rise and fall, so a pass of part B in particular is the expected outcome, and part B is easy to pass because genera that are extinct and large will often end with few species. The shuffled null and the part A criterion are the places where the test can discriminate. These expectations were not used to set the thresholds.",
+    "Range-through richness counts a species in every bin between its first and last appearance, so the richness of each genus rises and falls partly by construction, and singletons (species known from one occurrence) are given short ranges. The shuffle null and the noc >= 2 analysis only partly address this; neither is a proper occurrence-based subsampling (e.g. shareholder quorum subsampling), which was not pre-registered because the taxa/list endpoint does not give per-collection data and the occurrence endpoint is too large for a first test.",
+    "A genus's size in PBDB depends on how many species taxonomists have named and entered, not only on how many existed (monographic effort and splitting/lumping), and on the PBDB's current taxonomy; the pull of the Recent affects part A (young genera may still be growing) and is only removed from part B.",
+    "Thresholds (0.20 fixed 'often', 0.05 floor, n of at least 50, peak cut-offs 5 and 10, ratios 4 and 0.5, 10-Myr bins, 1000 shuffles, seed 20261101) were fixed now, before any trajectory was computed. Any change after seeing results must be written under 'deviations'.",
+    "The ten groups were chosen before looking because the scout record names marine invertebrates as the best-sampled part of PBDB; they were not selected by genus-level outcome. PBDB is a live database, so a rerun later will differ slightly; the checksums identify the snapshot used.",
+    "The three assessors differ on how resolvable the claim is (resolvable-now 0.86 and 0.90, partially-resolvable 0.72, with data-adequacy 0.67, 0.85 and 0.54 respectively); that disagreement, about sampling bias, is exactly what this test only partly controls, and the verdict should be read with it."
+  ],
+  "created": "2026-11-01T14:47:38Z",
+  "agent": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "prereg-darwin-batch-1",
+    "date": "2026-11-01"
+  }
+}

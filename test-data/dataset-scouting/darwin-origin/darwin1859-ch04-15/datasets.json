@@ -1,0 +1,289 @@
+{
+  "claim_id": "darwin1859-ch04-15",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "area of the region of origin of each clade (large landmass versus island or small region)",
+    "speciation or diversification rate per clade (dated phylogeny)",
+    "geographic range size per species",
+    "clade origin location and age"
+  ],
+  "datasets": [
+    {
+      "id": "vertlife",
+      "name": "VertLife",
+      "landing_url": "https://vertlife.org/",
+      "access_url": "https://vertlife.org/data/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://vertlife.org/ and https://vertlife.org/data/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated phylogenies of vertebrate groups (data page mentions mammal, amphibian and squamate trees and BirdTree)"
+      ],
+      "variables_missing": [
+        "area of region of origin",
+        "range sizes"
+      ],
+      "scope": "Terrestrial vertebrates; per-clade area not included",
+      "evidence": "Landing returned 200 (5,348 bytes); /data/ returned 200 (38,562 bytes) with text mentioning 'mammal tree', 'amphibian tree of life', 'squamate phylogeny' and BirdTree. Download formats were not examined.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence records",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/count",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GBIF API occurrence/count?isGeoreferenced=true",
+        "http_status": 200,
+        "note": "Landing 403; 200 is the API"
+      },
+      "variables_present": [
+        "georeferenced occurrences from which range sizes can be computed"
+      ],
+      "variables_missing": [
+        "clade origin area",
+        "diversification rates",
+        "native versus introduced status per record"
+      ],
+      "scope": "Global occurrence records",
+      "evidence": "API returned 200: 3,708,859,090 georeferenced occurrences. Landing page returned 403 to curl.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gift",
+      "name": "Global Inventory of Floras and Traits (GIFT)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GIFT API query=lists; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "island and mainland plant checklists with entity_class label"
+      ],
+      "variables_missing": [
+        "area values not seen in fields queried",
+        "diversification rates"
+      ],
+      "scope": "Plants only",
+      "evidence": "lists endpoint returned 200 with fields incl. entity_class (e.g. 'Island'); landing returned 200 (5,520 bytes). No area field appeared in the first 400 KB read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "glonaf-v2-02-zenodo",
+      "name": "Global Naturalized Alien Flora (GloNAF) v2.02",
+      "landing_url": "https://zenodo.org/records/17105725",
+      "access_url": "https://zenodo.org/records/17105725/files/glonaf_region.csv",
+      "doi": "10.5281/zenodo.17105725",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Zenodo API /api/records/17105725; GET https://glonaf.org/",
+        "http_status": 200,
+        "bytes": 80120
+      },
+      "variables_present": [
+        "naturalized plant lists for 1,343 regions (427 islands), 16,429 taxa"
+      ],
+      "variables_missing": [
+        "species origin area",
+        "diversification"
+      ],
+      "scope": "Plants; spread outside native range (human-mediated)",
+      "evidence": "Zenodo API returned 200: CC-BY-4.0, 16,429 taxa, 1,343 regions (427 islands), 336 sources; glonaf_region.csv 80,120 bytes. glonaf.org landing returned 200 (138,438 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about",
+        "http_status": null,
+        "note": "Landing 000; API 200"
+      },
+      "variables_present": [
+        "synthetic tree (2,385,875 tips) for diversification analyses"
+      ],
+      "variables_missing": [
+        "area of origin",
+        "branch lengths/dates not checked"
+      ],
+      "scope": "All life",
+      "evidence": "API returned 200 (opentree16.1). Landing did not respond (000).",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET PBDB API taxa/single.json?name=Mammalia; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil occurrence counts per taxon (Mammalia noc 128,310)",
+        "taxon records with ranks"
+      ],
+      "variables_missing": [
+        "area of origin per clade",
+        "range sizes"
+      ],
+      "scope": "Fossil record; sampling effort confounded",
+      "evidence": "taxa/single.json?name=Mammalia returned 200 with noc 128310. Landing returned 200 (9,257 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "passerine-islands-continents-465b258",
+      "name": "Contrasting drivers of diversification rates on islands and continents across three passerine families (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.465b258",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.465b258",
+      "doi": "10.5061/dryad.465b258",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.465b258 and /versions/*/files",
+        "http_status": 200,
+        "bytes": 2982112
+      },
+      "variables_present": [
+        "bill morphology, range data and diversification models for island and continental lineages of three passerine families (per abstract and file names)"
+      ],
+      "variables_missing": [
+        "global scope",
+        "area of origin per clade"
+      ],
+      "scope": "Three passerine families",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.465b258 returned 200: title 'Data from: Contrasting drivers of diversification rates on islands and continents across three Passerine families', published 2019-10-17, license CC0-1.0, storageSize 2982112 bytes; file list: ALL_TPS_FILES.txt 2,287,156; ESSim.R 13,505; Geomorph_PCScores.csv 322,165; MorphRangeData.csv 45,706; SSEModels.R 21,413; TPS_FILES_ImageID_Species.csv 286,676; geomorph.R 5,491. Abstract: speciation rates and range size across island and continental species. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "corvides-wallacea-diversification-s7h44j17v",
+      "name": "Wallacean and Melanesian islands promote higher rates of diversification within the global passerine radiation Corvides (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s7h44j17v",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s7h44j17v",
+      "doi": "10.5061/dryad.s7h44j17v",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.s7h44j17v and /versions/*/files",
+        "http_status": 200,
+        "bytes": 290016000
+      },
+      "variables_present": [
+        "tree of 728 corvoid taxa (file name) and gene alignment"
+      ],
+      "variables_missing": [
+        "area values",
+        "other clades"
+      ],
+      "scope": "Corvides only; main files exceed 1 MB (not downloaded)",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.s7h44j17v returned 200: title 'Wallacean and Melanesian islands promote higher rates of diversification within the global passerine radiation Corvides: Supplementary information', published 2022-10-17, license CC0-1.0, storageSize 290016000 bytes; file list: allcorv_inc_min_75percent_renamed.nex 281,463,005; Corvides_728-12gene-alignment.nex 8,503,864; corvides.728-simplified-nexus.tre 48,264; README.txt 867. Abstract concerns diversification across Wallacean and Melanesian islands. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "diversification rate island continent",
+      "url": "https://datadryad.org/api/v2/search?q=diversification+rate+island+continent&per_page=5",
+      "hits": 10,
+      "note": "found 465b258; other hits single clades"
+    },
+    {
+      "source": "DataCite",
+      "query": "speciation rate island area continental phylogeny diversification",
+      "url": "https://api.datacite.org/dois?query=speciation+rate+island+area+continental+phylogeny+diversification&page%5Bsize%5D=5",
+      "hits": 5,
+      "note": "found Corvides data (dryad.s7h44j17v)"
+    },
+    {
+      "source": "DataCite",
+      "query": "species range size area diversification vertebrates phylogeny",
+      "url": "https://api.datacite.org/dois?query=species+range+size+area+diversification+vertebrates+phylogeny&page%5Bsize%5D=5",
+      "hits": 17,
+      "note": "macroecology studies; none inspected"
+    },
+    {
+      "source": "Zenodo",
+      "query": "diversification rates islands versus continents phylogeny",
+      "url": "https://zenodo.org/api/records?q=diversification+rates+islands+versus+continents+phylogeny&size=5",
+      "hits": 338859,
+      "note": "clade-specific datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "GloNAF naturalized alien flora database",
+      "url": "https://zenodo.org/api/records?q=GloNAF+naturalized+alien+flora+database&size=5",
+      "hits": 211759,
+      "note": "found glonaf zenodo.17105725"
+    },
+    {
+      "source": "DataCite",
+      "query": "GloNAF Global Naturalized Alien Flora",
+      "url": "https://api.datacite.org/dois?query=GloNAF+Global+Naturalized+Alien+Flora&page%5Bsize%5D=5",
+      "hits": 33
+    },
+    {
+      "source": "PBDB API",
+      "query": "taxa single Mammalia",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Mammalia",
+      "hits": 1
+    }
+  ],
+  "status": "partial",
+  "summary": "Dated vertebrate trees (VertLife), the Open Tree synthetic tree, global occurrence records (GBIF, 3.7 billion georeferenced), plant naturalization lists (GloNAF) and fossil occurrences (PBDB) are open. None supplies the area of each clade's region of origin, which the claim needs; island-versus-continent diversification data exist only for single clades such as passerines.",
+  "next_step": "Define area of origin from published ancestral-range reconstructions for a chosen group (e.g. mammals or birds), join to VertLife trees and GBIF-derived range sizes, then pre-register the comparison.",
+  "obstacles_confirmed": [
+    "Clade origin area is not tabulated in any resource fetched.",
+    "Area, isolation and sampling effort are confounded in occurrence data.",
+    "Open Tree web landing did not respond; API did."
+  ]
+}

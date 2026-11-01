@@ -1,0 +1,142 @@
+{
+  "claim_id": "darwin1859-ch04-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "floral tube or corolla dimensions per plant species or population",
+    "proboscis or mouthpart dimensions of the insect visitors that pollinate them",
+    "plant-pollinator interaction records linking the two (who visits whom)",
+    "phylogenies of plants and insects (for correlated change)",
+    "reciprocal fitness effects on both partners (rarely available)"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-hawkmoth-plant-networks-morphological-matches-qn83r",
+      "name": "Beyond neutral and forbidden links: morphological matches and the assembly of mutualistic hawkmoth-plant networks (Dryad qn83r)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qn83r",
+      "access_url": null,
+      "doi": "10.5061/dryad.qn83r",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:10:00Z", "method": "Dryad search 'proboscis length corolla tube length' (4 hits), then GET dataset record and file list", "http_status": 200, "bytes": 15627 },
+      "variables_present": [
+        "per-site interaction networks (network_AF, CE, CM, CY1, CY2 .txt), hawkmoth tongue-length files (HPL_*.txt) and effective flower-length files (EFL_*.txt) for five sites"
+      ],
+      "variables_missing": ["phylogenies not in the file list", "no fitness data", "five communities only, one pollinator guild"],
+      "scope": "Hawkmoth-plant communities at five sites; 15 small txt files totalling 15,627 bytes",
+      "evidence": "Dryad API record, CC0-1.0, abstract says it tests association between mouthpart length and corolla depth of visited flowers; file list as above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-plant-bumblebee-network-sf7m0cg34",
+      "name": "Evolutionary and ecological processes influence a plant-bumble bee network (Dryad sf7m0cg34)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.sf7m0cg34",
+      "access_url": null,
+      "doi": "10.5061/dryad.sf7m0cg34",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:10:00Z", "method": "GET Dryad dataset record and file list", "http_status": 200, "bytes": 64442 },
+      "variables_present": ["plant and bumblebee functional-trait tables (xlsx), phylogenetic trees for both sides (.nwk), and a plant-bumblebee interaction matrix (csv); 2428 interactions per the abstract"],
+      "variables_missing": ["whether the trait tables include corolla and tongue length not confirmed (files not opened)", "no fitness data", "one network"],
+      "scope": "One plant-bumble bee network",
+      "evidence": "Dryad API record, CC0-1.0, files functionnal_traits_bumblebees.xlsx, functionnal_traits_plant.xlsx, phylogenetic_tree_bumblebee.nwk, phylogenetic_tree_plant.nwk, plant-bumblebee_interaction_matrix.csv.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "globi-interaction-api",
+      "name": "Global Biotic Interactions (GloBI) interaction API",
+      "landing_url": "https://api.globalbioticinteractions.org/interaction?interactionType=pollinates&limit=1&type=json",
+      "access_url": "https://api.globalbioticinteractions.org/interaction",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:10:00Z", "method": "GET interaction query interactionType=pollinates limit=1 (JSON)", "http_status": 200, "bytes": 998 },
+      "variables_present": ["pollination interaction records with source and target taxon names, paths, coordinates and study title (column list: source_taxon_name, interaction_type, target_taxon_name, latitude, longitude, study_title, ...)"],
+      "variables_missing": ["no trait measurements (corolla or proboscis) and no fitness effects", "total record count not queried"],
+      "scope": "Global interaction records compiled from many studies",
+      "evidence": "JSON response with columns list and one data row (source taxon Chilicola) for interaction_type pollinates.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "web-of-life-plant-pollinator-networks",
+      "name": "Web of Life ecological networks (plant-pollinator, e.g. M_PL_001)",
+      "landing_url": "https://www.web-of-life.es/",
+      "access_url": "https://www.web-of-life.es/get_networks.php?network_name=M_PL_001",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T12:10:00Z", "method": "GET landing page; GET get_networks.php for network M_PL_001 and count the JSON rows", "http_status": 200, "bytes": 43907 },
+      "variables_present": ["plant-pollinator interaction lists, e.g. network M_PL_001 with 361 rows of species1, species2, connection_strength"],
+      "variables_missing": ["no morphological traits; no phylogeny; no fitness"],
+      "scope": "Many published networks; only M_PL_001 fetched",
+      "evidence": "JSON rows such as Phacelia secunda with Centris cineraria, connection_strength 1; 361 rows.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life-synthetic-tree",
+      "name": "Open Tree of Life synthetic tree (API)",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:11:00Z", "method": "POST /v3/tree_of_life/about (GET returns 400: only POST forwarded)", "http_status": 200 },
+      "variables_present": ["synthetic tree synth_id opentree16.1 with 2,385,875 tips under 'cellular organisms', from 1,931 source studies and 2,064 source trees, taxonomy 3.7draft3"],
+      "variables_missing": ["not time-calibrated, so relative timing of change cannot be tested from it alone"],
+      "scope": "All life",
+      "evidence": "JSON: synth_id opentree16.1, num_tips 2385875, num_source_studies 1931.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait-database",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/TryWeb/Home.php",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET Home.php and dp.php (data explorer)", "http_status": 200, "bytes": 30280 },
+      "variables_present": [],
+      "variables_missing": ["floral morphology traits not confirmed from the pages fetched; no pollinator traits"],
+      "scope": "Plant traits, mainly vegetative",
+      "evidence": "Home page loaded (30,280 bytes) and the data-explorer page (6,337 bytes) was fetched; its text was searched only for 'buoyan', 'dispersal syndrome' and 'dispersal mode' (no match), so floral traits are neither confirmed nor ruled out",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=pollinator%20tongue%20length%20flower%20tube%20length%20trait%20matching&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:10:00Z", "method": "Dryad search API with two trait-matching queries (4 and 4 hits)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["repository; see specific datasets above"],
+      "scope": "Repository",
+      "evidence": "Search hits include bumble bee functional mismatch under climate change (10.5061/dryad.10278) and warming-driven size mismatch (10.5061/dryad.cfxpnvxjm), not opened.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "proboscis length corolla tube length", "url": "https://datadryad.org/api/v2/search?q=proboscis%20length%20corolla%20tube%20length&per_page=6", "hits": 4, "note": "hawkmoth networks qn83r opened" },
+    { "source": "Dryad", "query": "pollinator tongue length flower tube length trait matching", "url": "https://datadryad.org/api/v2/search?q=pollinator%20tongue%20length%20flower%20tube%20length%20trait%20matching&per_page=6", "hits": 4, "note": "plus bumble bee mismatch 10.5061/dryad.10278, plant-bumble bee network sf7m0cg34 opened" },
+    { "source": "GloBI", "query": "interactionType=pollinates", "url": "https://api.globalbioticinteractions.org/interaction?interactionType=pollinates&limit=1&type=json", "hits": null, "note": "one row returned; count not requested" },
+    { "source": "Web of Life", "query": "network M_PL_001", "url": "https://www.web-of-life.es/get_networks.php?network_name=M_PL_001", "hits": 361, "note": "rows in one network" }
+  ],
+  "status": "partial",
+  "summary": "Paired corolla-length and proboscis-length data with interaction networks are open for five hawkmoth-plant sites (Dryad qn83r, CC0), and a plant-bumblebee network with trait tables and both phylogenies is on Dryad; interaction records are large in GloBI and Web of Life but carry no morphology, and no dataset has reciprocal fitness on both partners.",
+  "next_step": "Open the HPL_/EFL_ files and the bumblebee trait xlsx to confirm columns; pre-register which communities and which tree source (Open Tree is not time-calibrated) are used.",
+  "obstacles_confirmed": [
+    "Interaction databases rarely include reciprocal fitness effects or fine structural measurements.",
+    "Visitor morphology and corolla measurements sit in a few community studies, not in the interaction databases."
+  ]
+}

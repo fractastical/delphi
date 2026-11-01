@@ -1,0 +1,165 @@
+{
+  "claim_id": "levin-2023-agential-12",
+  "variables_needed": [
+    "head-number outcome per regenerated fragment after a brief (about 2-day) physiological treatment",
+    "head-number outcome after repeated untreated re-cutting, per animal or fragment",
+    "genotype or sequence data showing the lines are wild type and unchanged",
+    "bioelectric (voltage) state of the treated fragments"
+  ],
+  "datasets": [
+    {
+      "id": "planform",
+      "name": "Planform / PlanformDB (planarian regeneration experiment database)",
+      "landing_url": "https://lobolab.umbc.edu/planform/",
+      "access_url": "https://lobolab.umbc.edu/planform/downloads/planformDB_2.5.0.edb",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url; GET access_url (744,448 bytes) opened as SQLite and queried locally",
+        "http_status": 200,
+        "bytes": 744448
+      },
+      "variables_present": [
+        "categorical head outcomes per experiment, e.g. 'Wild type' and 'Double head, two pharynxes' with frequencies",
+        "octanol/heptanol experiments: 44 ExperimentDrug rows, all Dugesia japonica"
+      ],
+      "variables_missing": [
+        "voltage state",
+        "per-animal repeated re-cut outcomes were not located",
+        "genotype data"
+      ],
+      "scope": "SQLite DB v2.5.0 (8 Feb 2018): 1,716 experiments, 119 publications, 17 species",
+      "evidence": "ResultantMorphology rows hold morphology name and frequency; ResultSet holds Num and RegenPeriod.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paper-pmc4661923",
+      "name": "Open-access paper PMC4661923: Gap Junctional Blockade Stochastically Induces Different Species-Specific Head Anatomies in Genetically Wild-Type Girardia dorotocephala Fragments",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Gap+Junctional+Blockade+Stochastically%22&format=json&resultType=lite",
+      "access_url": null,
+      "doi": "10.3390/ijms161126065",
+      "license": "cc by",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC REST search and core record (license cc by, hasSuppl Y)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "head outcomes reported in the paper (not downloaded)"
+      ],
+      "variables_missing": [
+        "a deposited per-animal table was not found; supplement not opened"
+      ],
+      "scope": "single Girardia dorotocephala study",
+      "evidence": "Europe PMC core record: PMCID PMC4661923, DOI 10.3390/ijms161126065, license cc by.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-sequence-read-archive",
+      "name": "NCBI Sequence Read Archive",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "E-utilities esearch db=sra on Organism",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Girardia: 244 SRA records; Dugesia japonica: 1,130 SRA records"
+      ],
+      "variables_missing": [
+        "a link from any record to the lines used in the head-number experiments was not checked"
+      ],
+      "scope": "sequencing runs exist for the genera; relation to the experimental colonies unverified",
+      "evidence": "esearch db=sra: Girardia[Organism] count 244; Dugesia japonica[Organism] count 1130.",
+      "verdict": "partial"
+    },
+    {
+      "id": "biomodels-model2110050001",
+      "name": "BioModels MODEL2110050001: Vu2019 planarian double-head regeneration (MorpheusML model)",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/MODEL2110050001?format=json",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET model JSON",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any measured head-number data"
+      ],
+      "scope": "a simulation model file (Planarian_regeneration_doublehead.xml), not experimental data",
+      "evidence": "JSON: name 'Vu2019 - Planarian double-head regeneration', format MorpheusML, file Planarian_regeneration_doublehead.xml.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioStudies",
+      "query": "planarian",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=planarian&pageSize=3",
+      "hits": 469,
+      "note": "includes Vu2019 models and Europe PMC-derived records; no head-number data files"
+    },
+    {
+      "source": "NCBI SRA",
+      "query": "Girardia[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Girardia%5BOrganism%5D&retmode=json&retmax=0",
+      "hits": 244,
+      "note": ""
+    },
+    {
+      "source": "NCBI SRA",
+      "query": "Dugesia japonica[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Dugesia+japonica%5BOrganism%5D&retmode=json&retmax=0",
+      "hits": 1130,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "\"planarian\" AND \"head number\"",
+      "url": "https://api.datacite.org/dois?query=%22planarian%22+AND+%22head+number%22&page%5Bsize%5D=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "Dugesia japonica",
+      "url": "https://datadryad.org/api/v2/search?q=Dugesia+japonica&per_page=3",
+      "hits": 1,
+      "note": "one 87-chemical behavioural screening dataset, not head number"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian regeneration bioelectric",
+      "url": "https://datadryad.org/api/v2/search?q=planarian+regeneration+bioelectric&per_page=3",
+      "hits": 0,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "Categorical head outcomes after octanol/heptanol are in PlanformDB for D. japonica and in the open-access PMC4661923 paper for G. dorotocephala; no per-animal repeated re-cut records, voltage measurements or genotype data tied to the experimental colonies were found, though SRA holds sequencing for both genera.",
+  "next_step": "Open the PMC4661923 supplement and the Planform records for re-cut manipulations to see how many rounds of untreated regeneration are tabulated.",
+  "obstacles_confirmed": [
+    "No individual-level lineage file was found in Dryad, DataCite or BioStudies.",
+    "No deposited genome tied to the experimental lines was identified."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

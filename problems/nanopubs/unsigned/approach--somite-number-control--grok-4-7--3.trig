@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Hold out mouse, chick and snake from a zebrafish-fit clock" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/somite-number-control> ;
+    dct:description "Fit a delayed-coupling phase-oscillator model of the segmentation clock to zebrafish only: coupling delay, intrinsic period, and elongation speed set so the simulated somite count matches the zebrafish count within the same 25 percent tolerance. Freeze those parameters. Predict chick, mouse and corn snake by changing only the two quantities Gomez et al. identify as the evolutionary variables, clock period and elongation speed, to the values published for those species. The model fails if any of those three predictions misses the 25 percent tolerance. No parameter may be touched after the zebrafish fit. This fails differently from the comparative ratio test: the ratio test can pass while this oscillator, with its frozen coupling, misses the other species." ;
+
+    delphi:proposedTest "Chick, mouse and corn snake somite counts each within 25 percent of the zebrafish-calibrated oscillator, with no refitting." ;
+    delphi:context "Fails if: Any one of the three held-out species misses the tolerance. The oscillator then does not carry the comparative prediction, even if the bare ratio N = T/τ does." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Specify the delayed-coupling oscillator and fit it to zebrafish only. 2. Freeze coupling and intrinsic parameters. 3. Insert published clock period and elongation speed for chick, mouse and corn snake. 4. Simulate somite number. 5. Apply the 25 percent tolerance to each held-out species." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: developmental-biology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch17-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nature07020> ;
+    rdfs:seeAlso <https://doi.org/10.1242/dev.063735> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/somite-number-control> a delphi:Concept, schema:Question ;
+    rdfs:label "What sets vertebrate somite number?" .
+
+
+  <https://doi.org/10.1038/nature07020> dct:title "Control of segment number in vertebrate embryos" ;
+    dct:bibliographicCitation "Gomez et al. 2008, the four species and the two evolutionary variables" .
+  <https://doi.org/10.1242/dev.063735> dct:title "Patterning embryos with oscillations: structure, function and dynamics of the vertebrate segmentation clock" ;
+    dct:bibliographicCitation "Oates, Morelli and Soroldoni 2012, the oscillator phenomenology being implemented" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to somite-number-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.342Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to somite-number-control: Hold out mouse, chick and snake from a zebrafish-fit clock" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/somite-number-control--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

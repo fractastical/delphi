@@ -1,0 +1,146 @@
+{
+  "claim_id": "darwin1859-ch09-07",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:52Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "per-capita origination and extinction of shallow-marine genera by time bin (with sampling measures)",
+    "independent classification of bins/regions as uplift (regression) vs subsidence (transgression), e.g. relative sea level or accommodation",
+    "amount/volume of fossiliferous rock or number of collections per bin and region"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-diversity-api",
+      "name": "Paleobiology Database: occs/diversity API (data1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/diversity.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:52Z",
+        "method": "GET paleobiodb.org/data1.2/occs/diversity.json?base_name=Brachiopoda&count=genera&time_reso=stage&limit=2",
+        "http_status": 200
+      },
+      "variables_present": [
+        "per-interval genus counts with boundary-crosser fields xft, xbl, xfl, xbt (from which origination/extinction rates can be computed), dsb, dib, noc (occurrence count per bin)",
+        "interval age bounds eag/lag"
+      ],
+      "variables_missing": [
+        "tectonic uplift/subsidence classification",
+        "rock volume"
+      ],
+      "scope": "Global marine and terrestrial fossil occurrences, queryable per clade and bin",
+      "evidence": "API 200: two sample records returned with the field names above (e.g. bin 'Chibanian' eag 0.774, lag 0.129, noc 114).",
+      "verdict": "holds"
+    },
+    {
+      "id": "macrostrat-api",
+      "name": "Macrostrat API v2 (columns, units, intervals)",
+      "landing_url": "https://macrostrat.org/",
+      "access_url": "https://macrostrat.org/api/v2/",
+      "doi": null,
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:52Z",
+        "method": "GET macrostrat.org/api/v2/defs/columns?all; /units?interval_name=Cretaceous&response=short; /defs/intervals?timescale=international ages; /api/v2/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "stratigraphic columns with area and max thickness",
+        "units with top/bottom ages (t_age, b_age), thickness and column ids",
+        "interval definitions with ages"
+      ],
+      "variables_missing": [
+        "fossil occurrences",
+        "an explicit uplift/subsidence label"
+      ],
+      "scope": "Macrostrat columns (responses include project_id and COSUNA North America references; global extent not verified)",
+      "evidence": "API 200 on all calls; payload license field 'CC-BY 4.0'; column records include col_area, max_thick, t_units; unit records include t_age, b_age, max_thick.",
+      "verdict": "holds"
+    },
+    {
+      "id": "dryad-sea-level-shelf-area",
+      "name": "Data from: Sea level change and the area of shallow-marine habitat (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.4pt8h",
+      "access_url": null,
+      "doi": "10.5061/dryad.4pt8h",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:52Z",
+        "method": "GET datadryad.org/api/v2/datasets/doi:10.5061/dryad.4pt8h",
+        "http_status": 200,
+        "bytes": 70873
+      },
+      "variables_present": [
+        "shelf (shallow-marine habitat) area as a function of sea level, from global elevation data"
+      ],
+      "variables_missing": [
+        "fossil origination/extinction",
+        "tectonic subsidence/uplift per region"
+      ],
+      "scope": "Global margins, sea-level scenarios",
+      "evidence": "Dryad API 200; 70,873 bytes; CC0-1.0; published 2011-11-17; abstract says relationship between sea level and shelf area is not consistent.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB API",
+      "query": "occs/diversity Brachiopoda genera by stage",
+      "url": "https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Brachiopoda&count=genera&time_reso=stage&limit=2",
+      "hits": 2,
+      "note": "records returned (limit 2)"
+    },
+    {
+      "source": "Macrostrat API",
+      "query": "units Cretaceous",
+      "url": "https://macrostrat.org/api/v2/units?interval_name=Cretaceous&response=short&format=json",
+      "hits": null,
+      "note": "units returned; total not counted"
+    },
+    {
+      "source": "DataCite",
+      "query": "sea level Phanerozoic fossil record",
+      "url": "https://api.datacite.org/dois?query=%22sea+level%22+Phanerozoic+fossil+record&page%5Bsize%5D=5",
+      "hits": 6,
+      "note": "one relevant (shelf area vs sea level)"
+    },
+    {
+      "source": "Dryad",
+      "query": "sea level fossil record",
+      "url": "https://datadryad.org/api/v2/search?q=sea+level+fossil+record&per_page=4",
+      "hits": 36,
+      "note": "mosasaur/ichthyosaur completeness, shelf area"
+    },
+    {
+      "source": "Dryad",
+      "query": "Phanerozoic sea level origination",
+      "url": "https://datadryad.org/api/v2/search?q=Phanerozoic+sea+level+origination&per_page=4",
+      "hits": 0,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "PBDB's diversity endpoint and Macrostrat's open CC-BY API supply rates, collection counts and rock-column/unit data, so rock-record and origination/extinction series can be built per interval. No ready dataset classes intervals or regions as uplift versus subsidence (sea-level curves were not found as a repository dataset), and speciation of 'varieties' is not recorded.",
+  "next_step": "Choose shallow-marine genera and a sea-level or accommodation proxy (e.g. a published curve) by region; build per-bin rates from PBDB with sampling standardization; pre-register uplift/subsidence bins.",
+  "obstacles_confirmed": [
+    "Rock availability biases inferred rates",
+    "Uplift and subsidence are spatially heterogeneous",
+    "Transgression can raise marine origination, unlike Darwin's island case"
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "claim_id": "levin-2022-tame-21",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "published conductance models with voltage-gated channels and voltage-sensitive gap junctions",
+    "gating parameters for connexins and ion channels",
+    "ability to apply transient inputs and re-integrate"
+  ],
+  "datasets": [
+    {
+      "id": "biomodels",
+      "name": "BioModels",
+      "landing_url": "https://www.biomodels.org/",
+      "access_url": "https://www.ebi.ac.uk/biomodels/search?query=gap+junction&offset=0&numResults=10&format=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET search API for 'gap junction', 'connexin', 'bistability membrane potential'",
+        "http_status": 200
+      },
+      "variables_present": [
+        "SBML models with membrane-potential and coupling dynamics (a few)"
+      ],
+      "variables_missing": [
+        "a verified multistable model of voltage-gated channels coupled by voltage-gated gap junctions (not found)"
+      ],
+      "scope": "'gap junction' 2 matches (Maleckar2008_AtrialMyocyte, Verma2016 hepatocyte Ca2+); 'connexin' 1; 'bistability membrane potential' 2 (Bertram2004 beta-cell models A and B); contents of the models not inspected",
+      "evidence": "Search responses listed MODEL9810152478, BIOMD0000000834, BIOMD0000000373, MODEL1006230071 (format SBML).",
+      "verdict": "partial"
+    },
+    {
+      "id": "iuphar-bps-guide-to-pharmacology",
+      "name": "IUPHAR/BPS Guide to Pharmacology",
+      "landing_url": "https://www.guidetopharmacology.org/",
+      "access_url": "https://www.guidetopharmacology.org/services/targets?name=connexin&type=Other%20protein",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page (200); GET web-service targets query (401)",
+        "http_status": 200,
+        "note": "web-service API returned 401: 'API key is missing' (registration required)"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "gating parameters for connexins and voltage-gated channels (not retrieved)"
+      ],
+      "scope": "curated pharmacology; API behind a registration key, so no gating data were retrieved",
+      "evidence": "Landing page HTTP 200; services/targets returned HTTP 401 {'message': 'API key is missing...'}.",
+      "verdict": "partial"
+    },
+    {
+      "id": "modeldb",
+      "name": "ModelDB",
+      "landing_url": "https://modeldb.science/",
+      "access_url": "https://modeldb.science/api/v1/models",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; GET /api/v1/models (id list); GET /api/v1/models?name=gap (HTTP 500)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "executable electrophysiology models (mostly neuronal)"
+      ],
+      "variables_missing": [
+        "a concept search for voltage-sensitive gap-junction coupling (API name filter failed)"
+      ],
+      "scope": "1,931 model ids returned",
+      "evidence": "/api/v1/models returned a JSON list of 1,931 integers; the name= filter returned HTTP 500, so no relevant subset was identified.",
+      "verdict": "partial"
+    },
+    {
+      "id": "betse",
+      "name": "BETSE - Bioelectric Tissue Simulation Engine (Pietak & Levin)",
+      "landing_url": "https://github.com/betsee/betse",
+      "access_url": "https://api.github.com/repos/betsee/betse",
+      "doi": null,
+      "license": "BSD-2-Clause",
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET GitHub API repo record, root contents, betse/data/yaml listing; GET PyPI JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "open-source simulator of multicellular bioelectric networks with ion channels and gap junctions",
+        "default simulation config sim_config.yaml and INITS/SIMS/RESULTS config directories"
+      ],
+      "variables_missing": [
+        "a published BETSE configuration verified to show multiple attractors and transient switching (not checked)"
+      ],
+      "scope": "software, not a dataset; PyPI release 1.5.0; repo pushed 2025-04-16; 105 stars at fetch",
+      "evidence": "GitHub API: full_name betsee/betse, description 'BETSE - Bioelectric Tissue Simulation Engine', license spdx BSD-2-Clause; contents list betse, betse_test, doc, pyproject.toml; betse/data/yaml has INITS, RESULTS, SIMS, extra_configs, geo, sim_config.yaml.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioModels",
+      "query": "gap junction",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=gap+junction&offset=0&numResults=10&format=json",
+      "hits": 2,
+      "note": "MODEL9810152478 Maleckar2008_AtrialMyocyte; BIOMD0000000834 Verma2016 hepatocyte Ca2+ propagation"
+    },
+    {
+      "source": "BioModels",
+      "query": "connexin",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=connexin&offset=0&numResults=10&format=json",
+      "hits": 1,
+      "note": "Maleckar2008_AtrialMyocyte"
+    },
+    {
+      "source": "BioModels",
+      "query": "bistability membrane potential",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=bistability+membrane+potential&offset=0&numResults=10&format=json",
+      "hits": 2,
+      "note": "BIOMD0000000373 and MODEL1006230071, Bertram2004 pancreatic beta-cell models A and B"
+    },
+    {
+      "source": "ModelDB API",
+      "query": "list all models",
+      "url": "https://modeldb.science/api/v1/models",
+      "hits": 1931,
+      "note": "list of model ids only; the name= filter returned HTTP 500, so no concept search was possible"
+    }
+  ],
+  "status": "partial",
+  "summary": "Executable models exist (BioModels search found a few coupled-cell or bistable membrane models; ModelDB lists 1,931 models; BETSE is open source, BSD-2-Clause) but I did not find a published model that combines voltage-gated channels with voltage-gated gap junctions, and the IUPHAR gating data sit behind an API key. Non-neural tissue data for the real mechanism are not covered.",
+  "next_step": "Inspect BIOMD0000000373 and MODEL9810152478 for gap-junction gating terms, or assemble a minimal model from BETSE defaults plus connexin gating from the literature.",
+  "obstacles_confirmed": [
+    "Most kinetic parameters come from neurons or heterologous cells, not the non-neural tissues in the claim.",
+    "Model attractors do not show that living non-neural tissue uses them as memory."
+  ]
+}

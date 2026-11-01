@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "delphi-frontier"
+version = "0.1.0"
+description = "A bounded, versioned scientific contribution store"
+requires-python = ">=3.11"
+dependencies = ["psycopg==3.3.4", "pydantic==2.13.4", "mcp==1.27.0"]
+
+[project.optional-dependencies]
+test = ["pytest==9.0.2"]
+engineering = ["z3-solver==5.3.3.0"]
+simulation = ["numpy==2.4.4", "scipy==1.17.1"]
+biomodels = ["numpy==2.4.4", "scipy==1.17.1", "libroadrunner==2.10.0"]
+nanopubs = ["rdflib==7.6.0"]
+# Exact versions used to build the printable geometry artifacts.
+geometry = ["manifold3d==3.5.4", "numpy==2.4.4", "trimesh==5.2.0", "matplotlib==3.11.2", "z3-solver==5.3.3.0",
+            "openpyxl==3.1.5"]
+
+[tool.setuptools.packages.find]
+include = ["frontier*", "engineering*", "attention*", "connectors*"]
+exclude = ["*.tests", "*.tests.*"]
+
+[tool.setuptools.package-data]
+frontier = ["schema.sql", "search_schema.sql", "vector_schema.sql"]
+"engineering.bioelectric" = ["*.json", "README.md"]
+"engineering.mechanobio" = ["*.json", "README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

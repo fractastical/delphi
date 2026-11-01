@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Forward simulations of sweeps, background selection and bottlenecks" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Ask whether a pre-specified demographic-plus-selection process can reproduce the empirical slope, using the slope from the first approach as a fixed target and not refitting it. Three regimes, parameters frozen first: neutral Wright–Fisher with N_e equal to census N; recurrent hitchhiking plus background selection with a stated deleterious mutation rate and a beneficial rate scaled per megabase; and a bottleneck regime with a contraction of factor 100 lasting a stated fraction of each run. For each regime, simulate a grid of census sizes spanning the empirical range, 20 replicates per size, and estimate the slope of mean log10 π on log10 N. A regime accounts for the paradox only if its slope's simulation interval covers the empirical slope and its diversity range covers the empirical diversity range within a factor of two at both ends. Code and seeds are part of the result." ;
+
+    delphi:proposedTest "A regime whose simulated slope interval covers the empirical slope and whose diversity range matches both empirical endpoints within a factor of two. If none does, demography-plus-linked-selection of this form does not resolve the paradox." ;
+    delphi:context "Fails if: All three regimes miss the slope or the endpoint range. Tuning the rates after seeing the empirical slope is a failed pre-registration." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Freeze mutation rates, selection coefficients and the bottleneck schedule before fitting. 2. Simulate the three regimes across the census-size grid, 20 replicates. 3. Estimate each regime's slope of log10 π on log10 N. 4. Compare slope and endpoint diversity with the empirical target. 5. Reject a regime that misses either the slope or the endpoint range." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Species-specific recombination maps are not used here; the regimes are deliberately generic. A species-matched map is the other approach." ;
+    skos:note "Tool: population-genetics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+    rdfs:seeAlso <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.1002112> ;
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.67509> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+
+  <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> dct:title "Leffler et al. 2012 diversity compilation" ;
+    dct:description "Empirical slope and diversity range used only as the pre-registered target." .
+  <https://doi.org/10.1371/journal.pbio.1002112> dct:title "Natural Selection Constrains Neutral Diversity across A Wide Range of Species" ;
+    dct:bibliographicCitation "Corbett-Detig, Hartl and Sackton 2015, the linked-selection regime" .
+  <https://doi.org/10.7554/eLife.67509> dct:title "Quantifying the relationship between genetic diversity and population size suggests natural selection cannot explain Lewontin’s Paradox" ;
+    dct:bibliographicCitation "Buffalo 2021, the empirical target the simulations must hit" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.339Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Forward simulations of sweeps, background selection and bottlenecks" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

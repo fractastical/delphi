@@ -1,0 +1,69 @@
+{
+  "claim_id": "darwin1859-ch07-13",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:33:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "worker morphometrics (head width, mandible length, thorax length) per individual",
+    "colony or nest identifier per specimen",
+    "species identity, to count how often a species has graded rather than discrete worker forms"
+  ],
+  "datasets": [
+    {
+      "id": "antweb-gbif",
+      "name": "AntWeb (GBIF dataset)",
+      "landing_url": "https://www.gbif.org/dataset/13b70480-bd69-11dd-b15f-b8a03c50a862",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?datasetKey=13b70480-bd69-11dd-b15f-b8a03c50a862",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:31:30Z", "method": "GBIF occurrence search count and one Atta cephalotes record; www.antweb.org itself returned 403", "http_status": 200, "bytes": null },
+      "variables_present": ["specimen occurrence records with species, collector and event date"],
+      "variables_missing": ["morphometric measurements in the occurrence record", "caste/sex/lifeStage and media fields were null in the one record inspected", "same-nest identifier (not seen in the fields inspected)"],
+      "scope": "GBIF reports 919,686 occurrence records for the dataset; 647 for Atta cephalotes. One record inspected only (occurrenceID CAS:ANTWEB:jtlc-vial-002282).",
+      "evidence": "GBIF API count 919686; Atta cephalotes count 647. The AntWeb site https://www.antweb.org/ returned HTTP 403 to curl, so its own specimen pages and images were not examined.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-ant-worker-caste-integration",
+      "name": "Data from: Macroevolutionary integration of phenotypes within and across ant worker castes (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.gqnk98sjx",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.gqnk98sjx",
+      "doi": "10.5061/dryad.gqnk98sjx",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "Dryad API dataset record plus version file list; file download itself returned 401 without auth on the /download endpoint (not retried)", "http_status": 200, "bytes": 1829317 },
+      "variables_present": ["head and mesosoma landmark shape data for major and minor workers (TPS files)", "Pheidole_Morphology_Data_03282019.csv (330,482 bytes)", "Pheidole_Tree.phy"],
+      "variables_missing": ["within-nest sampling of intermediates (the abstract describes major and minor workers across 246 Pheidole species, not graded series within one nest; not confirmed)", "nest identifier not verified"],
+      "scope": "Abstract: comparative analysis of 246 species of the ant genus Pheidole, major and minor workers. Files: Aligned_Head_Major.TPS, Aligned_Head_Minor.TPS, Pheidole_majors_Head.tps, Pheidole_majors_Mesosoma.tps, Pheidole_minors_Head.tps, Pheidole_minors_Mesosoma.tps, Pheidole_Morphology_Data_03282019.csv, Pheidole_Tree.phy.",
+      "evidence": "Dryad API returned title, CC0 licence, storageSize 1,829,317 and the file list above. Column names of the CSV not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://www.morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:31:00Z", "method": "HEAD -L landing page", "http_status": 403, "bytes": null, "note": "403 to curl; not retried" },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Not examined.",
+      "evidence": "HTTP 403.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "ant worker polymorphism allometry colony", "url": "https://datadryad.org/api/v2/search?q=ant%20worker%20polymorphism%20allometry%20colony&per_page=5", "hits": 0, "note": "no results" },
+    { "source": "Dryad", "query": "Pheidole soldier minor worker morphometric", "url": "https://datadryad.org/api/v2/search?q=Pheidole%20soldier%20minor%20worker%20morphometric&per_page=5", "hits": 0, "note": "no results" },
+    { "source": "DataCite", "query": "ant worker size variation colony morphometrics (type dataset)", "url": "https://api.datacite.org/dois?query=ant%20worker%20size%20variation%20colony%20morphometrics&resource-type-id=dataset&page%5Bsize%5D=5", "hits": 2, "note": "10.34810/data3145 (ant aggression, not morphometrics) and 10.5061/dryad.02v6wwq8s (Formica supergene genotypes and phenotypes); neither inspected for within-nest morphometrics" },
+    { "source": "Zenodo", "query": "ant worker polymorphism morphometrics", "url": "https://zenodo.org/api/records?q=ant%20worker%20polymorphism%20morphometrics&size=4", "hits": 59817, "note": "loose matching; top hits are taxonomic descriptions plus the Dryad-mirrored 10.5061/dryad.gqnk98sjx" },
+    { "source": "GBIF", "query": "dataset search antweb", "url": "https://api.gbif.org/v1/dataset/search?q=antweb&limit=3", "hits": 464, "note": "first hit is AntWeb, key 13b70480-bd69-11dd-b15f-b8a03c50a862" }
+  ],
+  "status": "partial",
+  "summary": "GBIF mirrors AntWeb occurrences (919,686 records) but the fields seen carry no morphometrics or nest identifier, and the AntWeb site refused automated access (403); the one morphometric repository dataset found (Pheidole major/minor shape data, 246 species, CC0) is cross-species rather than within-nest.",
+  "next_step": "Browse AntWeb manually (or via a permitted API) for specimen series with shared collection codes; look for a published within-colony size-frequency dataset for Atta, Camponotus, Pheidole or Solenopsis.",
+  "obstacles_confirmed": ["antweb.org and morphobank.org returned 403 to automated requests.", "GBIF occurrence fields inspected show no same-nest identifier or measurements."]
+}

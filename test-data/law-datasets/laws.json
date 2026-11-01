@@ -1,0 +1,153 @@
+{
+  "version": "0.1.0",
+  "about": "Twelve laws/theorems to scout for papers and data across plants, animals and the fossil record. Claim ids are in docs/claims.json. Slices are law x kingdom; 'fossils' covers fossil plants and fossil animals. Scouting only: nothing here runs a test.",
+  "kingdoms": ["plants", "animals", "fossils"],
+  "providers": {
+    "rotation": ["gpt-5.6-sol-medium", "gemini-4-argon-medium", "grok-4.7-high-fast", "claude-sonnet-5-5-high"],
+    "rule": "Law i is scouted by rotation[i % 4]; its remediation rounds 2, 4, 5 use rotation[(i+1) % 4], [(i+2) % 4], [(i+3) % 4]. Four different providers per law; the scout never audits its own work."
+  },
+  "laws": [
+    {
+      "id": "log-spiral",
+      "title": "Horns, shells, claws and teeth are logarithmic spirals",
+      "pentagon": "spiral",
+      "claims": ["thompson1917-ch13-03", "thompson1917-ch13-13", "thompson1917-ch13-01", "thompson1917-ch13-06"],
+      "variables": ["growth ratio or spiral pitch angle per specimen (Raup W, D, T; or log-spiral fit parameters)", "specimen outline, image or CT scan", "taxon and body part"],
+      "kingdoms": {
+        "plants": "coiled tendrils, fern fiddleheads, spiral seed pods and pollen-tube or root coils, spiral algae; sources that fit a spiral to a plant organ",
+        "animals": "mollusc shells (nautilus, snails), bovid and other horns, beaks, claws, teeth, tusks, cochlea; shell-coiling datasets (Raup, Okamoto, Urdy, Hammer), morphometric image archives",
+        "fossils": "ammonoids, nautiloids, gastropods, brachiopods, foraminifera, fossil horns and tusks; PBDB occurrence plus coiling parameters; MorphoSource or Dryad scans"
+      }
+    },
+    {
+      "id": "phyllotaxis",
+      "title": "Fibonacci phyllotaxis: one parastichy pair entails all lower pairs",
+      "pentagon": "phyllotaxis",
+      "claims": ["thompson1917-ch14-07", "thompson1917-ch14-08"],
+      "variables": ["parastichy pair (m, n) or divergence angle per organism", "leaves or organs per turn of the genetic spiral", "species and organ (cone, capitulum, shoot, rosette)"],
+      "kingdoms": {
+        "plants": "surveys of parastichy numbers and divergence angles across species and organ types (cones, sunflower heads, cacti, succulents, shoots); meristem imaging datasets; non-Fibonacci and anomalous cases too",
+        "animals": "spiral or Fibonacci arrangements outside plants (coral polyps, sponge or bryozoan zooids, feather and scale placement, Volvox-like colonies); say plainly when the animal side is thin",
+        "fossils": "leaf cushions and scars (Lepidodendron, Sigillaria, Calamites), fossil cones, cycadeoids, crinoid and echinoderm plate spirals; counts of parastichies from fossil specimens"
+      }
+    },
+    {
+      "id": "branching-murray",
+      "title": "Optimal branching: cube law, branch angle and wall thickness follow a flow-cost law",
+      "pentagon": "branching",
+      "claims": ["thompson1917-ch15-15", "thompson1917-ch15-10", "thompson1917-ch15-11"],
+      "variables": ["parent and daughter vessel radii at junctions", "branch angles at junctions", "vessel wall thickness against radius or pressure"],
+      "kingdoms": {
+        "plants": "leaf venation, xylem vessel and root branching networks, with measured junction radii or angles (Murray's law in plants, leaf vein networks, hydraulic architecture datasets)",
+        "animals": "arterial and venous trees, airways, insect tracheae, vascular corrosion casts, retinal vessels, sponge canals; published junction radius and angle tables",
+        "fossils": "fossil leaf venation (cleared-leaf collections, Cretaceous angiosperms), fossil bone vascular canals, fossil root systems, fossil sponge or coral canal systems"
+      }
+    },
+    {
+      "id": "plateau-hex-packing",
+      "title": "Plateau 120-degree cell-wall junctions and hexagonal packing",
+      "pentagon": "wing",
+      "claims": ["thompson1917-ch07-04", "thompson1917-ch07-09"],
+      "variables": ["wall junction angles", "neighbour counts or polygon-class distribution per cell", "cell area distribution", "segmented tissue images"],
+      "kingdoms": {
+        "plants": "leaf and root epidermis, shoot apical meristem, parenchyma and cork sections; segmented cell-network datasets (e.g. confocal meristem atlases)",
+        "animals": "epithelia (Drosophila wing disc and pupal wing, Hydra, cornea, retina), honeycomb and insect cells, ommatidia; neighbour-count (Lewis law) datasets; wing venation networks",
+        "fossils": "cellularly preserved tissue (Rhynie chert, fossil wood and cork, silicified plants), fossil bee comb or wasp nests, foraminifera or bryozoan packing"
+      }
+    },
+    {
+      "id": "turing-wavelength",
+      "title": "Turing pattern wavelength is set by reaction and diffusion, not tissue size",
+      "pentagon": "turing",
+      "claims": ["turing-wavelength"],
+      "variables": ["pattern spacing or wavelength per individual", "tissue or domain size", "perturbation of diffusion or reaction parameters", "pattern images"],
+      "kingdoms": {
+        "plants": "stomatal, trichome, root-hair and leaf-pattern spacing; Arabidopsis patterning mutants; experimental and modelled wavelength vs domain size",
+        "animals": "zebrafish and other fish stripes, mouse digits and palatal rugae, feather and hair follicle spacing, felid coats, chameleon and lizard skin; wavelength vs body size or perturbation experiments",
+        "fossils": "fossil skin, feather and colour patterns (pigment preservation), fossil digit and rugae counts, stromatolite and trace-fossil spacing; say plainly when thin"
+      }
+    },
+    {
+      "id": "length-weight-cube",
+      "title": "Weight varies as the cube of length; a change in k means a change of form",
+      "pentagon": null,
+      "claims": ["thompson1917-ch03-07", "thompson1917-ch02-01"],
+      "variables": ["body or organism mass and length per individual or species", "reported exponent b and condition factor k", "age or size class"],
+      "kingdoms": {
+        "plants": "stem, trunk and shoot biomass against height or diameter; allometry databases (BAAD, Tallo, GlobAllomeTree), seed and leaf mass vs dimension",
+        "animals": "length-weight relationships (FishBase LWR, bird and mammal body-mass tables, AnAge, PanTHERIA, Amniote database), growth series with measured L and W",
+        "fossils": "body-mass estimates from fossil length (dinosaur, fish, mammal compilations), measured fossil lengths with mass proxies, volumetric reconstructions"
+      }
+    },
+    {
+      "id": "scaling-limits",
+      "title": "Scaling limits: tree diameter ~ height^(3/2); gravity caps terrestrial size",
+      "pentagon": null,
+      "claims": ["thompson1917-ch02-02", "thompson1917-ch02-03"],
+      "variables": ["tree height and trunk diameter per tree", "limb-bone circumference or cross-section against body mass", "maximum body mass of land animals"],
+      "kingdoms": {
+        "plants": "tree height-diameter datasets (Tallo, global forest inventories, giant-tree records), elastic-similarity and buckling studies",
+        "animals": "limb-bone scaling (Biewener, Alexander, Campione & Evans), muscle cross-section vs mass, maximum size of land animals, mammal and bird body-mass databases",
+        "fossils": "sauropod, proboscidean and other fossil limb dimensions with mass estimates, Carboniferous giant arthropods and trees, maximum body size through time"
+      }
+    },
+    {
+      "id": "wolff-trabeculae",
+      "title": "Wolff's law: trabeculae and cortical wall thickness follow stress and bending moment",
+      "pentagon": null,
+      "claims": ["thompson1917-ch16-05", "thompson1917-ch16-04"],
+      "variables": ["trabecular orientation or fabric tensor per bone region", "cortical wall thickness along the shaft", "loading or principal stress direction", "micro-CT volumes"],
+      "kingdoms": {
+        "plants": "stem and trunk wood grain or reaction wood following mechanical stress, thigmomorphogenesis, tree-ring and fibre-orientation datasets; say plainly when thin",
+        "animals": "micro-CT of femora, humeri and vertebrae across species (MorphoSource, Dryad, Zenodo), trabecular-orientation and bone-ecology databases, finite-element comparisons",
+        "fossils": "CT scans of dinosaur, synapsid and hominin trabecular and cortical bone, fossil bone histology, fossil femur cross-sections"
+      }
+    },
+    {
+      "id": "molecular-clock",
+      "title": "Neutral substitution rate equals the mutation rate (the molecular clock)",
+      "pentagon": null,
+      "claims": ["kimura-substitution-rate"],
+      "variables": ["per-generation mutation rate per lineage", "substitution rate or divergence between lineages", "divergence time from fossil calibration", "generation time and effective population size"],
+      "kingdoms": {
+        "plants": "plant mutation-rate and substitution-rate studies (Arabidopsis, rice, Oenothera), plant divergence-time calibrations and genomes",
+        "animals": "pedigree and mutation-accumulation rate compilations (e.g. Bergeron et al.), vertebrate and insect genomes, TimeTree divergence estimates",
+        "fossils": "fossil calibration databases and fossil-calibrated trees (Fossil Calibration Database, PBDB first appearances, node-dating compilations)"
+      }
+    },
+    {
+      "id": "fisher-kpp-wave",
+      "title": "Fisher-KPP: an advantageous gene or population advances as a wave of fixed speed",
+      "pentagon": null,
+      "claims": ["fisher-kpp-speed"],
+      "variables": ["front position through time or space", "dispersal kernel or diffusion coefficient", "growth rate or selection coefficient", "range-edge occurrence records"],
+      "kingdoms": {
+        "plants": "post-glacial tree migration from pollen (Neotoma), invasive plant spread rates, allele or herbicide-resistance spread",
+        "animals": "invasion fronts (cane toad, muskrat, collared dove, starling), range expansions, allele-frequency clines and sweeps with spatial data, GBIF time-stamped occurrences",
+        "fossils": "fossil range shifts and Holocene or Pleistocene expansions, PBDB/Neotoma time series of first occurrences along transects, migration-rate estimates"
+      }
+    },
+    {
+      "id": "speed-sqrt-size",
+      "title": "Speed varies as the square root of linear size in swimming, flight and walking",
+      "pentagon": null,
+      "claims": ["thompson1917-ch02-10"],
+      "variables": ["measured speed per species or individual", "body length per species", "locomotion mode"],
+      "kingdoms": {
+        "animals": "fish swimming speed, bird flight speed, walking and running speed (Froude number), Alexander and Hoyt-type compilations, tracked-animal speed datasets (Movebank, FishBase swimming)",
+        "fossils": "speeds inferred from trackways (dinosaur, early tetrapod, arthropod), stride length with limb length, fossil fish and flight reconstructions"
+      }
+    },
+    {
+      "id": "jump-height",
+      "title": "Similarly built animals jump to the same height regardless of size",
+      "pentagon": null,
+      "claims": ["thompson1917-ch02-09"],
+      "variables": ["take-off velocity or jump height per individual", "body mass or length", "muscle mass fraction"],
+      "kingdoms": {
+        "animals": "jump height and take-off velocity compilations (insects, frogs, mammals, fleas, locusts, humans), Scholz and Alexander style cross-species data",
+        "fossils": "fossil jumpers or reconstructions (salientians, fossil insects, leaping mammals) with limb and body dimensions; say plainly when thin"
+      }
+    }
+  ]
+}

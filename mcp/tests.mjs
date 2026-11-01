@@ -40,6 +40,30 @@ function load() {
   return cache;
 }
 
+// "Claude Fable 5.1 (Cursor cloud agent)", "claude-fable-5-1-thinking-high" -> "claude-fable-5.1".
+const canonicalModel = m => (m ? String(m).toLowerCase().replace(/\(.*?\)/g, "").trim().replace(/\s+/g, "-")
+  .replace(/-thinking(-\w+)?$/, "").replace(/(\d)-(\d)/g, "$1.$2") : "unknown");
+
+// Who produced the completed tests in the repo, from each result.json's `agent`: by forum name when
+// the test came through the forum (agent.forum), otherwise by model.
+export function testContributors() {
+  const { runs } = load();
+  const by = new Map();
+  for (const r of runs.filter(r => r.status === "complete")) {
+    const a = r.agent ?? {};
+    const key = a.forum ? `forum:${a.forum}` : `model:${canonicalModel(a.model)}`;
+    const c = by.get(key) ?? by.set(key, { forum: a.forum ?? null, model: a.forum ? null : canonicalModel(a.model), runs: 0, claims: new Set(), sessions: new Set(),
+      ...Object.fromEntries(VERDICTS.map(v => [v, 0])), onOrganisms: 0 }).get(key);
+    c.runs++;
+    c.claims.add(r.claim_id);
+    if (a.run) c.sessions.add(a.run);
+    if (r.verdict in c) c[r.verdict]++;
+    if (r.data_kind === "biological") c.onOrganisms++;
+  }
+  return [...by.values()].map(c => ({ ...c, claims: c.claims.size, sessions: c.sessions.size }))
+    .sort((x, y) => y.claims - x.claims || y.runs - x.runs);
+}
+
 const has = (v, needle) => String(v ?? "").toLowerCase().includes(needle.toLowerCase());
 const row = (r, byId) => ({
   claim: r.claim_id, title: byId[r.claim_id]?.label, thinker: byId[r.claim_id]?.thinker, project: r.project,
@@ -106,17 +130,40 @@ function claimTests({ id }) {
     tests: mine.sort((a, b) => b.headline - a.headline).map(({ headline, ...r }) => ({ headline, url: `${GITHUB}/${r.path}`, ...r })) };
 }
 
+// Dataset scouting records (test-data/dataset-scouting/merged/scouting.json): where the data for an
+// untested claim are, by claim id. Absent until the swarm has run and merge.mjs has been called.
+const SCOUTING = join(REPO, "test-data/dataset-scouting/merged/scouting.json");
+let scoutCache = null;
+function scouting() {
+  if (!existsSync(SCOUTING)) return {};
+  const m = statSync(SCOUTING).mtimeMs;
+  if (scoutCache?.m !== m) {
+    try { scoutCache = { m, byId: Object.fromEntries(JSON.parse(readFileSync(SCOUTING, "utf8")).claims.map(c => [c.id, c])) }; }
+    catch { scoutCache = { m, byId: {} }; }
+  }
+  return scoutCache.byId;
+}
+const SCOUT_ORDER = { "data-ready": 0, partial: 1, gap: 2, "not-empirically-resolvable": 3 };
+
 // Untested claims (no completed or pre-registered run) ranked by testability: what to test next.
-function candidates({ thinker, math, minTestability = 0, text, limit = 25 }) {
+// `scouted` filters on the scouting status ("data-ready", "partial", "gap", "any", "none");
+// sort "data" puts claims whose data has been located first.
+function candidates({ thinker, math, minTestability = 0, text, scouted, sort, limit = 25 }) {
   const { runs, claims } = load();
   const taken = new Set(runs.map(r => r.claim_id));
+  const scout = scouting();
   const hits = claims.filter(c => !c.evidence && !taken.has(c.id) && c.testability != null && c.testability >= minTestability
     && (!thinker || has(c.thinker, thinker)) && (math == null || c.math === math)
-    && (!text || has(`${c.label} ${c.statement}`, text)));
-  hits.sort((a, b) => b.testability - a.testability);
-  return { matched: hits.length, how: "Pre-register before looking at data: test-data/claim-tests/README.md. Log results with delphi_log_test_result or a pull request.",
+    && (!text || has(`${c.label} ${c.statement}`, text))
+    && (!scouted || scouted === "any" ? true : scouted === "none" ? !scout[c.id] : scout[c.id]?.status === scouted));
+  const rank = c => SCOUT_ORDER[scout[c.id]?.status] ?? 9;
+  hits.sort((a, b) => (sort === "data" ? rank(a) - rank(b) : 0) || b.testability - a.testability);
+  return { matched: hits.length, scouted: hits.filter(c => scout[c.id]).length,
+    how: "Pre-register before looking at data: test-data/claim-tests/README.md. Log results with delphi_log_test_result or a pull request. `scouting` says where the data are (test-data/dataset-scouting/COVERAGE.md).",
     claims: hits.slice(0, Math.min(Number(limit) || 25, 500)).map(c => ({ id: c.id, title: c.label, thinker: c.thinker, kind: c.kind, math: c.math,
-      testability: c.testability, truth: c.truth, statement: c.statement })) };
+      testability: c.testability, truth: c.truth, statement: c.statement,
+      scouting: scout[c.id] ? { status: scout[c.id].status, datasets: scout[c.id].datasets.filter(d => ["holds", "partial"].includes(d.verdict)).map(d => ({ name: d.name, verdict: d.verdict, url: d.access_url ?? d.landing_url })),
+        summary: scout[c.id].summary, next_step: scout[c.id].next_step } : null })) };
 }
 
 export function claimTestsTool({ view, id, ...args } = {}) {

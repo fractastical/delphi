@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Prove density one half from left permutivity" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule30-center-column> ;
+    dct:description "The local rule f(l, c, r) = l XOR (c OR r) is left-permutive: for every fixed center and right, the two choices of the left neighbor give opposite outputs. Prove that permutivity, then the standard consequences that can be formalized: the global map on bi-infinite configurations is surjective, and the fair Bernoulli product measure is invariant. The prize question is not about almost every configuration. It is about the single orbit of the configuration with one black cell. The remaining lemma is equidistribution of that orbit's center cell: the visit frequency of black at the center tends to 1/2. State equidistribution as a separate theorem whose hypotheses, if any extra ergodicity assumption is used, are written explicitly. An extra assumption means the prize problem is not solved." ;
+
+    delphi:proposedTest "A no-sorry proof that the center-cell frequency along the single-seed orbit tends to 1/2, with no hypothesis beyond the rule and the initial cell." ;
+    delphi:context "Fails if: The measure lemmas go through but equidistribution of this orbit needs an assumption that is itself open. The approach has then failed on the prize statement even if the lemmas are worth keeping." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Prove left permutivity from the XOR-OR formula. 2. Prove surjectivity on bi-infinite configurations. 3. Prove invariance of the fair Bernoulli measure. 4. Attempt equidistribution of the single-seed center cell with no added assumption. 5. If an ergodicity hypothesis is required, stop and label the prize statement unproved." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: A proof idea that upgrades invariance of Bernoulli measure to equidistribution of one explicit orbit. That is the open step." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: symbolic-dynamics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-14> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/rule30-center-column> a delphi:Concept, schema:Question ;
+    rdfs:label "The Rule 30 center column" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule30-center-column, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.336Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule30-center-column: Prove density one half from left permutivity" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

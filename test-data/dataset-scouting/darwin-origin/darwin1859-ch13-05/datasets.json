@@ -1,0 +1,259 @@
+{
+  "claim_id": "darwin1859-ch13-05",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "sister-clade pairs (equal time since divergence)",
+    "divergence time / branch age per sister clade",
+    "amount of morphological or molecular modification per clade (disparity, rate, branch length)",
+    "assigned Linnaean rank per clade"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "curl -sL https://morphobank.org/ and https://www.morphobank.org/ (also with a browser User-Agent)",
+        "http_status": 403,
+        "note": "CloudFront 403 to non-browser clients; portal content (project/matrix counts) not verified."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "morphological character matrices (portal not reachable)"
+      ],
+      "scope": "Not inspected: the site refused every request from this client.",
+      "evidence": "Both URLs returned HTTP 403 with a 919-byte CloudFront error page (server: CloudFront, x-cache: Error from cloudfront); no project list or matrix could be fetched.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthesis tree, taxonomy, studies API)",
+      "landing_url": "https://opentreeoflife.github.io/",
+      "access_url": "https://api.opentreeoflife.org/v3/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://opentreeoflife.github.io/; POST https://api.opentreeoflife.org/v3/tree_of_life/about; POST /v3/tnrs/match_names",
+        "http_status": 200,
+        "note": "tree.opentreeoflife.org (the URL the assessors gave) returned no HTTP response (curl status 000) at check time; the API host and project site answered HTTP 200."
+      },
+      "variables_present": [
+        "sister-clade topologies",
+        "Linnaean rank per taxon in the taxonomy"
+      ],
+      "variables_missing": [
+        "morphological disparity",
+        "calibrated branch lengths (not checked)"
+      ],
+      "scope": "All life; 2,385,875 tips in the synthesis tree; includes taxonomy ranks and an 'extinct' flag on taxa",
+      "evidence": "POST /v3/tree_of_life/about returned synth_id opentree16.1, taxonomy_version 3.7draft3, num_source_studies 1931, num_source_trees 2064, root 'cellular organisms' with num_tips 2385875. POST /v3/tnrs/match_names resolved Aves=ott81461 (class), Mammalia=ott244265, Dipnoi=ott29500, Polypteridae=ott458429, Actinopterygii=ott773483 and Archaeopteryx=ott3604083 (flags: extinct, incertae_sedis).",
+      "verdict": "partial"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree (timetree.org) with public API",
+      "landing_url": "https://timetree.org/",
+      "access_url": "https://api.timetree.org/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://timetree.org/, http://www.timetree.org/ (redirects to https), https://timetree.org/api/, api.timetree.org pairwise and mrca calls",
+        "http_status": 200
+      },
+      "variables_present": [
+        "pairwise and clade divergence times with the underlying study estimates"
+      ],
+      "variables_missing": [
+        "morphological or molecular disparity per clade",
+        "Linnaean rank"
+      ],
+      "scope": "Literature-derived divergence times between NCBI-taxonomy taxa; species coverage not counted",
+      "evidence": "GET https://api.timetree.org/pairwise/9606/10090/json returned a JSON record (human vs house mouse) listing per-study divergence times; GET /mrca/id/9606+10090+9685/json returned mrca_ttid 261876 and a time_estimates array. https://timetree.org/api/ documents pairwise, mrca and timeline endpoints keyed by NCBI taxon id.",
+      "verdict": "partial"
+    },
+    {
+      "id": "catalogue-of-life",
+      "name": "Catalogue of Life (ChecklistBank release COL26.10, dataset 3LR)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": "https://api.checklistbank.org/dataset/3LR",
+      "doi": "10.48580/dgzh4",
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.catalogueoflife.org/; GET https://api.checklistbank.org/dataset/3LR and nameusage/search?rank=family|order&status=accepted&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "accepted names with ranks (taxon rank counts)"
+      ],
+      "variables_missing": [
+        "phylogenetic tree, divergence ages, morphology"
+      ],
+      "scope": "All kingdoms: 14,821 accepted families and 1,838 accepted orders by the search totals (unfiltered by kingdom)",
+      "evidence": "ChecklistBank /dataset/3LR returned alias COL26.10, size 5,466,019, doi 10.48580/dgzh4; nameusage/search with rank=family&status=accepted&limit=0 returned total 14821; rank=order -> total 1838.",
+      "verdict": "partial"
+    },
+    {
+      "id": "vertlife",
+      "name": "VertLife (vertlife.org)",
+      "landing_url": "https://vertlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://vertlife.org/ and https://vertlife.org/data/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "pointer to species-level vertebrate tree sets (not opened)"
+      ],
+      "variables_missing": [
+        "morphological disparity",
+        "rank"
+      ],
+      "scope": "Vertebrate trees; sizes not checked",
+      "evidence": "Landing page 5,348 bytes and /data/ page both returned HTTP 200; no file was downloaded and no record count was read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "upham-2019-mammal-trees",
+      "name": "Inferring the mammal tree: species-level sets of phylogenies (Upham et al. 2019)",
+      "landing_url": "https://doi.org/10.5061/dryad.tb03d03",
+      "access_url": null,
+      "doi": "10.5061/dryad.tb03d03",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET DataCite /dois/10.5061/dryad.tb03d03; Dryad API dataset and /files; GET https://doi.org/10.5061/dryad.tb03d03",
+        "http_status": 200
+      },
+      "variables_present": [
+        "time-calibrated species-level mammal phylogenies (credible tree sets, MCC trees, dating run files)"
+      ],
+      "variables_missing": [
+        "morphological disparity",
+        "Linnaean rank per sister clade"
+      ],
+      "scope": "Mammalia only; total storage 4,400,306,578 bytes (largest file 3.7 GB)",
+      "evidence": "Dryad file list includes Data_S5_backboneDating_runfiles_and_MCC.zip (1,831,991 bytes), Data_S7_Mammalia_credibleTreeSets_tipDR.zip (3,712,197,364 bytes); licence CC0 1.0.",
+      "verdict": "partial"
+    },
+    {
+      "id": "avonet-v7",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.16586228.v7",
+      "access_url": null,
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET Figshare API article search ':title: AVONET' (HTTP 200); GET https://doi.org/10.6084/m9.figshare.16586228.v7 (HTTP 202 after redirect to figshare.com)",
+        "http_status": 202,
+        "note": "Landing page returned HTTP 202 (probably a bot challenge); the API search returned HTTP 200."
+      },
+      "variables_present": [
+        "morphological trait measurements per bird species (title states morphological data for all birds)"
+      ],
+      "variables_missing": [
+        "Linnaean rank asymmetry",
+        "divergence ages (separate tree needed)"
+      ],
+      "scope": "Birds only; per-species trait table (columns and row count not opened)",
+      "evidence": "Figshare search returned article 16586228 with doi 10.6084/m9.figshare.16586228.v7 and the title above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-figshare-16586228-v7"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "TimeTree API",
+      "query": "pairwise 9606/10090 and mrca 9606+10090+9685",
+      "url": "https://api.timetree.org/pairwise/9606/10090/json",
+      "hits": null,
+      "note": "both calls returned JSON"
+    },
+    {
+      "source": "ChecklistBank (COL)",
+      "query": "accepted families and orders",
+      "url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?rank=family&status=accepted&limit=0",
+      "hits": 14821,
+      "note": "orders: 1838"
+    },
+    {
+      "source": "Open Tree of Life API",
+      "query": "tree_of_life/about",
+      "url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "hits": null,
+      "note": "1931 studies, 2064 trees"
+    },
+    {
+      "source": "Dryad",
+      "query": "time-calibrated phylogeny sister clades morphological disparity rate of evolution",
+      "url": "https://datadryad.org/api/v2/search?q=time-calibrated%20phylogeny%20sister%20clades%20morphological%20disparity%20rate%20of%20evolution",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "mammal phylogeny",
+      "url": "https://datadryad.org/api/v2/search?q=mammal%20phylogeny",
+      "hits": 160,
+      "note": "led to Upham et al. 2019 via DataCite lookup"
+    },
+    {
+      "source": "DataCite",
+      "query": "vertebrate species-level phylogeny time-calibrated posterior trees",
+      "url": "https://api.datacite.org/dois?query=vertebrate%20species-level%20phylogeny%20time-calibrated%20posterior%20trees",
+      "hits": 5,
+      "note": "gecko and other clade-specific sets; none vertebrate-wide"
+    },
+    {
+      "source": "Figshare",
+      "query": "AVONET",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 1,
+      "note": "POST search_for ':title: AVONET'; one AVONET record"
+    }
+  ],
+  "status": "partial",
+  "summary": "Time-calibrated trees (TimeTree API, Upham mammal trees, Open Tree topology) and Linnaean ranks (COL, Open Tree taxonomy) are open, so sister pairs and their ages and ranks can be listed. A comparable measure of morphological modification per clade exists only for particular groups (AVONET traits for birds; matrices on MorphoBank, which returned 403), so the full test is open only where one such clade is chosen.",
+  "next_step": "Pick bird and mammal sister clades; join AVONET (birds) or a mammal trait table to the Upham/TimeTree ages and COL ranks, and pre-register the disparity-ratio and rank-asymmetry statistics.",
+  "obstacles_confirmed": [
+    "No single open table pairs clade age, morphological modification and Linnaean rank across all life.",
+    "MorphoBank was unreachable (HTTP 403)."
+  ]
+}

@@ -2,7 +2,7 @@
   "claim_id": "levin-2015-place-01",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2015-place-01",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-10-31T19:20:00Z",
   "hypothesis": "In the paper's eight-cell active-inference model, cells that start identical, co-located and undifferentiated, and that share one generative model of the target form, end a 32-step free-energy descent near the target head-body-tail configuration with the correct cell types, while ensemble free energy falls.",
   "pass_criterion": "Pre-registered: over 20 random seeds (initial expectations drawn with log precision -4, as in the paper), in at least 16 runs (80%) after 32 time steps (a) the RMS distance between final cell positions and target positions under the best one-to-one assignment is below 0.5 x the smallest distance between two target positions, and (b) at least 7 of 8 cells have their most probable identity (softmax of hidden states) belonging to the cell type encoded at their assigned target location; and in every passing run ensemble free energy at step 32 is below its value at step 1.",
@@ -18,5 +18,138 @@
     "admissible_datasets": "The generative model, target morphology (8 cells, head-body-tail) and parameters as specified by the paper and its public SPM implementation. MATLAB is unavailable, so an independent Python re-implementation is used: same generative model (target locations, signal codes, softmax identities, monoexponential signal decay, exogenous linear gradients, time-increasing extracellular sensitivity, precisions), integrated by gradient descent on the Laplace-approximated free energy for internal states and action (prediction-error-closing signal expression, gradient-driven migration). If the current SPM file defaults to 16 cells, the 8-cell head-body-tail target of the paper (from the SPM12 file if it encodes it) is used.",
     "inference_method": "Count of passing seeds out of 20 against the 16 (pass) and 10 (fail) thresholds; free energy at step 32 versus step 1 per run."
   },
-  "agent": { "kind": "local-agent", "model": "claude-opus-5.5", "run": "cursor local session", "date": "2026-10-31" }
+  "deviations": [
+    "Initial-expectation spread: the pre-registration cites the paper's 'log precision -4', and the file uses randn/8. Both were run, with the rule (fixed before running) that 'supports' needs both to pass.",
+    "Sensitivity condition with SPM process noise added after the deterministic results were seen (see caveats)."
+  ],
+  "interpretation": "MATLAB is unavailable, so the test uses an independent numpy re-implementation (levin-2015-place-01/morphogenesis.py) of DEM_morphogenesis.m. Re-implemented exactly from the file: the 8-cell target (matrix T for L = 2; four cell types coded by signals 1-4), sensations of position (the exogenous linear gradient), intrinsic signal and extracellular signal (monoexponential decay, k = 1, scaled by the sensitivity ramp 1 - exp(-2t) with t = iY/32 as set by spm_ADEM), softmax identity expectations, model sensory precision exp(3), prior precision exp(-2) on identities, action precision exp(2) with action restricted to each cell's own sensations, and initial action equal to the t = 0 prediction (all cells near the centroid). Not re-implemented: spm_ADEM's generalised filter (embedding order 2, local-linearisation update). Instead each of the 32 bins integrates the gradient flow of the Laplace free energy for one time unit (dt = 1, 200 Euler sub-steps; 400 and 800 sub-steps give identical results to 3 decimals). Free energy is spm_ADEM's -J (E'iS E/2 - logdet(qu.c) - logdet(iS)/2) without generalised-motion terms, so only its changes are comparable to the paper's. The paper says initial expectations had 'a log precision of minus four' (sd = e^2 = 7.4), but the file uses randn(n,n)/8 (log precision about +4.2), which matches the paper's 'small random expectations' and 'undifferentiated'. The rule fixed before any baseline run was to run both and call the claim supported only if both pass, and mixed if they disagree. Assessor note checked: the current SPM file's header comment says 16 cells, but its default target (L = 2) has exactly 8 cells, the paper's head-body-tail form, identical in SPM12 r7679 and current main. SPLIT = 0, so the bisection path is off by default, as noted. 'Self-assemble into that form' means that after the paper's 32 time steps the cells sit within half a target spacing (RMS, best one-to-one assignment) of the target positions, with at least 7/8 cells' most probable identity of the type encoded at their position. The paper itself notes the 32-step result is 'not perfect', which is why 7/8 is allowed.",
+  "datasets": [
+    {
+      "id": "spm12-dem-morphogenesis",
+      "name": "SPM12 DEM toolbox: DEM_morphogenesis.m (r7679, 2019-10-24)",
+      "landing_url": "https://github.com/spm/spm12",
+      "doi": null,
+      "version": "SPM12 r7679",
+      "license": "GPL-2.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/spm/spm12/main/toolbox/DEM/DEM_morphogenesis.m",
+          "retrieved_at": "2026-10-31T19:46:01Z",
+          "byte_size": 12725,
+          "sha256": "f84c63411b092a939fe65a37ea192562a49694da4085aaac6667032a6477c8c5"
+        }
+      ],
+      "role": "generative model, generative process, precisions, target morphology (L = 2), initial conditions and SPLIT procedure re-implemented in Python"
+    },
+    {
+      "id": "spm-dem-morphogenesis-main",
+      "name": "SPM (current main): DEM_morphogenesis.m",
+      "landing_url": "https://github.com/spm/spm",
+      "doi": null,
+      "version": "main as retrieved",
+      "license": "GPL-2.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/spm/spm/main/toolbox/DEM/DEM_morphogenesis.m",
+          "retrieved_at": "2026-10-31T19:46:01Z",
+          "byte_size": 12666,
+          "sha256": "38e731d2890584b95b01bbd9c4e8b7e9c7d37d52b5b10bbd3ec06fb35b8ec895"
+        }
+      ],
+      "role": "check that the current file has the same target, defaults and model (it differs from SPM12 only in comments and punctuation)"
+    },
+    {
+      "id": "spm12-spm-adem",
+      "name": "SPM12 spm_ADEM.m",
+      "landing_url": "https://github.com/spm/spm12",
+      "doi": null,
+      "version": "SPM12",
+      "license": "GPL-2.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/spm/spm12/main/spm_ADEM.m",
+          "retrieved_at": "2026-10-31T19:46:02Z",
+          "byte_size": 32165,
+          "sha256": "3e0ff256e46463ca8108d6df623fcc355c5498d499f11ad93882ab3c1c51a70e"
+        }
+      ],
+      "role": "integration conventions: time variable t = iY/nY, dt = 1 per bin, action precision G(1).U, free-energy objective J"
+    },
+    {
+      "id": "friston-levin-2015-place",
+      "name": "Friston, Levin, Sengupta & Pezzulo 2015, Knowing one's place (J R Soc Interface)",
+      "landing_url": "https://doi.org/10.1098/rsif.2014.1383",
+      "doi": "10.1098/rsif.2014.1383",
+      "version": "published",
+      "license": "CC BY",
+      "files": [],
+      "role": "claim text and model description (repo copy claim-sources/levin-papers/inputs/2015-place.txt)"
+    }
+  ],
+  "method": "analysis.py fetches DEM_morphogenesis.m (SPM12 and current main) and spm_ADEM.m, parses the target and defaults, and runs 20 seeds of the 32-bin simulation for each initial-expectation spread (randn/8 from the file; sd e^2 from the paper's text). Each run is deterministic, plus a sensitivity copy with process noise. At step 32 it computes the RMS position error under the best of all 8! cell-to-target assignments and the number of correctly typed cells, and compares free energy at steps 1 and 32.",
+  "measured": {
+    "value": 19,
+    "unit": "runs of 20 assembled at step 32 (file initialisation randn/8)",
+    "n": 20,
+    "uncertainty": null,
+    "extra": {
+      "passing_runs": {
+        "code_randn_over_8": 19,
+        "paper_log_precision_minus4": 14,
+        "code_randn_over_8+process_noise": 19,
+        "paper_log_precision_minus4+process_noise": 14
+      },
+      "median_rms_32": {
+        "code_randn_over_8": 0.2864,
+        "paper_log_precision_minus4": 0.3321,
+        "code_randn_over_8+process_noise": 0.28615,
+        "paper_log_precision_minus4+process_noise": 0.3322
+      },
+      "rms_threshold": 0.5,
+      "median_correct_types_32": {
+        "code_randn_over_8": 8.0,
+        "paper_log_precision_minus4": 8.0,
+        "code_randn_over_8+process_noise": 8.0,
+        "paper_log_precision_minus4+process_noise": 8.0
+      },
+      "F_decreased_runs": {
+        "code_randn_over_8": 20,
+        "paper_log_precision_minus4": 20,
+        "code_randn_over_8+process_noise": 20,
+        "paper_log_precision_minus4+process_noise": 20
+      },
+      "median_F_1": {
+        "code_randn_over_8": -101.905,
+        "paper_log_precision_minus4": 58.010000000000005,
+        "code_randn_over_8+process_noise": -101.905,
+        "paper_log_precision_minus4+process_noise": 58.010000000000005
+      },
+      "median_F_32": {
+        "code_randn_over_8": -136.805,
+        "paper_log_precision_minus4": -132.005,
+        "code_randn_over_8+process_noise": -136.845,
+        "paper_log_precision_minus4+process_noise": -132.005
+      },
+      "default_target_cells": 8,
+      "header_comment_cells": 16,
+      "default_SPLIT": 0
+    }
+  },
+  "verdict": "mixed",
+  "data_kind": "computational",
+  "confidence": 0.6,
+  "caveats": [
+    "Independent re-implementation, not the published MATLAB solver. spm_ADEM's generalised filtering in generalised coordinates can follow a different path through the same free-energy landscape. Nothing was run in MATLAB or Octave.",
+    "After seeing the deterministic results, a disclosed sensitivity condition added the SPM generative process's sensory noise (precision exp(16)), which the pre-registered re-implementation omits. It did not change any count by more than one run.",
+    "Seeds are numpy default_rng(0..19). The paper reports one run with MATLAB rng('default'), which cannot be matched outside MATLAB.",
+    "Cell types use the file's encoding (T values 2, 1, 4, 3 from left to right along the body axis). The paper's head/body/tail labels map onto these four signal codes.",
+    "Under the file's initialisation (randn/8) the claim reproduces clearly: 19/20 runs assemble, with median RMS 0.29 against a threshold of 0.5, a median of 8/8 correct types, and free energy falling in every run. Under the paper's literal 'log precision -4' (initial identities already nearly one-hot and random), 14/20 assemble, which falls in the pre-registered mixed band. The mixed verdict comes from that initialisation discrepancy and is not evidence against self-assembly in the model.",
+    "This is a proof-of-principle claim about a model. Reproducing it says nothing about whether real cells minimise variational free energy."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local session",
+    "date": "2026-10-31"
+  }
 }

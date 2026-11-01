@@ -1,0 +1,252 @@
+{
+  "claim_id": "darwin1859-ch02-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "heritable (additive genetic) variance or heritability of traits within wild populations",
+    "individual fitness or selection differentials/gradients on those traits",
+    "trait change or allele-frequency change across generations, or divergence among populations/species"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-comparing-g-multi-population",
+      "name": "Data from: Comparing G: multivariate analysis of genetic variation in multiple populations",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.g860v",
+      "access_url": null,
+      "doi": "10.5061/dryad.g860v",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.g860v",
+        "http_status": 200,
+        "bytes": 5158500
+      },
+      "variables_present": [
+        "additive genetic variance-covariance (G) matrices for multiple populations (per abstract)"
+      ],
+      "variables_missing": [
+        "selection differentials/fitness",
+        "response across generations (abstract describes methods for comparing G across populations)"
+      ],
+      "scope": "Multiple populations; taxa not inspected beyond abstract",
+      "evidence": "API returned title, publicationDate 2013-02-06, license CC0-1.0, storageSize 5158500; abstract: 'The additive genetic variance-covariance matrix (G) summarizes the multivariate genetic relationships among a set of traits.'",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-environmental-coupling-heritability-selection",
+      "name": "Data from: Environmental coupling of heritability and selection is rare and of minor evolutionary significance in wild populations",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.3mk7f2q",
+      "access_url": null,
+      "doi": "10.5061/dryad.3mk7f2q",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.3mk7f2q",
+        "http_status": 200,
+        "bytes": 246292
+      },
+      "variables_present": [
+        "heritability and selection estimates from open pedigreed wild-population data (per abstract)"
+      ],
+      "variables_missing": [
+        "trait change across generations / divergence among populations"
+      ],
+      "scope": "Pedigreed wild populations (compilation)",
+      "evidence": "API returned publicationDate 2018-06-21, license CC0-1.0, storageSize 246292; abstract says the authors 'made use of freely accessible, open data on pedigreed wild populations' to study heritability and selection.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-lifetime-fitness-heritable-wild-primate",
+      "name": "Data and code from: Lifetime fitness and annual survival are heritable and highly genetically correlated in a wild primate population",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.pzgmsbd22",
+      "access_url": null,
+      "doi": "10.5061/dryad.pzgmsbd22",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.pzgmsbd22",
+        "http_status": 200,
+        "bytes": 1266903419
+      },
+      "variables_present": [
+        "individual fitness measures with a pedigree-based heritability analysis (title)"
+      ],
+      "variables_missing": [
+        "one population only; no multi-generation selection response stated in what was fetched"
+      ],
+      "scope": "One wild primate population",
+      "evidence": "API returned publicationDate 2026-04-25, license CC0-1.0, storageSize 1266903419 (1.27 GB; not downloaded).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "barcode-of-life-data-systems",
+      "name": "Barcode of Life Data Systems (BOLD)",
+      "landing_url": "https://boldsystems.org/",
+      "access_url": "https://portal.boldsystems.org/api/summary",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:45:51Z",
+        "method": "GET https://portal.boldsystems.org/api/summary?query=tax:species:Parus major&fields=specimens,country/ocean; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "within-species COI barcode sequence records with country"
+      ],
+      "variables_missing": [
+        "heritability",
+        "fitness/selection",
+        "phenotype of the sequenced individuals"
+      ],
+      "scope": "Barcode records, all taxa",
+      "evidence": "Summary API for Parus major returned counts {specimens: 165} across 14 countries; landing page 200. Records are one-marker sequences without heritability or selection variables.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nuccore)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "E-utilities esearch db=nuccore term=Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "nucleotide sequences, including population samples"
+      ],
+      "variables_missing": [
+        "heritability",
+        "fitness/selection",
+        "trait values"
+      ],
+      "scope": "All taxa",
+      "evidence": "esearch db=nuccore for Gasterosteus aculeatus[Organism] returned count 373001 (example taxon). Sequence records do not hold the variables.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-sra",
+      "name": "NCBI Sequence Read Archive",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET landing; E-utilities esearch db=sra term=Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "raw sequencing reads deposited by population-genomic and evolve-and-resequence studies"
+      ],
+      "variables_missing": [
+        "no phenotype, heritability, fitness or selection columns; studies must be identified and downloaded individually"
+      ],
+      "scope": "Archive of reads, all organisms",
+      "evidence": "esearch db=sra for Gasterosteus aculeatus[Organism] returned count 25745 (one example taxon). Landing page 200.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "heritability selection response wild population",
+      "url": "https://datadryad.org/api/v2/search?q=heritability%20selection%20response%20wild%20population",
+      "hits": 44,
+      "note": "relevant: 3mk7f2q, pzgmsbd22"
+    },
+    {
+      "source": "Dryad",
+      "query": "G-matrix additive genetic variance",
+      "url": "https://datadryad.org/api/v2/search?q=G-matrix%20additive%20genetic%20variance",
+      "hits": 30,
+      "note": "relevant: g860v (Comparing G), others on G-matrix evolution"
+    },
+    {
+      "source": "Dryad",
+      "query": "lifetime reproductive success selection gradient",
+      "url": "https://datadryad.org/api/v2/search?q=lifetime%20reproductive%20success%20selection%20gradient",
+      "hits": 3,
+      "note": "three datasets; selection on specific traits in single systems"
+    },
+    {
+      "source": "Zenodo",
+      "query": "G-matrix genetic variance divergence",
+      "url": "https://zenodo.org/api/records?q=G-matrix%20genetic%20variance%20divergence&size=1",
+      "hits": 715166,
+      "note": "hit count reflects loose OR matching; the first hit was a Dryad mirror of 'Conserved G-matrices of morphological and life-history traits among continental and island blackbird populations'"
+    },
+    {
+      "source": "DataCite",
+      "query": "heritability natural selection wild population quantitative genetics",
+      "url": "https://api.datacite.org/dois?query=heritability+natural+selection+wild+population+quantitative+genetics&page%5Bsize%5D=1",
+      "hits": 11,
+      "note": "first hit not relevant"
+    },
+    {
+      "source": "DataCite",
+      "query": "selection differentials meta-analysis wild populations",
+      "url": "https://api.datacite.org/dois?query=selection+differentials+meta-analysis+wild+populations&page%5Bsize%5D=1",
+      "hits": 1,
+      "note": "one Dryad dataset on temperature and selection"
+    }
+  ],
+  "status": "partial",
+  "summary": "Quantitative-genetic and selection data exist as individual Dryad datasets (G matrices across populations, pedigreed wild-population heritability and selection, a primate lifetime-fitness pedigree), but none pairs heritable variation with selection and a measured response or divergence in one table, and the sequence archives named by assessors hold no trait or fitness variables.",
+  "next_step": "Pick 3-5 pedigreed systems with trait, fitness and multi-generation records (starting from Dryad 3mk7f2q's source populations), pre-register what counts as a response, and pair them with G-matrix datasets of diverged populations such as Dryad g860v.",
+  "obstacles_confirmed": [
+    "Heritability and selection response are scattered across studies and are not columns in barcode or sequence archives.",
+    "Well-studied taxa are nonrandom."
+  ]
+}

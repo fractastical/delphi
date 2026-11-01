@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Xylem conduits and a radius-dependent exponent" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Two pre-registered extensions that can support an amended law even if the pooled animal exponent excludes 3. First, transcribe conduit radii at branch points from the tables of McCulloh, Sperry and Adler 2003, with a checksum of the transcription. Do not digitize figures. If the tables are not numerically usable, drop the xylem arm and say so. Estimate α by the same one-dimensional fit. Plant xylem agrees with Murray only if its interval contains 3. Second, on the retinal junctions only, regress per-junction α on log parent radius, with a random intercept for image. A shear-dependent amendment is supported if the slope's 95 percent interval excludes 0. These two tests are not pooled with the animal single-exponent test." ;
+
+    delphi:proposedTest "A xylem interval that contains or excludes 3, and a retinal slope of α on log parent radius whose interval contains or excludes 0." ;
+    delphi:context "Fails if: Xylem excludes 3, which refutes a cross-kingdom cubic law, or the retinal slope interval contains 0, which fails the shear-dependent amendment. Unusable tables make xylem inconclusive rather than a refutation." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Transcribe McCulloh tabled radii or drop xylem if the tables are not numeric. 2. Estimate xylem α and its interval. 3. Regress retinal per-junction α on log parent radius. 4. Support a radius-dependent exponent only if the slope interval excludes 0. 5. Report xylem and the slope as separate calls." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: A public xylem file of branch-point radii. If the 2003 tables cannot be transcribed without guessing, the xylem arm stops." ;
+    skos:note "Tool: vascular-morphometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://drive.grand-challenge.org/> ;
+    rdfs:seeAlso <https://www5.cs.fau.de/research/data/fundus-images/index.html> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature01444> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+  <https://drive.grand-challenge.org/> dct:title "DRIVE retinal vessel segmentation" ;
+    dct:description "Retinal junctions for the radius regression." .
+  <https://www5.cs.fau.de/research/data/fundus-images/index.html> dct:title "High-Resolution Fundus image database" ;
+    dct:description "Additional retinal junctions for the same regression." .
+  <https://doi.org/10.1038/nature01444> dct:title "Water transport in plants obeys Murray's law" ;
+    dct:bibliographicCitation "McCulloh, Sperry and Adler 2003, Water transport in plants obeys Murray's law; tabled radii only" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.342Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Xylem conduits and a radius-dependent exponent" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

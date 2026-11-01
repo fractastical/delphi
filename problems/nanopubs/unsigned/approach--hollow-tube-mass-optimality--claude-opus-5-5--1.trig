@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Formalize the constrained optimum: empty tubes have none, filled tubes do" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "The question presupposes an interior stiffness-per-mass optimum, but for an empty thin-walled tube at fixed mass (fixed r t) the bending stiffness E pi r^3 t grows as r^2, so stiffness per mass increases without bound as K = r_inner/r_outer goes to 1 and only local buckling (Brazier ovalisation, whose collapse moment scales as E r t^2 / sqrt(1 - nu^2)) or another constraint stops it. With a marrow or pith core of density ratio q = rho_core/rho_wall that must be carried, Currey and Alexander (1985) showed an interior optimum K*(q) exists. Formalize: (i) for an empty tube, stiffness-per-mass at fixed outer radius is strictly increasing in K on [0, 1); (ii) with core mass included, the mass at fixed bending stiffness has a unique minimum K*(q) in (0, 1) for q in (0, 1), and K* decreases as q increases; (iii) under a Brazier constraint the feasible set is K <= K_b(E, sigma_allow), so the predicted K is min(K*(q), K_b). These three lemmas turn the vague 'optimum' into three numerical predictions per structure: pneumatic (q = 0) structures should sit at the buckling limit, filled structures at K*(q)." ;
+
+    delphi:proposedTest "Compiled Lean module with no sorry proving the three lemmas, plus a numeric K*(q) table that makes the data test's predictions explicit." ;
+    delphi:context "Fails if: Uniqueness of K* cannot be proved without restricting q to a narrower interval than real marrow and pith densities span, in which case the prediction is not well defined for some structures." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define I(K) = (pi/4) R^4 (1 - K^4), wall area pi R^2 (1 - K^2), core area pi R^2 K^2 in Lean. 2. Prove the empty-tube monotonicity lemma. 3. Prove existence and uniqueness of the minimum-mass K* at fixed stiffness for core density ratio q in (0,1), via the derivative sign or an explicit convexity argument after the substitution x = K^2, and the monotone dependence on q. 4. State the Brazier feasibility constraint as a hypothesis-parameterized inequality and prove the min rule. 5. Compute K*(q) numerically for q in the range of marrow (fatty and haematopoietic) and pith densities, and store the table for approach 2." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials II" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.308Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Formalize the constrained optimum: empty tubes have none, filled tubes do" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

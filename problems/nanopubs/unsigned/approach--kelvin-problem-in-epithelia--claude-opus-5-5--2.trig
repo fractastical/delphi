@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean-checked lower bounds on equal-volume partition area" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> ;
+    dct:description "Prove a rigorous lower bound in Lean for surface area per cell of any partition of a 3-torus into N equal-volume cells, and state its distance from WP. Bound 1 (isoperimetric half-sphere): each cell has surface ≥ (36π)^{1/3} V^{2/3}, every interior face is shared by two cells, so partition area per cell ≥ ½(36π)^{1/3}V^{2/3} ≈ 2.418, against WP's ≈ 2.644 (half of 5.288), a gap of about 9%. This requires the 3D isoperimetric inequality, which as far as we know is not in Mathlib. Formalize it via the Brunn–Minkowski inequality for compact sets (Mathlib's measure theory supports a Prékopa–Leindler route) and the Minkowski-content definition of surface area, or state it as an explicit hypothesis in a first version. Bound 2: tighten using Kusner's face-count argument, that cells in a minimal foam have a bounded average number of faces, combined with a lower bound on the area of a polyhedral-like cell with k faces of constant curvature, giving a bound above 2.418." ;
+
+    delphi:proposedTest "A Lean theorem bounding area per cell of any equal-volume 3-torus partition from below, unconditional if the isoperimetric inequality is formalized, otherwise conditional on it as a named hypothesis, with the gap to WP stated. Bound 2 above 2.418 would be new." ;
+    delphi:context "Fails if: The isoperimetric inequality proves too large to formalize in a month, leaving only the conditional version, which is correct but adds little beyond the statement on paper." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Survey Mathlib for Brunn–Minkowski or Prékopa–Leindler; formalize the missing piece or state the isoperimetric inequality as a hypothesis in version 1. 2. Prove Bound 1 for partitions of the 3-torus (shared-face accounting as a finite-sum lemma). 3. Formalize the face-count argument and the per-cell bound for Bound 2, if Bound 1 completes. 4. Report the numerical gap to WP and Kelvin." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Geometric measure theory in Mathlib is thin; an unconditional isoperimetric inequality in ℝ³ is a substantial formalization project." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: geometric-measure-theory" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1007/s004540010071> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1992.0177> ;
+    rdfs:seeAlso <https://doi.org/10.1080/09500839408241577> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> a delphi:Concept, schema:Question ;
+    rdfs:label "Kelvin's problem in epithelia" .
+
+
+  <https://doi.org/10.1007/s004540010071> dct:title "The Honeycomb Conjecture" ;
+    dct:bibliographicCitation "Hales 2001, The honeycomb conjecture (2D analogue)" .
+  <https://doi.org/10.1098/rspa.1992.0177> dct:title "The number of faces in a minimal foam" ;
+    dct:bibliographicCitation "Kusner 1992, The number of faces in a minimal foam" .
+  <https://doi.org/10.1080/09500839408241577> dct:title "A counter-example to Kelvin's conjecture on minimal surfaces" ;
+    dct:bibliographicCitation "Weaire and Phelan 1994" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to kelvin-problem-in-epithelia, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.306Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to kelvin-problem-in-epithelia: Lean-checked lower bounds on equal-volume partition area" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

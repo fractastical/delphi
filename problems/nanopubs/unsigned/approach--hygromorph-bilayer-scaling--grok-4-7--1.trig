@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Published curvature and response time against the bilayer laws" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "The curvature formula and the diffusive time τ = h² / D are already theorems in ThompsonLaws.Hygromorphs (bilayerCurvature_ofEquilibrium, diffusiveTime_scale). The missing piece is the comparison with measurements. Extract, from tables when they exist and from figures only when they do not, every specimen that reports layer thicknesses, moduli and a swelling strain measured independently of the curvature, plus the measured curvature change. Response-time rows need thickness and a time constant after a humidity step. Sources to extract, in this order: Quan, Pirosa, Yang, Ritchie and Meyers 2021 (open access pine-cone scales), Reyssat and Mahadevan 2009 (pine scales and paper-polymer bilayers), Dawson, Vincent and Rocca 1997, Elbaum and colleagues 2007 on wheat awns, and Armon, Efrati, Kupferman and Sharon 2011 on chiral pods. Predicted curvature uses the Lean formula. Pass, pre-registered: median |κ_measured − κ_predicted| / |κ_predicted| ≤ 0.50, the sign of curvature correct in at least 90 percent of specimens, and the ordinary-least-squares slope of log(τ) on log(h) has a 95 percent interval that contains 2 and excludes 1 and 3. Swelling strains fitted from the curvature itself are forbidden. The problem's coverage bar is at least 20 specimens from five species, or fabricated bilayers at three thicknesses and two swelling mismatches. The Reyssat paper-polymer series is the fabricated arm and does not require the swarm to print." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--1#n_specimens> ;
+    delphi:proposedTest "The per-specimen relative curvature error and the response-time slope with its interval, on a sample that meets one of the two coverage bars. The model passes only if the median relative error is ≤ 0.50, the sign is right in ≥ 90 percent of rows, and the time-slope interval contains 2 and excludes 1 and 3." ;
+    delphi:context "Fails if: The open record does not reach 20 specimens from five species or the fabricated thickness series; most papers only back-calculate swelling from curvature; the median relative error exceeds 0.50; or the time-slope interval misses 2 or includes 1 or 3." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the 0.50 relative-error band, the sign rule and the slope exclusions before extracting numbers. 2. Pull independently measured inputs from the open papers; mark every figure-digitised point. 3. Reject rows whose swelling strain was fitted from curvature. 4. Compute Timoshenko curvature and the log-log time slope. 5. Score coverage against 20 specimens and five species, and against the fabricated-bilayer alternative." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: No humidity chamber and no printer, so no new specimens. Several of the papers expose only figures, and a scripted fetch of the Royal Society and Science landing pages returned 403, so some tables may be unreachable." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.actbio.2021.04.049> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1038/37745> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1140097> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1203874> ;
+    rdfs:seeAlso <https://doi.org/10.1364/josa.11.000233> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--1#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 20 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+
+  <https://doi.org/10.1016/j.actbio.2021.04.049> dct:title "Hydration-induced reversible deformation of the pine cone" ;
+    dct:bibliographicCitation "Quan, Pirosa, Yang, Ritchie and Meyers 2021, Hydration-induced reversible deformation of the pine cone. Open access." .
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1038/37745> dct:title "How pine cones open" ;
+    dct:bibliographicCitation "Dawson, Vincent and Rocca 1997, How pine cones open" .
+  <https://doi.org/10.1126/science.1140097> dct:title "The Role of Wheat Awns in the Seed Dispersal Unit" ;
+    dct:bibliographicCitation "Elbaum, Zaltzman, Burgert and Fratzl 2007, The role of wheat awns in the seed dispersal unit" .
+  <https://doi.org/10.1126/science.1203874> dct:title "Geometry and Mechanics in the Opening of Chiral Seed Pods" ;
+    dct:bibliographicCitation "Armon, Efrati, Kupferman and Sharon 2011, Geometry and mechanics in the opening of chiral seed pods" .
+  <https://doi.org/10.1364/josa.11.000233> dct:title "Analysis of Bi-Metal Thermostats" ;
+    dct:bibliographicCitation "Timoshenko 1925, Analysis of bi-metal thermostats" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.348Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Published curvature and response time against the bilayer laws" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

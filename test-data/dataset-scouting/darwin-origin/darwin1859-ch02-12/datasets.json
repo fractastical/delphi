@@ -1,0 +1,219 @@
+{
+  "claim_id": "darwin1859-ch02-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "species-level phylogeny (topology, ideally branch lengths) of every species in a large genus",
+    "genus size (number of species) to define \"large genera\"",
+    "pairwise genetic or morphological distances among congeneric species"
+  ],
+  "datasets": [
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree, v3 API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:03:24Z",
+        "method": "POST tree_of_life/about (landing page tree.opentreeoflife.org: timeout at 05:10:24Z, HTTP 503 at 08:03:07Z)",
+        "http_status": 200,
+        "note": "API answered 200; the web landing page returned 503 when checked"
+      },
+      "variables_present": [
+        "species-level tips for genera, e.g. Carex node (ott8151): num_tips 5519 on the MRCA node (broken: true)"
+      ],
+      "variables_missing": [
+        "branch lengths (synthetic tree is topology-only in this query)",
+        "pairwise distances"
+      ],
+      "scope": "Synthetic tree opentree16.1, taxonomy 3.7draft3: 2,385,875 tips, built from 2,064 source trees in 1,931 studies",
+      "evidence": "tree_of_life/about response: synth_id opentree16.1, root \"cellular organisms\" num_tips 2385875, num_source_trees 2064, num_source_studies 1931.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bold-systems",
+      "name": "Barcode of Life Data System (BOLD)",
+      "landing_url": "https://www.boldsystems.org/",
+      "access_url": "https://portal.boldsystems.org/api/summary?query=tax:genus:Carex&fields=specimens",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:40Z",
+        "method": "GET landing; GET portal summary API for genus Carex (2026-11-01T08:07:50Z, 200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "barcode specimen records queryable by genus (Carex: 7,627 specimens)"
+      ],
+      "variables_missing": [
+        "pairwise distance matrices not provided by this query"
+      ],
+      "scope": "Specimens with barcode records; plants less covered than animals not checked",
+      "evidence": "portal.boldsystems.org/api/summary?query=tax:genus:Carex&fields=specimens returned {\"counts\":{\"specimens\":7627}}.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "birdtree",
+      "name": "BirdTree (Jetz et al. 2012 global bird phylogeny)",
+      "landing_url": "https://birdtree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:42Z",
+        "method": "GET landing page, read page text",
+        "http_status": 200
+      },
+      "variables_present": [
+        "page describes a global phylogeny of birds and subset downloads (Jetz et al. 2012 Nature 491:444-448)"
+      ],
+      "variables_missing": [
+        "tree files not downloaded or counted"
+      ],
+      "scope": "Birds only",
+      "evidence": "Landing text: \"A GLOBAL PHYLOGENY OF BIRDS ... The global diversity of birds in space and time\", with tabs Methods, Taxonomy, Phylogeny subsets, Downloads.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nuccore, E-utilities)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Carex%5BOrganism%5D&rettype=count&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:42Z",
+        "method": "GET landing; GET esearch count for Carex[Organism] (200 at 08:03:38Z) and taxonomy species count",
+        "http_status": 200
+      },
+      "variables_present": [
+        "nucleotide sequences per genus (Carex: 73,246 nuccore records)",
+        "taxonomy database lists 1,701 species-rank records under Carex"
+      ],
+      "variables_missing": [
+        "aligned matrices or distance tables"
+      ],
+      "scope": "All organisms; unaligned records",
+      "evidence": "esearch db=nuccore term Carex[Organism] count \"73246\"; db=taxonomy term Carex[Subtree] AND species[Rank] count \"1701\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://www.timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing page and /downloads page (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "published divergence times for pairs of taxa (landing page reports 5,072 studies, 208,740 species)"
+      ],
+      "variables_missing": [
+        "complete within-genus trees not confirmed"
+      ],
+      "scope": null,
+      "evidence": "Landing page text: \"5,072 Studies 208,740 Species\"; downloads page lists data for researchers.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing (meta-refresh) and TryWeb/Home.php (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant trait records by species (version 7: 22,860,407 trait records, 306,701 plant taxa per home page)"
+      ],
+      "variables_missing": [
+        "a within-genus species-distance table is not provided"
+      ],
+      "scope": "Plants",
+      "evidence": "TryWeb/Home.php text: \"Database version 7 online (2026-09-04) 22,860,407 trait records 306,701 plant taxa\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Open Tree of Life",
+      "query": "TNRS match Carex then node_info",
+      "url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "hits": 1,
+      "note": "ott8151; node_info num_tips 5519, broken true"
+    },
+    {
+      "source": "NCBI E-utilities",
+      "query": "Carex[Organism] nuccore; taxonomy species count",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Carex%5BSubtree%5D+AND+species%5BRank%5D&retmode=json",
+      "hits": 1701
+    },
+    {
+      "source": "BOLD",
+      "query": "genus Carex specimen count",
+      "url": "https://portal.boldsystems.org/api/summary?query=tax:genus:Carex&fields=specimens",
+      "hits": 7627
+    },
+    {
+      "source": "Dryad",
+      "query": "species-level phylogeny large genus tree imbalance diversification",
+      "url": "https://datadryad.org/api/v2/search?q=species-level+phylogeny+large+genus+tree+imbalance+diversification&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "species-level time-calibrated phylogeny genus",
+      "url": "https://api.datacite.org/dois?query=species-level+time-calibrated+phylogeny+genus&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 95,
+      "note": "first eight hits are trait or community datasets, not genus-wide tree collections"
+    }
+  ],
+  "status": "partial",
+  "summary": "Tree and sequence sources exist for large genera (Open Tree node for Carex, 1,701 species-rank taxa in NCBI taxonomy, 7,627 BOLD specimens), but no ready-made table of within-genus trees or distances was found; a test would assemble them per genus.",
+  "next_step": "Choose a few large genera (e.g. Carex, Astragalus, Solanum), pull Open Tree subtrees or dated trees from the original studies, and pre-register the imbalance statistics and the null model.",
+  "obstacles_confirmed": [
+    "Incomplete taxon sampling in very large genera.",
+    "Open Tree flagged the Carex node as broken (non-monophyly in the synthetic tree)."
+  ]
+}

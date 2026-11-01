@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" ;
+    dct:description "Do genes annotated to morphogenesis and genes annotated to learning and memory overlap more than expected from gene-set size, pleiotropy and shared housekeeping components, as Levin's TAME framework predicts?" ;
+
+    skos:historyNote "Known state: Levin (2022) predicts wide overlap because, on his account, morphogenesis uses the same problem-solving machinery as cognition. The repo's one test (levin-2022-tame-19) returned refutes at confidence 0.7 using GO term overlap, but did not control for pleiotropy, annotation bias or gene-set size. INDRA CoGEx allows a mechanistically grounded, permutation-controlled test." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-C" ;
+    skos:scopeNote "Resolved when: A pre-registered test using INDRA CoGEx gene sets for morphogenesis and learning/memory (GO and HPO), a permutation null matched on gene-set size, pleiotropy degree and annotation count, and a stated effect-size threshold for 'wide overlap'." ;
+    skos:scopeNote "Resolved when: The same test on ion-channel and gap-junction subsets, which Levin names specifically." ;
+    skos:scopeNote "Refuted if: Overlap within the matched null refutes the prediction; overlap well above it (especially in the bioelectric subset) supports it and would revise the current verdict." ;
+    skos:note "Data access: INDRA CoGEx MCP (public), Gene Ontology, HPO." ;
+    skos:note "Requires: indra-cogex" ;
+    skos:note "Requires: gene-set-statistics" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: molecular" ;
+    skos:note "Scale: cellular" ;
+    skos:note "Scale: developmental" ;
+    skos:note "Scale: neural" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fnsys.2022.768201> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.3389/fnsys.2022.768201> dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:bibliographicCitation "Levin 2022, Technological approach to mind everywhere (TAME)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.291Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Do morphogenesis and learning share a gene set beyond pleiotropy?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,85 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Test whether published recombination maps close the residual" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Pre-register a second test aimed at linked selection, using only species that have both a diversity estimate in the Leffler or Buffalo tables and a public genetic map with at least 10^3 markers in centimorgans. Homo sapiens enters through the 1000 Genomes resource; every other species enters only with a map meeting the same marker floor. For each such species compute map length per megabase. Fit log10 π = a + b log10 N + c (map length per megabase) in the same nested taxonomic model as the slope test. Linked selection closes the gap only if, after this covariate, the residual slope on log10 N has a 95 percent interval containing 0 and the root-mean-square residual of log10 π is below 0.5. Both conditions are required. If fewer than 8 species qualify, the verdict is inconclusive, underpowered, and is not filled in by dropping the marker floor." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--2#n_species> ;
+    delphi:proposedTest "Residual slope interval containing 0 and residual RMSE of log10 π below 0.5, on at least 8 species with real maps. Otherwise linked selection, as measured here, does not close the gap." ;
+    delphi:context "Fails if: The residual slope interval excludes 0, or the RMSE stays at or above 0.5. Dropping the marker floor after seeing the fit is a failed pre-registration, not a result." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze the marker floor and the two numerical conditions before listing species. 2. Admit a species only when both a diversity row and a qualifying public map exist. 3. Fit the nested model with map length per megabase as covariate. 4. Record the residual slope interval and the residual RMSE. 5. Stop as underpowered if fewer than 8 species qualify." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Public genetic maps for most of the Leffler species. The test is designed to return underpowered rather than to invent maps." ;
+    skos:note "Tool: data-test" ;
+    skos:note "Tool: population-genetics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+    rdfs:seeAlso <https://www.internationalgenome.org/> ;
+    rdfs:seeAlso <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.1002112> ;
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.67509> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--2#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 8 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://www.internationalgenome.org/> dct:title "1000 Genomes Project" ;
+    dct:description "Human genetic map and diversity resources. Other species enter only with a comparable public map." .
+  <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> dct:title "Leffler et al. 2012 diversity compilation" ;
+    dct:description "Diversity values joined to maps." .
+  <https://doi.org/10.1371/journal.pbio.1002112> dct:title "Natural Selection Constrains Neutral Diversity across A Wide Range of Species" ;
+    dct:bibliographicCitation "Corbett-Detig, Hartl and Sackton 2015, linked selection as the hypothesis under test" .
+  <https://doi.org/10.7554/eLife.67509> dct:title "Quantifying the relationship between genetic diversity and population size suggests natural selection cannot explain Lewontin’s Paradox" ;
+    dct:bibliographicCitation "Buffalo 2021, the claim that linked selection does not close the gap" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.339Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Test whether published recombination maps close the residual" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

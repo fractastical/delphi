@@ -1,0 +1,95 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-register the diversity-census slope with a range covariate" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Pre-register before downloading tables. Response is log10 of nucleotide diversity π from the Leffler et al. 2012 compilation, with the Buffalo 2021 estimates used only as a second, separately reported column where the species overlap. Predictor is log10 of census size as published in those supplements. Covariate is log10 of GBIF range area: occurrences for the species with coordinate uncertainty below 10 km, reduced to presence on a 0.1 degree grid, range area the axis-aligned bounding box, species with fewer than 20 occupied cells dropped. Primary estimator is a nested taxonomic random-effects model, species within genus within family within order, fit by REML, not a single time-calibrated tree of all life. Neutral prediction is slope 1 of log10 π on log10 N. Secondary estimator, mammals only, is PGLS with Pagel's lambda on 100 trees from the Upham, Esselstyn and Jetz credible set. Linked selection is not fit in this approach. The verdict is about the slope: if the 95 percent profile interval includes 1, neutral scaling of diversity with census size is not rejected and the paradox sits in the intercept." ;
+
+    delphi:proposedTest "A 95 percent interval for the slope of log10 π on log10 census N. Neutral scaling is rejected only if that interval excludes 1 in the primary model." ;
+    delphi:context "Fails if: Fewer than 30 species survive the GBIF cell filter, in which case the verdict is inconclusive and underpowered. A slope interval that includes both 0 and 1 is also indecisive and is reported as such." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write the model, the GBIF filter and the drop rule before opening the supplements. 2. Join Leffler diversity and census size to GBIF bounding-box area. 3. Fit the nested random-effects model by REML and record the profile interval for the slope. 4. Repeat PGLS on the mammal overlap across 100 Upham trees. 5. Call the estimators mixed if one interval contains 1 and the other excludes it." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Census sizes are only as good as the supplements. GBIF bounding boxes are a range proxy, not a census, and the model treats them as a covariate rather than as N." ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+    rdfs:seeAlso <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> ;
+    rdfs:seeAlso <https://elifesciences.org/articles/67509> ;
+    rdfs:seeAlso <https://api.gbif.org/v1/> ;
+    rdfs:seeAlso <https://vertlife.org/data/mammals/> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.1001388> ;
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.67509> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.3000494> ;
+    rdfs:seeAlso <https://doi.org/10.1038/217624a0> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+
+  <https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388> dct:title "Leffler et al. 2012 diversity compilation" ;
+    dct:description "Species-level nucleotide diversity and the census sizes used in that paper." .
+  <https://elifesciences.org/articles/67509> dct:title "Buffalo 2021 diversity-census reanalysis" ;
+    dct:description "Second diversity column, reported separately, not pooled with Leffler in the primary fit." .
+  <https://api.gbif.org/v1/> dct:title "GBIF occurrence API" ;
+    dct:description "Occurrences used only to build range bounding boxes under the pre-registered filter." .
+  <https://vertlife.org/data/mammals/> dct:title "Upham mammal phylogenies" ;
+    dct:description "One hundred node-dated trees for the mammal-only PGLS." .
+  <https://doi.org/10.1371/journal.pbio.1001388> dct:title "Revisiting an Old Riddle: What Determines Genetic Diversity Levels within Species?" ;
+    dct:bibliographicCitation "Leffler et al. 2012, Revisiting an old riddle: what determines genetic diversity levels within species?" .
+  <https://doi.org/10.7554/eLife.67509> dct:title "Quantifying the relationship between genetic diversity and population size suggests natural selection cannot explain Lewontin’s Paradox" ;
+    dct:bibliographicCitation "Buffalo 2021, Quantifying the relationship between genetic diversity and population size" .
+  <https://doi.org/10.1371/journal.pbio.3000494> dct:title "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation" ;
+    dct:bibliographicCitation "Upham, Esselstyn and Jetz 2019, the mammal trees" .
+  <https://doi.org/10.1038/217624a0> dct:title "Evolutionary Rate at the Molecular Level" ;
+    dct:bibliographicCitation "Kimura 1968, the neutral prediction that heterozygosity scales with N" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.338Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Pre-register the diversity-census slope with a range covariate" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

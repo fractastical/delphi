@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Interval-certified cylinder attractors" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "Fix a smooth finite-range repulsion kernel and reduce the cylindrical placement process to a finite-memory map after proving an exponential tail bound. Use interval Newton and cone conditions to certify fixed or periodic lattice branches, then cover the state space with boxes whose images enter certified basins or declared unresolved sets." ;
+
+    delphi:proposedTest "For a nontrivial growth interval, a rigorous list of all attractors and basin-volume bounds whose uncovered state-space measure is below 10^-6." ;
+    delphi:context "Fails if: Persistent positive-measure unresolved boxes or a certified additional attractor outside the proposed branches disproves completeness." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Specify kernel, growth parameter interval and finite-memory truncation error. 2. Continue Fibonacci, Lucas and bijugate branches with interval arithmetic. 3. Certify hyperbolicity and trapping neighborhoods. 4. Run a validated box-cover basin computation and formally check interval certificates." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Validated numerics infrastructure for the model's discontinuous least-repulsion placement rule." ;
+    skos:note "Tool: interval-arithmetic" ;
+    skos:note "Tool: dynamical-systems" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.324Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Interval-certified cylinder attractors" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

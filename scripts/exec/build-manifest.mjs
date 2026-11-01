@@ -71,7 +71,7 @@ for (const project of dirs(TESTS)) {
     let steps = o.steps ?? null;
     if (!steps && script) {
       steps = [];
-      if (fetch && !/\bfetch\b/.test(scriptText)) steps.push({ cwd: key, script: fetch });
+      if (fetch && !/^\s*(import fetch\b|from fetch import)/m.test(scriptText)) steps.push({ cwd: key, script: fetch });
       steps.push({ cwd: key, script });
     }
     const scanned = [script, fetch].filter(Boolean).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");

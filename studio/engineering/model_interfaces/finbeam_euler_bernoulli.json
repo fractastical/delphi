@@ -1,0 +1,153 @@
+{
+ "engine": "numpy + scipy.sparse Hermite-cubic FEM",
+ "model_id": "finbeam_euler_bernoulli",
+ "name": "Elastic fin-ray surrogate: clamped-free Euler-Bernoulli cantilever (SIMULATED)",
+ "not_established": [
+  "a calibrated fin stiffness",
+  "that any real ray lies in the assumed EI range",
+  "fluid-structure interaction",
+  "biological feasibility"
+ ],
+ "ports": [
+  {
+   "bounds": null,
+   "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 0,
+    "s": -2
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "q_line",
+   "provenance": {
+    "read_level": "file",
+    "source": "uniform line load from the load bridge (or the same force at the tip)",
+    "status": "assumed"
+   },
+   "quantity": "line load on one fin ray",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "N/m"
+  },
+  {
+   "bounds": null,
+   "caveat": "a DECLARED fraction/length, not a measurement",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "L_ray",
+   "provenance": {
+    "read_level": "file",
+    "source": "from the load bridge",
+    "status": "assumed"
+   },
+   "quantity": "fin ray length",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "m"
+  },
+  {
+   "bounds": {
+    "hi": "1",
+    "lo": "1/1000000",
+    "source": "example_request.json assumed sweep range",
+    "status": "assumed"
+   },
+   "caveat": "ASSUMED stiffness range; no calibrated fin stiffness exists",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 3,
+    "s": -2
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "flexural_rigidity",
+   "provenance": {
+    "read_level": "none",
+    "source": "elastic.EI_status = ASSUMED_RANGE_NOT_MEASURED; bluegill 1e-6..1e-5 J m (Alben et al. 2007) is context only, read through a summarising tool",
+    "status": "assumed"
+   },
+   "quantity": "fin ray flexural rigidity EI",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "N m^2"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "tip_deflection",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated",
+    "status": "simulated"
+   },
+   "quantity": "tip deflection under load",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 3,
+    "s": -2
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "critical_stiffness",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated",
+    "status": "simulated"
+   },
+   "quantity": "EI below which the declared load breaks the small-deformation limits",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "N m^2"
+  }
+ ],
+ "reference": {
+  "branch": "work/fin-mechanics",
+  "commit": "72df07c",
+  "files": {
+   "engineering/fin_mechanics/beam.py": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+   "engineering/fin_mechanics/sweep.py": "17e2e1835d9f67c47b68e8285ae118b1b585c4d2b9a955bd13c598fbc498fa6e"
+  },
+  "path": "engineering/fin_mechanics/beam.py, engineering/fin_mechanics/sweep.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "source_sha256": "3bb3283e86cd73d0853716cb9bd9b3d70d6a45d0561362bf2273f21211301670"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "engineering.fin_mechanics.sweep",
+  "schema": "frontier.finmech.request/1"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "linear static beam with an ASSUMED stiffness range; no shear, no bilaminar structure, load uncoupled to deformation",
+ "status": "implemented",
+ "timescale": {
+  "kind": "static",
+  "seconds": null,
+  "source": "static problem: no time step"
+ }
+}

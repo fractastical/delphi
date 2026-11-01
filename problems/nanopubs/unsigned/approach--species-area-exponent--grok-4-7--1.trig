@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/species-area-exponent--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Power law against METE on GIFT island floras" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    dct:description "Pre-register on GIFT island regions: complete vascular-plant checklists, native species, region area as returned by the GIFT API. Exclude incomplete lists. Fit three models with the same data and the same log-likelihood: the power law log S = log c + z log A by a negative-binomial GLM with log area as offset predictor; the logarithmic curve S = c + z log A under the same likelihood family; and the METE species-area curve implemented by meteR's meteSAR, following Harte et al. 2009, where expected richness is the sum over the MaxEnt species-abundance distribution of the probability a species is present. Universal exponent, pre-registered: the pooled z has a 95 percent interval of width less than 0.1, and every island group with at least 10 islands has a z interval overlapping that pooled interval. Groups are the island-group identifiers GIFT returns; if that field is absent, stop, do not invent clusters. METE wins only if its AIC beats the power law by more than 10 and its mean absolute residual is smaller." ;
+
+    delphi:proposedTest "Either a pooled z interval narrower than 0.1 that every qualifying island group overlaps, or a rejection of that universality, plus an AIC comparison of METE against the power law with gap 10." ;
+    delphi:context "Fails if: Group identifiers are missing, or fewer than five groups have 10 islands. The test is then inconclusive. A METE win on residual and a loss on AIC, or the converse, is a split result and does not count as a win." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze the likelihood, the width criterion and the AIC gap before querying GIFT. 2. Download complete native vascular-plant island checklists and areas. 3. Fit the power law, the logarithmic curve and meteSAR. 4. Compute pooled and per-group z intervals. 5. Apply the universal-exponent rule and the METE rule separately." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: macroecology" ;
+    skos:note "Tool: model-comparison" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> ;
+    rdfs:seeAlso <https://gift.uni-goettingen.de/> ;
+    rdfs:seeAlso <https://biogeomacro.github.io/GIFT/> ;
+    rdfs:seeAlso <https://cran.r-project.org/package=meteR> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2009.01328.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/2041-210X.14213> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2005.00848.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1365-2699.2011.02652.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" .
+
+  <https://gift.uni-goettingen.de/> dct:title "GIFT, Global Inventory of Floras and Traits" ;
+    dct:description "Island checklists, native status and region area." .
+  <https://biogeomacro.github.io/GIFT/> dct:title "GIFT R package documentation" ;
+    dct:description "API access to checklists, including the island geographic type." .
+  <https://cran.r-project.org/package=meteR> dct:title "meteR" ;
+    dct:description "meteSAR implementation of the Harte species-area curve." .
+  <https://doi.org/10.1111/j.1461-0248.2009.01328.x> dct:title "Biodiversity scales from plots to biomes with a universal species–area curve" ;
+    dct:bibliographicCitation "Harte et al. 2009, the METE species-area curve" .
+  <https://doi.org/10.1111/2041-210X.14213> dct:title "<scp>GIFT</scp>\n                    —An R package to access the Global Inventory of Floras and Traits" ;
+    dct:bibliographicCitation "Denelle, Weigelt and Kreft, the GIFT R package" .
+  <https://doi.org/10.1111/j.1461-0248.2005.00848.x> dct:title "The imprint of the geographical, evolutionary and ecological context on species–area relationships" ;
+    dct:bibliographicCitation "Drakare, Lennon and Hillebrand 2006, context dependence of z" .
+  <https://doi.org/10.1111/j.1365-2699.2011.02652.x> dct:title "The island species–area relationship: biology and statistics" ;
+    dct:bibliographicCitation "Triantis, Guilhaumon and Whittaker 2012, comparison of island species-area forms" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to species-area-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.340Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to species-area-exponent: Power law against METE on GIFT island floras" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/species-area-exponent--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

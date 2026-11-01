@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Mean-intercept fabric versus finite-element principal stress" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Pre-register a claim test of thompson1917-ch16-05 before any orientation or stress field is inspected. In each surviving volume, binarize bone with Otsu's threshold on the bone histogram and compute the mean-intercept-length fabric tensor on a grid of cubic regions of interest (BoneJ anisotropy, or an equivalent coded intercept count). The stress tensor comes from a linear-elastic finite-element solve on the same geometry with one isotropic tissue modulus, so the fabric never enters the stress calculation. The primary load cases, fixed in advance, are: femoral head, uniform pressure on a spherical cap of 40 degree half-angle directed from the articular surface through the head centre toward the neck, distal cut fixed; vertebral body, uniform compression of the endplates. The statistic is the angle between the undirected primary fabric axis and the principal-stress direction of largest absolute value, folded into 0 to 90 degrees. The random-fabric null keeps the measured eigenvalues and draws the primary axis uniformly; for that null the distribution is known, P(angle ≤ θ) = 1 − cos θ on [0, π/2], so the null median is 60 degrees, and the script checks the formula with a Monte Carlo of the same draws. The growth-rule null aligns fabric with the local density gradient, or with the scanner superior-inferior axis when that gradient is below a pre-registered magnitude. A volume is dropped if it is an excised cube whose anatomical orientation is not in the deposit, if trabecular thickness is under three voxels, or if the growth-rule axis cannot be defined. Pass requires, on at least three volumes from at least two species, a median angle ≤ 20 degrees that is also at least 15 degrees below both null medians, with a permutation p < 0.01. A pre-registered cap-angle sweep from 20 to 60 degrees tests the load-case falsifier: a change under 5 degrees that leaves the median inside the random-fabric null counts as insensitive to the load." ;
+
+    delphi:proposedTest "A table of fabric-to-stress angles for every surviving region, with the median ≤ 20 degrees and at least 15 degrees below both null medians at permutation p < 0.01, on at least three volumes from two species. The cap-angle sweep must move the median by at least 5 degrees or the load-case falsifier trips." ;
+    delphi:context "Fails if: Fewer than three volumes survive the gates; the median is not distinguishable from the random-fabric null (median 60 degrees); or the median moves by less than 5 degrees across the cap-angle sweep while remaining inside that null." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write the pre-registration (thresholds, load cases, exclusion gates) and commit it before downloading volumes. 2. Download the Leeds lumbar set, the unaugmented Palanca vertebrae, the DaRUS femoral-head overview, and only those Doube stacks whose filenames and the 2011 protocol identify a whole head or condyle. 3. Apply the resolution and orientation gates; record every exclusion. 4. Compute mean-intercept-length fabric and the finite-element principal stresses on the surviving volumes. 5. Compare angles with the random-axis null and the growth-rule null, then run the cap-angle sweep." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Subject-specific joint loads are not in these deposits, and many Doube volumes are excised cubes. The test uses stated load cases and drops cubes whose orientation is unrecorded. No animal lab is available for a new reorientation experiment." ;
+    skos:note "Tool: bonej" ;
+    skos:note "Tool: fenics" ;
+    skos:note "Tool: imagej" ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.7257179> ;
+    rdfs:seeAlso <https://doi.org/10.18419/DARUS-1177> ;
+    rdfs:seeAlso <https://doi.org/10.5518/874> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.4062351> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.2011.0069> ;
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+  <https://doi.org/10.6084/m9.figshare.7257179> dct:title "Doube, Kłosowski, Hutchinson and Shefelbine micro-CT of femoral-head and condyle trabeculae" ;
+    dct:description "16-bit stacks, voxel size at most 15 µm, 18 avian, 72 mammalian and one crocodilian species. Whole heads or condyles only; excised cubes without a recorded anatomical orientation are excluded. About 36 GB." .
+  <https://doi.org/10.18419/DARUS-1177> dct:title "Ruf, Steeb, Gebert, Schneider and Helwig human femoral-head micro-XRCT" ;
+    dct:description "One explanted human femoral head. Use the 15 µm overview (about 22 GB). Body mass is recorded; joint-contact force is not, so the cap load is a stated model." .
+  <https://doi.org/10.5518/874> dct:title "Day, Jones and Wilcox lumbar-vertebra micro-CT" ;
+    dct:description "Raw micro-CT of 14 human lumbar vertebrae, about 1 GB, plus example finite-element models. Second species-site after the femoral heads." .
+  <https://doi.org/10.6084/m9.figshare.4062351> dct:title "Palanca, Cristofolini, Dall'Ara and Tozzi vertebral micro-CT" ;
+    dct:description "Natural and augmented vertebrae at 39 µm, about 8 GB. Use only unaugmented scans that pass the three-voxel trabecular-thickness gate." .
+  <https://doi.org/10.1098/rspb.2011.0069> dct:title "Trabecular bone scales allometrically in mammals and birds" ;
+    dct:bibliographicCitation "Doube, Kłosowski, Wiktorowicz-Conroy, Hutchinson and Shefelbine 2011, Trabecular bone scales allometrically in mammals and birds" .
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes, Ruimerman, van Lenthe and Janssen 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.346Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Mean-intercept fabric versus finite-element principal stress" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

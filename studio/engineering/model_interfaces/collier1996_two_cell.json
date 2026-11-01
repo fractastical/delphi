@@ -1,0 +1,76 @@
+{
+ "engine": "libroadrunner 2.10.0 (CVODE)",
+ "model_id": "collier1996_two_cell",
+ "name": "Collier 1996 two-cell Delta-Notch lateral inhibition (BIOMD0000001047)",
+ "not_established": [
+  "any flying-fish or fin role for Notch/Delta",
+  "SI units",
+  "parameter provenance"
+ ],
+ "ports": [
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+   "dim": null,
+   "direction": "in",
+   "kind": "model_units",
+   "name": "parameters_a_b_h_k",
+   "provenance": {
+    "read_level": "file",
+    "source": "values stored in the SBML (a 0.01, b 100, h 2, k 2, mu 1, rho 1); paper not read",
+    "status": "unknown"
+   },
+   "quantity": "feedback parameters",
+   "regime": "two coupled cells; non-dimensional as stored; no time scale",
+   "scale": "cell",
+   "unit": "model units"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+   "dim": null,
+   "direction": "out",
+   "kind": "model_units",
+   "name": "delta_asymmetry",
+   "provenance": {
+    "read_level": "file",
+    "source": "simulated (replay._asym over delta1, delta2); horizon 0-60 chosen by the connector",
+    "status": "simulated"
+   },
+   "quantity": "Delta level difference between the two cells",
+   "regime": "two coupled cells; non-dimensional as stored; no time scale",
+   "scale": "cell",
+   "unit": "model units"
+  }
+ ],
+ "reference": {
+  "branch": "work/biomodels",
+  "commit": "abf1838",
+  "files": {
+   "connectors/biomodels/client.py": "36e7bbcc93fb7102458fa43ecab9aa07bf775787577ef9f820ffb64b0691eea6",
+   "connectors/biomodels/receipts/BIOMD0000001047/receipt.json": "731a85a6fe893bd10f86196b5fd7101a64810d0d68ae03ebfa4eee3d2e04bc6e",
+   "connectors/biomodels/replay.py": "c9c017e6fd76aedcce2822de39c77a22349bea560dabc8ca432954f9d1938a8f",
+   "connectors/biomodels/sbml.py": "eda0dcf677cd6d7786e84c0180bec075bc6dbefaa04e7cdcaa0d48c2604d40a8"
+  },
+  "note": "the SBML bytes are not committed; the receipt pins this digest",
+  "path": "connectors/biomodels/client.py, connectors/biomodels/receipts/BIOMD0000001047/receipt.json, connectors/biomodels/replay.py, connectors/biomodels/sbml.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "sbml_sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+  "source_sha256": "a229adc20ac75c1ee5760736726101f68ab569e052a37a71fff6f10eec955232"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "connectors.biomodels.replay.replay_collier1996"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "a published model replayed as written; the replay checks the engine, not the file's fidelity to the paper",
+ "status": "implemented_replayed",
+ "timescale": {
+  "kind": "unknown",
+  "seconds": null,
+  "source": "the file declares none; horizon 0-60 is the connector's"
+ }
+}

@@ -1,0 +1,106 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Phylogenetic slopes of limb-bone size on body mass" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "Two open tables, analysed separately and then counted together. Campione and Evans, as redistributed in the MASSTIMATE package data frame extants, give body mass and humeral and femoral circumference for 245 extant tetrapods. Use only those extant rows. Dinosaur rows in the paper's supplement are excluded, because their masses are estimated from the limb bones. Amson and Bibi give body mass and humeral MeanArea for 152 mammal species, with a deposited timetree. The model is log(y) = α + β log(mass) + error, fitted by phylogenetic generalised least squares with Pagel's λ: covariance σ² (λ V + (1 − λ) I), λ by maximum likelihood. For circumference the three hypotheses are β = 1/3 (geometric), 3/8 (elastic) and 1/2 (stress). For cross-sectional area they are β = 2/3, 3/4 and 1. Campione circumferences also yield a circular-section area proxy C² / (4π), labelled as a proxy. A hypothesis is compatible if the 95 percent interval of β contains it, and it is the unique winner if it is the only compatible one. Clade fits use each order with at least 15 species. The exponent varies across clades if at least two such orders have intervals that exclude the pooled estimate. Mammal trees come from the Upham, Esselstyn and Jetz posterior; names are resolved through the organisms layer to GBIF. Reptiles in Campione are fitted by ordinary least squares unless a fetched tree file covers them, and that split is reported. The safety-factor claim is not measured here: constant stress under geometric posture is the area exponent 1, and no strain gauge data are in these tables. The problem asks for 300 taxa. The decisive count is the number of unique species across the two tables after name resolution. If that count is under 300, the fits are still reported and the coverage clause fails." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1#n_species> ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1#n_taxa> ;
+    delphi:proposedTest "The PGLS slope and 95 percent interval for each bone and each table, the list of compatible hypotheses, the order-level slopes, and the unique-species count. A single similarity law is supported only if one hypothesis is the unique winner in both tables and no two large orders exclude the pooled estimate. The 300-taxon bar is met only if the deduplicated union reaches 300." ;
+    delphi:context "Fails if: Tree mismatch drops more than half the species; every interval is wider than 0.25 so no hypothesis is excluded; the two tables pick different unique winners; or the unique-species count stays under 300." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the three exponents, the compatibility rule and the dinosaur exclusion before fitting. 2. Load MASSTIMATE extants and the Amson humerus table; resolve names to GBIF. 3. Build the mammal covariance from the Upham trees and the Amson timetree for that table. 4. Fit PGLS for humerus and femur, pooled and by order with n ≥ 15. 5. Report which hypotheses are compatible, and the unique-species count against 300." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: A reptile phylogeny file was not verified in the Campione supplement. In vivo bone strain and effective mechanical advantage are not in either table, so safety-factor flatness is not measured. The extant Campione table has 245 species, under the problem's 300 until the union is counted." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://cran.r-project.org/package=MASSTIMATE> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.12600440.v3> ;
+    rdfs:seeAlso <https://doi.org/10.5061/dryad.tb03d03> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://doi.org/10.1186/s12915-021-01016-1> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.3000494> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 15 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1#n_taxa> a schema:PropertyValue ;
+    schema:propertyID "n_taxa" ;
+    schema:value 300 ;
+    schema:description "taxa named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://cran.r-project.org/package=MASSTIMATE> dct:title "MASSTIMATE extants, Campione and Evans 2012 limb measurements" ;
+    dct:description "Data frame extants: 245 extant tetrapods, body mass in grams, humeral and femoral circumference in millimetres. The paper supplement is the same extant table plus dinosaur rows that this test excludes." .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "Campione and Evans 2012 paper" ;
+    dct:description "Source of the extant limb and body-mass table. Dinosaur masses in the supplement are estimated from limb dimensions and are not used as data." .
+  <https://doi.org/10.6084/m9.figshare.12600440.v3> dct:title "Amson and Bibi 2021 humeral structure and timetree" ;
+    dct:description "152 mammal species with body mass and humeral MeanArea, plus AlteredTimetree.nex. Independent of the Campione circumference table." .
+  <https://doi.org/10.5061/dryad.tb03d03> dct:title "Upham, Esselstyn and Jetz 2019 mammal trees" ;
+    dct:description "Posterior sample of node-dated mammal trees for the Campione mammal PGLS. Reptiles are not in this tree." .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" ;
+    dct:bibliographicCitation "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" .
+  <https://doi.org/10.1186/s12915-021-01016-1> dct:title "Differing effects of size and lifestyle on bone structure in mammals" ;
+    dct:bibliographicCitation "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals" .
+  <https://doi.org/10.1371/journal.pbio.3000494> dct:title "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation" ;
+    dct:bibliographicCitation "Upham, Esselstyn and Jetz 2019, Inferring the mammal tree" .
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.347Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Phylogenetic slopes of limb-bone size on body mass" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

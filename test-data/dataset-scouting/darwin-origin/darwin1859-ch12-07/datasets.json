@@ -1,0 +1,291 @@
+{
+  "claim_id": "darwin1859-ch12-07",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "woodiness or growth form (herb/shrub/tree) per plant species",
+    "island versus mainland native status per species",
+    "dated phylogeny to identify herbaceous continental ancestors and in-situ transitions",
+    "family-level herbaceous baseline for island-versus-mainland comparison"
+  ],
+  "datasets": [
+    {
+      "id": "global-inventory-of-floras-and-traits",
+      "name": "Global Inventory of Floras and Traits (GIFT)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GIFT API query=traits_meta, query=lists; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "woodiness per species (trait Woodiness_1: woody/non-woody/variable, count 249,169)",
+        "island vs other entity class for floras"
+      ],
+      "variables_missing": [
+        "ancestral growth form",
+        "sister-species pairs",
+        "phylogeny"
+      ],
+      "scope": "Worldwide; woodiness trait coverage 249,169 records (per traits_meta)",
+      "evidence": "traits_meta returned 200: Category Morphology, trait Woodiness_1, units 'woody, non-woody, variable', count 249169. lists endpoint returned 200 with entity_class (e.g. 'Island') for each list. Landing returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": "https://www.try-db.org/TryWeb/Home.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://www.try-db.org/TryWeb/Home.php",
+        "http_status": 200,
+        "note": "Bare domain returned a 96-byte body"
+      },
+      "variables_present": [
+        "plant traits incl. height and growth form (per assessors)"
+      ],
+      "variables_missing": [
+        "island-versus-mainland status",
+        "open download without request (not verified)"
+      ],
+      "scope": "Global plant traits; contents not queried",
+      "evidence": "Home page returned 200 (30,280 bytes); it states version 7 was released with about 50% more trait records and taxonomy harmonised with GBIF. No trait counts or island fields were fetched. https://www.try-db.org/ itself returned 200 with 96 bytes.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about and /v3/tnrs/match_names; GET landing",
+        "http_status": null,
+        "note": "Landing did not respond (000); status null refers to the landing page, API returned 200"
+      },
+      "variables_present": [
+        "synthetic species tree (opentree16.1, 2,385,875 tips)",
+        "name resolution for Echium and Lobelia"
+      ],
+      "variables_missing": [
+        "growth-form traits",
+        "branch lengths/dates not checked"
+      ],
+      "scope": "All life; no traits",
+      "evidence": "tree_of_life/about returned 200: synth_id opentree16.1, 2,385,875 tips, 2,064 source trees. TNRS match_names for Echium and Lobelia returned 200. The web landing https://tree.opentreeoflife.org/ did not respond (curl status 000).",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence records",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GBIF API occurrence/search?taxonKey=6&limit=0",
+        "http_status": 200,
+        "note": "Landing 403; 200 is the API"
+      },
+      "variables_present": [
+        "plant occurrence records on islands and mainland"
+      ],
+      "variables_missing": [
+        "growth form",
+        "native/introduced status per species"
+      ],
+      "scope": "Occurrences only",
+      "evidence": "API returned 200 with count 652,196,829 for Plantae; landing page returned 403 to curl.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank / nuccore",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "Entrez einfo db=nuccore; esearch Echium[Organism]; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "DNA sequences for building phylogenies (nuccore 744,629,387 records; Echium 1,824)"
+      ],
+      "variables_missing": [
+        "ready-made phylogenies",
+        "growth-form traits"
+      ],
+      "scope": "Raw sequences",
+      "evidence": "Entrez einfo returned 200: nuccore count 744,629,387 (build 261029-1250m.1). esearch '\"Echium\"[Organism]' returned count 1,824. Landing returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "island-woodiness-radiations-rt530k9",
+      "name": "Island woodiness underpins accelerated disparification in plant radiations (Dryad rt530k9, 2019)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.rt530k9",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.rt530k9",
+      "doi": "10.5061/dryad.rt530k9",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.rt530k9 and /versions/*/files",
+        "http_status": 200,
+        "bytes": 270033
+      },
+      "variables_present": [
+        "time trees and growth-form trait data for four radiations (Hawaiian silverswords, Macaronesian Echium, Andean Lupinus, Hypericum), island versus non-island relatives (per abstract)"
+      ],
+      "variables_missing": [
+        "global coverage"
+      ],
+      "scope": "Four clades",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.rt530k9 returned 200: title 'Data from: Island woodiness underpins accelerated disparification in plant radiations', published 2019-03-21, license CC0-1.0, storageSize 270033 bytes; file list: NuerkAtchinsonHughes_NewPytol_islandRad_data.zip 270,033. Abstract states secondary woodiness is associated with dispersal to islands in these radiations. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "canary-islands-insular-woodiness-timing-kh189322s",
+      "name": "Dated tree of 24,000 angiosperm species incl. Canary Island colonisation events",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.kh189322s",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.kh189322s",
+      "doi": "10.5061/dryad.kh189322s",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.kh189322s and /versions/*/files",
+        "http_status": 200,
+        "bytes": 123935686
+      },
+      "variables_present": [
+        "dated tree of about 24,000 angiosperm species with Canary Island colonisation events",
+        "origin timing of woodiness in 24 insular woody lineages (per abstract)"
+      ],
+      "variables_missing": [
+        "global island coverage",
+        "growth-form table in this file"
+      ],
+      "scope": "Canary Islands lineages; file is 124 MB (not downloaded)",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.kh189322s returned 200: title 'Dated tree of 24,000 Angiosperms species incl Canary Island colonisation events', published 2022-09-06, license CC0-1.0, storageSize 123935686 bytes; file list: megaphylogeny.tre.gz 123,935,686. Abstract: insular woodiness has arisen more than 30 times on the Canary Islands. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "canary-woodiness-succulence-cc2fqz6b4",
+      "name": "Woodiness and succulence of the Canary Islands flora",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.cc2fqz6b4",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.cc2fqz6b4",
+      "doi": "10.5061/dryad.cc2fqz6b4",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.cc2fqz6b4 and /versions/*/files",
+        "http_status": 200,
+        "bytes": 52436
+      },
+      "variables_present": [
+        "woodiness and succulence per native Canary Island species (per abstract)"
+      ],
+      "variables_missing": [
+        "mainland comparison",
+        "ancestral state"
+      ],
+      "scope": "Canary Islands only",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.cc2fqz6b4 returned 200: title 'Woodiness and succulence of the Canary Islands flora', published 2023-06-02, license CC0-1.0, storageSize 52436 bytes; file list: README.md 1,010; WoodinessSucculence_CI.csv 51,426. Abstract describes occurrence data plus woodiness and succulence for Canary Island native species. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "insular woodiness",
+      "url": "https://api.datacite.org/dois?query=insular+woodiness&page%5Bsize%5D=5",
+      "hits": 25,
+      "note": "found Canary Islands and Argyranthemum datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "insular woodiness",
+      "url": "https://zenodo.org/api/records?q=insular+woodiness&size=5",
+      "hits": 4403,
+      "note": "found zenodo.5132950 / dryad.p5hqbzkq2 (Canary woodiness timing; not inspected)"
+    },
+    {
+      "source": "Dryad",
+      "query": "insular woodiness",
+      "url": "https://datadryad.org/api/v2/search?q=insular+woodiness&per_page=5",
+      "hits": 13
+    },
+    {
+      "source": "Dryad",
+      "query": "woodiness island",
+      "url": "https://datadryad.org/api/v2/search?q=woodiness+island&per_page=5",
+      "hits": 64,
+      "note": "top hits Canary Islands and island radiation datasets"
+    },
+    {
+      "source": "DataCite",
+      "query": "plant growth form woodiness database",
+      "url": "https://api.datacite.org/dois?query=plant+growth+form+woodiness+database&page%5Bsize%5D=5",
+      "hits": 10,
+      "note": "no global island-versus-mainland table"
+    },
+    {
+      "source": "DataCite",
+      "query": "island woody herb transition growth form plants",
+      "url": "https://api.datacite.org/dois?query=island+woody+herb+transition+growth+form+plants&page%5Bsize%5D=5",
+      "hits": 3,
+      "note": "only GBIF download DOIs"
+    },
+    {
+      "source": "GIFT API",
+      "query": "traits_meta",
+      "url": "https://gift.uni-goettingen.de/api/extended/index.php?query=traits_meta",
+      "hits": 1,
+      "note": "woodiness trait count 249,169"
+    }
+  ],
+  "status": "partial",
+  "summary": "Species-level woodiness (249,169 records) with island labelling is open via GIFT, a global species tree via Open Tree of Life, and clade-level island woodiness data and dated trees via Dryad for four radiations and the Canary Islands. No fetched resource gives a global table of herbaceous-ancestor to woody-island transitions, and TRY's access terms were not verified.",
+  "next_step": "Combine GIFT woodiness and island status with the Open Tree synthetic tree to find island endemics and their closest mainland relatives; use the Dryad radiation datasets as a check on a few clades.",
+  "obstacles_confirmed": [
+    "Ancestral states and sister pairs are not stored as one global table.",
+    "Tree-of-life web landing did not respond; API did.",
+    "TRY island status and access conditions not verified."
+  ]
+}

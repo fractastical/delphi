@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Fix the generative model, then rank regeneration times" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> ;
+    dct:description "Before opening a regeneration time course, fix the generative model to the shared target morphology used by Friston, Levin, Sengupta and Pezzulo 2015, with no free retargeting. Define the surprise of a cut as the variational free energy of that initial condition under the fixed target. The prediction is ordinal: among fragment classes of one species in one paper, the ordering of free energies must match the ordering of regeneration times, with Spearman rank correlation above 0.5. Planarian fragment series are the admissible data, and only series that report times for at least four fragment classes. Parameters of the target are taken from the 2015 paper, not from the time series. Fewer than four classes, or times that exist only as unlabeled cartoons, makes the test inconclusive." ;
+
+    delphi:proposedTest "Spearman correlation above 0.5 between pre-registered free-energy rank and regeneration-time rank, on at least four fragment classes." ;
+    delphi:context "Fails if: Correlation at most 0.5. Changing the target after seeing the times fails the approach and is the unfalsifiability pattern the problem names." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Transcribe the 2015 target morphology and freeze it. 2. Define free energy of a cut under that target. 3. List fragment classes and published times from one admissible series. 4. Compute Spearman correlation between free-energy rank and time rank. 5. Refute the fixed model if the correlation is at most 0.5." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Quantitative regeneration times for four or more fragment classes in one paper. If the papers only show cartoons, the test is inconclusive." ;
+    skos:note "Tool: variational-inference" ;
+    skos:note "Tool: developmental-biology" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-15> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-20> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2014.1383> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.plrev.2019.06.001> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> a delphi:Concept, schema:Question ;
+    rdfs:label "A falsifiable form of active-inference morphogenesis" .
+
+
+  <https://doi.org/10.1098/rsif.2014.1383> dct:title "Knowing one's place: a free-energy approach to pattern regulation" ;
+    dct:bibliographicCitation "Friston, Levin, Sengupta and Pezzulo 2015, Knowing one's place" .
+  <https://doi.org/10.1016/j.plrev.2019.06.001> dct:title "Morphogenesis as Bayesian inference: A variational approach to pattern formation and control in complex biological systems" ;
+    dct:bibliographicCitation "Kuchling, Friston, Georgiev and Levin 2020, Morphogenesis as Bayesian inference" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to active-inference-morphogenesis-falsifiable, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.344Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to active-inference-morphogenesis-falsifiable: Fix the generative model, then rank regeneration times" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

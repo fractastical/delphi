@@ -1,0 +1,95 @@
+{
+  "claim_id": "thompson1917-ch05-11",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "cylinder radius R of free end cells of Spirogyra (or similar filaments), calibrated",
+    "end-cap height measured along the filament axis",
+    "radius of curvature of the end cap (or cap profile sufficient to fit a sphere)",
+    "image orientation / calibration metadata (scale bar or pixel size)"
+  ],
+  "datasets": [
+    {
+      "id": "algaebase",
+      "name": "AlgaeBase",
+      "landing_url": "https://www.algaebase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:32:00Z", "method": "HEAD then GET landing_url; GET genus detail page", "http_status": 200, "note": "HEAD returns 405; GET returns 200 HTML. No public JSON API; genus pages are HTML with analytics scripts, image content behind interactive pages." },
+      "variables_present": [],
+      "variables_missing": ["calibrated cylinder radius", "end-cap height", "cap curvature radius"],
+      "scope": "Taxonomic database of algae; Spirogyra genus pages carry nomenclature and illustrative images",
+      "evidence": "Landing page 200 (HEAD 405). Genus detail page returned HTML only; no downloadable image set or measurement table was found. AlgaeBase images are illustrative, as the assessor obstacle already notes.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Spirogyra&collection=bioimages",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:32:00Z", "method": "HEAD landing_url; GET BioStudies search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["any Spirogyra images", "end-cap geometry"],
+      "scope": "Archive-wide; Spirogyra not represented",
+      "evidence": "Search API for 'Spirogyra' in collection bioimages returned totalHits 0 (isTotalHitsExact true). A second search 'filamentous algae' returned 14 hits, none on Zygnematophyceae (diatoms, cyanobacteria, Hydrurus, plankton).",
+      "verdict": "not-found",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images/41009",
+      "doi": "10.6075/j0f76bdp",
+      "license": "CC BY-NC-ND 4.0 (per DataCite rightsList for CIL:41009)",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:36:00Z", "method": "HEAD landing_url; GET images/41009; GET DataCite record 10.6075/j0f76bdp", "http_status": 200 },
+      "variables_present": ["bright-field/polarized-light micrograph of Spirogyra filaments (single image)"],
+      "variables_missing": ["pixel size / scale calibration (not seen on page)", "free end cells specifically", "sample of filaments (n > 1)"],
+      "scope": "One competition image (Olympus BioScapes 2010) of Spirogyra; whole-mount, bright-field + polarized light",
+      "evidence": "Site keyword search page returned 200 but no parseable hit count; the /api/search endpoint is 404. DataCite search found CIL:41009 'Spirogyra' (resourceTypeGeneral Dataset), landing page 200 describing 'Spirogyra (a filamentous green algae)... Sixth Prize, 2010 Olympus BioScapes'. Imaging mode: bright-field microscopy; polarized light illumination. CC BY-NC-ND 4.0. A single illustrative image; no calibration metadata visible on the page.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-spirogyra-occurrence-images",
+      "name": "GBIF occurrence records of Spirogyra with still images",
+      "landing_url": "https://www.gbif.org/occurrence/search?taxon_key=2646845&media_type=StillImage",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2646845&mediaType=StillImage",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:38:00Z", "method": "GET GBIF species match + occurrence search API (limit=0, facet datasetKey)", "http_status": 200 },
+      "variables_present": ["photographs of Spirogyra filaments (uncalibrated, mostly citizen-science)"],
+      "variables_missing": ["scale calibration", "end-cell identification", "cap height and curvature"],
+      "scope": "8,551 occurrences of genus Spirogyra (GBIF taxonKey 2646845) with StillImage media; top three contributing datasets hold 2,178 / 1,798 / 990 records",
+      "evidence": "species/match returned usageKey 2646845 'Spirogyra Link, 1820' (EXACT). Occurrence search count 8551 with mediaType=StillImage. Images are observation photos without recorded pixel size; usable only if a scale can be inferred.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive (BioStudies API)", "query": "Spirogyra", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Spirogyra&collection=bioimages", "hits": 0, "note": "exact zero" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "filamentous algae", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=filamentous%20algae&collection=bioimages", "hits": 14, "note": "no Zygnematophyceae; diatoms, cyanobacteria, Hydrurus, plankton" },
+    { "source": "IDR search engine", "query": "organism = Spirogyra", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=organism&value=Spirogyra", "hits": 0, "note": "results list empty" },
+    { "source": "Zenodo", "query": "Spirogyra microscopy", "url": "https://zenodo.org/api/records?q=Spirogyra%20microscopy&size=5", "hits": 28576, "note": "loose full-text match; top hits are Plazi figure extractions and unrelated publications, no calibrated morphometric image set" },
+    { "source": "DataCite", "query": "Spirogyra microscopy", "url": "https://api.datacite.org/dois?query=Spirogyra%20microscopy&page[size]=5", "hits": 2, "note": "one relevant: 10.6075/j0f76bdp CIL:41009 Spirogyra (Cell Image Library)" },
+    { "source": "Dryad", "query": "Spirogyra", "url": "https://datadryad.org/api/v2/search?q=Spirogyra", "hits": 1, "note": "SSR marker genomics dataset, unrelated" },
+    { "source": "GBIF", "query": "Spirogyra occurrences with StillImage", "url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2646845&mediaType=StillImage&limit=0", "hits": 8551, "note": "uncalibrated observation photos" }
+  ],
+  "status": "partial",
+  "summary": "No repository holds calibrated measurements of Spirogyra free-end-cell caps. BioImage Archive and IDR have no Spirogyra at all; AlgaeBase is a taxonomic site with illustrative images; the Cell Image Library has a single CC BY-NC-ND competition micrograph (CIL:41009) without visible scale metadata; GBIF has 8,551 Spirogyra occurrence photographs, uncalibrated. Cap height/radius ratios (dimensionless) could in principle be measured from images lacking absolute scale, but no image set is selected for free end cells.",
+  "next_step": "Compile a small image set of Spirogyra filament ends (e.g., from GBIF/iNaturalist CC-licensed photos or a new culture) with cells imaged in profile, then pre-register measurement of cap height / R and fitted cap-sphere radius / R.",
+  "obstacles_confirmed": [
+    "Open Spirogyra samples with calibration and free end cells are limited.",
+    "AlgaeBase images are illustrations, not a random sample of free end cells.",
+    "Turgor and wall thickness are not recorded with the photographs."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "claim_id": "darwin1859-ch08-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T06:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "first-cross success or hybrid fertility per species pair (pre- and post-zygotic isolation)",
+    "genetic or phylogenetic distance per species pair, estimated independently of fertility",
+    "taxonomic rank of the pair (congeneric, same family, different families), to check the claim of no hybrids across families",
+    "pairs from several clades (animals and plants), not one group"
+  ],
+  "datasets": [
+    {
+      "id": "coyne-orr-drosophila-pairs-dryad-g5g43",
+      "name": "Data from: On the Coyne and Orr-igin of species (Drosophila species-pair data; CoynOrriginDat_funk.csv and CoynOrriginDat_roman.csv)",
+      "landing_url": "https://zenodo.org/api/records/4985394",
+      "access_url": "https://zenodo.org/api/records/4985394/files/CoynOrriginDat_funk.csv/content",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0 (Dryad SPDX CC0-1.0)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:23:40Z", "method": "GET Dryad API dataset record and file list (Dryad file download returns 401 without a token); GET Zenodo mirror CSV and read the header and first rows", "http_status": 200, "bytes": 26907 },
+      "variables_present": [
+        "species pair identifiers (sp1, sp2)",
+        "Nei's genetic distance per pair (NeisD)",
+        "prezygotic and postzygotic isolation indices per pair (prezygotic, postzygotic)",
+        "sympatry flag and percent sympatry; host-plant and X-chromosome size fields; a tree label per pair"
+      ],
+      "variables_missing": ["taxa other than Drosophila", "pairs from different families (only Drosophila species pairs)", "per-pair crossing success for first crosses is represented only as isolation indices"],
+      "scope": "Drosophila species pairs only: the CSV has a header and about 143 data rows (file split gave 144 lines); Dryad record published 2014-01-09, 58,489 B total storage",
+      "evidence": "CSV header: \"\",\"sp1\",\"sp2\",\"sympatry\",\"NeisD\",\"prezygotic\",\"postzygotic\",\"percent_sympatry\",\"diff.host\",\"x.size\",\"sp1.host\",\"sp2.host\",\"tree\". First row: athabasca_EA+athabasca_WN, sympatry 1, NeisD 0.12, prezygotic 0.942, postzygotic 0. Dryad file list: CoynOrriginDat_funk.csv 26,907 B, CoynOrriginDat_roman.csv 26,882 B, two R scripts.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree (API)",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T05:17:10Z", "method": "POST tree_of_life/about; earlier POST tnrs/match_names and induced_subtree for another claim", "http_status": 200 },
+      "variables_present": ["taxon name resolution and a global topology from which family membership and patristic-style relationships can be derived"],
+      "variables_missing": ["no crossing data", "branch lengths not seen in the induced-subtree output (Equus test returned an unresolved polytomy with empty supporting_studies)"],
+      "scope": "all life; 2,385,875 tips, 1,931 source studies",
+      "evidence": "tree_of_life/about returned num_tips 2385875 and num_source_studies 1931.",
+      "verdict": "partial"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:40Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": ["divergence-time lookup portal (no pair queries made)"],
+      "variables_missing": ["no crossing data"],
+      "scope": "portal for pairwise divergence times",
+      "evidence": "HEAD returned 200 text/html.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (landing page)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:17:33Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal page; supplies sequences for distance estimation but holds no crossing outcomes"],
+      "scope": "portal",
+      "evidence": "HEAD 200 text/html.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad-digital-repository",
+      "name": "Dryad Digital Repository",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=hybrid+fertility+genetic+distance+reproductive+isolation&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T05:23:30Z", "method": "GET search API 'hybrid fertility genetic distance reproductive isolation'; HEAD landing page returned 200 earlier", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["a multi-clade table pairing crossing outcomes with distance was not found"],
+      "scope": "repository; the search returned 1 hit (Phlox cuspidata selfing, dryad.hx3ffbgks), not a cross-clade table",
+      "evidence": "search total 1; a Zenodo search also surfaced single-system datasets (house mouse hybrid zone dryad.2br40, D. pseudoobscura hybrid male sterility dryad.8460, songbird hybrid female sterility dryad.41ng6).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "hybrid fertility genetic distance reproductive isolation", "url": "https://datadryad.org/api/v2/search?q=hybrid+fertility+genetic+distance+reproductive+isolation&per_page=6", "hits": 1, "note": "only a Phlox selfing dataset" },
+    { "source": "Zenodo", "query": "reproductive isolation genetic distance hybrid sterility many taxa dataset", "url": "https://zenodo.org/api/records?q=reproductive+isolation+genetic+distance+hybrid+sterility+many+taxa+dataset&size=5", "hits": 834582, "note": "single-system datasets only (house mouse, D. pseudoobscura, bluethroat/flycatcher)" },
+    { "source": "DataCite", "query": "hybrid sterility divergence time reproductive isolation", "url": "https://api.datacite.org/dois?query=hybrid+sterility+divergence+time+reproductive+isolation&page%5Bsize%5D=5", "hits": 5, "note": "none are cross-taxon crossing-versus-distance tables" },
+    { "source": "Dryad", "query": "dataset record doi:10.5061/dryad.g5g43", "url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.g5g43", "hits": null, "note": "resolves to the Drosophila species-pair data; file download needs a token, Zenodo mirror is open" },
+    { "source": "Zenodo", "query": "doi:10.5061/dryad.g5g43 mirror", "url": "https://zenodo.org/api/records?q=doi:%2210.5061/dryad.g5g43%22&size=1", "hits": 1, "note": "record 4985394 with four files" }
+  ],
+  "status": "partial",
+  "summary": "The assessor-named Drosophila dataset (dryad.g5g43) resolves and is openly readable through its Zenodo mirror: roughly 143 Drosophila species pairs with Nei's genetic distance and pre- and post-zygotic isolation indices. It covers one genus, so the claim about families, plants and other animals is untested by it. No multi-clade table of crossing outcomes against independent distance exists in the repositories searched; Open Tree and TimeTree can supply distance for a compiled table.",
+  "next_step": "Compile cross-clade crossing records (e.g. birds, Lepidoptera, frogs, fishes, Nicotiana/Solanum plants) from the literature, then add Open Tree or TimeTree distances; use the Drosophila CSV as the first slice.",
+  "obstacles_confirmed": [
+    "Dryad file downloads need a bearer token; the Zenodo mirror served the same CSV openly.",
+    "The only crossing-vs-distance table found is restricted to Drosophila.",
+    "No dataset of crosses between species of different families was found."
+  ]
+}

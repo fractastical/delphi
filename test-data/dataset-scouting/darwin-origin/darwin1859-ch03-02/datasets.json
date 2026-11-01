@@ -1,0 +1,119 @@
+{
+  "claim_id": "darwin1859-ch03-02",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:35:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "per-capita fecundity (seed or offspring output) of the same species in native vs introduced ranges",
+    "survival / mortality (and enemy release) in native vs introduced ranges",
+    "dated spread or abundance trajectories of introduced species",
+    "list of naturalised species with introduction dates and regions"
+  ],
+  "datasets": [
+    {
+      "id": "compadre-comadre-matrix-population-databases",
+      "name": "COMPADRE (plants) and COMADRE (animals) matrix population databases",
+      "landing_url": "https://compadre-db.org/",
+      "access_url": "https://compadre-db.org/Data/Compadre",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T08:25:00Z", "method": "GET landing (200, 1.3 MB page) and GET /Data/Compadre, read text", "http_status": 200, "bytes": 16756 },
+      "variables_present": ["stage-structured projection matrices, from which survival and fecundity-type vital rates and population growth rates can be read"],
+      "variables_missing": ["explicit native-vs-introduced range flag was not seen on the pages fetched", "dated spread trajectories"],
+      "scope": "Data page text: Version 6.26.3.0, 812 taxonomic species (COMPADRE page); welcome text says hundreds of plant and animal species. Which species are invasive with matrices in both ranges was not checked.",
+      "evidence": "Page text quoted above. Downloads were not fetched (database files not size-checked).",
+      "verdict": "partial"
+    },
+    {
+      "id": "glonaf-global-naturalized-alien-flora-v2-02",
+      "name": "Global Naturalized Alien Flora (GloNAF) v2.02 (Zenodo snapshot)",
+      "landing_url": "https://glonaf.org/",
+      "access_url": "https://zenodo.org/doi/10.5281/zenodo.13235356",
+      "doi": "10.5281/zenodo.13235356",
+      "license": "CC BY 4.0 (per DataCite)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:27:00Z", "method": "GET DataCite record 10.5281/zenodo.13235356 (200); glonaf.org landing GET -> 200. The Zenodo API itself returned 403 so the file list was not read", "http_status": 200 },
+      "variables_present": ["naturalised/invasive status of 16,429 vascular plant taxa in 1,343 regions (427 islands) from 336 sources"],
+      "variables_missing": ["fecundity", "mortality", "introduction-date trajectories", "animals"],
+      "scope": "Plants only. Statement also covers animals.",
+      "evidence": "DataCite description quoted: version 2.02, 16,429 unique taxa, 1,343 regions, 336 data sources; status (invasive/naturalized) per region.",
+      "verdict": "partial"
+    },
+    {
+      "id": "griis-global-register-introduced-invasive-species",
+      "name": "Global Register of Introduced and Invasive Species (GRIIS), country checklists",
+      "landing_url": "https://griis.org/",
+      "access_url": "https://api.gbif.org/v1/dataset/search?q=Global%20Register%20of%20Introduced%20and%20Invasive%20Species&limit=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T08:28:00Z", "method": "GET griis.org landing (200); GBIF dataset search for the title", "http_status": 200 },
+      "variables_present": ["country checklists of introduced and invasive species (published as GBIF datasets, e.g. Samoa, Egypt, Cuba)"],
+      "variables_missing": ["fecundity", "mortality", "abundance trajectories"],
+      "scope": "GBIF dataset search returned count 56775 for the phrase (search is loose, not the number of GRIIS checklists).",
+      "evidence": "Search hits include 'Global Register of Introduced and Invasive Species - Samoa/Egypt/Cuba'. Presence/status lists only.",
+      "verdict": "partial"
+    },
+    {
+      "id": "griis-gbif-dataset-4fb6f9e6",
+      "name": "GRIIS dataset URL given by assessor (gbif.org/dataset/4fb6f9e6-...)",
+      "landing_url": "https://www.gbif.org/dataset/4fb6f9e6-34e3-4e84-8e2a-0e8e2f86e8e8",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T08:28:00Z", "method": "GET https://api.gbif.org/v1/dataset/4fb6f9e6-34e3-4e84-8e2a-0e8e2f86e8e8", "http_status": 404, "note": "API says 'Entity not found'; the www.gbif.org page returned 403 to curl" },
+      "variables_present": [],
+      "variables_missing": ["all"],
+      "scope": "The specific UUID does not resolve in the GBIF registry.",
+      "evidence": "GBIF registry API HTTP 404 'Entity not found'.",
+      "verdict": "not-found"
+    },
+    {
+      "id": "gbif-occurrences-spread",
+      "name": "GBIF occurrence records (spatiotemporal observations of introduced species)",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Sturnus%20vulgaris&country=US&limit=0&facet=year&facetLimit=3",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T08:30:00Z", "method": "GET GBIF occurrence search limit=0 with year facet for Sturnus vulgaris in US (www.gbif.org returns 403 to curl; API works)", "http_status": 200 },
+      "variables_present": ["georeferenced occurrence records with year (one species example returned count 16,146,927; year facet returned)"],
+      "variables_missing": ["demographic rates", "introduction dates"],
+      "scope": "Spread (range occupancy over time) can be observed, but occurrence counts are dominated by recent observation effort. Only one example species queried.",
+      "evidence": "Response: count 16146927 with facet YEAR (2025: 1,738,986; 2024: 1,676,593; 2023: 1,595,489).",
+      "verdict": "partial"
+    },
+    {
+      "id": "map-of-life",
+      "name": "Map of Life",
+      "landing_url": "https://mol.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:15:00Z", "method": "GET landing page", "http_status": 200, "bytes": 426658 },
+      "variables_present": [],
+      "variables_missing": ["not inspected: no data file or API located"],
+      "scope": "Landing only.",
+      "evidence": "HTTP 200 landing page; no data endpoint fetched.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "GloNAF global naturalized alien flora", "url": "https://api.datacite.org/dois?query=GloNAF%20global%20naturalized%20alien%20flora&page%5Bsize%5D=5", "hits": 33, "note": "GloNAF Zenodo records 10.5281/zenodo.13235356 and 10.5281/zenodo.17105725" },
+    { "source": "DataCite", "query": "COMPADRE COMADRE matrix population database", "url": "https://api.datacite.org/dois?query=COMPADRE%20COMADRE%20matrix%20population%20database&page%5Bsize%5D=5", "hits": 8, "note": "papers/code that reuse the matrix databases; none obviously native-vs-introduced" },
+    { "source": "Dryad", "query": "native introduced range fecundity survival invasive", "url": "https://datadryad.org/api/v2/search?q=native%20introduced%20range%20fecundity%20survival%20invasive", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "enemy release invasive native range demography", "url": "https://datadryad.org/api/v2/search?q=enemy%20release%20invasive%20native%20range%20demography", "hits": 0, "note": "nothing; the named Colautti/Parker meta-analyses were not located in Dryad" },
+    { "source": "GBIF", "query": "dataset search Global Register of Introduced and Invasive Species", "url": "https://api.gbif.org/v1/dataset/search?q=Global%20Register%20of%20Introduced%20and%20Invasive%20Species&limit=3", "hits": 56775, "note": "loose text match; first hits are national GRIIS checklists" }
+  ],
+  "status": "partial",
+  "summary": "Naturalisation status lists (GloNAF, GRIIS), occurrence data (GBIF) and generic matrix-population databases (COMPADRE/COMADRE) are open, but no fetched dataset pairs fecundity and survival of the same species in native and introduced ranges at scale.",
+  "next_step": "Compile native-vs-introduced vital-rate pairs from the Colautti/Parker meta-analysis supplements and COMPADRE/COMADRE entries tagged as invasive, then pair with GloNAF/GRIIS status for the spread outcome.",
+  "obstacles_confirmed": [
+    "Native-range and introduced-range demographic pairs were not found in any queried repository (two Dryad searches returned zero hits).",
+    "GloNAF covers plants only; animals need GRIIS or occurrence data.",
+    "Zenodo API blocked (HTTP 403) during this scout, so Zenodo-hosted files were not listed."
+  ]
+}

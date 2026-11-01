@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-08--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch10-08: mixed, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "Six structurally different lossless compression methods (run-length, block Huffman, LZ77/Deflate, LZMA, Burrows-Wheeler/bzip2 and a two-dimensional quadtree code) all strongly compress uniform and repetitive cellular automaton patterns, compress nested patterns at least partly, and achieve little compression of complex patterns from rules 30 and 45, relative to random patterns of the same density." ;
+    delphi:passCriterion "Pre-registered. Patterns: elementary CAs from a single black cell, T = 2048 steps; window rows 1024-2047, columns -512..511 (1024 x 1024 cells, inside the light cone). Classes: uniform = rule 254; repetitive = rules 50 and 250; nested = rules 90 and 150; complex = rules 30 and 45; exploratory (not in the verdict) = rule 110. Methods: (1) run-length coding of the row-major bit stream with Elias-gamma run lengths; (2) static Huffman code on non-overlapping 8-bit blocks (size = code bits + 256-byte table); (3) zlib level 9; (4) lzma preset 9 extreme; (5) bz2 level 9; (6) quadtree code of the 1024 x 1024 bitmap (1 bit 'split' or 2 bits 'uniform leaf + colour'; 1 bit per single cell). Statistic: r = size(pattern) / size(Bernoulli(d) pattern of the same shape), d = pattern's black fraction clipped to [0.01, 0.99], Bernoulli control from numpy PCG64 seed 20261031. 'supports' if all of: (a) uniform: r <= 0.10 for all 6 methods; (b) each repetitive rule: r <= 0.20 for at least 4 of 6 methods; (c) each nested rule: r <= 0.80 for at least 3 of 6 methods; (d) each complex rule: r >= 0.85 for all 6 methods." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if any method achieves r < 0.60 on rule 30 or rule 45 (substantial compression of complex behavior by a generic method), or if (b) and (c) both fail (the methods do not share the ability to compress repetition and nesting). 'mixed' otherwise when any of (a)-(d) fails." ;
+    delphi:expectedObservation "Across all six methods, uniform and repetitive windows compress to a small fraction of a density-matched random window, nested windows compress at least partly, and rule 30 and rule 45 windows compress by at most 15 %." ;
+    delphi:disconfirmingObservation "Any generic method compressing a rule 30 or rule 45 window to less than 60 % of a density-matched random window, or the methods failing to compress both repetitive and nested patterns." ;
+    delphi:admissibleDatasets "Patterns generated exactly from elementary CA rules by committed code, analysed in a window inside the light cone; generic compressors not tuned to any rule; density-matched seeded random references." ;
+    delphi:inferenceMethod "Compressed size ratio r against a density-matched Bernoulli pattern for each (rule, method), compared with the pre-registered per-class thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py generates each rule's pattern from a single black cell for 2048 steps, takes the 1024 x 1024 interior window, and compresses it with six methods: Elias-gamma run-length coding, static Huffman on 8-bit blocks (plus a 256-byte table), zlib 9, lzma 9e, bz2 9 and a quadtree code. Each size is divided by the size of a Bernoulli pattern with the same black fraction (clipped to [0.01, 0.99]) compressed by the same method, and the ratios are compared with the pre-registered class thresholds. Run time about 2 s." ;
+    rdfs:comment "Measured: [object Object] compressed size relative to a density-matched Bernoulli pattern (r) (n = 1048576, deterministic patterns; Bernoulli control sizes vary by well under 1 % between seeds (rules 50 and 250 controls: 0.00-0.03 %)). Interpretation: Wolfram (p. 560-570) compares run-length, block (Huffman), pointer-based (LZ) and two-dimensional schemes on CA patterns and concludes they share the same capabilities. The four families are represented by our own run-length and block-Huffman coders, three standard library compressors (zlib/Deflate and lzma are pointer-based; bzip2 adds a block-sorting family Wolfram does not discuss) and a quadtree code as the two-dimensional scheme. 'Substantial compression' is measured relative to a random pattern of the same density, so that compression explained by an unequal black/white ratio alone does not count; thresholds of 0.85 (little compression) and 0.60 (substantial) are our choice. The universal 'all methods' wording cannot be tested; a purpose-built compressor for a specific rule is outside the claim's scope (generic methods), as the assessors note." ;
+    delphi:evidenceAgainst "Verdict 'mixed' follows the pre-registered rule because condition (a) fails on a single method: block Huffman compresses the all-black window to 16,640 bytes (12.7 % of raw, the 1-bit-per-symbol floor of a static Huffman code plus its table), which is 0.80 of what it achieves on the Bernoulli(0.99) control, not <= 0.10. This is an artefact of normalizing a uniform pattern by a nearly uniform control, a choice made at pre-registration; every other method compresses the uniform window to <= 1.1 % of the control and run-length/quadtree to essentially nothing. Under a raw-size normalization (not pre-registered) the uniform condition would hold." ;
+    delphi:evidenceAgainst "The substantive claim is borne out: no method compresses rule 30 or rule 45 by more than 12 % relative to random (minimum r = 0.88, lzma on rule 30), far above the refutation threshold of 0.60, whereas every method except run-length and quadtree compresses the repetitive pattern more than 7-fold and at least four methods compress each nested pattern to <= 0.49." ;
+    delphi:evidenceAgainst "The similarity of capabilities is partial, as Wolfram's own wording ('most methods') allows: run-length and quadtree coding do not compress the checkerboard (r 0.88 and 1.08) because it has no long runs or uniform blocks, and block Huffman barely compresses rule 90 (0.86)." ;
+    delphi:evidenceAgainst "Rules 50 and 250 produce the identical checkerboard window, so the repetitive class is effectively one pattern." ;
+    delphi:evidenceAgainst "Exploratory (outside the verdict): rule 110 from a single cell, which Wolfram counts as complex, is compressed strongly by all LZ/BWT methods (r 0.06-0.11) because most of its window is the periodic background; complex patterns embedded in regular backgrounds are compressible by the generic methods." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-08--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-08--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/wolfram-nks/wolfram2002-ch10-08/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-08--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Elementary CA rules 254, 50, 250, 90, 150, 30, 45 and 110 from a single black cell, 2048 steps; interior windows rows 1024-2047, x in [-512, 511] (generated by analysis.py)" ;
+    dct:description "uniform, repetitive, nested and complex patterns to be compressed" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p560--data-compression/> ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-08--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Density-matched Bernoulli 1024 x 1024 patterns, numpy PCG64 seed 20261031 (generated by analysis.py)" ;
+    dct:description "normalizing reference for compressed sizes" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch10-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-08--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/wolfram-nks/wolfram2002-ch10-08/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:03.033Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch10-08: mixed, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-08--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

@@ -1,0 +1,57 @@
+{
+  "schema": "frontier.betse-k-sensitivity.protocol/1",
+  "label": "prospective numerical sensitivity; simulated; generic 2-D BETSE patch; not calibrated or fish-fin data",
+  "question": "How does the simulated targeted and untargeted voltage response to a dimensionless Dm_K multiplier vary with the same gap-junction pathway open versus fully blocked?",
+  "model": {
+    "package": "BETSE",
+    "version": "1.5.0",
+    "python": "3.12",
+    "pinned_dependencies": "engineering/bioelectric_tissue/requirements-betse.txt",
+    "system_dependency": "ffmpeg, required only to render animation from saved trajectories; exact build recorded by preflight and in the result",
+    "network_inputs": "No external scientific data; install exact pinned Python package versions from PyPI and ffmpeg from the Ubuntu 24.04 package repository",
+    "world": "80 micrometre square hexagonal patch with BETSE default disorder; actual cell and membrane counts recorded from the generated state",
+    "world_policy": "create one baseline world and initialization; copy that exact initialization and run config to every condition; BETSE seed is generated once for this packet and is not claimed to reproduce the earlier packet",
+    "gene_regulatory_network": "disabled",
+    "extracellular_spaces": "disabled; ideal infinite bath"
+  },
+  "conditions": [
+    {"id": "baseline", "k_multiplier": 1.0, "k_change": false, "gap_junction_block": false, "dt_s": 0.001},
+    {"id": "k2_open", "k_multiplier": 2.0, "k_change": true, "gap_junction_block": false, "dt_s": 0.001},
+    {"id": "k2_blocked", "k_multiplier": 2.0, "k_change": true, "gap_junction_block": true, "dt_s": 0.001},
+    {"id": "k5_open", "k_multiplier": 5.0, "k_change": true, "gap_junction_block": false, "dt_s": 0.001},
+    {"id": "k5_blocked", "k_multiplier": 5.0, "k_change": true, "gap_junction_block": true, "dt_s": 0.001},
+    {"id": "k10_open", "k_multiplier": 10.0, "k_change": true, "gap_junction_block": false, "dt_s": 0.001},
+    {"id": "k10_blocked", "k_multiplier": 10.0, "k_change": true, "gap_junction_block": true, "dt_s": 0.001},
+    {"id": "k10_open_half_dt", "k_multiplier": 10.0, "k_change": true, "gap_junction_block": false, "dt_s": 0.0005}
+  ],
+  "intervention": {
+    "quantity": "BETSE change K mem multiplier on Dm_K for Spot-profile membrane",
+    "dimensionless_multipliers": [2.0, 5.0, 10.0],
+    "target_cells": "BETSE Spot tissue profile in the single generated world",
+    "start_s": 1.0,
+    "finish_s": 3.0,
+    "ramp_rate": 0.5,
+    "gap_block": "BETSE block gap junction event, 100 percent, t=1..3 s"
+  },
+  "solver": {
+    "initialization_dt_s": 0.01,
+    "initialization_duration_s": 3.0,
+    "simulation_duration_s": 4.0,
+    "simulation_dt_s": 0.001,
+    "sample_interval_s": 0.1,
+    "half_dt_control": "10x open-junction condition only"
+  },
+  "outputs": [
+    "full per-cell Vm, membrane Vm, Na/K/anion/protein concentrations, gap-junction open fraction, coordinates and geometry for each condition",
+    "targeted and untargeted peak delta-Vm, timing, spread ratio, and end-window concentration deltas",
+    "time-step comparison at 10x open junctions",
+    "animation of saved cell Vm states"
+  ],
+  "limits": [
+    "one generated world, one deterministic run per condition, no biological replicate",
+    "multipliers are chosen dimensionless perturbations and are not estimates of channel abundance or conductance",
+    "gap-junction surface fraction is not converted to siemens",
+    "no Kcnj13/Kir2.1 parameters, fin tissue mapping, growth mapping, measurements, or biological-success probability",
+    "a non-monotone response is preserved rather than rejected"
+  ]
+}

@@ -75,18 +75,53 @@ for (const project of projects) {
     records: reports.flatMap(f => readJson(f)).filter(r => r.status === "formalized").length,
     built: 0, signed: 0, test: 0, production: 0, ...gitState(reports.map(f => relative(ROOT, f))),
   });
-  // Data tests: complete results in test-data/claim-tests/<project>/, built into test-data/claim-tests/nanopubs/unsigned/<id>.trig.
+  // Data tests: complete results in test-data/claim-tests/<project>/<id>/result.json and further runs
+  // <id>/<run>/result.json, built into test-data/claim-tests/nanopubs/unsigned/<id>[--<run>].trig and
+  // published through scripts/release/publish.mjs (manifest.jsonl beside them).
   const testDir = join(ROOT, "test-data/claim-tests", basename(project));
   if (isDir(testDir)) {
-    const results = ls(testDir).map(id => join(testDir, id, "result.json")).filter(existsSync);
-    const complete = results.filter(f => readJson(f).status === "complete");
-    const built = complete.map(f => join(ROOT, "test-data/claim-tests/nanopubs/unsigned", `${readJson(f).claim_id}.trig`)).filter(existsSync);
-    rows.push({
-      project: name, kind: "data tests", records: complete.length, built: built.length,
-      signed: 0, test: 0, production: 0, preregistered: results.length - complete.length,
-      ...gitState([...results, ...built].map(f => relative(ROOT, f))),
-    });
+    const results = [];
+    for (const id of ls(testDir).filter(d => isDir(join(testDir, d)))) {
+      const dir = join(testDir, id);
+      for (const rel of [".", ...ls(dir).filter(d => !d.startsWith(".") && isDir(join(dir, d)))]) {
+        const f = join(dir, rel, "result.json");
+        if (existsSync(f)) results.push({ f, trig: `${id}${rel === "." ? "" : `--${rel}`}.trig` });
+      }
+    }
+    const complete = results.filter(r => readJson(r.f).status === "complete");
+    rows.push(nanopubRow(name, "data tests", join(ROOT, "test-data/claim-tests/nanopubs"), complete.map(r => r.trig),
+      { preregistered: results.length - complete.length, sources: complete.map(r => r.f) }));
   }
+}
+
+// One row for a set of built nanopubs in <npDir>/unsigned, with publication state from <npDir>/manifest.jsonl.
+function nanopubRow(project, kind, npDir, wanted, extra = {}) {
+  const published = manifest(npDir);
+  const on = (file, reg) => published.some(m => m.file === file && m.registry === reg);
+  const files = wanted.filter(f => existsSync(join(npDir, "unsigned", f)));
+  return {
+    project, kind, records: wanted.length, built: files.length,
+    signed: files.filter(f => existsSync(join(npDir, "signed", f))).length,
+    test: files.filter(f => on(`unsigned/${f}`, "test")).length,
+    production: files.filter(f => on(`unsigned/${f}`, "production")).length,
+    ...extra,
+    ...gitState([...(extra.sources ?? []), ...files.map(f => join(npDir, "unsigned", f))].map(f => relative(ROOT, f))),
+  };
+}
+
+// The problem graph: problems, the approaches proposed to them and the runs logged against them
+// (problems/build/build-nanopubs.mjs; forecasts/runs.json is the run log).
+{
+  const P = join(ROOT, "problems");
+  const problems = readJson(join(P, "problems.json")).problems;
+  const approaches = ls(join(P, "approaches"), /\.json$/).flatMap(f => { const a = readJson(join(P, "approaches", f)); return (a.approaches ?? []).map(ap => `approach--${ap.problem}--${a.model}--${ap.n}.trig`); });
+  const runs = ls(join(P, "nanopubs/unsigned"), /^run--.*\.trig$/);
+  const loggedRuns = existsSync(join(P, "forecasts/runs.json")) ? readJson(join(P, "forecasts/runs.json")).runs.length : 0;
+  rows.push(nanopubRow("problems", "problems", join(P, "nanopubs"), problems.map(p => `problem--${p.id}.trig`), { sources: [join(P, "problems.json")] }));
+  rows.push(nanopubRow("problems", "approaches", join(P, "nanopubs"), approaches, { sources: ls(join(P, "approaches"), /\.json$/).map(f => join(P, "approaches", f)) }));
+  const runRow = nanopubRow("problems", "runs", join(P, "nanopubs"), runs, { sources: [join(P, "forecasts/runs.json")] });
+  runRow.records = loggedRuns;
+  rows.push(runRow);
 }
 
 // docs/claims.json against a fresh build from the repo.

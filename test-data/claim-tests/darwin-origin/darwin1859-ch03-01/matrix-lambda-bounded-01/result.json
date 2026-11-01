@@ -1,0 +1,77 @@
+{
+  "claim_id": "darwin1859-ch03-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch03-01",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If Darwin is right that all organisms tend to increase at a geometrical rate but that increase is always checked (a struggle for existence), then in published matrix population models of wild, unmanipulated populations (a) most species show a population growth rate clearly above replacement in at least one of their populations or years (potential for geometric increase, lambda_max >= 1.05) and (b) almost no species shows sustained geometric growth over the whole of its record (geometric-mean lambda >= 1.10), because realized growth is held near replacement by limiting factors. This is tested separately for animals (COMADRE) and plants (COMPADRE).",
+  "pass_criterion": "Pre-registered (claim supported). Unit = species (SpeciesAccepted); only species with at least 3 eligible matrices are analysed, and each group (animals from COMADRE, plants from COMPADRE) must contain at least 30 such species. For each species lambda_max is the largest dominant eigenvalue of A = U + F over its eligible matrices and lambda_gm is the geometric mean of the dominant eigenvalues. A group SUPPORTS the claim if BOTH (A) the proportion of its species with lambda_max >= 1.05 is at least 0.80 AND (B) the proportion of its species with lambda_gm >= 1.10 is at most 0.10. The overall verdict is 'supports' only if both groups support.",
+  "fail_criterion": "Pre-registered (claim refuted). A group REFUTES the claim if EITHER (A) the proportion of its species with lambda_max >= 1.05 is below 0.50 (most species show no potential to increase even in their best matrix: no general tendency to increase) OR (B) the proportion of its species with lambda_gm >= 1.10 is above 0.25 (a quarter of species grow geometrically over their whole record: no general check on increase). Overall 'refutes' if at least one group refutes. MIXED: any other outcome, including a proportion between the support and refute thresholds in either part, or one group supporting and the other neither supporting nor refuting. INCONCLUSIVE (reason 'underpowered'): fewer than 30 species with at least 3 eligible matrices in either group. INCONCLUSIVE (reason 'data-unavailable'): either database file cannot be downloaded, cannot be parsed, or lacks the U/F split and the metadata fields named under method. If the served database version differs from the versions recorded below, the analysis is run on the version served and the difference is recorded in 'deviations'; the thresholds are not changed.",
+  "planned_datasets": [
+    "comadre-animal-matrix-database-v4.26.4.0",
+    "compadre-plant-matrix-database-v6.26.3.0"
+  ],
+  "datasets": [
+    {
+      "id": "comadre-animal-matrix-database-v4.26.4.0",
+      "name": "COMADRE Animal Matrix Database",
+      "landing_url": "https://compadre-db.org/Data/Comadre",
+      "doi": null,
+      "version": "v.4.26.4.0 (filename served by the download endpoint on 2026-11-01; the endpoint serves the current release, so the version at analysis time must be re-read and recorded)",
+      "license": "Data User Agreement and citation guidelines on compadre-db.org; no SPDX licence was verified, and the scout record lists none",
+      "files": [
+        {
+          "name": "COMADRE_v.4.26.4.0.RData",
+          "download_url": "https://compadre-db.org/Data/ComadreDownload",
+          "byte_size": 907304,
+          "size_source": "Content-Length from an HTTP HEAD request on 2026-11-01; sha256 to be recorded at retrieval"
+        }
+      ],
+      "role": "stage-structured transition matrices (U survival/growth, F fertility) of wild animal populations, from which lambda per matrix is computed",
+      "fetch_note": "The RData file holds R lists. Export metadata and the U and F submatrices to JSON with Rscript as in test-data/claim-tests/math-bio-claims/hamilton-senescence/fetch.py (Rscript and jsonlite are needed; neither Rscript nor pyreadr was present when this was registered)."
+    },
+    {
+      "id": "compadre-plant-matrix-database-v6.26.3.0",
+      "name": "COMPADRE Plant Matrix Database",
+      "landing_url": "https://compadre-db.org/Data/Compadre",
+      "doi": null,
+      "version": "v.6.26.3.0 (filename served by the download endpoint on 2026-11-01; re-read at analysis time)",
+      "license": "Data User Agreement and citation guidelines on compadre-db.org; no SPDX licence was verified, and the scout record lists none",
+      "files": [
+        {
+          "name": "COMPADRE_v.6.26.3.0.RData",
+          "download_url": "https://compadre-db.org/Data/CompadreDownload",
+          "byte_size": 1558536,
+          "size_source": "Content-Length from an HTTP HEAD request on 2026-11-01 (above the 1 MB cap for this registration, so not downloaded); sha256 to be recorded at retrieval. Do not commit the file."
+        }
+      ],
+      "role": "stage-structured transition matrices (U, F) of wild plant populations, from which lambda per matrix is computed",
+      "fetch_note": "Same export route as COMADRE."
+    }
+  ],
+  "method": "Planned, not run. (1) Download both RData files with a User-Agent header; record URL, retrieval time, byte size, SHA-256 and the version string in the file name and in the database's version field. (2) Export metadata and U, F matrices to JSON with Rscript. (3) Eligible matrix: MatrixSplit == 'Divided'; MatrixTreatment == 'Unmanipulated'; MatrixCaptivity == 'W'; MatrixComposite == 'Individual' (one population and period, so that mean or pooled matrices are not counted next to their own components); no missing entries in U or F; MatrixDimension >= 2; sum of F > 0 (a matrix with no recorded reproduction cannot show a tendency to increase, and the number excluded for this is reported); no condition is placed on the eigenvalues of U. (4) For each eligible matrix compute lambda as the eigenvalue of A = U + F with the largest real part (Perron root), in units per projection interval of the source study; no annualization is applied. (5) Group by SpeciesAccepted within each database; keep species with >= 3 eligible matrices; compute lambda_max and lambda_gm per species with equal weight per matrix. (6) For each group compute pA = share of species with lambda_max >= 1.05 and pB = share with lambda_gm >= 1.10, each with a 95 % Wilson interval, and apply the criteria above. Descriptive extras (not used for the verdict): share of species with lambda_max > 1.00; median lambda_gm; distribution of lambda_gm by Class; the same proportions using lambda_max >= 1.10 and lambda_gm >= 1.05 as sensitivity checks; the counts of matrices and species removed by each eligibility rule.",
+  "test_contract": {
+    "expected_observation": "In wild populations with measured fecundity and survival, most species can increase geometrically in at least one population or year (lambda at least 5 % above replacement), yet very few species increase that fast on average over their whole record, so realized growth sits near replacement.",
+    "disconfirming_observation": "Either most species never show a population growth rate clearly above replacement in any of at least three matrices (fewer than half with lambda_max >= 1.05), so there is no general tendency to increase; or a quarter or more of species have a geometric-mean lambda of at least 1.10 over their whole record, so there is no general check on increase.",
+    "admissible_datasets": "Published stage-structured matrix population models of wild, unmanipulated populations with the survival (U) and fertility (F) components separated, covering many species and more than one population or year per species, compiled independently of Darwin's text and available for download. A dataset of abundance counts alone, or one that does not separate fecundity from survival, is not admissible for part (A).",
+    "inference_method": "Per species, lambda_max and lambda_gm from the dominant eigenvalues of A = U + F over its eligible matrices; per group (animals, plants), the proportions pA (lambda_max >= 1.05) and pB (lambda_gm >= 1.10) with Wilson 95 % intervals, compared with the fixed thresholds in pass_criterion and fail_criterion (support: pA >= 0.80 and pB <= 0.10; refute: pA < 0.50 or pB > 0.25; otherwise mixed), with a minimum of 30 species with at least 3 eligible matrices per group."
+  },
+  "interpretation": "Darwin's 'high (geometrical) rate' of increase is mapped to a per-capita population growth rate lambda = dominant eigenvalue of the projection matrix A = U + F, with lambda > 1 meaning geometric growth; 1.05 (5 % per projection interval above replacement) is a convention chosen here as a margin clearly above sampling and rounding noise, not a figure from Darwin. His 'struggle for existence', the checking of that increase by conspecifics, other species or physical conditions, is mapped only to its demographic consequence: realized long-run growth near replacement (lambda_gm < 1.10). The test does not partition mortality into intraspecific, interspecific and abiotic causes, so it cannot test the 'with members of its own species, with other species, or with physical conditions' disjunction, which as a three-way disjunction covers every possible check (assessor grok). It does not show that more individuals are produced than survive in the literal sense of eggs or seeds, because the F entries of a matrix are recruits counted at the census, after early mortality; the clutch-size-versus-recruits comparison Darwin has in mind needs fecundity data of another kind (for example FishBase or AnAge) and is not covered. Modern reinterpretation: a matrix model is a statistical summary of one population in one period, not the 'potential' growth of a species; a high lambda_max is potential in the weak sense of 'achieved in at least one observed population or year'. Scope covered: wild plants and animals with published matrix models (strongly biased to temperate, vertebrate, vascular-plant and conservation-relevant taxa; microbes and most invertebrates are essentially absent). Darwin's 'all organic beings' is therefore only sampled.",
+  "caveats": [
+    "What was inspected before registering: the scout record, the claim text and the three assessors' operationalizations; the compadre-db.org Comadre and Compadre landing pages (HTTP status only), and HTTP HEAD requests to the two download endpoints, which returned the file names COMADRE_v.4.26.4.0.RData (907,304 bytes) and COMPADRE_v.6.26.3.0.RData (1,558,536 bytes). No RData file was downloaded or opened, no field names, record counts or matrix values were seen, and no lambda was computed. The metadata field names used (MatrixSplit, MatrixTreatment, MatrixCaptivity, MatrixComposite, MatrixDimension, SpeciesAccepted, Class) are those used by the repository's earlier COMADRE test (math-bio-claims/hamilton-senescence/fetch.py) and are assumed, not verified, for COMPADRE; an absent field makes the verdict inconclusive (data-unavailable), not a licence to redefine the filter.",
+    "Prior knowledge of the likely outcome: the author expects from the general matrix-model literature that realized lambda values cluster near 1 with a spread of roughly 10 to 20 percent and that many species have at least one matrix above 1.05, so a pass on part (A) is expected and part (B) is the less certain part. The thresholds (0.80 / 0.50 for A, 0.10 / 0.25 for B; lambda 1.05 and 1.10; at least 3 matrices; at least 30 species) were fixed from the claim's wording ('high rate', 'every species') and conventional round figures before any data were opened, and were not tuned.",
+    "lambda_max is a maximum over at least 3 matrices, so it is biased upward for species with many matrices and a pass on part (A) is easy to obtain; part (A) is deliberately a weak test of potential increase. Part (B) is the discriminating part and its threshold (10 % of species at lambda_gm >= 1.10 for support, above 25 % for refutation) leaves a wide 'mixed' band.",
+    "Matrix models in the databases are biased towards species that were studied because they are endangered, invasive or managed, which can push lambda in either direction; and matrices from the same study or population are not independent. Species is the unit, but several species from one study or one genus are not independent either, and no phylogenetic correction is applied.",
+    "lambda is per projection interval (often one year but not always); no annualization is applied. Sensitivity to the thresholds is reported, not used for the verdict.",
+    "A matrix with lambda near 1 is by construction produced from an observed, persisting population; selection of populations that persisted long enough to be studied biases lambda towards 1, which favours part (B).",
+    "GPDD (Global Population Dynamics Database, doi:10.5063/F1BZ63Z8) was considered as a second dataset for realized abundance and dropped from the plan: the scout record states it holds counts but no fecundity or survival, and pairing it species by species with the matrix data would add a taxonomic-matching step this registration cannot specify without looking at the data. The Living Planet Index and FishBase were not verified as downloadable by the scout and are not planned.",
+    "A positive result establishes only that matrix-modelled wild populations show a potential for increase and bounded long-run growth; it does not show that Darwin's mechanism (struggle caused by overproduction) is the cause, nor does it test any of the three kinds of struggle he lists.",
+    "The RData files hold R lists and need Rscript to export; this is an environment requirement, not a data property."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "prereg-darwin-batch-1",
+    "date": "2026-11-01"
+  }
+}

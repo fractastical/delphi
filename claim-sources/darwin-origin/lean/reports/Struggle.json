@@ -1,0 +1,108 @@
+[
+  {
+    "claim_id": "darwin1859-intro-02",
+    "status": "formalized",
+    "label": "Overproduction plus slight profitable variation leads to natural selection",
+    "notation": "N_0 r^t \\to \\infty\\ (r > 1),\\ \\sup_t N_t \\le K \\Rightarrow \\prod_{i<t} s_i \\to 0;\\quad w_B < w_A \\Rightarrow p' = \\frac{p w_A}{p w_A + (1-p) w_B} > p",
+    "lean_declaration": "DarwinLaws.Struggle.selectedFrequency",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.not_all_survive",
+      "DarwinLaws.Struggle.survivalProduct_tendsto_zero",
+      "DarwinLaws.Struggle.selectedFrequency_gt",
+      "DarwinLaws.Struggle.selectedTrajectory_tendsto_one"
+    ],
+    "assumptions": "Overproduction: each generation multiplies numbers by a constant r > 1 and the realised population never exceeds a carrying bound K, with per-generation survival fractions s_t ∈ [0,1]. Selection: a discrete-time, asexual (haploid) population of two types with constant fitnesses w_A > w_B > 0 and initial variant frequency 0 < p₀ < 1.",
+    "scope_note": "Two separate results are joined here: (1) under geometric increase in a bounded world the cumulative survival fraction tends to zero, so not every generation can survive in full (the struggle); (2) under a constant fitness advantage the favoured variant increases every generation and its frequency tends to one. Lean proves neither that real fecundity is geometric nor that a 'slight profitable variation' corresponds to a constant fitness difference; it also does not connect the two halves (the struggle does not by itself produce the fitness difference). The inference that selection follows is model-dependent: constant-fitness haploid selection with no drift, mutation, frequency dependence or environmental change."
+  },
+  {
+    "claim_id": "darwin1859-ch01-16",
+    "status": "formalized",
+    "label": "Keeping large numbers of individuals favours successful selection",
+    "notation": "P(\\text{some favourable variation among } N) = 1 - (1-p)^N,\\ \\text{strictly increasing in } N,\\ \\to 1",
+    "lean_declaration": "DarwinLaws.Struggle.probAnyFavourable",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.probAnyFavourable_strictMono",
+      "DarwinLaws.Struggle.probAnyFavourable_tendsto_one"
+    ],
+    "assumptions": "Each of N individuals independently presents a useful variation with the same probability p, 0 < p < 1.",
+    "scope_note": "Proves that the chance of at least one useful variation rises strictly with the number of individuals kept and tends to certainty. Same mathematics as darwin1859-ch04-14, applied to breeders' stock. Independence and a common p are idealisations; the claim's practical conclusion (that large stocks are 'of the highest importance' to breeders, and the breeder's ability to recognise and preserve the variation) is not modelled."
+  },
+  {
+    "claim_id": "darwin1859-ch02-01",
+    "status": "not-formalized",
+    "label": "Individual differences supply the material for natural selection",
+    "notation": "\\text{(no formal core)}",
+    "reason": "The claim identifies the source of heritable variation that selection acts on; it is a statement about what exists in populations, not a consequence of stated assumptions. The selection dynamics it feeds are formalized under darwin1859-ch04-01 (DarwinLaws.Struggle.selectedFrequency), which takes the existence of a variant with frequency 0 < p < 1 as a hypothesis rather than proving it."
+  },
+  {
+    "claim_id": "darwin1859-ch03-01",
+    "status": "formalized",
+    "label": "Overproduction makes a struggle for existence inevitable",
+    "notation": "N_t = N_0 r^t,\\ r > 1:\\ \\forall K\\ \\exists t\\ N_t > K;\\quad \\sup_t N_0 r^t \\prod_{i<t} s_i \\le K \\Rightarrow \\prod_{i<t} s_i \\le \\frac{K}{N_0 r^t} \\to 0",
+    "lean_declaration": "DarwinLaws.Struggle.geometricPopulation",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.geometricPopulation_exceeds_bound",
+      "DarwinLaws.Struggle.surplus_tendsto_atTop",
+      "DarwinLaws.Struggle.supportableFraction_tendsto_zero",
+      "DarwinLaws.Struggle.realisedPopulation_eq",
+      "DarwinLaws.Struggle.survivalProduct_le",
+      "DarwinLaws.Struggle.survivalProduct_tendsto_zero",
+      "DarwinLaws.Struggle.not_all_survive"
+    ],
+    "assumptions": "Discrete non-overlapping generations; unchecked numbers multiply by a constant r > 1 each generation from N₀ > 0 founders (Malthusian geometric increase); the area supports at most K individuals, so the realised population N₀ rᵗ ∏ sᵢ never exceeds K, where sᵢ ∈ [0,1] is the fraction of generation i's offspring that survive to breed.",
+    "scope_note": "Proves that geometric increase exceeds any bound, that the surplus grows without limit, and that in a bounded population the cumulative survival fraction is at most K/(N₀ rᵗ) and tends to zero, so not every generation can survive in full. 'Struggle for existence' is rendered only as inevitable mortality; competition, its forms (with conspecifics, other species, physical conditions) and its intensity are not represented. Whether any species has a constant r > 1 under unchecked conditions is empirical; Darwin's elephant calculation is not reproduced."
+  },
+  {
+    "claim_id": "darwin1859-ch03-02",
+    "status": "formalized",
+    "label": "Geometrical increase explains rapid spread of naturalised species",
+    "notation": "\\lambda = r s;\\ s < s' \\Rightarrow r s < r s';\\quad \\lambda > 1,\\ t \\ge \\frac{\\log(M/N_0)}{\\log \\lambda} \\Rightarrow N_0 \\lambda^t \\ge M",
+    "lean_declaration": "DarwinLaws.Struggle.growthMultiplier",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.growthMultiplier_lt_of_survival_lt",
+      "DarwinLaws.Struggle.geometricPopulation_reaches_in_log_time"
+    ],
+    "assumptions": "Realised per-generation multiplier λ = r·s with fixed fecundity r > 0 and survival fraction s; in the new country survival is higher (s' > s) because enemies are fewer; growth is geometric with multiplier λ > 1 and target size M ≥ N₀ > 0.",
+    "scope_note": "Proves that at fixed fecundity higher survival gives a strictly higher multiplier, and that a geometrically growing population reaches any size M within log(M/N₀)/log λ generations ('extraordinarily rapid' read as logarithmic time). It does not prove that naturalised species spread because of lowered mortality rather than raised fertility: the alternative (a rise in r) is not shown to be absent, only that lowered destruction suffices. The model has no spatial spread, density dependence or lag phase."
+  },
+  {
+    "claim_id": "darwin1859-ch03-03",
+    "status": "formalized",
+    "label": "Average abundance depends only indirectly on fecundity",
+    "notation": "r s N = N,\\ N \\ne 0 \\Rightarrow s = 1/r",
+    "lean_declaration": "DarwinLaws.Struggle.stationary_survival_eq",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.stationary_survival_eq"
+    ],
+    "assumptions": "A stationary population: N individuals each produce r offspring of which a fraction s survive to breed, and the resulting number r s N equals N; r, N ≠ 0.",
+    "scope_note": "Proves only the stationarity identity s = 1/r: in a population of constant average size the survival fraction is the reciprocal of fecundity, so fecundity is exactly compensated by destruction and does not by itself set N. This is a one-line algebraic fact. The claim's substance, that average numbers are set by the checks (destruction, especially early in life) and only indirectly by egg or seed number, is a statement about what determines N, which the identity does not determine; it only shows N is not fixed by r alone. Not an independent theorem of population dynamics."
+  },
+  {
+    "claim_id": "darwin1859-ch04-01",
+    "status": "formalized",
+    "label": "Natural selection preserves favourable and destroys injurious variations",
+    "notation": "p' = \\frac{p w_A}{p w_A + (1-p) w_B};\\ w_A > w_B \\Rightarrow p' > p;\\ w_A < w_B \\Rightarrow p' < p;\\quad p_t = \\frac{p_0 w_A^t}{p_0 w_A^t + (1-p_0) w_B^t} \\to 1\\ (w_A > w_B)",
+    "lean_declaration": "DarwinLaws.Struggle.selectedFrequency",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.selectedFrequency_gt",
+      "DarwinLaws.Struggle.selectedFrequency_lt",
+      "DarwinLaws.Struggle.selectedTrajectory_succ",
+      "DarwinLaws.Struggle.selectedTrajectory_tendsto_one"
+    ],
+    "assumptions": "Discrete-time haploid (asexual) selection between a variant with constant fitness w_A and the rest of the population with constant fitness w_B > 0; infinite population (deterministic frequencies), no mutation, no drift, no frequency or density dependence; initial frequency 0 < p₀ < 1.",
+    "scope_note": "Proves that any fitness advantage, however slight, raises the variant's frequency in one generation, any disadvantage lowers it, and that under a constant advantage the frequency tends to one so the less favoured type is eliminated. Model-dependent: with finite populations a slight advantage is often lost to drift (the 'however slight' part fails for s ≲ 1/N), with diploid inheritance recessive variants behave differently, and fitnesses in nature are not constant. The claim's causal clause (that this follows from overproduction) is not derived; the fitness difference is assumed. 'Natural selection' is here a name for the recursion, not an empirical process."
+  },
+  {
+    "claim_id": "darwin1859-ch04-14",
+    "status": "formalized",
+    "label": "Large populations favour natural selection by supplying more variations",
+    "notation": "P_N = 1 - (1-p)^N;\\ m < n \\Rightarrow P_m < P_n;\\ P_N \\to 1\\ (N \\to \\infty)",
+    "lean_declaration": "DarwinLaws.Struggle.probAnyFavourable",
+    "lean_theorems": [
+      "DarwinLaws.Struggle.probAnyFavourable_strictMono",
+      "DarwinLaws.Struggle.probAnyFavourable_tendsto_one"
+    ],
+    "assumptions": "Each of N individuals independently presents a profitable variation in a given period with the same probability p, 0 < p < 1.",
+    "scope_note": "Proves that the chance that at least one profitable variation arises in a period rises strictly with population size and tends to one. This is the supply side only; that selection then acts more effectively in large populations (the fixation side, where Kimura's 2s approximation and the drift barrier enter) is not proved. The compensating clause in Darwin's statement, that each individual in a large population is less variable, is not modelled. Independent Bernoulli trials is an idealisation."
+  }
+]

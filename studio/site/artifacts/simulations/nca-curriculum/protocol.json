@@ -1,0 +1,221 @@
+{
+  "schema": "frontier.nca.curriculum.protocol/1",
+  "question": "Does a preregistered root-erasing damage curriculum improve the observed left-half failure while retaining pattern persistence, under matched fresh initialization pairs and independently committed NEW evaluation masks/update seeds?",
+  "scope": "Computational local-rule imagepattern only, NOTcell/genome/neuralimplementation orbiologicalregeneration",
+  "parent": {
+    "summary_path": "artifacts/nca-seed-placement/run/summary.json",
+    "sha256": "8ae10dec66c746f2ac37177316070b6fcb30b7dd1edfcd1d689aab57123310da",
+    "observed_gap": "left-half0/12, central8/12,persistence12/12,diagonal12/12 underpreviouslyreusedtestcases; original0/48also preserved"
+  },
+  "target": {
+    "path": "artifacts/nca-pattern/target.npz",
+    "sha256": "fd1f4774882743f1c09fb2fa2513cbca70b3128f1c58431082298adba0298488",
+    "seed_xy": [
+      7,
+      41
+    ],
+    "unchanged_arrays": "samefinRGBA/rays/silhouette andseed asparent; no targetfit"
+  },
+  "training": {
+    "model_seeds": [
+      20261102,
+      20261103,
+      20261104,
+      20261105
+    ],
+    "regimes": [
+      "damage-pool",
+      "curriculum-pool"
+    ],
+    "models_expected": 8,
+    "steps_per_model": 2000,
+    "batch_size": 8,
+    "pool_size": 128,
+    "unroll_inclusive": [
+      64,
+      95
+    ],
+    "baseline": "exactprevious3randomcircles on3lowestlossselectedstates",
+    "curriculum": "2samecircles+1leftprefixerasure onthirdlowestlossselectedstate; all16channels erased",
+    "prefix_schedule": [
+      {
+        "iterations_inclusive": [
+          0,
+          499
+        ],
+        "cutoff_inclusive": [
+          16,
+          20
+        ]
+      },
+      {
+        "iterations_inclusive": [
+          500,
+          999
+        ],
+        "cutoff_inclusive": [
+          20,
+          24
+        ]
+      },
+      {
+        "iterations_inclusive": [
+          1000,
+          1999
+        ],
+        "cutoff_inclusive": [
+          24,
+          28
+        ]
+      }
+    ],
+    "prefix_definition": "x<cutoff, xcolumn0..63; erasesseedrootwhilepatternmayremain",
+    "rng": "baselineandcurriculumconsumeidenticalcircle/pool/unroll/firemasksstreams. IndependentprefixRNGseed=initialization_seed+211, onecutoffdrawperiteration inBOTHregimes. SameinitmodeltensorSHA andtotalCAupdatesrequiredperpair.",
+    "architecture_loss_optimizer": "UNCHANGED16channel/128hiddenNCA,rawRGBA MSE,Adam.002,perparameterL2gradientnormalization,fire.5,alphaalive.1,statemagnitudeguard100,TF32/AMPoff",
+    "no_resume_claim": "Poolnotserialized; checkpoint/RNGmetadata forprovenance, no exactresume",
+    "no_earlystop_or_selection": "fixedfinal2000stepcheckpoint only, allfourpairs kept"
+  },
+  "evaluation": {
+    "owner": "infra_director independentlycommitsfreshmaskmanifest/updatesseeds beforeadmission; neverreadsnewmodeloutputs tochoosecases",
+    "sealing_scope": "independentfrozencommitment+sourceorder/readguard, NOTcryptographic/adversarialsecrecy whenfiles shipinjob",
+    "coordinate_system": {
+      "shape": [
+        64,
+        64
+      ],
+      "x": "column0..63",
+      "y": "row0..63",
+      "mask_true": "eraseall16channels"
+    },
+    "mask_cases": [
+      {
+        "id": "new-left-prefix-30",
+        "family": "left-prefix",
+        "parameters": {
+          "cutoff": 30
+        }
+      },
+      {
+        "id": "new-left-prefix-34",
+        "family": "left-prefix",
+        "parameters": {
+          "cutoff": 34
+        }
+      },
+      {
+        "id": "new-left-prefix-38",
+        "family": "left-prefix",
+        "parameters": {
+          "cutoff": 38
+        }
+      },
+      {
+        "id": "new-right-suffix",
+        "family": "right-suffix",
+        "parameters": {
+          "cutoff_uniform_integer_inclusive": [
+            36,
+            40
+          ]
+        }
+      },
+      {
+        "id": "new-oblique-root",
+        "family": "oblique-root",
+        "parameters": {
+          "formula": "x+slope*(y-32)<offset",
+          "slope_uniform": [
+            0.35,
+            0.55
+          ],
+          "offset_uniform": [
+            31,
+            34
+          ]
+        }
+      },
+      {
+        "id": "new-disk-hole",
+        "family": "disk",
+        "parameters": {
+          "center_x_uniform": [
+            38,
+            42
+          ],
+          "center_y_uniform": [
+            30,
+            34
+          ],
+          "radius_uniform": [
+            10,
+            12
+          ]
+        }
+      },
+      {
+        "id": "new-horizontal-slab",
+        "family": "horizontal-slab",
+        "parameters": {
+          "y0_uniform_integer_inclusive": [
+            26,
+            30
+          ],
+          "width_uniform_integer_inclusive": [
+            8,
+            10
+          ]
+        }
+      }
+    ],
+    "mask_nonvacuity": "eachremoves10%..85%targetforeground; exactmaskuniquevsoldleft32/central-square/diagonal masks; atmost100independentdraws thenfail, nothresholdchange",
+    "update_seed_count": 3,
+    "updates_seeds_policy": "freshuniqueseeds, excludeprior7001/7002/7003 andalltrainingRNGseeds/offsets",
+    "persistence": {
+      "updates": 2048,
+      "test_at_saved_checkpoints_from": 256,
+      "criterion": "IoU>=.75 ANDrawRGBA_MSE<=.02 ateverycheckpoint256..2048"
+    },
+    "damage": {
+      "before_updates": 256,
+      "recovery_updates": 512,
+      "criterion": "samepredamageANDfinalIoU>=.75/rawMSE<=.02; nopredamagepattern=failure"
+    },
+    "design_probes_expected": 192,
+    "all_erased_negatives_expected": 8,
+    "total_probes_expected": 200,
+    "negative_scope": "absorbingzerooutside192design tests",
+    "trace_selection": {
+      "kind": "new-left-prefix-34",
+      "update_seed": "firstindependentlycommittedupdateseed",
+      "models": "all8",
+      "rgba_every_updates": 32,
+      "full_state_snapshot_updates": [
+        0,
+        256,
+        257,
+        768
+      ],
+      "scope": "8preselectedhistoriesonly; all200retainrawfinalRGBA+metrics16updates; no discardedfailures"
+    },
+    "barrier": "Alltrainingphasescompleteorpartialrecorded,finalcheckpointSHAmanifestwrittenBEFOREmaskNPZloaded; sourceauditreadguard enforced"
+  },
+  "analysis": {
+    "replicate_unit": "fourpairedinitializations; updateseeds/masks shareweights and aredependent",
+    "report": "perpair curriculum-minusbaseline fractions, persistenceanddamagefamilies separately; allfailures/partialmodels; no inferentialbiologicalprobability orbestpairselection",
+    "empirical_validation": "unknown"
+  },
+  "resources": {
+    "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+    "gpus": 1,
+    "cpu_threads": 2,
+    "training_soft_s": 1800,
+    "evaluation_soft_s": 2100,
+    "scientific_hard_s": 2400,
+    "output_raw_cap_bytes": 50331648,
+    "compressed_transport_cap_bytes": 50331648,
+    "runtime_basis": "prior4models+52eval710.833s;8models+200evalestimated1450\u20131600s, notguaranteed; partialretained"
+  },
+  "source_method": "Distill2020growing-ca Model/Experiments2\u20133, previouslyread; adaptationnotpublishedbenchmarkreproduction",
+  "old_results_immutable": true,
+  "base_commit": "ef0ccfc81f35114f8d07c1a00ecc46281832071e"
+}

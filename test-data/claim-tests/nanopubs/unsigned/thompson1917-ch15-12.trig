@@ -1,0 +1,97 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-12--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch15-12: refutes, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "In normal mammalian (here human) hearts the left-ventricular wall is six to seven times as thick as the right-ventricular wall, and the left-ventricular systolic pressure is six to seven times the right, so the two ratios match." ;
+    delphi:passCriterion "Pre-registered. Thickness ratio R_t = (mean LV free-wall thickness) / (mean RV free-wall thickness), computed separately for males and females from the published per-sex means of morphologically normal autopsy hearts (Westaby et al. 2022, Cardiovasc Pathol, n = 1,062); LV free wall = mean of the reported LV wall sites excluding the septum; RV free wall = mean of the reported RV wall sites excluding the outflow tract. Pressure ratio R_p = median systolic blood pressure of NHANES 2017-2018 adults aged 20-59 not taking blood-pressure medication (brachial systolic as the proxy for LV peak systolic pressure) divided by 20 mmHg, the midpoint of the healthy-subject RV systolic range 15-25 mmHg (Table 1 of PMC9487613), with the range ends 15 and 25 reported as bounds. SUPPORTS if, for both sexes, R_t is in [5.0, 8.5], R_p is in [5.0, 8.5] and R_t / R_p is in [0.75, 1.33]." ;
+    delphi:failCriterion "Pre-registered. REFUTES if, for both sexes, R_t < 4.5 or R_t > 9.5, or R_t / R_p is outside [0.6, 1.67] (thickness not 'in the same proportion' as pressure). Any other outcome is MIXED. If the autopsy table cannot be obtained: inconclusive (data-unavailable)." ;
+    delphi:expectedObservation "LV/RV free-wall thickness ratio of about 6-7 in normal hearts, and LV/RV systolic pressure ratio of about 6-7, with the two ratios within a third of each other." ;
+    delphi:disconfirmingObservation "LV/RV free-wall thickness ratio well below 6 (< 4.5) or well above 7 (> 9.5) in normal hearts, or a thickness ratio that differs from the pressure ratio by more than ~1.67-fold." ;
+    delphi:admissibleDatasets "Measured wall thickness of both ventricles in morphologically normal mammalian hearts (autopsy or imaging), with sample sizes reported; measured systemic and pulmonary/RV systolic pressures in healthy individuals of the same species; sources independent of Thompson; publicly accessible." ;
+    delphi:inferenceMethod "Ratios of published per-sex means (thickness) and of measured population medians / published normal ranges (pressure), compared with the pre-registered intervals around 6-7." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py fetches and checksums the sources, averages the published per-sex mean muscle thickness of the LV anterior, lateral and inferior walls (septum excluded) and of the RV anterior, lateral and inferior walls (outflow tract excluded) from Westaby et al. Table 2, and takes the ratio. For pressure it takes the median of each person's mean systolic reading in NHANES 2017-2018 adults aged 20-59 not taking antihypertensive medication, by sex, and divides by the 20 mmHg midpoint of the healthy RV systolic range parsed from PMC9487613 Table 1 (bounds from 15 and 25 mmHg). Ratios are compared with the pre-registered intervals." ;
+    rdfs:comment "Measured: 3.98 ratio of mean LV free-wall to mean RV free-wall muscle thickness in normal autopsy hearts (mean of female and male ratios) (n = 1062, female 4.024, male 3.936; per-site SDs 1.0 mm (RV) and 2 mm (LV)). Interpretation: Thompson's figures come from applying Laplace's law to the two ventricles; we test whether real hearts have the stated wall-thickness ratio and whether it matches the real pressure ratio. 'Thickness of the walls' is free-wall thickness measured at autopsy (the septum is shared by both ventricles and excluded). Peak LV systolic pressure is approximated by brachial systolic pressure (close in healthy adults without aortic stenosis); RV systolic pressure is not available as a public per-person dataset, so the published healthy range is used. Scope is 'mammalian hearts'; only human data are used, which can refute a general mammalian proportion but cannot confirm it for other species. Disclosure: before this pre-registration, web-search snippets shown while locating datasets displayed summary values from these sources (autopsy LV wall about 12 mm and RV walls about 2.7-3.6 mm; RV systolic 15-25 mmHg). The thresholds above are set from the claim's stated 6-7 with symmetric tolerance, not from those values." ;
+    delphi:evidenceAgainst "The pressure half of the claim holds: median systolic pressure is 5.7 (female) to 6.0 (male) times the 20 mmHg RV midpoint, inside Thompson's 6-7 band given the RV range (4.6-8.0). The thickness half fails: the LV free wall is only about 4.0 times as thick as the RV free wall in both sexes (11.0 vs 2.7 mm; 12.3 vs 3.1 mm), below the pre-registered 4.5 limit, so the walls are not 'in the same proportion' as the pressures (ratio of ratios 0.65-0.71)." ;
+    delphi:evidenceAgainst "A Laplace-law argument predicts wall thickness proportional to pressure times radius; the RV is crescent-shaped with a larger radius of curvature, so a thickness ratio below the pressure ratio is expected physiologically. That is a reason the claim fails, not a flaw in the test." ;
+    delphi:evidenceAgainst "Autopsy wall thickness is measured post mortem, when the heart is in rigor or relaxed and wall thickness can differ from life by several millimetres for the LV (Hamburg study, PMC12018510); RV values are coarse (1 mm resolution, many readings of 2-3 mm). A 1 mm error in RV thickness moves the ratio by about a third, but a ratio of 6 would need the RV wall to be about 2 mm, below the reported medians at every site." ;
+    delphi:evidenceAgainst "The autopsy cohort consists of sudden-death referrals with morphologically normal hearts, not a random population sample; the pressure data come from a different (US) population, and the RV pressure is a published normal range rather than measurements in the same people." ;
+    delphi:evidenceAgainst "Only human hearts were used. The claim's scope is mammalian hearts; other species were not tested." ;
+    delphi:evidenceAgainst "preregistered_at is the time of the pre-registration commit (2b1e5045); the committed pre-registration carried an estimated time (21:40Z) written before committing. Data were first downloaded after that commit; criteria are unchanged." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-12/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Westaby JD, Zullo E, Bicalho LM, Anderson RH, Sheppard MN. Effect of sex, age and body measurements on heart weight, atrial, ventricular, valvular and sub-epicardial fat measurements of the normal heart. Cardiovasc Pathol 2023;63:107508, Table 2" ;
+    dct:description "LV and RV free-wall muscle thickness in 1,062 morphologically normal human hearts (sudden-death referrals with normal hearts, UK, 2013-2020)" ;
+    delphi:hasChecksum "sha256:6e5ef590b9a8500c4a74a21558c48aa3c0ddd77b4042deb911ed1a4c0700943f" ;
+    prov:atLocation <https://openaccess.sgul.ac.uk/id/eprint/115017/3/1-s2.0-S1054880722001016-main.pdf> ;
+    prov:wasDerivedFrom <https://openaccess.sgul.ac.uk/id/eprint/115017/> ;
+    dct:license "CC BY 4.0 (open-access article)" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NHANES 2017-2018 Blood Pressure (BPX_J), Blood Pressure & Cholesterol questionnaire (BPQ_J) and Demographics (DEMO_J), CDC National Center for Health Statistics" ;
+    dct:description "measured systolic blood pressure (proxy for LV peak systolic pressure) in 2,620 US adults aged 20-59 not on antihypertensive medication" ;
+    delphi:hasChecksum "sha256:f98f1d9a4c18173e715c749b4294f6f1525140d5ad5751316bb17cc038fb3423" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BPX_J.xpt> ;
+    delphi:hasChecksum "sha256:63cfe1c331a1e7d3534328ac86312a21ffee3e01aa189bc1f74d06855239e5aa" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BPQ_J.xpt> ;
+    delphi:hasChecksum "sha256:c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt> ;
+    prov:wasDerivedFrom <https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017> ;
+    dct:license "US federal government public-use data" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-12--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Right heart catheterisation: best practice and pitfalls in pulmonary hypertension (Eur Respir Rev 2015;24), Table 1, RVP range in healthy subjects" ;
+    dct:description "healthy-subject RV systolic pressure range (15-25 mmHg), parsed from the table text by analysis.py" ;
+    delphi:hasChecksum "sha256:549fa00e434a103f2610fb7463395ac0d740430a813dc427b9ffc3ab05b6d84b" ;
+    prov:atLocation <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9487613/fullTextXML> ;
+    prov:wasDerivedFrom <https://pmc.ncbi.nlm.nih.gov/articles/PMC9487613/> ;
+    dct:license "CC BY-NC 4.0 (open-access article)" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch15-12> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-12--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-12/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:03.001Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch15-12: refutes, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-12--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

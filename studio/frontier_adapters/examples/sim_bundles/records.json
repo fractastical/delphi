@@ -1,0 +1,2714 @@
+{
+ "bio_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+ "mech_commit": "76a93e7e3d27f15b454463714efbed4520425e30",
+ "records": [
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-claim-baseline",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod",
+     "Request: {\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}."
+    ],
+    "context": "A deterministic model outcome for declared network, pulse and perturbation values; the membrane law is published squid giant axon, the 12-cell chain and gap conductance are assumed design scenarios. Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Scenario result file (actual voltage, time, gates and ionic currents).",
+     "content_available": false,
+     "content_sha256": "adf85e0722031b3f422014e11a91a4ccf3be2c47d10db2d5d2b9b3ea1ca84334",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/baseline.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's 12-cell Hodgkin-Huxley chain with ohmic gap junctions (scenario 'baseline': sodium_scale 1.0, potassium_scale 1.0, gap 0.5 mS/cm^2, stimulus 12.0 uA/cm^2 into cell 0 during 5 <= t < 6 ms, 6.3 C, 30.0 ms, dt 0.025 ms), 12 of 12 cells cross 0 mV; first crossings 7.8-15.7 ms; peak voltage by cell (mV): 36.3, 37.8, 38.6, 38.7, 38.4, 38.8, 38.8, 38.4, 38.8, 38.8, 38.4, 40.5.",
+    "title": "Bioelectric chain, scenario baseline: all gap-coupled cells"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-sim-baseline",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and request reproduces the voltage and time digests.",
+     "An independent reviewer checks the model against the source before the numbers are used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; __init__.py:5bc973ea6df8, controls.py:e9b034dd93af, model.py:b1cfb3f8f40f, render.py:9107b7884309, run.py:05f944f81e57, sources.json:9f39ddd341aa",
+     "environment": "python 3.13.12, numpy 2.4.4, threads {'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}",
+     "input": "request sha256 cc8b7fe9b6913662a54b06ab40502b31b12cbf12f1e7bf990b5ca935785ba05e; scenario baseline",
+     "model": "hh1952_gap_chain (classical RK4, event-aligned current steps; actual sampled integration states; no language model)",
+     "parameters": "{\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}",
+     "scope": "simulated; published squid-axon parameters, assumed network",
+     "target": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-baseline",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): independent HH + ohmic equal-area cell network, scenario baseline"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "ad665774b5302cafef3dbf97130e22852823bcf528c7057aba62b4f8595982d9",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-sim-baseline",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 503030,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "adf85e0722031b3f422014e11a91a4ccf3be2c47d10db2d5d2b9b3ea1ca84334",
+      "title": "output: artifacts/bioelectric/baseline.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/baseline.json]",
+      "uri": "urn:sha256:adf85e0722031b3f422014e11a91a4ccf3be2c47d10db2d5d2b9b3ea1ca84334"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 559,
+      "license": null,
+      "media_type": "application/json",
+      "role": "environment",
+      "sha256": "7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d",
+      "title": "environment: artifacts/bioelectric/integrity_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/integrity_receipt.json]",
+      "uri": "urn:sha256:7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2358,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+      "title": "input: artifacts/bioelectric/sources.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json]",
+      "uri": "urn:sha256:199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 10176,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7",
+      "title": "code: engineering/bioelectric/model.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/model.py]",
+      "uri": "urn:sha256:b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8586,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8",
+      "title": "code: engineering/bioelectric/run.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/run.py]",
+      "uri": "urn:sha256:05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2021,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "c12e6404ad3da96a5b2aadc849f5ff569ba6065dccc29ff1c4d3d6102a3c0d09",
+      "title": "certificate: artifacts/bioelectric/controls_baseline.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/controls_baseline.json]",
+      "uri": "urn:sha256:c12e6404ad3da96a5b2aadc849f5ff569ba6065dccc29ff1c4d3d6102a3c0d09"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 748,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "c237d5a5053a1e04d6065f41292118722a874dc77476a64f35d9146929772a9b",
+      "title": "log: artifacts/bioelectric/mutation_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/mutation_receipt.json]",
+      "uri": "urn:sha256:c237d5a5053a1e04d6065f41292118722a874dc77476a64f35d9146929772a9b"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "Applicability: this model with these assumed network values. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "local_id": null,
+    "method": "classical RK4, event-aligned current steps; actual sampled integration states. Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-sim-baseline",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "ad665774b5302cafef3dbf97130e22852823bcf528c7057aba62b4f8595982d9"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 62.52291289716959,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "manifest_command": "python -m engineering.bioelectric.run --output artifacts/bioelectric",
+     "model_id": "hh1952_gap_chain",
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_identity": "Exact source files are pinned by SHA256; worktree_parent_commit is the parent at execution, not a clean-source assertion",
+     "state_sha256": "313a13e7055c2257946f451f0cec9607e011d30b5182cff2529e8854392db841",
+     "timestamp_seattle": "2026-10-31 13:25:12 PDT",
+     "voltage_sha256": "997071236abbe2f643ed54dc62410f7cf67559e48cd92198b7e6bf71d4c9b070",
+     "worktree_parent_commit": "69ddca35b6c00c8e79e5a17a6e92f5e3f884fea0"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Source envelope of the model.",
+     "content_available": false,
+     "content_sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-baseline",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "uncertainty": "No uncertainty quantification: deterministic runs; numerical convergence screened for the default scenario and a smooth passive cable only."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "662261ad5a202a144f4f5c996e5d2e04549c0d0179cb8508e19a59c76b0607f9",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-claim-sodium_reduced",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod",
+     "Request: {\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 0.35, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}."
+    ],
+    "context": "A deterministic model outcome for declared network, pulse and perturbation values; the membrane law is published squid giant axon, the 12-cell chain and gap conductance are assumed design scenarios. Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Scenario result file (actual voltage, time, gates and ionic currents).",
+     "content_available": false,
+     "content_sha256": "5d85345cc0b65e5f3c21eebb5a64ca1f07469c4a6e8db7c34391684240adcc93",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sodium_reduced.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's 12-cell Hodgkin-Huxley chain with ohmic gap junctions (scenario 'sodium_reduced': sodium_scale 0.35, potassium_scale 1.0, gap 0.5 mS/cm^2, stimulus 12.0 uA/cm^2 into cell 0 during 5 <= t < 6 ms, 6.3 C, 30.0 ms, dt 0.025 ms), 0 of 12 cells cross 0 mV; peak voltage by cell (mV): -58.2, -64.1, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0.",
+    "title": "Bioelectric chain, scenario sodium_reduced: sodium conductance scaled to 0.35"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-sim-sodium_reduced",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and request reproduces the voltage and time digests.",
+     "An independent reviewer checks the model against the source before the numbers are used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; __init__.py:5bc973ea6df8, controls.py:e9b034dd93af, model.py:b1cfb3f8f40f, render.py:9107b7884309, run.py:05f944f81e57, sources.json:9f39ddd341aa",
+     "environment": "python 3.13.12, numpy 2.4.4, threads {'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}",
+     "input": "request sha256 c4ec4e0626c32b813014eb51770c26f2c194861eefca7f03488af9e5bc0eef74; scenario sodium_reduced",
+     "model": "hh1952_gap_chain (classical RK4, event-aligned current steps; actual sampled integration states; no language model)",
+     "parameters": "{\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 0.35, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}",
+     "scope": "simulated; published squid-axon parameters, assumed network",
+     "target": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-sodium_reduced",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): independent HH + ohmic equal-area cell network, scenario sodium_reduced"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "13fa22d86c5ace9b70e2af6a63b43e83b4a02eb0bb3c242731a1a69b2cf71b5e",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-sim-sodium_reduced",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 505623,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "5d85345cc0b65e5f3c21eebb5a64ca1f07469c4a6e8db7c34391684240adcc93",
+      "title": "output: artifacts/bioelectric/sodium_reduced.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sodium_reduced.json]",
+      "uri": "urn:sha256:5d85345cc0b65e5f3c21eebb5a64ca1f07469c4a6e8db7c34391684240adcc93"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 559,
+      "license": null,
+      "media_type": "application/json",
+      "role": "environment",
+      "sha256": "7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d",
+      "title": "environment: artifacts/bioelectric/integrity_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/integrity_receipt.json]",
+      "uri": "urn:sha256:7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2358,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+      "title": "input: artifacts/bioelectric/sources.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json]",
+      "uri": "urn:sha256:199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 10176,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7",
+      "title": "code: engineering/bioelectric/model.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/model.py]",
+      "uri": "urn:sha256:b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8586,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8",
+      "title": "code: engineering/bioelectric/run.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/run.py]",
+      "uri": "urn:sha256:05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "Applicability: this model with these assumed network values. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "local_id": null,
+    "method": "classical RK4, event-aligned current steps; actual sampled integration states. Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-sim-sodium_reduced",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "13fa22d86c5ace9b70e2af6a63b43e83b4a02eb0bb3c242731a1a69b2cf71b5e"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 62.52291289716959,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "manifest_command": "python -m engineering.bioelectric.run --output artifacts/bioelectric",
+     "model_id": "hh1952_gap_chain",
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_identity": "Exact source files are pinned by SHA256; worktree_parent_commit is the parent at execution, not a clean-source assertion",
+     "state_sha256": "8bbffbc8e0f7a07ce283add1b5eb1f211b7c8e4d1dc0d8fe36c721e2715644f7",
+     "timestamp_seattle": "2026-10-31 13:25:12 PDT",
+     "voltage_sha256": "65c1dbd8b09c4063f9cbfae3aea0606493afb2ad1149218ca424b9b6dc50ea48",
+     "worktree_parent_commit": "69ddca35b6c00c8e79e5a17a6e92f5e3f884fea0"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Source envelope of the model.",
+     "content_available": false,
+     "content_sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-sodium_reduced",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "uncertainty": "No uncertainty quantification: deterministic runs; numerical convergence screened for the default scenario and a smooth passive cable only."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "f9e25c86780cbac2d76547632130a6fe9a1e528a7f939d074bdb5b7fa69a1688",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-claim-disconnected",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod",
+     "Request: {\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.0, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}."
+    ],
+    "context": "A deterministic model outcome for declared network, pulse and perturbation values; the membrane law is published squid giant axon, the 12-cell chain and gap conductance are assumed design scenarios. Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Scenario result file (actual voltage, time, gates and ionic currents).",
+     "content_available": false,
+     "content_sha256": "47841e17fdc503be5d2b8d61f4075ea3d7088a5c79798bae47ec25f4f8373000",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/disconnected.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's 12-cell Hodgkin-Huxley chain with ohmic gap junctions (scenario 'disconnected': sodium_scale 1.0, potassium_scale 1.0, gap 0.0 mS/cm^2, stimulus 12.0 uA/cm^2 into cell 0 during 5 <= t < 6 ms, 6.3 C, 30.0 ms, dt 0.025 ms), 1 of 12 cells cross 0 mV; first crossings 6.9-6.9 ms; peak voltage by cell (mV): 39.3, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0.",
+    "title": "Bioelectric chain, scenario disconnected: gap conductance 0"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-sim-disconnected",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and request reproduces the voltage and time digests.",
+     "An independent reviewer checks the model against the source before the numbers are used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; __init__.py:5bc973ea6df8, controls.py:e9b034dd93af, model.py:b1cfb3f8f40f, render.py:9107b7884309, run.py:05f944f81e57, sources.json:9f39ddd341aa",
+     "environment": "python 3.13.12, numpy 2.4.4, threads {'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}",
+     "input": "request sha256 24203e53a2880fd8346955538a20caf1a7aecb864c56db3eda778f8a82869f4a; scenario disconnected",
+     "model": "hh1952_gap_chain (classical RK4, event-aligned current steps; actual sampled integration states; no language model)",
+     "parameters": "{\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.0, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}",
+     "scope": "simulated; published squid-axon parameters, assumed network",
+     "target": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-disconnected",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): independent HH + ohmic equal-area cell network, scenario disconnected"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "cd7f7ee3c4d2bbedeb77ba1cbe97c8a07ca4b0707698db02d0da8ac9d5debe06",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-sim-disconnected",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 502303,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "47841e17fdc503be5d2b8d61f4075ea3d7088a5c79798bae47ec25f4f8373000",
+      "title": "output: artifacts/bioelectric/disconnected.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/disconnected.json]",
+      "uri": "urn:sha256:47841e17fdc503be5d2b8d61f4075ea3d7088a5c79798bae47ec25f4f8373000"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 559,
+      "license": null,
+      "media_type": "application/json",
+      "role": "environment",
+      "sha256": "7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d",
+      "title": "environment: artifacts/bioelectric/integrity_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/integrity_receipt.json]",
+      "uri": "urn:sha256:7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2358,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+      "title": "input: artifacts/bioelectric/sources.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json]",
+      "uri": "urn:sha256:199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 10176,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7",
+      "title": "code: engineering/bioelectric/model.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/model.py]",
+      "uri": "urn:sha256:b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8586,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8",
+      "title": "code: engineering/bioelectric/run.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/run.py]",
+      "uri": "urn:sha256:05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "Applicability: this model with these assumed network values. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "local_id": null,
+    "method": "classical RK4, event-aligned current steps; actual sampled integration states. Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-sim-disconnected",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "cd7f7ee3c4d2bbedeb77ba1cbe97c8a07ca4b0707698db02d0da8ac9d5debe06"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 62.52291289716959,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "manifest_command": "python -m engineering.bioelectric.run --output artifacts/bioelectric",
+     "model_id": "hh1952_gap_chain",
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_identity": "Exact source files are pinned by SHA256; worktree_parent_commit is the parent at execution, not a clean-source assertion",
+     "state_sha256": "05caf05321ccfb88e5063cd9cff06949c4abaab2b9341e7007a7472b38075891",
+     "timestamp_seattle": "2026-10-31 13:25:12 PDT",
+     "voltage_sha256": "d247da2e335ca411985aa259212b35268b0e9992c82f551c43f7c591514f009b",
+     "worktree_parent_commit": "69ddca35b6c00c8e79e5a17a6e92f5e3f884fea0"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Source envelope of the model.",
+     "content_available": false,
+     "content_sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-disconnected",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "uncertainty": "No uncertainty quantification: deterministic runs; numerical convergence screened for the default scenario and a smooth passive cable only."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "321145081de4c449f80f788bb3c7276f800dd7fafad653fec0b01db341a59276",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-claim-no_stimulus",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod",
+     "Request: {\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 0.0, \"temperature_c\": 6.3}."
+    ],
+    "context": "A deterministic model outcome for declared network, pulse and perturbation values; the membrane law is published squid giant axon, the 12-cell chain and gap conductance are assumed design scenarios. Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Scenario result file (actual voltage, time, gates and ionic currents).",
+     "content_available": false,
+     "content_sha256": "532ae0873a4170ec3dde479a5360403b329a4fd9014c4764603f88e7d9237e83",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/no_stimulus.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's 12-cell Hodgkin-Huxley chain with ohmic gap junctions (scenario 'no_stimulus': sodium_scale 1.0, potassium_scale 1.0, gap 0.5 mS/cm^2, stimulus 0.0 uA/cm^2 into cell 0 during 5 <= t < 6 ms, 6.3 C, 30.0 ms, dt 0.025 ms), 0 of 12 cells cross 0 mV; peak voltage by cell (mV): -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0, -65.0.",
+    "title": "Bioelectric chain, scenario no_stimulus: stimulus current 0"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "c2f0cb7f1dcef3757a7c6a38ef74e28929754b647ec424a48d1267fac3fe7b36",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-sim-no_stimulus",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and request reproduces the voltage and time digests.",
+     "An independent reviewer checks the model against the source before the numbers are used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; __init__.py:5bc973ea6df8, controls.py:e9b034dd93af, model.py:b1cfb3f8f40f, render.py:9107b7884309, run.py:05f944f81e57, sources.json:9f39ddd341aa",
+     "environment": "python 3.13.12, numpy 2.4.4, threads {'OPENBLAS_NUM_THREADS': '1', 'OMP_NUM_THREADS': '1'}",
+     "input": "request sha256 0998d95a4324170a101d546381a4560a7e2eb299a25dde81fe870974706721a8; scenario no_stimulus",
+     "model": "hh1952_gap_chain (classical RK4, event-aligned current steps; actual sampled integration states; no language model)",
+     "parameters": "{\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1.0, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 0.0, \"temperature_c\": 6.3}",
+     "scope": "simulated; published squid-axon parameters, assumed network",
+     "target": "c2f0cb7f1dcef3757a7c6a38ef74e28929754b647ec424a48d1267fac3fe7b36"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-no_stimulus",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "c2f0cb7f1dcef3757a7c6a38ef74e28929754b647ec424a48d1267fac3fe7b36"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): independent HH + ohmic equal-area cell network, scenario no_stimulus"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "4d3ed1f1adaa23572222c2886bbd33ef869de19618b262ea3ce55304abd18c95",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-sim-no_stimulus",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 502226,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "532ae0873a4170ec3dde479a5360403b329a4fd9014c4764603f88e7d9237e83",
+      "title": "output: artifacts/bioelectric/no_stimulus.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/no_stimulus.json]",
+      "uri": "urn:sha256:532ae0873a4170ec3dde479a5360403b329a4fd9014c4764603f88e7d9237e83"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 559,
+      "license": null,
+      "media_type": "application/json",
+      "role": "environment",
+      "sha256": "7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d",
+      "title": "environment: artifacts/bioelectric/integrity_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/integrity_receipt.json]",
+      "uri": "urn:sha256:7540e887a4bd43cdec8c60aecf08c603e062e1ab3a42c8db3452bd63e956362d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2358,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+      "title": "input: artifacts/bioelectric/sources.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json]",
+      "uri": "urn:sha256:199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 10176,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7",
+      "title": "code: engineering/bioelectric/model.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/model.py]",
+      "uri": "urn:sha256:b1cfb3f8f40ff76edbe571978ca136ff6b309dd856cc520471c969c642b5c4c7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8586,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8",
+      "title": "code: engineering/bioelectric/run.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/run.py]",
+      "uri": "urn:sha256:05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "Applicability: this model with these assumed network values. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "local_id": null,
+    "method": "classical RK4, event-aligned current steps; actual sampled integration states. Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-sim-no_stimulus",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "4d3ed1f1adaa23572222c2886bbd33ef869de19618b262ea3ce55304abd18c95"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 62.52291289716959,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "manifest_command": "python -m engineering.bioelectric.run --output artifacts/bioelectric",
+     "model_id": "hh1952_gap_chain",
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_identity": "Exact source files are pinned by SHA256; worktree_parent_commit is the parent at execution, not a clean-source assertion",
+     "state_sha256": "92b3f8f2e69021f826d3c68b6f76cf5a7dc76230fab1731a7a79832123b4e870",
+     "timestamp_seattle": "2026-10-31 13:25:12 PDT",
+     "voltage_sha256": "ceaf6da442d2fa917424b686b9ba97524a4b1ae2859cdbac9150aea760eccadc",
+     "worktree_parent_commit": "69ddca35b6c00c8e79e5a17a6e92f5e3f884fea0"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Source envelope of the model.",
+     "content_available": false,
+     "content_sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-no_stimulus",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "c2f0cb7f1dcef3757a7c6a38ef74e28929754b647ec424a48d1267fac3fe7b36"
+    },
+    "uncertainty": "No uncertainty quantification: deterministic runs; numerical convergence screened for the default scenario and a smooth passive cable only."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "37032cb119aa82495b886fad8111804d4e5d5238c614bda4f78449ce653aa9b1",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-claim-atlas",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod",
+     "Axis status: sodium_scale design-selected; gap_mS_cm2 assumed-network-scenario."
+    ],
+    "context": "Fixed squid-axon membrane model; no fish or fin calibration. Simulation response atlas, not measured phenotypes or an optimization objective. Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Atlas file; each cell points to a hashed per-run artifact.",
+     "content_available": false,
+     "content_sha256": "4aaf10f0767527bf54a25363a7f093414b68468ce95e8580ad5fd10dbd618b05",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/atlas.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "Over the producer's 49 integrations (sodium_scale [0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5] by gap_mS_cm2 [0, 0.125, 0.25, 0.5, 1.0, 1.5, 2.0], other values fixed at {\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}), the number of cells whose saved voltage crosses 0 mV within 30 ms is, by gap row: gap 0: [0, 0, 0, 1, 1, 1, 1]; gap 0.125: [0, 0, 0, 10, 12, 12, 12]; gap 0.25: [0, 0, 0, 0, 12, 12, 12]; gap 0.5: [0, 0, 0, 0, 12, 12, 12]; gap 1.0: [0, 0, 0, 0, 0, 12, 12]; gap 1.5: [0, 0, 0, 0, 0, 12, 12]; gap 2.0: [0, 0, 0, 0, 0, 0, 12].",
+    "title": "Bioelectric chain response atlas: cells crossing 0 mV over sodium scale x gap conductance"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-sim-atlas",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution reproduces each per-run voltage/time digest listed in atlas.json.",
+     "An independent reviewer checks the grid choices."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; model.py b1cfb3f8f40f",
+     "environment": "python 3.13.12, numpy 2.4.4",
+     "input": "atlas.json sha256 4aaf10f0767527bf54a25363a7f093414b68468ce95e8580ad5fd10dbd618b05",
+     "model": "hh1952_gap_chain (no language model)",
+     "parameters": "{\"dt_ms\": 0.025, \"duration_ms\": 30.0, \"gap_mS_cm2\": 0.5, \"potassium_scale\": 1, \"sodium_scale\": 1.0, \"stimulus_uA_cm2\": 12.0, \"temperature_c\": 6.3}",
+     "scope": "simulated response map; not an optimisation objective",
+     "target": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-atlas",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): 49 integrations over the sodium-by-gap grid"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "69ed5821e95f0304d943363b6ddcea6ed6c81cdd225874c53ce76e8b3ba9cefa",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-sim-atlas",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 42208,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "4aaf10f0767527bf54a25363a7f093414b68468ce95e8580ad5fd10dbd618b05",
+      "title": "output: artifacts/bioelectric/atlas.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/atlas.json]",
+      "uri": "urn:sha256:4aaf10f0767527bf54a25363a7f093414b68468ce95e8580ad5fd10dbd618b05"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8586,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8",
+      "title": "code: engineering/bioelectric/run.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/run.py]",
+      "uri": "urn:sha256:05f944f81e57c277e79303fcbda9086f64e531674ffad1262d4d7183a1d717b8"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "Applicability: this model grid only. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED with published squid-axon membrane kinetics; NOT measured fin voltages and not calibrated to any fish.",
+     "Implementation controls: baseline exit 0; with the gap-junction endpoint current sign flipped (law mutant) exit 1 (control detects it); restored exit 0. Numerical scope: convergence checked for default HH scenario and smooth passive cable; not the entire atlas. Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer.",
+     "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+     "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+     "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+     "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+     "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established.",
+     "OPEN (bioelectric-cell-tissue, scales cell,tissue): Which ion channels, reservoir concentrations and gap conductances determine fin-cell voltage and its causal relation to tissue pattern? Next evidence: Species- and developmental-stage-matched voltage/channel/coupling measurements and a held-out perturbation prediction.",
+     "OPEN (bioelectric-tissue-fin, scales tissue,organ): Can a measured tissue voltage perturbation predict fin geometry or material properties through a calibrated causal model? Next evidence: An independently tested voltage-to-pattern-to-geometry bridge with uncertainty; no such calibration is in this model."
+    ],
+    "local_id": null,
+    "method": "49 integrations of the same model; the matrix counts cells crossing 0 mV.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-sim-atlas",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "69ed5821e95f0304d943363b6ddcea6ed6c81cdd225874c53ce76e8b3ba9cefa"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "per_run_artifacts": 49,
+     "per_run_digests_recomputed_by_producer": 53,
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Source envelope of the model.",
+     "content_available": false,
+     "content_sha256": "199c6cb4376a3a9e24581fc850c2ee3bc8f6caea9bb058765125bc40d8f60e76",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/sources.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-atlas",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "a4e5578bc9b504f9471e68dc4c71bbf0a8bd7566678241afbd82960cbda0f465",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-render-baseline",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and scenario files reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "The video is a picture of computed states, not evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; render.py 9107b7884309",
+     "environment": "matplotlib/ffmpeg builds NOT recorded in the receipt",
+     "input": "simulation evidence version 662261ad5a202a144f4f5c996e5d2e04549c0d0179cb8508e19a59c76b0607f9; render inputs baseline.json:adf85e072203, sodium_reduced.json:5d85345cc0b6, disconnected.json:47841e17fdc5",
+     "model": "none: deterministic rendering",
+     "parameters": "180 frames, 24 fps, model horizon 30.0 ms, temporal interpolation none; selected actual saved state frames; ffmpeg -y -loglevel error -f rawvideo -pix_fmt rgba -s 1280x720 -r 24 -i - -an -c:v libx264 -pix_fmt yuv420p -crf 24 -preset fast -threads 1 -movflags +faststart artifacts/bioelectric/bioelectric.mp4",
+     "scope": "visualisation of a simulated model",
+     "target": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-bioelectric-evidence-sim-baseline",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "662261ad5a202a144f4f5c996e5d2e04549c0d0179cb8508e19a59c76b0607f9"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy and matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-baseline",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): ffmpeg encode of actual selected state frames of three scenarios (one video shows all three)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "2fbcd8431949c0b4fa096240bdd36dc949e6c694bbcdc65826968c6d5db24265",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-render-baseline",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 157609,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594",
+      "title": "output: artifacts/bioelectric/bioelectric.mp4 [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/bioelectric.mp4]",
+      "uri": "urn:sha256:25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 123076,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83",
+      "title": "output: artifacts/bioelectric/poster.png [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/poster.png]",
+      "uri": "urn:sha256:a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1972,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+      "title": "log: artifacts/bioelectric/render_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json]",
+      "uri": "urn:sha256:e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 5711,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472",
+      "title": "code: engineering/bioelectric/render.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/render.py]",
+      "uri": "urn:sha256:9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The same video shows baseline, sodium_reduced and disconnected; which part belongs to this scenario is not recorded in the receipt. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Producer draws 180 actual selected state frames (no temporal interpolation: none; selected actual saved state frames) and encodes with ffmpeg (exit 0).",
+    "produced_by": {
+     "id": "sim-bioelectric-action-render-baseline",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "2fbcd8431949c0b4fa096240bdd36dc949e6c694bbcdc65826968c6d5db24265"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "ffprobe": {
+      "programs": [],
+      "streams": [
+       {
+        "codec_name": "h264",
+        "duration": "7.500000",
+        "height": 720,
+        "nb_frames": "180",
+        "width": 1280
+       }
+      ]
+     },
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_frame_indices_count": 180,
+     "wall_playback_seconds": 7.5
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render receipt.",
+     "content_available": false,
+     "content_sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-baseline",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "ff25c2ff7673f0c78fb5b32c977c2894319437360a828d2e6fb4a65bef4bd3a4"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "3781a810fec095c8faea9ddc9426cb6ca26f716c1c6938b24543831d89d85d16",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-render-sodium_reduced",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and scenario files reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "The video is a picture of computed states, not evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; render.py 9107b7884309",
+     "environment": "matplotlib/ffmpeg builds NOT recorded in the receipt",
+     "input": "simulation evidence version f9e25c86780cbac2d76547632130a6fe9a1e528a7f939d074bdb5b7fa69a1688; render inputs baseline.json:adf85e072203, sodium_reduced.json:5d85345cc0b6, disconnected.json:47841e17fdc5",
+     "model": "none: deterministic rendering",
+     "parameters": "180 frames, 24 fps, model horizon 30.0 ms, temporal interpolation none; selected actual saved state frames; ffmpeg -y -loglevel error -f rawvideo -pix_fmt rgba -s 1280x720 -r 24 -i - -an -c:v libx264 -pix_fmt yuv420p -crf 24 -preset fast -threads 1 -movflags +faststart artifacts/bioelectric/bioelectric.mp4",
+     "scope": "visualisation of a simulated model",
+     "target": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-bioelectric-evidence-sim-sodium_reduced",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "f9e25c86780cbac2d76547632130a6fe9a1e528a7f939d074bdb5b7fa69a1688"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy and matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-sodium_reduced",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): ffmpeg encode of actual selected state frames of three scenarios (one video shows all three)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "bba787425e0748ef05fec4bb047f902872efb9879269213bfa4d9a2a938c361d",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-render-sodium_reduced",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 157609,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594",
+      "title": "output: artifacts/bioelectric/bioelectric.mp4 [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/bioelectric.mp4]",
+      "uri": "urn:sha256:25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 123076,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83",
+      "title": "output: artifacts/bioelectric/poster.png [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/poster.png]",
+      "uri": "urn:sha256:a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1972,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+      "title": "log: artifacts/bioelectric/render_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json]",
+      "uri": "urn:sha256:e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 5711,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472",
+      "title": "code: engineering/bioelectric/render.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/render.py]",
+      "uri": "urn:sha256:9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The same video shows baseline, sodium_reduced and disconnected; which part belongs to this scenario is not recorded in the receipt. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Producer draws 180 actual selected state frames (no temporal interpolation: none; selected actual saved state frames) and encodes with ffmpeg (exit 0).",
+    "produced_by": {
+     "id": "sim-bioelectric-action-render-sodium_reduced",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "bba787425e0748ef05fec4bb047f902872efb9879269213bfa4d9a2a938c361d"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "ffprobe": {
+      "programs": [],
+      "streams": [
+       {
+        "codec_name": "h264",
+        "duration": "7.500000",
+        "height": 720,
+        "nb_frames": "180",
+        "width": 1280
+       }
+      ]
+     },
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_frame_indices_count": 180,
+     "wall_playback_seconds": 7.5
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render receipt.",
+     "content_available": false,
+     "content_sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-sodium_reduced",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "e3267220ed425c3a1160dafa143fa65438d09179a6dba35964664e32e66ce36a"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "abf0c45a852a7523a9b56ac44f11bbbbe2b1c0720ae2e3875a575fecaf532931",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-render-disconnected",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and scenario files reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "The video is a picture of computed states, not evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; render.py 9107b7884309",
+     "environment": "matplotlib/ffmpeg builds NOT recorded in the receipt",
+     "input": "simulation evidence version 321145081de4c449f80f788bb3c7276f800dd7fafad653fec0b01db341a59276; render inputs baseline.json:adf85e072203, sodium_reduced.json:5d85345cc0b6, disconnected.json:47841e17fdc5",
+     "model": "none: deterministic rendering",
+     "parameters": "180 frames, 24 fps, model horizon 30.0 ms, temporal interpolation none; selected actual saved state frames; ffmpeg -y -loglevel error -f rawvideo -pix_fmt rgba -s 1280x720 -r 24 -i - -an -c:v libx264 -pix_fmt yuv420p -crf 24 -preset fast -threads 1 -movflags +faststart artifacts/bioelectric/bioelectric.mp4",
+     "scope": "visualisation of a simulated model",
+     "target": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-bioelectric-evidence-sim-disconnected",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "321145081de4c449f80f788bb3c7276f800dd7fafad653fec0b01db341a59276"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy and matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-disconnected",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): ffmpeg encode of actual selected state frames of three scenarios (one video shows all three)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "d4431746b446b6008e516a3dedb84035e02e4b1378bd8a931c2f674ff9a6fb14",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-render-disconnected",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 157609,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594",
+      "title": "output: artifacts/bioelectric/bioelectric.mp4 [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/bioelectric.mp4]",
+      "uri": "urn:sha256:25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 123076,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83",
+      "title": "output: artifacts/bioelectric/poster.png [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/poster.png]",
+      "uri": "urn:sha256:a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1972,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+      "title": "log: artifacts/bioelectric/render_receipt.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json]",
+      "uri": "urn:sha256:e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 5711,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472",
+      "title": "code: engineering/bioelectric/render.py [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:engineering/bioelectric/render.py]",
+      "uri": "urn:sha256:9107b7884309413d7dafc062f0887a522fd5fa1fff0d2cd831361f865f241472"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The same video shows baseline, sodium_reduced and disconnected; which part belongs to this scenario is not recorded in the receipt. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Producer draws 180 actual selected state frames (no temporal interpolation: none; selected actual saved state frames) and encodes with ffmpeg (exit 0).",
+    "produced_by": {
+     "id": "sim-bioelectric-action-render-disconnected",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "d4431746b446b6008e516a3dedb84035e02e4b1378bd8a931c2f674ff9a6fb14"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "ffprobe": {
+      "programs": [],
+      "streams": [
+       {
+        "codec_name": "h264",
+        "duration": "7.500000",
+        "height": 720,
+        "nb_frames": "180",
+        "width": 1280
+       }
+      ]
+     },
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a",
+     "source_frame_indices_count": 180,
+     "wall_playback_seconds": 7.5
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render receipt.",
+     "content_available": false,
+     "content_sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/render_receipt.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-disconnected",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "9bc050d122bd6cb24b3218b6c04888cc71fa684ebec32d7121726fecebd5e562"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "7083e358cf4e98aa1704e3db88fe99896410d172b7358b79519bc2524dd02a54",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-action-render-atlas",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-running run.py reproduces atlas.png from atlas.json."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a; run.py 05f944f81e57",
+     "environment": "NOT RECORDED separately",
+     "input": "simulation evidence version a4e5578bc9b504f9471e68dc4c71bbf0a8bd7566678241afbd82960cbda0f465",
+     "model": "none",
+     "parameters": "as run.py",
+     "scope": "visualisation of a simulated grid",
+     "target": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-bioelectric-evidence-sim-atlas",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "a4e5578bc9b504f9471e68dc4c71bbf0a8bd7566678241afbd82960cbda0f465"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy and matplotlib"
+    ],
+    "target": {
+     "id": "sim-bioelectric-claim-atlas",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): atlas image from atlas.json (no separate render receipt: produced inside the same run)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "8b26763eaf63269d046e12c227cb8ddc7e8c57dd5382c6ca921c1d001c9fcbc1",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:00+00:00",
+   "id": "sim-bioelectric-evidence-render-atlas",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 82503,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "8be1a3a2f717dbbc05b235d7bbc9eb145231b7a91bf2108cdd80d448c8d040ae",
+      "title": "output: artifacts/bioelectric/atlas.png [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/atlas.png]",
+      "uri": "urn:sha256:8be1a3a2f717dbbc05b235d7bbc9eb145231b7a91bf2108cdd80d448c8d040ae"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 9171,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+      "title": "log: artifacts/bioelectric/manifest.json [git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json]",
+      "uri": "urn:sha256:e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Hodgkin AL, Huxley AF, A quantitative description of membrane current and its application to conduction and excitation in nerve, DOI 10.1113/jphysiol.1952.sp004764 (PMCID:PMC1392413). Squid giant axon; empirical voltage-clamp fitted membrane equations, not fin tissue. Published fitted parameters; no raw measurements digitized, no new empirical validation.",
+     "Source sections read: pp. 518\u2013519: equation 26 and six rate laws, units, 6.3 Celsius and Q10=3; p. 520 Table 3: capacitance, reversal offsets, maximal conductances; page rendered and read; pp. 543\u2013544: summary and potassium-exchange discrepancy. PDF sha256 29b26736b92fe03f... (full text not redistributed).",
+     "V_here = -65 mV - V_original; ENa=50, EK=-77, EL=-54.387 mV. The original Table 3 leakage offset is -10.613 mV.",
+     "Implementation cross-check only (no NEURON/BETSE run): https://raw.githubusercontent.com/neuronsimulator/nrn/master/src/nrnoc/hh.mod"
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The producer recorded no separate render receipt for atlas.png. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Atlas image drawn from the atlas matrix.",
+    "produced_by": {
+     "id": "sim-bioelectric-action-render-atlas",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "8b26763eaf63269d046e12c227cb8ddc7e8c57dd5382c6ca921c1d001c9fcbc1"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "source_commit": "42cbd81857b3f8c0962382cda701709326711b5a"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Bundle manifest.",
+     "content_available": false,
+     "content_sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+     "license": null,
+     "locator": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a:artifacts/bioelectric/manifest.json",
+     "source_version": "git:delphi-frontier@42cbd81857b3f8c0962382cda701709326711b5a",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-bioelectric-claim-atlas",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4815c6c73c57e101d387dbbc594208eadcf7c2542adae406028803bbcc43821e"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:bioelectric",
+   "version": "33656607ae77542cc03b34a62e9b26273f2c5eba54bf8d49e638f556b24c0112",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-claim-sweep",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "A descriptive summary of the producer's sweep.json computed by this adapter from its rows (min and max of two columns). Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED motor-clutch mechanics with a seeded first-order Bernoulli binding/rupture split; no reinforcement, no catch bonds, no ligand recruitment, no membrane resistance.",
+     "Intervals are Monte Carlo (normal approximation) only; they are not biological or parameter uncertainty.",
+     "Producer states it does not establish: No calibration to any fish cell, fin, tissue, developmental pathway or organism.",
+     "Producer states it does not establish: No conversion of contact stiffness (pN/nm) to ECM modulus (kPa) without geometry.",
+     "Producer states it does not establish: No reproduction of the paper's figures, experimental data or full reinforcement model.",
+     "Producer states it does not establish: Spreading proxy is v_unloaded - v_retrograde, assuming polymerization equals unloaded flow; not cell area or migration.",
+     "Producer states it does not establish: No membrane resistance, ligand recruitment, catch bonds, tissue remodeling or whole-cell shape.",
+     "A separate cloud sweep (7x7 cells x 32 seeds x 2 arms, 3136 simulations) was specified by the producer but is NOT claimed executed.",
+     "Producer inconsistency kept visible: the simulation manifest lists render.py as c893405680b8c835..., but the pinned render.py hashes to a662afe13b1548da... (the render manifest agrees). render.py takes no part in the simulation; the listing predates a render edit."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Sweep file with all replicate summaries.",
+     "content_available": false,
+     "content_sha256": "92e9786db10dfac2de88d5b123a8c4bb5c356d581be4117215e4bb7f4a4d8d71",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/sweep.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's motor-clutch model (25 stiffness-by-viscosity cells x 12 seeds x 2 rupture arms = 600 simulations), mean traction across cells ranges 9.068 to 39.222 pN; the paired mean change from constant-rupture to Bell-force rupture ranges 0.00060 to 0.32121 pN across cells. These are Monte Carlo summaries of a declared model.",
+    "title": "Motor-clutch model: mean traction over a 5x5 stiffness-by-viscosity grid with Bell versus constant rupture (600 simulations)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-claim-bell-sensitivity",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "An implementation-sensitivity control of the model, not a biological finding. Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED motor-clutch mechanics with a seeded first-order Bernoulli binding/rupture split; no reinforcement, no catch bonds, no ligand recruitment, no membrane resistance.",
+     "Intervals are Monte Carlo (normal approximation) only; they are not biological or parameter uncertainty.",
+     "Producer states it does not establish: No calibration to any fish cell, fin, tissue, developmental pathway or organism.",
+     "Producer states it does not establish: No conversion of contact stiffness (pN/nm) to ECM modulus (kPa) without geometry.",
+     "Producer states it does not establish: No reproduction of the paper's figures, experimental data or full reinforcement model.",
+     "Producer states it does not establish: Spreading proxy is v_unloaded - v_retrograde, assuming polymerization equals unloaded flow; not cell area or migration.",
+     "Producer states it does not establish: No membrane resistance, ligand recruitment, catch bonds, tissue remodeling or whole-cell shape.",
+     "A separate cloud sweep (7x7 cells x 32 seeds x 2 arms, 3136 simulations) was specified by the producer but is NOT claimed executed.",
+     "Producer inconsistency kept visible: the simulation manifest lists render.py as c893405680b8c835..., but the pinned render.py hashes to a662afe13b1548da... (the render manifest agrees). render.py takes no part in the simulation; the listing predates a render edit."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Controls file.",
+     "content_available": false,
+     "content_sha256": "4b0930bacaefd7270aaaa2f35202d7227d0162cb01693fb7e23e2f2b8efc2f7e",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/controls.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In the producer's declared 5-clutch setting (stiffness 1 pN/nm, rupture force 1 pN, seed 19), mean traction is 1.849 pN with Bell force-dependent rupture and 35.568 pN when exp(force/Fb) is replaced by 1 (absolute change 33.719 pN; detection threshold 1.0 pN, detected True).",
+    "title": "Motor-clutch model: Bell-law rupture matters in the declared 5-clutch setting"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-action-sim-sweep",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and protocol reproduces the sweep rows and trajectory hashes.",
+     "An independent reviewer checks the model against the paper."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30; __init__.py:1abb513765ae, controls.py:07dee9a4f639, demo.py:96c0a908bec8, model.py:ea47285467d9, render.py:c893405680b8, sweep.py:37da50441d3a",
+     "environment": "environment sha256 4f6a31680d800cb859094ea8334a4b0b858fcbc2f5422a389710ca0a859172f5; python/numpy/scipy per environment.json",
+     "input": "protocol sha256 fd85bddbb44ebf0c69d34486de7b1d02be377316116607ec960eb231a8f2e4ed",
+     "model": "motor-clutch + standard-linear-solid contact (exact matrix exponentials; seeded Bernoulli binding; no language model)",
+     "parameters": "{\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}",
+     "scope": "simulated; not calibrated to any cell",
+     "target": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy and scipy"
+    ],
+    "target": {
+     "id": "sim-mechanobio-claim-sweep",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): motor-clutch ensemble simulation"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "1da06ce38a11bb0fb97add8b8c470a2b178f69c1025fd509ecea136ed6adbb34",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-evidence-sim-sweep",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 341227,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "92e9786db10dfac2de88d5b123a8c4bb5c356d581be4117215e4bb7f4a4d8d71",
+      "title": "output: artifacts/mechanobio/sweep.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/sweep.json]",
+      "uri": "urn:sha256:92e9786db10dfac2de88d5b123a8c4bb5c356d581be4117215e4bb7f4a4d8d71"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1100531,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "4b23b2464967ce344eb010fe73b6ef7e032375bd86fd487cba5d1ee31fd697b5",
+      "title": "output: artifacts/mechanobio/trajectory.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/trajectory.json]",
+      "uri": "urn:sha256:4b23b2464967ce344eb010fe73b6ef7e032375bd86fd487cba5d1ee31fd697b5"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 70,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "40217fdd5d87dac81879c4edaad1dd40b0fc2356e8082c5d1d2a061c2c4ed3ba",
+      "title": "input: artifacts/mechanobio/request.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/request.json]",
+      "uri": "urn:sha256:40217fdd5d87dac81879c4edaad1dd40b0fc2356e8082c5d1d2a061c2c4ed3ba"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 894,
+      "license": null,
+      "media_type": "application/json",
+      "role": "protocol",
+      "sha256": "d9a60b0558f21f3090a521a601d6e2930dde24eb95c37f824311b1e5870dcf2b",
+      "title": "protocol: artifacts/mechanobio/protocol.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/protocol.json]",
+      "uri": "urn:sha256:d9a60b0558f21f3090a521a601d6e2930dde24eb95c37f824311b1e5870dcf2b"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1924,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "4b0930bacaefd7270aaaa2f35202d7227d0162cb01693fb7e23e2f2b8efc2f7e",
+      "title": "certificate: artifacts/mechanobio/controls.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/controls.json]",
+      "uri": "urn:sha256:4b0930bacaefd7270aaaa2f35202d7227d0162cb01693fb7e23e2f2b8efc2f7e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 395,
+      "license": null,
+      "media_type": "application/json",
+      "role": "environment",
+      "sha256": "069d258c4c290284cc0d9af711b22304ee7381ccfb7849369cfd2177382fa132",
+      "title": "environment: artifacts/mechanobio/environment.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/environment.json]",
+      "uri": "urn:sha256:069d258c4c290284cc0d9af711b22304ee7381ccfb7849369cfd2177382fa132"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 12188,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "ea47285467d927d7e2b1f29ed6fa8576443dfd456e072724e50f3ce47fd1c076",
+      "title": "code: engineering/mechanobio/model.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/model.py]",
+      "uri": "urn:sha256:ea47285467d927d7e2b1f29ed6fa8576443dfd456e072724e50f3ce47fd1c076"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 5900,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "37da50441d3aed6578586a2ef20a4380fa32bcbe147da21df0ea4964b388326d",
+      "title": "code: engineering/mechanobio/sweep.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/sweep.py]",
+      "uri": "urn:sha256:37da50441d3aed6578586a2ef20a4380fa32bcbe147da21df0ea4964b388326d"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "Applicability: this model with these assumed parameters. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED motor-clutch mechanics with a seeded first-order Bernoulli binding/rupture split; no reinforcement, no catch bonds, no ligand recruitment, no membrane resistance.",
+     "Intervals are Monte Carlo (normal approximation) only; they are not biological or parameter uncertainty.",
+     "Producer states it does not establish: No calibration to any fish cell, fin, tissue, developmental pathway or organism.",
+     "Producer states it does not establish: No conversion of contact stiffness (pN/nm) to ECM modulus (kPa) without geometry.",
+     "Producer states it does not establish: No reproduction of the paper's figures, experimental data or full reinforcement model.",
+     "Producer states it does not establish: Spreading proxy is v_unloaded - v_retrograde, assuming polymerization equals unloaded flow; not cell area or migration.",
+     "Producer states it does not establish: No membrane resistance, ligand recruitment, catch bonds, tissue remodeling or whole-cell shape.",
+     "A separate cloud sweep (7x7 cells x 32 seeds x 2 arms, 3136 simulations) was specified by the producer but is NOT claimed executed.",
+     "Producer inconsistency kept visible: the simulation manifest lists render.py as c893405680b8c835..., but the pinned render.py hashes to a662afe13b1548da... (the render manifest agrees). render.py takes no part in the simulation; the listing predates a render edit."
+    ],
+    "local_id": null,
+    "method": "Producer's ensemble simulation; controls: analytic elastic max error 1.04e-12 pN; independent solve_ivp max error 2.74e-10 pN; zero binding 0.0 pN; zero motor velocity 0.0 pN; force-balance residual 5.33e-15 pN; timestep screen {\"statistics\": {\"0.02\": {\"mean_pN\": 31.22741370434326, \"sd_pN\": 0.08727125443245491, \"se_pN\": 0.025193041119547083, \"n\": 12}, \"0.01\": {\"mean_pN\": 31.18249808361527, \"sd_pN\": 0.13668660021625367, \"se_p.",
+    "produced_by": {
+     "id": "sim-mechanobio-action-sim-sweep",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "1da06ce38a11bb0fb97add8b8c470a2b178f69c1025fd509ecea136ed6adbb34"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 89.73134788312018,
+     "environment": {
+      "kinetics": "Bernoulli tau-leaping, exact frozen-rate transition probability, first-order split",
+      "machine": "x86_64",
+      "mechanics": "scipy.linalg.expm; exact fixed-topology linear step",
+      "numpy": "2.4.4",
+      "platform": "Linux-6.17.0-1012-aws-x86_64-with-glibc2.39",
+      "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]",
+      "scipy": "1.17.1"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "source_commit": "76a93e7e3d27f15b454463714efbed4520425e30",
+     "source_receipt_sha256": "580d98fb4057f4c51b1dccde7c62e4eee0548703f2e2425e585ad24f268207cb"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:12+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Simulation manifest.",
+     "content_available": false,
+     "content_sha256": "4d7b96f8585bedfa15f5657b67132bdfd10ae64868375cc73348a55b02ffb4a8",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/simulation-manifest.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-mechanobio-claim-sweep",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "uncertainty": "Monte Carlo normal-approximation intervals over seeds only; no parameter or biological uncertainty."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "8cfb889a7ac6500ac93d8b968b84226109500d6ee2500bfef30fdd6382a1d816",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-action-sim-bell",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and protocol reproduces the sweep rows and trajectory hashes.",
+     "An independent reviewer checks the model against the paper."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30; __init__.py:1abb513765ae, controls.py:07dee9a4f639, demo.py:96c0a908bec8, model.py:ea47285467d9, render.py:c893405680b8, sweep.py:37da50441d3a",
+     "environment": "environment sha256 4f6a31680d800cb859094ea8334a4b0b858fcbc2f5422a389710ca0a859172f5; python/numpy/scipy per environment.json",
+     "input": "request sha256 8ec3cbd3c35cc8dc1f819a0744cd251b4d809ff3613180c206de7be0f6411da4; input cb14f959c2885252",
+     "model": "motor-clutch + standard-linear-solid contact (exact matrix exponentials; seeded Bernoulli binding; no language model)",
+     "parameters": "5 clutches, rupture force 1 pN, stiffness 1 pN/nm, seed 19 (explicitly assumed scenario)",
+     "scope": "simulated; not calibrated to any cell",
+     "target": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy and scipy"
+    ],
+    "target": {
+     "id": "sim-mechanobio-claim-bell-sensitivity",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): motor-clutch ensemble simulation"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "a1d1c32f2714d94cd396a4efe37160b7d6b145a0c33ca35349e4864eaa6f0a07",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-evidence-sim-bell",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 265909,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "dd11e69cfc72ff2d705898d29414ac68d8e8f305edf407bd181f3fe4402afea0",
+      "title": "output: artifacts/mechanobio/feedback-trajectory.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/feedback-trajectory.json]",
+      "uri": "urn:sha256:dd11e69cfc72ff2d705898d29414ac68d8e8f305edf407bd181f3fe4402afea0"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 302046,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "87f1fc893a323d96d7a90cae88e440f88cd7a06278ce9c182004643a66ad9c7c",
+      "title": "output: artifacts/mechanobio/constant-rupture-trajectory.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/constant-rupture-trajectory.json]",
+      "uri": "urn:sha256:87f1fc893a323d96d7a90cae88e440f88cd7a06278ce9c182004643a66ad9c7c"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1924,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "4b0930bacaefd7270aaaa2f35202d7227d0162cb01693fb7e23e2f2b8efc2f7e",
+      "title": "certificate: artifacts/mechanobio/controls.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/controls.json]",
+      "uri": "urn:sha256:4b0930bacaefd7270aaaa2f35202d7227d0162cb01693fb7e23e2f2b8efc2f7e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 70,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "40217fdd5d87dac81879c4edaad1dd40b0fc2356e8082c5d1d2a061c2c4ed3ba",
+      "title": "input: artifacts/mechanobio/request.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/request.json]",
+      "uri": "urn:sha256:40217fdd5d87dac81879c4edaad1dd40b0fc2356e8082c5d1d2a061c2c4ed3ba"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 12188,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "ea47285467d927d7e2b1f29ed6fa8576443dfd456e072724e50f3ce47fd1c076",
+      "title": "code: engineering/mechanobio/model.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/model.py]",
+      "uri": "urn:sha256:ea47285467d927d7e2b1f29ed6fa8576443dfd456e072724e50f3ce47fd1c076"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 5900,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "37da50441d3aed6578586a2ef20a4380fa32bcbe147da21df0ea4964b388326d",
+      "title": "code: engineering/mechanobio/sweep.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/sweep.py]",
+      "uri": "urn:sha256:37da50441d3aed6578586a2ef20a4380fa32bcbe147da21df0ea4964b388326d"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "Applicability: this model with these assumed parameters. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "SIMULATED motor-clutch mechanics with a seeded first-order Bernoulli binding/rupture split; no reinforcement, no catch bonds, no ligand recruitment, no membrane resistance.",
+     "Intervals are Monte Carlo (normal approximation) only; they are not biological or parameter uncertainty.",
+     "Producer states it does not establish: No calibration to any fish cell, fin, tissue, developmental pathway or organism.",
+     "Producer states it does not establish: No conversion of contact stiffness (pN/nm) to ECM modulus (kPa) without geometry.",
+     "Producer states it does not establish: No reproduction of the paper's figures, experimental data or full reinforcement model.",
+     "Producer states it does not establish: Spreading proxy is v_unloaded - v_retrograde, assuming polymerization equals unloaded flow; not cell area or migration.",
+     "Producer states it does not establish: No membrane resistance, ligand recruitment, catch bonds, tissue remodeling or whole-cell shape.",
+     "A separate cloud sweep (7x7 cells x 32 seeds x 2 arms, 3136 simulations) was specified by the producer but is NOT claimed executed.",
+     "Producer inconsistency kept visible: the simulation manifest lists render.py as c893405680b8c835..., but the pinned render.py hashes to a662afe13b1548da... (the render manifest agrees). render.py takes no part in the simulation; the listing predates a render edit."
+    ],
+    "local_id": null,
+    "method": "Producer's ensemble simulation; controls: analytic elastic max error 1.04e-12 pN; independent solve_ivp max error 2.74e-10 pN; zero binding 0.0 pN; zero motor velocity 0.0 pN; force-balance residual 5.33e-15 pN; timestep screen {\"statistics\": {\"0.02\": {\"mean_pN\": 31.22741370434326, \"sd_pN\": 0.08727125443245491, \"se_pN\": 0.025193041119547083, \"n\": 12}, \"0.01\": {\"mean_pN\": 31.18249808361527, \"sd_pN\": 0.13668660021625367, \"se_p.",
+    "produced_by": {
+     "id": "sim-mechanobio-action-sim-bell",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "a1d1c32f2714d94cd396a4efe37160b7d6b145a0c33ca35349e4864eaa6f0a07"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "elapsed_s": 0.22256212309002876,
+     "environment": {
+      "kinetics": "Bernoulli tau-leaping, exact frozen-rate transition probability, first-order split",
+      "machine": "x86_64",
+      "mechanics": "scipy.linalg.expm; exact fixed-topology linear step",
+      "numpy": "2.4.4",
+      "platform": "Linux-6.17.0-1012-aws-x86_64-with-glibc2.39",
+      "python": "3.13.12 | packaged by Anaconda, Inc. | (main, Feb 24 2026, 16:13:31) [GCC 14.3.0]",
+      "scipy": "1.17.1"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "source_commit": "76a93e7e3d27f15b454463714efbed4520425e30",
+     "source_receipt_sha256": "580d98fb4057f4c51b1dccde7c62e4eee0548703f2e2425e585ad24f268207cb"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:12+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Simulation manifest.",
+     "content_available": false,
+     "content_sha256": "4d7b96f8585bedfa15f5657b67132bdfd10ae64868375cc73348a55b02ffb4a8",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/simulation-manifest.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-mechanobio-claim-bell-sensitivity",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "uncertainty": "Monte Carlo normal-approximation intervals over seeds only; no parameter or biological uncertainty."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "d633aea50bf05e285846ce62f12581b97fac47f37c7b9630e2fe66f6e3176715",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-action-render-sweep",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and the trajectory/sweep reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "Pictures are read as views of computed states, not as evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30; render.py a662afe13b15",
+     "environment": "matplotlib 3.10.8; ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FF",
+     "input": "simulation evidence version 8cfb889a7ac6500ac93d8b968b84226109500d6ee2500bfef30fdd6382a1d816; trajectory dd11e69cfc72ff2d; sweep 92e9786db10dfac2",
+     "model": "none: deterministic rendering",
+     "parameters": "180 frames, 15 fps, frame_indices_sha256 e0f5b8273e5f65bb",
+     "scope": "visualisation of a simulated model",
+     "target": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-mechanobio-evidence-sim-sweep",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "8cfb889a7ac6500ac93d8b968b84226109500d6ee2500bfef30fdd6382a1d816"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "sim-mechanobio-claim-sweep",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): video, poster and response-surface plot from computed states"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "a04cf80c17137a414fd47e4752745294aef9cec57dc8fbb758cf4a8a7f748649",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-evidence-render-sweep",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 264242,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e",
+      "title": "output: artifacts/mechanobio/mechanobio.mp4 [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/mechanobio.mp4]",
+      "uri": "urn:sha256:993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 162992,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "967255cda3309b2e67f93d3aaaf3dc0908185be331734c6bea5492f95b3c9b2f",
+      "title": "output: artifacts/mechanobio/poster.png [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/poster.png]",
+      "uri": "urn:sha256:967255cda3309b2e67f93d3aaaf3dc0908185be331734c6bea5492f95b3c9b2f"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 62433,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "af3afdf0e71a4e59c2521a9af6b2247c9162fd3fcade9ac2415cd9fef23385f6",
+      "title": "output: artifacts/mechanobio/response-surface.png [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/response-surface.png]",
+      "uri": "urn:sha256:af3afdf0e71a4e59c2521a9af6b2247c9162fd3fcade9ac2415cd9fef23385f6"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2287,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb",
+      "title": "log: artifacts/mechanobio/render-manifest.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/render-manifest.json]",
+      "uri": "urn:sha256:5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 6744,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "a662afe13b1548dab72d001876349bb30658afb7eedd3a18c40c0d76e40bc1c4",
+      "title": "code: engineering/mechanobio/render.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/render.py]",
+      "uri": "urn:sha256:a662afe13b1548dab72d001876349bb30658afb7eedd3a18c40c0d76e40bc1c4"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The video follows the 5-clutch paired scenario and the plot the sweep; both outputs are attached to each Claim. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Producer draws 180 frames from the feedback trajectory and sweep and encodes them (ffmpeg).",
+    "produced_by": {
+     "id": "sim-mechanobio-action-render-sweep",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "a04cf80c17137a414fd47e4752745294aef9cec57dc8fbb758cf4a8a7f748649"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+     "frame_indices_sha256": "e0f5b8273e5f65bb684bdb25555a299d0ea63ac80b0328faebec7bef40a0785f",
+     "matplotlib": "3.10.8",
+     "source_commit": "76a93e7e3d27f15b454463714efbed4520425e30"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:12+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render manifest.",
+     "content_available": false,
+     "content_sha256": "5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/render-manifest.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-mechanobio-claim-sweep",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "812ba6f3245e49afc49bbaa4451a13c1af1b8a22d372f08a4ec64ebeb93e4e8b"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "221c154619e0ddb900ac9d976b1f95ad1a7c7487859e24145710d99f54651051",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-action-render-bell",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and the trajectory/sweep reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "Pictures are read as views of computed states, not as evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30; render.py a662afe13b15",
+     "environment": "matplotlib 3.10.8; ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FF",
+     "input": "simulation evidence version d633aea50bf05e285846ce62f12581b97fac47f37c7b9630e2fe66f6e3176715; trajectory dd11e69cfc72ff2d; sweep 92e9786db10dfac2",
+     "model": "none: deterministic rendering",
+     "parameters": "180 frames, 15 fps, frame_indices_sha256 e0f5b8273e5f65bb",
+     "scope": "visualisation of a simulated model",
+     "target": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "sim-mechanobio-evidence-sim-bell",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "d633aea50bf05e285846ce62f12581b97fac47f37c7b9630e2fe66f6e3176715"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "sim-mechanobio-claim-bell-sensitivity",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): video, poster and response-surface plot from computed states"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "7f14b2d15583cd1c5d472ef3b87a33fd87c10499e1cb6f31040da887c05559d2",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T20:29:12+00:00",
+   "id": "sim-mechanobio-evidence-render-bell",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 264242,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e",
+      "title": "output: artifacts/mechanobio/mechanobio.mp4 [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/mechanobio.mp4]",
+      "uri": "urn:sha256:993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 162992,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "967255cda3309b2e67f93d3aaaf3dc0908185be331734c6bea5492f95b3c9b2f",
+      "title": "output: artifacts/mechanobio/poster.png [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/poster.png]",
+      "uri": "urn:sha256:967255cda3309b2e67f93d3aaaf3dc0908185be331734c6bea5492f95b3c9b2f"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 62433,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "af3afdf0e71a4e59c2521a9af6b2247c9162fd3fcade9ac2415cd9fef23385f6",
+      "title": "output: artifacts/mechanobio/response-surface.png [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/response-surface.png]",
+      "uri": "urn:sha256:af3afdf0e71a4e59c2521a9af6b2247c9162fd3fcade9ac2415cd9fef23385f6"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2287,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb",
+      "title": "log: artifacts/mechanobio/render-manifest.json [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/render-manifest.json]",
+      "uri": "urn:sha256:5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 6744,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "a662afe13b1548dab72d001876349bb30658afb7eedd3a18c40c0d76e40bc1c4",
+      "title": "code: engineering/mechanobio/render.py [git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:engineering/mechanobio/render.py]",
+      "uri": "urn:sha256:a662afe13b1548dab72d001876349bb30658afb7eedd3a18c40c0d76e40bc1c4"
+     }
+    ],
+    "assumptions": [
+     "Scientific source: Gong et al., PNAS 2018, DOI 10.1073/pnas.1716620115, Model Description Eqs 1-6 and Fig 1C/D (motor-clutch model with a standard-linear-solid contact). Supplementary Table S1 was NOT retrieved; parameters other than the main-text example are assumed (per the producer).",
+     "Protocol: stiffness [0.01, 0.05623413251903491, 0.31622776601683794, 1.7782794100389228, 10.0] pN/nm x viscosity [0.01, 0.1, 1.0, 10.0, 100.0] pN s/nm, seeds [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 20.0 s at dt 0.01 s; defaults {\"additional_stiffness_pN_nm\": 1.0, \"clutch_stiffness_pN_nm\": 0.8, \"clutches\": 40, \"long_term_stiffness_pN_nm\": 0.1, \"motor_stall_pN\": 2.0, \"motors\": 20, \"off_rate_s\": 0.1, \"on_rate_s\": 1.0, \"rupture_force_pN\": 2.0, \"unloaded_speed_nm_s\": 100.0, \"viscosity_pN_s_nm\": 1.0}.",
+     "Intervention: Bell force-dependent rupture versus constant unloaded rupture; paired seeds. Monte Carlo uncertainty only; normal approximation; not biological or parameter uncertainty."
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The video follows the 5-clutch paired scenario and the plot the sweep; both outputs are attached to each Claim. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right."
+    ],
+    "local_id": null,
+    "method": "Producer draws 180 frames from the feedback trajectory and sweep and encodes them (ffmpeg).",
+    "produced_by": {
+     "id": "sim-mechanobio-action-render-bell",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "7f14b2d15583cd1c5d472ef3b87a33fd87c10499e1cb6f31040da887c05559d2"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+     "frame_indices_sha256": "e0f5b8273e5f65bb684bdb25555a299d0ea63ac80b0328faebec7bef40a0785f",
+     "matplotlib": "3.10.8",
+     "source_commit": "76a93e7e3d27f15b454463714efbed4520425e30"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T20:29:12+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render manifest.",
+     "content_available": false,
+     "content_sha256": "5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb",
+     "license": null,
+     "locator": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30:artifacts/mechanobio/render-manifest.json",
+     "source_version": "git:delphi-frontier@76a93e7e3d27f15b454463714efbed4520425e30",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "sim-mechanobio-claim-bell-sensitivity",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "70580d8fb06718559b4c86ac28740608922b0153f6edf35892ab3c4ebdf7d369"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:sim-bundles:mechanobio",
+   "version": "f44b7359addd4acf742857765f7542e18494d0648e5fb6c1c53e37c61004f9cd",
+   "visibility": "public"
+  }
+ ]
+}

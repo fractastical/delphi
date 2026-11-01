@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule54-universality--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Finite-factor obstruction to universality" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule54-universality> ;
+    dct:description "Search for a symbolic-dynamics obstruction: a finite-state transducer or invariant cone showing every finite perturbation of each Rule 54 periodic domain decomposes into ballistic particles with ultimately periodic interactions. Infer candidate invariants from de Bruijn graphs, then prove closure and an upper bound on crossing-sequence complexity in Lean." ;
+
+    delphi:proposedTest "A machine-checked theorem that finite perturbations of specified periodic backgrounds have decidable long-term behavior via a finite particle quotient." ;
+    delphi:context "Fails if: Future-equivalence class counts grow without stabilization and collision products generate unbounded novel defects, defeating the finite-factor premise." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Construct order-k de Bruijn graphs for k through 24 and minimize future-equivalence classes. 2. Infer conserved additive charges and particle interaction normal forms. 3. Attempt a finite-defect decomposition and confluence theorem. 4. If obtained, prove finite-defect prediction decidable and state the exact restricted nonuniversality result." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Even a finite-defect theorem may not cover arbitrary computable initial configurations." ;
+    skos:note "Tool: symbolic-dynamics" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-21> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-19> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-20> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/rule54-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Is Rule 54 computationally universal?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule54-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.321Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule54-universality: Finite-factor obstruction to universality" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule54-universality--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

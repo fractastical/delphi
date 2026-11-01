@@ -1,0 +1,81 @@
+[
+  {
+    "claim_id": "hygromorph-bilayer-curvature",
+    "status": "formalized",
+    "label": "Bilayer curvature is Timoshenko's coefficient times the swelling-strain mismatch",
+    "notation": "\\kappa = \\frac{6(1+m)^2}{h\\,[3(1+m)^2 + (1+mn)(m^2 + 1/(mn))]}\\,\\Delta\\varepsilon, \\quad m = h_1/h_2,\\ n = E_1/E_2,\\ h = h_1+h_2; \\text{ for } m = 1, n = 1: \\kappa = \\tfrac{3}{2}\\,\\Delta\\varepsilon / h",
+    "lean_declaration": "ThompsonLaws.Hygromorphs.bilayerCurvature",
+    "lean_theorems": [
+      "ThompsonLaws.Hygromorphs.bilayerCurvature_linear",
+      "ThompsonLaws.Hygromorphs.bilayerCurvature_zero",
+      "ThompsonLaws.Hygromorphs.bilayerCurvature_symmetric",
+      "ThompsonLaws.Hygromorphs.timoshenkoCoefficient_pos",
+      "ThompsonLaws.Hygromorphs.bilayerCurvature_sign",
+      "ThompsonLaws.Hygromorphs.bilayerCurvature_ofEquilibrium"
+    ],
+    "assumptions": "Two perfectly bonded layers of thicknesses h₁, h₂ > 0, moduli E₁, E₂ > 0 and uniform eigenstrains ε₁, ε₂, per unit width, under Euler–Bernoulli kinematics (plane sections, common curvature κ, bending moment Eᵢhᵢ³κ/12 in each layer, membrane strain Pᵢ/(Eᵢhᵢ)); linear elasticity and small strains. m = h₁/h₂, n = E₁/E₂, h = h₁ + h₂, Δε = ε₁ − ε₂.",
+    "scope_note": "The formula is derived, not just taken as the definition: bilayerCurvature_ofEquilibrium shows that force balance (P₁ + P₂ = 0), moment balance about the interface, and strain compatibility at the interface force κ to equal timoshenkoCoefficient (h₁+h₂) (h₁/h₂) (E₁/E₂) · (ε₁ − ε₂), i.e. Timoshenko's 1925 expression. The other theorems give the consequences stated in the claim: κ is linear in Δε and vanishes with it, the symmetric case m = n = 1 gives κ = (3/2)Δε/h, and for positive h, m, n the coefficient is positive so κ has the sign of Δε. Whether a pine cone scale's layers are uniform, linearly elastic, well bonded and slender, and the values of m, n and Δε, are left to measurement."
+  },
+  {
+    "claim_id": "hygromorph-response-time",
+    "status": "formalized",
+    "label": "Hygromorph response time scales as thickness squared over diffusivity",
+    "notation": "\\tau \\sim h^2 / D",
+    "lean_declaration": "ThompsonLaws.Hygromorphs.diffusiveTime",
+    "lean_theorems": [
+      "ThompsonLaws.Hygromorphs.diffusiveTime_scale",
+      "ThompsonLaws.Hygromorphs.diffusiveRate_eq",
+      "ThompsonLaws.Hygromorphs.diffusionMode_hasDerivAt_time",
+      "ThompsonLaws.Hygromorphs.diffusionMode_hasDerivAt_space",
+      "ThompsonLaws.Hygromorphs.diffusionMode_deriv_space",
+      "ThompsonLaws.Hygromorphs.diffusionMode_heat",
+      "ThompsonLaws.Hygromorphs.diffusionMode_boundary",
+      "ThompsonLaws.Hygromorphs.diffusionMode_decay"
+    ],
+    "assumptions": "Fickian diffusion with constant diffusivity D through a single layer of thickness h, concentration held fixed at both faces (u = 0 at x = 0 and x = h); quasi-static mechanical response so the time scale is the diffusive one.",
+    "scope_note": "Proves the scaling τ(kh) = k²τ(h) for τ = h²/D, and that u(x,t) = exp(−π²Dt/h²)·sin(πx/h) satisfies the one-dimensional heat equation ∂u/∂t = D ∂²u/∂x² (diffusionMode_heat, with Mathlib's deriv), vanishes at both faces, and decays as exp(−t/(τ/π²)) from its initial profile, so the slowest mode relaxes on the time h²/(π²D) ∝ h²/D. Not proved: that this mode is the slowest (completeness of the Fourier sine basis and ordering of eigenvalues) and that a real bilayer's water uptake is Fickian with constant D; the measured exponent is the data test."
+  },
+  {
+    "claim_id": "hygromorph-antisymmetric-twist",
+    "status": "formalized",
+    "label": "Antisymmetric fibre angles give a pure shear mismatch and no axial mismatch",
+    "notation": "\\varepsilon_{12}^{(j)} = \\tfrac{1}{2}(\\varepsilon_L - \\varepsilon_T)\\sin 2\\phi_j; \\text{ with } \\phi_1 = +\\phi,\\ \\phi_2 = -\\phi: \\ \\Delta\\varepsilon_{12} = (\\varepsilon_L - \\varepsilon_T)\\sin 2\\phi, \\ \\Delta\\varepsilon_{11} = 0",
+    "lean_declaration": "ThompsonLaws.Hygromorphs.shearStrain",
+    "lean_theorems": [
+      "ThompsonLaws.Hygromorphs.shearStrain_neg",
+      "ThompsonLaws.Hygromorphs.axialStrain_neg",
+      "ThompsonLaws.Hygromorphs.shearStrain_mismatch",
+      "ThompsonLaws.Hygromorphs.axialStrain_mismatch",
+      "ThompsonLaws.Hygromorphs.strainInStripAxes_entries"
+    ],
+    "assumptions": "Each layer swells with principal strains εL along its fibres and εT across them; the strain is a rank-2 tensor, so in the strip axes it is R diag(εL, εT) Rᵀ with R the rotation by the fibre angle φ; the two layers share εL, εT and |φ|, with fibre angles +φ and −φ.",
+    "scope_note": "Proves that the in-plane shear strains of the two layers are equal and opposite, that their axial strains are equal, hence Δε₁₂ = (εL − εT) sin 2φ and Δε₁₁ = 0, and (strainInStripAxes_entries, Mohr's circle) that axialStrain and shearStrain are exactly the (1,1) and (1,2) entries of the rotated tensor R diag(εL,εT) Rᵀ. The step from a pure shear mismatch to helical twisting of the strip, and the helicoid-to-helix transition with width, rest on thin-plate theory and are not formalized; fibre angles and strains of real pods and awns are measured."
+  },
+  {
+    "claim_id": "flytrap-snap-geometry",
+    "status": "not-formalized",
+    "label": "Flytrap snap parameter α = L⁴κ²/h² is dimensionless and grows with leaf size",
+    "notation": "\\alpha = L^4 \\kappa^2 / h^2 \\gtrsim \\alpha_c \\approx 0.8 \\text{ for bistability (snap-buckling); } \\tau_{snap} \\sim \\tau_{poroelastic} = \\mu L^2 / (k E) \\text{ when } \\alpha \\gg \\alpha_c",
+    "reason": "The claim's content is the existence of a bistability threshold in α = L⁴κ²/h² (α_c ≈ 0.8) and the snap-time scaling, which rest on shallow-shell numerics and experiment, not on a closed-form proof. The module ThompsonLaws/Hygromorphs.lean does prove the dimensional-analysis part (snapParameter_dimensionless, snapParameter_mono_size, snapParameter_anti_thickness, snapParameter_threshold_mono, poroelasticTime_scale), but that is not the law, so the claim is left at its recorded formal status (partial) rather than counted as a theorem."
+  },
+  {
+    "claim_id": "stimulus-response-systems-category",
+    "status": "formalized",
+    "label": "Stimulus–response systems with simulation-preserving pairs form a category",
+    "notation": "\\text{Obj: } (X, E, f),\\ \\dot x = f(x,e);\\ \\text{Mor: } (\\alpha, \\alpha_E) \\text{ with } d\\alpha_x\\big(f(x,e)\\big) = g\\big(\\alpha(x), \\alpha_E(e)\\big);\\ (\\beta,\\beta_F)\\circ(\\alpha,\\alpha_E) = (\\beta\\circ\\alpha, \\beta_F\\circ\\alpha_E) \\text{ again satisfies the condition}",
+    "lean_declaration": "ThompsonLaws.Hygromorphs.StimulusResponseSystem",
+    "lean_theorems": [
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.id",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.comp_simulation",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.comp",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.id_comp",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.comp_id",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.comp_assoc",
+      "ThompsonLaws.Hygromorphs.StimulusResponseHom.mapsSolutions",
+      "ThompsonLaws.Hygromorphs.stimulusResponseCategory",
+      "ThompsonLaws.Hygromorphs.stimulusResponseCategory_comp_simulation"
+    ],
+    "assumptions": "A system is a state space X (a real normed space, standing in for the finite-dimensional smooth manifold), a stimulus set E and an evolution law f : X → E → X read as the vector field of ẋ = f(x, e). A morphism (α, αE) has α differentiable on all of X and satisfies the simulation condition fderiv ℝ α x (f x e) = g (α x) (αE e) for all x, e; no smoothness is required of αE because the theorem does not use it.",
+    "scope_note": "Smooth (fderiv) version. StimulusResponseHom.id shows the identity pair satisfies the simulation condition; comp_simulation shows the condition is closed under composition by the chain rule (Mathlib's fderiv_comp), which is the paper's Appendix A.2 argument; id_comp, comp_id and comp_assoc are the category laws, and stimulusResponseCategory packages them as a Mathlib CategoryTheory.Category instance. mapsSolutions proves what the condition means: a morphism carries every solution of ẋ = f(x, e(t)) to a solution of ẏ = g(y, αE(e(t))). Simplifications: state spaces are normed vector spaces rather than general manifolds, and the chart-free vector-field reading of f is used throughout; the claim about material hierarchies (that locally valid scale transitions compose to a globally valid one) is exactly this closure theorem, while the fidelity of each local model is empirical and not addressed."
+  }
+]

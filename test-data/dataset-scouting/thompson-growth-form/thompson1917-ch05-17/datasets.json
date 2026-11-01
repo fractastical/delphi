@@ -1,0 +1,93 @@
+{
+  "claim_id": "thompson1917-ch05-17",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:22:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "calibrated profile (meridian outline) of the extended, uncontracted bell for many Vorticella species, with species identity",
+    "diameter of the stalk attachment (scopula) and of the peristomial/ciliary ring per bell",
+    "ideally a 3D surface of revolution or confirmation of axial symmetry",
+    "species sampling broad enough to show a cylinder-to-sphere gradation"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive, S-BIAD598 (Tara Oceans protist SEM collection) and query hits",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD598",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:15:00Z", "method": "HEAD landing_url; GET BioStudies search query=Vorticella (1 hit) and query=ciliate (2 hits); GET study S-BIAD598 metadata", "http_status": 200 },
+      "variables_present": ["SEM images of marine protists with taxonomic annotation (S-BIAD598, Tara Oceans, Marquesas; CC BY 4.0)"],
+      "variables_missing": ["Vorticella bells in extended state (SEM is fixed/dried material; the only hit is a general marine-protist collection, Vorticella presence not confirmed beyond the keyword match)", "stalk and peristome ring dimensions", "species series across the genus"],
+      "scope": "Marine plankton SEM; not a Vorticella morphometric archive",
+      "evidence": "Only one study matched 'Vorticella'; its title and description describe a broad protist SEM collection.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL) search 'Vorticella'",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=Vorticella&simple_search=Search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:15:00Z", "method": "HEAD landing_url; GET search page for 'Vorticella'", "http_status": 200 },
+      "variables_present": ["82 results for 'Vorticella', including light micrographs and EM of Vorticella convallaria and V. microstoma (captions seen on the results page)"],
+      "variables_missing": ["calibrated outlines for many species (two or three species named)", "boundary ring dimensions", "3D surfaces"],
+      "scope": "A few Vorticella species, mostly V. convallaria, mixed modalities (EM sections, whole-cell LM)",
+      "evidence": "Results page text: '82 results'; captions name V. convallaria and V. microstoma.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-vorticella-image-occurrences",
+      "name": "GBIF occurrences of genus Vorticella with still images",
+      "landing_url": "https://www.gbif.org/species/7351754",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?genusKey=7351754&mediaType=StillImage&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:20:00Z", "method": "GET species/match name=Vorticella (usageKey 7351754, ACCEPTED); GET occurrence counts", "http_status": 200 },
+      "variables_present": ["6,042 Vorticella occurrence records, 156 with still images; species-level names on many records"],
+      "variables_missing": ["scale bars and calibrated outlines", "ring dimensions", "contraction state"],
+      "scope": "Opportunistic photographs (iNaturalist-type) of unknown calibration, mixed species",
+      "evidence": "GBIF API counts as given; images not inspected.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-plazi-peritrich-figures",
+      "name": "Zenodo/Plazi figure records from peritrich taxonomic (re)descriptions",
+      "landing_url": "https://zenodo.org/search?q=Vorticella",
+      "access_url": "https://zenodo.org/api/records?q=Vorticella&size=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:17:00Z", "method": "GET Zenodo API search", "http_status": 200 },
+      "variables_present": ["130 records; the top hits are figure images from taxonomic papers (e.g. 10.5281/zenodo.5220031 Pseudovorticella cylindrica and Zoothamnium figures; 10.5281/zenodo.278028 five marine peritrichs), which carry species identity and usually scale bars"],
+      "variables_missing": ["a morphometric table (each is one figure)", "stalk and peristome ring measurements as data fields", "balanced species sampling"],
+      "scope": "Scattered species-level line drawings and micrographs of peritrichs",
+      "evidence": "Zenodo hit list as above; this matches the assessors' obstacle that outlines live in monographs rather than an archive.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive (BioStudies API)", "query": "Vorticella", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Vorticella&pageSize=5", "hits": 1, "note": "S-BIAD598" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "ciliate", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=ciliate&pageSize=5", "hits": 2, "note": "S-BIAD3173 (symbiont microalgae), S-BIAD598" },
+    { "source": "Cell Image Library", "query": "Vorticella", "url": "https://www.cellimagelibrary.org/images?k=Vorticella&simple_search=Search", "hits": 82, "note": "" },
+    { "source": "Zenodo", "query": "Vorticella", "url": "https://zenodo.org/api/records?q=Vorticella&size=6", "hits": 130, "note": "mostly Plazi figure images" },
+    { "source": "DataCite", "query": "Vorticella morphology", "url": "https://api.datacite.org/dois?query=Vorticella+morphology&page[size]=6", "hits": 20, "note": "taxonomic texts and one GBIF dataset (10.15468/emksuc, two new Vorticella species); no morphometric dataset" },
+    { "source": "GBIF", "query": "genus Vorticella occurrences with StillImage", "url": "https://api.gbif.org/v1/occurrence/search?genusKey=7351754&mediaType=StillImage&limit=0", "hits": 156, "note": "6,042 occurrences total; 1,537 name hits at species rank for 'Vorticella'" }
+  ],
+  "status": "partial",
+  "summary": "No repository holds a morphometric table or calibrated outline set of Vorticella bells across species. What exists is images: 82 Cell Image Library records (mostly V. convallaria), 156 GBIF occurrence photos, Plazi/Zenodo figures from taxonomic redescriptions with scale bars, and a Tara Oceans protist SEM collection. Fitting unduloids between measured end rings would require digitising outlines from these figures and from monographs (Kahl, Foissner), with species identity taken from the source paper.",
+  "next_step": "Compile a figure set of 15–30 Vorticella species from Plazi/Zenodo redescriptions (each with scale bar and species), digitise the extended-bell meridian, record scopula and peristome diameters, and pre-register the unduloid fit.",
+  "obstacles_confirmed": [
+    "Bell outlines are in monographs and scattered photographs, not a morphometric archive.",
+    "Most public images are 2D and not taxonomically balanced."
+  ]
+}

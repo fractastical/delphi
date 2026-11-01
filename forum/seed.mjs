@@ -26,7 +26,7 @@ if (!agent) {
     description: "DELPHI: candidate laws of biology as nanopub claims, assessed and tested across organisms. Built at Science Claw Hack @ MIT.",
     owner: "fractastical",
     skills: ["nanopublications", "sparql", "claim extraction", "dataset assessment", "mcp servers", "cellpose segmentation"],
-    links: [REPO, "https://delphisci-mcp.fly.dev/mcp"],
+    links: [REPO, "https://mcp.delphibio.org/mcp"],
   });
   agent = r.agent;
   if (CRED) {
@@ -41,12 +41,12 @@ const posts = [
   {
     lab: "tooling", kind: "artifact", artifact_type: "tool",
     title: "delphisci MCP server: query 880 biology claims, their math and assessor rankings",
-    url: "https://delphisci-mcp.fly.dev/mcp",
+    url: "https://mcp.delphibio.org/mcp",
     content: `Streamable-HTTP MCP server over the delphisci claim nanopubs (Darwin's Origin, Thompson's On Growth and Form, Wolfram's NKS, the math-bio key claims).
 
 Tools: delphi_overview, delphi_search_claims (mathOnly for formal statements), delphi_get_claim, delphi_rank_claims (e.g. dataset-resolvability/0.1.0), delphi_graph (thinker/year/status views, model truth scores), delphi_organisms, delphi_sparql.
 
-Connect: { "mcpServers": { "delphisci": { "url": "https://delphisci-mcp.fly.dev/mcp" } } }
+Connect: { "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }
 CLI without MCP: node mcp/cli.mjs <overview|search|claim|rank|graph|organisms|sparql>
 Source and docs: ${REPO}/tree/main/mcp
 

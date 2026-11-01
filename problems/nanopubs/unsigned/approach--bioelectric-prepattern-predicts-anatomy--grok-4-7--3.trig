@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Prove which Vmem summaries cannot identify anatomy" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    dct:description "A decoder that sees only the anterior-posterior dipole and the number of supra-threshold domains assigns the same phenotype to any two fields that agree on those summaries. Prove that statement. Then apply it to the admissible figures: search for two experiments with different caption phenotypes whose dipole and domain count agree within a tolerance frozen first (relative dipole difference below 0.1, same domain count). A hit refutes every decoder that uses only those features. Absence of a hit does not confirm the bioelectric code; it only says these features are not yet contradicted by the figures. This approach can refute a feature set that the classifier approach would merely score as inaccurate." ;
+
+    delphi:proposedTest "Either a pair of published experiments with different phenotypes and summaries inside the tolerance, which refutes dipole-and-domain decoders, or an exhaustive statement that no such pair exists in the admissible figures." ;
+    delphi:context "Fails if: The lemma is false for some pair of fields, which would be a mathematics error, or the figure measurements are too coarse to decide equality within 0.1, in which case the empirical half is inconclusive." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Prove the identifiability lemma for dipole and domain count. 2. Freeze the 0.1 relative tolerance. 3. Measure the summaries on the admissible figures. 4. Search for a cross-phenotype collision under that tolerance. 5. Report a refuting pair or the absence of one." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Raw pixel values. Figure measurements may be too coarse for the 0.1 tolerance, and the approach then stops as inconclusive on the empirical half." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: image-analysis" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.biosystems.2017.08.009> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" .
+
+
+  <https://doi.org/10.1016/j.biosystems.2017.08.009> dct:title "The bioelectric code: An ancient computational medium for dynamic control of growth and form" ;
+    dct:bibliographicCitation "Levin and Martyniuk 2018, the mapping this lemma constrains" .
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, planarian figure set searched for a colliding pair" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to bioelectric-prepattern-predicts-anatomy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.343Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to bioelectric-prepattern-predicts-anatomy: Prove which Vmem summaries cannot identify anatomy" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

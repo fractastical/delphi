@@ -1,0 +1,522 @@
+{
+  "round": "r1-2026-11-01",
+  "slice": "slice-02",
+  "model": "gemini-4-argon",
+  "provider": "Google",
+  "generated": "2026-11-01T05:30:00Z",
+  "problems": [
+    {
+      "problem": "species-area-exponent",
+      "p_solved_30d": 0.45,
+      "p_solved_365d": 0.75,
+      "rationale": "The most direct path to meeting the acceptance criteria is pairing GIFT vascular-plant checklists with coverage-standardized GBIF occurrence counts on well-sampled oceanic archipelagos and fitting the power law, METE, and curved alternatives under a pre-registered AICc/ELPD and z-overlap rule, supplemented by random-placement SAD null computations. The primary blocker is uneven GBIF sampling completeness on smaller islands and non-plant taxa (such as land snails) plus the need for total abundance proxies to anchor METE. Logging a clean GIFT+GBIF multi-archipelago tournament script or extracting the full Triantis et al. 2012 supplementary tables with abundance proxies would substantially raise the 30-day probability.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "species-area-exponent--claude-opus-5-5--1",
+          "p_complete": 0.45,
+          "p_settle": 0.55,
+          "note": "Six named archipelagos with GIFT checklists and iNEXT rarefaction are well-scoped, though reaching 0.95 coverage for land snails on small islands and anchoring METE abundances may trigger the data-quality failure signature."
+        },
+        {
+          "approach": "species-area-exponent--claude-opus-5-5--2",
+          "p_complete": 0.78,
+          "p_settle": 0.50,
+          "note": "Evaluating Coleman random-placement formulas over a parameter grid of lognormal and log-series SADs is a fast, self-contained computation, but unobservable SAD parameters give the null wide flexibility and only address the sampling-null piece of the problem."
+        },
+        {
+          "approach": "species-area-exponent--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.60,
+          "note": "Fitting a REML meta-regression on published Triantis and Drakare compilations is straightforward if supplementary tables are accessible, though sparse abundance reporting may limit the METE local-slope collapse arm."
+        },
+        {
+          "approach": "species-area-exponent--gpt-5-6-sol--1",
+          "p_complete": 0.35,
+          "p_settle": 0.55,
+          "note": "Standardizing GBIF checklists and island polygons across at least 30 oceanic archipelagos at 80% coverage is heavier data engineering within 30 days and risks hitting the low-coverage inconclusive signature."
+        },
+        {
+          "approach": "species-area-exponent--gpt-5-6-sol--2",
+          "p_complete": 0.25,
+          "p_settle": 0.50,
+          "note": "Assembling and harmonizing 50 genuinely nested multi-scale surveys with at least six area scales from public sources is a major data-curation bottleneck with high risk of falling short of the 30-series floor."
+        },
+        {
+          "approach": "species-area-exponent--grok-4-7--1",
+          "p_complete": 0.60,
+          "p_settle": 0.55,
+          "note": "Querying complete native vascular-plant checklists from the GIFT API and fitting negative-binomial GLMs alongside meteR is highly tractable for the swarm, though split AIC versus residual calls or missing abundance totals for meteSAR could leave the verdict inconclusive."
+        },
+        {
+          "approach": "species-area-exponent--grok-4-7--2",
+          "p_complete": 0.72,
+          "p_settle": 0.45,
+          "note": "Simulating 1,000 logseries-thinning replicates calibrated on a single GIFT reference region is computationally simple, but tests only one parametric SAD family rather than settling the full functional-form debate."
+        },
+        {
+          "approach": "species-area-exponent--grok-4-7--3",
+          "p_complete": 0.50,
+          "p_settle": 0.85,
+          "note": "Proving in Lean 4 that the finite-sum METE species-area curve has a non-constant logarithmic derivative with zero infinite-abundance limit is feasible real analysis and definitively settles the mathematical property it targets."
+        }
+      ]
+    },
+    {
+      "problem": "clade-trajectory-universality",
+      "p_solved_30d": 0.50,
+      "p_solved_365d": 0.80,
+      "rationale": "Because the Paleobiology Database API is open and already wired into the repo's organisms layer, the swarm can readily execute shareholder-quorum subsampling (SQS) across marine orders and families and compare hat-shapedness statistics against conditioned birth-death and sampling-intensity nulls. The main obstacle to a fully settled answer is separating biological decline from paraphyletic Linnaean taxon definitions and Cenozoic pull-of-the-recent artifacts, which requires cross-referencing PBDB families against Open Tree of Life monophyly. A logged SQS run with an explicit Open Tree monophyly filter and Cenozoic stage-drop sensitivity check would move this problem close to resolution.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "clade-trajectory-universality--claude-opus-5-5--1",
+          "p_complete": 0.70,
+          "p_settle": 0.60,
+          "note": "Fetching PBDB genus occurrences and running SQS against a conditioned MBL birth-death null uses standard paleobiology pipelines, though conditioning on duration and terminal extinction makes random walks themselves somewhat hat-shaped."
+        },
+        {
+          "approach": "clade-trajectory-universality--claude-opus-5-5--2",
+          "p_complete": 0.25,
+          "p_settle": 0.45,
+          "note": "Running PyRate MCMC to convergence across hundreds of families is computationally heavy for a 30-day window and often suffers from non-identifiability between preservation and diversification slopes."
+        },
+        {
+          "approach": "clade-trajectory-universality--claude-opus-5-5--3",
+          "p_complete": 0.60,
+          "p_settle": 0.65,
+          "note": "Simulating birth-death trees partitioned by morphological-divergence thresholds and comparing with Open Tree monophyletic and extinct-only PBDB subsets directly addresses the taxonomic-artifact critique."
+        },
+        {
+          "approach": "clade-trajectory-universality--gpt-5-6-sol--1",
+          "p_complete": 0.72,
+          "p_settle": 0.55,
+          "note": "Subsampling well-sampled PBDB marine clades at quorum 0.6 against occurrence-preserving randomizations is straightforward to execute, but sensitivity across quorum levels 0.4–0.7 may yield an inconclusive call."
+        },
+        {
+          "approach": "clade-trajectory-universality--gpt-5-6-sol--2",
+          "p_complete": 0.30,
+          "p_settle": 0.50,
+          "note": "Fitting state-space birth-death models with simulation-based calibration across 10,000 synthetic clades and 50 real clades is computationally demanding and likely to flag high confusion between hats and sampling heterogeneity."
+        },
+        {
+          "approach": "clade-trajectory-universality--grok-4-7--1",
+          "p_complete": 0.68,
+          "p_settle": 0.55,
+          "note": "Alroy's SQS on marine invertebrate orders and families with a Cenozoic stage-removal sensitivity check is very practical, though lacking an explicit monophyly filter leaves the paraphyly critique partially open."
+        },
+        {
+          "approach": "clade-trajectory-universality--grok-4-7--2",
+          "p_complete": 0.75,
+          "p_settle": 0.50,
+          "note": "Forcing a constant-rate birth-death simulation through the empirical global PBDB stage collection curve is fast to implement and cleanly isolates database-wide sampling-intensity artifacts."
+        },
+        {
+          "approach": "clade-trajectory-universality--grok-4-7--3",
+          "p_complete": 0.65,
+          "p_settle": 0.50,
+          "note": "Fitting Poisson stage-to-stage richness transitions to compare linear diversity-dependent extinction against constant rates is computationally light once SQS curves are generated, testing the Red Queen mechanism specifically."
+        }
+      ]
+    },
+    {
+      "problem": "empty-shell-morphospace",
+      "p_solved_30d": 0.35,
+      "p_solved_365d": 0.65,
+      "rationale": "The swarm has the `morpholib` pipeline, simulation tools, and Lean 4 to formalize geometric self-intersection boundaries (`D = 1/W`) and test occupancy models on held-out molluscan families. However, the main bottleneck is data acquisition and 3D processing: automatically extracting accurate coiling axes and Raup parameters `(W, D, T)` from disparate MorphoSource meshes and iDigBio images across enough families to beat a phylogenetic random walk is error-prone. Note that `p_solved_30d` (0.35) is below the `p_complete * p_settle` of `grok-4-7--1` (0.60) and `claude-opus-5-5--3` (0.42) because those approaches only settle the mathematical/developmental boundary piece (`D = 1/W`), whereas solving the problem requires the empirical held-out museum-shell data test as well. Demonstrating automated spiral fitting with high inter-method reliability on an initial batch of 30–100 open meshes would substantially increase confidence in a 30-day solution.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "empty-shell-morphospace--claude-opus-5-5--1",
+          "p_complete": 0.30,
+          "p_settle": 0.60,
+          "note": "Curating and fitting 3D/2D spirals across 500 species and 50 families with RMSE under 3% is a major data-pipeline hurdle in 30 days, though hitting the phylogenetic random-walk falsifier on a qualifying set would still settle the test."
+        },
+        {
+          "approach": "empty-shell-morphospace--claude-opus-5-5--2",
+          "p_complete": 0.55,
+          "p_settle": 0.50,
+          "note": "Generating synthetic shell meshes across a `(W, D, T)` grid and computing volume economy, hydrostatic stability, and linear-elastic crushing resistance is feasible, but the Pareto front may be too broad or load-case sensitive to carve out the empty space."
+        },
+        {
+          "approach": "empty-shell-morphospace--claude-opus-5-5--3",
+          "p_complete": 0.65,
+          "p_settle": 0.65,
+          "note": "Proving the `D = 1/W` whorl-touching and penetration conditions in Lean 4 and sampling an aperture-growth ODE model are well-suited to the swarm's formal and computational capabilities for defining the constructional and developmental surfaces."
+        },
+        {
+          "approach": "empty-shell-morphospace--gpt-5-6-sol--1",
+          "p_complete": 0.20,
+          "p_settle": 0.65,
+          "note": "Requiring 1,000 openly digitized adult shells across 100 genera plus 100 manual measurements with ICC above 0.9 makes completion within 30 days unlikely."
+        },
+        {
+          "approach": "empty-shell-morphospace--gpt-5-6-sol--2",
+          "p_complete": 0.45,
+          "p_settle": 0.50,
+          "note": "Evaluating self-intersection and mechanical stress over a million-point lattice is computationally doable with coarse-to-fine refinement, though mechanically feasible empty regions may still require phylogenetic or developmental explanation."
+        },
+        {
+          "approach": "empty-shell-morphospace--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.80,
+          "note": "Deriving and proving the planispiral (`T = 0`) circle disjointness inequality in Lean 4 is a clean algebraic geometry task that reliably settles the planispiral constructional boundary."
+        },
+        {
+          "approach": "empty-shell-morphospace--grok-4-7--2",
+          "p_complete": 0.50,
+          "p_settle": 0.60,
+          "note": "Setting a realistic floor of 30 species on MorphoSource meshes and explicitly counting a phylogenetic-GP win as hitting the problem's falsifier makes this the most attainable end-to-end data test."
+        },
+        {
+          "approach": "empty-shell-morphospace--grok-4-7--3",
+          "p_complete": 0.65,
+          "p_settle": 0.50,
+          "note": "Gridding `(W, D, T)` at the resolution of Raup's figures to test self-intersection is easy to code, though its completion depends on having the measured mesh coordinates from the companion approach."
+        }
+      ]
+    },
+    {
+      "problem": "somite-number-control",
+      "p_solved_30d": 0.45,
+      "p_solved_365d": 0.70,
+      "rationale": "The swarm can compile published segmentation-clock periods and presomitic mesoderm (PSM) elongation durations for the handful of model vertebrates studied in live imaging (zebrafish, medaka, chick, mouse, corn snake, plus in vitro mammalian systems), test the predicted somite counts against museum/literature vertebral counts, and compute a phylogenetic value-of-information ranking across FishBase and Open Tree. The fundamental blocker is external data scarcity: fewer than about 6–8 species have independent live-imaging measurements of both clock period and elongation duration, and the swarm has no wet lab to measure more. Note that `p_solved_30d` (0.45) is below `grok-4-7--2`'s `p_complete * p_settle` (0.56) because `grok-4-7--2` only produces the second acceptance criterion (the unmeasured-species variance-reduction ranking) and does not test the clock-ratio mechanism itself. A careful literature extraction that identifies at least 6 qualifying species with independent vertebral counts alongside the phylogenetic ranking would meet both acceptance criteria.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "somite-number-control--claude-opus-5-5--1",
+          "p_complete": 0.65,
+          "p_settle": 0.55,
+          "note": "Compiling published τ and PSM dynamics for 5–8 species and ranking unmeasured taxa by expected variance reduction addresses both acceptance criteria, though temperature mismatches or having fewer than 5 species with full PSM rates could leave the test underpowered."
+        },
+        {
+          "approach": "somite-number-control--claude-opus-5-5--2",
+          "p_complete": 0.55,
+          "p_settle": 0.55,
+          "note": "Proving the exponential-decay PSM balance closed form and elasticity in Lean 4 is tractable, and leave-one-out fitting across the four Gomez et al. species is a sharp test despite figure-digitization noise."
+        },
+        {
+          "approach": "somite-number-control--claude-opus-5-5--3",
+          "p_complete": 0.50,
+          "p_settle": 0.40,
+          "note": "Comparing Arrhenius thermal sensitivities of clock and elongation against fish meristic rearing experiments is clever, but very few species have both clock Q10 and vertebral-plasticity measurements."
+        },
+        {
+          "approach": "somite-number-control--gpt-5-6-sol--1",
+          "p_complete": 0.60,
+          "p_settle": 0.30,
+          "note": "The literature search will likely complete by hitting the pre-registered failure signature of fewer than 10–15 species having direct live-imaging measurements of both clock period and somitogenesis duration."
+        },
+        {
+          "approach": "somite-number-control--gpt-5-6-sol--2",
+          "p_complete": 0.65,
+          "p_settle": 0.50,
+          "note": "Running Sobol sensitivity and profile-likelihood identifiability on a delayed-oscillator wavefront model is purely computational and produces a clear ranking of discriminating perturbations."
+        },
+        {
+          "approach": "somite-number-control--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.50,
+          "note": "Testing `N = T_elongation / T_clock` with a 25% tolerance and a 6-species floor is quick to execute from literature tables, though hovering near the 6-species threshold risks an underpowered call."
+        },
+        {
+          "approach": "somite-number-control--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.70,
+          "note": "Using FishBase vertebral counts and the Open Tree vertebrate phylogeny to rank unmeasured species by posterior variance reduction is self-contained and directly satisfies the second acceptance criterion."
+        },
+        {
+          "approach": "somite-number-control--grok-4-7--3",
+          "p_complete": 0.65,
+          "p_settle": 0.55,
+          "note": "Calibrating a delayed-coupling phase oscillator on zebrafish and predicting chick, mouse, and corn snake without refitting is a clean computational test that can quickly falsify simple parameter-transfer assumptions."
+        }
+      ]
+    },
+    {
+      "problem": "murrays-law-vascular-optimality",
+      "p_solved_30d": 0.60,
+      "p_solved_365d": 0.85,
+      "rationale": "Open retinal vessel segmentations (DRIVE, HRF), 3D vascular centerlines (VesSAP, Vascular Model Repository), and published xylem tables (McCulloh et al. 2003) are readily accessible, and the companion Lean 4 derivations of Poiseuille and Blasius junction exponents are straightforward calculus. The primary technical risk is that pixel-discretization noise in 2D retinal images biases nonlinear root-finding for `r_0^x = r_1^x + r_2^x` unless large vessels are filtered and errors-in-variables are calibrated on synthetic trees. Note that `p_solved_30d` (0.60) is below the `p_complete * p_settle` of the Lean formalization approaches (`grok-4-7--1` at 0.72, `gpt-5-6-sol--2` at 0.70, `claude-opus-5-5--2` at 0.68) because those only prove the theoretical cost-minimization piece, whereas solving the problem requires the empirical test across at least three vascular datasets. Combining the synthetic-tree noise calibration with multi-tissue hierarchical estimation gives a strong 0.60 chance of full resolution in 30 days.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "murrays-law-vascular-optimality--claude-opus-5-5--1",
+          "p_complete": 0.65,
+          "p_settle": 0.70,
+          "note": "Estimating bifurcation exponents across DRIVE, HRF, VesSAP, coronary tables, and McCulloh xylem data with calibrated errors-in-variables directly satisfies all acceptance criteria."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--claude-opus-5-5--2",
+          "p_complete": 0.80,
+          "p_settle": 0.85,
+          "note": "Proving the cubic laminar law, 7/3 Blasius turbulent law, and load-bearing deviation in Lean 4 requires only single-variable calculus and `rpow` algebra already well-supported in Mathlib."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--claude-opus-5-5--3",
+          "p_complete": 0.70,
+          "p_settle": 0.70,
+          "note": "Generating synthetic vascular trees and rendering them through 2D and 3D blur/PSF models cleanly establishes the minimum vessel diameter in pixels needed to separate exponent 3 from 7/3."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--gpt-5-6-sol--1",
+          "p_complete": 0.55,
+          "p_settle": 0.65,
+          "note": "Fitting a specimen-held-out errors-in-variables model across at least 500 bifurcations per modality is feasible if open 3D vascular graphs and xylem tables meet the sample-size floor."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--gpt-5-6-sol--2",
+          "p_complete": 0.82,
+          "p_settle": 0.85,
+          "note": "Formalizing the generalized `r^-k` resistance and volume-maintenance optimization in Lean 4 is a well-bounded mathematical task with high probability of a no-sorry proof."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.85,
+          "note": "Deriving the `(b + 2) / a` junction exponent and the cubic special case in Lean 4 is elementary algebra and calculus that the swarm's formalization tools handle reliably."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--grok-4-7--2",
+          "p_complete": 0.75,
+          "p_settle": 0.65,
+          "note": "Extracting centerlines and branch points from DRIVE, HRF, and the Vascular Model Repository is very tractable, though uncalibrated errors-in-variables could widen the pooled interval enough to include both 7/3 and 3."
+        },
+        {
+          "approach": "murrays-law-vascular-optimality--grok-4-7--3",
+          "p_complete": 0.70,
+          "p_settle": 0.60,
+          "note": "Regressing retinal junction exponents on log parent radius is easy to run, and the explicit stop rule if McCulloh's 2003 tables lack raw branch-point radii guarantees a clean completion."
+        }
+      ]
+    },
+    {
+      "problem": "morphogenesis-cognition-gene-overlap",
+      "p_solved_30d": 0.72,
+      "p_solved_365d": 0.90,
+      "rationale": "This problem is ideally matched to the swarm's existing tools: `indra-cogex` is live via MCP, GO and HPO annotations are directly queryable, and the repo already has a baseline test on `levin-2022-tame-19` that only needs to be upgraded with a pleiotropy-, publication-count-, and degree-matched permutation null plus ion-channel and gap-junction subset analyses. The main technical pitfall is over-stratification when matching simultaneously on GO depth, publication count, and expression breadth, which can be avoided via propensity scoring or coarser decile strata. Running any of the matched permutation approaches on INDRA CoGEx will almost certainly settle the question within 30 days.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--1",
+          "p_complete": 0.82,
+          "p_settle": 0.75,
+          "note": "Querying INDRA CoGEx for experimental GO/HPO annotations and running 100,000 stratified permutations across all genes and the bioelectric subset directly satisfies every acceptance criterion."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--2",
+          "p_complete": 0.70,
+          "p_settle": 0.60,
+          "note": "Testing morphological versus behavioural phenotypes in systematic IMPC mouse knockouts avoids literature-curation bias, though IMPC behavioural assays mostly measure activity/anxiety rather than learning per se."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--3",
+          "p_complete": 0.78,
+          "p_settle": 0.65,
+          "note": "Computing Menche network separation `s_AB` on the INDRA causal graph with degree-preserving randomization and top-1% hub removal is a strong mechanistic complement to set overlap."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--1",
+          "p_complete": 0.78,
+          "p_settle": 0.75,
+          "note": "Using propensity-score matching on annotation count, publication count, PPI degree, and gene length in both human and mouse prevents empty-stratum issues while rigorously testing the full and bioelectric sets."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--2",
+          "p_complete": 0.55,
+          "p_settle": 0.60,
+          "note": "Filtering out cross-domain papers by PMID and running 10,000 constrained network rewires on INDRA statement subgraphs is more complex to implement but controls well for review-article leakage."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.78,
+          "note": "Matching `GO:0009653` and `GO:0007611` on GO annotation count and INDRA degree with primary endpoints for `GO:0005216` and `GO:0005921` is concise, reproducible, and maps one-to-one onto the problem's acceptance criteria."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.65,
+          "note": "Counting high-evidence (`>= 5`) INDRA statements across the morphogenesis–learning cut against degree-preserving random bipartitions is fast to run via Cypher and tests mechanistic wiring directly."
+        },
+        {
+          "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--3",
+          "p_complete": 0.75,
+          "p_settle": 0.55,
+          "note": "Restricting GO annotations to pre-2015 assignment dates (with an explicit stop rule if dates are unavailable) cleanly tests whether any overlap predates recent TAME-inspired curation."
+        }
+      ]
+    },
+    {
+      "problem": "bioelectric-prepattern-predicts-anatomy",
+      "p_solved_30d": 0.25,
+      "p_solved_365d": 0.52,
+      "rationale": "Testing whether a measured Vmem pattern quantitatively predicts anatomical outcome on held-out perturbations requires both a calibrated bioelectric simulator (such as BETSE) and a corpus of Vmem images linked to outcomes. The severe bottleneck for the swarm is data availability: published papers typically show a few representative uncalibrated dye-intensity figures per condition rather than specimen-level raw image stacks paired with individual anatomical outcomes, and `frontier_simulate` only offers bounded previews. Note that `p_solved_30d` (0.25) is slightly below `grok-4-7--3`'s `p_complete * p_settle` (0.32) and `claude-opus-5-5--3`'s (0.27) because those approaches only test a 2-summary identifiability collision or penetrance meta-regression rather than the full simulation-plus-decoder acceptance criteria. Discovering an open repository of specimen-level DiBAC image stacks or logging a calibrated BETSE + leave-one-study-out decoder would significantly raise these probabilities.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--1",
+          "p_complete": 0.45,
+          "p_settle": 0.35,
+          "note": "Harvesting open-access DiBAC/CC2-DMPE figures for leave-one-study-out decoding is doable, but group-representative figures and uncalibrated dye intensities are likely to trigger the data-unavailable failure signature."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--2",
+          "p_complete": 0.40,
+          "p_settle": 0.45,
+          "note": "Calibrating a local BETSE planarian model on three conditions to predict at least 10 held-out perturbations is scientifically sound, though finding 10 perturbations with unambiguous molecular parameterization in BETSE is challenging."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--3",
+          "p_complete": 0.60,
+          "p_settle": 0.45,
+          "note": "A random-effects meta-regression of phenotype penetrance on standardized Vmem shift from published tables/figures is much more tractable than raw image decoding, though it tests graded correlation rather than spatial decoding."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--1",
+          "p_complete": 0.20,
+          "p_settle": 0.50,
+          "note": "Requiring at least 200 specimen-linked raw Vmem maps and 30 specimens per held-out intervention class exceeds what is publicly archived in supplementary files."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--2",
+          "p_complete": 0.15,
+          "p_settle": 0.50,
+          "note": "Fitting a conductance-level tissue simulator via simulation-based inference to predict both spatial Vmem (`r > 0.7`) and anatomy across unseen channel/pump interventions is a long shot without longitudinal single-specimen data."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--1",
+          "p_complete": 0.65,
+          "p_settle": 0.35,
+          "note": "Restricting to published figures in three named papers with a 20-experiment minimum and an explicit underpowered stop rule makes the run easy to complete, though it will likely stop as underpowered."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--2",
+          "p_complete": 0.50,
+          "p_settle": 0.45,
+          "note": "Running BETSE at published 2016 default parameters on two pre-named perturbations from Durant et al. 2017 is well-scoped, though testing only two conditions gives limited statistical power."
+        },
+        {
+          "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--3",
+          "p_complete": 0.70,
+          "p_settle": 0.45,
+          "note": "Proving the trivial summary-collision lemma in Lean 4 is immediate, and finding two published figures with matching coarse dipole/domain summaries but different phenotypes can refute simple 2-feature decoders."
+        }
+      ]
+    },
+    {
+      "problem": "grn-memory-generic-or-biological",
+      "p_solved_30d": 0.62,
+      "p_solved_365d": 0.86,
+      "rationale": "This problem is purely computational and uses open SBML models from BioModels plus the published protocol of Biswas et al. 2021, making it highly tractable for the swarm within 30 days. The main blocker is faithfully reproducing at least 80–90% of the original paper's per-model memory calls from the published stimulus schedules and thresholds before generating the 350+ matched random ODE networks. Once the reproduction step is verified with `libRoadRunner` or `libsbml`, running the matched random-network ensemble and topology/parameter surgery arms will decisively settle whether pathway memory is enriched beyond generic nonlinear dynamics.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "grn-memory-generic-or-biological--claude-opus-5-5--1",
+          "p_complete": 0.72,
+          "p_settle": 0.80,
+          "note": "Reimplementing the Biswas protocol with `libRoadRunner` on the 35 BioModels and 350 random networks matched on degree, kinetic forms, parameters, and steady-state stability directly satisfies the problem's acceptance criteria."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--claude-opus-5-5--2",
+          "p_complete": 0.70,
+          "p_settle": 0.70,
+          "note": "Perturbing the 35 SBML models via degree-preserving edge swaps, parameter shuffling, and Hill-to-Michaelis–Menten replacement cleanly isolates whether cooperativity or wiring drives memory retention."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.65,
+          "note": "Proving the linear exponential-relaxation bound in Lean 4 and classifying models by slowest eigenvalue and CRNT deficiency provides a strong theoretical explanation, though non-mass-action kinetics limit CRNT coverage."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--gpt-5-6-sol--1",
+          "p_complete": 0.65,
+          "p_settle": 0.80,
+          "note": "Generating 3,500 stiffness- and degree-matched convergent null networks and fitting a model-paired conditional logistic regression is a rigorous, high-powered test once the 80% reproduction bar is met."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--gpt-5-6-sol--2",
+          "p_complete": 0.45,
+          "p_settle": 0.65,
+          "note": "Sweeping 10,000 parameter sets across all signed 3- and 4-node motifs and performing targeted edge ablations in the 35 BioModels is computationally heavier and may find context-dependent motif effects."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.78,
+          "note": "Matching 350 random networks on node count, reaction count, kinetic family, and empirical parameter magnitudes with a paired permutation test is straightforward to implement and directly tests the problem's falsifier."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--grok-4-7--2",
+          "p_complete": 0.68,
+          "p_settle": 0.75,
+          "note": "Crossing fixed-topology parameter redraws against degree-preserving rewires with fixed parameters across 350 networks per arm cleanly separates topological from kinetic contributions."
+        },
+        {
+          "approach": "grn-memory-generic-or-biological--grok-4-7--3",
+          "p_complete": 0.35,
+          "p_settle": 0.60,
+          "note": "While proving in Lean 4 that linear ODEs cannot habituate by superposition is easy, formally proving peak-decrement and recovery inequalities for a forced nonlinear 3-ODE system over an open parameter set is difficult in Lean."
+        }
+      ]
+    },
+    {
+      "problem": "active-inference-morphogenesis-falsifiable",
+      "p_solved_30d": 0.45,
+      "p_solved_365d": 0.72,
+      "rationale": "The problem requires deriving a quantitative prediction from a frozen generative model (such as Friston et al. 2015) and testing it on published planarian or Xenopus regeneration time courses, or proving that unpinned degrees of freedom allow every candidate prediction to be rescued post hoc. The swarm can readily prove the finite complete-class tautology and fixed-target non-identity theorems in Lean 4, and combine them with a reimplementation of the 2015 simulation tested against published planarian fragment-size curves or Xenopus organ-remodelling trajectories. Note that `p_solved_30d` (0.45) is slightly below the `p_complete * p_settle` of `claude-opus-5-5--1` (0.51) and `grok-4-7--2` (0.47) because those approaches settle the formal falsifiability criterion in Lean without executing the empirical regeneration time-course test required by the second acceptance criterion. Extracting quantitative regeneration time series across at least four fragment classes or developmental stages would move the 30-day probability higher.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--1",
+          "p_complete": 0.78,
+          "p_settle": 0.65,
+          "note": "Proving a finite complete-class theorem and a fixed-model separating trajectory over finite types in Lean 4 is very tractable and settles the formal conditions under which active-inference claims have empirical content."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--2",
+          "p_complete": 0.50,
+          "p_settle": 0.60,
+          "note": "Reimplementing the Friston et al. 2015 simulation to derive graded-excision recovery envelopes and testing them against published planarian fragment-size data meets both acceptance criteria, including if the envelope proves too wide to exclude any monotone curve."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.50,
+          "note": "Testing whether organ-correction velocity in 'Picasso' Xenopus tadpoles is proportional to displacement from published figures is a clean empirical test, though shared with non-inferential potential-gradient models."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--1",
+          "p_complete": 0.35,
+          "p_settle": 0.55,
+          "note": "Calibrating a full generative model on unperturbed planarian regeneration and predicting median times and failure rates across held-out perturbations is hampered by sparse specimen-level regeneration time series."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--2",
+          "p_complete": 0.68,
+          "p_settle": 0.65,
+          "note": "Fitting bounded active-inference models to synthetic reaction-diffusion, mechanical-relaxation, and random state-space trajectories is a self-contained computational test that directly measures universal-fit specificity."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--1",
+          "p_complete": 0.60,
+          "p_settle": 0.55,
+          "note": "Computing the Spearman rank correlation between initial variational free energy under the frozen 2015 target and published regeneration times across four or more planarian fragment classes is simple if quantitative times exist in the literature."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--2",
+          "p_complete": 0.72,
+          "p_settle": 0.65,
+          "note": "Formalizing in Lean 4 that an unconstrained target morphology trivially minimizes free energy while auditing whether unpinned parameters in the 2015 target flip cut rankings directly addresses the problem's falsifier."
+        },
+        {
+          "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--3",
+          "p_complete": 0.55,
+          "p_settle": 0.35,
+          "note": "Inspecting Kuchling et al. 2020 for a complete numerical parameter set and either simulating one held-out cut or stopping as non-operationalizable is easy to execute, though likely to stop on missing parameter values."
+        }
+      ]
+    }
+  ]
+}

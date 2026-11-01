@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered test: clock period and PSM dynamics versus vertebral counts" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/somite-number-control> ;
+    dct:description "Avoid the tautology. 'One somite per clock cycle' makes N = (duration of somitogenesis)/(period) trivially true, so the test must predict N from quantities measured independently of the count: the clock period τ, the rate at which the presomitic mesoderm (PSM) is replenished by the tailbud, and the PSM length at onset, which together determine when the PSM is exhausted (Gomez et al. 2008). Compile from time-lapse literature every species with τ and PSM dynamics measured: zebrafish, medaka, chick, mouse, corn snake, and human and other mammals from in vitro PSM systems (Matsuda et al. 2020), at stated temperatures. Predict total somite number N̂ from the Gomez-type balance model with parameters measured, not fitted. Compare with observed somite or vertebral counts from literature and museum data via the organisms layer (FishBase for fish vertebrae; Head and Polly 2015 for squamates). Pre-registered tolerance: supports if |N̂ − N|/N ≤ 15% in every species with complete data; refutes if > 30% in two or more." ;
+
+    delphi:proposedTest "Per-species predicted versus observed somite numbers within or outside the 15% tolerance for all species with independent measurements (n ≈ 5–8), plus a ranked list of species whose clock measurement would most reduce uncertainty: long-bodied fishes, caecilians, and snakes other than corn snake." ;
+    delphi:context "Fails if: Too few species have PSM dynamics measured independently of somite counts (n < 4), so the test is underpowered; or published measurements were taken at temperatures incompatible with the counts." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with the prediction formula, tolerance and admissible measurement types. 2. Compile τ, PSM length and elongation rates per species with temperature; record sources. 3. Compute N̂ and compare with observed counts. 4. Compute, for unmeasured species, the expected reduction in posterior uncertainty about the mechanism from measuring τ (value-of-information ranking), using the variance of predicted N across plausible τ." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Clock and PSM measurements exist for only a handful of species; the decisive species need new time-lapse experiments the swarm cannot perform." ;
+    skos:note "Tool: comparative-data" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch17-04> ;
+    rdfs:seeAlso <https://www.fishbase.se/> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14042> ;
+    rdfs:seeAlso <https://doi.org/10.1016/S0022-5193(76)80131-2> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature07020> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.aba7668> ;
+    rdfs:seeAlso <https://doi.org/10.1242/dev.063735> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14042> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/somite-number-control> a delphi:Concept, schema:Question ;
+    rdfs:label "What sets vertebrate somite number?" .
+
+  <https://www.fishbase.se/> dct:title "FishBase" ;
+    dct:description "Vertebral counts for fishes" .
+  <https://doi.org/10.1038/nature14042> dct:title "Head and Polly 2015 vertebral data (supplementary to the Nature article)" ;
+    dct:description "Squamate and amniote vertebral counts" .
+  <https://doi.org/10.1016/S0022-5193(76)80131-2> dct:title "A clock and wavefront model for control of the number of repeated structures during animal morphogenesis" ;
+    dct:bibliographicCitation "Cooke and Zeeman 1976, clock and wavefront" .
+  <https://doi.org/10.1038/nature07020> dct:title "Control of segment number in vertebrate embryos" ;
+    dct:bibliographicCitation "Gomez et al. 2008, Control of segment number in vertebrate embryos" .
+  <https://doi.org/10.1126/science.aba7668> dct:title "Species-specific segmentation clock periods are due to differential biochemical reaction speeds" ;
+    dct:bibliographicCitation "Matsuda et al. 2020, Species-specific segmentation clock periods" .
+  <https://doi.org/10.1242/dev.063735> dct:title "Patterning embryos with oscillations: structure, function and dynamics of the vertebrate segmentation clock" ;
+    dct:bibliographicCitation "Oates, Morelli and Soroldoni 2012, review of the segmentation clock" .
+  <https://doi.org/10.1038/nature14042> dct:title "Evolution of the snake body form reveals homoplasy in amniote Hox gene function" ;
+    dct:bibliographicCitation "Head and Polly 2015, snake body form and vertebral counts" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to somite-number-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.302Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to somite-number-control: Pre-registered test: clock period and PSM dynamics versus vertebral counts" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

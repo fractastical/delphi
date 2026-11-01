@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pleiotropy-matched overlap of morphogenesis and learning genes" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    dct:description "Pre-register human genes with GO:0009653 (anatomical structure morphogenesis) and GO:0007611 (learning or memory). Primary run excludes evidence code IEA; a second run includes it and is labeled. Background is human protein-coding genes. The statistic is the odds ratio of the intersection. The null is 10,000 permutations that preserve both set sizes and match genes on the number of GO annotations and on degree in the public INDRA statement graph. Wide overlap, the pre-registered threshold, is an odds ratio above 2 and a permutation p-value below 0.01. The same threshold is a primary endpoint, not a subgroup glance, for the subsets annotated with GO:0005216 (monoatomic ion channel activity; the synonym is ion channel activity) and with GO:0005921 (gap junction). Housekeeping is partly absorbed by the annotation-count match; it is not a separate covariate invented after the test." ;
+
+    delphi:proposedTest "Odds ratio above 2 and permutation p below 0.01 for the full sets and, separately, for the ion-channel subset and the gap-junction subset." ;
+    delphi:context "Fails if: The full-set odds ratio falls inside the matched null. That refutes wide overlap beyond pleiotropy and annotation volume. A hit that appears only in the IEA-included run is annotation noise and does not count." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze the two GO sets, the IEA rule, the odds-ratio threshold and the permutation scheme. 2. Pull annotations from Gene Ontology and degrees from INDRA. 3. Compute the observed odds ratio. 4. Run 10,000 matched permutations. 5. Apply the same test to the ion-channel and gap-junction subsets as primary endpoints." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: indra-cogex" ;
+    skos:note "Tool: gene-set-statistics" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://geneontology.org/> ;
+    rdfs:seeAlso <https://discovery.indra.bio/> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fnsys.2022.768201> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" .
+
+  <https://geneontology.org/> dct:title "Gene Ontology" ;
+    dct:description "Annotations for GO:0009653, GO:0007611, GO:0005216 and GO:0005921." .
+  <https://discovery.indra.bio/> dct:title "INDRA CoGEx" ;
+    dct:description "Statement degree used to match the permutation null." .
+  <https://doi.org/10.3389/fnsys.2022.768201> dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:bibliographicCitation "Levin 2022, Technological approach to mind everywhere, the overlap prediction" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to morphogenesis-cognition-gene-overlap, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.342Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to morphogenesis-cognition-gene-overlap: Pleiotropy-matched overlap of morphogenesis and learning genes" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

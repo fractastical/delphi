@@ -1,0 +1,81 @@
+{
+  "claim_id": "thompson1917-ch03-30",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "regenerated tail length (or area/volume) per individual tadpole at repeated times after amputation",
+    "time since amputation at each measurement, dense enough (daily or better) to estimate velocity after the early maximum",
+    "species, stage and temperature",
+    "amount of tail removed"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=tadpole%20tail%20regeneration&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:15:00Z", "method": "HEAD landing_url; GET BioStudies BioImages search for 'tadpole tail regeneration' and 'Xenopus regeneration'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["any time-lapse study of tadpole tail regrowth; no hit had tail regeneration in its title"],
+      "scope": "Archive portal; 89 and 48 hits respectively, all cryo-EM (EMPIAR) or unrelated cell-biology studies",
+      "evidence": "'tadpole tail regeneration' totalHits=89: EMPIAR-14067 (phage portal protein), EMPIAR-10505 (phage tail), S-BIAD748 (KIF3A tail domain)... 'Xenopus regeneration' totalHits=48: EMPIAR-11263 and nucleosome tomography sets from Xenopus egg extract. None is a regenerating-tail image series.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=tadpole%20tail%20regeneration%20length",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:15:00Z", "method": "GET /api/v2/search with 'tadpole tail regeneration length' and 'Xenopus regeneration tail'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["regenerated length vs time series for tadpoles"],
+      "scope": "General repository; Dryad's own search returned total=0 for both queries. Dryad DOIs surfaced via Zenodo's index concern lizard tail regeneration (10.5061/dryad.n6n6495, 10.5061/dryad.f7m0cfxv9), not tadpoles.",
+      "evidence": "Dryad API total=0 and total=0. Zenodo query '\"tail regeneration\" tadpole' type=dataset total=158, top hits lizard tail-loss datasets and tadpole ecology sets without regeneration measurements.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "figshare-30019333-chapman-xenopus-tail-regeneration",
+      "name": "Raw data for Figure 7: commensal skin bacteria and tail regeneration in Xenopus laevis tadpoles (Chapman et al., figshare)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.30019333.v2",
+      "access_url": "https://api.figshare.com/v2/articles/30019333",
+      "doi": "10.6084/m9.figshare.30019333.v2",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:18:00Z", "method": "GET figshare articles API (found via DataCite search)", "http_status": 200 },
+      "variables_present": [
+        "per-tadpole regeneration outcome at 1 week after amputation, four categories (full, partial good, partial bad, none) for 438 of 503 Xenopus laevis tadpoles",
+        "16S read proportions per tail"
+      ],
+      "variables_missing": ["regenerated length as a continuous variable", "repeated measurements through time (only a single 1-week endpoint)"],
+      "scope": "Xenopus laevis, one lab experiment, 503 tadpoles; files 'Supporting information Figure 7.xlsx' 68,108 bytes plus two .docx",
+      "evidence": "API JSON: title 'Raw data for Figure 7 in: Commensal skin bacteria ... promote tail regeneration in Xenopus laevis tadpoles', license CC BY 4.0, description states regeneration status at 1 week recorded per tadpole as FR/PG/PB/NR; files listed with sizes.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "tadpole tail regeneration", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=tadpole%20tail%20regeneration&pageSize=5", "hits": 89, "note": "no relevant hits in the first page (phage tails, kinesin tail domain)" },
+    { "source": "BioImage Archive", "query": "Xenopus regeneration", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Xenopus%20regeneration&pageSize=8", "hits": 48, "note": "egg-extract cryo-ET only" },
+    { "source": "Dryad", "query": "tadpole tail regeneration length", "url": "https://datadryad.org/api/v2/search?q=tadpole%20tail%20regeneration%20length&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "Xenopus regeneration tail", "url": "https://datadryad.org/api/v2/search?q=Xenopus%20regeneration%20tail&per_page=8", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "Xenopus tail regeneration length time, type=dataset", "url": "https://zenodo.org/api/records?q=Xenopus%20tail%20regeneration%20length%20time&type=dataset&size=6", "hits": 93177, "note": "loose matching; nothing on tadpole tail regrowth in top hits" },
+    { "source": "Zenodo", "query": "\"tail regeneration\" tadpole, type=dataset", "url": "https://zenodo.org/api/records?q=%22tail%20regeneration%22%20tadpole&type=dataset&size=8", "hits": 158, "note": "lizard tail regeneration (10.5061/dryad.n6n6495, 10.5061/dryad.f7m0cfxv9) and tadpole ecology sets; no regrowth time series" },
+    { "source": "DataCite", "query": "\"tail regeneration\" tadpole Xenopus, resource-type dataset", "url": "https://api.datacite.org/dois?query=%22tail%20regeneration%22%20tadpole%20Xenopus&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 5, "note": "figshare 10.6084/m9.figshare.30019333 (1-week categorical outcome) and 10.6084/m9.figshare.5131867 (supplementary figures to an IL-11 paper)" }
+  ],
+  "status": "gap",
+  "summary": "No repository dataset found with repeated regenerated-tail-length measurements over time in tadpoles; BioImage Archive and Dryad searches returned nothing relevant, and the only tadpole tail-regeneration data record located (figshare 30019333, CC BY) records a single categorical outcome at one week for 503 Xenopus laevis tadpoles, which cannot yield a velocity-versus-time curve.",
+  "next_step": "Compile daily regenerate-length series from paper figures/supplements (Xenopus laevis tail regeneration studies report length at 1,3,5,7 dpa in figures) or generate a dense time-lapse series; Thompson's own tabulated tadpole series (Ch. III) can be digitised from the book as a first dataset.",
+  "obstacles_confirmed": [
+    "Length-versus-time series are in individual papers, not a shared archive.",
+    "Few public series have dense enough time sampling to estimate velocity."
+  ]
+}

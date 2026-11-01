@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2023-competency-08--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2023-competency-08: refutes, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "In a re-implementation of the Shreesha & Levin (2023) evolvable-competency model, the correlation between genotypic and phenotypic fitness across the individuals of a population falls from high values to about zero within about 20 generations and stays there." ;
+    delphi:passCriterion "Pre-registered design: 30 repeats x 1000 generations (the evolvable-competency simulator of levin-2023-competency-07 with independent seeds). Primary statistic, as the claim states it ('for all individuals in these populations'): each generation, the Pearson correlation across the 100 individuals between genotypic and phenotypic fitness (undefined when phenotypic fitness is constant; such generations are excluded and counted), averaged over repeats. Pass if all of: mean r at generation 1 >= 0.5; mean r over generations 21-40 <= 0.1; mean r over generations 41-1000 <= 0.1." ;
+    delphi:failCriterion "Pre-registered: refutes if the mean r over generations 21-40 or over generations 41-1000 is >= 0.3. Anything else not meeting the pass criterion -> mixed. Reported but not entering the verdict: the authors' code statistic (Pearson correlation between the repeat-mean best genotypic and best phenotypic fitness curves within 10-generation bins, NaN set to 0) and the selection differential on genotypic fitness (mean genotypic fitness of the 10 selected parents minus the population mean)." ;
+    delphi:expectedObservation "Across-individual genotype-phenotype fitness correlation near 1 at the start, ~0 from about generation 20 onward." ;
+    delphi:disconfirmingObservation "A substantial positive correlation (>= 0.3) persisting after generation 20." ;
+    delphi:admissibleDatasets "Runs of the evolvable-competency model as described in the paper, with unspecified details from the authors' public code; seeds independent of the levin-2023-competency-07 test." ;
+    delphi:inferenceMethod "Per-generation across-individual Pearson r averaged over 30 repeats, window means over generations 21-40 and 41-1000 compared with thresholds 0.1 (pass) and 0.3 (fail)." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py runs 30 independent 1000-generation evolutions of the evolvable-competency model and, each generation, computes the Pearson correlation across the 100 individuals between genotypic and phenotypic fitness (generations with constant phenotypic fitness excluded), the authors' binned best-curve correlation, and the mean genotypic fitness of the 10 selected parents minus the population mean. Repeat-mean correlations over generations 21-40 and 41-1000 are compared with the pre-registered thresholds." ;
+    rdfs:comment "Measured: 0.2972 mean across-individual Pearson r between genotypic and phenotypic fitness, generations 41-1000, averaged over repeats (n = 30, SD across repeats of per-run generation-41-1000 mean r: 0.0138; fixed seed). Interpretation: Simulation-result claim, tested by replication. The claim's text says the correlation was computed 'for all individuals in these populations', so the primary statistic is the per-generation Pearson correlation across the 100 individuals between genotypic and phenotypic fitness (on the paper's 9^x/9 scale). The authors' Exp3 code instead correlates the repeat-mean best-genotypic and best-phenotypic curves within 10-generation bins and sets undefined values to 0; that statistic is reported as secondary. 'Disrupts the ability to select the best structural genes' is the authors' interpretation; the selection differential on genotypic fitness is reported as a descriptive check." ;
+    delphi:evidenceAgainst "This is a replication of a simulation, not an empirical test: it shows what follows from the stated model, not what real cellular competency does." ;
+    delphi:evidenceAgainst "Across individuals the correlation falls from 0.997 at generation 1 to about 0.3 by generation 3 and stays there: 0.311 over generations 21-40 and 0.297 over 41-1000 (per-run SD 0.014); it never reaches 0.1. The pre-registered fail rule triggers on the 21-40 window (>= 0.3); the 41-1000 window is just below 0.3, so the outcome is close to the refute/mixed boundary, but it is not near zero." ;
+    delphi:evidenceAgainst "The authors' own statistic reproduces the claim exactly (1.00 in the first bin, 0.00 in every later bin), but only because the best individual's phenotypic fitness is pinned at 1.0 in every run from generation 11 at the latest, so the within-bin correlation is undefined and their code sets it to 0. The reported drop to zero appears to be an artefact of that statistic rather than a loss of genotype-phenotype correlation in the population." ;
+    delphi:evidenceAgainst "The weaker conclusion holds: selection's differential on genotypic fitness drops from 0.018 (generations 1-10) to 0.0015 (41-1000), and best genotypic fitness stays at 0.53, so selection does little to improve structural genes once competency is high. The residual 0.3 correlation is presumably carried by mutants whose competency or structural genes leave them short of fitness 1.0; this was not decomposed." ;
+    delphi:evidenceAgainst "156 of 30,000 run-generations had constant phenotypic fitness and were excluded from the primary statistic." ;
+    delphi:evidenceAgainst "The repository was restructured while this test ran (claim-tests/ moved to test-data/claim-tests/, books/ to claim-sources/); the pre-registered planned_datasets keep the old paths." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-08/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Evolvable-competency runs of the Shreesha & Levin (2023) model, 30 repeats x 1000 generations, seeds independent of levin-2023-competency-07 (generated by analysis.py)" ;
+    dct:description "per-generation across-individual genotype-phenotype fitness correlation, best-fitness curves and selection differential; curves in derived/correlation_curves.json" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Shreesha L, Levin M (2023) Cellular Competency during Development Alters Evolutionary Dynamics in an Artificial Embryogeny Model. Entropy 25(1):131" ;
+    dct:description "model specification (Sections 2-3, Discussion); full text vendored in claim-sources/levin-papers/inputs/2023-competency.txt" ;
+    prov:wasDerivedFrom <https://doi.org/10.3390/e25010131> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-08--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Authors' simulation code for Shreesha & Levin (2023), CellularCompetency" ;
+    dct:description "unspecified evolvable-competency details and the authors' correlation statistic; not imported" ;
+    delphi:hasChecksum "sha256:55ad59da900e896f2b59b153c8dcdfe9371d0c3f01a8fc5ba3638a430badc1d6" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/core_functions.py> ;
+    delphi:hasChecksum "sha256:b172cf3b2d5858636156156730ba710e5972eba0c38f5a5460021d7717890ec9" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/Exp3-EvolvableCompetency.py> ;
+    prov:wasDerivedFrom <https://github.com/Niwhskal/CellularCompetency> ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/levin-2023-competency-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2023-competency-08--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-08/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.962Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2023-competency-08: refutes, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2023-competency-08--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

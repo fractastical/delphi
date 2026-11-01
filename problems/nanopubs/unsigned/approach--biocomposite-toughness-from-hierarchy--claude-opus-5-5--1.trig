@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered meta-regression of toughness enhancement over a constituent-only bound" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Build a provenanced table of at least 40 records across at least five families (nacre, bone by site, dentin, enamel, antler, crustacean cuticle, sponge spicule) from primary papers cited in the Wegst 2015, Launey and Ritchie 2009, Barthelat 2016 and Ritchie 2011 reviews. Fix the toughness metric first: crack-initiation toughness K_IC and, separately, the maximum crack-growth toughness from J-R curves converted to K_J = sqrt(J E'), because hierarchy acts mostly on extrinsic crack-growth toughening and pooling the two would blur the effect. The constituent-only null is an energy mixing law G_mix = phi G_mineral + (1 - phi) G_organic with E from the Voigt-Reuss average, K_mix = sqrt(E_mix G_mix). The enhancement metric is log(K / K_mix). Regress it on platelet or fibril aspect ratio, mineral volume fraction, interface compliance proxy (organic layer thickness over platelet thickness) and the number of hierarchical levels counted by a written rule (a level counts only if it has its own characteristic length differing by at least a factor 5 from adjacent levels and its own documented deformation mechanism), with family as random effect. Validate by leave-one-family-out prediction." ;
+
+    delphi:proposedTest "Leave-one-family-out RMSE of the architecture model at least 25% lower than the constituent-only null on log enhancement, and the level coefficient positive with 95% CI excluding 0 after controlling for volume fraction (compounding supported), or not (compounding refuted)." ;
+    delphi:context "Fails if: Fewer than five families with both toughness and descriptors from comparable test methods; level counts that change under reasonable alternative counting rules (sensitivity analysis flips the sign); or measurement method (specimen size, hydration) explaining more variance than any structural descriptor." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register metric definitions, extraction rules, the level-counting rule, the model and the pass thresholds in test-data/claim-tests. 2. Extract records with page and table provenance; two independent agents per record, discrepancies adjudicated. 3. Compute K_mix from constituent values reported in the same paper where possible, else from a fixed reference table of mineral and collagen/chitin properties stated in advance. 4. Fit mixed models: null (intercept only, i.e. constituents explain toughness up to a constant), architecture model, levels model; compare by leave-one-family-out RMSE. 5. Test monotonicity of enhancement in levels with an isotonic regression versus a flat model, controlling for volume fraction." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Interface compliance and constituent toughness are rarely measured in the same study as composite toughness; hydration state and test geometry differ between papers and cannot be harmonized without new measurements." ;
+    skos:note "Tool: literature-extraction" ;
+    skos:note "Tool: r-lme4" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1002/adma.200803322> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nmat4089> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nmat3115> ;
+    rdfs:seeAlso <https://doi.org/10.1038/natrevmats.2016.7> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.pmatsci.2007.06.001> ;
+    rdfs:seeAlso <https://doi.org/10.1080/14786430410001680935> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1002/adma.200803322> dct:title "On the Fracture Toughness of Advanced Materials" ;
+    dct:bibliographicCitation "Launey and Ritchie 2009, On the fracture toughness of advanced materials" .
+  <https://doi.org/10.1038/nmat4089> dct:title "Bioinspired structural materials" ;
+    dct:bibliographicCitation "Wegst et al. 2015, Bioinspired structural materials" .
+  <https://doi.org/10.1038/nmat3115> dct:title "The conflicts between strength and toughness" ;
+    dct:bibliographicCitation "Ritchie 2011, The conflicts between strength and toughness" .
+  <https://doi.org/10.1038/natrevmats.2016.7> dct:title "Structure and mechanics of interfaces in biological materials" ;
+    dct:bibliographicCitation "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials" .
+  <https://doi.org/10.1016/j.pmatsci.2007.06.001> dct:title "Nature’s hierarchical materials" ;
+    dct:bibliographicCitation "Fratzl and Weinkamer 2007, Nature's hierarchical materials" .
+  <https://doi.org/10.1080/14786430410001680935> dct:title "The mechanical efficiency of natural materials" ;
+    dct:bibliographicCitation "Wegst and Ashby 2004, The mechanical efficiency of natural materials" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.308Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Pre-registered meta-regression of toughness enhancement over a constituent-only bound" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

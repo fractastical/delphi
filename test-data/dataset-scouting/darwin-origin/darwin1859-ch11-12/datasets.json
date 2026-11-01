@@ -1,0 +1,246 @@
+{
+  "claim_id": "darwin1859-ch11-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "dated molecular phylogenies of North American and European (Eurasian) sister temperate lineages (divergence times)",
+    "ancestral area reconstruction or high-latitude fossil occurrences of the same lineages",
+    "Pliocene (and neighbouring epochs) fossil occurrences with high-latitude coordinates",
+    "modern distributions on both continents"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?interval=Pliocene&latmin=60&limit=1&rowcount",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:24Z",
+        "method": "GET occs/list.json with rowcount (2026-11-01T08:04:30-33Z)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Pliocene occurrences: 109,350 in total, 171 with latitude >= 60 (51 with longitude -180 to -60, 104 with longitude -30 to 60)"
+      ],
+      "variables_missing": [
+        "divergence times",
+        "sister-lineage assignment between continents"
+      ],
+      "scope": "All taxa; Pliocene interval as named in PBDB",
+      "evidence": "rowcount responses: Pliocene all 109350; latmin=60 -> 171; plus lngmin/lngmax windows -> 51 and 104. Sample record: Hypolagus, eag 4.7, lag 1.4.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nuccore, E-utilities)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Carex%5BOrganism%5D&rettype=count&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:42Z",
+        "method": "GET landing; GET nuccore esearch count for Carex (a Holarctic genus)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "sequence data (Carex: 73,246 records)"
+      ],
+      "variables_missing": [
+        "divergence times",
+        "curated sister-clade sets"
+      ],
+      "scope": null,
+      "evidence": "esearch db=nuccore Carex[Organism] count \"73246\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF (occurrence API)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?limit=0&continent=EUROPE&taxonKey=2721893",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:04:38Z",
+        "method": "GET occurrence/search limit=0 with continent filters (API 200); web landing returned 403 (Cloudflare) at 05:10:46Z",
+        "http_status": 200,
+        "note": "web landing 403; API fine"
+      },
+      "variables_present": [
+        "modern occurrences by continent (Carex, taxonKey 2721893: EUROPE 11,804,177; NORTH_AMERICA 1,086,222)"
+      ],
+      "variables_missing": [
+        "divergence times",
+        "fossil data"
+      ],
+      "scope": null,
+      "evidence": "occurrence/search counts as given; species/match name=Carex -> usageKey 2721893, GENUS, Cyperaceae.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "powo",
+      "name": "Plants of the World Online (Kew)",
+      "landing_url": "https://powo.science.kew.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:46Z",
+        "method": "GET landing and GET /api/2/search?q=Carex (second request also 403, 08:04:39Z)",
+        "http_status": 403
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not inspect"
+      ],
+      "scope": null,
+      "evidence": "Both requests returned a Cloudflare \"Just a moment...\" page with HTTP 403.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://www.timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing and /downloads (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "published divergence times between taxon pairs (5,072 studies, 208,740 species per landing page)"
+      ],
+      "variables_missing": [
+        "list of North America-Europe sister clades"
+      ],
+      "scope": null,
+      "evidence": "Landing text: \"5,072 Studies 208,740 Species\"; /downloads titled \"Downloads for researchers\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-02v6wwq0w-cornus",
+      "name": "Data from: Phylogenomics, biogeography, and evolution of the blue- or white-fruited dogwoods",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.02v6wwq0w",
+      "access_url": null,
+      "doi": "10.5061/dryad.02v6wwq0w",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:50Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 18798797846
+      },
+      "variables_present": [
+        "RAD-seq, morphology, fossils, niche and biogeographic history for one Holarctic clade (per abstract)"
+      ],
+      "variables_missing": [
+        "one clade",
+        "size 18.8 GB reported by API; not downloadable here"
+      ],
+      "scope": "Cornus blue/white-fruited clade",
+      "evidence": "API abstract: \"we combined data from RAD-seq, morphology, fossils, and ecological niche to understand species relationships, biogeographic history ...\"; storageSize 18798797846.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-7b87b-ranunculus-glacialis",
+      "name": "Data from: The extreme disjunction between Beringia and Europe in Ranunculus glacialis s. l.",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.7b87b",
+      "access_url": null,
+      "doi": "10.5061/dryad.7b87b",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:50Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 490221
+      },
+      "variables_present": [
+        "plastid and nuclear marker data on a Beringia-Europe disjunct arctic-alpine plant"
+      ],
+      "variables_missing": [
+        "single species complex"
+      ],
+      "scope": "Ranunculus glacialis s. l.",
+      "evidence": "API title as given; abstract says it is distributed in temperate European mountains and shows disjunction between the North Atlantic Arctic and Beringia; storage 490221 B.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB",
+      "query": "Pliocene occurrences, latitude >= 60",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?interval=Pliocene&latmin=60&limit=1&rowcount",
+      "hits": 171
+    },
+    {
+      "source": "GBIF",
+      "query": "Carex occurrences by continent",
+      "url": "https://api.gbif.org/v1/occurrence/search?limit=0&continent=NORTH_AMERICA&taxonKey=2721893",
+      "hits": 1086222
+    },
+    {
+      "source": "Dryad",
+      "query": "Beringian disjunct sister species North America Eurasia divergence time",
+      "url": "https://datadryad.org/api/v2/search?q=Beringian+disjunct+sister+species+North+America+Eurasia+divergence+time&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "divergence time North America Europe disjunct temperate sister lineages Beringia dated phylogeny",
+      "url": "https://zenodo.org/api/records?q=divergence+time+North+America+Europe+disjunct+temperate+sister+lineages+Beringia+dated+phylogeny&size=8",
+      "hits": 974805,
+      "note": "top hits are single-clade Dryad deposits (Cornus, Quercus, Ranunculus glacialis, Campanula); no multi-clade compilation seen"
+    },
+    {
+      "source": "TimeTree",
+      "query": "downloads page",
+      "url": "https://www.timetree.org/downloads",
+      "hits": 1,
+      "note": "page text only; no clade list"
+    }
+  ],
+  "status": "partial",
+  "summary": "High-latitude Pliocene fossils (PBDB: 171 occurrences at latitude 60 or higher), modern ranges (GBIF) and per-clade phylogeographic deposits (Dryad) exist, but no compilation of dated North America-Europe sister clades was found; TimeTree holds pairwise dates without a ready clade list.",
+  "next_step": "Define a list of disjunct sister pairs (e.g. from published biogeography reviews), pull their TimeTree or Dryad dates, and pre-register a comparison against the Pliocene boundaries.",
+  "obstacles_confirmed": [
+    "Clock dates for the same clade often span more than the Pliocene.",
+    "Dated phylogenies are deposited clade by clade, not as one table."
+  ]
+}

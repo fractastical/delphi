@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" ;
+    dct:description "For a stated load case (compression of a block, three-point bending, femoral-head loading), does a lattice whose struts follow the computed principal stress trajectories carry more load or absorb more energy before failure than a uniform lattice of equal mass and equal strut count, when both are made by the same stereolithography process? How large is the gain, and does it survive print-process variability?" ;
+
+    skos:historyNote "Known state: Thompson (1917, ch. 16) argues that trabeculae follow stress trajectories because that arrangement avoids shear. Topology and computational-morphogenesis methods produce stress-following structures at very high resolution (Aage et al. 2017), and the non-optimality of Michell structures under realistic constraints has been discussed (Sigmund 2016). Natural materials are compared by Ashby et al. 1995 and Wegst et al. 2015. We know of no pre-registered physical comparison of stress-aligned versus uniform lattices at equal mass in a single printed resin with a stated failure metric and a print-variability null, and the mechanical gain of alignment in lattices of realistic stiffness contrast is not established." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered experiment printing at least 10 replicates each of a stress-aligned and a uniform lattice of equal mass and strut count for each of three load cases, testing in a stated mechanical protocol and comparing peak load and energy to failure with a stated effect size and a replicate-to-replicate variability bound." ;
+    skos:scopeNote "Refuted if: If the stress-aligned lattice does not exceed the uniform lattice in peak load or energy by more than the print-to-print variability, the advantage of alignment is refuted for this material and these load cases." ;
+    skos:scopeNote "Refuted if: If the ranking reverses between load cases, a general advantage of alignment is refuted." ;
+    skos:note "Data access: No dataset: the test needs an SLA printer, a tough resin, a universal testing machine or a calibrated fixture, and a post-processing line; the swarm can design the lattices and the analysis plan, and an operator has to print and test." ;
+    skos:note "Requires: finite-element-analysis" ;
+    skos:note "Requires: generative-design" ;
+    skos:note "Requires: mechanical-testing" ;
+    skos:note "Requires: additive-manufacturing" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: organ" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature23911> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s00158-016-1420-7> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nmat4089> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1038/nature23911> dct:title "Giga-voxel computational morphogenesis for structural design" ;
+    dct:bibliographicCitation "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design" .
+  <https://doi.org/10.1007/s00158-016-1420-7> dct:title "On the (non-)optimality of Michell structures" ;
+    dct:bibliographicCitation "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures" .
+  <https://doi.org/10.1038/nmat4089> dct:title "Bioinspired structural materials" ;
+    dct:bibliographicCitation "Wegst et al. 2015, Bioinspired structural materials" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.293Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,137 @@
+{
+  "claim_id": "levin-2025-wisdom-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2025-wisdom-08",
+  "project": "levin-papers",
+  "status": "complete",
+  "hypothesis": "Among human disease genes in the Human Phenotype Ontology annotations, numerous ion-channel genes cause both structural patterning defects (craniofacial or limb malformation) and nervous-system phenotypes, and ion-channel disease genes carry patterning phenotypes more often than non-channel disease genes with the same depth of phenotype annotation.",
+  "pass_criterion": "Pre-registered: (a) at least 20 ion-channel genes (GO:0005216 ion channel activity or a descendant, any evidence, human GOA) are annotated in HPO genes_to_phenotype to both a patterning term (HP:0001999 Abnormal facial shape, HP:0000202 Orofacial cleft, HP:0001159 Syndactyly, HP:0010442 Polydactyly or HP:0009815 Aplasia/hypoplasia of the extremities, or any descendant) and a nervous-system term (HP:0000707 Abnormality of the nervous system or descendant); and (b) among all HPO-annotated genes, the Mantel-Haenszel odds ratio for carrying a patterning term, ion-channel vs non-channel genes, stratified by deciles of each gene's number of distinct HPO terms, is > 1.2 with one-sided Cochran-Mantel-Haenszel p < 0.05.",
+  "fail_criterion": "Pre-registered: fewer than 10 ion-channel genes meet (a); or the Mantel-Haenszel odds ratio is < 0.8 with p < 0.05 for depletion and fewer than 20 genes meet (a). Any other outcome (e.g. >= 20 such genes but no depth-adjusted enrichment, or enrichment with 10-19 genes) is pre-registered as 'mixed'.",
+  "planned_datasets": [
+    "HPO genes_to_phenotype.txt (https://github.com/obophenotype/human-phenotype-ontology/releases/latest/download/genes_to_phenotype.txt)",
+    "HPO ontology hp.obo (https://purl.obolibrary.org/obo/hp.obo)",
+    "GO basic ontology (https://purl.obolibrary.org/obo/go/go-basic.obo)",
+    "Human GO annotations goa_human.gaf.gz (https://current.geneontology.org/annotations/goa_human.gaf.gz)"
+  ],
+  "interpretation": "Only the first clause is tested: 'numerous channelopathies that result in patterning defects'. 'Channelopathy' is a human disease gene (any HPO annotation) whose product has GO ion channel activity (GO:0005216, any evidence code, NOT-qualified lines removed). 'Patterning defect' is mapped to five HPO structural-malformation branches of the face and limbs, chosen because they are the craniofacial and limb patterning outcomes Levin's cited examples emphasise; brain malformations are deliberately excluded because they are also nervous-system phenotypes and would make the overlap circular. 'Numerous' is fixed at >= 20 genes. The link to neuroscience is operationalized as co-annotation with a nervous-system phenotype, and the 'deep symmetry' as enrichment of patterning phenotypes in channel genes relative to other disease genes after controlling for how heavily each gene is phenotyped (HPO term count deciles), since syndromic genes accumulate many terms. The second clause (neuroscience tools such as drugs, optogenetics and training applied to morphogenesis) is not in these databases and is not tested.",
+  "test_contract": {
+    "expected_observation": ">= 20 ion-channel genes with both a face/limb malformation and a nervous-system phenotype in HPO, and a depth-adjusted odds ratio > 1.2 (p < 0.05) for patterning phenotypes in channel vs non-channel disease genes.",
+    "disconfirming_observation": "Fewer than 10 such channel genes, or channel genes depleted for patterning phenotypes (MH OR < 0.8, p < 0.05) while fewer than 20 channel genes have them.",
+    "admissible_datasets": "Curated human gene-phenotype annotations (HPO, built from OMIM and Orphanet) and a gene-function annotation defining ion channels independently of phenotype (GO molecular function). Must not be the review's own Table 1 or cited references; current public releases with checksums.",
+    "inference_method": "Count channel genes co-annotated to patterning and nervous-system branches (with ontology descendants); Mantel-Haenszel odds ratio and one-sided CMH test for patterning annotation, channel vs non-channel, over deciles of distinct-HPO-term count; thresholds as in pass/fail criteria."
+  },
+  "datasets": [
+    {
+      "id": "hpo-genes-to-phenotype",
+      "name": "Human Phenotype Ontology gene-to-phenotype annotations (genes_to_phenotype.txt), release accompanying hp/releases/2026-09-01",
+      "landing_url": "https://hpo.jax.org/data/annotations",
+      "doi": null,
+      "version": "latest GitHub release as retrieved (ontology data-version hp/releases/2026-09-01)",
+      "license": "HPO license (free for use with attribution)",
+      "files": [
+        {
+          "download_url": "https://github.com/obophenotype/human-phenotype-ontology/releases/latest/download/genes_to_phenotype.txt",
+          "retrieved_at": "2026-10-31T21:16:28Z",
+          "byte_size": 20821704,
+          "sha256": "507a17bff9c49e6329fbd88b1f91734fa7e9fdea5c06304044c0892eb6ab248c"
+        }
+      ],
+      "role": "disease-gene phenotype annotations (universe, patterning and nervous-system sets, annotation depth)"
+    },
+    {
+      "id": "hpo-obo",
+      "name": "Human Phenotype Ontology (hp.obo)",
+      "landing_url": "https://hpo.jax.org/",
+      "doi": null,
+      "version": "hp/releases/2026-09-01",
+      "license": "HPO license (free for use with attribution)",
+      "files": [
+        {
+          "download_url": "https://purl.obolibrary.org/obo/hp.obo",
+          "retrieved_at": "2026-10-31T21:17:41Z",
+          "byte_size": 10863613,
+          "sha256": "93dace952fcb3ec4728818857f6ba76bc2d5312f4d83266519b8694b8e798f22"
+        }
+      ],
+      "role": "is_a hierarchy for propagating annotations to the patterning and nervous-system branches"
+    },
+    {
+      "id": "go-basic-obo",
+      "name": "Gene Ontology, basic edition (go-basic.obo)",
+      "landing_url": "https://geneontology.org/docs/download-ontology/",
+      "doi": null,
+      "version": "releases/2026-07-26",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://purl.obolibrary.org/obo/go/go-basic.obo",
+          "retrieved_at": "2026-10-31T21:23:01Z",
+          "byte_size": 32227785,
+          "sha256": "b08d45b268b8c24ccb2513dbbbc7d4df9f6521c099b413f79eb31e06e0fa3bcc"
+        }
+      ],
+      "role": "descendants of GO:0005216 ion channel activity"
+    },
+    {
+      "id": "goa-human-gaf",
+      "name": "GOA human GO annotations (GAF), via the GO Consortium",
+      "landing_url": "https://current.geneontology.org/products/pages/downloads.html",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://current.geneontology.org/annotations/goa_human.gaf.gz",
+          "retrieved_at": "2026-10-31T21:23:36Z",
+          "byte_size": 15041996,
+          "sha256": "db472faff1785878521693af62646546cea6af4a386609dd01c72c0554a46a30"
+        }
+      ],
+      "role": "ion-channel gene set (molecular function annotations, any evidence)"
+    }
+  ],
+  "method": "fetch.py downloads the four files. analysis.py defines ion-channel genes as those with a non-NOT GOA molecular-function annotation to GO:0005216 or a descendant (553 genes, 209 of them HPO disease genes), keeps HPO annotations under HP:0000118 Phenotypic abnormality for 5,269 genes, and propagates each gene's terms up the is_a hierarchy. It counts channel genes annotated to both a face/limb patterning branch and HP:0000707, then compares the fraction of channel vs non-channel genes with a patterning annotation by Fisher's exact test and by a Mantel-Haenszel odds ratio with a one-sided Cochran-Mantel-Haenszel z test over ten equal-sized strata of genes ranked by number of distinct phenotype terms.",
+  "measured": {
+    "value": 59,
+    "unit": "ion-channel disease genes with both a face/limb patterning phenotype and a nervous-system phenotype in HPO",
+    "n": 209,
+    "uncertainty": "depth-stratified Mantel-Haenszel OR = 0.591, one-sided CMH p(enrichment) = 0.998",
+    "extra": {
+      "hpo_genes": 5269,
+      "go_ion_channel_genes_any_evidence": 553,
+      "ion_channel_hpo_genes": 209,
+      "ion_channel_genes_with_patterning": 59,
+      "ion_channel_genes_with_patterning_and_nervous": 59,
+      "examples": ["KCNJ2", "CACNA1C", "SCN1A", "SCN2A", "GRIN1", "GRIN2A", "KCNH1", "KCNK9", "NALCN", "PIEZO2", "TRPV4", "CHRNG"],
+      "fraction_patterning_channel": 0.2823,
+      "fraction_patterning_non_channel": 0.3387,
+      "fraction_patterning_among_nervous_channel_genes": 0.3207,
+      "fraction_patterning_among_nervous_non_channel_genes": 0.4064,
+      "crude_odds_ratio": 0.7678,
+      "fisher_two_sided_p": 0.1,
+      "mantel_haenszel_odds_ratio": 0.591,
+      "cmh_z": -2.871,
+      "cmh_p_one_sided_enrichment": 0.998,
+      "cmh_p_one_sided_depletion": 0.00205,
+      "median_terms_channel_vs_non_channel": [38.0, 36.0],
+      "criteria": {"a_ge_20_genes": true, "b_mh_or_gt_1.2_p_lt_0.05": false, "depleted_mh_or_lt_0.8_p_lt_0.05": true},
+      "verdict_by_preregistered_rule": "mixed"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.75,
+  "caveats": [
+    "The literal claim holds: 59 of 209 ion-channel disease genes (28%) have a face or limb malformation in HPO, and every one of them also has a nervous-system phenotype (e.g. KCNJ2, the Andersen-Tawil gene; CACNA1C, Timothy syndrome; KCNH1, Temple-Baraitser and Zimmermann-Laband; KCNK9, Birk-Barel; NALCN; PIEZO2; TRPV4). That is well above the pre-registered 'numerous' threshold of 20.",
+    "The specific link does not hold: channel genes carry patterning phenotypes less often than other disease genes (28% vs 34%; 32% vs 41% among genes with nervous-system phenotypes), and after stratifying by annotation depth the Mantel-Haenszel odds ratio is 0.59 (one-sided CMH p = 0.002 for depletion). Patterning defects are a common feature of syndromic disease genes in general, so their presence among channelopathies is not by itself evidence of a special developmental role for ion channels. By the pre-registered rule this combination (>= 20 genes but depletion) is 'mixed', not 'supports'.",
+    "GO:0005216 with any evidence code is broad: it includes intracellular channels and some genes whose channel function is peripheral (e.g. SEC61A1, BNIP1, TMCO1, OCA2). A stricter plasma-membrane channel set could shift the odds ratio either way.",
+    "The patterning set is five face/limb malformation branches chosen in advance; 'Abnormal facial shape' contributes most genes (45) and includes mild dysmorphic features, which are common in neurodevelopmental syndromes and may be secondary to brain or muscle defects rather than primary patterning errors.",
+    "HPO reflects what clinicians record; dysmorphology is ascertained more often in syndromic, pediatric conditions than in the adult-onset arrhythmias, myotonias and epilepsies typical of channelopathies. Depth stratification addresses annotation volume, not this case-mix difference.",
+    "Human only; the claim's scope is vertebrates. The second clause (neuroscience tools applied to morphogenesis) is not tested. HPO and GOA are 'current' releases fetched at run time, so exact numbers will drift; the SHA-256 values identify the files used."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}

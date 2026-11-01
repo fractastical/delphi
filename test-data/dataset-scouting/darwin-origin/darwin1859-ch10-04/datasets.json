@@ -1,0 +1,119 @@
+{
+  "claim_id": "darwin1859-ch10-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "species-level occurrence records with age bounds (fossil and living)",
+    "stable species identifications across time bins",
+    "stratigraphic gaps between a species' occurrences",
+    "independent evidence (phylogeny/genomes) to distinguish survival from re-evolution"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service v1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET PBDB occs/list.json with taxon_reso=species and rowcount&limit=0",
+        "http_status": 200,
+        "note": "Landing page HTTP 200; API calls below also HTTP 200."
+      },
+      "variables_present": [
+        "species-level occurrence records with early/late age bounds (eag, lag) and stage names",
+        "first/last appearance per species"
+      ],
+      "variables_missing": [
+        "independent identity check (genetics) for species recurring after a gap",
+        "sampling-effort measure per interval beyond collection IDs"
+      ],
+      "scope": "Vertebrata: 149,537 occurrences identified to species (of 273,750); Bivalvia: 110,923 species-level occurrences",
+      "evidence": "occs/list.json?base_name=Vertebrata&taxon_reso=species&rowcount&limit=0 -> 149537; base_name=Bivalvia&taxon_reso=species -> 110923; sample record fields: tna, eag, lag, oei, cid.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nucleotide sequences)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.ncbi.nlm.nih.gov/ and /genbank/ landing pages",
+        "http_status": 200
+      },
+      "variables_present": [
+        "living-species DNA sequences"
+      ],
+      "variables_missing": [
+        "sequences from extinct species at the scale of the question",
+        "stratigraphic ages",
+        "a way to compare a reappearing 'species' with its earlier form"
+      ],
+      "scope": "Sequence repository for living (and some ancient-DNA) material; not a fossil occurrence resource",
+      "evidence": "Landing pages returned HTTP 200 (39,223 and 37,829 bytes). The assessor's use (genomic tests of iterative ecomorphs) needs taxon-specific sequence sets that no single GenBank record provides.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB data1.2",
+      "query": "species-resolved occurrences: Vertebrata and Bivalvia",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Vertebrata&taxon_reso=species&rowcount&limit=0",
+      "hits": 149537,
+      "note": "Bivalvia 110923"
+    },
+    {
+      "source": "PBDB data1.2",
+      "query": "one occurrence record with show=time",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Vertebrata&taxon_reso=species&limit=1&show=time&rowcount",
+      "hits": 149537,
+      "note": "fields oid, cid, tna, tid, oei, eag, lag, rid"
+    },
+    {
+      "source": "Dryad",
+      "query": "Lazarus taxon",
+      "url": "https://datadryad.org/api/v2/search?q=Lazarus%20taxon",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "Lazarus taxa fossil record gaps species ranges",
+      "url": "https://api.datacite.org/dois?query=Lazarus%20taxa%20fossil%20record%20gaps%20species%20ranges",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Zenodo",
+      "query": "Lazarus taxa stratigraphic range data",
+      "url": "https://zenodo.org/api/records?q=Lazarus%20taxa%20stratigraphic%20range%20data",
+      "hits": 1427256,
+      "note": "loose match; top hits are unrelated figure records"
+    }
+  ],
+  "status": "partial",
+  "summary": "PBDB provides the occurrence-level data a gap analysis needs (149,537 species-resolved vertebrate occurrences with age bounds), so apparent reappearances can be listed. No dataset found separates a true re-evolution from a surviving but unsampled lineage (no Lazarus-taxon compilation found on Dryad, DataCite or Zenodo), and species names themselves are taxonomic decisions.",
+  "next_step": "Query PBDB occurrences per species, flag species with gaps longer than a pre-registered threshold, then audit each flagged case against the cited literature.",
+  "obstacles_confirmed": [
+    "Species names in PBDB are applied by taxonomists, so temporally separated homeomorphs may already be named as different species.",
+    "No ready-made Lazarus taxon table located."
+  ]
+}

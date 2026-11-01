@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Synthetic-tree calibration: can image-derived radii distinguish exponent 3 from 7/3?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Exponent estimates from images are biased: estimating x from r₀^x = r₁^x + r₂^x is nonlinear, and radius noise near junctions inflates or deflates x. Before trusting approach 1, generate synthetic vascular trees with known exponent x_true ∈ {2, 7/3, 2.7, 3}, using constrained constructive optimization or a simple binary tree with stated asymmetry and length ratios. Render them through realistic image formation for each modality: a fundus model (2D projection, Gaussian blur, vessel central reflex, noise at matched SNR); light-sheet volumes for VesSAP (anisotropic PSF, voxel size); micro-CT. Run the same segmentation and radius pipeline as approach 1. Output: the bias and variance of estimated x as a function of x_true, vessel size in pixels and modality. These become the noise priors in approach 1's model, and determine the minimum vessel diameter (in pixels) at which 3 and 7/3 are distinguishable." ;
+
+    delphi:proposedTest "Calibration curves giving, for each modality, the smallest vessel diameter at which estimated x separates 3 from 7/3 with 95% power. If no real dataset reaches that resolution, approach 1 is underpowered by design and the question needs better imaging." ;
+    delphi:context "Fails if: Forward models fail validation: synthetic images differ visibly from real ones in vessel-contrast statistics, so the calibration does not transfer." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement the synthetic tree generator and modality-specific forward image models. 2. Run approach 1's segmentation pipeline on 10^3 synthetic trees per setting. 3. Fit bias and variance curves for x as functions of x_true and diameter in pixels. 4. Publish calibration tables; set approach 1's minimum-diameter inclusion threshold from them." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: vascular-morphometry" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://drive.grand-challenge.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.cell.2020.01.028> ;
+    rdfs:seeAlso <https://doi.org/10.1085/jgp.78.4.431> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+  <https://drive.grand-challenge.org/> dct:title "DRIVE" ;
+    dct:description "Real images to validate the fundus forward model" .
+  <https://doi.org/10.1016/j.cell.2020.01.028> dct:title "Mapping the Fine-Scale Organization and Plasticity of the Brain Vasculature" ;
+    dct:bibliographicCitation "Kirst et al. 2020, Mapping the fine-scale organization and plasticity of the brain vasculature (imaging resolution for the forward model)" .
+  <https://doi.org/10.1085/jgp.78.4.431> dct:title "On connecting large vessels to small. The meaning of Murray's law." ;
+    dct:bibliographicCitation "Sherman 1981" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.303Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Synthetic-tree calibration: can image-derived radii distinguish exponent 3 from 7/3?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

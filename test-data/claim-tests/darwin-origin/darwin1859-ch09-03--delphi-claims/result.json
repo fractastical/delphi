@@ -1,0 +1,60 @@
+{
+  "claim_id": "darwin1859-ch09-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch09-03",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "If Darwin's denudation argument holds, the time elapsed since the latter part of the Secondary (Mesozoic) period, i.e. since the youngest Chalk, is roughly 300 million years or more on the modern radiometrically calibrated timescale.",
+  "pass_criterion": "Pre-registered. Data: the International Commission on Stratigraphy (ICS) chronostratigraphic boundary ages as served by the Macrostrat API (defs/intervals, timescale 'international ages'), which carries the ICS chart's numeric ages in Ma. Quantities: age of the top of the Maastrichtian (= Cretaceous-Paleogene boundary, the end of Chalk deposition) and age of the base of the Campanian (start of the youngest Chalk stages). SUPPORTS if the top-of-Maastrichtian age is >= 225 Ma (within 25% of 300 Myr, or older). Reported alongside: the base-of-Campanian age and the ratio of Darwin's 306.7 Myr to the measured age.",
+  "fail_criterion": "Pre-registered. REFUTES if the top-of-Maastrichtian age is < 225 Ma (Darwin's figure is off by more than 25%). MIXED is not possible for this one-number test. INCONCLUSIVE (data-unavailable) if the API cannot be reached; INCONCLUSIVE (not-operationalizable) if the API does not return a Maastrichtian interval.",
+  "planned_datasets": [
+    "ics-chronostratigraphic-ages-via-macrostrat-api"
+  ],
+  "interpretation": "Darwin's 'latter part of the Secondary period' is the Late Cretaceous, and 'since the late Chalk' is the time from the youngest Chalk Group strata (Campanian-Maastrichtian) to the present. The claim is a duration (about 300 million years, which he says is an underestimate of the time since the late Secondary) inferred from an assumed erosion rate; the test compares that duration with the radiometric timescale and does not test the erosion rate. Darwin himself withdrew the calculation in later editions. This follows the swarm thread's draft plan for this claim with the same 25% tolerance. READINGS CHECK (added after the result, at the hub's request; no number or threshold changed). Darwin's 306,662,400 years is the time he computed for the denudation of the Weald, which he takes to have begun after the Chalk was laid down; he then says more than that has elapsed 'since the latter part of the Secondary period'. Reading 1 (tested): 300 Myr is a lower bound on the time since the end of the Chalk; measured 66 Ma, refuted. Reading 2: 300 Myr is the duration of the Weald denudation itself; that denudation can have taken at most the time since the Chalk ended (66 Myr) and most of it is Neogene, so refuted by a wider margin. Reading 3: 'since the latter part of the Secondary' means since the start of the Late Cretaceous (base Cenomanian, 100.5 Ma); the ratio is then 3.05, still outside the 25% tolerance, refuted. Reading 4 (qualitative): Darwin's point was only that geological time is immense, far longer than Kelvin's physics allowed; that reading is supported by the modern timescale (the Mesozoic began 252 Ma; the Earth is 4.5 Gyr old), but it is not the claim as the claim graph states it, which carries the 300 Myr figure. The verdict is 'refutes' under every numeric reading and flips only under the non-numeric one.",
+  "datasets": [
+    {
+      "id": "ics-chronostratigraphic-ages-via-macrostrat-api",
+      "name": "International Chronostratigraphic Chart boundary ages (ICS), as served by the Macrostrat API (defs/intervals, timescale 'international ages')",
+      "landing_url": "https://stratigraphy.org/chart",
+      "doi": null,
+      "version": "Macrostrat API v2 response of 2026-10-31 (ages match ICS chart v2023/09)",
+      "license": "CC-BY 4.0",
+      "files": [
+        {
+          "download_url": "https://macrostrat.org/api/v2/defs/intervals?timescale=international%20ages",
+          "retrieved_at": "2026-10-31T06:14:01Z",
+          "byte_size": 33145,
+          "sha256": "4900709f37f77efcf5ed5abf14b910db91204a1328bbd1625c5dce4a742d6e73"
+        }
+      ],
+      "role": "top and base ages (Ma) of the Maastrichtian and Campanian stages"
+    }
+  ],
+  "method": "fetch.py saves the API's JSON (102 intervals). analysis.py reads the top age of the Maastrichtian (the Cretaceous-Paleogene boundary) and the base age of the Campanian and applies the pre-registered 225 Ma threshold.",
+  "measured": {
+    "value": 66.0,
+    "unit": "Ma, age of the top of the Maastrichtian (end of the Chalk); Darwin's figure was 306.7 million years",
+    "n": "102 ICS intervals in the response",
+    "uncertainty": "ICS boundary ages for these stages carry uncertainties of about 0.2 Ma, far below the threshold",
+    "extra": {
+      "base_of_campanian_Ma": 83.6,
+      "base_of_maastrichtian_Ma": 72.2,
+      "darwin_Myr": 306.6624,
+      "ratio_darwin_to_measured": 4.6464,
+      "threshold_Ma": 225
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.99,
+  "caveats": [
+    "Darwin's 300 million years is 4.6 times the radiometric age of the end of the Chalk; Darwin withdrew the calculation in the third edition after Phillips's criticism, so this refutes the claim as stated in the first edition, which is how the claim graph records it.",
+    "The test uses the ICS ages through Macrostrat's API rather than the chart PDF; the two agree for these stages and the version is recorded.",
+    "This is a one-number test with no sampling uncertainty; it does not evaluate Darwin's erosion rate, only the duration he inferred.",
+    "Readings check: under the three numeric readings of Darwin's figure (lower bound since the end of the Chalk; duration of the Weald denudation; time since the start of the Late Cretaceous) the measured age is 3.1 to 4.6 times smaller than 300 Myr, so the verdict is unchanged; only the purely qualitative reading ('geological time is immense') would be supported, and the claim graph's statement is the numeric one."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted",
+    "date": "2026-10-31"
+  }
+}

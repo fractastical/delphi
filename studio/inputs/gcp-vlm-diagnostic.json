@@ -1,0 +1,44 @@
+{
+  "vm": "frontier-cpu-20261031-04",
+  "task_id": "vlm-diagnostic-v1",
+  "vcpus": 4,
+  "memory_gb": 8,
+  "runtime_s": 900,
+  "tasks_max": 128,
+  "export_interval_s": 300,
+  "source_sha256": "36de63a5d975e05f357b4aebd0308e99adcb31227a64068eea63184d46bdd20d",
+  "source_commit": "283e3a7f6ed4338f3425e22c13a7cb6b49d51709",
+  "input_sha256": {
+    "engineering/cfd3d/vlm.py": "044a6dc281a50db17f522d66d2c1efa0fbb0bf0d38f71b5885763a88f7f0a06a",
+    "engineering/cfd3d/vlm_diag.py": "cc6dc5fd2a0380a47d4e60fcc61c4fd6b2bc9f4b29a612f28f7d47bac1246562",
+    "engineering/cfd3d/vlm_diag_contract.json": "176945a7ab9c79286c7c31492edc3ad5e3aeedfcb18d72b151013ee78a715fcc",
+    "engineering/cfd3d/vlm_diag_addendum_repair.json": "6a68b13da4a17e379507372c80df955681eee87896e50abacb90aee805ae921d",
+    "engineering/cfd3d/gates_vlm.json": "f9ede945cfd28f284c2ec08e8dd87b1a38d5684af1912fe3f4ced80cedbc4d58",
+    "engineering/cfd3d/vlm_diag_run.sh": "65c95362417a9da6751f977b997858f012188e062d4952cb8ac0b243fe011e1d",
+    "engineering/cfd3d/vlm_diag_requirements.txt": "738071c1d9633f276433ad6738de256d2bf0d22f66dc4bd3179012bebb63bdd1",
+    "engineering/cfd3d/vlmdiag_packet.json": "a05dfa49134e71f1d65e27fd2ab4f05369af74187915dce056e271ac97f0028f",
+    "artifacts/fish3d/fish3d-v3a-fan/panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d"
+  },
+  "bucket": "delphi-frontier-cpu-artifacts-20261031",
+  "parameters": {
+    "expected_solves": 372,
+    "workers": 4,
+    "threads_per_worker": 1,
+    "no_new_solve_after_s": 700,
+    "scope": "Original and diagnostic collocation variants, rigid fixed-alpha inviscid VLM; original criteria/unknown verdicts preserved; no biological validity",
+    "zero_solve_preflight_exit": 0,
+    "science_output_cap_bytes": 5000000
+  },
+  "argv": [
+    "bash",
+    "-c",
+    "set -euo pipefail; /work/ecology-venv/bin/python -m pip install --disable-pip-version-check -r engineering/cfd3d/vlm_diag_requirements.txt > \"$COPS_OUT/dependencies.log\" 2>&1; /work/ecology-venv/bin/python -m pip freeze > \"$COPS_OUT/installed-pins.txt\"; export PYTHON=/work/ecology-venv/bin/python; exec sh engineering/cfd3d/vlm_diag_run.sh \"$COPS_OUT/science\""
+  ],
+  "env": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "max_export_bytes": 8000000,
+  "output_directory": "out-vlm-diagnostic"
+}

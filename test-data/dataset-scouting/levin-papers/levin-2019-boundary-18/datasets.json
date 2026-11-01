@@ -1,0 +1,156 @@
+{
+  "claim_id": "levin-2019-boundary-18",
+  "variables_needed": [
+    "list of anesthetics used in animals and in plants",
+    "per-compound gap-junction coupling measurement (dye transfer, scrape-loading or junctional conductance) with concentration",
+    "comparator non-anesthetic compounds",
+    "plant-side data (plasmodesmata or other symplastic coupling) under anesthetics"
+  ],
+  "datasets": [
+    {
+      "id": "chembl",
+      "name": "ChEMBL bioactivity database",
+      "landing_url": "https://www.ebi.ac.uk/chembl/",
+      "access_url": "https://www.ebi.ac.uk/chembl/api/data/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url; ChEMBL REST target/search, assay/search, activity and molecule/search counts",
+        "http_status": 200
+      },
+      "variables_present": [
+        "connexin targets (human GJB1 CHEMBL4879427: 5 activities; GJB2 CHEMBL4295738: 74; GJA1 CHEMBL4680024: 92)",
+        "assay descriptions mentioning gap junction (281 hits; first three are 'Inhibition of rat glial cell gap junction at the concentration of 50 uM' style)",
+        "halothane CHEMBL931: 85 activity records across all targets"
+      ],
+      "variables_missing": [
+        "coverage of the general anesthetic list",
+        "plant data",
+        "dye-transfer uncoupling as a structured field for most anesthetics"
+      ],
+      "scope": "medicinal-chemistry records, mostly mammalian; 3 connexin targets found by target search, all Homo sapiens",
+      "evidence": "REST responses: target search 'connexin' total_count 3; assay search 'gap junction' total_count 281; halothane molecule CHEMBL931 found; activity counts as listed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "iuphar-bps-guide-to-pharmacology",
+      "name": "IUPHAR/BPS Guide to Pharmacology",
+      "landing_url": "https://www.guidetopharmacology.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url; GET /services/targets?name=connexin and /services/ligands?name=halothane",
+        "http_status": 200,
+        "note": "landing page HTTP 200; services endpoints HTTP 401 (API key required)"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "web-service access to target and ligand lists"
+      ],
+      "scope": "curated pharmacology portal; web services require registration",
+      "evidence": "Landing page HTTP 200, but both web-service calls returned HTTP 401 with message 'API key is missing'; no annotation was retrieved.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "pubchem",
+      "name": "PubChem compounds and bioassays",
+      "landing_url": "https://pubchem.ncbi.nlm.nih.gov/",
+      "access_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url; PUG REST compound name lookup; E-utilities esearch db=pcassay",
+        "http_status": 200
+      },
+      "variables_present": [
+        "compound record for halothane (CID 3562)",
+        "149 bioassay records matching 'gap junction'"
+      ],
+      "variables_missing": [
+        "a curated anesthetic-by-coupling table",
+        "plant data"
+      ],
+      "scope": "compound and assay archive across species; assay hits not inspected individually",
+      "evidence": "PUG REST: halothane -> CID 3562; esearch pcassay term \"gap junction\" count 149.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "ChEMBL",
+      "query": "target search: connexin",
+      "url": "https://www.ebi.ac.uk/chembl/api/data/target/search.json?q=connexin&limit=10",
+      "hits": 3,
+      "note": "three human connexin targets"
+    },
+    {
+      "source": "ChEMBL",
+      "query": "assay search: gap junction",
+      "url": "https://www.ebi.ac.uk/chembl/api/data/assay/search.json?q=gap+junction&limit=3",
+      "hits": 281,
+      "note": "first three hits are rat glial cell gap junction inhibition assays"
+    },
+    {
+      "source": "PubChem BioAssay",
+      "query": "\"gap junction\"",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pcassay&term=%22gap+junction%22&retmode=json&retmax=3",
+      "hits": 149,
+      "note": ""
+    },
+    {
+      "source": "Europe PMC",
+      "query": "\"gap junction\" AND halothane AND uncoupl*",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22gap+junction%22+AND+halothane+AND+uncoupl*&format=json&resultType=lite&pageSize=1",
+      "hits": 219,
+      "note": "literature count, not a dataset"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "\"gap junction\" AND anesthetic AND plasmodesmata",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22gap+junction%22+AND+anesthetic+AND+plasmodesmata&format=json&resultType=lite&pageSize=1",
+      "hits": 4,
+      "note": "plant side is sparse in the literature"
+    },
+    {
+      "source": "Dryad",
+      "query": "\"gap junction\" anesthetic",
+      "url": "https://datadryad.org/api/v2/search?q=%22gap+junction%22+anesthetic&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"gap junction\" AND anesthetic",
+      "url": "https://zenodo.org/api/records?q=%22gap+junction%22+AND+anesthetic&size=3",
+      "hits": 1,
+      "note": "one unrelated review record"
+    }
+  ],
+  "status": "partial",
+  "summary": "ChEMBL and PubChem hold mammalian connexin assays and compound records (e.g. halothane), but there is no structured table of anesthetic-by-gap-junction-coupling and no plant-side data; the IUPHAR web services need an API key, so they were not queried.",
+  "next_step": "Compile a fixed list of animal and plant anesthetics and extract coupling measurements from the literature (Europe PMC lists 219 papers on halothane and gap-junction uncoupling); add plasmodesmata papers for the plant arm.",
+  "obstacles_confirmed": [
+    "Gap-junction uncoupling is not a structured field for most anesthetics.",
+    "Plant anesthesia data are sparse: 4 Europe PMC hits for anesthetic plus plasmodesmata plus gap junction."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

@@ -1,0 +1,401 @@
+{
+ "equations": [
+  {
+   "claimed_by_source": "the gradients scale in two dimensions with the fin's size; scaling by an expansion-repression mechanism with expander Smoc1",
+   "context": "zebrafish pectoral fin bud, BRE reporter, 48-78 hpf, anterior and posterior gradients",
+   "form": "C(s) = C0 * exp(-s / lambda)",
+   "id": "eq-exp-gradient",
+   "name": "Exponential morphogen gradient",
+   "not_established_here": "the quantitative lambda(fin size) relation was not extracted; the equation is not validated beyond 48-78 hpf or beyond the pectoral fin",
+   "parameters": [
+    {
+     "kind": "fitted to reporter data",
+     "name": "lambda",
+     "value": "about 5 cell diameters (around 28 um) at 60 hpf, both gradients"
+    }
+   ],
+   "quotes": [
+    {
+     "locator": "Results: Two BMP Signaling Gradients during Pectoral Fin Development",
+     "quote": "C(s)=C0e\u2212s/\u03bb",
+     "source": "mateus2020",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: Two BMP Signaling Gradients during Pectoral Fin Development",
+     "quote": "length scale of about 5 cell diameters (around 28 \u03bcm)",
+     "source": "mateus2020",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: Two BMP Signaling Gradients during Pectoral Fin Development",
+     "quote": "after 78 hpf, the profile does not fit an exponential curve",
+     "source": "mateus2020",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "modelled_and_fit_to_fish_data",
+   "units": {
+    "C": "arbitrary (reporter intensity)",
+    "lambda": "length",
+    "s": "length (cell diameters or micrometres; the paper uses both)"
+   },
+   "variables": {
+    "C": "BMP-signalling reporter (BRE) signal, arbitrary units",
+    "C0": "amplitude at the proximal side",
+    "lambda": "length scale",
+    "s": "position along the gradient"
+   }
+  },
+  {
+   "context": "DLD1 human colorectal tumour spheroids in culture; constant a; time-independent",
+   "form": "D * Laplacian(C) = a   (spherical Laplacian)",
+   "id": "eq-diffusion-consumption",
+   "name": "Steady-state diffusion with constant consumption (spherical)",
+   "not_established_here": "any value of D, C0 or a for fish tissue or a bioink",
+   "parameters": [
+    {
+     "kind": "assumed close to water, not measured",
+     "name": "D",
+     "value": "2e-9 m^2 s^-1"
+    },
+    {
+     "kind": "fitted to spheroid hypoxia staining",
+     "name": "a",
+     "value": "7.29 +/- 1.4 e-7 m^3 kg^-1 s^-1 (= 1.82 +/- 0.35 e-3 mol kg^-1 min^-1)"
+    },
+    {
+     "kind": "fitted",
+     "name": "r_l",
+     "value": "233 +/- 22 um"
+    }
+   ],
+   "quotes": [
+    {
+     "locator": "Methods: Model derivation",
+     "quote": "At the edge of the spheroid, a radius of ro, the volume of oxygen per unit mass is Co",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: Hypoxic and oxic interface",
+     "quote": "we have assumed the oxygen diffusion constant D is close to that of water",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Discussion",
+     "quote": "a = 7.29 \u00b1 1.4 \u00d7 10\u22127 m3 kg\u22121 s\u22121",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Discussion",
+     "quote": "rl had a relatively constantly value of 233 \u00b1 22 \u03bcm",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Discussion",
+     "quote": "The model is time independent",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Introduction",
+     "quote": "oxygen diffusion limits are typically 100\u2013200 \u03bcm",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "borrowed_nonfish",
+   "typeset_equation_note": "equations 2.1-2.10 are images in the open-access XML; their text was not read. The setup is taken from the paper's words; closed forms in engineering/lifecycle/diffusion.py are derived here.",
+   "units": {
+    "C": "m^3 kg^-1",
+    "D": "m^2 s^-1",
+    "a": "m^3 kg^-1 s^-1 (volume of oxygen gas per kg of tissue per second)"
+   },
+   "variables": {
+    "C": "oxygen per unit mass (volume of O2 per kg)",
+    "D": "oxygen diffusion constant of the tissue",
+    "a": "oxygen consumption rate per unit mass"
+   }
+  },
+  {
+   "context": "derived here from the paper's stated boundary conditions, then verified by substitution; the sphere form is the paper's 'diffusion limit' defined as the radius at which the centre pressure just reaches zero",
+   "form": "sphere: r_l = sqrt(6 D C0 / a);  slab, one-sided supply: L = sqrt(2 D C0 / a);  slab supplied from both faces: total thickness 2L",
+   "id": "eq-diffusion-limit",
+   "name": "Diffusion limit (sphere) and the slab analogue",
+   "not_established_here": "this is a sizing aid for an assumed uniform consumption; it says nothing about vascularised tissue",
+   "parameters": [],
+   "quotes": [
+    {
+     "locator": "Methods: Model derivation",
+     "quote": "which is the greatest radius the spheroid can obtain and still be entirely viable",
+     "source": "grimes2014",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "derived_here_from_stated_setup",
+   "units": {
+    "C0/a": "s",
+    "L": "m",
+    "r_l": "m"
+   },
+   "variables": {
+    "C0": "oxygen amount per unit volume at the supplied boundary",
+    "a": "consumption per unit volume"
+   }
+  },
+  {
+   "context": "laboratory zebrafish, three temperatures (24, 28.5, 33 C) and three densities, N = 782",
+   "form": "logistic regression of trait presence on SL or HAA (all R^2 > 0.5); temperature and density add R^2 < 0.05 after size",
+   "id": "rel-size-over-age",
+   "name": "Size predicts developmental progress better than age",
+   "parameters": [],
+   "quotes": [
+    {
+     "locator": "Growth and environmental effects",
+     "quote": "size (measured as SL or HAA) had the highest correlation with developmental progress for all traits examined",
+     "source": "parichy2009",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Growth and environmental effects",
+     "quote": "temperature, density, and their interactions with size explained very little additional variance",
+     "source": "parichy2009",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "measured_in_fish",
+   "units": {
+    "HAA": "mm",
+    "SL": "mm"
+   },
+   "variables": {
+    "HAA": "height at anterior of anal fin (linear for HAA > 0.5 mm)",
+    "SL": "standard length"
+   }
+  },
+  {
+   "context": "Parichy 2009 Table 3, R^2 = 0.98; valid for HAA > 0.5 mm",
+   "form": "SL = 3.56 * HAA + 4.40",
+   "id": "reg-sl-haa",
+   "name": "SL from HAA",
+   "parameters": [
+    {
+     "name": "slope",
+     "value": 3.56
+    },
+    {
+     "name": "intercept",
+     "value": "4.40 mm"
+    }
+   ],
+   "quotes": [
+    {
+     "locator": "Table 3",
+     "quote": "SL = (3.56 \u00d7 HAA) + 4.40",
+     "source": "parichy2009",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "measured_in_fish",
+   "units": {
+    "HAA": "mm",
+    "SL": "mm"
+   },
+   "variables": {
+    "HAA": "height at anterior of anal fin",
+    "SL": "standard length"
+   }
+  },
+  {
+   "context": "larvae reared at 24 C and at 33 C; the 28.5 C value is not stated in this sentence",
+   "form": "dSL/dt (measured mean, not a fitted law)",
+   "id": "param-growth-rate",
+   "name": "Post-embryonic growth rate in SL",
+   "not_established_here": "no growth law (von Bertalanffy, Gompertz or other) was found in the text read; none is asserted",
+   "parameters": [
+    {
+     "name": "24 C",
+     "value": "0.45 +/- 0.009 mm/day (mean +/- SE)"
+    },
+    {
+     "name": "33 C",
+     "value": "0.54 +/- 0.011 mm/day (mean +/- SE)"
+    }
+   ],
+   "quotes": [
+    {
+     "locator": "Growth and environmental effects",
+     "quote": "fish reared at 24 \u00b0C grew more slowly than fish reared at 33 \u00b0C (SL mm per day, mean\u00b1SE: 0.45\u00b10.009, 0.54\u00b10.011, respectively",
+     "source": "parichy2009",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "measured_in_fish",
+   "units": {
+    "dSL/dt": "mm per day"
+   },
+   "variables": {
+    "dSL/dt": "growth rate"
+   }
+  },
+  {
+   "context": "zebrafish at 28.5 C, Oroboros chamber (Konadu) and Seahorse XF24 (Stackley)",
+   "form": "measured rates (no equation)",
+   "id": "param-o2-consumption",
+   "name": "Oxygen consumption per animal",
+   "parameters": [
+    {
+     "name": "5 dpf 'embryos'",
+     "value": "126 +/- 4.6 pmol/min/embryo (Konadu; n = 60 pooled per experiment)"
+    },
+    {
+     "name": "larvae 0.6-0.9 cm",
+     "value": "94.4 +/- 8.3 pmol/min/larva (Konadu; 5 pooled)"
+    },
+    {
+     "name": "adult 3 mo and 12 mo male",
+     "value": "160 pmol/min (Konadu; unit or normalisation suspect)"
+    },
+    {
+     "name": "3-48 hpf",
+     "value": "basal respiration increases linearly (Stackley; values in figures not read)"
+    }
+   ],
+   "quotes": [
+    {
+     "locator": "Results 3.1",
+     "quote": "embryos consume 126 \u00b1 4.6 pmol O2 per minute per embryo",
+     "source": "konadu2023",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results 3.1",
+     "quote": "Basal oxygen consumption rate was determined to be 94.4 \u00b1 8.3 pmol O2 per minute per larvae",
+     "source": "konadu2023",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Discussion",
+     "quote": "the average oxygen consumption in a 3-month-old and a 12-month male is the same (160 pmol O2/min)",
+     "source": "konadu2023",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Methods 2.1",
+     "quote": "Zebrafish embryos that were 5 dpf were used",
+     "source": "konadu2023",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: Metabolic respiration increased linearly",
+     "quote": "Total basal respiration increased linearly from 3 to 48 hpf",
+     "source": "stackley2011",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "measured_in_fish",
+   "units": {
+    "OCR": "pmol O2 per minute per animal (pooled animals per chamber)"
+   },
+   "variables": {
+    "OCR": "oxygen consumption rate"
+   }
+  },
+  {
+   "context": "zebrafish juveniles, live imaging of individual fish; Fgf signalling necessary for scale initiation and outgrowth",
+   "form": "invariant sequence of row and column addition (no equation)",
+   "id": "seq-squamation",
+   "name": "Scale formation sequence and staging",
+   "parameters": [],
+   "quotes": [
+    {
+     "locator": "Discussion",
+     "quote": "zebrafish squamation proceeds through an invariant sequence of row and column addition",
+     "source": "aman2018",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: sp7+ osteoblast like cells generate scales",
+     "quote": "Within one day, two complete rows of scales formed",
+     "source": "aman2018",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Results: Fgf-dependent differentiation of scale",
+     "quote": "complete arrest of squamation and scale growth without affecting overall somatic growth",
+     "source": "aman2018",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "observed_qualitative",
+   "units": {},
+   "variables": {}
+  },
+  {
+   "context": "adult fin regeneration; kcnk5b/alf mutants",
+   "form": "qualitative: dose-dependent coordinated overgrowth (no equation)",
+   "id": "obs-fin-calcineurin",
+   "name": "Fin regeneration growth and calcineurin",
+   "not_established_here": "no allometric coefficient or growth law was found",
+   "parameters": [],
+   "quotes": [
+    {
+     "locator": "Results: Skeletal phenotypes of fins treated with FK506",
+     "quote": "dose-dependent coordinated overgrowth of fin regenerates",
+     "source": "daane2018",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Introduction",
+     "quote": "act to maintain heightened rate of growth during regeneration of the fin",
+     "source": "daane2018",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "observed_qualitative",
+   "units": {},
+   "variables": {}
+  },
+  {
+   "context": "review of tissue-engineering scaffolds (bone, skin, others); not fish tissue",
+   "disagreement": "bone windows differ across the cited works (50-700, 100-600, 200-600 um) and the review notes very large pores can impair stability and cell attachment",
+   "form": "ranges by tissue; sources disagree",
+   "id": "win-scaffold-pore",
+   "name": "Scaffold pore-size windows (design context, not a law)",
+   "parameters": [],
+   "quotes": [
+    {
+     "locator": "Section 2",
+     "quote": "Scaffolds with a 50\u2013700 \u00b5m pore size range are commonly used in bone tissue engineering",
+     "source": "mukasheva2024",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Section 4.2",
+     "quote": "Other sources, however, identify an optimal pore size range of 100\u2013600 \u00b5m",
+     "source": "mukasheva2024",
+     "verified_verbatim": true
+    },
+    {
+     "locator": "Section 3.3",
+     "quote": "Moderate pore sizes, around 2\u201312 \u03bcm, are more suited to the dermal layer",
+     "source": "mukasheva2024",
+     "verified_verbatim": true
+    }
+   ],
+   "status": "borrowed_nonfish",
+   "units": {
+    "pore size": "micrometres"
+   },
+   "variables": {
+    "pore size": "diameter"
+   }
+  }
+ ],
+ "retrieved": "2026-10-31",
+ "schema": "fish-lifecycle-equations-0.1 (connector-local)"
+}

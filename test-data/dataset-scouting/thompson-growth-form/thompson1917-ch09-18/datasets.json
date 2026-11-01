@@ -1,0 +1,133 @@
+{
+  "claim_id": "thompson1917-ch09-18",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "3D or multi-view images of twenty-spined radiolarian skeletons (Acantharia or Polycystina) with spines resolvable",
+    "spine directions or latitudes per specimen (digitised)",
+    "taxon identity for each specimen"
+  ],
+  "datasets": [
+    {
+      "id": "mikrotax",
+      "name": "Mikrotax",
+      "landing_url": "https://www.mikrotax.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "HEAD landing page (200); GET https://www.mikrotax.org/Radiolaria/index.php (404, a path I guessed)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "I could not locate a radiolarian section; no twenty-spined (Acantharia) images confirmed"
+      ],
+      "scope": "Micropalaeontology portal",
+      "evidence": "Landing page HEAD 200 (text/html). The guessed radiolarian URL returned 404, so I have no evidence of radiolarian spine images here; this is a portal, not a dataset.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Radiolaria",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET https://www.morphosource.org/api/media?q=Radiolaria",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no media records match 'Radiolaria'"
+      ],
+      "scope": "3D specimen repository, vertebrate-dominated",
+      "evidence": "API response pages.total_count 0 for q=Radiolaria; facets empty.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad598-tara-sem-protists",
+      "name": "S-BIAD598: SEM images of protists and their taxonomic annotations (Tara Oceans, Marquesas)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD598",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD598",
+      "doi": "10.6019/S-BIAD598",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET BioStudies study JSON; found via BIA search 'Radiolaria' (2 hits)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "2D scanning-electron-microscope images of marine unicellular eukaryotes with expert taxonomic annotation (1,075 files per search listing)"
+      ],
+      "variables_missing": [
+        "2D images, not 3D",
+        "I did not confirm any twenty-spined acantharian or radiolarian is in the set",
+        "spines not digitised"
+      ],
+      "scope": "Planktonic protists from four Pacific sites; Tara Oceans 2011",
+      "evidence": "Study JSON: DOI 10.6019/S-BIAD598, ReleaseDate 2022-12-25, imaging 'Large scale exploration of planktonic sample by SEM' on Philips 505 / JEOL 7401F, annotation by taxonomic experts; BioStudies search 'Radiolaria' returned this and S-BIAD595 (confocal, 104,988 files).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "MorphoSource",
+      "query": "Radiolaria",
+      "url": "https://www.morphosource.org/api/media?q=Radiolaria",
+      "hits": 0
+    },
+    {
+      "source": "GBIF",
+      "query": "Acantharea with StillImage media",
+      "url": "https://api.gbif.org/v1/occurrence/search?q=Acantharea&mediaType=StillImage&limit=0",
+      "hits": 0,
+      "note": "species search for class Acantharea gave 11 name usages, first with numOccurrences 0"
+    },
+    {
+      "source": "DataCite",
+      "query": "radiolaria spine arrangement 3D",
+      "url": "https://api.datacite.org/dois?query=radiolaria%20spine%20arrangement%203D&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "Acantharia Radiolaria skeleton micro-CT spicule",
+      "url": "https://zenodo.org/api/records?q=Acantharia%20Radiolaria%20skeleton%20micro-CT%20spicule&size=5",
+      "hits": 53403,
+      "note": "unranked broad match; top hits are photosymbiosis flux data and a taxon treatment, no skeleton geometry"
+    },
+    {
+      "source": "BioImage Archive",
+      "query": "Radiolaria",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Radiolaria&pageSize=5",
+      "hits": 2,
+      "note": "two Tara Oceans protist image collections"
+    }
+  ],
+  "status": "gap",
+  "summary": "I found no public 3D or spine-resolved image set of twenty-spined radiolarians: MorphoSource has 0 media for 'Radiolaria', GBIF has 0 image-bearing Acantharea occurrences, and DataCite has 0 hits. The only open image collection of marine protists with taxonomic labels (BioImage Archive S-BIAD598, 2D SEM) is not shown to contain twenty-spined forms.",
+  "next_step": "Compile spine-angle measurements from published plates or micrographs of Acantharia and Polycystina (including the older drawings the claim discusses), recording the figure source of each, then pre-register the template comparison.",
+  "obstacles_confirmed": [
+    "Suitable intact microscopic 3D specimens may be sparse.",
+    "Acantharia are poorly represented in the open image databases I queried."
+  ]
+}

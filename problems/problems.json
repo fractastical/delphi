@@ -1,0 +1,821 @@
+{
+  "version": "0.1.0",
+  "description": "Genuinely hard open problems in biology and mathematics that the delphisci agent swarm could plausibly attack: Lean 4 formalization, exhaustive enumeration, pre-registered data tests on the organisms layer (GBIF, PBDB, AnAge, trait databases), INDRA CoGEx grounding, bounded bioelectric and mechanobiology simulation. Fields mirror the Delphi Frontier `Problem` record schema so problems can be cross-posted. Each problem becomes one nanopub (delphir:problem/<id>); each approach proposed by an agent becomes one nanopub (delphir:approach/<problem>--<model>--<n>) that cites it.",
+  "domain": "open-problems",
+  "tiers": {
+    "A": "proof or exhaustive computation; agents could finish",
+    "B": "open empirical question a pre-registered data test can settle",
+    "C": "hard and open, where these agents have an unusual angle"
+  },
+  "problems": [
+    {
+      "id": "rule110-universality-machine-checked",
+      "title": "Machine-check the universality of Rule 110",
+      "field": "mathematics",
+      "tier": "A",
+      "question": "Can Cook's proof that elementary cellular automaton Rule 110 is computationally universal be formalized and checked in Lean 4 with no `sorry` and no added axioms?",
+      "known_state": "Cook (2004) proved universality by emulating cyclic tag systems with glider collisions; Neary and Woods (2006) sharpened the emulation to polynomial time. Neither proof has been machine-checked. The repo records the claim as inconclusive (wolfram2002-ch11-14) because reproduction tests can only exercise the construction, not verify it.",
+      "acceptance_criteria": [
+        "A Lean 4 module whose main theorem states that for every cyclic tag system and input there is an initial configuration of Rule 110 whose evolution encodes the computation, compiled with no sorry and only Lean's standard axioms.",
+        "The glider catalog, collision table and the periodic background are each a checked lemma rather than an assumption."
+      ],
+      "falsifiers": [
+        "A gap in the collision table that cannot be closed (a required collision that does not behave as Cook's table says), which would also be a finding against the published proof."
+      ],
+      "required_capabilities": ["lean4", "cellular-automaton-simulation", "proof-engineering"],
+      "data_access": "No data needed; Rule 110 is fully specified. Cook's glider tables are in the open-access Complex Systems paper.",
+      "scales": [],
+      "related_claims": ["wolfram2002-ch11-14", "wolfram2002-ch11-27", "wolfram2002-ch01-07"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.25088/ComplexSystems.15.1.1", "note": "Cook 2004, Universality in elementary cellular automata" },
+        { "doi": "10.1007/11786986_13", "note": "Neary and Woods 2006, P-completeness of cellular automaton Rule 110" }
+      ]
+    },
+    {
+      "id": "smallest-universal-turing-machine-2-3",
+      "title": "Settle whether the (2,3) Turing machine is universal under a conventional definition",
+      "field": "mathematics",
+      "tier": "A",
+      "question": "Is Wolfram's 2-state 3-color Turing machine universal when the initial tape is required to be finite-support or eventually periodic, rather than the non-periodic infinite background used in Smith's prize proof?",
+      "known_state": "Smith's 2007 proof (published 2020) uses an infinite, non-periodic but computable initial tape, which several authors argue smuggles computation into the input. Standard small-universal-machine results (Neary and Woods) use blank or periodic backgrounds. Whether the (2,3) machine is universal under those definitions is open.",
+      "acceptance_criteria": [
+        "Either a construction with a finite-support or eventually periodic initial tape that emulates a universal system, formalized in Lean 4, or a proof that no such construction exists (for example by showing the machine's behaviour on all eventually periodic tapes is decidable)."
+      ],
+      "falsifiers": [
+        "A decidability proof for eventually periodic inputs would refute universality under that definition."
+      ],
+      "required_capabilities": ["lean4", "turing-machine-enumeration", "computability-theory"],
+      "data_access": "None needed; the machine is a 6-entry table.",
+      "scales": [],
+      "related_claims": ["wolfram2002-ch11-27", "wolfram2002-ch11-28", "wolfram2002-ch12-23"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.25088/ComplexSystems.29.1.1", "note": "Smith 2020, Universality of Wolfram's 2, 3 Turing Machine" },
+        { "doi": "10.1016/j.tcs.2008.09.051", "note": "Woods and Neary 2009, The complexity of small universal Turing machines: a survey" }
+      ]
+    },
+    {
+      "id": "rule54-universality",
+      "title": "Is Rule 54 computationally universal?",
+      "field": "mathematics",
+      "tier": "A",
+      "question": "Is elementary cellular automaton Rule 54 capable of universal computation, as Wolfram conjectures, or can a bound on its information transmission rule it out?",
+      "known_state": "Open since 2002. Martínez, Adamatzky and McIntosh catalogued Rule 54's gliders and collisions and built logic gates in 2006, but no complete emulation of a universal system exists. Wolfram's search of 100 million initial conditions (wolfram2002-ch11-21) found only repetitive and nested structures.",
+      "acceptance_criteria": [
+        "A construction (glider-based or otherwise) emulating a known universal system, with the collision table verified by exhaustive simulation and formalized in Lean 4, or",
+        "A proof that Rule 54 cannot be universal (for example a regularity or transmission bound on all configurations)."
+      ],
+      "falsifiers": [
+        "Partial results only (new gates without a complete emulation) leave the problem open."
+      ],
+      "required_capabilities": ["cellular-automaton-simulation", "glider-collision-search", "lean4"],
+      "data_access": "None needed.",
+      "scales": [],
+      "related_claims": ["wolfram2002-ch11-21", "wolfram2002-ch11-19", "wolfram2002-ch11-20"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1016/j.chaos.2005.05.013", "note": "Martínez, Adamatzky and McIntosh 2006, Phenomenology of glider collisions in cellular automaton Rule 54" }
+      ]
+    },
+    {
+      "id": "rule30-center-column",
+      "title": "The Rule 30 center column",
+      "field": "mathematics",
+      "tier": "A",
+      "question": "Is the center column of Rule 30 from a single black cell non-periodic, does it have asymptotic density 1/2, and does computing its n-th cell require effort growing at least linearly in n?",
+      "known_state": "The three Wolfram Rule 30 Prize problems (2019), all unsolved. Non-periodicity has been verified computationally far beyond a million steps (wolfram2002-ch02-05 tests the statistical claim). Partial results exist for related sequences (surjectivity of Rule 30 on bi-infinite configurations, left-permutivity), none settles the column.",
+      "acceptance_criteria": [
+        "A proof of any of the three statements, machine-checked in Lean 4.",
+        "A weaker but new result: a proven lower bound on the period (if periodic) that exceeds all computational checks, or a proof that the column is not eventually periodic under an added hypothesis made explicit."
+      ],
+      "falsifiers": [
+        "Discovery of a period (would refute problem 1) or a proven density different from 1/2."
+      ],
+      "required_capabilities": ["lean4", "symbolic-dynamics", "large-scale-simulation"],
+      "data_access": "None needed.",
+      "scales": [],
+      "related_claims": ["wolfram2002-ch02-05", "wolfram2002-ch12-27", "wolfram2002-ch06-14"],
+      "frontier_problem": "Rule30 center column periodicity",
+      "references": [
+        { "url": "https://www.rule30prize.org/", "note": "Wolfram Rule 30 Prizes, 2019" }
+      ]
+    },
+    {
+      "id": "turing-capable-network-topologies",
+      "title": "Classify the network topologies that admit diffusion-driven instability",
+      "field": "both",
+      "tier": "A",
+      "question": "For reaction networks of n species with m diffusing, which interaction sign-patterns (topologies) admit a Turing instability for some parameters, and is it true that for n >= 3 almost all topologies with at least one feedback loop do?",
+      "known_state": "Turing (1952) settled n = 2 (activator-inhibitor or substrate-depletion sign patterns, with the inhibitor diffusing faster). Marcon et al. (2016) and Scholes et al. (2019) enumerated 2- and 3-node topologies numerically and found many that pattern without differential diffusivity, but there is no proof characterizing the Turing-capable set for general n, and the genericity conjecture is numerical only. turing-ddi has formal status partial in the repo.",
+      "acceptance_criteria": [
+        "A theorem, machine-checked in Lean 4 or at least rigorously proved, giving necessary and sufficient sign-pattern conditions for the existence of parameters producing a Turing instability for n = 3, and",
+        "An exhaustive, reproducible enumeration for n = 3 and n = 4 against which the theorem is checked."
+      ],
+      "falsifiers": [
+        "A 3-node topology that the enumeration finds Turing-capable but the theorem excludes, or vice versa."
+      ],
+      "required_capabilities": ["linear-algebra", "sign-pattern-matrices", "enumeration", "lean4"],
+      "data_access": "None needed; verification against published topology atlases (Marcon 2016, Scholes 2019) which are open access.",
+      "scales": ["tissue", "developmental"],
+      "related_claims": ["turing-ddi", "turing-wavelength", "turing-morphogen-hypothesis"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1098/rstb.1952.0012", "note": "Turing 1952, The chemical basis of morphogenesis" },
+        { "doi": "10.7554/eLife.14022", "note": "Marcon et al. 2016, High-throughput mathematical analysis identifies Turing networks for patterning with equally diffusing signals" },
+        { "doi": "10.1016/j.cels.2019.07.007", "note": "Scholes et al. 2019, A comprehensive network atlas reveals that Turing patterns are common but not robust" }
+      ]
+    },
+    {
+      "id": "hamiltons-rule-exact-scope",
+      "title": "The exact scope of Hamilton's rule",
+      "field": "both",
+      "tier": "A",
+      "question": "Under precisely which population-genetic models is Hamilton's rule rb > c (i) a theorem with predictive content, (ii) an identity with no content beyond the Price equation, and (iii) false?",
+      "known_state": "Nowak, Tarnita and Wilson (2010) argued the rule is almost never a theorem and when general is tautological; Gardner, West and Wild (2011) replied that the regression form is exact and general. Birch and Okasha (2015) separate the readings. The dispute is partly about theorem statements, which makes it formalizable; no formalization exists. The repo records hamilton-rule as proved in the regression form and hamilton-haplodiploidy as refuted.",
+      "acceptance_criteria": [
+        "A Lean 4 development stating the general regression form, the additive-fitness form and a frequency-dependent counterexample as separate theorems, each proved or refuted, with the model assumptions as explicit hypotheses.",
+        "A short statement of which disputed claims in the 2010-2011 exchange correspond to which formal theorem."
+      ],
+      "falsifiers": [
+        "A formal model in which the regression form fails to predict the direction of allele-frequency change would refute Gardner et al.'s generality claim."
+      ],
+      "required_capabilities": ["lean4", "population-genetics", "price-equation"],
+      "data_access": "None needed for the formal part; empirical follow-up can use pedigreed cooperative-breeder datasets.",
+      "scales": ["evolutionary", "collective"],
+      "related_claims": ["hamilton-rule", "hamilton-haplodiploidy", "hamilton-lmc"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1016/0022-5193(64)90038-4", "note": "Hamilton 1964, The genetical evolution of social behaviour I" },
+        { "doi": "10.1038/nature09205", "note": "Nowak, Tarnita and Wilson 2010, The evolution of eusociality" },
+        { "doi": "10.1111/j.1420-9101.2011.02236.x", "note": "Gardner, West and Wild 2011, The genetical theory of kin selection" },
+        { "doi": "10.1093/biosci/biu196", "note": "Birch and Okasha 2015, Kin selection and its critics" }
+      ]
+    },
+    {
+      "id": "phyllotaxis-attractor-classification",
+      "title": "Rigorous classification of attractors in dynamical phyllotaxis",
+      "field": "both",
+      "tier": "A",
+      "question": "In the Douady-Couder class of models (new primordium placed at the point of least repulsion from existing ones on a growing cylinder or disc), what is the complete set of attractors and their basins as the growth parameter varies, and does the golden-angle Fibonacci branch have full-measure basin for small growth parameter?",
+      "known_state": "Douady and Couder (1992) showed numerically and experimentally that the Fibonacci branch is selected; Levitov (1991) explained the energetics; Atela, Golé and Hotton (2002) proved convergence to Fibonacci lattices for a cylindrical model under restrictions. Pennybacker, Shipman and Newell (2015) review the gap: no rigorous classification covering Lucas and bijugate branches, basin boundaries, or the disc geometry. Thompson's phyllotaxis claims (ch14) sit on this.",
+      "acceptance_criteria": [
+        "A theorem characterizing the attractors for the cylindrical Douady-Couder map over a stated parameter range, including the Lucas branch, with proof (Lean 4 or rigorous computer-assisted interval proof).",
+        "Numerical basin maps matching the theorem."
+      ],
+      "falsifiers": [
+        "Numerical discovery of an attractor outside the classified set."
+      ],
+      "required_capabilities": ["dynamical-systems", "interval-arithmetic", "lean4", "simulation"],
+      "data_access": "None needed; sunflower and cone parastichy counts in the repo (thompson1917-ch14-05/06 tests) can check predictions.",
+      "scales": ["organ", "developmental"],
+      "related_claims": ["thompson1917-ch14-01", "thompson1917-ch14-05", "thompson1917-ch14-06", "thompson1917-ch14-09", "thompson1917-ch14-02"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1103/PhysRevLett.68.2098", "note": "Douady and Couder 1992, Phyllotaxis as a physical self-organized growth process" },
+        { "doi": "10.1103/PhysRevLett.66.224", "note": "Levitov 1991, Phyllotaxis of flux lattices in layered superconductors" },
+        { "doi": "10.1016/j.physd.2015.05.003", "note": "Pennybacker, Shipman and Newell 2015, Phyllotaxis: some progress, but a story far from over" }
+      ]
+    },
+    {
+      "id": "lewontins-paradox-of-variation",
+      "title": "Lewontin's paradox of variation",
+      "field": "biology",
+      "tier": "B",
+      "question": "Why does nucleotide diversity scale so weakly with census population size across species, and can linked selection plus demographic history account quantitatively for the gap predicted by neutral theory?",
+      "known_state": "Kimura's neutral theory predicts heterozygosity proportional to 4Nu; observed diversity spans about three orders of magnitude while census sizes span more than twelve (Lewontin 1974). Leffler et al. (2012) compiled diversity across 167 species; Corbett-Detig et al. (2015) argued linked selection explains part of it; Buffalo (2021) estimated the diversity-census slope with phylogenetic correction and found linked selection insufficient. The quantitative residual is unexplained.",
+      "acceptance_criteria": [
+        "A pre-registered test combining a current polymorphism compilation with census-size and range-size estimates (GBIF occurrence extents from the organisms layer) and recombination-rate or genome-size covariates, with explicit quantitative predictions from each hypothesis (neutral, linked selection, boom-bust demography) stated before analysis.",
+        "A verdict on whether linked selection models fitted to measured recombination landscapes close the gap."
+      ],
+      "falsifiers": [
+        "If linked-selection models with measured parameters predict the observed slope, the paradox is resolved; if the residual stays at orders of magnitude, demographic explanations are required."
+      ],
+      "required_capabilities": ["population-genetics", "phylogenetic-comparative-methods", "gbif", "data-test"],
+      "data_access": "Leffler 2012 and Buffalo 2021 supplementary tables (open); GBIF via the organisms layer; recombination maps per species where published.",
+      "scales": ["evolutionary", "ecological"],
+      "related_claims": ["kimura-heterozygosity", "kimura-neutral-theory", "kimura-substitution-rate"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1038/217624a0", "note": "Kimura 1968, Evolutionary rate at the molecular level" },
+        { "doi": "10.1371/journal.pbio.1001388", "note": "Leffler et al. 2012, Revisiting an old riddle: what determines genetic diversity levels within species?" },
+        { "doi": "10.1371/journal.pbio.1002112", "note": "Corbett-Detig, Hartl and Sackton 2015, Natural selection constrains neutral diversity across a wide range of species" },
+        { "doi": "10.7554/eLife.67509", "note": "Buffalo 2021, Quantifying the relationship between genetic diversity and population size suggests natural selection cannot explain Lewontin's paradox" }
+      ]
+    },
+    {
+      "id": "metabolic-scaling-exponent",
+      "title": "Is there a universal metabolic scaling exponent?",
+      "field": "biology",
+      "tier": "B",
+      "question": "Does basal metabolic rate scale with body mass with a single exponent across taxa, and if so is it 3/4 (fractal supply networks) or 2/3 (surface-to-volume), or does the exponent vary systematically with taxon, temperature and body size?",
+      "known_state": "Kleiber (1932) reported 3/4; West, Brown and Enquist (1997) derived 3/4 from space-filling branching networks; White and Seymour (2003) found 2/3 for mammals once body temperature and digestive state are controlled; Kozlowski and Konarzewski (2004) disputed the WBE derivation. Current syntheses find curvature and taxon dependence. Thompson's surface-volume claims (ch02-01, ch03-07) encode the 2/3 alternative.",
+      "acceptance_criteria": [
+        "A pre-registered phylogenetically controlled analysis across the organism taxa with AnAge/PanTHERIA body mass and metabolic data, with stated predictions: a single exponent with 95% interval excluding one of 2/3 and 3/4, or a model-comparison verdict that a curved or taxon-specific model beats any single power law.",
+        "A Lean 4 formalization of the WBE derivation stating its assumptions as hypotheses, so the disputed step is explicit."
+      ],
+      "falsifiers": [
+        "If the pooled exponent interval contains both 2/3 and 3/4 after controls, the universality question is empirically underdetermined with present data."
+      ],
+      "required_capabilities": ["phylogenetic-comparative-methods", "allometry", "data-test", "lean4"],
+      "data_access": "AnAge (open), PanTHERIA (open), White and Seymour 2003 compilation; taxon resolution via test-data/organisms.",
+      "scales": ["organism", "evolutionary"],
+      "related_claims": ["thompson1917-ch03-07", "thompson1917-ch02-01", "thompson1917-ch03-10"],
+      "frontier_problem": "Mammalian body size control",
+      "references": [
+        { "doi": "10.3733/hilg.v06n11p315", "note": "Kleiber 1932, Body size and metabolism" },
+        { "doi": "10.1126/science.276.5309.122", "note": "West, Brown and Enquist 1997, A general model for the origin of allometric scaling laws in biology" },
+        { "doi": "10.1073/pnas.0436428100", "note": "White and Seymour 2003, Mammalian basal metabolic rate is proportional to body mass 2/3" },
+        { "doi": "10.1111/j.0269-8463.2004.00830.x", "note": "Kozlowski and Konarzewski 2004, Is West, Brown and Enquist's model of allometric scaling mathematically correct and biologically relevant?" }
+      ]
+    },
+    {
+      "id": "species-area-exponent",
+      "title": "Why does the species-area exponent cluster where it does?",
+      "field": "biology",
+      "tier": "B",
+      "question": "Is the island species-area relationship a power law with a near-universal exponent z around 0.25, and if so what sets that value; or is the power law an approximation to a non-power form (as the maximum entropy theory of ecology predicts) whose apparent exponent depends on scale?",
+      "known_state": "Darwin recorded that islands hold fewer species than equal continental areas (ch12-04). Drakare, Lennon and Hillebrand (2006) meta-analysed 794 species-area curves and found z depends on sampling design, habitat and body size; Harte et al. (2009) derived a universal non-power curve from METE; Triantis, Guilhaumon and Whittaker (2012) compared 20 functional forms across 601 island datasets and found the power law best overall but with substantial variation in z. Whether a single mechanism sets z is unresolved.",
+      "acceptance_criteria": [
+        "A pre-registered test on GBIF occurrence counts for a defined set of island archipelagos (from the organisms layer), fitting the power law, METE and at least two alternatives with identical sampling corrections, stating in advance the decision rule for 'universal exponent' versus 'scale-dependent form'."
+      ],
+      "falsifiers": [
+        "METE predictions failing systematically at the island scale would refute the universal non-power form; z intervals that do not overlap across archipelagos refute universality."
+      ],
+      "required_capabilities": ["gbif", "macroecology", "model-comparison", "data-test"],
+      "data_access": "GBIF (open), island area from Triantis et al. 2012 supplementary data (open).",
+      "scales": ["ecological"],
+      "related_claims": ["darwin1859-ch12-04", "darwin1859-ch12-05", "darwin1859-ch11-02"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1111/j.1461-0248.2005.00848.x", "note": "Drakare, Lennon and Hillebrand 2006, The imprint of the geographical, evolutionary and ecological context on species-area relationships" },
+        { "doi": "10.1111/j.1461-0248.2009.01328.x", "note": "Harte et al. 2009, Biodiversity scales from plots to biomes with a universal species-area curve" },
+        { "doi": "10.1111/j.1365-2699.2011.02652.x", "note": "Triantis, Guilhaumon and Whittaker 2012, The island species-area relationship: biology and statistics" }
+      ]
+    },
+    {
+      "id": "clade-trajectory-universality",
+      "title": "Are clade diversity trajectories universally hat-shaped?",
+      "field": "biology",
+      "tier": "B",
+      "question": "Do most fossil clades rise to a diversity peak and decline symmetrically, as Darwin and later Foote and Quental and Marshall proposed, or is the apparent hat shape a product of sampling and the way clades are defined?",
+      "known_state": "Darwin claimed groups rise gradually to a maximum then decline (ch10-06; repo verdict mixed). Foote (2007) found symmetric waxing and waning of marine invertebrate genera; Liow and Stenseth (2007) found similar shapes in mammals; Quental and Marshall (2013) linked decline to Red Queen dynamics. Critics attribute symmetry to the 'pull of the recent', paraphyletic clade definitions and sampling heterogeneity. No standardized, subsampling-corrected test across all orders and families exists.",
+      "acceptance_criteria": [
+        "A pre-registered test over all PBDB orders and families meeting stated occurrence thresholds, using shareholder-quorum subsampling and monophyly filters, with a stated statistic for hat-shapedness and a null from randomized origination-extinction sequences.",
+        "A verdict with effect size: fraction of clades significantly hat-shaped versus the null."
+      ],
+      "falsifiers": [
+        "If the fraction of hat-shaped clades is indistinguishable from the random-walk null after subsampling, the pattern is an artifact."
+      ],
+      "required_capabilities": ["pbdb", "paleobiology-statistics", "subsampling", "data-test"],
+      "data_access": "Paleobiology Database API (open), already wired into test-data/organisms.",
+      "scales": ["evolutionary"],
+      "related_claims": ["darwin1859-ch10-06", "darwin1859-ch10-07", "darwin1859-ch10-02"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1666/06084.1", "note": "Foote 2007, Symmetric waxing and waning of marine invertebrate genera" },
+        { "doi": "10.1098/rspb.2007.1006", "note": "Liow and Stenseth 2007, The rise and fall of species: implications for macroevolutionary and macroecological studies" },
+        { "doi": "10.1126/science.1239431", "note": "Quental and Marshall 2013, How the Red Queen drives terrestrial mammals to extinction" }
+      ]
+    },
+    {
+      "id": "empty-shell-morphospace",
+      "title": "Why is shell morphospace empty where it is?",
+      "field": "both",
+      "tier": "B",
+      "question": "In Raup's parameter space of coiled shells (whorl expansion W, distance from axis D, translation T), is the unoccupied region explained by developmental constraint, functional selection (strength, hydrodynamics, stability) or phylogenetic inertia, and can these be told apart quantitatively?",
+      "known_state": "Raup (1966) showed realized shells occupy a small, structured part of the theoretical space. Fifty years of theoretical morphology (reviewed by Gerber 2017) have proposed functional and constructional explanations, but no accepted test discriminates them, partly because digitized shell parameter data were sparse. Thompson's shell-form claims (ch11) assume the logarithmic-spiral generative model.",
+      "acceptance_criteria": [
+        "A pre-registered test on digitized museum shell datasets (parameters measured by the morpholib MorphoEval pipeline), fitting explicit occupancy models: a developmental-constraint model (parameter correlations imposed by the generating curve), a functional model (strength and stability thresholds) and a phylogenetic model, compared by predictive likelihood on held-out taxa.",
+        "An empty-region map with the winning model's predicted boundaries."
+      ],
+      "falsifiers": [
+        "If no model beats a phylogenetic random walk on held-out taxa, the question stays open with present data."
+      ],
+      "required_capabilities": ["theoretical-morphology", "morpholib", "3d-shape-analysis", "data-test"],
+      "data_access": "Digitized shell collections (MorphoSource, iDigBio, open), Raup parameters re-measured; taxon resolution via test-data/organisms.",
+      "scales": ["organism", "evolutionary"],
+      "related_claims": ["thompson1917-ch11-09", "thompson1917-ch11-11", "thompson1917-ch11-05", "thompson1917-ch11-15"],
+      "frontier_problem": null,
+      "references": [
+        { "url": "https://www.jstor.org/stable/1301405", "note": "Raup 1966, Geometric analysis of shell coiling: general problems" },
+        { "doi": "10.1111/brv.12276", "note": "Gerber 2017, The geometry of morphospaces: lessons from the classic Raup shell coiling model" }
+      ]
+    },
+    {
+      "id": "somite-number-control",
+      "title": "What sets vertebrate somite number?",
+      "field": "biology",
+      "tier": "B",
+      "question": "Across vertebrates, is total somite (and hence vertebral) number set by the ratio of the duration of axis elongation to the segmentation-clock period, as clock-and-wavefront predicts, and if so what evolutionary changes in clock period and elongation explain the range from about 30 to over 300?",
+      "known_state": "Cooke and Zeeman (1976) proposed clock-and-wavefront; Gomez et al. (2008) showed in zebrafish, chick, mouse and corn snake that snakes make many more somites by slowing axis elongation relative to the clock; Oates, Morelli and Soroldoni (2012) review the clock. Clock period and elongation rate are measured in only a handful of species, so the comparative prediction has not been tested broadly. Already a Frontier Problem.",
+      "acceptance_criteria": [
+        "A pre-registered comparative test: for every species with a measured clock period and elongation duration, compare predicted and observed vertebral counts (from museum and literature counts via the organisms layer); state in advance the tolerance for 'supports'.",
+        "A ranked list of species whose clock measurement would most reduce uncertainty about the mechanism."
+      ],
+      "falsifiers": [
+        "Measured clock period and elongation duration whose ratio mispredicts somite number by more than the stated tolerance in several species."
+      ],
+      "required_capabilities": ["developmental-biology", "comparative-data", "data-test"],
+      "data_access": "Vertebral counts in literature and museum databases (open); clock periods from published time-lapse studies.",
+      "scales": ["developmental", "evolutionary"],
+      "related_claims": ["thompson1917-ch17-04"],
+      "frontier_problem": "Somite number control",
+      "references": [
+        { "doi": "10.1016/S0022-5193(76)80131-2", "note": "Cooke and Zeeman 1976, A clock and wavefront model for control of the number of repeated structures during animal morphogenesis" },
+        { "doi": "10.1038/nature07020", "note": "Gomez et al. 2008, Control of segment number in vertebrate embryos" },
+        { "doi": "10.1242/dev.063735", "note": "Oates, Morelli and Soroldoni 2012, Patterning embryos with oscillations" }
+      ]
+    },
+    {
+      "id": "murrays-law-vascular-optimality",
+      "title": "Does real vasculature obey Murray's law?",
+      "field": "both",
+      "tier": "B",
+      "question": "At vascular branch points, does the cube of the parent radius equal the sum of the cubes of the daughter radii (Murray's minimum-work law), does the exponent shift toward 2 in high-shear or turbulent beds, and does plant xylem obey the same law?",
+      "known_state": "Murray (1926) derived the cubic law from minimizing pumping work plus blood-volume maintenance; Sherman (1981) found good agreement in arterial trees; McCulloh, Sperry and Adler (2003) found plant xylem conduits obey Murray's law where conduits are not load-bearing. Modern retinal and whole-organ imaging datasets allow exponent estimation at thousands of branch points, but no standardized cross-tissue, cross-kingdom test exists. Thompson's claim (ch15-13) is the minimum-effort statement.",
+      "acceptance_criteria": [
+        "A pre-registered test estimating the branching exponent across at least three open vascular datasets (retinal fundus segmentations, micro-CT of organ vasculature, xylem anatomy), with the hypotheses 'exponent 3', 'exponent 7/3 (turbulent)' and 'no single exponent' stated in advance."
+      ],
+      "falsifiers": [
+        "Exponent intervals excluding 3 across tissues would refute the general law; a shear-dependent shift would support the amended form."
+      ],
+      "required_capabilities": ["image-segmentation", "vascular-morphometry", "data-test"],
+      "data_access": "Open retinal vessel datasets (DRIVE, HRF), open micro-CT vascular casts, xylem data from McCulloh et al. 2003.",
+      "scales": ["tissue", "organ"],
+      "related_claims": ["thompson1917-ch15-13", "thompson1917-ch16-03"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1073/pnas.12.3.207", "note": "Murray 1926, The physiological principle of minimum work I" },
+        { "doi": "10.1085/jgp.78.4.431", "note": "Sherman 1981, On connecting large vessels to small: the meaning of Murray's law" },
+        { "doi": "10.1038/nature01444", "note": "McCulloh, Sperry and Adler 2003, Water transport in plants obeys Murray's law" }
+      ]
+    },
+    {
+      "id": "morphogenesis-cognition-gene-overlap",
+      "title": "Do morphogenesis and learning share a gene set beyond pleiotropy?",
+      "field": "biology",
+      "tier": "C",
+      "question": "Do genes annotated to morphogenesis and genes annotated to learning and memory overlap more than expected from gene-set size, pleiotropy and shared housekeeping components, as Levin's TAME framework predicts?",
+      "known_state": "Levin (2022) predicts wide overlap because, on his account, morphogenesis uses the same problem-solving machinery as cognition. The repo's one test (levin-2022-tame-19) returned refutes at confidence 0.7 using GO term overlap, but did not control for pleiotropy, annotation bias or gene-set size. INDRA CoGEx allows a mechanistically grounded, permutation-controlled test.",
+      "acceptance_criteria": [
+        "A pre-registered test using INDRA CoGEx gene sets for morphogenesis and learning/memory (GO and HPO), a permutation null matched on gene-set size, pleiotropy degree and annotation count, and a stated effect-size threshold for 'wide overlap'.",
+        "The same test on ion-channel and gap-junction subsets, which Levin names specifically."
+      ],
+      "falsifiers": [
+        "Overlap within the matched null refutes the prediction; overlap well above it (especially in the bioelectric subset) supports it and would revise the current verdict."
+      ],
+      "required_capabilities": ["indra-cogex", "gene-set-statistics", "data-test"],
+      "data_access": "INDRA CoGEx MCP (public), Gene Ontology, HPO.",
+      "scales": ["molecular", "cellular", "developmental", "neural"],
+      "related_claims": ["levin-2022-tame-19"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.3389/fnsys.2022.768201", "note": "Levin 2022, Technological approach to mind everywhere (TAME)" }
+      ]
+    },
+    {
+      "id": "bioelectric-prepattern-predicts-anatomy",
+      "title": "Does the bioelectric prepattern predict anatomical outcome?",
+      "field": "biology",
+      "tier": "C",
+      "question": "Is there a quantitative, predictive mapping from a measured resting-potential (Vmem) pattern in a tissue to the anatomical structure it will form, such that perturbing the pattern predicts the anatomical change before it occurs?",
+      "known_state": "Levin and colleagues report that Vmem patterns prefigure and can instruct anatomy in planarian head regeneration, Xenopus face and eye induction, and tumour induction (Levin and Martyniuk 2018). BETSE (Pietak and Levin 2016) simulates Vmem dynamics; Durant et al. (2017) modelled planarian anterior-posterior polarity. No model takes an arbitrary measured Vmem map and outputs a falsifiable anatomical prediction with stated accuracy. Thirteen Levin tests in the repo are pre-registered and awaiting data.",
+      "acceptance_criteria": [
+        "A model (bounded bioelectric simulation plus a pattern-to-anatomy decoder) that, given published Vmem images of perturbed and control embryos or planarian fragments, predicts the anatomical phenotype class with pre-registered accuracy on held-out images.",
+        "Explicit statement of which published datasets are used for training and which for testing."
+      ],
+      "falsifiers": [
+        "Prediction accuracy at chance on held-out perturbations refutes the predictive form of the bioelectric-code hypothesis for those tissues."
+      ],
+      "required_capabilities": ["bioelectric-simulation", "image-analysis", "frontier_simulate", "data-test"],
+      "data_access": "Published Vmem imaging (DiBAC/CC2-DMPE) in open-access Levin lab papers; BETSE (open source).",
+      "scales": ["cellular", "tissue", "developmental"],
+      "related_claims": ["levin-2015-girardia-11", "levin-2018-hcn2-06", "levin-2018-hcn2-16", "levin-2019-boundary-14"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1016/j.biosystems.2017.08.009", "note": "Levin and Martyniuk 2018, The bioelectric code" },
+        { "doi": "10.3389/fbioe.2016.00055", "note": "Pietak and Levin 2016, Exploring instructive physiological signaling with the bioelectric tissue simulation engine" },
+        { "doi": "10.1016/j.bpj.2017.04.011", "note": "Durant et al. 2017, Long-term, stochastic editing of regenerative anatomy via targeting endogenous bioelectric gradients" }
+      ]
+    },
+    {
+      "id": "grn-memory-generic-or-biological",
+      "title": "Is memory in gene regulatory network models generic or a biological signature?",
+      "field": "both",
+      "tier": "C",
+      "question": "Do the memory and habituation behaviours found in published ODE models of biological pathways occur at the same rate in random nonlinear ODE networks of matched size, sparsity and kinetics, or are they enriched in biological networks?",
+      "known_state": "Biswas, Manicka, Hoel and Levin (2021) found several kinds of memory (UCS-based, pairing, associative, consolidation) in 35 BioModels pathway models, and habituation in 27 of them (levin-2022-grn-learning claims, top of the repo's testability ranking). No matched random-network null has been run, so it is unknown whether the result says anything about biology rather than about nonlinear dynamics in general.",
+      "acceptance_criteria": [
+        "A pre-registered computational test re-running the Biswas protocol on the original 35 models and on at least 350 random networks matched on node count, edge density, kinetic form and parameter ranges; the enrichment statistic and its threshold stated in advance.",
+        "Code and seeds published so the result is reproducible."
+      ],
+      "falsifiers": [
+        "Memory rates in random networks equal to or above the biological ones refute the biological-signature reading."
+      ],
+      "required_capabilities": ["ode-simulation", "biomodels", "random-network-nulls", "data-test"],
+      "data_access": "BioModels (open), Biswas et al. 2021 code (open access paper).",
+      "scales": ["molecular", "cellular"],
+      "related_claims": ["levin-2022-grn-learning-01", "levin-2022-grn-learning-08", "levin-2022-grn-learning-11", "levin-2022-grn-learning-14", "levin-2022-grn-learning-16"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1016/j.isci.2021.102131", "note": "Biswas, Manicka, Hoel and Levin 2021, Gene regulatory networks exhibit several kinds of memory" }
+      ]
+    },
+    {
+      "id": "active-inference-morphogenesis-falsifiable",
+      "title": "A falsifiable form of active-inference morphogenesis",
+      "field": "both",
+      "tier": "C",
+      "question": "Can the claim that morphogenesis is variational free-energy minimization be stated as a quantitative prediction that a regeneration or development experiment could refute, and does existing data refute it?",
+      "known_state": "Friston, Levin, Sengupta and Pezzulo (2015) modelled morphogenesis as active inference by identical cells sharing a generative model; Kuchling et al. (2020) extended it to regeneration. Critics hold the framework is unfalsifiable because any outcome can be described as free-energy minimization under some generative model. No prediction has been derived that fixes the generative model in advance and could fail. The repo's levin-2015-place and levin-2019-boundary claims are untested for this reason.",
+      "acceptance_criteria": [
+        "A derivation, from a generative model fixed before looking at data, of a quantitative prediction (for example regeneration time or error rate scaling with a stated surprise measure under graded perturbations) together with the observation that would refute it.",
+        "A pre-registered test of that prediction on published planarian or Xenopus regeneration time courses."
+      ],
+      "falsifiers": [
+        "If every candidate prediction can be rescued by changing the generative model post hoc, the framework is not empirically testable in its current form; that is itself a result."
+      ],
+      "required_capabilities": ["variational-inference", "developmental-biology", "philosophy-of-science", "data-test"],
+      "data_access": "Published regeneration time courses (open-access Levin lab papers).",
+      "scales": ["cellular", "tissue", "developmental"],
+      "related_claims": ["levin-2015-place-03", "levin-2015-place-04", "levin-2019-boundary-15", "levin-2015-girardia-20"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1098/rsif.2014.1383", "note": "Friston, Levin, Sengupta and Pezzulo 2015, Knowing one's place: a free-energy approach to pattern regulation" },
+        { "doi": "10.1016/j.plrev.2019.06.001", "note": "Kuchling, Friston, Georgiev and Levin 2020, Morphogenesis as Bayesian inference" }
+      ]
+    },
+    {
+      "id": "kelvin-problem-in-epithelia",
+      "title": "Kelvin's problem in epithelia",
+      "field": "both",
+      "tier": "C",
+      "question": "What is the energy-minimizing partition of space into equal-volume cells (Kelvin's problem, still open), and do cells in curved epithelia adopt the minimal shapes (scutoids) that the corresponding constrained problem predicts?",
+      "known_state": "Kelvin's 1887 conjecture was beaten by the Weaire-Phelan foam (1994); no proof of optimality for any 3D partition exists, in contrast to Hales's proof of the 2D honeycomb conjecture (2001). Gomez-Galvez et al. (2018) showed that cells in curved epithelia adopt scutoid shapes and argued they minimize energy; Thompson's cell-packing claims (ch07) are the 2D and 3D precursors and the repo's cell-geometry project segments micrographs for them.",
+      "acceptance_criteria": [
+        "For the biological part: a pre-registered test on segmented 3D epithelial datasets comparing observed scutoid frequency against energy-minimizing predictions for the measured curvature, with a stated tolerance.",
+        "For the mathematical part: a new rigorous result, for example a Lean-checked lower bound on the surface area of equal-volume partitions in a periodic cell, or a computer-assisted proof of local optimality for Weaire-Phelan."
+      ],
+      "falsifiers": [
+        "A partition with lower surface area than Weaire-Phelan would overturn the biological energy-minimization comparison baseline; scutoid frequencies far from the minimal-energy prediction would refute the energy-minimization account."
+      ],
+      "required_capabilities": ["surface-evolver", "3d-segmentation", "cell-geometry", "lean4"],
+      "data_access": "Gomez-Galvez 2018 supplementary data (open); EM epithelial volumes (open repositories).",
+      "scales": ["cellular", "tissue"],
+      "related_claims": ["thompson1917-ch07-04", "thompson1917-ch07-11", "thompson1917-ch07-08", "thompson1917-ch09-16"],
+      "frontier_problem": null,
+      "references": [
+        { "doi": "10.1080/09500839408241577", "note": "Weaire and Phelan 1994, A counter-example to Kelvin's conjecture on minimal surfaces" },
+        { "doi": "10.1007/s004540010071", "note": "Hales 2001, The honeycomb conjecture" },
+        { "doi": "10.1038/s41467-018-05376-1", "note": "Gomez-Galvez et al. 2018, Scutoids are a geometrical solution to three-dimensional packing of epithelia" }
+      ]
+    },
+    {
+      "id": "mutant-morphant-discrepancy-prediction",
+      "title": "Predict which genes show mutant-morphant discrepancies",
+      "field": "biology",
+      "tier": "C",
+      "question": "Can a rule be learned and validated that predicts, from a gene's sequence, paralog structure and network position, whether its zebrafish CRISPR mutant will lack the phenotype its morpholino knockdown shows (transcriptional adaptation / genetic compensation)?",
+      "known_state": "Kok et al. (2015) found most morphant phenotypes absent in mutants; Rossi et al. (2015) showed genetic compensation; El-Brolosy et al. (2019) identified the mechanism as transcriptional adaptation triggered by mutant mRNA decay and upregulating sequence-similar genes. Which genes compensate is not predictable in advance. Already a Frontier Problem.",
+      "acceptance_criteria": [
+        "A pre-registered classifier using ZFIN mutant and morphant phenotype records as labels and INDRA CoGEx paralog, NMD-pathway and network features as predictors, with held-out accuracy and the chance baseline stated in advance.",
+        "A ranked list of untested genes with predicted compensation, so the prediction can be checked by future experiments."
+      ],
+      "falsifiers": [
+        "Held-out accuracy at the baseline refutes the predictability claim with present features."
+      ],
+      "required_capabilities": ["indra-cogex", "zfin", "machine-learning", "data-test"],
+      "data_access": "ZFIN (open), INDRA CoGEx (public MCP), Ensembl paralog tables (open).",
+      "scales": ["molecular", "developmental"],
+      "related_claims": ["darwin1859-ch05-06", "levin-2022-tame-19"],
+      "frontier_problem": "Zebrafish mutant morphant discrepancy attribution",
+      "references": [
+        { "doi": "10.1016/j.devcel.2014.11.018", "note": "Kok et al. 2015, Reverse genetic screening reveals poor correlation between morpholino-induced and mutant phenotypes in zebrafish" },
+        { "doi": "10.1038/nature14580", "note": "Rossi et al. 2015, Genetic compensation induced by deleterious mutations but not gene knockdowns" },
+        { "doi": "10.1038/s41586-019-1064-z", "note": "El-Brolosy et al. 2019, Genetic compensation triggered by mutant mRNA degradation" }
+      ]
+    },
+    {
+      "id": "trabecular-stress-alignment-wolffs-law",
+      "title": "Do trabeculae align with principal stress, and is that alignment causal?",
+      "field": "biology",
+      "tier": "B",
+      "question": "In loaded cancellous bone (femoral head, vertebral body, calcaneus), is the mean trabecular orientation within a small angular tolerance of the principal stress directions computed from the bone's own geometry and a physiological load case? Is the alignment stronger than expected from a load-independent growth rule, and does it re-orient after experimentally altered loading?",
+      "known_state": "Wolff (1892) and Thompson (1917, ch. 16) hold that trabeculae lie along trajectories of principal stress because material off those lines is shear-loaded and remodelled away. Finite-element and remodelling models reproduce aligned architectures (Huiskes et al. 2000), and in vivo load-orientation experiments in bird and sheep joints report re-orientation (Pontzer et al. 2006; Barak et al. 2011), but results are mixed on how tight the alignment is, on whether alignment reflects the loads of habitual or peak activity, and on whether a purely genetic or developmental pattern would give the same fabric. Christen et al. 2014 find human remodelling load-driven but not lazy. No standardized, pre-registered cross-site and cross-species estimate of the stress-fabric angle with a developmental null exists.",
+      "acceptance_criteria": [
+        "A pre-registered test on at least three open micro-CT datasets of loaded bone sites from at least two species: compute the mean-intercept-length fabric tensor, compute principal stresses from a stated finite-element load case, report the angular error distribution, and compare it against a null with the same density field but randomized fabric directions and against a growth-rule null. State the angular tolerance and the pass threshold in advance."
+      ],
+      "falsifiers": [
+        "A median fabric-to-stress angular error not distinguishable from the randomized-fabric null, or insensitive to the choice of load case, would refute stress alignment as the dominant organizing principle at the tested sites.",
+        "Reproducible failure to re-orient after a documented change in joint loading would refute the causal claim."
+      ],
+      "required_capabilities": [
+        "micro-ct-morphometry",
+        "finite-element-analysis",
+        "data-test"
+      ],
+      "data_access": "Open micro-CT of femora, vertebrae and calcanei on MorphoSource, Dryad and Zenodo; paired load data are the main uncertainty and have to be established by scouting before the test is pre-registered.",
+      "scales": [
+        "tissue",
+        "organ"
+      ],
+      "related_claims": [
+        "thompson1917-ch16-05",
+        "thompson1917-ch16-06",
+        "thompson1917-ch16-07",
+        "thompson1917-ch16-16"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1038/35015116",
+          "note": "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone"
+        },
+        {
+          "doi": "10.1038/ncomms5855",
+          "note": "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy"
+        },
+        {
+          "doi": "10.1242/jeb.01971",
+          "note": "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation"
+        },
+        {
+          "doi": "10.1016/j.bone.2011.08.020",
+          "note": "Barak et al. 2011, A Wolff in sheep's clothing: trabecular bone adaptation in response to changes in joint loading orientation"
+        }
+      ]
+    },
+    {
+      "id": "biocomposite-toughness-from-hierarchy",
+      "title": "Does hierarchy itself explain the toughness of biological composites?",
+      "field": "both",
+      "tier": "B",
+      "question": "Across nacre, bone, dentin, antler and other mineralised composites, is fracture toughness predicted by quantitative structural descriptors (mineral volume fraction, platelet aspect ratio, interface compliance, number of hierarchical levels) beyond what the constituents' stiffness and strength predict? Is there a scaling of toughness enhancement with the number of hierarchical levels?",
+      "known_state": "Natural composites reach toughness well above that of their brittle mineral phase (Launey and Ritchie 2009; Wegst et al. 2015). Nacre's tablets and soft interlayer have been modelled as a tension-shear chain and measured at the tablet scale (Jackson, Vincent and Turner 1988; Barthelat et al. 2007), and interface mechanics is reviewed by Barthelat et al. 2016. Ashby, Gibson, Wegst and Olive 1995 chart property ranges of natural materials. What is missing is a single dataset-wide regression that separates the contribution of architecture from constituents, and a test of whether toughness gain compounds with hierarchical levels as often asserted. Thompson's claim (ch. 16-02) that bone is an economical material is the starting point for the bone case.",
+      "acceptance_criteria": [
+        "A pre-registered meta-analysis of at least 40 published material records spanning at least five biocomposite families, with structural descriptors extracted by stated rules, the null model (constituent-only mixing law) and the toughness-enhancement metric fixed in advance, and a leave-one-family-out validation."
+      ],
+      "falsifiers": [
+        "If a constituent-only model explains the toughness within the stated error bound, hierarchy adds nothing and the claim is refuted for this dataset.",
+        "If enhancement is not monotone in the number of hierarchical levels after controlling for volume fraction, the compounding claim is refuted."
+      ],
+      "required_capabilities": [
+        "literature-extraction",
+        "meta-analysis",
+        "data-test"
+      ],
+      "data_access": "Published material property tables and supplementary data (Ashby et al. 1995 charts, Wegst et al. 2015 and Barthelat et al. 2016 compilations, tablet-scale nacre measurements); records have to be extracted with provenance and each family's measurement method checked, because fracture toughness methods differ between papers.",
+      "scales": [
+        "molecular",
+        "tissue"
+      ],
+      "related_claims": [
+        "thompson1917-ch16-02",
+        "thompson1917-ch16-16"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1002/adma.200803322",
+          "note": "Launey and Ritchie 2009, On the fracture toughness of advanced materials"
+        },
+        {
+          "doi": "10.1038/nmat4089",
+          "note": "Wegst et al. 2015, Bioinspired structural materials"
+        },
+        {
+          "doi": "10.1038/natrevmats.2016.7",
+          "note": "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials"
+        },
+        {
+          "doi": "10.1098/rspb.1988.0056",
+          "note": "Jackson, Vincent and Turner 1988, The mechanical design of nacre"
+        },
+        {
+          "doi": "10.1016/j.jmps.2006.07.007",
+          "note": "Barthelat et al. 2007, On the mechanics of mother-of-pearl: a key feature in the material hierarchical structure"
+        },
+        {
+          "doi": "10.1098/rspa.1995.0075",
+          "note": "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts"
+        }
+      ]
+    },
+    {
+      "id": "hollow-tube-mass-optimality",
+      "title": "Are biological hollow structures at the stiffness-per-mass optimum?",
+      "field": "both",
+      "tier": "B",
+      "question": "For bone shafts, plant stems, bamboo, feathers and quills, is the radius-to-wall-thickness ratio at the value that maximizes bending stiffness per unit mass, or does a competing constraint (local buckling, impact, vascular space, growth) set it? How large is the systematic deviation, and does it depend on the organism's size?",
+      "known_state": "Thompson (1917, ch. 16) argues that where stiffness against bending in all directions is required organisms use hollow cylinders with little material in the core, and that the walls of long bones are thickest where bending is greatest. Thin-walled-tube theory gives the stiffness-per-mass optimum and the local-buckling limit, and Ashby, Gibson, Wegst and Olive 1995 compare natural and engineering shapes. We know of no pre-registered cross-taxon comparison of measured thickness ratios with the optimum and buckling limits that uses the measured material properties of each structure, so the extent of optimality is unmeasured.",
+      "acceptance_criteria": [
+        "A pre-registered comparison of measured radius and wall thickness for at least 100 structures from at least four structure types (long bones, stems, bamboo culms, feather rachises), each with its measured tissue modulus, against the stiffness-per-mass optimum and the buckling limit, with the tolerance for 'at optimum' stated in advance."
+      ],
+      "falsifiers": [
+        "If the measured ratios cluster at the buckling limit rather than at the stiffness-per-mass optimum for most structures, the optimality claim is refuted and a buckling-limited design is supported.",
+        "If the ratios show no relation to either, the claim is refuted for the tested set."
+      ],
+      "required_capabilities": [
+        "morphometry",
+        "mechanics-modelling",
+        "data-test"
+      ],
+      "data_access": "Published cross-section morphometry of long bones, culms and rachises, and open CT of limb bones on MorphoSource; tissue modulus values have to be taken from the same or a closely matched source, which limits the usable sample.",
+      "scales": [
+        "tissue",
+        "organ"
+      ],
+      "related_claims": [
+        "thompson1917-ch16-03",
+        "thompson1917-ch16-04"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1098/rspa.1995.0076",
+          "note": "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency"
+        },
+        {
+          "doi": "10.1098/rspa.1995.0075",
+          "note": "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts"
+        }
+      ]
+    },
+    {
+      "id": "limb-bone-scaling-vs-mechanical-similarity",
+      "title": "How do limb bones actually scale with body mass?",
+      "field": "biology",
+      "tier": "B",
+      "question": "Across quadrupedal tetrapods, do limb-bone cross-sections scale with body mass at the exponent set by geometric similarity (2/3), elastic similarity (3/4), or stress similarity (1, with posture change compensating), and does the answer depend on clade, posture and bone? Is the scaling of bone safety factor flat?",
+      "known_state": "Thompson (1917, ch. 2) argues that because bone strength grows as cross-section and weight as volume there is an upper limit to size. McMahon (1973) proposed elastic similarity, with limb-bone diameter scaling as the 3/8 power of length. Biewener (1989) showed that mammals compensate through posture so that bone safety factors stay roughly constant, and Campione and Evans (2012) found a universal relation between body mass and the circumference of the humerus and femur in quadrupeds, with a different scaling for bipeds. Disagreement remains about clade-specific exponents, about phylogenetic correction, and about whether the exponent reflects structural limits or the constraints of locomotion.",
+      "acceptance_criteria": [
+        "A pre-registered phylogenetically corrected regression of limb-bone circumference (or cross-sectional area) on body mass across at least 300 taxa, using the Campione and Evans dataset and an independent compilation, with the three similarity hypotheses and the tolerance on the exponent stated in advance, and clade-by-clade fits."
+      ],
+      "falsifiers": [
+        "An exponent interval excluding all three hypotheses, or an exponent that varies significantly across clades after phylogenetic correction, would refute the hypothesis of a single mechanical similarity law."
+      ],
+      "required_capabilities": [
+        "phylogenetic-comparative-methods",
+        "data-test",
+        "gbif-taxon-resolution"
+      ],
+      "data_access": "Campione and Evans 2012 supplementary data, AnAge and PanTHERIA body masses, and the vendored organisms layer for taxon resolution; independent bone measurements have to be located in published compilations.",
+      "scales": [
+        "organ",
+        "organism"
+      ],
+      "related_claims": [
+        "thompson1917-ch02-03",
+        "thompson1917-ch16-04"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1126/science.179.4079.1201",
+          "note": "McMahon 1973, Size and shape in biology"
+        },
+        {
+          "doi": "10.1126/science.2740914",
+          "note": "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics"
+        },
+        {
+          "doi": "10.1186/1741-7007-10-60",
+          "note": "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods"
+        }
+      ]
+    },
+    {
+      "id": "hygromorph-bilayer-scaling",
+      "title": "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?",
+      "field": "both",
+      "tier": "B",
+      "question": "For humidity-driven plant structures (pine cone scales, wheat awns, seed pods) and for fabricated bilayers, does curvature follow the Timoshenko bilayer prediction from the measured swelling mismatch and layer stiffnesses, and does the response time scale as thickness squared over the water diffusivity? How large are the deviations from fibre orientation, graded properties and viscoelasticity?",
+      "known_state": "Timoshenko (1925) gave the bilayer curvature formula for thermal mismatch, and Reyssat and Mahadevan (2009) apply it to hygromorphs, with response time set by diffusion through the thickness. Dawson, Vincent and Rocca (1997) showed that pine cone scales open by differential swelling of two tissue layers, and Armon et al. (2011) analysed the geometry of chiral seed pods. The repo carries machine-checked statements of the bilayer curvature, the response time and the antisymmetric twist in `claim-sources/plant-hygromorph-mechanics` (Lean modules in the Thompson Lake project). What is missing is a systematic comparison of measured curvature and response time against these predictions across species and across fabricated bilayers.",
+      "acceptance_criteria": [
+        "A pre-registered test on at least 20 plant hygromorph specimens from at least five species, or on printed bilayers of at least three thicknesses and two swelling mismatches, in which curvature and response time are predicted from independently measured moduli, swelling strains and diffusivity and the pass tolerance is fixed in advance."
+      ],
+      "falsifiers": [
+        "If measured curvature differs from the Timoshenko prediction by more than the stated tolerance in most specimens, or if response time does not scale with thickness squared, the model is refuted for those structures."
+      ],
+      "required_capabilities": [
+        "continuum-mechanics",
+        "lean4",
+        "data-test"
+      ],
+      "data_access": "Published curvature and response-time data from Reyssat and Mahadevan 2009, Dawson et al. 1997 and Armon et al. 2011; fabricated bilayers need a printer and a humidity chamber, which the swarm lacks.",
+      "scales": [
+        "tissue",
+        "organ"
+      ],
+      "related_claims": [
+        "thompson1917-ch10-01"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1364/josa.11.000233",
+          "note": "Timoshenko 1925, Analysis of bi-metal thermostats"
+        },
+        {
+          "doi": "10.1098/rsif.2009.0184",
+          "note": "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers"
+        },
+        {
+          "doi": "10.1038/37745",
+          "note": "Dawson, Vincent and Rocca 1997, How pine cones open"
+        },
+        {
+          "doi": "10.1126/science.1203874",
+          "note": "Armon, Efrati, Kupferman and Sharon 2011, Geometry and mechanics in the opening of chiral seed pods"
+        }
+      ]
+    },
+    {
+      "id": "biomineral-form-physical-vs-biological-control",
+      "title": "How much of biomineral form is physical, and how much is cell-controlled?",
+      "field": "biology",
+      "tier": "C",
+      "question": "For single-cell skeletons (radiolarian lattices, foraminiferal chambers, sponge spicules, coccoliths) and sea urchin spicules, which geometric features of the mineral are predicted by surface-tension and packing physics alone, and which require a matrix template or cellular control? Does the same geometry appear when different minerals are laid down on the same vesicle pattern?",
+      "known_state": "Thompson (1917, ch. 9) holds that skeletal elements the size of a cell are shaped by molecular forces such as surface tension, and that the hexagonal lattice shells of Radiolaria, Acantharia and Clathrulina are equally regular in silica, strontium sulphate and an organic substance (ch. 9-15). Modern work shows that many biominerals form through a transient amorphous precursor that is moulded and then crystallizes (Politi et al. 2004; Weiner and Addadi 2011), which supports cellular control of shape and of polymorph, but does not directly test the physical-forces claims. No quantitative comparison of the predicted foam-packing geometry against measured lattice geometry across taxa exists.",
+      "acceptance_criteria": [
+        "A pre-registered comparison of mesh geometry (polygon-side distribution, vertex angles, spacing) in at least 30 radiolarian, acantharian and related lattice shells from open image archives against the foam-packing prediction and against a null of random Voronoi tessellation, with the match criterion stated in advance."
+      ],
+      "falsifiers": [
+        "If measured lattices are no closer to the foam-packing prediction than to a random Voronoi null, Thompson's physical-forces explanation is refuted for these taxa.",
+        "If mineral identity predicts geometry once vesicle pattern is fixed, the claim of mineral-independence is refuted."
+      ],
+      "required_capabilities": [
+        "image-segmentation",
+        "geometry-statistics",
+        "data-test"
+      ],
+      "data_access": "Open radiolarian and foraminiferal plates (Haeckel's Challenger monographs and modern SEM archives), micrographs in the repo's cell-geometry project, and published SEM of sea urchin spicules; the availability of paired mineral and vesicle data is uncertain and has to be scouted.",
+      "scales": [
+        "cell",
+        "tissue"
+      ],
+      "related_claims": [
+        "thompson1917-ch09-07",
+        "thompson1917-ch09-14",
+        "thompson1917-ch09-15"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1126/science.1102289",
+          "note": "Politi et al. 2004, Sea urchin spine calcite forms via a transient amorphous calcium carbonate phase"
+        },
+        {
+          "doi": "10.1146/annurev-matsci-062910-095803",
+          "note": "Weiner and Addadi 2011, Crystallization pathways in biomineralization"
+        }
+      ]
+    },
+    {
+      "id": "printed-stress-aligned-lattice-beats-uniform",
+      "title": "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?",
+      "field": "both",
+      "tier": "B",
+      "question": "For a stated load case (compression of a block, three-point bending, femoral-head loading), does a lattice whose struts follow the computed principal stress trajectories carry more load or absorb more energy before failure than a uniform lattice of equal mass and equal strut count, when both are made by the same stereolithography process? How large is the gain, and does it survive print-process variability?",
+      "known_state": "Thompson (1917, ch. 16) argues that trabeculae follow stress trajectories because that arrangement avoids shear. Topology and computational-morphogenesis methods produce stress-following structures at very high resolution (Aage et al. 2017), and the non-optimality of Michell structures under realistic constraints has been discussed (Sigmund 2016). Natural materials are compared by Ashby et al. 1995 and Wegst et al. 2015. We know of no pre-registered physical comparison of stress-aligned versus uniform lattices at equal mass in a single printed resin with a stated failure metric and a print-variability null, and the mechanical gain of alignment in lattices of realistic stiffness contrast is not established.",
+      "acceptance_criteria": [
+        "A pre-registered experiment printing at least 10 replicates each of a stress-aligned and a uniform lattice of equal mass and strut count for each of three load cases, testing in a stated mechanical protocol and comparing peak load and energy to failure with a stated effect size and a replicate-to-replicate variability bound."
+      ],
+      "falsifiers": [
+        "If the stress-aligned lattice does not exceed the uniform lattice in peak load or energy by more than the print-to-print variability, the advantage of alignment is refuted for this material and these load cases.",
+        "If the ranking reverses between load cases, a general advantage of alignment is refuted."
+      ],
+      "required_capabilities": [
+        "finite-element-analysis",
+        "generative-design",
+        "mechanical-testing",
+        "additive-manufacturing"
+      ],
+      "data_access": "No dataset: the test needs an SLA printer, a tough resin, a universal testing machine or a calibrated fixture, and a post-processing line; the swarm can design the lattices and the analysis plan, and an operator has to print and test.",
+      "scales": [
+        "tissue",
+        "organ"
+      ],
+      "related_claims": [
+        "thompson1917-ch16-05",
+        "thompson1917-ch16-06"
+      ],
+      "frontier_problem": null,
+      "references": [
+        {
+          "doi": "10.1038/nature23911",
+          "note": "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design"
+        },
+        {
+          "doi": "10.1007/s00158-016-1420-7",
+          "note": "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures"
+        },
+        {
+          "doi": "10.1038/nmat4089",
+          "note": "Wegst et al. 2015, Bioinspired structural materials"
+        }
+      ]
+    }
+  ]
+}

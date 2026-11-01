@@ -1,0 +1,30 @@
+{
+ "queue_id": "p9-windtunnel-dt4",
+ "max_wall_s": 3000,
+ "margin_s": 60,
+ "max_part_bytes": 3000000,
+ "workloads": [
+  {
+   "id": "windtunnel-cuda-bundle",
+   "argv": [
+    "python3",
+    "frontier_compute/wt_entry.py"
+   ],
+   "timeout_s": 1500,
+   "max_part_bytes": 3000000
+  },
+  {
+   "id": "frozen-subset-dt4",
+   "argv": [
+    "python3",
+    "frontier_compute/dt_entry.py",
+    "inputs/dt4_subset_cols.xz",
+    "--arms",
+    "dt4",
+    "--budget-s",
+    "700"
+   ],
+   "timeout_s": 780
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch09-03> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-darwin1859-ch09-03--numeric> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-darwin1859-ch09-03--numeric> a delphi:EvidenceItem ;
+    rdfs:label "Refuted: the end of the Chalk (top of the Maastrichtian) is 66.0 Ma, 4.6 times younger than Darwin's 306.7 million years; the Weald-denudation and start-of-Late-Cretaceous readings (100.5 Ma, ratio 3.05) are refuted too" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If Darwin's denudation argument holds, the time elapsed since the latter part of the Secondary (Mesozoic) period, i.e. since the youngest Chalk, is roughly 300 million years or more on the modern radiometrically calibrated timescale." ;
+    delphi:statisticalTest "One-number comparison of ICS chronostratigraphic boundary ages (Macrostrat API, international ages; uncertainties about 0.2 Ma) with the pre-registered threshold of 225 Ma; no sampling test" ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule, sub:reading ;
+    rdfs:comment "Darwin's 300 million years is 4.6 times the radiometric age of the end of the Chalk; Darwin withdrew the calculation in the third edition after Phillips's criticism, so this refutes the claim as stated in the first edition, which is how the claim graph records it." ;
+    rdfs:comment "The test uses the ICS ages through Macrostrat's API rather than the chart PDF; the two agree for these stages and the version is recorded." ;
+    rdfs:comment "This is a one-number test with no sampling uncertainty; it does not evaluate Darwin's erosion rate, only the duration he inferred." ;
+    rdfs:comment "Readings check: under the three numeric readings of Darwin's figure (lower bound since the end of the Chalk; duration of the Weald denudation; time since the start of the Late Cretaceous) the measured age is 3.1 to 4.6 times smaller than 300 Myr, so the verdict is unchanged; only the purely qualitative reading ('geological time is immense') would be supported, and the claim graph's statement is the numeric one." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/ics-chronostratigraphic-ages-via-macrostrat-api> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "Darwin estimated that more than 300 million years had passed since the late Chalk; the modern timescale puts the end of the Chalk at 66 million years ago." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "refuted" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: refutes; this record covers the numeric reading of the claim only" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "66.0"^^xsd:double ; schema:unitText "Ma, age of the top of the Maastrichtian (end of the Chalk); Darwin's figure was 306.7 million years" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "102 ICS intervals in the response" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "ICS boundary ages for these stages carry uncertainties of about 0.2 Ma, far below the threshold" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: the International Commission on Stratigraphy (ICS) chronostratigraphic boundary ages as served by the Macrostrat API (defs/intervals, timescale 'international ages'), which carries the ICS chart's numeric ages in Ma. Quantities: age of the top of the Maastrichtian (= Cretaceous-Paleogene boundary, the end of Chalk deposition) and age of the base of the Campanian (start of the youngest Chalk stages). SUPPORTS if the top-of-Maastrichtian age is >= 225 Ma (within 25% of 300 Myr, or older). Reported alongside: the base-of-Campanian age and the ratio of Darwin's 306.7 Myr to the measured age. FAIL: Pre-registered. REFUTES if the top-of-Maastrichtian age is < 225 Ma (Darwin's figure is off by more than 25%). MIXED is not possible for this one-number test. INCONCLUSIVE (data-unavailable) if the API cannot be reached; INCONCLUSIVE (not-operationalizable) if the API does not return a Maastrichtian interval." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Does not evaluate Darwin's erosion rate, only the duration he inferred from it; refutes the figure as stated in the first edition, which Darwin withdrew in the third; the qualitative reading that geological time is immense is a separate record (darwin1859-ch09-03--qualitative)." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:reading a schema:PropertyValue ; schema:propertyID "reading_of_claim" ; schema:value "numeric" ; schema:description "Which reading of the source claim this record evaluates; the other reading has its own record linked to the same claim." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 33145 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/ics-chronostratigraphic-ages-via-macrostrat-api> a dcat:Dataset ;
+    rdfs:label "International Chronostratigraphic Chart boundary ages (ICS), as served by the Macrostrat API (defs/intervals, timescale 'international ages')" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes ;
+    dct:identifier "https://stratigraphy.org/chart" ;
+    dcat:landingPage <https://stratigraphy.org/chart> ;
+    dcat:version "Macrostrat API v2 response of 2026-10-31 (ages match ICS chart v2023/09)" ;
+    dct:rights "CC-BY 4.0" ;
+    dct:license "CC-BY 4.0" ;
+    rdfs:comment "Role in this test: top and base ages (Ma) of the Maastrichtian and Campanian stages" ;
+    dcat:distribution sub:ds1f1 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://macrostrat.org/api/v2/defs/intervals?timescale=international%20ages> ;
+    dcat:byteSize "33145"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:01Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "4900709f37f77efcf5ed5abf14b910db91204a1328bbd1625c5dce4a742d6e73"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json>, <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json> dct:title "claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json at commit c364a3d (2026-10-31T14:22:26Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> a prov:Entity ; dct:title "claim-tests: pre-register 4 Darwin/Thompson tests (ICS ages, LR04+EDC, NHANES, CCDB)" ; dct:date "2026-10-31T06:13:26Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T06:13:26Z; the first data file for this test was retrieved at 2026-10-31T06:14:01Z, 35 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/ics-chronostratigraphic-ages-via-macrostrat-api>, <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json> .
+  <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/darwin-origin/darwin1859-ch09-03--delphi-claims/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted; model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:25:59Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for darwin1859-ch09-03: refuted" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-darwin1859-ch09-03--numeric> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+  this: delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+  <https://w3id.org/delphi/resource/domain/darwin-origin-1859> rdfs:label "darwin-origin-1859" .
+}

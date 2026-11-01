@@ -1,0 +1,112 @@
+{
+  "claim_id": "darwin1859-ch04-21",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:34:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "species lists per small plot (fine-grain co-occurrence)",
+    "taxonomy (genus, order) or phylogeny for each species",
+    "a regional species pool for a null model"
+  ],
+  "datasets": [
+    {
+      "id": "splotopen",
+      "name": "sPlotOpen: environmentally-balanced, open-access, global dataset of vegetation plots (iDiv)",
+      "landing_url": "https://idata.idiv.de/ddm/Data/ShowData/3474?version=76",
+      "access_url": null,
+      "doi": "10.25829/idiv.3474-bb7k72",
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:33:40Z", "method": "DataCite API record for the DOI; doi.org resolution", "http_status": 200, "bytes": null },
+      "variables_present": ["georeferenced vegetation plot records (per title)"],
+      "variables_missing": ["phylogeny (not part of the record; would come from another source)"],
+      "scope": "Title from DataCite: sPlotOpen, an environmentally balanced open-access global dataset of vegetation plots. Plot count not read (the 95,000 figure in the assessor text was not confirmed). Plot area per plot not examined. DataCite rightsList empty, so licence unknown. The paper DOI 10.1111/geb.13346 returned 403 via Wiley.",
+      "evidence": "DOI 10.25829/idiv.3474-bb7k72 resolves (200) to the iDiv data portal; files not listed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "bien",
+      "name": "BIEN (Botanical Information and Ecology Network)",
+      "landing_url": "https://bien.nceas.ucsb.edu/bien/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:33:20Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["plant plot and occurrence data (not inspected)"],
+      "variables_missing": [],
+      "scope": "Landing page only.",
+      "evidence": "HTTP 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "biotime",
+      "name": "BioTIME",
+      "landing_url": "https://biotime.st-andrews.ac.uk/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:33:20Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["standardized community time series samples (not inspected)"],
+      "variables_missing": [],
+      "scope": "Landing page only.",
+      "evidence": "HTTP 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "splot",
+      "name": "sPlot (iDiv project page)",
+      "landing_url": "https://www.idiv.de/research/projects/splot/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:33:20Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["global vegetation plots (not inspected)"],
+      "variables_missing": [],
+      "scope": "Project page only; the full sPlot database is restricted according to the assessor obstacle list (not verified here).",
+      "evidence": "HTTP 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "forestgeo",
+      "name": "ForestGEO",
+      "landing_url": "https://forestgeo.si.edu/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:33:20Z", "method": "HEAD -L landing page", "http_status": 403, "bytes": null, "note": "403 to curl; not retried" },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Not examined.",
+      "evidence": "HTTP 403.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "grassplot",
+      "name": "GrassPlot",
+      "landing_url": "https://edgg.org/databases/GrassPlot",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:33:20Z", "method": "HEAD -L landing page", "http_status": 503, "bytes": null, "note": "503 service unavailable; not retried" },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Not examined.",
+      "evidence": "HTTP 503.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "sPlotOpen vegetation plots (type dataset)", "url": "https://api.datacite.org/dois?query=%22sPlotOpen%22%20vegetation%20plots&resource-type-id=dataset&page%5Bsize%5D=4", "hits": 5, "note": "found sPlotOpen DOI 10.25829/idiv.3474-bb7k72; other hits unrelated" },
+    { "source": "DataCite", "query": "sPlotOpen", "url": "https://api.datacite.org/dois?query=sPlotOpen&page%5Bsize%5D=3", "hits": 41, "note": "top hits are VegVault (10.48700/frrj8-ync93), a vegetation/trait database; not inspected" },
+    { "source": "GBIF", "query": "dataset search sPlot vegetation plots", "url": "https://api.gbif.org/v1/dataset/search?q=sPlot%20vegetation%20plots&limit=3", "hits": 102, "note": "regional vegetation plot datasets only; sPlot not among the first three" }
+  ],
+  "status": "partial",
+  "summary": "sPlotOpen (iDiv, DOI 10.25829/idiv.3474-bb7k72) is the open plot-level species-composition source and resolves, but its file list, plot sizes and licence were not read; ForestGEO and GrassPlot were unreachable (403, 503) and the taxonomy/phylogeny for the null model has to come from another source.",
+  "next_step": "Open the iDiv portal record to read file list, plot sizes and licence; pair with a plant phylogeny for MPD/MNTD null models.",
+  "obstacles_confirmed": ["ForestGEO returned 403 and GrassPlot 503 to automated requests.", "Plant plots dominate the found sources; no animal assemblage plot dataset was verified."]
+}

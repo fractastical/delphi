@@ -1,0 +1,34 @@
+{
+ "what": "Bounded discovery-index refresh timer installed as a systemd USER unit for the dedicated Frontier database.",
+ "installed_at_utc": "2026-10-31T20:28:52Z",
+ "units": {
+  "service": "~/.config/systemd/user/delphi-frontier-discovery-refresh.service",
+  "timer": "~/.config/systemd/user/delphi-frontier-discovery-refresh.timer",
+  "copies_in_repo": "deploy/discovery/installed/"
+ },
+ "schedule": "first run 2 min after the user manager starts, then every 10 minutes (OnUnitActiveSec=10min, AccuracySec=30s)",
+ "command": "/data/services/delphi-frontier/venv/bin/python -m frontier.discovery refresh --namespace delphi-frontier --schema public --max-requests 20 --receipt ~/.local/state/delphi-frontier/discovery-refresh.jsonl",
+ "app_path": "WorkingDirectory=/data/services/delphi-frontier/app (the current-release symlink; follows root's deploys)",
+ "venv": "/data/services/delphi-frontier/venv",
+ "limits": "20 provider requests per run, zero when nothing changed; advisory lock (overlap skips); MemoryMax=2G, MemorySwapMax=0, TasksMax=128, TimeoutStartSec=300, NoNewPrivileges",
+ "credentials": "EnvironmentFile=~/.config/morphoswarm/gemini.env (existing file, read by systemd into the process environment; no value in any unit, log, receipt or repository). The DSN has no password (unix socket, role frontier_app).",
+ "state_now": {
+  "timer": "enabled and active (waiting)",
+  "service": "inactive (dead): the start condition ConditionPathExists=/data/services/delphi-frontier/app/frontier/discovery.py is unmet because the deployed release 12eb390c does not contain the module yet. The service is SKIPPED, not failed, and will start working on the first timer firing after root deploys a release that contains frontier/discovery.py."
+ },
+ "verified": {
+  "how": "a transient systemd user unit with the same venv python, environment file, DSN, memory/task/privilege limits, working directory = this branch's checkout (the deployed release lacks the module), command identical to the service's",
+  "result": {
+   "planned": 2444,
+   "already_current": 2444,
+   "to_embed": 0,
+   "requests": 0,
+   "embedded": 0,
+   "failed": 0
+  },
+  "exit": 0,
+  "key_loaded_from_envfile": true,
+  "note": "zero provider calls because nothing changed; the first earlier live index (49 requests) is in 2026-10-31-discovery-live-index-receipt.json"
+ },
+ "not_done": "No service restart, no deploy, no change to the release, the web unit or any credential file. The deployed release was not modified."
+}

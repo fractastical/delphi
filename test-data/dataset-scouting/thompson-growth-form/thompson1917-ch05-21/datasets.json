@@ -1,0 +1,109 @@
+{
+  "claim_id": "thompson1917-ch05-21",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "images or 3D scans of Lagena tests and hydroid gonangia showing fold/costa orientation (longitudinal vs transverse) by region",
+    "local wall thickness relative to local diameter (sections or micro-CT)",
+    "local curvature / diameter along the body and neck",
+    "coverage of both taxa named: Lagena (Foraminifera) and tubular hydroid gonangia"
+  ],
+  "datasets": [
+    {
+      "id": "bforams-mikrotax",
+      "name": "bforams@mikrotax (benthic foraminifera taxonomy with published illustrations)",
+      "landing_url": "https://www.mikrotax.org/bforams/",
+      "access_url": "https://www.mikrotax.org/bforams/index.php?taxon=Lagena",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:30:00Z", "method": "HEAD landing (200); GET index.php?taxon=Lagena and ?id=Lagena; GET system search module=bforams&search=Lagena", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["could not confirm Lagena pages: the taxon-query pages returned 200 but the HTML is client-rendered (jQuery/ntax scripts) with no 'Lagena' text in the response; no wall thickness or diameter anywhere"],
+      "scope": "Illustration catalogue of benthic foraminifera; qualitative ornament only",
+      "evidence": "Landing 200; index.php?taxon=Lagena 200 with no 'Lagena' string in the body; system search returned the Nannotax3 shell page. Content is not reachable by plain HTTP for programmatic use.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "foraminifera-eu",
+      "name": "foraminifera.eu (Foraminifera Database Search)",
+      "landing_url": "https://foraminifera.eu/",
+      "access_url": "https://foraminifera.eu/querydb.php?genus=Lagena",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:30:30Z", "method": "HEAD landing (200); GET querydb.php?genus=Lagena", "http_status": 200, "bytes": null },
+      "variables_present": ["photographs of foraminifera tests (page title 'Foraminifera Database Search'; the Lagena query page shows '2 images' labels)"],
+      "variables_missing": ["wall thickness", "calibrated diameter/curvature", "hydroid gonangia"],
+      "scope": "Amateur/specialist photo database; the genus query did not expose a parsable species list ('Lagena <species>' strings: 0 in the HTML)",
+      "evidence": "querydb.php?genus=Lagena returned 200, title 'Foraminifera Database Search', with '2 images' text; no record count or species names parsable.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource 3D media",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Foraminifera&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:31:00Z", "method": "GET /api/media?q= for Lagena, Foraminifera, Lagenidae, gonangium, Hydrozoa", "http_status": 200, "bytes": null },
+      "variables_present": ["75 foraminifera media (e.g. 'Reticulate Nummulites From Tdp 12/26/1 44 55 Cm'), none Lagena"],
+      "variables_missing": ["Lagena scans (0 hits)", "hydroid gonangia (0 hits for gonangium, Hydrozoa)", "wall thickness (would need CT, not meshes)"],
+      "scope": "No scans of the named taxa",
+      "evidence": "API total_count: Lagena 0, Foraminifera 75, Lagenidae 0, gonangium 0, Hydrozoa 0.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-lagena-occurrences-with-images",
+      "name": "GBIF occurrences of Lagena Walker & Jacob, 1798 (Foraminifera) with still images",
+      "landing_url": "https://www.gbif.org/species/3211203",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=3211203&mediaType=StillImage&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:36:00Z", "method": "GET species/search for genus Lagena in the GBIF backbone; GET occurrence/search counts with and without mediaType=StillImage", "http_status": 200, "bytes": null },
+      "variables_present": ["1,567 occurrence records with still images of Lagena specimens (fold/costa orientation scorable by eye)", "17,592 occurrences in total with locality"],
+      "variables_missing": ["wall thickness", "calibrated diameter", "hydroid gonangia"],
+      "scope": "Genus Lagena (GBIF backbone key 3211203, taxonomic status DOUBTFUL in the backbone; other 'Lagena' homonyms are an oomycete, an arthropod and molluscs); image licences vary per record",
+      "evidence": "occurrence/search?taxonKey=3211203 count=17592; with mediaType=StillImage count=1567. Backbone search listed 'Lagena Walker & Jacob, 1798' Foraminifera key 3211203.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-lageninae-pliocene-pleistocene-nw",
+      "name": "GBIF dataset: The species of Lageninae Brady, 1881 (Foraminifera) from the Pliocene-Early Pleistocene of north-west… (checklist/occurrence dataset, CC0)",
+      "landing_url": "https://www.gbif.org/dataset/08c00c56-bb28-483f-b7c3-629d719e2187",
+      "access_url": "https://api.gbif.org/v1/dataset/search?q=Lageninae&limit=2",
+      "doi": "10.15468/eg7nkx",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:37:00Z", "method": "DataCite search 'Lagena foraminifera' (hit 10.15468/eg7nkx) and GBIF dataset/search", "http_status": 200, "bytes": null },
+      "variables_present": ["species-level taxonomic records of Lageninae (Lagena and relatives) from one Plio-Pleistocene region"],
+      "variables_missing": ["images, wall thickness, diameter"],
+      "scope": "Regional fossil checklist published via GBIF (Plazi-type treatment data)",
+      "evidence": "GBIF dataset/search count 86 for 'Lageninae'; first result key 08c00c56-bb28-483f-b7c3-629d719e2187, licence http://creativecommons.org/publicdomain/zero/1.0/legalcode; DataCite DOI 10.15468/eg7nkx with the same title.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "media q=Lagena / Foraminifera / Lagenidae / gonangium / Hydrozoa", "url": "https://www.morphosource.org/api/media?q=Lagena&per_page=1", "hits": 0, "note": "Foraminifera 75; all others 0" },
+    { "source": "WoRMS", "query": "AphiaRecordsByName Lagena", "url": "https://www.marinespecies.org/rest/AphiaRecordsByName/Lagena?like=false&marine_only=true", "hits": 2, "note": "AphiaID 112215 accepted genus Lagena; 1544432 unaccepted homonym" },
+    { "source": "GBIF", "query": "species/search q=Lagena rank=GENUS (backbone)", "url": "https://api.gbif.org/v1/species/search?q=Lagena&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=10", "hits": 6, "note": "foraminiferal Lagena key 3211203; occurrences 17,592, with images 1,567" },
+    { "source": "Zenodo", "query": "foraminifera \"micro-CT\" \"wall thickness\"", "url": "https://zenodo.org/api/records?q=foraminifera+%22micro-CT%22+%22wall+thickness%22&size=5", "hits": 8589, "note": "relevant tooling and data: 10.5281/zenodo.17800194 MFSE microfossil 3D segmentation editor; 10.5281/zenodo.18653517 benthic foraminifera shell traits (Arctic); none on Lagena specifically" },
+    { "source": "DataCite", "query": "Lagena foraminifera", "url": "https://api.datacite.org/dois?query=Lagena+foraminifera&page%5Bsize%5D=5", "hits": 546, "note": "PANGAEA census tables and GBIF downloads; 10.15468/eg7nkx Lageninae checklist" },
+    { "source": "Dryad", "query": "hydroid gonotheca OR gonangium OR hydrotheca morphology", "url": "https://datadryad.org/api/v2/search?q=hydroid+gonotheca+OR+gonangium+OR+hydrotheca+morphology&per_page=5", "hits": 0, "note": null }
+  ],
+  "status": "partial",
+  "summary": "Fold orientation on Lagena tests can be scored from images: GBIF holds 1,567 Lagena occurrence records with still images (genus key 3211203), and foraminifera.eu and bforams@mikrotax serve illustrations, though both catalogue sites are client-rendered and not queryable by plain HTTP. No source records wall thickness relative to diameter, MorphoSource has no Lagena or hydroid scans (0 hits; 75 foraminifera media overall), and nothing was found for tubular hydroid gonangia, so the thick-neck half of the claim has no data.",
+  "next_step": "Compile a scored image set from GBIF Lagena media (costae longitudinal vs annular, by body region) and seek micro-CT of Lagena for wall-thickness/diameter ratios (Zenodo foraminifera micro-CT sets as a protocol model); hydroid gonangia need new SEM/sections.",
+  "obstacles_confirmed": [
+    "Most catalog images do not report wall thickness, so the stiffness variable has to be inferred or measured from a subset of sections and micro-CT.",
+    "Hydroid gonangia are not in the foraminiferal archives (and not in MorphoSource or Dryad either)."
+  ]
+}

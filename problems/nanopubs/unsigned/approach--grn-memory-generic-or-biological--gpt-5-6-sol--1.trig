@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Matched random-network memory enrichment test" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> ;
+    dct:description "Reimplement the exact stimulation and memory criteria for all 35 biological ODE models, then generate 100 matched nulls per model preserving node count, signed degree sequence, kinetic-law family, parameter marginal distributions and stiffness. Blindly apply identical protocols and estimate enrichment with a model-paired conditional logistic regression." ;
+
+    delphi:proposedTest "Biological enrichment requires paired odds ratio at least 2 with 99% interval excluding 1 for a memory class and replication across two null generators; odds ratio at or below 1 refutes enrichment." ;
+    delphi:context "Fails if: Fewer than 80% of published calls reproduce or null convergence filtering changes network dynamics enough to break covariate balance." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Freeze executable model versions and numerical tolerances. 2. Validate protocol reproduction against all reported memory calls. 3. Generate at least 3500 convergent null networks with fixed seeds. 4. Classify memory, habituation and consolidation using preregistered effect thresholds." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: ode-simulation" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-16> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> a delphi:Concept, schema:Question ;
+    rdfs:label "Is memory in gene regulatory network models generic or a biological signature?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to grn-memory-generic-or-biological, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.328Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to grn-memory-generic-or-biological: Matched random-network memory enrichment test" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

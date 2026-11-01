@@ -1,0 +1,116 @@
+{
+  "claim_id": "levin-2024-anthrobots-01",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "time-lapse or lineage records of single NHBE cells seeded in matrix and followed for two weeks",
+    "counts of seeded cells that form multicellular spheroids, with failures",
+    "motility of the resulting spheroids after transfer to low-viscosity medium",
+    "protocol metadata (matrix, medium, absence of editing or scaffold)"
+  ],
+  "datasets": [
+    {
+      "id": "anthrobots-2024-adv-sci-pmc10811512",
+      "name": "Gumuskaya et al. 2024, Motile Living Biobots (PMC10811512) article and supporting information",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10811512/",
+      "access_url": null,
+      "doi": "10.1002/advs.202303575",
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET PMC article page and search the text for a data availability statement and supplementary files",
+        "http_status": 200,
+        "bytes": 310783
+      },
+      "variables_present": [
+        "article text with reported transition and consistency summaries",
+        "Supplemental Videos 1-7 and a 1.5 MB Supporting Information PDF listed as downloads"
+      ],
+      "variables_missing": [
+        "Anthrobot track files",
+        "single-cell lineage or seeding records",
+        "per-spheroid counts"
+      ],
+      "scope": "Anthrobots (adult human bronchial epithelial cells), one paper",
+      "evidence": "HTTP 200, 310,783 bytes. Data Availability Statement reads: \"The data that support the findings of this study are available from the corresponding author upon reasonable request.\" The supplement list names Supplemental Video 1 (2 MB mp4), 2 (11.5 MB avi), 3 ... 7 (10.9 MB avi) and a 1.5 MB PDF. The article text states that each Anthrobot begins as a single cell and that cilia localization is seen within one week (about 20 days from single cell to cilia-coated spheroid).",
+      "verdict": "partial"
+    },
+    {
+      "id": "geo-gse281379-anthrobot-lifecycle",
+      "name": "GSE281379: A Transcriptome Analysis of the Lifecycle of Anthrobots",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE281379",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "eutils esearch/esummary db=gds, then GET landing page",
+        "http_status": 200,
+        "bytes": 21545
+      },
+      "variables_present": [
+        "Homo sapiens Anthrobot transcriptome series"
+      ],
+      "variables_missing": [
+        "single-cell seeding records",
+        "spheroid counts",
+        "motility tracks"
+      ],
+      "scope": "Anthrobot gene expression, not formation or motility records",
+      "evidence": "esummary returned accession GSE281379, title \"A Transcriptome Analysis of the Lifecycle of Anthrobots\", taxon Homo sapiens. Landing page HTTP 200 (21,545 bytes, content not read).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Zenodo",
+      "query": "anthrobots",
+      "url": "https://zenodo.org/api/records?size=5&q=anthrobots",
+      "hits": 9,
+      "note": "theory preprints only"
+    },
+    {
+      "source": "Dryad",
+      "query": "anthrobots",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=anthrobots",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "xenobots OR anthrobots",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=xenobots%20OR%20anthrobots",
+      "hits": 42,
+      "note": "top 5 unrelated"
+    },
+    {
+      "source": "BioStudies",
+      "query": "anthrobots",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=anthrobots",
+      "hits": 2,
+      "note": "article mirrors only"
+    },
+    {
+      "source": "NCBI GEO (eutils db=gds)",
+      "query": "anthrobots OR xenobots",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&retmode=json&retmax=5&term=anthrobots%20OR%20xenobots",
+      "hits": 25,
+      "note": "GSE281379 is the only Anthrobot series in the top 5"
+    }
+  ],
+  "status": "gap",
+  "summary": "No public record of single-cell seeding, spheroid formation counts or motility tracking exists beyond the 2024 paper itself: its data statement gives data on reasonable request, and the open material is 7 supplemental videos and a PDF plus an unrelated-variable GEO transcriptome series.",
+  "next_step": "Ask the corresponding authors for the seeding and culture logs and the motility videos, or run the protocol (single NHBE cells in matrix for 2 weeks, then low-viscosity medium) as a new experiment.",
+  "obstacles_confirmed": [
+    "Data available only on reasonable request (stated in PMC10811512).",
+    "Supplemental videos illustrate motility and do not establish that each spheroid began as one cell."
+  ]
+}

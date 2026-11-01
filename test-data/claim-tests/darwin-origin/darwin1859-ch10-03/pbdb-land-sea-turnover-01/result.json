@@ -1,0 +1,90 @@
+{
+  "claim_id": "darwin1859-ch10-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-03",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "problem": "land-vs-sea-rate-of-change-in-the-fossil-record",
+  "hypothesis": "If Darwin is right that 'the productions of the land seem to change at a quicker rate than those of the sea', then fossil animal genera recorded from terrestrial environments in the Paleobiology Database turn over faster through the Phanerozoic than genera recorded from marine environments: in matched 10-million-year time bins, the per-capita turnover rate (the mean of the Foote boundary-crosser origination and extinction rates, per genus per million years) is higher for terrestrial than for marine genera, with a median paired difference d = (terrestrial - marine) above zero.",
+  "pass_criterion": "Pre-registered (claim supported). In the primary analysis (all environment-classified animal genera, 10-Myr bins 10-540 Ma, bins qualifying as defined in 'qualifying_bins' below) ALL of: (1) at least 15 qualifying bins; (2) the median of the paired bin differences d is greater than 0; (3) the 95 % percentile-bootstrap confidence interval of that median (10,000 resamples of bins with replacement, numpy seed 20261101) has a lower bound above 0; (4) a one-sided Wilcoxon signed-rank test of d > 0 gives p < 0.05; AND (5) the robustness analysis restricted to genera with at least 5 occurrences in their assigned environment also has at least 15 qualifying bins, a positive median d and a one-sided Wilcoxon p < 0.05.",
+  "fail_criterion": "Pre-registered (claim refuted). In the primary analysis, with at least 15 qualifying bins, EITHER the upper bound of the 95 % bootstrap confidence interval of the median d is at or below 0 (terrestrial turnover no faster, or slower, than marine), OR the whole 95 % interval lies inside the equivalence band [-0.01, +0.01] per genus per Myr (no difference of practical size; equal rates count against the claim). MIXED: any other outcome with at least 15 qualifying bins, namely (a) the interval includes 0 and is not inside the equivalence band; (b) the primary pass conditions (1)-(4) hold but the robustness condition (5) fails; or (c) the median differences in origination and in extinction taken separately have 95 % intervals that exclude 0 on opposite sides. INCONCLUSIVE with reason 'underpowered': fewer than 15 qualifying bins in the primary analysis, or fewer than 2,000 genera classified as terrestrial or fewer than 2,000 as marine after the 90 % rule. INCONCLUSIVE with reason 'data-unavailable': either PBDB query cannot be fetched completely (all pages) after three attempts on separate days, or a response is not the schema described in 'datasets'. The thresholds above are fixed now and are not to be revised after the data are opened; any change goes in a 'deviations' field.",
+  "qualifying_bins": "Bins are fixed 10-Myr intervals [t, t+10) Ma for t = 10, 20, ..., 530 (the Holocene/Recent bin 0-10 Ma is excluded to avoid the pull of the Recent, since extant genera have no recorded last appearance). A bin qualifies for a given analysis when, in BOTH environments, the number of genera crossing its older boundary is at least 20, the number crossing its younger boundary is at least 20, and the number crossing both boundaries (N_bt) is at least 5.",
+  "planned_datasets": [
+    "pbdb-occs-taxa-genus-envtype-terrestrial-marine"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-occs-taxa-genus-envtype-terrestrial-marine",
+      "name": "Paleobiology Database data service 1.2, occs/taxa operation: genus-rank taxa with first and last appearance age bounds and occurrence counts, for occurrences with envtype terrestrial and envtype marine, base taxon Metazoa",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "PBDB data service 1.2 (live database; no frozen release identified, so the retrieval time and the SHA-256 of each response are the version)",
+      "license": null,
+      "license_note": "The scout record (test-data/dataset-scouting/darwin-origin/darwin1859-ch10-03/datasets.json) recorded no licence and none was verified for this registration; it must be read from the PBDB site at retrieval and recorded in the final result.json before any redistribution of derived tables.",
+      "files": [
+        {
+          "name": "pbdb_occs_taxa_genus_terrestrial.json",
+          "download_url": "https://paleobiodb.org/data1.2/occs/taxa.json?base_name=Metazoa&envtype=terrestrial&rank=genus&show=app&order=hierarchy&rowcount",
+          "fallback_if_timeout": "add &limit=5000&offset=0, 5000, 10000, ... until records_returned is 0 and concatenate the pages",
+          "retrieved_at": null,
+          "byte_size": null,
+          "sha256": null,
+          "planned_check_before_run": "metadata request already answered: records_found 28550 genus-rank records (a limit=2 request, HTTP 200). Fields seen: oid, rnk (5 = genus), nam, par, rid, ext (extant flag), noc (occurrence count in the filtered set), fea, fla (first appearance, early and late age bound, Ma), lea, lla (last appearance, early and late age bound, Ma), and the interval names tei and tli."
+        },
+        {
+          "name": "pbdb_occs_taxa_genus_marine.json",
+          "download_url": "https://paleobiodb.org/data1.2/occs/taxa.json?base_name=Metazoa&envtype=marine&rank=genus&show=app&order=hierarchy&rowcount",
+          "fallback_if_timeout": "add &limit=5000&offset=0, 5000, 10000, ... until records_returned is 0 and concatenate the pages",
+          "retrieved_at": null,
+          "byte_size": null,
+          "sha256": null,
+          "planned_check_before_run": "only partly confirmed: the same operation without rank=genus and show=app returned records_found 167852 taxa of all ranks with HTTP 200 (about 35 s). The marine query with rank=genus and show=app was not itself tried, and its genus-rank record count is unknown; it uses identical parameters to the terrestrial query except envtype, which that query shows to be accepted."
+        }
+      ],
+      "role": "environment-coded genus ranges (first and last appearance with their age bounds) and occurrence counts, from which per-bin boundary-crosser origination and extinction rates are computed separately for terrestrial and marine genera",
+      "expected_response_size": "the terrestrial response is expected to be a few MB; the files are not committed (README rule 3). Commit the fetch script, the SHA-256 and byte size of each response, and a derived per-bin table under 200 KB."
+    }
+  ],
+  "excluded_datasets_considered": [
+    "now-new-and-old-worlds-fossil-mammals: Cenozoic land mammals only, no marine comparison group and no rows inspected; not used.",
+    "dryad-near-stasis-mesozoic-tetrapods (doi 10.5061/dryad.9fr76): Mesozoic land vertebrates only, no marine comparison group in the deposit per the scout; not used.",
+    "morphological-rate data (for example MorphoBank matrices): not scouted for a land/sea contrast; the test therefore does not measure morphological change."
+  ],
+  "analysis_plan": {
+    "environment_assignment": "For each genus, n_terr and n_mar are the 'noc' values from the terrestrial and marine files (0 if the genus is absent from a file). The environment fraction f = n_terr / (n_terr + n_mar). A genus is 'terrestrial' if f >= 0.9, 'marine' if f <= 0.1, and is dropped from all analyses otherwise (amphibious, marginal or inconsistently coded genera). The number dropped is reported. Genera are matched across the two files by the taxon identifier 'oid'.",
+    "ages": "FAD age F = (fea + fla) / 2 and LAD age L = (lea + lla) / 2, in Ma, per genus, taken from the file of the genus's assigned environment (the occurrences in that environment). Genera with F < L or missing ages are dropped and counted.",
+    "boundary_crosser_rates": "For the bin with older boundary B and younger boundary T = B - 10: N_bt = genera with F > B and L < T; N_bL = genera with F > B and T <= L <= B; N_Ft = genera with T < F <= B and L < T. N_b = N_bt + N_bL and N_t = N_bt + N_Ft. Per-capita extinction q = -ln(N_bt / N_b) / 10 and origination p = -ln(N_bt / N_t) / 10, per genus per Myr (Foote 2000 boundary-crosser formulas). Turnover rate = (p + q) / 2.",
+    "primary_statistic": "d_i = turnover(terrestrial, bin i) - turnover(marine, bin i) over qualifying bins. Median d, 95 % percentile bootstrap interval of the median (10,000 resamples of bins, numpy seed 20261101), and the one-sided Wilcoxon signed-rank test of d > 0. The fraction of bins with d > 0 is reported.",
+    "robustness_analysis": "The same, using only genera with at least 5 occurrences (n_terr for terrestrial genera, n_mar for marine genera). This limits the contribution of rarely sampled genera, whose ranges are the most truncated by poor preservation.",
+    "descriptive_only_not_used_for_verdict": [
+      "origination p and extinction q taken separately (median differences and bootstrap intervals), which decide the verdict only through mixed rule (c);",
+      "Cenozoic-only bins (10-66 Ma), where the terrestrial record is best;",
+      "genera with at least 20 occurrences;",
+      "the same analysis restricted to Tetrapoda (terrestrial and marine tetrapods, base_name=Tetrapoda) as a clade-matched comparison, if the counts allow it;",
+      "median observed genus duration (F - L) for extinct genera by environment, reported with the warning that poor preservation shortens observed ranges;",
+      "bins qualifying in the primary analysis but not in the robustness analysis;",
+      "a leave-one-bin-out check of the sign of the median d."
+    ]
+  },
+  "test_contract": {
+    "expected_observation": "Terrestrial animal genera in the fossil record show a higher per-capita origination-plus-extinction rate than marine genera in the same time bins, so that the median paired bin difference is positive with a bootstrap interval excluding zero, and this survives restriction to well-sampled genera.",
+    "disconfirming_observation": "Terrestrial turnover equal to or lower than marine turnover in matched bins: a bootstrap interval for the median paired difference with an upper bound at or below zero, or wholly inside the equivalence band of +/-0.01 per genus per Myr.",
+    "admissible_datasets": "Openly accessible fossil occurrence compilations in which each occurrence or taxon carries (i) first and last appearance ages with their bounds and (ii) a recorded environment from which marine and terrestrial can be told apart, covering the Phanerozoic at genus rank or finer, and compiled independently of Darwin's text. A dataset limited to one environment, one clade or one era, or lacking a marine comparison, is not admissible as the primary test (NOW and the Dryad Mesozoic tetrapod deposit fail this).",
+    "inference_method": "Foote boundary-crosser per-capita origination and extinction rates in fixed 10-Myr bins, separately for terrestrial and marine genera (classified by a 90 % occurrence-fraction rule); the paired bin difference in mean turnover; the median of the differences with a 10,000-resample bin bootstrap 95 % interval and a one-sided Wilcoxon signed-rank test; a robustness repeat on genera with at least 5 occurrences. Verdict thresholds exactly as in pass_criterion and fail_criterion."
+  },
+  "interpretation": "Darwin's sentence ('The productions of the land seem to change at a quicker rate than those of the sea', Origin, chapter X, 'On their different rates of change') is read as an empirical generalization about the fossil record: lineages on land are replaced faster through geological time than lineages in the sea. 'Productions' is mapped to animal (Metazoan) genera; 'change at a quicker rate' is mapped to a modern reinterpretation, taxonomic turnover (origination plus extinction) at genus rank, because that is what a compiled occurrence database measures. Darwin himself was speaking of the replacement of forms, and offered a Swiss instance. 'Land' is mapped to PBDB's environment type 'terrestrial' and 'sea' to 'marine', as coded for the occurrences. This test does NOT cover: morphological rates of change (the claim's other reading, which would need phylogenetic character data); species-level turnover (PBDB genera are used because species ranges are far less reliably dated and resolved); plants and microbes (base taxon is Metazoa); Darwin's Swiss instance; whether the reasons Darwin gave are correct; or a clade-matched comparison, which is only a descriptive Tetrapoda check, because the land and sea faunas are largely different clades and clade composition is confounded with environment. A positive result would show higher turnover of terrestrial genera in PBDB records, which is also what poorer terrestrial preservation and more episodic sampling would produce, and it would not show that terrestrial lineages evolve faster.",
+  "caveats": [
+    "Metadata-only inspection before registering. I read the scout record, the claim and the three dataset-resolvability assessments, and made about six metadata requests to the PBDB data service: records_found for the occs/taxa operation with envtype=terrestrial (96,230 taxa of all ranks) and envtype=marine (167,852 taxa of all ranks), a documentation page, and a limit=2 request with rank=genus, show=app, envtype=terrestrial (records_found 28,550). The limit=1 requests returned only the root record (Animalia, with occurrence counts 348,354 terrestrial and 1,670,076 marine, and appearance bounds for the terrestrial one), and the limit=2 genus request returned two genus records, so I saw the names and age fields of two genera (a Cambrian genus and a Triassic crinoid genus, both coded terrestrial). I computed no statistic and looked at no other value.",
+    "That glimpse of two records showed that the terrestrial environment coding in PBDB contains apparently marine animals (for example an echinoderm), probably through erroneous or marginal environment coding of some collections. The 90 % occurrence-fraction classification rule was adopted partly in response, after seeing those two records. It concerns classification, not the rate comparison, but it is a design choice made after a (tiny) look and is declared here.",
+    "The occurrence totals seen in the metadata requests (marine noc 1,670,076 for all animals in occs/taxa) differ from the 1,090,143 marine Metazoa occurrences quoted in the scout record for occs/list; I did not resolve the discrepancy (the operations, the base taxon or counts of non-Metazoan animals may differ). The analysis uses only occs/taxa and should record the noc totals.",
+    "It is not verified that 'noc' in occs/taxa with rank=genus counts all occurrences assigned to the genus, including those identified to species. If it counts only genus-level identifications the 5-occurrence robustness filter is stricter than intended; this is recorded, not corrected.",
+    "The marine rank=genus and show=app request was not tried before registration (its genus-rank record count is unknown) and the exact membership of PBDB's 'terrestrial' and 'marine' envtype groups (for example whether lacustrine, fluvial, coastal and lagoonal zones are included) was not read; both must be recorded at run time. Marine here includes everything PBDB codes as marine, including shallow shelf, reef and deep-sea settings.",
+    "Prior knowledge of the likely outcome: I have general familiarity with the literature on sampling and turnover in fossil databases, but did not look up or compute a result. I expect observed terrestrial turnover to come out higher than marine in raw PBDB data, because poorer and more episodic terrestrial sampling breaks ranges and inflates boundary-crosser rates, and the bias is in the direction of the claim. A pass is therefore weak evidence. The robustness restriction to genera with at least 5 occurrences reduces but does not remove this bias; the test contains no preservation-rate model and no occurrence-level subsampling (the full occurrence set is far larger than is practical to fetch), which is a real limitation of this design. A stronger design is left for a follow-up run.",
+    "The bins are not independent (adjacent bins share genera and the turnover rate is autocorrelated), so the bootstrap interval and the Wilcoxon p-value are optimistic; that is why a pass also requires the robustness analysis and the thresholds are not tuned to p alone. Mass extinctions, the Cretaceous-Paleogene boundary and the Cenozoic dominance of the terrestrial record may drive the result; leave-one-bin-out sign checks are descriptive only.",
+    "PBDB genera are taxonomic constructs: land and sea faunas are split differently (for example more splitting in vertebrates and insects than in marine invertebrates), and the scout flagged that taxonomic splitting was not assessed. Differences in the rate may therefore reflect taxonomy.",
+    "The equivalence band of +/-0.01 per genus per Myr and the minimums of 20 genera per boundary, 5 crossers per bin, 15 bins and 2,000 genera per environment are conventional round choices made before any rate was seen, not derived from power analysis; the typical order of magnitude of marine genus rates (of the order of 0.05-0.1 per Myr) is general background knowledge, not a measurement from this dataset.",
+    "The two assessors who scored this claim as resolvable (gemini, 0.85) or partially resolvable (gpt, grok; data-adequacy 0.45-0.54, discriminating power 0.45-0.48) disagreed; the disagreement concerns preservation bias, which this design only partly addresses, and it is not averaged away."
+  ],
+  "created": "2026-11-01",
+  "created_utc": "2026-11-01T14:45:47Z",
+  "agent": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "prereg-darwin-batch-1", "date": "2026-11-01" }
+}

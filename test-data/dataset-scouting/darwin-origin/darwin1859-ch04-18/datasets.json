@@ -1,0 +1,213 @@
+{
+  "claim_id": "darwin1859-ch04-18",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "abundance or occupancy per taxon per time bin up to its last appearance (fossil)",
+    "abundance time series for competing species in the same assemblage (modern)",
+    "extirpation/extinction events with dates",
+    "sampling-effort standardisation"
+  ],
+  "datasets": [
+    {
+      "id": "biotime",
+      "name": "BioTIME: global biodiversity time-series database (Zenodo release 24_06_2021)",
+      "landing_url": "https://zenodo.org/records/5026943",
+      "access_url": "https://zenodo.org/records/5026943",
+      "doi": "10.5281/zenodo.5026943",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://biotime.st-andrews.ac.uk/ (HTTP 200); Zenodo API /api/records/5026943 and GET https://doi.org/10.5281/zenodo.5026943 (HTTP 200)",
+        "http_status": 200,
+        "bytes": 134395553
+      },
+      "variables_present": [
+        "species abundances in ecological assemblages through time (raw data table plus 10 metadata tables)"
+      ],
+      "variables_missing": [
+        "fossil data",
+        "a competitor label (favoured vs less favoured)"
+      ],
+      "scope": "Assemblage time series; the Zenodo description states a raw data table plus ten metadata tables; row counts not read",
+      "evidence": "Zenodo record 5026943: CC BY 4.0, files BioTIMEQuery_24_06_2021.zip (134,395,553 bytes), BioTIMESQL_24_06_2021.zip (144,235,915 bytes), BioTIMEMetadata_24_06_2021.csv (1,127,795 bytes), citations CSV/XLSX.",
+      "verdict": "holds"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service v1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET PBDB occs/list.json and occs/diversity.json",
+        "http_status": 200,
+        "note": "Landing page HTTP 200; API calls below also HTTP 200."
+      },
+      "variables_present": [
+        "occurrence records per taxon with age bounds and collection IDs (occupancy by time bin computable)",
+        "last-appearance ages"
+      ],
+      "variables_missing": [
+        "population abundance counts",
+        "standardised sampling effort"
+      ],
+      "scope": "273,750 vertebrate occurrences and 110,923 species-level bivalve occurrences; diversity endpoint gives per-stage counts",
+      "evidence": "occs/list.json counts (Vertebrata 273750; Bivalvia species-level 110923); occs/diversity.json returned per-stage fields including noc (occurrence count), xft, xbl, xfl, xbt.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence data via API",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://api.gbif.org/v1/occurrence/search?limit=0; https://www.gbif.org/ returned 403 to curl",
+        "http_status": 200,
+        "note": "Web portal https://www.gbif.org/ returned HTTP 403; the API returned HTTP 200."
+      },
+      "variables_present": [
+        "georeferenced occurrence records with dates (modern)"
+      ],
+      "variables_missing": [
+        "abundance time series for competing species",
+        "extinction dates"
+      ],
+      "scope": "Total 3,887,469,368 occurrences at check time; opportunistic records, not standardised surveys",
+      "evidence": "API count returned 3887469368 occurrences.",
+      "verdict": "partial"
+    },
+    {
+      "id": "living-planet-database",
+      "name": "Living Planet Database",
+      "landing_url": "https://www.livingplanetindex.org/data_portal",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.livingplanetindex.org/ and /data_portal (HTTP 200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "vertebrate population time series (per portal name; contents not opened)"
+      ],
+      "variables_missing": [
+        "species-level pairing with competitors",
+        "invertebrates/plants"
+      ],
+      "scope": "Vertebrate populations; counts and licence not read",
+      "evidence": "Both pages returned HTTP 200; no data file or record count fetched.",
+      "verdict": "partial"
+    },
+    {
+      "id": "iucn-red-list",
+      "name": "IUCN Red List of Threatened Species",
+      "landing_url": "https://www.iucnredlist.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.iucnredlist.org/ (403); GET https://api.iucnredlist.org/api/v4/docs (404)",
+        "http_status": 403,
+        "note": "403 to non-browser client; API requires a token (not tested)."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "population trend values (not verified)"
+      ],
+      "scope": "Not inspected",
+      "evidence": "Landing page returned HTTP 403 (5,356 bytes); the v4 docs path returned 404 and apiv3 docs 403, so no field list was seen.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Zenodo",
+      "query": "BioTIME",
+      "url": "https://zenodo.org/api/records?q=BioTIME",
+      "hits": 27,
+      "note": "records 5026943 (2018 deposit with files) and 825784 (2017, no files listed)"
+    },
+    {
+      "source": "DataCite",
+      "query": "BioTIME database biodiversity time series",
+      "url": "https://api.datacite.org/dois?query=BioTIME%20database%20biodiversity%20time%20series",
+      "hits": 23,
+      "note": "includes BioTIME 2.0 paper DOI 10.3929/ethz-c-000793229 (paper, not data)"
+    },
+    {
+      "source": "PBDB data1.2",
+      "query": "occurrence counts and per-stage diversity",
+      "url": "https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Vertebrata&count=genera&reso=stage&limit=2",
+      "hits": null,
+      "note": "per-stage rows returned"
+    },
+    {
+      "source": "GBIF API",
+      "query": "occurrence count",
+      "url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "hits": 3887469368,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "geographic range extinction risk fossil occupancy decline before extinction",
+      "url": "https://datadryad.org/api/v2/search?q=geographic%20range%20extinction%20risk%20fossil%20occupancy%20decline%20before%20extinction",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "pre-extinction decline geographic range fossil record occupancy",
+      "url": "https://api.datacite.org/dois?query=pre-extinction%20decline%20geographic%20range%20fossil%20record%20occupancy",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "Living Planet Database population time series",
+      "url": "https://api.datacite.org/dois?query=Living%20Planet%20Database%20population%20time%20series",
+      "hits": 54,
+      "note": "top hits unrelated"
+    }
+  ],
+  "status": "partial",
+  "summary": "The modern clause has an open, downloadable dataset (BioTIME on Zenodo: abundance time series with a raw table and metadata, CC BY 4.0), and the geological clause has PBDB occurrences with age bounds from which occupancy per time bin can be computed. No dataset labels a form as 'favoured' or links one species' increase to another's decline, and PBDB has no abundance counts or sampling standardisation.",
+  "next_step": "Pre-register separately: (a) BioTIME species pairs within assemblages for negative abundance coupling, (b) PBDB occupancy before last appearance with a sampling model.",
+  "obstacles_confirmed": [
+    "Signor-Lipps effect needs a sampling model on PBDB.",
+    "Ecological series are short relative to extinction.",
+    "IUCN portal gave 403 and no API field list was seen."
+  ]
+}

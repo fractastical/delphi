@@ -1,0 +1,71 @@
+{
+  "claim_id": "levin-2022-grn-learning-21",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:21:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "set of biological ODE pathway models used for the memory screen",
+    "random-network counterparts and a rule for random edge deletion/addition with new kinetic parameters",
+    "memory-capacity metric computed before and after each edit",
+    "number of edit repeats per network"
+  ],
+  "datasets": [
+    {
+      "id": "biomodels",
+      "name": "BioModels (EMBL-EBI)",
+      "landing_url": "https://www.biomodels.org/",
+      "access_url": "https://www.ebi.ac.uk/biomodels/search?query=*&numResults=1&format=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:13:00Z", "method": "GET search API (numResults=1) and HEAD landing page", "http_status": 200 },
+      "variables_present": ["biological ODE model structures (SBML)"],
+      "variables_missing": ["random counterparts", "edit procedure and memory metric", "which models were used in the paper"],
+      "scope": "3217 matches for '*'; 47 for 'gene regulatory network'; 144 for 'ordinary differential equation model AND transcription'.",
+      "evidence": "Search API returned JSON with a 'matches' count; landing page returned 200 after redirect from ebi.ac.uk/biomodels/.",
+      "verdict": "partial"
+    },
+    {
+      "id": "grn-ode",
+      "name": "GRN_ODE (Biswas, Clawson, Levin 2022 code)",
+      "landing_url": "https://github.com/wesleypclawson/GRN_ODE",
+      "access_url": "https://api.github.com/repos/wesleypclawson/GRN_ODE/contents/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:40Z", "method": "GET GitHub API repo metadata, contents listing and README", "http_status": 200 },
+      "variables_present": ["scripts for randomising ODE expressions (Randomize_ODE_Expressions.m)", "edge-removal / robustness scripts by file name (Remove_Mem_SLURM.m, Box_Robust.m, Box_Robust_Prep1.m)", "MEMORY_EVALUATOR_Rand_Disc_Diff.m", "ODE_New.mat (175,993 bytes) stored in repo"],
+      "variables_missing": ["an open license", "documentation of which scripts produced which figure (README is a 5-line note)"],
+      "scope": "Repository size 266 KB, last pushed 2022-11-23, MATLAB scripts and .mat files. Contents not executed or read beyond file names and README.",
+      "evidence": "GitHub contents API listed the files named above; repository metadata shows license null; README says the code is kept temporarily as it is refactored.",
+      "verdict": "partial"
+    },
+    {
+      "id": "learning-in-transcriptional-network-models-article-and-supplements",
+      "name": "Learning in Transcriptional Network Models (Biswas et al. 2022, Int J Mol Sci 24:285)",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "access_url": null,
+      "doi": "10.3390/ijms24010285",
+      "license": "CC BY 4.0 (from Crossref record)",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:00Z", "method": "HEAD doi.org (403 after redirect to mdpi.com) and GET Crossref works API (200)", "http_status": 403, "note": "doi.org landing returned 403 to curl; Crossref API returned 200 with title, date 2022-12-23 and CC BY 4.0 licence URL" },
+      "variables_present": [],
+      "variables_missing": ["not a repository dataset; supplements not inspected"],
+      "scope": "Paper, open access per Crossref.",
+      "evidence": "Crossref metadata only; full text and supplement not fetched.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "BioModels search", "query": "*", "url": "https://www.ebi.ac.uk/biomodels/search?query=*&numResults=1&format=json", "hits": 3217, "note": "service total" },
+    { "source": "GitHub repository search", "query": "gene regulatory network memory Levin associative learning ODE", "url": "https://api.github.com/search/repositories?q=gene+regulatory+network+memory+Levin+associative+learning+ODE&per_page=5", "hits": 0, "note": "no other repos" },
+    { "source": "Crossref", "query": "DOI 10.3390/ijms24010285", "url": "https://api.crossref.org/works/10.3390/ijms24010285", "hits": 1, "note": "metadata record found; licence CC BY 4.0" }
+  ],
+  "status": "partial",
+  "summary": "Biological ODE models are public (BioModels) and the authors' MATLAB scripts for randomising and removing edges and evaluating memory are on GitHub (GRN_ODE, unlicensed). The rule for assigning kinetic parameters to added edges and the exact model list are not documented in any dataset I could open.",
+  "next_step": "Read the GRN_ODE scripts to extract the model IDs, the edge-edit rule and the memory metric, then pre-register the biological-vs-random comparison.",
+  "obstacles_confirmed": [
+    "No record documents how new edges get kinetic parameters; it has to be read from the code or paper.",
+    "Random-network controls are generated by code, not deposited as a dataset."
+  ]
+}

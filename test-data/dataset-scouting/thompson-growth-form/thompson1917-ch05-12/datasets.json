@@ -1,0 +1,105 @@
+{
+  "claim_id": "thompson1917-ch05-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:55:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "radius of the viscid coating (or of the axial flagelliform fibre plus coating) on capture thread before breakup",
+    "spacing between primary glue droplets along the thread (or droplets per mm)",
+    "droplet size / volume, including primary vs secondary (smaller intermediate) droplets",
+    "glue viscosity or a proxy, and species identity"
+  ],
+  "datasets": [
+    {
+      "id": "dryad",
+      "name": "Dryad (repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=spider%20capture%20thread%20glue%20droplet",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:45:00Z", "method": "HEAD landing_url; GET search API (3 queries)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Repository, not a dataset; see the one dataset it surfaced below (doi:10.6086/D1M97D)",
+      "evidence": "Landing 200. Search 'spider capture thread glue droplet' total 1; 'viscid silk droplet spacing' total 0; 'orb web glue droplet' total 1 (same record). Dryad file download API returned 401 (bearer token required), so files were read from the Zenodo mirror.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo",
+      "name": "Zenodo (repository)",
+      "landing_url": "https://zenodo.org/",
+      "access_url": "https://zenodo.org/api/records?q=spider%20%22capture%20thread%22%20droplet&size=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:45:00Z", "method": "HEAD landing_url; GET records search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Repository, not a dataset; loose full-text search returns 47,840 hits, of which the Dryad mirror 6567737 is the one relevant dataset",
+      "evidence": "Landing 200. Search hits 47840 (loose match); the first two hits are the Kelly et al. Dryad mirror (software 6543197, dataset 6567737); the rest are Plazi figures and unrelated publications.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "kelly-et-al-orb-weaver-glue-droplets-d1m97d",
+      "name": "Data from: Correlated evolution between orb weaver glue droplets and supporting fibers maintains their distinct biomechanical roles in adhesion (Kelly et al.)",
+      "landing_url": "https://doi.org/10.6086/D1M97D",
+      "access_url": "https://zenodo.org/api/records/6567737/files/Glyco_properties_16.csv/content",
+      "doi": "10.6086/D1M97D",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:50:00Z", "method": "GET Dryad dataset API record + versions/files list; GET Zenodo record 6567737 and downloaded Glyco_properties_16.csv (1,515 B) and README_file.txt (23,400 B) from the Zenodo mirror", "http_status": 200, "bytes": 442895 },
+      "variables_present": [
+        "drop_mm: glue droplets per millimetre of capture thread (inverse of droplet spacing), species mean",
+        "drop_volume: total droplet volume from flattening procedure (µm³), species mean",
+        "glyco_vol: glycoprotein core volume (µm³)",
+        "flag_CSA: flagelliform axial fibre cross-sectional area (core-thread radius derivable)",
+        "weight_mg: spider mass; glyco_ym_Mpa, glyco_tough: glycoprotein elastic modulus and toughness at 55% RH"
+      ],
+      "variables_missing": [
+        "coating radius before breakup / instability wavelength at formation",
+        "individual-droplet positions (only species-mean droplets per mm)",
+        "secondary (smaller intermediate) droplet sizes",
+        "glue viscosity (modulus and toughness are given instead)"
+      ],
+      "scope": "15 orb-weaving species (one row each; rows = 15 after header) plus a phylogeny (spidertree.tre); droplets measured on fresh orb webs at 55% RH",
+      "evidence": "Dryad API: title as above, license https://spdx.org/licenses/CC0-1.0.html, storageSize 442895, version 3, files Glyco_properties_16.csv (1515 B), Kelly_et_al.__Glycoprotein_Properties.xlsx (21026 B), README_file.txt (23400 B), spidertree.tre (396954 B). CSV header: Species,weight_mg,drop_mm,drop_volume,glyco_vol,flag_CSA,glyco_ym_Mpa,flag_ym_MPa,glyco_tough,flag_tough,gvol_pmm,flag_vol; 15 data rows (e.g., Araneus_marmoreus drop_mm 4.4; Araneus_pegnia drop_mm 13.9). README defines drop_mm as 'Glue droplets per millimeter of capture thread length' and flag_CSA as 'Flagelliform fiber cross-sectional area'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "figshare-adhesion-modulation-glue-droplet-spreading-4933292",
+      "name": "Experimental data from 'Adhesion modulation using glue droplet spreading in spider capture silk' (J. R. Soc. Interface supplement)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.c.3759554.v1",
+      "access_url": "https://api.figshare.com/v2/articles/4933292",
+      "doi": "10.6084/m9.figshare.c.3759554.v1",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:52:00Z", "method": "GET figshare collection 3759554 and article 4933292 via API", "http_status": 200, "bytes": 19710 },
+      "variables_present": ["raw adhesion-experiment data (pull-off force vs humidity) for capture silk droplets"],
+      "variables_missing": ["droplet spacing", "coating radius", "bead size hierarchy"],
+      "scope": "One article (rsif20170228_si_001.xlsx, 19,710 B); adhesion vs humidity, a few species",
+      "evidence": "Collection description: 'Capture spiral silk is composed of an axial fibre of flagelliform silk covered with glue droplets that are arranged in a beads-on-a-string morphology'; article description 'Raw data for the adhesion experiments presented in the manuscript'. Not a morphometric dataset of droplet spacing.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "spider capture thread glue droplet", "url": "https://datadryad.org/api/v2/search?q=spider%20capture%20thread%20glue%20droplet", "hits": 1, "note": "doi:10.6086/D1M97D Kelly et al." },
+    { "source": "Dryad", "query": "viscid silk droplet spacing", "url": "https://datadryad.org/api/v2/search?q=viscid%20silk%20droplet%20spacing", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "orb web glue droplet", "url": "https://datadryad.org/api/v2/search?q=orb%20web%20glue%20droplet", "hits": 1, "note": "same D1M97D" },
+    { "source": "Zenodo", "query": "spider \"capture thread\" droplet", "url": "https://zenodo.org/api/records?q=spider%20%22capture%20thread%22%20droplet&size=8", "hits": 47840, "note": "loose; relevant: 6567737 (Dryad mirror), 6543197 (its software)" },
+    { "source": "DataCite", "query": "spider capture thread glue droplets spacing", "url": "https://api.datacite.org/dois?query=spider%20capture%20thread%20glue%20droplets%20spacing&page[size]=8", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "spider glue droplet", "url": "https://api.datacite.org/dois?query=spider%20glue%20droplet&page[size]=8", "hits": 16, "note": "relevant: 10.6086/d1m97d; 10.6084/m9.figshare.c.3759554 (adhesion supplement); 10.6084/m9.figshare.33198870 (aggregate silk rate-dependent material properties); 10.5061/dryad.t01q1 (nutrient extraction and trap properties)" }
+  ],
+  "status": "partial",
+  "summary": "One open table (Kelly et al., Dryad doi:10.6086/D1M97D, CC0, mirrored on Zenodo 6567737) gives species-mean glue droplets per mm, droplet volume, glycoprotein volume and axial-fibre cross-section for 15 orb weavers, i.e. mean bead spacing and core radius but not the pre-breakup coating radius, individual droplet positions, secondary-droplet sizes or viscosity. Other hits are adhesion-mechanics supplements. No repository dataset records the beading process or the instability wavelength directly; Dryad and Zenodo themselves are repositories, not datasets.",
+  "next_step": "Combine D1M97D drop_mm and flag_CSA with per-species droplet dimensions from the Opell lab papers' supplements (figshare 33198870, dryad.t01q1) to get spacing/radius ratios; for onset and secondary beads, a new calibrated image series of freshly spun capture thread would be needed.",
+  "obstacles_confirmed": [
+    "No public morphometric table of bead spacing exists.",
+    "Public images may omit fluid radius, viscosity, or time of formation.",
+    "Micrographs are concentrated on a few orb-weaver species and often illustrate rather than sample the thread."
+  ]
+}

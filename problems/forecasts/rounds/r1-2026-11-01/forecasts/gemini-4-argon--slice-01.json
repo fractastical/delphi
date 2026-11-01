@@ -1,0 +1,522 @@
+{
+  "round": "r1-2026-11-01",
+  "slice": "slice-01",
+  "model": "gemini-4-argon",
+  "provider": "Google",
+  "generated": "2026-11-01T05:30:00Z",
+  "problems": [
+    {
+      "problem": "rule110-universality-machine-checked",
+      "p_solved_30d": 0.08,
+      "p_solved_365d": 0.35,
+      "rationale": "The main route to solving this is decomposing Cook's construction into a verified cyclic-tag universality module, a kernel-checked glider and collision catalog via light-cone splicing, and a bisimulation theorem for the compiler. While the swarm can readily audit the collision table computationally and formalize cyclic tag systems or the collision table alone within 30 days, `p_solved_30d` (0.08) is below the best single approach's `p_complete * p_settle` (0.39 for `grok-4-7--2`) because those tractable approaches only settle their sub-target (cyclic-tag universality or the collision catalog) rather than the full acceptance criteria, which require both the catalog and the global Rule 110 emulation theorem. I would increase this probability substantially if an initial run logs a complete Lean-checked collision catalog and a clean formulation of the well-separated glider invariant.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "rule110-universality-machine-checked--claude-opus-5-5--1",
+          "p_complete": 0.06,
+          "p_settle": 0.95,
+          "note": "Full end-to-end Lean formalization across all five layers in 30 days is a long shot due to kernel evaluation limits and the complexity of the layer-4 glider calculus, though completing it would essentially settle the problem."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--claude-opus-5-5--2",
+          "p_complete": 0.80,
+          "p_settle": 0.20,
+          "note": "Writing a bit-sliced simulator and auditing Cook's glider collisions is well within the swarm's computational capabilities, but an unverified audit only settles the problem if it uncovers a genuine fatal gap in Cook's table."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--claude-opus-5-5--3",
+          "p_complete": 0.04,
+          "p_settle": 0.90,
+          "note": "Designing a spacetime tile grammar that captures unbounded CTS gap variations and proving its soundness in Lean requires novel mathematical structuring unlikely to finish in 30 days."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--gpt-5-6-sol--1",
+          "p_complete": 0.05,
+          "p_settle": 0.95,
+          "note": "Proving global phase synchronization and non-interference for the compiled tag steps in Lean 4 is a massive formalization effort that rarely finishes in one month, even if it would fully meet the acceptance criteria."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--gpt-5-6-sol--2",
+          "p_complete": 0.35,
+          "p_settle": 0.45,
+          "note": "Enumerating glider collisions and replaying finite traces in Lean is moderately tractable, but settles only the catalog half of the problem without the global simulation theorem."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--grok-4-7--1",
+          "p_complete": 0.40,
+          "p_settle": 0.60,
+          "note": "Formalizing the background, glider catalog, and collision table via blocked kernel reduction is achievable if split into small step blocks, and directly settles the second acceptance criterion."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--grok-4-7--2",
+          "p_complete": 0.55,
+          "p_settle": 0.70,
+          "note": "Formalizing Cocke-Minsky and Cook's tag-to-cyclic-tag reduction in pure Lean without Rule 110 is a clean, self-contained computability proof that settles the abstract half of the emulation."
+        },
+        {
+          "approach": "rule110-universality-machine-checked--grok-4-7--3",
+          "p_complete": 0.05,
+          "p_settle": 0.95,
+          "note": "Because it depends on prior completion of the collision lemmas and still faces the hardest lockstep bisimulation invariant, finishing this module in 30 days is very unlikely."
+        }
+      ]
+    },
+    {
+      "problem": "smallest-universal-turing-machine-2-3",
+      "p_solved_30d": 0.02,
+      "p_solved_365d": 0.07,
+      "rationale": "Settling whether Wolfram's (2,3) Turing machine is universal on eventually periodic or finite-support tapes is a major open problem in theoretical computer science where neither a periodic refuel gadget nor a global decidability invariant is known. The swarm can complete bounded computational searches and formalize properties of Smith's non-periodic tape (`grok-4-7--1`), which is why `p_solved_30d` (0.02) is below the best approach's `p_complete * p_settle` (0.07): proving Smith's tape is non-periodic settles that approach's sub-question, whereas the problem's acceptance criteria require proving or refuting universality across all eventually periodic tapes. A breakthrough in automated synthesis of a periodic-background compiler or discovery of a closed regular invariant across all periodic tails would be required to move these numbers higher.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "smallest-universal-turing-machine-2-3--claude-opus-5-5--1",
+          "p_complete": 0.55,
+          "p_settle": 0.03,
+          "note": "Running adapted bbchallenge deciders on small periodic backgrounds will likely finish and produce a census of undecided cases, which is its own stated fallback result, but has very low odds of yielding a universal decidability proof."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--claude-opus-5-5--2",
+          "p_complete": 0.20,
+          "p_settle": 0.10,
+          "note": "Instrumenting Smith's chain is straightforward, but finding a periodic refuel gadget via SAT and proving the full emulation in Lean within 30 days requires an unknown mathematical construction."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--claude-opus-5-5--3",
+          "p_complete": 0.08,
+          "p_settle": 0.25,
+          "note": "Formalizing all 40 pages of Smith's intermediate systems in Lean in 30 days is very difficult, and even a proved bound on his non-periodic tape complexity only clarifies the dispute rather than settling the periodic-tape question."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--gpt-5-6-sol--1",
+          "p_complete": 0.04,
+          "p_settle": 0.85,
+          "note": "Because its decisive result requires actually finding a working periodic-background compiler and proving a Lean simulation theorem, completion is extremely unlikely unless a small gadget happens to exist."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--gpt-5-6-sol--2",
+          "p_complete": 0.03,
+          "p_settle": 0.90,
+          "note": "Proving bounded crossing complexity for all eventually periodic tapes in Lean would completely refute conventional universality, but finding such a global invariant is an open research problem."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--grok-4-7--1",
+          "p_complete": 0.35,
+          "p_settle": 0.20,
+          "note": "Proving in Lean that Smith's doubling recurrence is not eventually periodic is a tractable formalization task, though it only settles the status of Smith's specific construction rather than the open problem."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--grok-4-7--2",
+          "p_complete": 0.03,
+          "p_settle": 0.90,
+          "note": "Finding and proving a finite-monoid invariant that decides reachability on all eventually periodic tapes would settle the problem negatively, but is highly unlikely to succeed on a complex machine like 596440."
+        },
+        {
+          "approach": "smallest-universal-turing-machine-2-3--grok-4-7--3",
+          "p_complete": 0.70,
+          "p_settle": 0.08,
+          "note": "Exhausting or finding a witness in a bounded block grammar over periods up to 32 is computationally straightforward, but an exhaustion certificate only rules out that restricted family."
+        }
+      ]
+    },
+    {
+      "problem": "rule54-universality",
+      "p_solved_30d": 0.02,
+      "p_solved_365d": 0.06,
+      "rationale": "Rule 54 universality has been open since 2002 despite extensive glider and logic-gate catalogs by Martínez, Adamatzky, and McIntosh, and the acceptance criteria explicitly exclude partial gate sets. Thus `p_solved_30d` (0.02) sits well below the highest approach `p_complete * p_settle` (0.39 for `claude-opus-5-5--3` and 0.25 for `grok-4-7--3`), because certifying bounded de Bruijn glider completeness or closing the 2006 gate monoid settles only those restricted sub-targets rather than whole-problem universality. Discovering a gap-sensitive conditional-append reaction in the collision graph or an exact conserved defect invariant for all finite perturbations would move this forecast.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "rule54-universality--claude-opus-5-5--1",
+          "p_complete": 0.45,
+          "p_settle": 0.05,
+          "note": "The SMT search over the bounded collision graph can complete by proving no conditional-append reaction exists up to the bound, which achieves its secondary decisive result but leaves unbounded universality open."
+        },
+        {
+          "approach": "rule54-universality--claude-opus-5-5--2",
+          "p_complete": 0.04,
+          "p_settle": 0.50,
+          "note": "Proving both a general defect-decomposition theorem and a non-increasing collision potential in Lean is a major theoretical hurdle, and even if completed it would not rule out infinite periodic program streams."
+        },
+        {
+          "approach": "rule54-universality--claude-opus-5-5--3",
+          "p_complete": 0.65,
+          "p_settle": 0.60,
+          "note": "Certifying the completeness of the Rule 54 glider catalog for small periods via de Bruijn cycle enumeration in Lean is very feasible and settles the bounded catalog question it targets."
+        },
+        {
+          "approach": "rule54-universality--gpt-5-6-sol--1",
+          "p_complete": 0.03,
+          "p_settle": 0.85,
+          "note": "Because its decisive result demands finding a complete library of phase-restoring modules that emulate a cyclic tag system and certifying it in Lean, completion requires Rule 54 to actually be universal via small gliders."
+        },
+        {
+          "approach": "rule54-universality--gpt-5-6-sol--2",
+          "p_complete": 0.04,
+          "p_settle": 0.60,
+          "note": "Proving a finite-defect decomposition and confluence theorem in Lean is an ambitious symbolic-dynamics research problem unlikely to yield to 30 days of automation."
+        },
+        {
+          "approach": "rule54-universality--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.10,
+          "note": "Colliding all pairs from the 2006 glider catalog across 256 separations with two simulators is an easy finite computation that will almost certainly complete with a negative census rather than a universal tag append."
+        },
+        {
+          "approach": "rule54-universality--grok-4-7--2",
+          "p_complete": 0.03,
+          "p_settle": 0.70,
+          "note": "A conserved modular weighting that restricts all finite ether perturbations to a regular language would refute finite-seed universality, but no such invariant is known to exist."
+        },
+        {
+          "approach": "rule54-universality--grok-4-7--3",
+          "p_complete": 0.45,
+          "p_settle": 0.55,
+          "note": "Kernel-checking the published 2006 gates and analyzing the finite monoid they generate up to a fixed vector length is tractable and can definitively settle whether those specific gates suffice."
+        }
+      ]
+    },
+    {
+      "problem": "rule30-center-column",
+      "p_solved_30d": 0.08,
+      "p_solved_365d": 0.25,
+      "rationale": "While the three Wolfram Rule 30 Prize problems themselves have near-zero probability of an unconditional proof, the second acceptance criterion admits a Lean 4 proof that the center column is not eventually periodic under an explicit added hypothesis or a certified period lower bound exceeding published checks. Even so, `p_solved_30d` (0.08) is kept below the top single-approach product (0.25 for `claude-opus-5-5--1` and 0.23 for `claude-opus-5-5--3`) because `claude-opus-5-5--1` settles Jen's two-column theorem more easily than a genuinely new single-column conditional theorem, and `claude-opus-5-5--3` settles bounded DFAO non-automaticity rather than the non-periodicity or linear-effort criteria directly. Scaling Lean kernel replay past the billion-step horizon or finding a non-trivial single-column conditional lemma would move this forecast.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "rule30-center-column--claude-opus-5-5--1",
+          "p_complete": 0.55,
+          "p_settle": 0.45,
+          "note": "Formalizing left-permutivity and Jen's two-column theorem in Lean 4 is quite tractable, and pairing it with an explicit conditional single-column theorem directly targets the second acceptance criterion."
+        },
+        {
+          "approach": "rule30-center-column--claude-opus-5-5--2",
+          "p_complete": 0.15,
+          "p_settle": 0.10,
+          "note": "Reaching 10^10 bits requires roughly 10^4 GPU-hours which exceeds typical swarm compute budgets, and an unverified computational extension does not provide a Lean-checked theorem."
+        },
+        {
+          "approach": "rule30-center-column--claude-opus-5-5--3",
+          "p_complete": 0.65,
+          "p_settle": 0.35,
+          "note": "Using SAT and DRAT certificates to prove in Lean that small base-k DFAOs cannot generate the Rule 30 prefix is a clean, tractable finite computation that settles the restricted automaticity question."
+        },
+        {
+          "approach": "rule30-center-column--gpt-5-6-sol--1",
+          "p_complete": 0.10,
+          "p_settle": 0.30,
+          "note": "Bit-blasting the Rule 30 light cone into SAT for periods up to 100,000 will hit severe solver scaling walls long before beating existing direct-simulation horizons."
+        },
+        {
+          "approach": "rule30-center-column--gpt-5-6-sol--2",
+          "p_complete": 0.02,
+          "p_settle": 0.90,
+          "note": "Proving unbounded algebraic degree or non-periodicity from ANF recurrences would solve a famous prize problem, but monomial cancellations in Rule 30 make finding a monotone invariant a long shot."
+        },
+        {
+          "approach": "rule30-center-column--grok-4-7--1",
+          "p_complete": 0.05,
+          "p_settle": 0.80,
+          "note": "Because the published computational horizon for Rule 30 exceeds a billion steps, replaying an even longer prefix inside Lean's kernel is computationally infeasible within 30 days."
+        },
+        {
+          "approach": "rule30-center-column--grok-4-7--2",
+          "p_complete": 0.01,
+          "p_settle": 0.95,
+          "note": "While invariance of the fair Bernoulli measure is standard, proving equidistribution for the single-seed orbit without extra assumptions is an open prize problem far beyond current provers."
+        },
+        {
+          "approach": "rule30-center-column--grok-4-7--3",
+          "p_complete": 0.08,
+          "p_settle": 0.50,
+          "note": "Certifying finitely many distinct 2-kernel subsequences is easy, but proving in Lean that new subsequences appear at arbitrarily large scales requires an infinite structural induction that is likely out of reach."
+        }
+      ]
+    },
+    {
+      "problem": "turing-capable-network-topologies",
+      "p_solved_30d": 0.45,
+      "p_solved_365d": 0.80,
+      "rationale": "Solving this problem requires satisfying both acceptance criteria jointly: a rigorous or Lean-checked theorem giving necessary and sufficient sign-pattern conditions for n = 3 Turing instability, AND an exhaustive reproducible enumeration for n = 3 and n = 4 checked against the theorem. Because no single approach delivers both the Lean theorem and the full n = 3 and n = 4 enumeration on its own, `p_solved_30d` (0.45) is lower than the best single-piece approach product (0.64 for the `claude-opus-5-5--2` enumeration and 0.60 for the `grok-4-7--1` n = 2 formalization). The main blocker within 30 days is combining the enumeration with a complete 3x3 Routh-Hurwitz and sign-stability proof in Lean and resolving any counterexamples to the 'potentially stable and not sign-stable' conjecture.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "turing-capable-network-topologies--claude-opus-5-5--1",
+          "p_complete": 0.45,
+          "p_settle": 0.80,
+          "note": "Formalizing the 3x3 Routh-Hurwitz conditions and proving the sign-pattern characterization via additive D-stability in Lean is demanding but achievable, and directly addresses the first acceptance criterion."
+        },
+        {
+          "approach": "turing-capable-network-topologies--claude-opus-5-5--2",
+          "p_complete": 0.75,
+          "p_settle": 0.85,
+          "note": "Combining random rational witness search with z3 nlsat/CAD for the 3,400 canonical n=3 patterns and 1.8M canonical n=4 patterns is a well-scoped computational pipeline that satisfies the enumeration criterion."
+        },
+        {
+          "approach": "turing-capable-network-topologies--claude-opus-5-5--3",
+          "p_complete": 0.40,
+          "p_settle": 0.70,
+          "note": "Proving asymptotic genericity via a 3-node embedding perturbation argument and Janson's inequality is mathematically clean on paper, though eigenvalue continuity in Lean may require fallback to a rigorous paper proof."
+        },
+        {
+          "approach": "turing-capable-network-topologies--gpt-5-6-sol--1",
+          "p_complete": 0.40,
+          "p_settle": 0.80,
+          "note": "Exact quantifier elimination on all canonical 3-node graphs paired with Lean-checked Routh-Hurwitz certificates is a strong route to settling the n=3 characterization, limited mainly by certificate translation overhead."
+        },
+        {
+          "approach": "turing-capable-network-topologies--gpt-5-6-sol--2",
+          "p_complete": 0.45,
+          "p_settle": 0.55,
+          "note": "Sampling graphs up to n=8 with interval verification and proving an embedding lemma is feasible and informative for the genericity question, though sampling alone does not complete the exact n=4 enumeration."
+        },
+        {
+          "approach": "turing-capable-network-topologies--grok-4-7--1",
+          "p_complete": 0.80,
+          "p_settle": 0.75,
+          "note": "Proving in Lean that equal diffusion forbids Turing instability for all n and classifying the n=2 sign patterns via quadratic Hurwitz criteria is an easy formalization that settles the classical baseline."
+        },
+        {
+          "approach": "turing-capable-network-topologies--grok-4-7--2",
+          "p_complete": 0.60,
+          "p_settle": 0.75,
+          "note": "An exhaustive interval branch-and-bound census of all 19,683 3-node sign patterns is computationally manageable, though certifying incapability on boundary patterns without symbolic QE may leave a small unresolved fraction."
+        },
+        {
+          "approach": "turing-capable-network-topologies--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.35,
+          "note": "Monte Carlo sampling of 2,000 4-node cyclic patterns with 100 rate draws each is trivial to run in days, but only tests a statistical threshold rather than providing the exhaustive n=4 enumeration."
+        }
+      ]
+    },
+    {
+      "problem": "hamiltons-rule-exact-scope",
+      "p_solved_30d": 0.75,
+      "p_solved_365d": 0.92,
+      "rationale": "This problem is exceptionally well-suited to the swarm because its acceptance criteria require a finite-population Lean 4 formalization of the Price equation, the least-squares regression form of Hamilton's rule, the additive-fitness form, and a frequency-dependent counterexample, plus a mapping to the 2010–2011 literature exchange. All of these are finite algebraic identities and rational counterexamples over `Finset` sums that require only standard tactics (`ring`, `field_simp`, `norm_num`, `linarith`) already mastered in the repo's Lean workflows. The only minor risk in 30 days is clumsiness in handling zero-variance edge cases or incomplete documentation of the literature mapping.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "hamiltons-rule-exact-scope--claude-opus-5-5--1",
+          "p_complete": 0.80,
+          "p_settle": 0.85,
+          "note": "Proving Price's identity, the 2x2 normal-equations regression form, additive parameter recovery, and state-dependence under synergy over finite populations in Lean 4 uses elementary algebra and covers almost the entire problem."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--claude-opus-5-5--2",
+          "p_complete": 0.85,
+          "p_settle": 0.85,
+          "note": "Exhibiting explicit rational game parameters where parameter-based rb > c mispredicts Δp and checking them with `norm_num` in Lean is straightforward and settles the counterexample requirement."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--claude-opus-5-5--3",
+          "p_complete": 0.75,
+          "p_settle": 0.50,
+          "note": "Computing fixation probabilities across Wright-Fisher and Moran grids is a tractable computational task that maps the empirical scope, though the acceptance criteria require a Lean development to settle the problem."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--gpt-5-6-sol--1",
+          "p_complete": 0.75,
+          "p_settle": 0.90,
+          "note": "This single approach directly formalizes all three required theorems (regression identity, additive causal theorem, and frequency-dependent countermodel) in Lean 4, making it sufficient to solve the problem on its own."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--gpt-5-6-sol--2",
+          "p_complete": 0.80,
+          "p_settle": 0.55,
+          "note": "Exhaustively enumerating exact rational transition kernels for small haploid populations is easy to complete and produces clean counterexamples, complementing the formal proofs."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--grok-4-7--1",
+          "p_complete": 0.70,
+          "p_settle": 0.90,
+          "note": "Formalizing the Birch-Okasha three-theorem split in Lean 4 with an explicit docstring mapping to the 2010–2011 exchange matches the exact acceptance criteria with modest proof complexity."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--grok-4-7--2",
+          "p_complete": 0.90,
+          "p_settle": 0.65,
+          "note": "Computing exact rational expectations for a 7-state paired Moran chain with synergy is a trivial linear-algebra script that cleanly demonstrates the divergence between frozen and refit regressions."
+        },
+        {
+          "approach": "hamiltons-rule-exact-scope--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.60,
+          "note": "Solving the 7-state stationary distribution with mutation u=0.01 is equally fast and settles the concrete distinction between one-step regression accuracy and long-run inclusive-fitness ESS maximization."
+        }
+      ]
+    },
+    {
+      "problem": "phyllotaxis-attractor-classification",
+      "p_solved_30d": 0.15,
+      "p_solved_365d": 0.45,
+      "rationale": "Solving this problem requires both numerical basin maps AND a rigorous theorem (in Lean 4 or via computer-assisted interval proof) characterizing the cylindrical Douady-Couder attractors over a stated parameter range, including the Lucas branch. Consequently, `p_solved_30d` (0.15) is below the `p_complete * p_settle` of approaches that only target the static lattice parastichy theorem (`claude-opus-5-5--2`), empirical sunflower or disc basin simulations (`claude-opus-5-5--3`, `gpt-5-6-sol--2`, `grok-4-7--3`), or a finite grid of parameter values (`grok-4-7--1`). The true bottleneck is certifying global basin partitions and hyperbolicity across a continuous parameter interval via interval Newton and Conley-Morse graphs without unresolved recurrent boxes; logging such an interval-certified theorem would significantly raise my forecast.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "phyllotaxis-attractor-classification--claude-opus-5-5--1",
+          "p_complete": 0.20,
+          "p_settle": 0.80,
+          "note": "Building a rigorous Conley-Morse graph and interval Newton enclosure for the reduced front map in 30 days is hard because non-smooth boundaries and high box counts often leave unresolved Morse sets."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--claude-opus-5-5--2",
+          "p_complete": 0.65,
+          "p_settle": 0.45,
+          "note": "Proving in Lean that visible opposed parastichy pairs of golden and Lucas lattices follow continued-fraction convergents is a tractable number-theory formalization, though it covers static lattices rather than dynamical attractors."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--claude-opus-5-5--3",
+          "p_complete": 0.75,
+          "p_settle": 0.50,
+          "note": "Simulating 10^5 ontogenetic trajectories and testing basin frequencies against published sunflower parastichy counts is straightforward and settles whether the noisy model matches biological frequencies."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--gpt-5-6-sol--1",
+          "p_complete": 0.10,
+          "p_settle": 0.85,
+          "note": "Certifying global basin volumes down to an uncovered state-space measure below 10^-6 via interval box coverings in 30 days is a long shot due to the curse of dimensionality in the finite-memory truncation."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--gpt-5-6-sol--2",
+          "p_complete": 0.80,
+          "p_settle": 0.40,
+          "note": "Running 100,000 randomized trajectories per stratum to produce an empirical basin atlas is computationally easy and delivers the numerical basin maps, but cannot prove the attractor theorem."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--grok-4-7--1",
+          "p_complete": 0.40,
+          "p_settle": 0.65,
+          "note": "Applying interval Newton to the exact Atela-Golé-Hotton cylindrical return map across a parameter grid is feasible and can rigorously certify local attracting cycles for the Fibonacci and Lucas branches."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--grok-4-7--2",
+          "p_complete": 0.12,
+          "p_settle": 0.75,
+          "note": "Formalizing the full real-analysis stability estimates of Atela, Golé, and Hotton (2003) in Lean 4 without leaving unproved hypotheses is likely too large for a 30-day window."
+        },
+        {
+          "approach": "phyllotaxis-attractor-classification--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.45,
+          "note": "Sweeping 200 growth parameters by 500 seeds on the disc geometry is a fast simulation that reliably maps empirical disc basins and tests for unclassified attractors."
+        }
+      ]
+    },
+    {
+      "problem": "lewontins-paradox-of-variation",
+      "p_solved_30d": 0.65,
+      "p_solved_365d": 0.88,
+      "rationale": "The acceptance criteria ask for a pre-registered test combining a polymorphism compilation (Leffler 2012 / Buffalo 2021) with GBIF range-size and census-size estimates from the organisms layer and recombination or genome-size covariates, yielding an explicit verdict on whether linked selection closes the diversity-census gap. The swarm already has the organisms layer, GBIF access, open supplementary tables, and phylogenetic comparative tools, making execution highly tractable within 30 days. The main blocker to a definitive verdict is data sparsity and measurement error: if too few species have qualifying recombination maps or if GBIF range proxies produce wide confidence intervals overlapping multiple hypotheses, the test completes as underpowered.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "lewontins-paradox-of-variation--claude-opus-5-5--1",
+          "p_complete": 0.75,
+          "p_settle": 0.75,
+          "note": "Joining Buffalo (2021) diversity data with GBIF range hulls, Damuth density, and published map lengths to fit PGLS models directly executes the acceptance criteria with high probability of a clear slope verdict."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--claude-opus-5-5--2",
+          "p_complete": 0.80,
+          "p_settle": 0.65,
+          "note": "Matching Bergeron et al. (2023) vertebrate pedigree mutation rates with published π to test drift-barrier compression in μ is a clean data test that settles how much of the slope flattening comes from mutation rate."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.65,
+          "note": "Running SLiM forward simulations up to N=10^7 and extrapolating background selection and sweeps to 10^12 is feasible and bounds the theoretical maximum flattening from linked selection."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--gpt-5-6-sol--1",
+          "p_complete": 0.65,
+          "p_settle": 0.80,
+          "note": "A hierarchical phylogenetic model across 150 species with 30 recombination maps compared via leave-one-clade-out ELPD is a rigorous implementation of the required test, provided data harmonization finishes on time."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--gpt-5-6-sol--2",
+          "p_complete": 0.30,
+          "p_settle": 0.70,
+          "note": "Harmonizing raw window-level polymorphism callsets, annotations, and recombination maps across 20 species from scratch is heavy data engineering that may stall within 30 days."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.55,
+          "note": "Fitting a nested taxonomic random-effects model and mammal PGLS on Leffler/Buffalo tables plus GBIF bounding boxes is fast and reliable, though it omits linked-selection covariates."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.60,
+          "note": "Testing whether map length per megabase reduces the residual log10(π) slope to zero on species with 1000-marker maps is easy to execute and gives a crisp pass/fail verdict on linked selection."
+        },
+        {
+          "approach": "lewontins-paradox-of-variation--grok-4-7--3",
+          "p_complete": 0.75,
+          "p_settle": 0.60,
+          "note": "Simulating generic Wright-Fisher, hitchhiking, and bottleneck regimes across a census-size grid is straightforward and tests whether simple demographic or sweep schedules can match the empirical slope."
+        }
+      ]
+    },
+    {
+      "problem": "metabolic-scaling-exponent",
+      "p_solved_30d": 0.75,
+      "p_solved_365d": 0.92,
+      "rationale": "The acceptance criteria require two well-defined deliverables: a pre-registered phylogenetically controlled analysis across AnAge/PanTHERIA testing single exponents (2/3 vs 3/4) against curved or clade-specific models, and a Lean 4 formalization of the West-Brown-Enquist derivation with explicit hypotheses. The data test is highly tractable using existing PanTHERIA/AnAge tables, the organisms layer, and Upham mammal trees, and the Lean formalization reduces to finite geometric series and logarithm limits that are straightforward in Mathlib. The main blocker is the empirical falsifier—if the pooled 95% interval contains both 2/3 and 3/4 and no curved/clade model wins decisively—though with 300+ mammal species the statistical power to either separate the exponents or detect curvature/clade heterogeneity is high.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "metabolic-scaling-exponent--claude-opus-5-5--1",
+          "p_complete": 0.85,
+          "p_settle": 0.80,
+          "note": "Fitting PGLS models (single slope, temperature-corrected, quadratic curvature, and order random slopes) across 300+ mammals on Upham trees is a standard comparative pipeline with enough sample size to yield a decisive model comparison."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--claude-opus-5-5--2",
+          "p_complete": 0.75,
+          "p_settle": 0.85,
+          "note": "Formalizing the geometric-series blood volume sum and the N → ∞ limit yielding 3/4 under explicit area-preservation and space-filling hypotheses in Lean 4 is well-scoped and satisfies the formal acceptance criterion."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--claude-opus-5-5--3",
+          "p_complete": 0.80,
+          "p_settle": 0.75,
+          "note": "Fitting a Bayesian hierarchical slope model to DeLong et al. (2010) and AnAge data across prokaryotes, protists, ectotherms, and endotherms is fast and strongly tests cross-domain universality."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--gpt-5-6-sol--1",
+          "p_complete": 0.80,
+          "p_settle": 0.75,
+          "note": "Comparing fixed 2/3 and 3/4 slopes, clade-varying slopes, and quadratic models across mammals and birds via family-held-out ELPD is a clean, high-powered test of the empirical criterion."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--gpt-5-6-sol--2",
+          "p_complete": 0.70,
+          "p_settle": 0.85,
+          "note": "Proving the logarithmic exponent implications and constructing finite-tree countermodels when WBE assumptions are weakened in Lean 4 is a tractable formalization that settles the theoretical audit."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--grok-4-7--1",
+          "p_complete": 0.90,
+          "p_settle": 0.75,
+          "note": "Running PGLS on paired PanTHERIA BMR and mass columns across 100 Upham trees is a self-contained script that will quickly complete and adjudicate between single-slope, quadratic, and order-specific models."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.85,
+          "note": "Stating the WBE scaling hypotheses and the Kozlowski-Konarzewski service-volume critique as separate algebraic lemmas in Lean 4 avoids heavy real analysis while fulfilling the formal criterion."
+        },
+        {
+          "approach": "metabolic-scaling-exponent--grok-4-7--3",
+          "p_complete": 0.95,
+          "p_settle": 0.45,
+          "note": "Evaluating finite geometric branching networks from generation 2 to 24 in a script takes minutes and verifies the finite-size convergence rate toward 3/4, though it is not a Lean proof or empirical test."
+        }
+      ]
+    }
+  ]
+}

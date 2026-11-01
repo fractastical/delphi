@@ -16,7 +16,7 @@ test-data/organisms/<project>/<slice>/datasets/<dataset-id>.json
 test-data/organisms/<project>/<slice>/REPORT.md
 ```
 
-`<project>` is `darwin-origin` or `thompson-growth-form`; `<slice>` is a chapter range such as
+`<project>` is `darwin-origin`, `thompson-growth-form` or `aristotle-biology`; `<slice>` is a chapter range such as
 `ch01-05`. Duplicates across slices are merged later by identifier (GBIF key / Wikidata QID).
 
 Run `node test-data/organisms/validate.mjs [<project>/<slice>]` before committing; it checks the field
@@ -45,6 +45,41 @@ are those whose chapter key (`darwin1859-ch03-…`, `thompson1917-ch11-…`) fal
 | thompson-growth-form | `ch11` | XI | 16507–19560 |
 | thompson-growth-form | `ch12-14` | XII–XIV | 19561–21574 |
 | thompson-growth-form | `ch15-epilogue` | XV–XVII, Epilogue | 21575–28917 |
+| aristotle-biology | `ha01-04` | History of Animals I–IV | `ha.txt` 6–659 |
+| aristotle-biology | `ha05-06` | History of Animals V–VI | `ha.txt` 660–1186 |
+| aristotle-biology | `ha07-09` | History of Animals VII–IX | `ha.txt` 1187–1783 |
+| aristotle-biology | `pa01-04` | Parts of Animals I–IV | `pa.txt` 6–481 |
+| aristotle-biology | `ga01-05` | Generation of Animals I–V | `ga.txt` 6–505 |
+
+For Aristotle the texts are `claim-sources/aristotle-biology/inputs/{ha,pa,ga}.txt` and a slice's
+claims are those whose id starts with its work and book (`aristotle-ha01-…` to `aristotle-ha04-…`
+for `ha01-04`). His animal names are Greek kinds in a 1910 translation ("the cestreus", "the
+glanis", "the trochilus"); resolve them through the translator's identification where the
+standard commentaries agree, and record the uncertainty in `notes` and `REPORT.md` otherwise.
+
+### Claim-test slices
+
+`claim-tests/<slice>` holds the animal species the data tests in `test-data/claim-tests/` actually
+measured, which are often not the taxa the book names (the cube-law test `thompson1917-ch02-01`
+uses twenty North Sea fish and jellyfish). Each slice is generated, not hand-written:
+
+```sh
+python3 test-data/organisms/claim-tests/candidates.py validated --exclude-lean   # -> validated/species.json
+uv run --with pyarrow test-data/organisms/claim-tests/fetch.py validated         # -> taxa/, datasets/, mentions.json, REPORT.md, PROFILES.md, files/
+```
+
+| slice | claims | species |
+|---|---|---|
+| `lean-tested` | the five claims with a Lean proof and a data verdict (`thompson1917-ch02-01`, `ch03-07`, `ch07-04`, `ch07-11`, `ch17-06`); `species.json` written by hand | 26 |
+| `validated` | the other biological claims with a supports or mixed verdict; 28 of the 46 count genera or regions and name no species | 110 |
+
+`fetch.py` queries every axis `coverage.mjs` scores (GBIF, Wikidata, NCBI Taxonomy and Datasets,
+WoRMS, OBIS, BOLD, PBDB, IUCN via GBIF, MorphoSource, DANDI, Open Tree, FishBase/SeaLifeBase,
+AnAge), writes a dataset record only when a source returned data and lists the empty ones as gaps
+in `REPORT.md`. It vendors every FishBase/SeaLifeBase row for each species in
+`files/lifebase/<slug>.json` and a per-species summary of all sources in `files/profiles/<slug>.json`.
+`species.json` entries may set `accepted_name` and `wikidata_qid` where the GBIF backbone still
+uses an older name, so the merge does not report a conflict.
 
 ## Rules
 
@@ -201,6 +236,29 @@ releases per decade) and `mosaic.jpg` (every thumbnail, ordered by first appeara
 period-colour stripe). The per-taxon cards are gitignored (~110 MB); thumbnails, manifest,
 timeline data and the two summaries are committed. Image licences are CC/public domain as
 reported by Commons; check `manifest.json` before reusing a picture outside this repo.
+
+### Tree of life with claims
+
+```sh
+node test-data/organisms/tree.mjs             # -> merged/tree.json, images/tree.svg (reuses the cached Open Tree answer)
+node test-data/organisms/tree.mjs --refresh   # re-query Open Tree of Life
+```
+
+`tree.mjs` draws the inventory as one time-calibrated tree (`images/tree.svg`, ~1200×8200 px,
+open it in a browser: boxes have tooltips and link to the claim graph). Topology comes from the
+Open Tree of Life synthetic tree: every accepted name is matched with the TNRS (exact matches, the
+"Animals" context for metazoan phyla so homonyms in other kingdoms cannot win) and the matched OTT
+ids go to `induced_subtree`. A merged taxon that contains another (an order and one of its species)
+is an internal node and is labelled there; a taxon that is not monophyletic in the synthetic tree
+is attached to the MRCA node Open Tree reports for it (`broken` in `merged/tree.json`). Horizontal
+position is the PBDB first appearance from `merged/timeline.json`; an internal node sits at the
+oldest first appearance beneath it, which is a lower bound on the clade's age and not a divergence
+time. Lineages with no PBDB range are dashed at an arbitrary position. Beside each taxon is one box
+per claim that mentions it (`mentioned_in` plus `merged/mentions.json`), coloured from
+`docs/claims.json`: theorem, data verdict (supports / mixed / inconclusive / refutes) or untested.
+`merged/tree.json` keeps the TNRS matches, the Newick string, the unmatched names (mostly obsolete
+or fossil-only names Open Tree does not carry: Pachydermata, Ichthyosauria, Productus), the ids
+pruned from the synthetic tree, and each taxon's placement and claim list, with the retrieval time.
 
 `merge.mjs` unifies taxa across slices and projects by GBIF key (else Wikidata QID, else NCBI
 taxid), unions names, mentions and datasets, merges shared-database records by id, and lists

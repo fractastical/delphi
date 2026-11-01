@@ -1,0 +1,93 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Measured hollowness against the mass optimum and buckling" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "Using the k-star and the buckling boundary from the Lean development, compare measured hollowness on every open record that supplies either an inner and outer radius or the two areas that define them. For a circular annulus, global compactness Cg = bone area / total area gives k = sqrt(1 − Cg). Amson and Bibi deposit humeral MeanArea, MeanC, cross-sectional shape and body mass for 152 mammal species (159 rows in the humerus file). MeanC is used as compactness only if their methods equate it with Cg; otherwise those rows are dropped from the k test and MeanArea is not a substitute. Alfieri, Nyakatura and Amson deposit cortical compactness and cortical area for humeri and femora of slow arboreal mammals, a lifestyle-biased long-bone set. The junco deposit has cortical thickness, total area and marrow area for femur and humerus of one species, which determine k directly. Bamboo is the one verified culm table with outer diameter and wall thickness on some internodes, plus the single Moso culm whose diameters and mean wall thickness are stated in Dixon and Gibson. Feather rachises are included only from the measurements printed in the 2017 Royal Society Open Science rachis paper, and only if that supplement can be fetched. A structure is at the stiffness optimum if |k − k-star(q)| ≤ 0.10, and at the buckling limit if it is within 0.10 of the buckling boundary and farther than 0.10 from k-star. The core ratio q is 0 for air-filled culms and pneumatic bones, and is the marrow-to-bone density ratio only when a fetched source states it. Tissue modulus must come from the same paper or the row is excluded from the buckling comparison. The problem's bar is at least 100 structures of at least four types; this approach reports that count and does not relax it." ;
+
+    delphi:proposedTest "A classification of at least 100 structures from four types (long bones, stems, bamboo culms, feather rachises), each with a matched modulus, into at-optimum, at-buckling or neither, using the 0.10 bands. The optimality claim passes only if the majority of structures in most types are at-optimum rather than at-buckling." ;
+    delphi:context "Fails if: Fewer than four types have at least ten modulus-matched structures, so the acceptance bar is missed; or the measured k values fall mostly in neither class; or they cluster on the buckling boundary rather than on k-star." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the 0.10 bands, the circular-annulus conversion and the rule for q before converting any table. 2. Confirm from Amson and Bibi's methods whether MeanC is global compactness; drop it if not. 3. Compute k for every row with a verified radius pair or area pair. 4. Attach a modulus only from the same paper, then classify each row. 5. Test whether the majority class is the stiffness optimum, the buckling boundary, or neither, by structure type." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: No public stem radius-and-wall compilation was verified. The feather paper's publisher page blocked a scripted fetch, so its table may be unreachable. Matched tissue moduli are missing for most long-bone rows, and the swarm has no calipers or scanner of its own." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.12600440.v3> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.12896249.v8> ;
+    rdfs:seeAlso <https://doi.org/10.6078/D1WT5H> ;
+    rdfs:seeAlso <http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv> ;
+    rdfs:seeAlso <https://doi.org/10.1186/s12915-021-01016-1> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2014.0321> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsos.160927> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+  <https://doi.org/10.6084/m9.figshare.12600440.v3> dct:title "Amson and Bibi 2021 humeral structure table" ;
+    dct:description "RawDataHumerusR1.csv has 159 rows and 152 mammal species, with body mass, MeanArea and MeanC. MeanC enters the hollowness test only if the paper defines it as global compactness." .
+  <https://doi.org/10.6084/m9.figshare.12896249.v8> dct:title "Alfieri, Nyakatura and Amson cortical compactness" ;
+    dct:description "TableS1_humeri.xlsx and TableS2_femora.xlsx give cortical compactness and cortical area for slow arboreal mammals. Lifestyle-biased; one structure type." .
+  <https://doi.org/10.6078/D1WT5H> dct:title "Junco hyemalis bone microstructure" ;
+    dct:description "Cortical thickness, total cross-sectional area and marrow area for femur and humerus of one species, enough to compute k. Not a multi-species sample." .
+  <http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv> dct:title "Elegant Experiments bamboo internode table" ;
+    dct:description "One culm labelled Phyllostachys, CC BY. Outer diameter and, for some internodes, wall thickness. A single bamboo example, not a species survey." .
+  <https://doi.org/10.1186/s12915-021-01016-1> dct:title "Differing effects of size and lifestyle on bone structure in mammals" ;
+    dct:bibliographicCitation "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals" .
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1098/rsif.2014.0321> dct:title "The structure and mechanics of Moso bamboo material" ;
+    dct:bibliographicCitation "Dixon and Gibson 2014, The structure and mechanics of Moso bamboo material. One culm: outer diameter about 12.4 to 16.8 cm and a stated mean wall thickness." .
+  <https://doi.org/10.1098/rsos.160927> dct:title "Rachis morphology cannot accurately predict the mechanical performance of primary feathers in extant (and therefore fossil) feathered flyers" ;
+    dct:bibliographicCitation "Lees et al. 2017, Rachis morphology cannot accurately predict the mechanical performance of primary feathers in extant (and therefore fossil) feathered flyers" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.347Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Measured hollowness against the mass optimum and buckling" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

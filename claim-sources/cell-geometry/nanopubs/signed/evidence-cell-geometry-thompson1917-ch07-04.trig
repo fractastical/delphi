@@ -1,5 +1,5 @@
-@prefix this: <https://w3id.org/np/RA7cXwDk_dDADMSeHrandLwNMsPn_pKmV3iQnK66WQBgA>.
-@prefix sub: <https://w3id.org/np/RA7cXwDk_dDADMSeHrandLwNMsPn_pKmV3iQnK66WQBgA/>.
+@prefix this: <https://w3id.org/np/RAv8rktaRZFksVshZRbRrMGD8CXmHKF0ZUbeWKFbeReeg>.
+@prefix sub: <https://w3id.org/np/RAv8rktaRZFksVshZRbRrMGD8CXmHKF0ZUbeWKFbeReeg/>.
 @prefix np: <http://www.nanopub.org/nschema#>.
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
 @prefix prov: <http://www.w3.org/ns/prov#>.
@@ -152,15 +152,41 @@ sub:value9 a <https://schema.org/PropertyValue>;
     <https://schema.org/propertyID> "frac_T_like_junctions";
     <https://schema.org/value> "0.003"^^xsd:double;
     <https://schema.org/about> <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye>.
+<https://w3id.org/delphi/resource/activity/cell-geometry-thompson1917-ch07-04--revision-1> a prov:Activity;
+    dc:description "Segmenter-bias null (claim-sources/cell-geometry/segmenter_bias.py, results/segmenter-bias/): the same CPSAM v2 checkpoint turns a brick-wall tiling with 100% T-junctions into 3-16% T-junctions and compresses angle SD from 40.5 to 25-26 degrees; a grass-like cell-file tiling goes from 100% to 48-59% T; random Voronoi goes from 14% to 28-31% of junctions within 15 degrees of 120. Cell counts were exact, so the bias is in boundary shape. The measured 0-3% T fractions in the four conforming tissues are below the segmenter floor for a tissue that truly has 100% T-junctions, and grass (49%) matches the segmented cell-file tiling, so its true T fraction is probably near 100%.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Revision 1 of the thompson1917-ch07-04 cell-geometry test (2026-10-31)";
+    prov:startedAtTime "2026-10-31"^^xsd:date;
+    prov:used <https://github.com/fractastical/delphisci/blob/16f4d8730c37849c164ea2a045b2ad2e5c54118f/claim-sources/cell-geometry/results/segmenter-bias/summary.json>;
+    prov:wasInformedBy <https://w3id.org/delphi/resource/agent/moltbook-hivefound>, <https://w3id.org/delphi/resource/agent/moltbook-nanoswarm>, <https://w3id.org/delphi/resource/agent/moltbook-vina>;
+    <https://w3id.org/delphi/ontology/evidenceAgainst> "Before: mixed, 4 of 5 tissues conform (confidence 0.6). After: mixed, 4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter (confidence 0.35).".
+<https://w3id.org/delphi/resource/agent/moltbook-hivefound> a prov:Agent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "hivefound";
+    <http://www.w3.org/2000/01/rdf-schema#comment> "proposed that every claim carry a disconfirming observation, admissible dataset constraints and inference method as separate fields";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#a55aa7a0-cf2b-442b-b58a-8ff6018d4165>.
+<https://w3id.org/delphi/resource/agent/moltbook-nanoswarm> a prov:Agent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "nanoswarm";
+    <http://www.w3.org/2000/01/rdf-schema#comment> "warned that blur alone curves ridges toward Y near a vertex; proposed annulus line-fitting and validating the ridge pipeline on synthetic tilings with an annulus-radius sweep before real tissues";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.moltbook.com/post/9ff17185-86a8-42ec-9337-aa8951185f64#64213952-fb39-4933-a8cb-5eca6f46c28f>.
+<https://w3id.org/delphi/resource/agent/moltbook-vina> a prov:Agent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "vina";
+    <http://www.w3.org/2000/01/rdf-schema#comment> "asked for a null in which the junction statistics are run on segmenter output for synthetic masks with known non-hexagonal packing";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#b3696eb0-2271-44af-9d4d-6086324ae860>.
+<https://w3id.org/delphi/resource/activity/cell-geometry-thompson1917-ch07-04--revision-2> a prov:Activity;
+    dc:description "Independent, non-Cellpose evidence from the two TissueMiner datasets used for thompson1917-ch07-09 (Dye et al. wing disc, Zenodo 22760592; Etournay et al. 2015 pupal wing WT_1-3), segmented with TissueAnalyzer and manually corrected. Three-way vertices: 98.4-98.8% in five proliferating discs, 99.7% in three pupal wings, so the 'by threes' half of the claim is well supported. Angles at interior three-way junctions (straight chords between vertices): SD 24-28 degrees in the dividing discs with 16-21% of junctions having all three angles within 15 degrees of 120, close to the random-Voronoi control (14%); in the pupal wings SD falls from 21 degrees to 15 degrees and the near-120 fraction rises from 24-27% to 42-49% over the 17 h in which division ceases. So junction angles are not 120 degrees 'irrespective of size' as a standing property of tissues: they approach 120 degrees as the tissue leaves proliferation, and never reach the corneal-endothelium regularity (75%). Confidence rises because the split verdict now rests on expert segmentations rather than on a segmenter with a known bias; the verdict stays mixed because one half of Thompson's sentence is right and the other is conditional on tissue state. Chord angles on curved bonds are a cruder angle estimate than the ridge method; they are used only for comparison across the same pipeline.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Revision 2 of the thompson1917-ch07-04 cell-geometry test (2026-11-01)";
+    prov:startedAtTime "2026-11-01"^^xsd:date;
+    <https://w3id.org/delphi/ontology/evidenceAgainst> "Before: mixed, 4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter (confidence 0.35). After: mixed, three-at-a-time holds (98-99.7% of interior vertices in 8 expert-segmented Drosophila epithelia); 120 degrees holds only loosely and only once division has stopped (confidence 0.6).";
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Evidence used: test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/derived/summary.json (sensitivity_junction_angles) and test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/derived/*_angles.csv".
 <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> <https://w3id.org/delphi/ontology/hasEvidence> <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-04>.
 <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-04> a <https://w3id.org/delphi/ontology/EvidenceItem>;
     <https://schema.org/value> 4;
-    <https://schema.org/unitText> "tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control";
-    dc:description "Exploratory test of thompson1917-ch07-04: If tissue cell walls meet three at a time at 120 degrees regardless of cell size, junction angles in real tissues cluster near 120 degrees more tightly than in a random partition of the plane, T-shaped junctions are rare, four cells do not meet at one point, and angle deviation does not depend on cell size.\n\nResult: 4 (tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control; n = 5; one image per tissue).\n\nCriterion: Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test. A tissue conforms if its junction-angle SD and its fraction of T-like junctions (largest angle >= 160 deg) are both below the random-Voronoi control. Supports if every usable tissue conforms; mixed if some do and some do not; refutes if none do.\n\nInterpretation: Thompson's 'tissue cell walls' are taken as segmented cell outlines in 2D images of epithelia and epidermes; the angle is the angle between wall directions near the junction. The compound eye is included as a packing of ommatidia, not of single cells.";
-    <http://www.w3.org/2000/01/rdf-schema#comment> "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test.\nOne image per tissue, all from Wikimedia Commons; tissues were chosen by availability, not sampled.\nFour-way junction fractions are upper bounds: the random-Voronoi control, which has no true four-way vertices, scores 8.6% because close three-way junctions merge.\nWeak negative size-deviation correlations in some tissues also appear in the random control, so they are attributed to measurement noise in small cells.\nThe Drosophila eye image is an SEM of a curved surface; projection distorts its angles.";
+    <https://schema.org/unitText> "tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control, as measured on Cellpose-SAM output (see revisions for segmenter bias)";
+    dc:description "Exploratory test of thompson1917-ch07-04: If tissue cell walls meet three at a time at 120 degrees regardless of cell size, junction angles in real tissues cluster near 120 degrees more tightly than in a random partition of the plane, T-shaped junctions are rare, four cells do not meet at one point, and angle deviation does not depend on cell size.\n\nResult: 4 (tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control, as measured on Cellpose-SAM output (see revisions for segmenter bias); n = 5; one image per tissue).\n\nCriterion: Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test. A tissue conforms if its junction-angle SD and its fraction of T-like junctions (largest angle >= 160 deg) are both below the random-Voronoi control. Supports if every usable tissue conforms; mixed if some do and some do not; refutes if none do.\n\nInterpretation: Thompson's 'tissue cell walls' are taken as segmented cell outlines in 2D images of epithelia and epidermes; the angle is the angle between wall directions near the junction. The compound eye is included as a packing of ommatidia, not of single cells.";
     <http://www.w3.org/2000/01/rdf-schema#label> "Exploratory cell-geometry test of thompson1917-ch07-04 on 5 images: mixed";
-    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json>;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye>, <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf>, <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis>, <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis>, <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium>;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Segmenter bias (added 2026-10-31 after external review): Cellpose-SAM pulls non-hexagonal packings toward 120-degree junctions (brick wall 100% -> 3-16% T-junctions). Conforming tissues are consistent with 120-degree packing but their margin over the random control is inflated; see revisions[0].\nExploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test.\nOne image per tissue, all from Wikimedia Commons; tissues were chosen by availability, not sampled.\nFour-way junction fractions are upper bounds: the random-Voronoi control, which has no true four-way vertices, scores 8.6% because close three-way junctions merge.\nWeak negative size-deviation correlations in some tissues also appear in the random control, so they are attributed to measurement noise in small cells.\nThe Drosophila eye image is an SEM of a curved surface; projection distorts its angles.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://github.com/fractastical/delphisci/blob/16f4d8730c37849c164ea2a045b2ad2e5c54118f/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json>;
+    prov:qualifiedRevision <https://w3id.org/delphi/resource/activity/cell-geometry-thompson1917-ch07-04--revision-1>, <https://w3id.org/delphi/resource/activity/cell-geometry-thompson1917-ch07-04--revision-2>;
     <https://schema.org/additionalProperty> sub:value0, sub:value1, sub:value10, sub:value11, sub:value12, sub:value13, sub:value14, sub:value15, sub:value16, sub:value17, sub:value18, sub:value19, sub:value2, sub:value20, sub:value21, sub:value22, sub:value23, sub:value24, sub:value25, sub:value26, sub:value27, sub:value3, sub:value4, sub:value5, sub:value6, sub:value7, sub:value8, sub:value9
 }
 sub:provenance {
@@ -172,71 +198,72 @@ sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delph
     <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
 sub:analysis a prov:Activity;
     <http://www.w3.org/2000/01/rdf-schema#label> "Junction-angle and neighbour-number measurement on Cellpose masks";
+    prov:wasInformedBy sub:segmentation0, sub:segmentation1, sub:segmentation2, sub:segmentation3, sub:segmentation4;
     prov:qualifiedAssociation sub:analysisPlan;
-    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>;
-    prov:wasInformedBy sub:segmentation0, sub:segmentation1, sub:segmentation2, sub:segmentation3, sub:segmentation4.
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>.
 <https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
     <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
-sub:analysisPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/analyze.py>.
 sub:segmentation0 a prov:Activity;
     <https://schema.org/description> "input PNG sha256 b6bb942891669fb05d3e2cfda5c10ab272dbb86fce529b408ce49b66685d61b8 (crop null of the downloaded file); mask sha256 78ddf749045db35d474dfeab0be5ed7b63b6bd5470c0bca017158c07313023ee; 139 objects; diameter hint auto";
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose segmentation of human-corneal-endothelium, Nebius operation op-88c64c6c1ed019df";
+    prov:startedAtTime "2026-10-31T03:59:04Z"^^xsd:dateTime;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium>;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose>;
     dc:identifier "op-88c64c6c1ed019df";
-    prov:endedAtTime "2026-10-31T03:59:08Z"^^xsd:dateTime;
-    prov:startedAtTime "2026-10-31T03:59:04Z"^^xsd:dateTime.
+    prov:endedAtTime "2026-10-31T03:59:08Z"^^xsd:dateTime.
 sub:segmentation1 a prov:Activity;
     <https://schema.org/description> "input PNG sha256 b5756a70bf88cab98b908833acd0de916d63876786cda6f219fb96b20d51f0a1 (crop [0,0,1600,1075] of the downloaded file); mask sha256 0fc006b9b838773b4000eeb07972cfc7a3f287350faaa59e9cd4388361c1751c; 223 objects; diameter hint auto";
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose segmentation of drosophila-compound-eye, Nebius operation op-66616d87d6bbc038";
+    prov:startedAtTime "2026-10-31T04:10:32Z"^^xsd:dateTime;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye>;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose>;
     dc:identifier "op-66616d87d6bbc038";
-    prov:endedAtTime "2026-10-31T04:10:36Z"^^xsd:dateTime;
-    prov:startedAtTime "2026-10-31T04:10:32Z"^^xsd:dateTime.
+    prov:endedAtTime "2026-10-31T04:10:36Z"^^xsd:dateTime.
 sub:segmentation2 a prov:Activity;
     <https://schema.org/description> "input PNG sha256 c3160be9b42cbb98a0986d25fa7d517a45e760a8e8e8b3fe2017c405ca58db16 (crop null of the downloaded file); mask sha256 2e95512401367e17c53fabb020929b553c87bafc722a37edcfffb696cfb2c71d; 135 objects; diameter hint 80";
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose segmentation of physcomitrella-leaf, Nebius operation op-5914678cabfd153b";
+    prov:startedAtTime "2026-10-31T04:17:15Z"^^xsd:dateTime;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf>;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose>;
     dc:identifier "op-5914678cabfd153b";
-    prov:endedAtTime "2026-10-31T04:17:18Z"^^xsd:dateTime;
-    prov:startedAtTime "2026-10-31T04:17:15Z"^^xsd:dateTime.
+    prov:endedAtTime "2026-10-31T04:17:18Z"^^xsd:dateTime.
 sub:segmentation3 a prov:Activity;
     <https://schema.org/description> "input PNG sha256 40860be8e6c07d35e9d968d7e21bc1a673f4f2627b3de0ef1b8f0df2aa77255b (crop null of the downloaded file); mask sha256 6628bfc067fcdc66a620b29dc5a5288340602040012f4b734f71b3dd3db43f73; 260 objects; diameter hint auto";
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose segmentation of festuca-leaf-epidermis, Nebius operation op-42fd591f68652535";
+    prov:startedAtTime "2026-10-31T04:12:31Z"^^xsd:dateTime;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis>;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose>;
     dc:identifier "op-42fd591f68652535";
-    prov:endedAtTime "2026-10-31T04:12:37Z"^^xsd:dateTime;
-    prov:startedAtTime "2026-10-31T04:12:31Z"^^xsd:dateTime.
+    prov:endedAtTime "2026-10-31T04:12:37Z"^^xsd:dateTime.
 sub:segmentation4 a prov:Activity;
     <https://schema.org/description> "input PNG sha256 5fb2fefbc9f911f1c335edc8fa45629ca3f41f62d23701188c1cd06371ab30b5 (crop null of the downloaded file); mask sha256 8d7eacb6fda670ae9ea9eb205718ed7448356b6388ab2826878dc783743d30af; 117 objects; diameter hint 130";
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose segmentation of aloe-leaf-epidermis, Nebius operation op-ab000188a0746cc5";
+    prov:startedAtTime "2026-10-31T04:18:09Z"^^xsd:dateTime;
     prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis>;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose>;
     dc:identifier "op-ab000188a0746cc5";
-    prov:endedAtTime "2026-10-31T04:18:15Z"^^xsd:dateTime;
-    prov:startedAtTime "2026-10-31T04:18:09Z"^^xsd:dateTime.
+    prov:endedAtTime "2026-10-31T04:18:15Z"^^xsd:dateTime.
+sub:analysisPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/16f4d8730c37849c164ea2a045b2ad2e5c54118f/claim-sources/cell-geometry/analyze.py>.
 <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> a prov:SoftwareAgent;
     <http://www.w3.org/2000/01/rdf-schema#label> "Cellpose CPSAM v2 on the Nebius Scientific AI Platform (segment_cells_native)";
     prov:actedOnBehalfOf <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>;
     prov:qualifiedAssociation sub:segmentPlan;
     <https://schema.org/softwareVersion> "cellpose 4.2.1, model mouseland/cellpose-sam/cpsam_v2 sha256 0f1cc3f7ecdd8a037a57c6c48d9d8921391be4cbce3fa9f13c3e3a2e1253c667".
-sub:segmentPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/segment.py>
+sub:segmentPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/16f4d8730c37849c164ea2a045b2ad2e5c54118f/claim-sources/cell-geometry/segment.py>
 }
 sub:pubinfo {
-this: <http://www.w3.org/2000/01/rdf-schema#label> "Evidence item: exploratory cell-geometry test of Thompson 1917 claim thompson1917-ch07-04";
-    dc:created "2026-10-31T14:38:29.901Z"^^xsd:dateTime;
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Evidence item: exploratory cell-geometry test of Thompson 1917 claim thompson1917-ch07-04 (revision 2)";
+    dc:created "2026-11-01T05:31:43.979Z"^^xsd:dateTime;
     dc:creator <https://orcid.org/0009-0007-4948-9192>;
     dc:license <https://creativecommons.org/licenses/by/4.0/>;
     npx:hasNanopubType <https://w3id.org/delphi/ontology/EvidenceItem>;
     npx:introduces <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-04>;
+    npx:supersedes <https://w3id.org/np/RA7Z54FpZwCWXjcavnSklYczANZ5WM3lhQ5UiVH7o-CNU>;
     <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
 <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
 sub:sig npx:hasAlgorithm "RSA";
     npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
     npx:hasSignatureTarget this:;
     npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
-    npx:hasSignature "XJFvLL0IcNxUMcvArMdmtfHSltfSwp6CfFY4/ejBw+DRa9Ay4L03YybH9aklkmWBXHSQa8mY7mcE8ROwIJHXb0wePydP3jxu/ymkXwSQn2RF6NbgezW6aopi3/JrYdFXGYbBc6IR3k7sgs6V5HG+UmRz6cO8rU1CB8db4+BtL5C3OPbTOiFc1V/k1Rm4QQQ1YHeqArN1TXZPdlhlGgFca2g61fGb7td4PMI4+dlBOkWK+Ry9of2tRzZW+F1tMJ7E3qz2wyMgY/v7lhWrMXIfrwsuK6XGkQo3kdn3a0+ZsibkOtjxRUAqdw9miJr9S7aXkwp8S9hqW+B5pYtZFTgJdA=="
+    npx:hasSignature "bFT5wAc42k7UUcDNtiF+eqi0RpIf569s3Jv61ewGxECwo3wYHa63zTxoooNTWWMevpq/TiHfKcVrs70wcDGDOlirSmK0pnCxiTIeGx6uDtoZoYJtIy7VxMoie9d5HCTzhGzm0TWzNlOXCdhI9v3QBIF86d0bpTZN+29OhAdDGuVBGbVyZGGLspMFx+OzU/eEfw2yjytaaciRIZb/ifFu9v7D0ENLgok1Lny2vt10sy75yPwToCOEaz+e/5Yt8ZVyEyeS2zzfdrVdoYeCpqep5C6OLh4fxh108uK5sVkQiCctqgFE+NeQABukhiGERRewcpTmVEULZkzRxXnffcWwrw=="
 }

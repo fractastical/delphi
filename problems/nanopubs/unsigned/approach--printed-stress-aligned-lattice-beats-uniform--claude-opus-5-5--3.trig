@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Meta-analysis of published aligned-versus-uniform lattice tests at matched mass" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    dct:description "Many additive-manufacturing papers compare stress-aligned, isostatic-line or functionally graded lattices with uniform ones experimentally. Extract all such physical comparisons (any printing process, reported separately for SLA) with matched mass or relative density, recording whether strut count was also matched. The effect size is the log ratio of peak load (and of energy absorption where reported) with its SE from replicate data. Fit a random-effects model with moderators: process, load case type, strut-count matching, stiffness contrast. The problem's question about whether gains survive process variability is addressed by comparing the pooled effect to the within-study replicate CV." ;
+
+    delphi:proposedTest "Pooled log peak-load ratio with 95% CI from at least eight independent physical comparisons, and the estimate in the mass-and-strut-count-matched subset." ;
+    delphi:context "Fails if: Fewer than eight eligible studies, or none matched on strut count, so the problem's exact comparison cannot be estimated; strong funnel asymmetry." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register search strings (Europe PMC, Crossref), inclusion criteria (physical tests, matched mass within 5%, at least 3 replicates per arm) and the model. 2. Screen and extract with provenance; two agents per paper. 3. Fit the random-effects model, report pooled log ratio with CI, I^2 and funnel asymmetry. 4. Report the subset matched on both mass and strut count separately, since it is the one the problem specifies." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Published comparisons rarely match strut count and often report single specimens; publication bias toward positive gains is likely." ;
+    skos:note "Tool: europe-pmc" ;
+    skos:note "Tool: r-metafor" ;
+    skos:note "Tool: literature-extraction" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.matdes.2017.04.082> ;
+    rdfs:seeAlso <https://doi.org/10.1089/3dp.2017.0001> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" .
+
+
+  <https://doi.org/10.1016/j.matdes.2017.04.082> dct:title "Optimisation of functionally graded lattice structures using isostatic lines" ;
+    dct:bibliographicCitation "Daynes, Feih, Lu and Wei 2017, Optimisation of functionally graded lattice structures using isostatic lines" .
+  <https://doi.org/10.1089/3dp.2017.0001> dct:title "Additive Manufacturing Along Principal Stress Lines" ;
+    dct:bibliographicCitation "Tam and Mueller 2017, Additive manufacturing along principal stress lines" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to printed-stress-aligned-lattice-beats-uniform, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.312Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to printed-stress-aligned-lattice-beats-uniform: Meta-analysis of published aligned-versus-uniform lattice tests at matched mass" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

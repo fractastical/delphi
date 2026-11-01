@@ -161,12 +161,14 @@ def wait_all(client, ops, out_root, every=30):
     """ops: {tag: op_id}. Collects each as it finishes; returns {tag: run record or error}."""
     pending, done = dict(ops), {}
     while pending:
+        states = {}
         for tag, op in list(pending.items()):
             if (Path(out_root) / tag / "run.json").exists():
                 done[tag] = collect(client, op, Path(out_root) / tag)
                 del pending[tag]
                 continue
             st = status(client, op)
+            states[st] = states.get(st, 0) + 1
             if any(s in st for s in ("succeed", "complete", "done")):
                 done[tag] = collect(client, op, Path(out_root) / tag)
                 print(f"{tag}: done ({done[tag].get('command_seconds') or 0:.0f} s)", flush=True)
@@ -176,6 +178,6 @@ def wait_all(client, ops, out_root, every=30):
                 print(f"{tag}: {st}", flush=True)
                 del pending[tag]
         if pending:
-            print(f"{time.strftime('%H:%M:%S')} waiting on {len(pending)}: {', '.join(sorted(pending))}", flush=True)
+            print(f"{time.strftime('%H:%M:%S')} waiting on {len(pending)} {states}: {', '.join(sorted(pending))}", flush=True)
             time.sleep(every)
     return done

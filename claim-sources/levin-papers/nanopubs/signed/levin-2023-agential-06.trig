@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RABx7qAVJ9M_iuvH26LQPrnSsfkZO36xFVciQHdx9Bruw>.
+@prefix sub: <https://w3id.org/np/RABx7qAVJ9M_iuvH26LQPrnSsfkZO36xFVciQHdx9Bruw/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2023-agential-06> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Evolution discovered very early, around the time of bacterial biofilms, that electrical networks of ion channels and pumps are a convenient way to integrate and process information across space and time and to scale the functions of individual cells toward large-scale tasks, the same reason brains use this modality.";
+    dc:type "historical-inference";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Bioelectric networks were exploited for information integration since bacterial biofilms";
+    <https://w3id.org/delphi/ontology/context> "Levin M, “Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology”, Cellular and molecular life sciences : CMLS (2023), doi:10.1007/s00018-023-04790-z; section “Bioelectric control: a mechanism for scaling cell behaviors to large-scale morphogenetic goals”. Scope: Bacteria through metazoans"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1007/s00018-023-04790-z>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt#line=45,46>;
+    prov:wasQuotedFrom <https://doi.org/10.1007/s00018-023-04790-z>;
+    <https://schema.org/text> "But evolution discovered very early on, around the time of bacterial biofilms [144], that electric networks are also extremely convenient ways to integrate and process information across space and time, and to scale the functions of individual computing units towards a large-scale task (the same reason that brains, and computers, use this modality [145]).".
+<https://doi.org/10.1007/s00018-023-04790-z> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Levin M. Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology. Cellular and molecular life sciences : CMLS (2023). doi:10.1007/s00018-023-04790-z";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2023"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10167196>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt#line=45,46> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10167196/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1007/s00018-023-04790-z>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "7cb007b21f299596565787f8254edeb74dd5c062e02c02e4b266ca3cfde1c971"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2023 claim: Bioelectric networks were exploited for information integration since bacterial biofilms";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2023-agential-06>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "gyiCz6AQKW47IFeWn9T80ld0cmVOwQcV/rcUjq+AhE5YwYV7AT5lhVkC+qL2m/7GKOsLJqWRqQLFuzTrgFUGKTkD5rUjcWCrNo2brLo8qICaZGYofpBJXEMrpnyweNLhTrtT7H7OnOvl1qtleZSMEQ3hOUKcn8SdbdADk9sME+3fnz1FgDixx5V+jaifkq5tZdsliSkiNu6qCrH2vsHa6Gl7UiaC4jnCoLGJZpzlqThIgg+AfF37+L3sU2POvU/TgMZGt77xSuK1O/UOX1DnxMbE4c2KfcZnxyrsrKnwPG7eylNSz3z2ygJUkTayeEN5fQX6TzM/8CHcrTc7A/wlYg=="
+}

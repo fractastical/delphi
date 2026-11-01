@@ -1,0 +1,97 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Measure Raup parameters from 3D scans and compare occupancy models on held-out taxa" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Build the dataset the field lacks. From MorphoSource CT and surface scans of gastropod, ammonoid (where 3D fossil scans exist) and bivalve shells, and iDigBio 2D images in standard apertural view for gastropods, extract the coiling axis and the generating-curve centroid trajectory, and fit Raup's W (whorl expansion per revolution), D (relative distance of generating curve from axis) and T (translation) by nonlinear least squares on the spiral. Fit generating-curve shape with elliptic Fourier coefficients. Use the morpholib MorphoEval pipeline for segmentation and quality scoring, and admit a specimen only if fit RMSE < 3% of shell height. Target: ≥ 500 species across ≥ 50 families, taxa resolved via the organisms layer and MolluscaBase. Occupancy models over (log W, D, T): (M_dev) a developmental-constraint density proportional to the volume of parameter space producing geometrically valid, non-self-intersecting shells, with correlations imposed by the generating curve; (M_fun) density decreasing with distance below functional thresholds, from approach 2; (M_phy) phylogenetic Brownian or OU model on the molluscan tree with no boundaries; and combinations. Score by predictive log-likelihood on held-out families (leave-one-family-out)." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1#n_species> ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1#n_families> ;
+    delphi:proposedTest "A ranked comparison of developmental, functional and phylogenetic occupancy models by held-out predictive log-likelihood (a difference > 10 units counts as decisive), plus a map of the empty region with the winning model's predicted boundary." ;
+    delphi:context "Fails if: Fewer than about 200 species pass quality filters, or no model beats the phylogenetic random walk on held-out families, which is the problem's stated falsifier." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register specimen admission criteria, models and the held-out scoring rule. 2. Query MorphoSource and iDigBio for shell media; build the fetch list with licences and checksums. 3. Run segmentation and spiral fitting through morpholib; quality-filter. 4. Fit the occupancy models; compute held-out log-likelihood; produce the empty-region map under the winning model." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Scan coverage of molluscs on MorphoSource is uneven; ammonoids are mostly 2D. Labelled training data for spiral-fitting quality control would need curation." ;
+    skos:note "Tool: morpholib" ;
+    skos:note "Tool: 3d-shape-analysis" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+    rdfs:seeAlso <https://www.morphosource.org/catalog/media> ;
+    rdfs:seeAlso <https://search.idigbio.org/v2/search/records?rq=%7B%22family%22%3A%22conidae%22%7D&limit=1> ;
+    rdfs:seeAlso <https://www.molluscabase.org/> ;
+    rdfs:seeAlso <https://www.jstor.org/stable/1301405> ;
+    rdfs:seeAlso <https://doi.org/10.1111/brv.12276> ;
+    rdfs:seeAlso <https://github.com/fractastical/morpholib> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 500 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1#n_families> a schema:PropertyValue ;
+    schema:propertyID "n_families" ;
+    schema:value 50 ;
+    schema:description "families named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://www.morphosource.org/catalog/media> dct:title "MorphoSource" ;
+    dct:description "3D CT and surface scans of shells" .
+  <https://search.idigbio.org/v2/search/records?rq=%7B%22family%22%3A%22conidae%22%7D&limit=1> dct:title "iDigBio specimen records API" ;
+    dct:description "Specimen images and metadata for gastropods" .
+  <https://www.molluscabase.org/> dct:title "MolluscaBase" ;
+    dct:description "Taxonomic resolution" .
+  <https://www.jstor.org/stable/1301405> dct:bibliographicCitation "Raup 1966, Geometric analysis of shell coiling: general problems" .
+  <https://doi.org/10.1111/brv.12276> dct:title "The geometry of morphospaces: lessons from the classic\n                    <scp>R</scp>\n                    aup shell coiling model" ;
+    dct:bibliographicCitation "Gerber 2017, The geometry of morphospaces: lessons from the classic Raup shell coiling model" .
+  <https://github.com/fractastical/morpholib> dct:bibliographicCitation "morpholib MorphoEval pipeline" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.301Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Measure Raup parameters from 3D scans and compare occupancy models on held-out taxa" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

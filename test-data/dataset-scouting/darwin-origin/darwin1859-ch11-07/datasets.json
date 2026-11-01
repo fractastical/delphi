@@ -1,0 +1,196 @@
+{
+  "claim_id": "darwin1859-ch11-07",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "range-wide, georeferenced genetic samples per species (multi-locus or genomic)",
+    "species delimitation sufficient to avoid cryptic-species artefacts",
+    "gene-tree/ancestral-area reconstructions allowing monophyly vs polyphyly of populations"
+  ],
+  "datasets": [
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence and species indices",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://api.gbif.org/v1/occurrence/search?limit=0 and /species/search?rank=GENUS&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "georeferenced occurrence records of extant (and fossil-specimen) taxa",
+        "taxonomic backbone (genus and species names)"
+      ],
+      "variables_missing": [
+        "no trait, abundance-through-time, mating-system or sequence-origin variables"
+      ],
+      "scope": "Global, all taxa",
+      "evidence": "occurrence/search?limit=0 returned count 3887469368; basisOfRecord=FOSSIL_SPECIMEN returned count 10258418; species/search?rank=GENUS returned count 4225471 (name usages across checklists, not unique accepted genera).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nuccore)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "E-utilities esearch db=nuccore term=Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "nucleotide sequences for population samples (example taxon)"
+      ],
+      "variables_missing": [
+        "locality fields were not inspected in this check",
+        "species delimitation",
+        "systematic range-wide design"
+      ],
+      "scope": "All taxa",
+      "evidence": "esearch db=nuccore count 373001 for Gasterosteus aculeatus[Organism] (single example taxon).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bold-systems",
+      "name": "BOLD Systems barcode records",
+      "landing_url": "https://boldsystems.org/",
+      "access_url": "https://portal.boldsystems.org/api/summary",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:45:51Z",
+        "method": "GET https://portal.boldsystems.org/api/summary?query=tax:species:Parus major&fields=specimens,country/ocean",
+        "http_status": 200
+      },
+      "variables_present": [
+        "COI barcode specimens with country/ocean of collection (country counts returned)"
+      ],
+      "variables_missing": [
+        "single marker, country-level locality in the summary",
+        "no multi-origin inference"
+      ],
+      "scope": "Barcode records, all taxa",
+      "evidence": "Summary API for Parus major returned counts {specimens: 165} and country counts (Japan 24, Iran 32, Russia 13, ...).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-range-wide-spongy-moth",
+      "name": "Range-wide population genomics of the spongy moth, Lymantria dispar (Erebidae)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.wwpzgmsp5",
+      "access_url": null,
+      "doi": "10.5061/dryad.wwpzgmsp5",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:45:35Z",
+        "method": "GET https://datadryad.org/api/v2/search?q=phylogeography multiple origins range-wide sampling species (record in results)",
+        "http_status": 200,
+        "bytes": 179390315871
+      },
+      "variables_present": [
+        "range-wide population genomic data for one species"
+      ],
+      "variables_missing": [
+        "a single species",
+        "reads not inspected"
+      ],
+      "scope": "Lymantria dispar",
+      "evidence": "Search result listed storageSize 179390315871 bytes (about 179 GB; not downloaded).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "phylogeography multiple origins range-wide sampling species",
+      "url": "https://datadryad.org/api/v2/search?q=phylogeography%20multiple%20origins%20range-wide%20sampling%20species",
+      "hits": 4,
+      "note": "single-species range-wide datasets (spongy moth, others)"
+    },
+    {
+      "source": "Dryad",
+      "query": "polyploid recurrent origins multiple independent origins species",
+      "url": "https://datadryad.org/api/v2/search?q=polyploid%20recurrent%20origins%20multiple%20independent%20origins%20species",
+      "hits": 2,
+      "note": "moonwort ferns and allopolyploid sibling species: single-clade datasets"
+    },
+    {
+      "source": "DataCite",
+      "query": "phylogeography mitochondrial sequences georeferenced many species compilation (dataset type)",
+      "url": "https://api.datacite.org/dois?query=phylogeography+mitochondrial+sequences+georeferenced+many+species+compilation&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "multiple origins phylogeography single origin species range (dataset type)",
+      "url": "https://api.datacite.org/dois?query=multiple+origins+phylogeography+single+origin+species+range&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "NCBI",
+      "query": "esearch db=nuccore Gasterosteus aculeatus",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Gasterosteus%20aculeatus%5BOrganism%5D&retmode=json&rettype=count",
+      "hits": 373001,
+      "note": null
+    }
+  ],
+  "status": "partial",
+  "summary": "Raw material for single-origin tests is public (GenBank and BOLD sequences with locality, GBIF occurrence ranges), but no compiled multi-species phylogeographic table was found, and the only range-wide datasets located are single-species deposits; the test would need a purpose-built sample of species with range-wide sequences.",
+  "next_step": "Choose 20-50 species with range-wide multilocus data (start from BOLD species with many countries), pre-register the monophyly criterion and the species-delimitation filter.",
+  "obstacles_confirmed": [
+    "Range-wide sequences exist for a small fraction of species.",
+    "Species boundaries and geographic origins are often uncertain.",
+    "Published phylogeographies would have to be compiled, which is months of work at global scope."
+  ]
+}

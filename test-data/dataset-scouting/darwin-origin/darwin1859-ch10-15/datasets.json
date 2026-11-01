@@ -1,0 +1,74 @@
+{
+  "claim_id": "darwin1859-ch10-15",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "homologous discrete character matrix covering early (fossil) and living members of each of two related higher groups",
+    "stratigraphic age of each fossil member",
+    "a defined set of group pairs with long later histories (e.g. mammals/reptiles, birds/crocodilians)",
+    "missing-data rate per taxon, so that distances can be normalized"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank-portal",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET morphobank.org, www.morphobank.org and a Projects page", "http_status": 403, "note": "all three returned a CloudFront 403 'Request blocked' to a script client; contents not confirmed in this run" },
+      "variables_present": [],
+      "variables_missing": ["not verified: no response body beyond the 403 page"],
+      "scope": "Unknown from this run",
+      "evidence": "Three GETs returned HTTP 403, 919 bytes, CloudFront error page.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-mammal-fossil-living-character-matrices-qj552",
+      "name": "Assessment of available anatomical characters for linking living mammals to fossil taxa (Dryad qj552, Matrices.zip)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qj552",
+      "access_url": null,
+      "doi": "10.5061/dryad.qj552",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:05:00Z", "method": "Dryad search 'morphological character matrix fossil phylogeny' (16 hits), then GET dataset record and file list", "http_status": 200, "bytes": 1403718 },
+      "variables_present": ["morphological character matrices assembled to link living mammals and fossil taxa (Matrices.zip, 1,403,349 bytes; README_for_Matrices.txt)"],
+      "variables_missing": ["archive contents not unpacked; unknown whether it covers a second group with its own early and living members", "mammals only as described"],
+      "scope": "Mammals (living and fossil), one clade",
+      "evidence": "Dryad API record: title as given, CC0-1.0, files Matrices.zip and README.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-anseriformes-fossil-extant-dataset-v15dv4208",
+      "name": "A new Paleogene fossil and a new dataset for waterfowl (Dryad v15dv4208)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.v15dv4208",
+      "access_url": null,
+      "doi": "10.5061/dryad.v15dv4208",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:06:00Z", "method": "GET Dryad dataset record and file list", "http_status": 200, "bytes": 6834568760 },
+      "variables_present": ["morphological dataset for Anseriformes including extinct taxa (record text); mostly CT TIFF slices of specimens"],
+      "variables_missing": ["a single order, not pairs of groups; storage is 6.8 GB of image slices, not a matrix"],
+      "scope": "Waterfowl, one clade",
+      "evidence": "Dryad API record storageSize 6834568760, license CC0-1.0, file list of TIFF reslices plus README.md.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "morphological character matrix fossil phylogeny", "url": "https://datadryad.org/api/v2/search?q=morphological%20character%20matrix%20fossil%20phylogeny&per_page=6", "hits": 16, "note": "single-clade matrices (mammals qj552, primates 4g42q, turtles fqz612k4w, waterfowl v15dv4208); two opened" },
+    { "source": "DataCite", "query": "morphological character matrix morphobank", "url": "https://api.datacite.org/dois?query=morphological%20character%20matrix%20morphobank&page%5Bsize%5D=6", "hits": 12, "note": "Dryad matrices only (bat family, hyracoid teeth, Permian ray-finned fish, character partitions 10.5061/dryad.3h4m5); no MorphoBank DOI surfaced" },
+    { "source": "Zenodo", "query": "discrete morphological character matrix fossil and extant", "url": "https://zenodo.org/api/records?q=discrete%20morphological%20character%20matrix%20fossil%20and%20extant&size=4", "hits": 4588668, "note": "broad OR; top hits are Dryad-mirrored matrices (bullhead sharks 10.5061/dryad.6p4f83q) and a methods paper; not opened" },
+    { "source": "Dryad", "query": "morphological disparity through time fossil clade character matrix", "url": "https://datadryad.org/api/v2/search?q=morphological%20disparity%20through%20time%20fossil%20clade%20character%20matrix&per_page=5", "hits": 0, "note": null }
+  ],
+  "status": "partial",
+  "summary": "Discrete character matrices with fossil and living taxa are openly deposited on Dryad (CC0) clade by clade, for example the mammal matrices in doi 10.5061/dryad.qj552, but MorphoBank itself returned HTTP 403 to scripts and no dataset found pairs two related higher groups with early and living members in matched characters.",
+  "next_step": "Open Matrices.zip and similar single-clade matrices, check whether character definitions overlap between clade pairs, and retry MorphoBank from a browser or its project export.",
+  "obstacles_confirmed": [
+    "Suitable shared-character matrices exist for limited clades; the deposits found are one clade each."
+  ]
+}

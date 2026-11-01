@@ -1,0 +1,85 @@
+{
+  "schema": "frontier.bioelectric-tissue.interface/1",
+  "status": "SIMULATED output of BETSE 1.5.0; generic 2-D patch of cells with BETSE default parameters. Fin applicability: UNKNOWN (no sourced fin tissue parameters). Growth coupling: assumption/open question, not calibrated.",
+  "outputs": [
+    {
+      "port": "Vm",
+      "quantity": "cell membrane potential, inside minus outside",
+      "unit": "mV in summary; V in trajectories (vm_cell_V per cell, vm_mem_V per membrane)",
+      "where": "trajectories/*.npz"
+    },
+    {
+      "port": "ion_concentrations",
+      "quantity": "cytosolic Na+, K+, P-, M- per cell",
+      "unit": "mol/m^3 (= mmol/L) (cc_mol_m3, order in ion_order)",
+      "where": "trajectories/*.npz"
+    },
+    {
+      "port": "gap_junction_state",
+      "quantity": "open fraction per membrane (voltage gating applied)",
+      "unit": "dimensionless (gj_open_fraction_mem)",
+      "where": "trajectories/*.npz"
+    },
+    {
+      "port": "geometry_cell_size",
+      "quantity": "cell centres, volume, surface area",
+      "unit": "m, m^3, m^2 (cell_centres_m, cell_vol_m3, cell_sa_m2)",
+      "where": "trajectories/*.npz"
+    }
+  ],
+  "inputs": [
+    {
+      "port": "K_permeability_multiplier",
+      "meaning": "BETSE 'change K mem' multiplier on the K+ membrane diffusion constant Dm_K of the Spot tissue profile",
+      "value_used": 5.0,
+      "unit": "dimensionless factor",
+      "status": "chosen for a control, not measured; NOT the Kir2.1 channel"
+    },
+    {
+      "port": "gap_junction_block",
+      "meaning": "BETSE 'block gap junctions' (random fraction 100 %)",
+      "value_used": "100 %",
+      "status": "chosen for a control"
+    },
+    {
+      "port": "cell_size",
+      "meaning": "BETSE cell radius / height",
+      "value_used": {
+        "radius_m": 5e-06,
+        "height_m": 1e-05
+      },
+      "status": "BETSE default, not a fin measurement"
+    }
+  ],
+  "not_exposed_as_requested_quantities": [
+    {
+      "port": "gap_conductance_S",
+      "reason": "BETSE parameterizes junctions by a surface fraction (5e-8 of cell area), a diffusion constant and voltage gating, not an absolute conductance in siemens; no conversion is made here, so the value is UNKNOWN"
+    },
+    {
+      "port": "channel_conductance_S",
+      "reason": "BETSE uses membrane diffusion constants Dm (m^2/s) in a GHK/electrodiffusion formulation, not conductances; no conversion is made, so the value is UNKNOWN"
+    },
+    {
+      "port": "growth_coupling",
+      "reason": "no mapping from Vm or ion state to growth is sourced or calibrated; it is an assumption/open question"
+    }
+  ],
+  "candidate_channel_links": [
+    {
+      "candidate": "Kcnj13 (zebrafish Kir7.1-family gene; UniProt Q0KIZ7 / NCBI BAF03613.1, 362 aa)",
+      "role_in_this_model": "none: listed as an unparameterized, unverified channel candidate only; conductance, reversal potential, gating, copy number and any pigment-cell phenotype are UNKNOWN",
+      "used_to_set_any_parameter": false,
+      "not_used_to_calibrate_betse": true,
+      "source_link": {
+        "handoff": "artifacts/bio-services/kcnj13_openfold2/bioelectric_handoff.md",
+        "source_manifest": "artifacts/bio-services/kcnj13_source/source_manifest.json",
+        "repo_commit_read": "279fff3 (codex-demo worktree)",
+        "sequence_sha256": "8029209004a52efea91ae2c899c017ed4795a843615b4b272c7087c67ba396b2",
+        "provider_operation": "op-5ba1d104dbbcd293"
+      },
+      "structure_prediction_caveat": "hosted OpenFold2 single-sequence monomer, provider confidence 52.86, pTM 0.273, mean PAE 22.91 A, no membrane/tetramer/ligand: weak structural hypothesis; gives no basis for any numeric parameter",
+      "source_discrepancy": "RefSeq NP_001429136.1 variant 4 differs by four N-terminal residues (kept explicit in the source manifest; not resolved here)"
+    }
+  ]
+}

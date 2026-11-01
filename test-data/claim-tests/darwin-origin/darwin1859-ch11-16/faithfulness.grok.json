@@ -1,0 +1,33 @@
+{
+  "claim_id": "darwin1859-ch11-16",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:43:10Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful-with-narrower-scope",
+  "confidence": 0.76,
+  "variables": {
+    "claim_asserts": "At the present day, very many European productions have become naturalised in La Plata, and to a lesser degree in Australia, and have to some extent beaten the natives, whereas extremely few southern forms have become naturalised anywhere in Europe.",
+    "test_measures": "WCVP accepted-species counts: A_LP = 465 species native in TDWG level-1 Europe and introduced in La Plata (AGE+URU) but not native there; B_LP = 341 native in La Plata, not native in Europe, introduced in Europe (ratio 1.364). Australia (level-2 region 50): A_AU = 837, B_AU = 274 (ratio 3.055). Supports only if both ratios are >= 5; refutes if either ratio is < 2.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "A native/introduced vascular-plant checklist is the right kind of data for which plants have become naturalised. It does not measure cover or displacement ('cover the ground', 'beaten the natives'), and it does not include animals. interpretation maps 'naturalised' to WCVP introduced=1, which drops doubtful and extinct records and is meant to exclude casuals."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "Raw counts, not per-source-species rates, match 'very many' versus 'extremely few'. The per-1000 rates reverse for La Plata (17.22 European natives naturalised in La Plata versus 58.47 La Plata natives naturalised in Europe) and are reported but do not enter the verdict. The 5× and 2× cutoffs are the test's translation of that qualitative contrast; 341 southern species recorded as introduced in Europe is a count on which 'extremely few' fails. The 2026 checklist includes introductions after 1859; caveats say so. That narrows the period, it does not replace the exchange Darwin named."
+  },
+  "scope": {
+    "claim_scope": "Naturalised plants and animals exchanged between Europe and southern-hemisphere regions, especially La Plata and, to a lesser degree, Australia, as of Darwin's present.",
+    "test_scope": "Vascular plants only, in the June 2026 WCVP. Europe = TDWG level-1 region 1; La Plata = AGE+URU (a wider AGE+AGW+AGS+URU+PAR sensitivity, ratio 1.42, is not in the rule); Australia = level-2 region 50. The 'lesser degree in Australia' comparison is reported (837 > 465, so the clause fails) and is excluded from the verdict.",
+    "narrower": true
+  },
+  "reasons": [
+    "The verdict uses the same contrast Darwin states: counts of species naturalised in one direction versus the other. La Plata ratio A_LP/B_LP = 465/341 = 1.364 is below the refute threshold of 2, which is why the rule returns refutes even though the Australia ratio 3.055 sits between 2 and 5. Direction matches the claim; the magnitude 'extremely few' does not, and that is what is scored.",
+    "Plants-only, the introduced flag, and the TDWG units for Europe, La Plata and Australia are stated in interpretation. Stated scope includes animals; none are counted. 'Cover the ground' and displacement are not measured, so species counts are a declared proxy for naturalised productions, not a census of dominance.",
+    "The continent-confined sensitivity (La Plata ratio 0.089, Australia 0.432) is a different filter and is not the verdict. Keeping it out avoids substituting a per-lineage or single-continent reading Darwin did not state."
+  ],
+  "what_would_change_it": "Counting species already naturalised by the mid-nineteenth century, or measuring abundance or ground cover of European versus southern aliens in the Río de la Plata and Australia, would match 'at the present day' and 'cover the ground'. Adding animals would drop the taxon narrowing. Using the per-1000 source-pool rates as the pass/fail statistic would score a different contrast from 'very many' versus 'extremely few'.",
+  "files_read": ["result.json", "analysis.py", "derived/measured.json", "derived/species_lists.json"]
+}

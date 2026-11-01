@@ -1,0 +1,200 @@
+{
+  "claim_id": "darwin1859-ch04-03",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:49:30Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "list of established non-native species per country/region (plants and animals)",
+    "native vs introduced status/establishment per species-region record",
+    "total biota size per region to express non-native fraction",
+    "evidence of competitive displacement of natives (impact), distinct from mere presence"
+  ],
+  "datasets": [
+    {
+      "id": "griis-gbif-checklists",
+      "name": "GRIIS country checklists published as GBIF checklist datasets",
+      "landing_url": "https://www.gbif.org/dataset/search?q=GRIIS",
+      "access_url": "https://api.gbif.org/v1/dataset/c42ad93c-88a8-440f-8842-118f2a1927a8",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:49:30Z",
+        "method": "GET api.gbif.org/v1/dataset/search?q=GRIIS; api.gbif.org/v1/dataset?type=CHECKLIST&q=GRIIS; /dataset/{key}/metrics for Mongolia, Cuba, Samoa checklists",
+        "http_status": 200
+      },
+      "variables_present": [
+        "country-by-country checklists of introduced and invasive species (all taxa, plants and animals)",
+        "species names with ranks"
+      ],
+      "variables_missing": [
+        "native-species totals per country",
+        "competitive displacement/impact evidence"
+      ],
+      "scope": "One checklist dataset per country/territory; 383 CHECKLIST-type datasets match 'GRIIS'",
+      "evidence": "GBIF API 200: dataset search 'GRIIS' count 456; CHECKLIST-type 383. Sample metrics: Mongolia 66 species / 162 usages, Cuba 617 species / 1,041 usages, Samoa 350 species / 600 usages; the metrics report only counts by rank, so the plant/animal split was not checked.",
+      "verdict": "holds"
+    },
+    {
+      "id": "glonaf-zenodo",
+      "name": "GloNAF: Global Naturalized Alien Flora (Zenodo v2.02 snapshot)",
+      "landing_url": "https://glonaf.org/",
+      "access_url": null,
+      "doi": "10.5281/zenodo.13235356",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:49:30Z",
+        "method": "GET glonaf.org; GET api.datacite.org/dois/10.5281/zenodo.13235356",
+        "http_status": 200
+      },
+      "variables_present": [
+        "naturalized alien vascular plant inventories per region",
+        "16,429 unique taxa across 1,343 regions (427 islands) from 336 sources (per DataCite description)"
+      ],
+      "variables_missing": [
+        "alien animals",
+        "native totals",
+        "impact on natives"
+      ],
+      "scope": "Vascular plants; 1,343 regions",
+      "evidence": "DataCite record 200: GloNAF v2.02, license CC BY 4.0, DOI 10.5281/zenodo.13235356; text states counts above. File listing not retrieved.",
+      "verdict": "holds"
+    },
+    {
+      "id": "gisd",
+      "name": "Global Invasive Species Database (IUCN ISSG)",
+      "landing_url": "https://www.iucngisd.org/gisd/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:49:30Z",
+        "method": "GET www.iucngisd.org/gisd/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "query by species, location, taxonomy, impact (EICAT) per landing"
+      ],
+      "variables_missing": [
+        "bulk download (not verified)",
+        "full country coverage"
+      ],
+      "scope": "Curated invasive species, all taxa",
+      "evidence": "Landing 200 shows search filters Taxonomy, Location, System, Pathway, Impact, EICAT. Not a complete census of established non-natives.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-occurrences-establishment",
+      "name": "GBIF occurrence API (establishment fields)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:49:30Z",
+        "method": "GET api.gbif.org/v1/occurrence/search?establishmentMeans=INTRODUCED&limit=1; ?degreeOfEstablishment=established&limit=0",
+        "http_status": 200,
+        "note": "web landing www.gbif.org returned 403 to curl earlier; API 200"
+      },
+      "variables_present": [
+        "occurrence records with degreeOfEstablishment (215,132 records 'established')"
+      ],
+      "variables_missing": [
+        "establishmentMeans filter returned 0 with INTRODUCED",
+        "native totals"
+      ],
+      "scope": "Global occurrence records",
+      "evidence": "API 200: establishmentMeans=INTRODUCED returned count 0 (filter unusable as queried); degreeOfEstablishment=established returned 215,132.",
+      "verdict": "partial"
+    },
+    {
+      "id": "griis-portal",
+      "name": "GRIIS portal",
+      "landing_url": "https://griis.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:49:30Z",
+        "method": "GET griis.org",
+        "http_status": 200
+      },
+      "variables_present": [
+        "portal for country checklists (title 'GRIIS')"
+      ],
+      "variables_missing": [
+        "verified bulk files"
+      ],
+      "scope": "Global",
+      "evidence": "Landing 200 titled 'GRIIS'; the checklists were verified through GBIF instead.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GBIF datasets",
+      "query": "GRIIS",
+      "url": "https://api.gbif.org/v1/dataset/search?q=GRIIS&limit=3",
+      "hits": 456,
+      "note": "country checklist datasets"
+    },
+    {
+      "source": "GBIF datasets",
+      "query": "type=CHECKLIST q=GRIIS",
+      "url": "https://api.gbif.org/v1/dataset?type=CHECKLIST&q=GRIIS&limit=1",
+      "hits": 383,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "GloNAF naturalized alien flora",
+      "url": "https://api.datacite.org/dois?query=GloNAF+naturalized+alien+flora&page%5Bsize%5D=5",
+      "hits": 34,
+      "note": "Zenodo GloNAF v2.02 snapshot found"
+    },
+    {
+      "source": "GBIF occurrence",
+      "query": "establishmentMeans=INTRODUCED",
+      "url": "https://api.gbif.org/v1/occurrence/search?establishmentMeans=INTRODUCED&limit=1",
+      "hits": 0,
+      "note": "filter did not return results"
+    },
+    {
+      "source": "GBIF occurrence",
+      "query": "degreeOfEstablishment=established",
+      "url": "https://api.gbif.org/v1/occurrence/search?degreeOfEstablishment=established&limit=0",
+      "hits": 215132,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "Presence/establishment is well covered: GRIIS country checklists (all taxa) are in GBIF and GloNAF holds naturalized plants for 1,343 regions under CC BY 4.0. These show where non-natives established, not that natives could be improved or that invaders outcompete natives; impact and native-biota totals need other sources.",
+  "next_step": "Pull GRIIS checklists for all countries via GBIF and GloNAF region lists; add native richness per region (e.g. GIFT/checklists) to compute fractions; impact needs a separate source.",
+  "obstacles_confirmed": [
+    "Establishment reflects propagule pressure and disturbance",
+    "Animal naturalizations less completely tabulated than plants",
+    "'Firm possession' not measured by checklists"
+  ]
+}

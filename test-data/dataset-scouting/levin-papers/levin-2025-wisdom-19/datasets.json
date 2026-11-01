@@ -1,0 +1,100 @@
+{
+  "claim_id": "levin-2025-wisdom-19",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:28:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "RNA-seq of Xenopus laevis embryos in small versus large groups, with and without teratogen",
+    "malformation and survival rates under identical teratogen dose across isolated, small and large groups",
+    "replicate structure and developmental stage"
+  ],
+  "datasets": [
+    {
+      "id": "gene-expression-omnibus-gse245782",
+      "name": "GEO GSE245782 (SuperSeries; GSE245780 stage 25 and GSE245781 stage 35)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE245782",
+      "access_url": "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE245nnn/GSE245780/suppl/GSE245780_rsem_gene_counts.tsv.gz",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:12:00Z", "method": "GET GEO accession text pages for GSE245782, GSE245780, GSE245781; eutils esummary; HEAD on supplementary files", "http_status": 200, "bytes": 911516 },
+      "variables_present": ["RNA-seq counts for control and thioridazine-treated embryos in small and large groups at two stages", "RSEM gene counts and logCPM tables per stage"],
+      "variables_missing": ["malformation and survival rates (not in the expression series)", "isolated single-embryo condition (the sample titles list small and large groups)"],
+      "scope": "Xenopus laevis, platform GPL18936, 24 samples (12 per stage, triplicates), released 2023-12-02, linked PMID 38233424 (Nat Commun 2024), BioProject PRJNA1029966. Files: GSE245780_rsem_gene_counts.tsv.gz (911,516 bytes), GSE245781_rsem_gene_counts.tsv.gz (1,028,544 bytes), GSE245780_logCPM_for_plotting.xlsx (3,263,713 bytes), GSE245781_logCPM_for_plotting.csv.gz. Sample titles include 'thioridazine-treated, large group, sample 1' and 'control, small group, sample 1'. Only one teratogen, thioridazine.",
+      "evidence": "GEO text records list !Series_supplementary_file entries; esummary for GSE245782 lists n_samples 24 and sample titles. Count files were not downloaded (at or above 1 MB or not needed).",
+      "verdict": "partial"
+    },
+    {
+      "id": "gene-expression-omnibus",
+      "name": "Gene Expression Omnibus (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal; the relevant series is listed separately"],
+      "scope": "Portal.",
+      "evidence": "Landing page returned 200.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "ncbi-sequence-read-archive",
+      "name": "NCBI Sequence Read Archive (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal; BioProject PRJNA1029966 is the linked project, reads not checked"],
+      "scope": "Portal.",
+      "evidence": "Landing page returned 200.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page with redirect", "http_status": 200, "note": "redirected to https://www.xenbase.org/xenbase/recaptcha.do?nextUrl=%2Fxenbase%2F, a reCAPTCHA wall; no content seen" },
+      "variables_present": [],
+      "variables_missing": ["could not be queried programmatically"],
+      "scope": "Unreachable without solving a challenge; no teratogen-by-group-size data seen.",
+      "evidence": "Redirect target contains 'recaptcha'.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "nat-commun-2024-embryos-assist-morphogenesis",
+      "name": "Embryos assist morphogenesis of others through calcium and ATP signaling mechanisms in collective teratogen resistance (Nat Commun 2024)",
+      "landing_url": "https://www.nature.com/articles/s41467-023-44522-2",
+      "access_url": null,
+      "doi": "10.1038/s41467-023-44522-2",
+      "license": "cc by (Europe PMC licence field)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:25:00Z", "method": "HEAD nature.com (200) and Europe PMC REST core record for PMID 38233424", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["paper, not a dataset: malformation and survival rates would be in figures or source data that I did not open (Europe PMC flags hasSuppl Y, hasData Y)"],
+      "scope": "Open-access paper PMC10794468, the one linked from GSE245782.",
+      "evidence": "Europe PMC record only; a request for the supplementary-file listing returned no response in 20 s.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "GEO (eutils db=gds)", "query": "GSE245782", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=GSE245782&retmode=json", "hits": 26, "note": "SuperSeries plus sub-series and samples" },
+    { "source": "Europe PMC", "query": "EXT_ID:38233424", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=EXT_ID:38233424%20AND%20SRC:MED&format=json&resultType=core", "hits": 1, "note": "Nat Commun 2024, PMC10794468, CC BY" },
+    { "source": "Dryad", "query": "embryos collective teratogen resistance Xenopus", "url": "https://datadryad.org/api/v2/search?q=embryos%20collective%20teratogen%20resistance%20Xenopus", "hits": 0, "note": "none" }
+  ],
+  "status": "partial",
+  "summary": "GSE245782 (24 samples, stages 25 and 35, small versus large groups, with and without thioridazine; counts tables) covers the transcriptome clause for one species and one teratogen. Defect and survival rates for isolated, small and large groups are not in any deposit I located; they are in the linked Nat Commun paper.",
+  "next_step": "Pre-register the contrast on the counts tables; extract defect and survival rates from the paper's source data and check whether an isolated-embryo group exists.",
+  "obstacles_confirmed": [
+    "One species and one teratogen (thioridazine).",
+    "Defect and survival rates are not in the expression series."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "claim_id": "thompson1917-ch03-16",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "brain mass (or volume with a density conversion) per individual at known age, from birth to ~25 years",
+    "heart and liver mass per individual at known age",
+    "whole-body mass of the same individual at the same age",
+    "the same series in at least one non-human species (Thompson names lion and dogfish)"
+  ],
+  "datasets": [
+    {
+      "id": "nhanes",
+      "name": "CDC National Health and Nutrition Examination Survey (NHANES) body-measures files",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "access_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:33:00Z", "method": "HEAD landing_url (www.cdc.gov/nchs/nhanes/ and wwwn.cdc.gov/nchs/nhanes/) and HEAD BMX_J.xpt", "http_status": 200, "bytes": 1466000 },
+      "variables_present": ["body mass and height by age for a US population sample (BMX body-measures files, 2017–2018 cycle file is 1,466,000 bytes)"],
+      "variables_missing": ["brain, heart or liver mass", "any organ measurement", "non-human species"],
+      "scope": "Humans, United States, cross-sectional survey cycles from 1999 onward; ages from infancy to 80+",
+      "evidence": "Both landing URLs returned 200; the SAS transport file BMX_J.xpt returned 200 with Content-Length 1466000. Column contents not inspected (binary XPT). Covers only the denominator (body mass by age).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "human-connectome-project",
+      "name": "Human Connectome Project (Young Adult and Lifespan releases)",
+      "landing_url": "https://www.humanconnectome.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:33:00Z", "method": "HEAD landing_url", "http_status": 200, "note": "data are behind ConnectomeDB registration and data-use terms; not fetched" },
+      "variables_present": ["adult (22–35 y) structural MRI from which brain volume can be derived"],
+      "variables_missing": ["brain mass", "body mass (in restricted-access demographics, if at all)", "birth-to-adult age range", "heart, liver", "non-human species"],
+      "scope": "Adult humans; imaging volumes, not weights",
+      "evidence": "Landing page 200. Portal, not a downloadable table; MRI volume is not autopsy weight (obstacle noted by assessors).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "nih-pediatric-mri-data-repository",
+      "name": "NIH Pediatric MRI Data Repository (NIH MRI Study of Normal Brain Development)",
+      "landing_url": "https://nda.nih.gov/edit_collection.html?id=1151",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:36:00Z", "method": "HEAD https://pediatricmri.nih.gov/ (curl exit, no response, code 000, http and https); HEAD NDA collection 1151", "http_status": 200, "note": "assessor URL pediatricmri.nih.gov does not respond; the data now sit in the NIMH Data Archive (collection page title 'NIMH Data Archive - Data - Collection'), which requires an NDA data-access request" },
+      "variables_present": ["pediatric structural MRI (ages ~0–18) from which brain volume can be derived, with demographics"],
+      "variables_missing": ["brain mass", "body mass confirmed in open files", "ages beyond 18", "heart, liver", "non-human species"],
+      "scope": "Children and adolescents, USA; MRI volumes",
+      "evidence": "Original host unreachable; NDA page reachable (200) but is an access-controlled collection, no open download observed.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "openneuro",
+      "name": "OpenNeuro",
+      "landing_url": "https://openneuro.org/",
+      "access_url": "https://openneuro.org/crn/graphql",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:34:00Z", "method": "HEAD landing_url; POST GraphQL { datasets(first:1){ pageInfo{ count } } } and dataset(id:\"ds000228\") summary", "http_status": 200 },
+      "variables_present": ["1,936 public BIDS datasets (GraphQL count) with structural MRI; per-subject age in participants.tsv for many (e.g. ds000228 lists subjects pixar001…, a child/adult sample)"],
+      "variables_missing": ["brain mass", "body mass (participants.tsv rarely carries weight)", "heart, liver", "non-human species"],
+      "scope": "Humans (plus a few non-human primate datasets); heterogeneous scanners and ages",
+      "evidence": "GraphQL returned {\"datasets\":{\"pageInfo\":{\"count\":1936}}}. Brain volume would have to be computed from the images; no weight column.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-4300167-heart-weight-swiss-autopsy",
+      "name": "Dataset for Vanhaebost et al. 2014, predicted heart weights (Swiss autopsy series)",
+      "landing_url": "https://zenodo.org/records/4300167",
+      "access_url": "https://zenodo.org/api/records/4300167",
+      "doi": "10.5281/zenodo.4300167",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:37:00Z", "method": "GET Zenodo API record", "http_status": 200, "bytes": 30424 },
+      "variables_present": ["autopsy heart weight with body weight, height, age and sex per case (file 'Heart weight.xlsx', 30,424 bytes)"],
+      "variables_missing": ["brain and liver weight", "children (adult forensic series)", "non-human species"],
+      "scope": "Adults, Switzerland, forensic autopsy; one organ",
+      "evidence": "Zenodo metadata: 'heart weight increases along with the increase of the body weight, body height, BMI and BSA'; licence cc-by-4.0; one xlsx file.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "autopsy organ weight age", "url": "https://api.datacite.org/dois?query=autopsy+organ+weight+age&page[size]=5", "hits": 30, "note": "top hits are a porpoise database, a postmortem-CT paper (10.48350/161578) and preprints; no organ-weight-by-age table" },
+    { "source": "Dryad", "query": "organ weight brain liver heart body mass age human", "url": "https://datadryad.org/api/v2/search?q=organ%20weight%20brain%20liver%20heart%20body%20mass%20age%20human", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "brain mass ontogeny body mass", "url": "https://datadryad.org/api/v2/search?q=brain%20mass%20ontogeny%20body%20mass&per_page=5", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "brain weight body weight age autopsy", "url": "https://zenodo.org/api/records?q=brain%20weight%20body%20weight%20age%20autopsy&size=5", "hits": 459839, "note": "loose full-text match; relevant: 10.5281/zenodo.4300167 (heart weight dataset), 10.5281/zenodo.15769256 (Nepalese heart-weight paper, PDF only, not a dataset)" },
+    { "source": "OpenNeuro GraphQL", "query": "datasets count; ds000228 subjects", "url": "https://openneuro.org/crn/graphql", "hits": 1936, "note": "count of public datasets" }
+  ],
+  "status": "partial",
+  "summary": "No open repository table pairs brain, heart and liver weight with body weight across the birth-to-adult span. Body mass by age is open (NHANES); brain volume by age is derivable from open MRI (OpenNeuro) but not mass, and the pediatric NIH series has moved behind NDA access control; the only open organ-weight-with-body-weight table found is an adult heart-weight autopsy set (Zenodo 4300167). The classical sources (Vierordt, Boyd, Coppoletta & Wolbach, Dekaban & Sadowsky) are in paper tables, not repositories; lion and dogfish series were not found.",
+  "next_step": "Transcribe an age-by-organ-weight reference table (e.g. Coppoletta & Wolbach 1933 for 0–12 y, Dekaban & Sadowsky 1978 for brain 0–86 y) into one CSV with body weight, then pair with NHANES for denominators; search literature for a non-human series.",
+  "obstacles_confirmed": [
+    "MRI volume and autopsy weight are not the same quantity, and body mass is often not in the imaging file.",
+    "The lion and dogfish series are not in these human-centered archives.",
+    "pediatricmri.nih.gov no longer responds; the collection is access-controlled in NDA."
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "claim_id": "levin-2022-tame-03",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "trial-level choice data in the light-mediated learning assay for tail-eye, sham, native-eye and no-eye tadpoles",
+    "acquisition and retention measures per animal"
+  ],
+  "datasets": [
+    {
+      "id": "pubmed-central-ectopic-eye-papers",
+      "name": "PMC3587383 (Blackiston & Levin 2013, J Exp Biol) and PMC5665622 (Blackiston et al. 2017, npj Regen Med)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3587383/",
+      "access_url": null,
+      "doi": "10.1242/jeb.074963",
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET both article pages; listed /articles/instance/<pmcid>/bin/ links; searched for data-availability text",
+        "http_status": 200,
+        "bytes": 209229
+      },
+      "variables_present": [
+        "summary visual-learning performance reported in figures and text of the papers"
+      ],
+      "variables_missing": [
+        "trial-level choice records",
+        "per-animal innervation classification (spinal cord vs peripheral)"
+      ],
+      "scope": "Xenopus laevis tadpoles with ectopic eyes; PMC3587383 page lists no supplementary /bin/ files and no data-availability section was found; PMC5665622 (serotonergic stimulation, posterior eye grafts) lists one supplementary file, 41536_2017_12_MOESM1_ESM.jpg",
+      "evidence": "Europe PMC search returned both papers as open access (PMC3587383 isOpenAccess N in the lite record, page itself served HTTP 200). Neither page links a data table.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "Xenopus eye",
+      "url": "https://datadryad.org/api/v2/search?q=Xenopus%20eye",
+      "hits": 4,
+      "note": "glaucoma/optineurin, opsins, salamander table, Celf1 lens; none about ectopic or tail eyes or learning"
+    },
+    {
+      "source": "Dryad",
+      "query": "Xenopus learning tadpole",
+      "url": "https://datadryad.org/api/v2/search?q=Xenopus%20learning%20tadpole",
+      "hits": 1,
+      "note": "dry-mass imaging of larvae; unrelated"
+    },
+    {
+      "source": "DataCite",
+      "query": "Xenopus ectopic eye tail",
+      "url": "https://api.datacite.org/dois?query=Xenopus%20ectopic%20eye%20tail&page%5Bsize%5D=5",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"ectopic eye\" Xenopus",
+      "url": "https://zenodo.org/api/records?q=%22ectopic%20eye%22%20Xenopus&size=3",
+      "hits": null,
+      "note": "top hits are 'Trained models for Xenopus segmentation and tracking workflow' and a chytrid prevalence table; unrelated"
+    },
+    {
+      "source": "BioStudies",
+      "query": "Xenopus ectopic eye",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Xenopus%20ectopic%20eye&pageSize=3",
+      "hits": 66667,
+      "note": "OR-matched; top hits are Xenopus eye-development papers, none on tail eyes or learning"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "\"ectopic eyes\" Xenopus tail learning Blackiston",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22ectopic%20eyes%22%20Xenopus%20tail%20learning%20Blackiston&format=json&pageSize=5&resultType=lite",
+      "hits": 5,
+      "note": "primary papers PMC3587383 (Blackiston & Levin 2013) and PMC5665622 (Blackiston et al. 2017) plus reviews"
+    }
+  ],
+  "status": "gap",
+  "summary": "Same situation as levin-2023-agential-08: the two primary ectopic-eye papers are open on PMC but no trial-level choice data are deposited in Dryad, Zenodo, DataCite or BioStudies.",
+  "next_step": "Request trial-level choice logs from the authors of Blackiston & Levin 2013 and Blackiston et al. 2017, or transcribe group-level success rates from their figures.",
+  "obstacles_confirmed": [
+    "Trial-level choice logs are not in a public repository.",
+    "Both positive reports come from the same group; no independent replicate dataset was found."
+  ]
+}

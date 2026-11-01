@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Empirical basin frequencies from randomized primordia" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "Pre-register a computational experiment over growth parameters and perturbation amplitudes. Sample 100000 initial states per stratum using a declared uniform phase measure, simulate until convergence diagnostics stabilize, classify parastichy pairs, and estimate basin probabilities with simultaneous multinomial confidence intervals. Compare cylinder and disc geometries." ;
+
+    delphi:proposedTest "A reproducible basin atlas with 99% lower confidence bound above 0.999 for the Fibonacci basin in any claimed small-growth interval, or a measured non-Fibonacci mass exceeding 0.001." ;
+    delphi:context "Fails if: Classifier instability under precision doubling or discovery of persistent unclassified trajectories above 0.1% prevents the full-measure inference." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Fix repulsion kernel, numerical precision, initial-state measure and attractor classifier. 2. Validate convergence classifications against high-precision reruns. 3. Estimate basin probabilities on an adaptive parameter grid. 4. Search rare trajectories for unknown attractors and hand them to interval certification." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Simulation cannot prove full measure." ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: interval-arithmetic" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.324Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Empirical basin frequencies from randomized primordia" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,1854 @@
+{
+ "built": "2026-11-01T04:59:09.131Z",
+ "title": "Four-arm agent comparison: single agent vs isolated workers vs centralized swarm vs decentralized swarm, on pre-registered test plans for Darwin and Thompson claims",
+ "source": {
+  "author": "Amit Shenoy (swarm thread, ScienceClaw hackathon 2026-10-31)",
+  "imported_from": "https://github.com/xX-its-amit-Xx/delphi/tree/fab9a2d29dc76a22baffba0ba4f115c87227cd52/dashboard/public/t/swarm (PR #36)",
+  "imported": "2026-11-01",
+  "pre_registration": "four-arm/PREREG.md (written 2026-10-31T05:52:04Z per DEVIATIONS.md; experiment 2 appended 06:27:23Z, each before its first run)",
+  "deviations": "four-arm/DEVIATIONS.md",
+  "harness": "four-arm/code/{run,verify,metrics,emperor,figure}.mjs",
+  "model_all_arms": "claude-sonnet-5-5 via headless claude -p",
+  "not_imported": "index.html dashboard page, state.json/status.json, and the unsigned nanopub drafts (legacy template IRIs, see issue #37)"
+ },
+ "task": "For each of 20 claims produce one pre-registered empirical test plan naming exactly one real public dataset that could decide it. Scored mechanically by four-arm/code/verify.mjs.",
+ "arms_defined_in": "four-arm/PREREG.md §Arms",
+ "experiments": [
+  {
+   "experiment": 1,
+   "built_by_harness": "2026-10-31T06:28:47.664Z",
+   "claims": [
+    "darwin1859-ch09-03",
+    "darwin1859-ch12-08",
+    "darwin1859-ch12-02",
+    "darwin1859-ch12-09",
+    "darwin1859-ch01-09",
+    "darwin1859-ch01-10",
+    "darwin1859-ch11-13",
+    "darwin1859-ch12-04",
+    "darwin1859-ch11-16",
+    "darwin1859-ch12-10",
+    "thompson1917-ch03-05",
+    "thompson1917-ch17-13",
+    "thompson1917-ch03-08",
+    "thompson1917-ch15-01",
+    "thompson1917-ch04-13",
+    "thompson1917-ch03-07",
+    "thompson1917-ch03-17",
+    "thompson1917-ch14-02",
+    "thompson1917-ch03-24",
+    "thompson1917-ch05-24"
+   ],
+   "n_claims": 20,
+   "metric": "verified-dataset rate: claims whose named dataset's landing URL (or DOI) resolves with HTTP 2xx and the page names the dataset, out of 20 (PREREG.md §Scores). Experiment 2 also requires that the call which wrote the plan fetched that landing URL and reported a page title agreeing with the checker's.",
+   "decision_rule": "A beats B if A has 0 fabricated identifiers and A's verified-dataset count exceeds B's by at least 2 claims. Under 2 claims is reported as no difference. Primary run only; replicates never replace the primary.",
+   "web_tools": "allowed, used by no arm (0 fetches, 0 searches)",
+   "budget_usd_per_arm": 3,
+   "arms": {
+    "single": {
+     "primary": {
+      "verified": 13,
+      "checker_only": 13,
+      "dataset_named": 17,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 1,
+      "attempts_total": 20,
+      "minutes_wall": 2.64,
+      "minutes_agent": 2.64,
+      "tokens": {
+       "input": 8,
+       "output": 25177,
+       "cache_read": 58665,
+       "cache_creation": 76194
+      },
+      "cost_usd_list": 0.5742,
+      "web_requests": {
+       "search": 0,
+       "fetch": 0
+      },
+      "budget_usd": 3,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:05:08.714Z",
+      "finished": "2026-10-31T06:07:49.382Z",
+      "run_dir": "swarm/compare/runs/single-2026-10-31T06-05-08"
+     },
+     "replicates": [
+      {
+       "verified": 15,
+       "checker_only": 15,
+       "dataset_named": 17,
+       "fabricated_identifiers_all_attempts": 0,
+       "fabricated_identifiers_final_plans": 0,
+       "untouched": 0,
+       "duplicated_work": 0,
+       "calls": 1,
+       "attempts_total": 20,
+       "minutes_wall": 2.75,
+       "minutes_agent": 2.75,
+       "tokens": {
+        "input": 8,
+        "output": 25694,
+        "cache_read": 74601,
+        "cache_creation": 60309
+       },
+       "cost_usd_list": 0.5175,
+       "web_requests": {
+        "search": 0,
+        "fetch": 0
+       },
+       "budget_usd": 3,
+       "stopped_by": null,
+       "model": "claude-sonnet-5-5",
+       "started": "2026-10-31T06:15:20.597Z",
+       "finished": "2026-10-31T06:18:05.887Z",
+       "run_dir": "swarm/compare/runs/single-2026-10-31T06-15-20-rep1"
+      }
+     ]
+    },
+    "isolated": {
+     "primary": {
+      "verified": 17,
+      "checker_only": 17,
+      "dataset_named": 19,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 20,
+      "attempts_total": 20,
+      "minutes_wall": 1.98,
+      "minutes_agent": 8.17,
+      "tokens": {
+       "input": 136,
+       "output": 59437,
+       "cache_read": 884369,
+       "cache_creation": 462640
+      },
+      "cost_usd_list": 2.5968,
+      "web_requests": {
+       "search": 0,
+       "fetch": 0
+      },
+      "budget_usd": 3,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T05:57:46.622Z",
+      "finished": "2026-10-31T05:59:46.948Z",
+      "run_dir": "swarm/compare/runs/isolated-2026-10-31T05-57-46"
+     },
+     "replicates": [
+      {
+       "verified": 15,
+       "checker_only": 15,
+       "dataset_named": 17,
+       "fabricated_identifiers_all_attempts": 0,
+       "fabricated_identifiers_final_plans": 0,
+       "untouched": 0,
+       "duplicated_work": 0,
+       "calls": 20,
+       "attempts_total": 20,
+       "minutes_wall": 1.74,
+       "minutes_agent": 7.91,
+       "tokens": {
+        "input": 122,
+        "output": 58121,
+        "cache_read": 780456,
+        "cache_creation": 347422
+       },
+       "cost_usd_list": 2.0964,
+       "web_requests": {
+        "search": 0,
+        "fetch": 0
+       },
+       "budget_usd": 3,
+       "stopped_by": null,
+       "model": "claude-sonnet-5-5",
+       "started": "2026-10-31T06:08:36.982Z",
+       "finished": "2026-10-31T06:10:21.280Z",
+       "run_dir": "swarm/compare/runs/isolated-2026-10-31T06-08-36-rep1"
+      }
+     ]
+    },
+    "centralized": {
+     "primary": {
+      "verified": 19,
+      "checker_only": 19,
+      "dataset_named": 19,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 26,
+      "attempts_total": 26,
+      "minutes_wall": 2.7,
+      "minutes_agent": 10.39,
+      "tokens": {
+       "input": 154,
+       "output": 74946,
+       "cache_read": 918668,
+       "cache_creation": 513141
+      },
+      "cost_usd_list": 2.9821,
+      "web_requests": {
+       "search": 0,
+       "fetch": 0
+      },
+      "budget_usd": 3,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T05:59:47.033Z",
+      "finished": "2026-10-31T06:02:31.151Z",
+      "run_dir": "swarm/compare/runs/centralized-2026-10-31T05-59-47"
+     },
+     "replicates": [
+      {
+       "verified": 19,
+       "checker_only": 19,
+       "dataset_named": 19,
+       "fabricated_identifiers_all_attempts": 0,
+       "fabricated_identifiers_final_plans": 0,
+       "untouched": 0,
+       "duplicated_work": 0,
+       "calls": 27,
+       "attempts_total": 27,
+       "minutes_wall": 3.05,
+       "minutes_agent": 11.51,
+       "tokens": {
+        "input": 176,
+        "output": 78919,
+        "cache_read": 1336338,
+        "cache_creation": 513354
+       },
+       "cost_usd_list": 3.0751,
+       "web_requests": {
+        "search": 0,
+        "fetch": 0
+       },
+       "budget_usd": 3,
+       "stopped_by": null,
+       "model": "claude-sonnet-5-5",
+       "started": "2026-10-31T06:10:21.367Z",
+       "finished": "2026-10-31T06:13:24.976Z",
+       "run_dir": "swarm/compare/runs/centralized-2026-10-31T06-10-21-rep1"
+      }
+     ]
+    },
+    "decentralized": {
+     "primary": {
+      "verified": 18,
+      "checker_only": 18,
+      "dataset_named": 18,
+      "fabricated_identifiers_all_attempts": 1,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 22,
+      "attempts_total": 22,
+      "minutes_wall": 1.8,
+      "minutes_agent": 8.57,
+      "tokens": {
+       "input": 128,
+       "output": 58102,
+       "cache_read": 759469,
+       "cache_creation": 628666
+      },
+      "cost_usd_list": 3.283,
+      "web_requests": {
+       "search": 0,
+       "fetch": 0
+      },
+      "budget_usd": 3,
+      "stopped_by": "budget",
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:02:31.237Z",
+      "finished": "2026-10-31T06:04:19.403Z",
+      "run_dir": "swarm/compare/runs/decentralized-2026-10-31T06-02-31"
+     },
+     "replicates": [
+      {
+       "verified": 18,
+       "checker_only": 18,
+       "dataset_named": 18,
+       "fabricated_identifiers_all_attempts": 0,
+       "fabricated_identifiers_final_plans": 0,
+       "untouched": 0,
+       "duplicated_work": 0,
+       "calls": 22,
+       "attempts_total": 22,
+       "minutes_wall": 1.92,
+       "minutes_agent": 8.61,
+       "tokens": {
+        "input": 128,
+        "output": 61551,
+        "cache_read": 688607,
+        "cache_creation": 574111
+       },
+       "cost_usd_list": 3.0463,
+       "web_requests": {
+        "search": 0,
+        "fetch": 0
+       },
+       "budget_usd": 3,
+       "stopped_by": "budget",
+       "model": "claude-sonnet-5-5",
+       "started": "2026-10-31T06:13:25.063Z",
+       "finished": "2026-10-31T06:15:20.503Z",
+       "run_dir": "swarm/compare/runs/decentralized-2026-10-31T06-13-25-rep1"
+      }
+     ]
+    }
+   },
+   "comparisons": [
+    {
+     "a": "centralized",
+     "b": "single",
+     "a_verified": 19,
+     "b_verified": 13,
+     "verdict": "centralized beats single"
+    },
+    {
+     "a": "decentralized",
+     "b": "centralized",
+     "a_verified": 18,
+     "b_verified": 19,
+     "verdict": "no difference (under 2 claims)"
+    },
+    {
+     "a": "centralized",
+     "b": "isolated",
+     "a_verified": 19,
+     "b_verified": 17,
+     "verdict": "centralized beats isolated"
+    },
+    {
+     "a": "decentralized",
+     "b": "single",
+     "a_verified": 18,
+     "b_verified": 13,
+     "verdict": "decentralized verified more but fails the hard constraint (1 fabricated identifier), so no win"
+    },
+    {
+     "a": "isolated",
+     "b": "single",
+     "a_verified": 17,
+     "b_verified": 13,
+     "verdict": "isolated beats single"
+    }
+   ],
+   "best_collective_arm": "centralized",
+   "best_collective_arm_any": "centralized",
+   "margin_best_collective_over_single": {
+    "arm": "centralized",
+    "verified": 19,
+    "single_verified": 13,
+    "margin_claims": 6,
+    "claims_collective_verified_single_did_not": [
+     "darwin1859-ch12-08",
+     "darwin1859-ch12-09",
+     "darwin1859-ch12-04",
+     "darwin1859-ch12-10",
+     "thompson1917-ch15-01",
+     "thompson1917-ch14-02"
+    ],
+    "claims_single_verified_collective_did_not": [],
+    "cost_ratio_collective_over_single": 5.19
+   },
+   "multi_vs_single_min_margin": 4,
+   "per_claim": [
+    {
+     "claim_id": "darwin1859-ch09-03",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Chronostratigraphic Chart (International Commission on Stratigraphy (ICS))",
+      "landing_url": "https://stratigraphy.org/chart",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Chronostratigraphic Chart (International Commission on Stratigraphy (ICS))",
+      "landing_url": "https://stratigraphy.org/chart",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Chronostratigraphic Chart (International Commission on Stratigraphy (ICS))",
+      "landing_url": "https://stratigraphy.org/chart",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Chronostratigraphic Chart (International Commission on Stratigraphy (IUGS))",
+      "landing_url": "https://stratigraphy.org/chart",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-08",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence Download / Occurrence API (class Amphibia) (Global Biodiversity Information Facility)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence Data (Amphibia, class key 131), searched via the GBIF occurrence search and API (Global Biodiversity Information Facility (GBIF))",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "AmphibiaWeb (AmphibiaWeb (University of California, Berkeley))",
+      "landing_url": "https://amphibiaweb.org",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "AmphibiaWeb (AmphibiaWeb (University of California, Berkeley))",
+      "landing_url": "https://amphibiaweb.org",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-02",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "FishBase (species, country and distribution tables) (FishBase Consortium)",
+      "landing_url": "https://www.fishbase.se",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "FishBase (FishBase Consortium (Froese & Pauly, eds.))",
+      "landing_url": "https://www.fishbase.se",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "FishBase (FishBase Consortium (hosted by Quantitative Aquatics / SeaLifeBase and FishBase Information and Research Group))",
+      "landing_url": "https://www.fishbase.se",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "A global database on freshwater fish species occurrences in drainage basins (figshare (Springer Nature collection; Tedesco, Leprieur et al., Scientific Data 2017))",
+      "landing_url": "https://springernature.figshare.com/collections/A_global_database_on_freshwater_fish_species_occurrences_in_drainage_basins/3739145/1",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-09",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "The IUCN Red List of Threatened Species - Terrestrial Mammals spatial data and range maps (IUCN)",
+      "landing_url": "https://www.iucnredlist.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "MegaPast2Future/PHYLACINE_1.2: PHYLACINE Version 1.2.1 (Zenodo (MegaPast2Future; Faurby et al., PHYLACINE))",
+      "landing_url": "https://zenodo.org/record/3690867",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Mammal Diversity Database (Version v2.5, published July 28, 2026) (Mammal Diversity Database, American Society of Mammalogists (via Zenodo))",
+      "landing_url": "https://zenodo.org/records/4139722",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: PHYLACINE 1.2: The Phylogenetic Atlas of Mammal Macroecology (Dryad (Faurby et al.; data paper in Ecology))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.bp26v20",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch01-09",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "NCBI Genome: Canis lupus familiaris (National Center for Biotechnology Information)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genome/?term=Canis+lupus+familiaris",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Canis lupus familiaris genome assembly UU_Cfam_GSD_1.0 (GCF_011100685.1) (NCBI (National Center for Biotechnology Information))",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "NCBI Genome: Canis lupus familiaris (taxid 9615) genome assemblies (National Center for Biotechnology Information (NCBI), U.S. National Library of Medicine)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/datasets/genome/?taxon=9615",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "UU_Cfam_GSD_1.0 (Canis lupus familiaris) genome assembly, GCF_011100685.1 (NCBI (National Center for Biotechnology Information), assembly submitted by Uppsala University)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_011100685.1/",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch01-10",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "NCBI Genome: Columba livia (National Center for Biotechnology Information)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genome/?term=Columba+livia",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Columba livia (rock pigeon) (NCBI BioProject (Shapiro et al. 2013, Science))",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA167554",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Columba livia (rock pigeon) (NCBI BioProject (submitted by BGI); linked to Shapiro et al. 2013)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA167554",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Whole genome resequencing data for rock pigeon (Columba livia) (BioProject PRJNA532675) (NCBI Sequence Read Archive / BioProject (data note in PMC8351366))",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/bioproject/PRJNA532675",
+      "fabricated": 1
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch11-13",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "NOAA NCEI Paleoclimatology Data (ice core and marine temperature records) (NOAA National Centers for Environmental Information)",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "A Pliocene-Pleistocene stack of 57 globally distributed benthic d18O records (LR04 Stack) (PANGAEA (data from Lisiecki and Raymo, 2005, Paleoceanography))",
+      "landing_url": "https://doi.pangaea.de/10.1594/PANGAEA.704257",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Pliocene-Pleistocene stack of globally distributed benthic stable oxygen isotope records (PANGAEA (data of Lisiecki and Raymo, 2005))",
+      "landing_url": "https://doi.pangaea.de/10.1594/PANGAEA.704257",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Pliocene-Pleistocene stack of globally distributed benthic stable oxygen isotope records (PANGAEA (Lisiecki & Raymo, 2005))",
+      "landing_url": "https://doi.pangaea.de/10.1594/PANGAEA.704257",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-04",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence Download / Occurrence API (plants and birds) (Global Biodiversity Information Facility)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GIFT - Global Inventory of Floras and Traits (Biodiversity, Macroecology and Biogeography group, University of Göttingen)",
+      "landing_url": "https://gift.uni-goettingen.de",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "GIFT – Global Inventory of Floras and Traits (Biodiversity, Macroecology & Biogeography group, University of Göttingen)",
+      "landing_url": "https://gift.uni-goettingen.de",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GIFT – Global Inventory of Floras and Traits (Biodiversity, Macroecology & Biogeography group, University of Göttingen (Weigelt, König & Kreft))",
+      "landing_url": "https://gift.uni-goettingen.de/about",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch11-16",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global Naturalized Alien Flora (GloNAF) (GloNAF consortium)",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global Naturalized Alien Flora (GloNAF) (GloNAF consortium (Pyšek, van Kleunen and colleagues))",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global Naturalized Alien Flora (GloNAF) database (GloNAF consortium (hosted at glonaf.org))",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global Naturalized Alien Flora (GloNAF) (GloNAF consortium (van Kleunen, Pyšek, Dawson, Essl et al.))",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-10",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "The IUCN Red List of Threatened Species - Mammals spatial data (Chiroptera) (IUCN)",
+      "landing_url": "https://www.iucnredlist.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence Data: Chiroptera (taxonKey 734) (Global Biodiversity Information Facility (GBIF))",
+      "landing_url": "https://www.gbif.org/occurrence/search?taxon_key=734",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "GBIF Occurrence records, order Chiroptera (taxonKey 734) (GBIF: Global Biodiversity Information Facility)",
+      "landing_url": "https://api.gbif.org/v1/species/734",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: PHYLACINE 1.2: The Phylogenetic Atlas of Mammal Macroecology (Dryad (Faurby et al.; data paper in Ecology))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.bp26v20",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-05",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) Body Measures (BMX) and Demographics (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) – Body Measures (Examination data) (US CDC National Center for Health Statistics (NCHS))",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) - Body Measures and Demographics (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) – Body Measures (BMX) and Infant/Child examination data (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch17-13",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "TimeTree: The Timescale of Life (TimeTree (Kumar et al.))",
+      "landing_url": "https://timetree.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "TimeTree (Timetree of Life) (TimeTree.org (Kumar, Hedges and colleagues))",
+      "landing_url": "https://timetree.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Mammal trees (Inferring the mammal tree: species-level sets of phylogenies for questions in ecology, evolution, and conservation), VertLife (VertLife project (Upham, Esselstyn & Jetz))",
+      "landing_url": "https://vertlife.org/data/mammals/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation (Dryad (Upham, Esselstyn and Jetz, 2019))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.tb03d03",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-08",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) Body Measures (BMX) and Demographics (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Growth reference data for 5-19 years (WHO 2007) (World Health Organization)",
+      "landing_url": "https://www.who.int/tools/growth-reference-data-for-5to19-years",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) – Body Measures (BMX) and Demographics (DEMO) (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch15-01",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The evolution of egg shape in birds: Evolutionary constraints and adaptations (Dryad (data by Montgomerie, Birkhead, Thompson and Hemmings))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.sj3tx9648",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: The evolution of egg shape in birds: Evolutionary constraints and adaptations (Dryad (data authors: Robert Montgomerie, Tim Birkhead, James Thompson, Nicola Hemmings))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.sj3tx9648",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: The evolution of egg shape in birds: Evolutionary constraints and adaptations (Dryad (Montgomerie, Birkhead, Thompson and Hemmings))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.sj3tx9648",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch04-13",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Chromosome Counts Database (CCDB) (Tel Aviv University / Rice et al.)",
+      "landing_url": "http://ccdb.tau.ac.il",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Chromosome Counts Database (CCDB) (Tel Aviv University (Rice et al. 2015, New Phytologist))",
+      "landing_url": "http://ccdb.tau.ac.il",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Chromosome Counts Database (CCDB) (Tel Aviv University (Rice et al., 2015))",
+      "landing_url": "http://ccdb.tau.ac.il",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Chromosome Counts Database (CCDB) (Tel Aviv University (Rice et al., Chromosome Counts Database; New Phytologist 2015))",
+      "landing_url": "http://ccdb.tau.ac.il",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-07",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) Body Measures (BMX) (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) - Body Measures (BMX) examination data (US CDC National Center for Health Statistics (NCHS))",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) (CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) – Body Measures (BMX) and Demographics (DEMO) (US CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-17",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "ICES DATRAS (Database of Trawl Surveys) - biological sampling (CA) data (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (Database of Trawl Surveys) (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "ICES DATRAS (Database of Trawl Surveys) (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS - Database of Trawl Surveys (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch14-02",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (data from Swinton et al., Royal Society Open Science 2016))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": false,
+      "attempts": 2,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-24",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Tree-Ring Data Bank (ITRDB), Arizona Pinus ponderosa chronologies (NOAA National Centers for Environmental Information)",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology/tree-ring",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Tree-Ring Data Bank (ITRDB) (NOAA National Centers for Environmental Information (NCEI), World Data Service for Paleoclimatology)",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology/tree-ring",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Tree-Ring Data Bank (ITRDB) (NOAA National Centers for Environmental Information (NCEI), World Data Service for Paleoclimatology)",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology/tree-ring",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "International Tree-Ring Data Bank (ITRDB) (NOAA National Centers for Environmental Information (NCEI), World Data Service for Paleoclimatology)",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology/tree-ring",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch05-24",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "CytoShapeNet: Red blood cell phenotyping from 3D confocal images using artificial neural networks (Zenodo (Simionato, Hinkelmann, Chachanidze, Bianchi, Fermo, van Wijk, Leonetti, Wagner, Kaestner, Quint))",
+      "landing_url": "https://zenodo.org/record/4670205",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": false,
+      "attempts": 3,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     }
+    }
+   ],
+   "run_files": "four-arm/runs/<arm>/{index.json,log.jsonl,summary.json,plans/,verify/}",
+   "infra_failures_excluded": [
+    "single-2026-10-31T05-57-45",
+    "single-2026-10-31T06-00-44-test",
+    "single-2026-10-31T06-01-39-test"
+   ],
+   "test_runs_ignored": [
+    "isolated-2026-10-31T05-56-34-test",
+    "single-2026-10-31T06-02-04-test"
+   ]
+  },
+  {
+   "experiment": 2,
+   "built_by_harness": "2026-10-31T06:38:50.908Z",
+   "claims": [
+    "darwin1859-ch05-06",
+    "darwin1859-ch04-22",
+    "darwin1859-ch11-01",
+    "darwin1859-ch10-16",
+    "darwin1859-ch09-14",
+    "darwin1859-ch10-12",
+    "darwin1859-ch09-04",
+    "darwin1859-ch14-03",
+    "darwin1859-ch12-05",
+    "darwin1859-ch04-13",
+    "thompson1917-ch07-04",
+    "thompson1917-ch14-06",
+    "thompson1917-ch11-08",
+    "thompson1917-ch11-10",
+    "thompson1917-ch14-05",
+    "thompson1917-ch17-06",
+    "thompson1917-ch13-02",
+    "thompson1917-ch02-01",
+    "thompson1917-ch03-18",
+    "thompson1917-ch03-13"
+   ],
+   "n_claims": 20,
+   "metric": "verified-dataset rate: claims whose named dataset's landing URL (or DOI) resolves with HTTP 2xx and the page names the dataset, out of 20 (PREREG.md §Scores). Experiment 2 also requires that the call which wrote the plan fetched that landing URL and reported a page title agreeing with the checker's.",
+   "decision_rule": "A beats B if A has 0 fabricated identifiers and A's verified-dataset count exceeds B's by at least 2 claims. Under 2 claims is reported as no difference. Primary run only; replicates never replace the primary.",
+   "web_tools": "required: landing page must be fetched before it is named",
+   "budget_usd_per_arm": 8,
+   "arms": {
+    "single": {
+     "primary": {
+      "verified": 12,
+      "checker_only": 12,
+      "dataset_named": 12,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 1,
+      "attempts_total": 20,
+      "minutes_wall": 1.96,
+      "minutes_agent": 1.96,
+      "tokens": {
+       "input": 10,
+       "output": 13589,
+       "cache_read": 174848,
+       "cache_creation": 74943
+      },
+      "cost_usd_list": 0.5225,
+      "web_requests": {
+       "search": 5,
+       "fetch": 13
+      },
+      "budget_usd": 8,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:36:43.488Z",
+      "finished": "2026-10-31T06:38:41.329Z",
+      "run_dir": "swarm/compare/runs/exp2-single-2026-10-31T06-36-43"
+     },
+     "replicates": []
+    },
+    "isolated": {
+     "primary": {
+      "verified": 16,
+      "checker_only": 17,
+      "dataset_named": 18,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 20,
+      "attempts_total": 20,
+      "minutes_wall": 2.16,
+      "minutes_agent": 9.69,
+      "tokens": {
+       "input": 138,
+       "output": 44346,
+       "cache_read": 1255340,
+       "cache_creation": 929583
+      },
+      "cost_usd_list": 4.4837,
+      "web_requests": {
+       "search": 15,
+       "fetch": 23
+      },
+      "budget_usd": 8,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:28:12.756Z",
+      "finished": "2026-10-31T06:30:22.549Z",
+      "run_dir": "swarm/compare/runs/exp2-isolated-2026-10-31T06-28-12"
+     },
+     "replicates": []
+    },
+    "centralized": {
+     "primary": {
+      "verified": 18,
+      "checker_only": 19,
+      "dataset_named": 19,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 26,
+      "attempts_total": 26,
+      "minutes_wall": 3.62,
+      "minutes_agent": 14.48,
+      "tokens": {
+       "input": 202,
+       "output": 64948,
+       "cache_read": 2322823,
+       "cache_creation": 1105220
+      },
+      "cost_usd_list": 5.6118,
+      "web_requests": {
+       "search": 24,
+       "fetch": 35
+      },
+      "budget_usd": 8,
+      "stopped_by": null,
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:30:22.643Z",
+      "finished": "2026-10-31T06:33:59.580Z",
+      "run_dir": "swarm/compare/runs/exp2-centralized-2026-10-31T06-30-22"
+     },
+     "replicates": []
+    },
+    "decentralized": {
+     "primary": {
+      "verified": 17,
+      "checker_only": 18,
+      "dataset_named": 18,
+      "fabricated_identifiers_all_attempts": 0,
+      "fabricated_identifiers_final_plans": 0,
+      "untouched": 0,
+      "duplicated_work": 0,
+      "calls": 26,
+      "attempts_total": 26,
+      "minutes_wall": 2.73,
+      "minutes_agent": 13.8,
+      "tokens": {
+       "input": 208,
+       "output": 64293,
+       "cache_read": 2468428,
+       "cache_creation": 1279831
+      },
+      "cost_usd_list": 6.3667,
+      "web_requests": {
+       "search": 27,
+       "fetch": 41
+      },
+      "budget_usd": 8,
+      "stopped_by": "budget",
+      "model": "claude-sonnet-5-5",
+      "started": "2026-10-31T06:33:59.669Z",
+      "finished": "2026-10-31T06:36:43.394Z",
+      "run_dir": "swarm/compare/runs/exp2-decentralized-2026-10-31T06-33-59"
+     },
+     "replicates": []
+    }
+   },
+   "comparisons": [
+    {
+     "a": "centralized",
+     "b": "single",
+     "a_verified": 18,
+     "b_verified": 12,
+     "verdict": "centralized beats single"
+    },
+    {
+     "a": "decentralized",
+     "b": "centralized",
+     "a_verified": 17,
+     "b_verified": 18,
+     "verdict": "no difference (under 2 claims)"
+    },
+    {
+     "a": "centralized",
+     "b": "isolated",
+     "a_verified": 18,
+     "b_verified": 16,
+     "verdict": "centralized beats isolated"
+    },
+    {
+     "a": "decentralized",
+     "b": "single",
+     "a_verified": 17,
+     "b_verified": 12,
+     "verdict": "decentralized beats single"
+    },
+    {
+     "a": "isolated",
+     "b": "single",
+     "a_verified": 16,
+     "b_verified": 12,
+     "verdict": "isolated beats single"
+    }
+   ],
+   "best_collective_arm": "centralized",
+   "best_collective_arm_any": "centralized",
+   "margin_best_collective_over_single": {
+    "arm": "centralized",
+    "verified": 18,
+    "single_verified": 12,
+    "margin_claims": 6,
+    "claims_collective_verified_single_did_not": [
+     "darwin1859-ch05-06",
+     "darwin1859-ch04-22",
+     "darwin1859-ch11-01",
+     "darwin1859-ch14-03",
+     "thompson1917-ch07-04",
+     "thompson1917-ch17-06",
+     "thompson1917-ch13-02"
+    ],
+    "claims_single_verified_collective_did_not": [
+     "thompson1917-ch14-06"
+    ],
+    "cost_ratio_collective_over_single": 10.74
+   },
+   "multi_vs_single_min_margin": 4,
+   "per_claim": [
+    {
+     "claim_id": "darwin1859-ch05-06",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence API (occurrence search) (Global Biodiversity Information Facility (GBIF))",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GBIF Backbone Taxonomy (GBIF Secretariat)",
+      "landing_url": "https://api.gbif.org/v1/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": false,
+      "attempts": 3,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch04-22",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GloNAF – Global Naturalized Alien Flora (GloNAF consortium (Zenodo record and iDiv Biodiversity Data Portal))",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GloNAF – Global Naturalized Alien Flora (GloNAF consortium (van Kleunen, Pyšek, Dawson, Essl, Weigelt et al.); data on Zenodo)",
+      "landing_url": "https://glonaf.org",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global Naturalized Alien Flora (GloNAF) (GloNAF consortium (Davis, Dawson, Essl, Kreft, Pergl, Pyšek, Weigelt, Winter, van Kleunen), hosted on Zenodo)",
+      "landing_url": "https://zenodo.org/records/13235356",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch11-01",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Terrestrial Ecosystems of the World (TEOW) from WWF-US (Olson) (World Wildlife Fund (WWF-US), hosted on USGS ScienceBase)",
+      "landing_url": "https://sciencebase.gov/catalog/item/508fece8e4b0a1b43c29ca22",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GBIF Occurrence Search API (GBIF occurrence records, country AU query) (Global Biodiversity Information Facility (GBIF))",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?limit=0&country=AU",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "WWF Terrestrial Ecoregions of the World (World Wildlife Fund (WWF), distributed via Source Cooperative (cboettig/ecoregion))",
+      "landing_url": "https://data.source.coop/cboettig/ecoregion/README.md",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch10-16",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (international consortium))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (PBDB) Data Service, fossil occurrences (The Paleobiology Database)",
+      "landing_url": "https://paleobiodb.org/data1.2/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org/#/",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch09-14",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Macrostrat (Macrostrat / UW-Madison)",
+      "landing_url": "https://macrostrat.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Macrostrat (Macrostrat (University of Wisconsin–Madison))",
+      "landing_url": "https://macrostrat.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Muller, et al., 2008 Age, spreading rates and spreading symmetry of the world's ocean crust (NOAA National Centers for Environmental Information (NCEI), hosting data by R.D. Müller, M. Sdrolias, C. Gaina and W.R. Roest)",
+      "landing_url": "https://www.ngdc.noaa.gov/mgg/ocean_age/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org/#/",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch10-12",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (international consortium))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org/#/",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch09-04",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (international consortium))",
+      "landing_url": "https://paleobiodb.org",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "PBDB Data Service: Documentation (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org/data1.2/",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "PBDB Data Service (The Paleobiology Database)",
+      "landing_url": "https://paleobiodb.org/data1.2/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "The Paleobiology Database (Paleobiology Database (PBDB))",
+      "landing_url": "https://paleobiodb.org/#/",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch14-03",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Reference Proteomes (UniProt Knowledgebase, current release) (UniProt Consortium (EMBL-EBI, SIB, PIR))",
+      "landing_url": "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "OrthoDB: the hierarchical catalog of orthologs (v13) (Zdobnov lab, University of Geneva / SIB Swiss Institute of Bioinformatics)",
+      "landing_url": "https://www.orthodb.org/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": false,
+      "attempts": 3,
+      "dataset": "Database of Clusters of Orthologous Genes (COGs) (NCBI, National Library of Medicine)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/research/cog",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch12-05",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": "GIFT – Global Inventory of Floras and Traits (University of Göttingen (Biodiversity, Macroecology and Biogeography))",
+      "landing_url": "https://gift.uni-goettingen.de",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": false,
+      "attempts": 3,
+      "dataset": "GIFT (University of Göttingen (Biodiversity, Macroecology and Biogeography group), Global Inventory of Floras and Traits)",
+      "landing_url": "https://gift.uni-goettingen.de",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "GIFT – Global Inventory of Floras and Traits (R package GIFT, CRAN page; GIFT database access) (Biodiversity, Macroecology & Biogeography group, University of Göttingen (Weigelt, König, Kreft); package hosted on CRAN)",
+      "landing_url": "https://cran.r-project.org/web/packages/GIFT/index.html",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "darwin1859-ch04-13",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global distribution and evolutionary transitions of angiosperm sexual systems (Dryad (Wang et al.))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s1rn8pk7n",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global distribution and evolutionary transitions of angiosperm sexual systems (Dryad (Wang et al., 2021))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s1rn8pk7n",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global distribution and evolutionary transitions of angiosperm sexual systems (Dryad (data from Wang et al. 2021, Ecology Letters))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s1rn8pk7n",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Global distribution and evolutionary transitions of angiosperm sexual systems (Dryad (Wang, Luo, Lyu, Dimitrov, Xu, Freckleton, et al.))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s1rn8pk7n",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch07-04",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Arabidopsis ovule primordium stages 0-I to 2-II, wild-type Col_0, Ws-4 and botero (bot1-7) mutant (Dryad (Baroux, Mendocilla-Sato, Autran))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.02v6wwq2c",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Accurate and versatile 3D segmentation of plant tissues at cellular resolution: Core Datasets (Open Science Framework (Wolny et al., PlantSeg; EMBL/Heidelberg))",
+      "landing_url": "https://api.osf.io/v2/nodes/uzq3w/",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "WT Arabidopsis ovule atlas (EMBL-EBI BioStudies (deposited by Vijayan, Tofanelli et al., Technical University of Munich / Max Planck Institute for Plant Breeding Research))",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/studies/S-BSST475",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch14-06",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (Swinton and Ochu))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": false,
+      "attempts": 3,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "REVISED RESULTS: Directional phyllotactic bias in calatheas (Goeppertia, Marantaceae): a citizen science approach (figshare (authors Durrington, Chong and Chitwood))",
+      "landing_url": "https://figshare.com/articles/dataset/REVISED_RESULTS_Directional_phyllotactic_bias_in_calatheas_Goeppertia_Marantaceae_a_citizen_science_approach/13513176",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch11-08",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (Collins et al.))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (data by Collins, Klapaukh, Crampton, Gazley, Schipper, Maksimenko, Hines))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (Collins, Klapaukh, Crampton, Gazley, Schipper, Maksimenko, Hines))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Measurement data for septal spacing and conch morphology in Cretaceous ammonoids (Dryad (data by Nishino, Komazaki, Arai, Hattori, Uoya, Iida and Wani, Yokohama National University))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.bzkh189gp",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch11-10",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (Collins et al.))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (Collins, Klapaukh, Crampton, Gazley, Schipper, Maksimenko, Hines))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (data from Collins et al., Paleobiology))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data associated with: Going round the twist – An empirical analysis of shell coiling in helicospiral gastropods (Dryad (Collins, Klapaukh, Crampton, Gazley, Schipper, Maksimenko, Hines))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch14-05",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (Swinton and Ochu))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (Swinton & Ochu, Royal Society Open Science 2016))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (Swinton & Ochu, Royal Society Open Science 2016))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad (data by Swinton and Ochu, Royal Society Open Science 2016))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch17-06",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Predicting body mass in Ruminantia using postcranial measurements (Dryad (Alexa Wimberly, University of Chicago))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.8sf7m0ctf",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Predicting body mass in Ruminantia using postcranial measurements (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.8sf7m0ctf",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Predicting body mass in Ruminantia using postcranial measurements (Dryad (data by Alexa Wimberly, University of Chicago))",
+      "landing_url": "https://datadryad.org/stash/dataset/doi:10.5061/dryad.8sf7m0ctf",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch13-02",
+     "single": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": false,
+      "attempts": 1,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 2,
+      "dataset": "Data: Diversification of the ruminant skull along an evolutionary line of least resistance (Dryad (data author Daniel Rhoda, University of Chicago))",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.2280gb5x2",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": false,
+      "attempts": 2,
+      "dataset": null,
+      "landing_url": null,
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch02-01",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (the Database of Trawl Surveys) (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (Database of Trawl Surveys), ICES (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Weight and length measurements for 37 Mekong River fish species of the 'Dai' fishery (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.dr7sqvb5h",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-18",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (the Database of Trawl Surveys) (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (Database of Trawl Surveys): ICES data portal, biological sample (CA) records for North Sea IBTS, BTS and SNS surveys (International Council for the Exploration of the Sea (ICES))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "DATRAS (Database of Trawl Surveys) (ICES (International Council for the Exploration of the Sea))",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/DATRAS.aspx",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Macroscopic and histological image dataset of the European plaice (Pleuronectes platessa) ovaries (Zenodo (Sauger, Quinquis, Kellner, Heude-Berthelin, Poitevin, Elie, Dubroca))",
+      "landing_url": "https://zenodo.org/records/3574510",
+      "fabricated": 0
+     }
+    },
+    {
+     "claim_id": "thompson1917-ch03-13",
+     "single": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes",
+      "fabricated": 0
+     },
+     "isolated": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (CDC National Center for Health Statistics (NCHS))",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes/index.html",
+      "fabricated": 0
+     },
+     "centralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "National Health and Nutrition Examination Survey (NHANES) (CDC National Center for Health Statistics (NCHS))",
+      "landing_url": "https://www.cdc.gov/nchs/nhanes/index.html",
+      "fabricated": 0
+     },
+     "decentralized": {
+      "verified": true,
+      "attempts": 1,
+      "dataset": "Growth Charts - Percentile Data Files with LMS Values (CDC National Center for Health Statistics)",
+      "landing_url": "https://www.cdc.gov/growthcharts/cdc-data-files.htm",
+      "fabricated": 0
+     }
+    }
+   ],
+   "run_files": "four-arm/runs2/<arm>/{index.json,log.jsonl,summary.json,plans/,verify/}",
+   "infra_failures_excluded": [],
+   "test_runs_ignored": [
+    "exp2-isolated-2026-10-31T06-27-33-test"
+   ]
+  }
+ ],
+ "what_this_shows": "Every multi-agent arm beat the single agent by at least 4 of 20 verified datasets in both experiments, with 0 fabricated identifiers in the final plans of every arm. The three multi-agent arms are not distinguishable from one another at n=20 under the pre-registered 2-claim margin (centralized vs decentralized: no difference in both experiments).",
+ "what_this_does_not_show": [
+  "The single agent costs a fifth (experiment 1) to a tenth (experiment 2) of a swarm arm; its shortfall is mostly blank plans (context exhaustion), not worse dataset picks (DEVIATIONS.md, experiment 2: 8 of 8 shortfalls blank).",
+  "Verified means the URL resolves to a page that names the dataset, not that the dataset can decide the claim.",
+  "n=20 per experiment, one model (Sonnet 5.5) in every arm, same provider as the builder; no blind assessor from another provider scored the plans.",
+  "Experiment 1 decentralized arm wrote 1 fabricated identifier on a first attempt (corrected after a board gap note), so under the strict all-attempts count it fails the hard constraint and is excluded from the best-collective-arm margin in experiment 1.",
+  "A sister project with deterministic specialists (delphi-evolve) reported no collective advantage; the gain here is in the regime where context and attention are the bottleneck."
+ ]
+}

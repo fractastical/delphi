@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered leave-one-family-out meta-regression of toughness across 50 samples" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Compile a provenance-tracked table of 50 samples across six mineralized biological composite families (mollusc nacre, cortical bone, osteonal dentin, cervid antler, glass sponge spicule rods, and crustacean cuticle) from published experimental tables (Jackson et al. 1988; Ashby et al. 1995; Barthelat et al. 2007; Launey and Ritchie 2009; Wegst et al. 2015). For each record, extract fracture toughness K_Jc (separating crack-initiation K_Ic from R-curve steady-state K_Jc), mineral volume fraction phi, constituent moduli E_m and E_p, mineral tablet aspect ratio rho, and discrete hierarchical level count N_levels (defined strictly by distinct structural length scales separated by at least 10x in characteristic dimension).\n\nPre-register a nested model comparison in log-space: fit the constituent-only Voigt/Reuss/Halpin-Tsai mixing baseline for log(K_Jc / K_mineral) using phi and E_m/E_p alone, then fit the architectural tension-shear chain and hierarchical compounding model adding log(rho) and N_levels, controlling for fracture test geometry (SENB, CT, indentation) as a random effect. Evaluate predictive log-likelihood and R^2 under leave-one-family-out cross-validation." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--1#n_samples> ;
+    delphi:proposedTest "Across the 50 samples, the architectural model reduces leave-one-family-out log10(K_Jc) RMSE by at least 30% relative to the constituent-only mixing baseline and yields a positive partial slope beta_N > 0.25 log10-units per hierarchical level (95% CI excluding zero)." ;
+    delphi:context "Fails if: Leave-one-family-out predictive likelihood of the hierarchical model is indistinguishable from or worse than the constituent-only mixing law, or the partial slope beta_N on N_levels overlaps zero once mineral volume fraction phi and test protocol (K_Ic vs K_Jc) are controlled." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Extract and audit 50 samples across the six biocomposite families with verbatim table provenance, measurement method (K_Ic vs K_Jc), phi, rho, and N_levels. 2. Pre-register the constituent-only baseline equation, the architectural hierarchy model, and the leave-one-family-out cross-validation criterion. 3. Fit hierarchical Bayesian and mixed-effects regressions with test-method random intercepts and compute out-of-sample RMSE on each held-out material family. 4. Test whether the partial regression slope beta_N on N_levels is strictly positive after conditioning on mineral volume fraction phi and tablet aspect ratio rho." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: literature-extraction" ;
+    skos:note "Tool: meta-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://doi.org/10.17632/hdpmjgx8rg> ;
+    rdfs:seeAlso <https://doi.org/10.1002/adma.200803322> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nmat4089> ;
+    rdfs:seeAlso <https://doi.org/10.1038/natrevmats.2016.7> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.1988.0056> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--1#n_samples> a schema:PropertyValue ;
+    schema:propertyID "n_samples" ;
+    schema:value 50 ;
+    schema:description "samples named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://doi.org/10.17632/hdpmjgx8rg> dct:title "BoneMechDamage human cortical and trabecular mechanical dataset" ;
+    dct:description "Open experimental mechanical stress-strain and damage curves for bone tissue baseline records" .
+  <https://doi.org/10.1002/adma.200803322> dct:title "On the Fracture Toughness of Advanced Materials" ;
+    dct:bibliographicCitation "Launey and Ritchie 2009, On the fracture toughness of advanced materials" .
+  <https://doi.org/10.1038/nmat4089> dct:title "Bioinspired structural materials" ;
+    dct:bibliographicCitation "Wegst et al. 2015, Bioinspired structural materials" .
+  <https://doi.org/10.1038/natrevmats.2016.7> dct:title "Structure and mechanics of interfaces in biological materials" ;
+    dct:bibliographicCitation "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials" .
+  <https://doi.org/10.1098/rspb.1988.0056> dct:title "The mechanical design of nacre" ;
+    dct:bibliographicCitation "Jackson, Vincent and Turner 1988, The mechanical design of nacre" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.314Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Pre-registered leave-one-family-out meta-regression of toughness across 50 samples" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

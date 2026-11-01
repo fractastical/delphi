@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered 3D poroelastic FE benchmark and print protocol for 18 specimens" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "To address the fabricated-bilayer branch of the acceptance criteria (at least three thicknesses and two swelling mismatches), generate a complete pre-registered experimental and 3D coupled poroelastic-viscoelastic finite-element benchmark across 18 specimens (3 total thicknesses h in {0.5, 1.0, 2.0} mm x 2 swelling mismatches Delta_epsilon in {0.05, 0.15} x 3 replicates). Run the 3D finite-strain poroelastic simulation in `frontier_simulate` / FEniCS with transverse shear, finite-width anticlastic saddle-to-cylinder bifurcation, and Prony-series viscoelastic relaxation.\n\nQuantify the exact regime boundaries where 3D edge effects and viscoelastic relaxation cause departures from the 1D Timoshenko curvature and h^2 diffusion scaling, and emit the print-ready multi-material G-code/STL files and time-lapse camera tracking script for physical execution." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--3#n_specimens> ;
+    delphi:proposedTest "Measured curvature and response time across the 18 specimens agree with the zero-free-parameter Timoshenko and h^2 predictions within 15% for slender strips (w/h < 5), while 3D poroelastic FE captures the finite-width departure within 10%." ;
+    delphi:context "Fails if: Physical fabricated bilayers show interfacial delamination, viscoelastic creep > 30%, or Case-II non-Fickian diffusion (tau prop h^1), falsifying both Timoshenko and Fickian h^2 scaling." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Generate CAD/STL geometries for the 6 bilayer configurations (3 thicknesses x 2 swelling mismatches) plus dogbone coupons for independent E_1, E_2, Delta_epsilon, and D measurement. 2. Run 3D coupled Fickian-diffusion and finite-strain viscoelastic FE simulations across all 6 configurations to predict full curvature trajectories kappa(t). 3. Commit the pre-registered pass/fail script comparing measured vs Timoshenko and 3D-FE trajectories. 4. Hand off the STL package and protocol to an external lab operator with a multi-material printer and humidity chamber." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: The swarm has no multi-material 3D printer, hydrogel/elastomer resins, or controlled humidity chamber with optical tracking; completing the physical half requires a wet-lab collaborator." ;
+    skos:note "Tool: continuum-mechanics" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2026.106780> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--3#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 18 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1016/j.jmps.2026.106780> dct:title "A category-theoretic framework from biological mechanics to engineered stimulus-response systems" ;
+    dct:bibliographicCitation "Marom et al. 2026, A category-theoretic framework from biological mechanics to engineered stimulus-response systems" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.315Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Pre-registered 3D poroelastic FE benchmark and print protocol for 18 specimens" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,147 @@
+{
+  "claim_id": "levin-2023-glue-12",
+  "variables_needed": [
+    "head-number outcomes (one vs two heads) of regenerated Dugesia japonica fragments with and without the commensal Aquitalea isolate or indole",
+    "microbiome-depleted and heat-killed/mutant bacterial controls",
+    "bacterial strain sequence data and host transcriptomes under treatment"
+  ],
+  "datasets": [
+    {
+      "id": "paper-pmid32439577",
+      "name": "Regulation of axial and head patterning during planarian regeneration by a commensal bacterium (Mech Dev 2020)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22commensal+bacterium%22+AND+planarian+AND+%22head+patterning%22&format=json&resultType=core&pageSize=3",
+      "access_url": null,
+      "doi": "10.1016/j.mod.2020.103614",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record (PMID 32439577, DOI 10.1016/j.mod.2020.103614)",
+        "http_status": 200,
+        "note": "Europe PMC API HTTP 200; the article itself is not open access, full text not retrieved"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any public data"
+      ],
+      "scope": "single article; Europe PMC isOpenAccess N and no PMCID returned",
+      "evidence": "Europe PMC core record fields: isOpenAccess N, license null, no PMCID. Full text was not retrieved.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "paper-pmc6280633",
+      "name": "Open-access article PMC6280633: The Bacterial Metabolite Indole Inhibits Regeneration of the Planarian Flatworm Dugesia japonica (iScience 2018)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=PMCID:PMC6280633&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.1016/j.isci.2018.11.021",
+      "license": "cc by-nc-nd",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record (license cc by-nc-nd, hasSuppl Y, hasData Y)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "indole-and-regeneration experiments reported in the paper (not downloaded)"
+      ],
+      "variables_missing": [
+        "a deposited head-number table",
+        "supplement and data-link contents not opened (databaseLinks returned no entries)"
+      ],
+      "scope": "single article, DOI 10.1016/j.isci.2018.11.021",
+      "evidence": "Europe PMC: pmcid PMC6280633, license 'cc by-nc-nd'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-sequence-read-archive",
+      "name": "NCBI Sequence Read Archive (Aquitalea records)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "esearch + esummary db=sra on Aquitalea[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "12 SRA records for Aquitalea (esummary titles show A. magnusonii, A. palustris, A. aquatica, A. pelogenes genomes/MAGs)"
+      ],
+      "variables_missing": [
+        "a link to the planarian commensal isolate",
+        "host head-number or transcriptome data"
+      ],
+      "scope": "reference-genome style records; no planarian-related title among the 12",
+      "evidence": "esummary titles as listed; none mentions planarian or Dugesia.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Europe PMC",
+      "query": "Aquitalea AND planarian",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=Aquitalea+AND+planarian&format=json&resultType=core&pageSize=5",
+      "hits": 8,
+      "note": "includes the commensal-bacterium paper (not OA) and the indole paper (OA)"
+    },
+    {
+      "source": "NCBI SRA",
+      "query": "Aquitalea[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Aquitalea%5BOrganism%5D&retmode=json&retmax=0",
+      "hits": 12,
+      "note": "all bacterial genomes/MAGs"
+    },
+    {
+      "source": "NCBI BioProject",
+      "query": "Dugesia japonica[Organism] AND microbio*",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=bioproject&term=Dugesia+japonica%5BOrganism%5D+AND+microbio*&retmode=json&retmax=5",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "NCBI GEO",
+      "query": "indole AND (planaria* OR Dugesia)",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=indole+AND+(planaria*+OR+Dugesia)&retmode=json&retmax=5",
+      "hits": 0,
+      "note": "no RNA-seq series for the indole treatment"
+    },
+    {
+      "source": "NCBI GEO",
+      "query": "Dugesia japonica[Organism] AND GSE",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Dugesia+japonica%5BOrganism%5D+AND+GSE%5BEntry+Type%5D&retmode=json&retmax=0",
+      "hits": 19,
+      "note": "D. japonica series exist; not individually examined"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian bacteria regeneration",
+      "url": "https://datadryad.org/api/v2/search?q=planarian+bacteria+regeneration&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"Aquitalea\" AND planarian",
+      "url": "https://zenodo.org/api/records?q=%22Aquitalea%22+AND+planarian&size=3",
+      "hits": 0,
+      "note": ""
+    }
+  ],
+  "status": "gap",
+  "summary": "No public head-number, microbiome or host-transcriptome data for the commensal-bacterium or indole experiments were found: the commensal paper is not open access, the indole paper is open access with an unopened supplement, and SRA's Aquitalea records are unrelated reference genomes.",
+  "next_step": "Open the PMC6280633 supplement and request the commensal paper's counts; otherwise pre-register a new Dugesia japonica colonisation assay with head-number scoring.",
+  "obstacles_confirmed": [
+    "The RNA-seq mentioned with indole treatment was not found as a public GEO series (0 hits).",
+    "Head-number counts are in the papers, not in a repository searched."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

@@ -106,7 +106,7 @@
     "expected_observation": "In planar sections of a cellular tissue, the three angles at each three-way wall junction cluster near 120 degrees: junction-angle SD and T-junction fraction are both below those of a random Voronoi tiling of the same cell count.",
     "disconfirming_observation": "Junction angles in a tissue are as dispersed as, or more dispersed than, a random Voronoi tiling, or T-junctions (one angle near 180 degrees) are the majority, as in cell-file tissues such as grass epidermis.",
     "admissible_datasets": "Public micrographs of planar (one-cell-thick or surface) tissue with resolvable cell walls, segmentable to label images; not drawings or diagrams; not images used to illustrate the claim in the source; licence permitting reuse. Segmenter output must be calibrated against synthetic tilings with known junction statistics (see revisions).",
-    "inference_method": "Cellpose-SAM segmentation, three-way junction extraction from the label image, angle SD and T-junction fraction per tissue, compared with a perfect hexagonal lattice and a random Voronoi control; pass if both statistics fall below the random control, with segmenter bias measured on synthetic tilings and subtracted from the margin."
+    "inference_method": "Cellpose-SAM segmentation, three-way junction extraction from the label image, angle SD and T-junction fraction per tissue, compared with a perfect hexagonal lattice and a random Voronoi control; pass if both statistics fall below the random control, with segmenter bias measured on synthetic tilings and subtracted from the margin. Planned ridge-based re-measurement (no learned boundary model): fit a straight line to each wall ridge in an annulus starting several blur widths from the vertex and take angles between fitted lines; validate on the synthetic tilings first and sweep the inner annulus radius, reporting the radius at which the brick-wall T fraction plateaus as the measurement floor (cautions from nanoswarm, Moltbook, 2026-10-31)."
   },
   "interpretation": "Thompson's 'tissue cell walls' are taken as segmented cell outlines in 2D images of epithelia and epidermes; the angle is the angle between wall directions near the junction. The compound eye is included as a packing of ommatidia, not of single cells.",
   "measured": {
@@ -224,7 +224,7 @@
   },
   "data_kind": "biological",
   "verdict": "mixed",
-  "confidence": 0.35,
+  "confidence": 0.6,
   "caveats": [
     "Segmenter bias (added 2026-10-31 after external review): Cellpose-SAM pulls non-hexagonal packings toward 120-degree junctions (brick wall 100% -> 3-16% T-junctions). Conforming tissues are consistent with 120-degree packing but their margin over the random control is inflated; see revisions[0].",
     "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test.",
@@ -259,9 +259,31 @@
           "venue": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f",
           "comment": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#a55aa7a0-cf2b-442b-b58a-8ff6018d4165",
           "contribution": "proposed that every claim carry a disconfirming observation, admissible dataset constraints and inference method as separate fields"
+        },
+        {
+          "agent": "nanoswarm",
+          "venue": "https://www.moltbook.com/post/9ff17185-86a8-42ec-9337-aa8951185f64",
+          "comment": "https://www.moltbook.com/post/9ff17185-86a8-42ec-9337-aa8951185f64#64213952-fb39-4933-a8cb-5eca6f46c28f",
+          "contribution": "warned that blur alone curves ridges toward Y near a vertex; proposed annulus line-fitting and validating the ridge pipeline on synthetic tilings with an annulus-radius sweep before real tissues"
         }
       ],
       "null_result": "claim-sources/cell-geometry/results/segmenter-bias/summary.json"
+    },
+    {
+      "date": "2026-11-01",
+      "from": {
+        "verdict": "mixed",
+        "confidence": 0.35,
+        "summary": "4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter"
+      },
+      "to": {
+        "verdict": "mixed",
+        "confidence": 0.6,
+        "summary": "three-at-a-time holds (98-99.7% of interior vertices in 8 expert-segmented Drosophila epithelia); 120 degrees holds only loosely and only once division has stopped"
+      },
+      "reason": "Independent, non-Cellpose evidence from the two TissueMiner datasets used for thompson1917-ch07-09 (Dye et al. wing disc, Zenodo 22760592; Etournay et al. 2015 pupal wing WT_1-3), segmented with TissueAnalyzer and manually corrected. Three-way vertices: 98.4-98.8% in five proliferating discs, 99.7% in three pupal wings, so the 'by threes' half of the claim is well supported. Angles at interior three-way junctions (straight chords between vertices): SD 24-28 degrees in the dividing discs with 16-21% of junctions having all three angles within 15 degrees of 120, close to the random-Voronoi control (14%); in the pupal wings SD falls from 21 degrees to 15 degrees and the near-120 fraction rises from 24-27% to 42-49% over the 17 h in which division ceases. So junction angles are not 120 degrees 'irrespective of size' as a standing property of tissues: they approach 120 degrees as the tissue leaves proliferation, and never reach the corneal-endothelium regularity (75%). Confidence rises because the split verdict now rests on expert segmentations rather than on a segmenter with a known bias; the verdict stays mixed because one half of Thompson's sentence is right and the other is conditional on tissue state. Chord angles on curved bonds are a cruder angle estimate than the ridge method; they are used only for comparison across the same pipeline.",
+      "prompted_by": [],
+      "null_result": "test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/derived/summary.json (sensitivity_junction_angles) and test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/derived/*_angles.csv"
     }
   ]
 }

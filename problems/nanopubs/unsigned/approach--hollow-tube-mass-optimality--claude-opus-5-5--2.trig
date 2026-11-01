@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Cross-taxon test of K against marrow-adjusted optimum and buckling limit" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "Compile at least 100 structures from four types: marrow-filled mammal long bones, pneumatic and marrow-filled bird long bones, bamboo culms and hollow grass stems, and feather rachises, each with outer radius, wall thickness and tissue modulus from the same or a matched source. For each, compute three predictions from approach 1: K*(q) (core-mass-adjusted stiffness optimum), K_b (Brazier local-buckling limit using measured E and an assumed strength-to-modulus ratio stated per tissue) and the predicted value min(K*, K_b). The sharpest test is within birds: pneumatic bones carry no marrow mass, so they are predicted to sit nearer K_b, while marrow-filled bones of the same birds should sit near K*(q). Classify each structure as at-optimum (|K - K*| <= 0.05), at-buckling (|K - K_b| <= 0.05), or neither; test size dependence by regressing K on log body or structure mass with phylogenetic GLS for the animal subset." ;
+
+    delphi:proposedTest "Proportions of structures at K*, at K_b and at neither, with the pneumatic-versus-filled contrast in birds; Thompson's optimality claim is supported if most filled structures fall within 0.05 of K* and pneumatic ones are shifted toward K_b." ;
+    delphi:context "Fails if: Most structures fall in the 'neither' class, or the pneumatic-filled contrast is absent or reversed; or fewer than 100 structures have a matched modulus, in which case the test is underpowered rather than decisive." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the tolerance (0.05 in K), the q values per tissue, and the classification rule. 2. Extract K and E from Currey and Alexander 1985 and other primary tables found by a pre-registered search; resolve taxa through the organisms layer (GBIF, NCBI). 3. Compute predictions and classify; run the paired pneumatic-versus-marrow comparison with a sign test and a mixed model with species as random effect. 4. Fit K versus log mass, phylogenetically corrected for vertebrates." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Matched tissue moduli for feather rachises and many plant stems are sparse; bird pneumaticity status per bone must be extracted from anatomical literature." ;
+    skos:note "Tool: literature-extraction" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: r-phylolm" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, Material property charts" .
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, Microstructures for mechanical efficiency" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.308Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Cross-taxon test of K against marrow-adjusted optimum and buckling limit" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -22,7 +22,8 @@ from urllib.parse import quote
 from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
-DOCS = REPO / "docs"
+DOCS = REPO.parent / "site"  # REPO is ; the built site sits beside it
+TEMPLATES = REPO / "scripts/site/templates"
 OUT = DOCS / "team"
 ORG_IMAGES = REPO / "test-data/organisms/images"
 
@@ -38,6 +39,7 @@ PANELS = [
         "species": [
             {"bundle": "2026-10-18-phyllotaxis-audit-v2", "name": "Helianthus annuus", "common": "Sunflower",
              "image": "datasets/phyllotaxis/helianthus_annuus_capitulum_specimen.jpg",
+             "crop": (0.5, 0.5, 0.92),
              "credit": "File:Sunflower Spiral.jpg, Wikimedia Commons, CC BY-SA 2.0",
              "finding": "621 florets segmented on a real seed head; cell circularity 0.79 against 0.85 for the "
                         "golden-angle model, with parastichy counts checked against Swinton et al. 2016."},
@@ -54,6 +56,7 @@ PANELS = [
         "species": [
             {"bundle": "2026-10-18-venation-audit-v2", "name": "Ginkgo biloba", "common": "Ginkgo leaf venation",
              "image": "datasets/venation/ginkgo_open_venation_specimen.jpg",
+             "crop": (0.5, 0.3, 0.55),
              "credit": "File:Ginkgo biloba 01 SR 87-36-02 A.jpg, Wikimedia Commons, CC BY-SA 3.0",
              "finding": "Runions space-colonisation veins with Murray's law at the junctions, measured on a real leaf; "
                         "Ginkgo's open dichotomous veins form no loops, a reticulate leaf supplies the looped case."},
@@ -69,7 +72,7 @@ PANELS = [
         "claims_note": "Thompson's cell-packing laws: the venation model's cells are the same 120° partitions.",
         "species": [
             {"bundle": "2026-10-14-odonata-audit", "name": "Odonata", "common": "Dragonflies, 69 fossil and 394 living wings",
-             "org_image": "odonata",
+             "org_image": "odonata", "crop": (0.38, 0.42, 0.62),
              "finding": "Median wing-cell length stays at 0.78–0.99 mm across 150 million years and a sixfold range "
                         "of wing length: the inhibition length is approximately, not strictly, conserved."},
         ],
@@ -85,16 +88,19 @@ PANELS = [
         "species": [
             {"bundle": "2026-10-19-turing-audit-v2", "name": "Pomacanthus imperator", "common": "Emperor angelfish",
              "image": "datasets/turing/pomacanthus_imperator_stripes_specimen.jpg",
+             "crop": (0.64, 0.47, 0.55),
              "credit": "Diego Delso, Wikimedia Commons, CC BY-SA 4.0",
              "finding": "Stripe spacing measured on a real flank (CV 0.15, 22 Y-junctions) against a Turing labyrinth "
                         "and an equal-diffusion control that makes no pattern."},
             {"bundle": "2026-10-19-palate-ruguga-turing-audit-v3", "name": "Equus caballus", "common": "Horse palate rugae",
              "image": "datasets/palate_ruguga_turing/palate_rugae_specimen.jpg",
+             "crop": (0.5, 0.52, 0.95),
              "credit": "File:Palatum horse.JPG, Wikimedia Commons, CC BY-SA 3.0",
              "finding": "An FGF/SHH Turing sheet raises 9 ridges on the Shh stripes; their duty cycle (0.42) is "
                         "close to the segmented rugae (0.44–0.49), and the ridges vanish with equal diffusion."},
             {"bundle": "2026-10-26-bos-taurus-turing-wavelength-audit-v7", "name": "Bos taurus", "common": "Holstein coat",
              "image": "datasets/bos_taurus_turing_wavelength/bos_taurus_specimen.jpg",
+             "crop": (0.45, 0.52, 0.85),
              "credit": "Province of Ontario Picture Bureau, c.1920, Wikimedia Commons, public domain",
              "negative": True,
              "finding": "Tested negative. On 10 cows a single-wavelength Turing pattern is rejected (it predicts ~125 "
@@ -112,16 +118,19 @@ PANELS = [
         "species": [
             {"bundle": "2026-10-28-t1917-027-the-logarithmic-spiral-audit-v2", "name": "Nautilus pompilius",
              "common": "Chambered nautilus", "image": "datasets/thompson_1917/t1917-027/nautilus_pompilius_specimen.jpg",
+             "crop": (0.42, 0.45, 0.72),
              "credit": "File:Pu - Nautilus pompilius - 10.jpg, Wikimedia Commons, CC BY-SA 4.0",
              "finding": "The shell outline fits a logarithmic spiral (log-polar r ≈ 0.96), with synthetic-recovery "
                         "and shuffle controls."},
             {"bundle": "2026-10-28-t1917-031-the-shapes-of-horns-and-of-tee-audit-v2", "name": "Ovis ammon",
              "common": "Argali horn", "image": "datasets/thompson_1917/t1917-031/ovis_ammon_argali_skull_horns_specimen.jpg",
+             "crop": (0.72, 0.4, 0.55),
              "credit": "Ksuryawanshi, Wikimedia Commons, CC BY-SA 4.0",
              "finding": "A real horn gives a spiral angle of 74.7° (73.6–75.6), matching Thompson's 75°, but the "
                         "angle moves to 87° when the tip arc is dropped. Verdict mixed."},
             {"bundle": "2026-10-28-t1917-029-the-spiral-shells-of-the-foram-audit-v2", "name": "Fusulinida",
              "common": "Fusulinid foraminifera", "image": "datasets/thompson_1917/t1917-029/fusulinid_axial_thin_section_commons_NEON.jpg",
+             "crop": (0.5, 0.5, 0.95),
              "credit": "ja:User:NEON, Wikimedia Commons, CC BY-SA 2.5",
              "finding": "A thin section gives a whorl ratio of 1.49 ± 0.10, matching Thompson's 1.5 and Triticites' "
                         "1.53; the late-whorl drift fails in some genera. Verdict mixed."},
@@ -166,11 +175,16 @@ def bundle_record(morpho, bundle, gone):
     }
 
 
-def thumb(src, name, size=240):
+def thumb(src, name, size=240, crop=(0.5, 0.5, 1.0)):
+    """Square crop around the part of the photo that shows the pattern: (centre x, centre y, side),
+    the first two as fractions of width and height, the side as a fraction of the shorter edge."""
     im = Image.open(src).convert("RGB")
     w, h = im.size
-    s = min(w, h)
-    im = im.crop(((w - s) // 2, (h - s) // 2, (w - s) // 2 + s, (h - s) // 2 + s)).resize((size, size), Image.LANCZOS)
+    fx, fy, k = crop
+    s = int(min(w, h) * k)
+    x0 = min(max(int(fx * w - s / 2), 0), w - s)
+    y0 = min(max(int(fy * h - s / 2), 0), h - s)
+    im = im.crop((x0, y0, x0 + s, y0 + s)).resize((size, size), Image.LANCZOS)
     dst = OUT / "species" / f"{name}.jpg"
     dst.parent.mkdir(parents=True, exist_ok=True)
     im.save(dst, quality=84, optimize=True)
@@ -184,14 +198,14 @@ def species_records(morpho):
     for p in PANELS:
         rows = []
         for s in p["species"]:
-            r = {k: v for k, v in s.items() if k not in ("image", "org_image")}
+            r = {k: v for k, v in s.items() if k not in ("image", "org_image", "crop")}
             r.update(bundle_record(morpho, s["bundle"], gone))
             if "org_image" in s:
                 o = org[s["org_image"]]
-                r["img"] = thumb(REPO / o["thumb_path"], slug(s["name"]), size=160)
+                r["img"] = thumb(REPO / o["thumb_path"], slug(s["name"]), size=160, crop=s["crop"])
                 r["credit"] = f"{o['commons_file']}, {o['author']}, Wikimedia Commons, {o['license']}"
             else:
-                r["img"] = thumb(morpho / s["image"], slug(s["name"]))
+                r["img"] = thumb(morpho / s["image"], slug(s["name"]), crop=s.get("crop", (0.5, 0.5, 1.0)))
             rows.append(r)
         out[p["key"]] = rows
     return out
@@ -204,8 +218,16 @@ def claim_records(ids):
         c = claims.get(i)
         if not c:
             sys.exit(f"claim {i} not in docs/claims.json")
-        rows.append({k: c[k] for k in ("id", "label", "thinker", "year", "status", "proof", "theorem",
-                                       "truth", "nanopub", "registry", "kind")})
+        r = {k: c[k] for k in ("id", "label", "thinker", "year", "status", "proof", "theorem",
+                               "truth", "nanopub", "registry", "kind", "math", "statement", "truth_by",
+                               "assessor_confidence", "evidence", "lean_theorems")}
+        # The graph view needs the evidence that hangs off each claim: who scored it and how sure
+        # they were, the data test and its verdict, the Lean proof, and the MorphoEval audits.
+        t = c.get("data_test") or None
+        r["data_test"] = {k: t.get(k) for k in ("verdict", "confidence", "preregistered", "data_kind")} if t else None
+        r["morpholib"] = [{k: m.get(k) for k in ("id", "relation", "organism", "verdict", "score", "nanopub", "registry")}
+                          for m in (c.get("morpholib") or [])]
+        rows.append(r)
     return rows
 
 
@@ -248,8 +270,12 @@ def main():
     seal = (REPO / "assets/logo.svg").read_text().strip()
     inline = re.sub(r"<svg[^>]*>", lambda t: re.sub(r'\s(width|height)="\d+"', "", t.group(0)), seal, count=1)
     inline = inline.replace("<svg ", '<svg role="img" aria-label="DELPHI seal" ', 1)
-    page = (DOCS / "team.template.html").read_text()
-    page = (page.replace("<!--__SEAL__-->", inline)
+    page = (TEMPLATES / "team.template.html").read_text()
+    parts = TEMPLATES / "partials"
+    head = (parts / "site-head.html").read_text().replace('data-page="team"', 'aria-current="page"')
+    head = re.sub(r' data-page="[^"]*"', "", head)
+    page = (page.replace("<!--__SITE_HEAD__-->", head)
+                .replace("<!--__SITE_FOOT__-->", (parts / "site-foot.html").read_text())
                 .replace("/*__SEAL_URI__*/", quote(seal, safe="-_.!~*'()"))
                 .replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")))
     (DOCS / "team.html").write_text(page)

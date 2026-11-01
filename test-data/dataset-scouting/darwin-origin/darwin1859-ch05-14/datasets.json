@@ -1,0 +1,272 @@
+{
+  "claim_id": "darwin1859-ch05-14",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "sex-specific measurements of secondary sexual characters (ornaments, weapons) per species",
+    "comparable measurements of non-sexual traits for the same species",
+    "within-species variance and among-species divergence within genera, plus a phylogeny"
+  ],
+  "datasets": [
+    {
+      "id": "avonet-figshare-v7",
+      "name": "AVONET: morphological, ecological and geographical data for all birds",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://api.figshare.com/v2/articles/16586228",
+        "http_status": 200,
+        "bytes": 21524673
+      },
+      "variables_present": [
+        "non-sexual somatic morphology: eleven continuous traits, raw individual measurements (90020 individuals, 11009 species)"
+      ],
+      "variables_missing": [
+        "no ornament or plumage variables stated",
+        "sex coding of individuals not stated in the description"
+      ],
+      "scope": "All extant birds",
+      "evidence": "Figshare API description and file list as in other AVONET entries; license CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-v7"
+    },
+    {
+      "id": "dryad-flight-hampers-weapons-birds",
+      "name": "Data and codes from: Flight hampers the evolution of weapons in birds (species_spur_data.csv)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.r2280gbdk",
+      "access_url": null,
+      "doi": "10.5061/dryad.r2280gbdk",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:44:45Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.r2280gbdk and versions/165445/files",
+        "http_status": 200,
+        "bytes": 1565132
+      },
+      "variables_present": [
+        "species-level spur data (one secondary sexual weapon) for birds, with phylogenetic trees"
+      ],
+      "variables_missing": [
+        "no within-species variance stated",
+        "no matched non-sexual traits",
+        "columns not inspected"
+      ],
+      "scope": "Birds",
+      "evidence": "File list includes species_spur_data.csv (1565132 bytes) and Jetz_trees.nex; license CC0-1.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "birdtree",
+      "name": "BirdTree",
+      "landing_url": "https://birdtree.org/",
+      "access_url": "https://birdtree.org/downloads/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://birdtree.org/downloads/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated bird phylogeny distributions for downloads"
+      ],
+      "variables_missing": [
+        "traits"
+      ],
+      "scope": "Birds",
+      "evidence": "Downloads page describes four tree distributions of 10K trees each in zip archives.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "macaulay-library",
+      "name": "Macaulay Library",
+      "landing_url": "https://www.macaulaylibrary.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:46:31Z",
+        "method": "GET https://www.macaulaylibrary.org/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "media archive (images, sounds)"
+      ],
+      "variables_missing": [
+        "no measurement table; ornament size would have to be extracted from media"
+      ],
+      "scope": "Birds media archive",
+      "evidence": "Landing page returned 200 (132622 bytes); no dataset or measurement endpoint was fetched.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://www.morphosource.org/api/media?q=Cervidae&per_page=1 and ?q=Mammalia&per_page=1 (and landing earlier)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D media of vertebrate specimens (CT, surface scans)"
+      ],
+      "variables_missing": [
+        "no measurements; paired/homologous structures would have to be landmarked from the meshes"
+      ],
+      "scope": "Museum specimen media, taxon-patchy",
+      "evidence": "API q=Cervidae returned an empty media list; q=Mammalia returned total_count 5 with per_page=1 (first record: Bettongia ogilbyi sylvatica holotype skull, Photogrammetry). Public API search returned few records for these terms.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    },
+    {
+      "id": "vertlife-phylogeny-subsets",
+      "name": "VertLife phylogeny subsets",
+      "landing_url": "https://vertlife.org/phylosubsets/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://vertlife.org/phylosubsets/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated vertebrate trees"
+      ],
+      "variables_missing": [
+        "traits"
+      ],
+      "scope": "Vertebrates",
+      "evidence": "Phylosubsets page describes subsetting dated trees; full trees downloadable.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "plumage ornament tail length species comparative dimorphism sex-specific measurements",
+      "url": "https://datadryad.org/api/v2/search?q=plumage%20ornament%20tail%20length%20species%20comparative%20dimorphism%20sex-specific%20measurements",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "secondary sexual traits coefficient of variation versus non-sexual traits",
+      "url": "https://datadryad.org/api/v2/search?q=secondary%20sexual%20traits%20coefficient%20of%20variation%20versus%20non-sexual%20traits",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "sexually selected traits variation interspecific divergence plumage tail length (dataset type)",
+      "url": "https://api.datacite.org/dois?query=sexually+selected+traits+variation+interspecific+divergence+plumage+tail+length&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "sexual selection weaponry comparative dataset",
+      "url": "https://datadryad.org/api/v2/search?q=sexual%20selection%20weaponry%20comparative%20dataset",
+      "hits": 1,
+      "note": "bird spurs"
+    },
+    {
+      "source": "MorphoSource",
+      "query": "API media search Mammalia",
+      "url": "https://www.morphosource.org/api/media?q=Mammalia&per_page=1",
+      "hits": 5,
+      "note": null
+    }
+  ],
+  "status": "gap",
+  "summary": "No repository table pairs measurements of secondary sexual characters with matched non-sexual traits and within-species variance across congeneric species; AVONET gives the non-sexual bird baseline and one Dryad deposit gives bird spurs, but the Dale/Cooney plumage compilations and the CV meta-analyses named by an assessor were not found as datasets by any search.",
+  "next_step": "Compile sex-specific ornament and body measurements for one dense clade (galliforms or lizards, as the obstacles suggest) and pre-register the CV and divergence comparison, using AVONET as the non-sexual reference.",
+  "obstacles_confirmed": [
+    "Global morphology tables are mostly unsexed and omit plumage and other ornaments.",
+    "Sex-specific compilations are dense for a few groups, such as galliforms and lizards, and sparse elsewhere."
+  ]
+}

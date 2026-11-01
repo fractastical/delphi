@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--problem-sar-gift> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-04 (problem-sar-gift): supports, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "Native vascular plant richness of oceanic islands (GIFT islands >= 500 km from the mainland) lies far below the mainland species-area prediction at equal area; and, for the problem it belongs to, the island species-area relationship is a power law with a near-universal exponent around 0.25." ;
+    delphi:passCriterion "Pre-registered (PREREG.md, sha256 6573bfe3e5e1d4b9692910d12b74fbd67547131856c21a0fd1bee38272a6c6a2): claim supported if the median observed/predicted richness ratio of oceanic-proxy islands against a negative-binomial mainland power law is <= 0.5, at least 70% lie below the prediction and a one-sided Wilcoxon test of log ratios gives p < 0.01. Problem-level: universal power law if pooled z in [0.15, 0.35], bootstrap CI width < 0.1, all qualifying 60x30 degree groups' z intervals overlap the pooled one, DerSimonian-Laird tau < 0.05, and no alternative form beats the power law by AIC > 10 and held-out ELPD > 10." ;
+    delphi:failCriterion "Claim refuted if the median ratio >= 1. Universality refuted if any two qualifying groups have disjoint 95% z intervals or any group interval misses the pooled one." ;
+    delphi:expectedObservation "GIFT native vascular richness of far-offshore islands is a small fraction of what mainland units of equal area hold, and island z clusters near one value." ;
+    delphi:disconfirmingObservation "Island richness at or above the mainland prediction (median ratio >= 1); or island exponents whose group-level intervals are disjoint." ;
+    delphi:admissibleDatasets "Public GIFT checklists of Tracheophyta (type Flora or Checklist, native status indicated, suitable for geographic analysis), one list per geographic entity (largest native richness); island areas from GIFT. Independent of the WCVP data used by the existing test of this claim." ;
+    delphi:inferenceMethod "Negative-binomial (NB2) maximum likelihood for every model; mainland power law predicts islands; group z by Wald; pooled z by bootstrap over islands; model selection by AIC and leave-one-group-out ELPD; thresholds fixed in PREREG.md." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Part 2: 1,124 GIFT islands and 232 mainland entities, native richness per entity from the largest eligible checklist; NB2 fits of power, power+curvature, Gleason, Lomolino-type and logseries-placement (METE-type surrogate) forms; group, pooled, CV and island-versus-mainland analyses as pre-registered. Part 1: Coleman random-placement null on 5,130 grid cells (lognormal and logseries pools) with stochastic replicates, Preston canonical lognormal. See RESULTS.md." ;
+    rdfs:comment "Measured: 0.21601291362136876 median observed / mainland-predicted native vascular richness, GIFT islands >= 500 km from the mainland (n = 440, share below prediction 0.891; one-sided Wilcoxon p = 5.53e-67). Interpretation: Darwin's 'oceanic islands' are proxied by GIFT entity_class Island with distance_to_mainland >= 500 km (fixed before inspecting data); 'equal continental areas' are GIFT mainland political units, botanical countries and regions (random subset of at most 400, seed 20261101). No physical-condition covariate (latitude, climate) is used in this test, unlike the WCVP test, so the 'not explained by physical conditions' clause is not tested. 'Island groups' are mechanical 60x30 degree cells, not archipelagos, because GIFT returns no group field." ;
+    delphi:evidenceAgainst "Verdict is for the claim's island-versus-mainland comparison on GIFT; the problem-level results (power law, universality, METE-type, sampling null) are in measured.extra and RESULTS.md." ;
+    delphi:evidenceAgainst "GIFT 'Island' entities are heterogeneous (continental shelf islands, oceanic islands, differing checklist effort); distance_to_mainland >= 500 km is only a proxy for 'oceanic'." ;
+    delphi:evidenceAgainst "No latitude or climate control in this test; the existing WCVP test of this claim has one." ;
+    delphi:evidenceAgainst "The METE-type form is a logseries-placement surrogate (alpha ln(1 + A/A*)), not meteR/METE, which needs abundance totals and nested cells that island checklists do not give." ;
+    delphi:evidenceAgainst "The 'group' unit is a mechanical longitude-latitude cell, not an archipelago; heterogeneity between cells mixes archipelago effects with sampling and taxonomy effects." ;
+    delphi:evidenceAgainst "The grok-4-7 n=2 null was adapted (richness only, density as nuisance parameter) and its coarse pre-registered grid missed the density window; the fine sweep is post hoc." ;
+    delphi:evidenceAgainst "Not run: claude-opus-5-5 n=1 and n=3, gpt-5-6-sol n=1 and n=2 (no GBIF/nested-survey/meta-analytic data pulled), grok-4-7 n=3 (Lean), and the Triantis et al. observed-z comparison of claude-opus-5-5 n=2." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-04--claim-test--problem-sar-gift--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-sonnet-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/problem-sar-gift/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-04--claim-test--problem-sar-gift--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GIFT, Global Inventory of Floras and Traits (public API)" ;
+    dct:description "island and mainland native vascular plant richness and area" ;
+    delphi:hasChecksum "sha256:d2b0108030e625fc985439989bf1f182c2f580036149a1cbc65a8b7ce5c95773" ;
+    prov:atLocation <https://gift.uni-goettingen.de/api/index.php?query=geoentities> ;
+    delphi:hasChecksum "sha256:344e2c4f4412ba08c9d315991b9f3820f8e1a9468459de558043382d744a4213" ;
+    prov:atLocation <https://gift.uni-goettingen.de/api/extended/index.php?query=lists> ;
+    delphi:hasChecksum "sha256:3ccf565e5d8845d8182d0da5abae7bb152f1599072051d668a70da135170ce78" ;
+    rdfs:comment "Location (not a URL): https://gift.uni-goettingen.de/api/extended/index.php?query=checklists&listid=<id>" ;
+    prov:wasDerivedFrom <https://gift.uni-goettingen.de/> ;
+    dct:license "not verified here; see the GIFT terms of use" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--problem-sar-gift> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-sonnet-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/problem-sar-gift/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-sonnet-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-sonnet-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-sonnet-5-5; problems/runs/species-area-exponent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-sonnet-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-sonnet-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-sonnet-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-04 (problem-sar-gift): supports, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--problem-sar-gift> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

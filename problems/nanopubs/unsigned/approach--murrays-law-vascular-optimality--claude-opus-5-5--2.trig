@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean formalization of Murray's cubic law and its turbulent and load-bearing variants" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Formalize the optimization so that each empirical exponent has a precise theoretical antecedent. Cost per unit length of a vessel with flow Q and radius r: C(r) = 8μQ²/(πr⁴) + b π r², Poiseuille dissipation plus metabolic maintenance proportional to volume. Theorem 1: C has a unique minimizer on r > 0, with r³ = (16μ/(bπ²))^{1/2} · Q, so Q ∝ r³. Theorem 2: with flow conservation Q₀ = Q₁ + Q₂ at a bifurcation and each segment at its optimum, r₀³ = r₁³ + r₂³. Theorem 3 (turbulent): with dissipation ∝ Q^{7/4}r^{−19/4} (Blasius friction), optimal radius r ∝ Q^{3/7}, giving exponent 7/3 at bifurcations. Theorem 4 (xylem): if conduits also bear mechanical load with cost ∝ r² independent of flow, the optimum shifts away from the cubic law (explicit exponent), matching McCulloh et al.'s observation that load-bearing conduits deviate. Proofs use derivative sign analysis (Mathlib's deriv and monotonicity lemmas) and rpow algebra." ;
+
+    delphi:proposedTest "A Lean module proving the cubic law, the 7/3 turbulent law and the load-bearing deviation from explicit cost functions, compiled with only standard axioms. This makes approach 1's hypotheses theorem-backed." ;
+    delphi:context "Fails if: None mathematically. The risk is rpow manipulations in Mathlib taking longer than expected; low risk." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the cost functions with ℝ and positivity hypotheses. 2. Prove existence, uniqueness and the closed form of the minimizer (first-derivative test, strict convexity). 3. Derive bifurcation exponents for laminar and turbulent cases with flow conservation. 4. Report each theorem linked to thompson1917-ch15-13 with scope notes on what data must decide." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.12.3.207> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature01444> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.1012194108> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+
+  <https://doi.org/10.1073/pnas.12.3.207> dct:title "The Physiological Principle of Minimum Work" ;
+    dct:bibliographicCitation "Murray 1926" .
+  <https://doi.org/10.1038/nature01444> dct:title "Water transport in plants obeys Murray's law" ;
+    dct:bibliographicCitation "McCulloh, Sperry and Adler 2003" .
+  <https://doi.org/10.1073/pnas.1012194108> dct:title "Hydraulic trade-offs and space filling enable better predictions of vascular structure and function in plants" ;
+    dct:bibliographicCitation "Savage et al. 2010, Hydraulic trade-offs and space filling in plant vascular networks" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.303Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Lean formalization of Murray's cubic law and its turbulent and load-bearing variants" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

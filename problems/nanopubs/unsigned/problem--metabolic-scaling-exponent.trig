@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" ;
+    dct:description "Does basal metabolic rate scale with body mass with a single exponent across taxa, and if so is it 3/4 (fractal supply networks) or 2/3 (surface-to-volume), or does the exponent vary systematically with taxon, temperature and body size?" ;
+
+    skos:historyNote "Known state: Kleiber (1932) reported 3/4; West, Brown and Enquist (1997) derived 3/4 from space-filling branching networks; White and Seymour (2003) found 2/3 for mammals once body temperature and digestive state are controlled; Kozlowski and Konarzewski (2004) disputed the WBE derivation. Current syntheses find curvature and taxon dependence. Thompson's surface-volume claims (ch02-01, ch03-07) encode the 2/3 alternative." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered phylogenetically controlled analysis across the organism taxa with AnAge/PanTHERIA body mass and metabolic data, with stated predictions: a single exponent with 95% interval excluding one of 2/3 and 3/4, or a model-comparison verdict that a curved or taxon-specific model beats any single power law." ;
+    skos:scopeNote "Resolved when: A Lean 4 formalization of the WBE derivation stating its assumptions as hypotheses, so the disputed step is explicit." ;
+    skos:scopeNote "Refuted if: If the pooled exponent interval contains both 2/3 and 3/4 after controls, the universality question is empirically underdetermined with present data." ;
+    skos:note "Data access: AnAge (open), PanTHERIA (open), White and Seymour 2003 compilation; taxon resolution via test-data/organisms." ;
+    skos:note "Requires: phylogenetic-comparative-methods" ;
+    skos:note "Requires: allometry" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Requires: lean4" ;
+    skos:note "Scale: organism" ;
+    skos:note "Scale: evolutionary" ;
+    skos:note "Also recorded as a Delphi Frontier Problem: Mammalian body size control" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+    rdfs:seeAlso <https://doi.org/10.3733/hilg.v06n11p315> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.276.5309.122> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0436428100> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.0269-8463.2004.00830.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.3733/hilg.v06n11p315> dct:title "Body size and metabolism" ;
+    dct:bibliographicCitation "Kleiber 1932, Body size and metabolism" .
+  <https://doi.org/10.1126/science.276.5309.122> dct:title "A General Model for the Origin of Allometric Scaling Laws in Biology" ;
+    dct:bibliographicCitation "West, Brown and Enquist 1997, A general model for the origin of allometric scaling laws in biology" .
+  <https://doi.org/10.1073/pnas.0436428100> dct:title "Mammalian basal metabolic rate is proportional to body mass\n                    <sup>2/3</sup>" ;
+    dct:bibliographicCitation "White and Seymour 2003, Mammalian basal metabolic rate is proportional to body mass 2/3" .
+  <https://doi.org/10.1111/j.0269-8463.2004.00830.x> dct:title "Is West, Brown and Enquist's model of allometric scaling mathematically correct and biologically relevant?" ;
+    dct:bibliographicCitation "Kozlowski and Konarzewski 2004, Is West, Brown and Enquist's model of allometric scaling mathematically correct and biologically relevant?" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.290Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Is there a universal metabolic scaling exponent?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

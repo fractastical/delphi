@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--wing-disc-timelapse> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch07-08 (wing-disc-timelapse): refutes, confidence 0.55" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.55"^^xsd:double ;
+    delphi:hypothesis "If regular hexagons occur only where cells are uniform in size and the forces on them uniform, then inside a proliferating epithelium whose overall hexagon fraction is low (Drosophila wing disc pouch, f6 about 0.39 in the ch07-09 test), neighbourhoods whose cells are locally uniform in size must be markedly more hexagonal than neighbourhoods of mixed size, and neighbourhoods under directional traction (high local cell elongation) must be less hexagonal than isotropic ones." ;
+    delphi:passCriterion "Pre-registered. In each of the five movies, every 10th frame, for every interior cell (not touching the margin cell and with no margin-touching neighbour) compute (a) the coefficient of variation of area over its neighbours, excluding the cell itself (CV_nb), and (b) the mean elongation magnitude of the cell and its neighbours, sqrt(elong_xx^2 + elong_xy^2) from the TissueMiner cells table (E_loc). Pool cell-frames per movie and cut CV_nb into deciles. Size clause: the claim is supported in a movie if the fraction of six-sided cells f6 in the lowest-CV_nb decile exceeds that in the highest decile by at least 0.10 and Spearman rho between decile rank and decile f6 is <= -0.3. Force clause (reported, pre-registered direction): f6 in the lowest E_loc decile should exceed the highest by >= 0.05. Overall verdict supports if the size clause holds in at least four of five movies." ;
+    delphi:failCriterion "Pre-registered. Refuted if in at least four of five movies the lowest-to-highest CV_nb decile difference in f6 is below 0.05 or its sign is reversed (local size uniformity does not go with hexagons). Between the two (difference in [0.05, 0.10), or movies split) is 'mixed'. The force clause does not change the verdict but is reported with its pre-registered direction; a reversed sign is recorded as a failed sub-prediction. Diagnostic, not part of the verdict: the same statistic on a Poisson-Voronoi partition (the within-image relation exists in any space-filling partition, claim-sources/cell-geometry found rho 0.23 on random tilings), and the f6 reached in the most uniform decile, compared with Thompson's regular tissues (RPE 0.67, compound eye 0.99 in claim-sources/cell-geometry)." ;
+    delphi:expectedObservation "Within one epithelium, cells whose neighbours are uniform in size are hexagonal much more often than cells whose neighbours vary in size (decile gap in six-sided fraction >= 0.10, monotone), and cells in locally elongated (anisotropically stressed) regions are hexagonal less often." ;
+    delphi:disconfirmingObservation "The six-sided fraction does not depend on the local size uniformity of neighbours (gap < 0.05 or reversed), i.e. hexagon regularity is set by something other than size and force uniformity." ;
+    delphi:admissibleDatasets "Public, licensed, expert-corrected segmentations of a confluent epithelium with per-cell areas, neighbour relations and a per-cell shape tensor, from a tissue not used by the claim's author as an example, large enough for decile analysis (>= 1,000 cells per frame); not produced by a segmenter shown in this repo to round junctions." ;
+    delphi:inferenceMethod "Per movie: pooled cell-frames cut into deciles of neighbour-area CV; f6 per decile; lowest-minus-highest decile gap and Spearman rho over decile ranks; verdict by majority of movies against fixed thresholds; Poisson-Voronoi partition as the null for a non-biological space-filling tiling; elongation deciles for the force clause." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Every 10th frame of each movie (15-20 frames, 28,000-40,000 cell-frames per movie), each interior cell's neighbours were listed from the directed bonds and their conjugates; cells touching the margin cell or having a margin-touching neighbour were excluded. For each cell: number of neighbours n, CV of area over its neighbours excluding itself (CV_nb), and mean elongation magnitude sqrt(elong_xx^2+elong_xy^2) over the cell and its neighbours (E_loc). Cell-frames were pooled per movie and cut into deciles of CV_nb and of E_loc; the fraction of six-sided cells f6 per decile, the lowest-minus-highest decile gap and Spearman rho over the ten decile ranks were computed, plus cell-level Spearman rho between CV_nb (or E_loc) and |n-6|. The same CV_nb statistic was computed on a Poisson-Voronoi partition of 40,000 points (25,585 interior cells) as the non-biological null." ;
+    rdfs:comment "Measured: 0.0086 median over movies of f6(lowest neighbour-area-CV decile) minus f6(highest decile) (n = 5 movies, 162,957 cell-frames, range -0.030 to +0.064 across movies). Interpretation: The first run of this claim (top-level result.json) tested between regions of the human RPE, a tissue Thompson names as regular. This run tests within a tissue Thompson would call irregular, the proliferating Drosophila wing disc, asking whether his conditional still holds locally: are the uniform patches hexagonal? 'Uniform in size' is read as the CV of area over a cell's immediate neighbours, excluding the cell itself so that a small, recently divided cell does not by itself make its own neighbourhood look non-uniform. 'Uniform forces' has no direct measurement; the TissueMiner cell elongation tensor (Etournay et al. 2015 use it as the cell-shape contribution to tissue shear) is used as the proxy for directional traction, which is what Thompson contrasts with uniform force. The data were already on disk from the ch07-09 test (commit 370fa74f); this analysis was specified before any of these local statistics were computed." ;
+    delphi:evidenceAgainst "Size clause: pre-registered refutation criterion met in 4 of 5 movies. The f6 gap between the most and least size-uniform neighbourhoods is -0.030 to +0.064 (median 0.009), never reaching 0.10, with no consistent monotone trend (decile rho -0.55 to +0.15, none significant) and cell-level rho between neighbour-area CV and |n-6| of 0.00-0.07. The most uniform decile (neighbour-area CV below about 0.17) has f6 of only 0.32-0.38, no higher than the tissue average and far from Thompson's regular tissues (0.67-0.99). Within a proliferating epithelium, local size uniformity does not pick out the hexagonal patches." ;
+    delphi:evidenceAgainst "Force clause (pre-registered direction, not part of the verdict): passes in direction in all five movies, f6 falls monotonically with local cell elongation (decile rho -0.59 to -0.99, significant in 4 of 5), gap 0.02-0.11 (>= 0.05 in 3 of 5). Thompson's 'directional traction' half has modest support; his 'uniform size' half, tested this way, has none." ;
+    delphi:evidenceAgainst "Logical direction: Thompson states a necessary condition (regular only where uniform). This run tests whether uniform neighbourhoods are more regular, i.e. local sufficiency, which the pre-registered hypothesis made explicit. The refutation shows that uniformity of surrounding cell sizes does not produce hexagons; it is compatible with the necessary condition holding vacuously if no patch of a proliferating disc is regular. Readers who hold Thompson to the necessary condition only should weigh this run accordingly; the between-tissue reading was supported by the top-level RPE run and by claim-sources/cell-geometry (rho -0.9 across five tissues)." ;
+    delphi:evidenceAgainst "Why the earlier within-image correlations now look different: the cell-geometry pipeline found rho 0.23-0.57 between mixed-size neighbourhoods and non-hexagonality including the focal cell's own area. Here the focal cell is excluded from CV_nb, and the Poisson-Voronoi null also shows no relation (gap -0.037). Together with the ch07-09 finding that a cell's own relative area predicts its sides at rho 0.43-0.51, this says the within-tissue size effect is Lewis's law (big cells have more sides, small cells fewer), not an effect of size uniformity as Thompson framed it." ;
+    delphi:evidenceAgainst "Neighbour-area CV in a proliferating disc ranges 0.17-1.6 across deciles; the tissue has no neighbourhoods as uniform as the compound eye (CV 0.09), so the test cannot say what would happen at that extreme. Every 10th frame was used; cell-frames of the same cell across frames are not independent, so decile rho p-values are descriptive." ;
+    delphi:evidenceAgainst "Data were on disk from the ch07-09 test (commit 370fa74f) before this run was pre-registered (commit 20279b3a); none of the local statistics had been computed before pre-registration. Ex vivo culture caveats as in the ch07-09 test. The top-level result.json (RPE between-ROI run) remains the verdict the claim graph reports for this claim; this run is recorded as a second, within-tissue run." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--wing-disc-timelapse--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/wing-disc-timelapse/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--wing-disc-timelapse--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Timelapse imaging, boundary segmentation, and cell tracking data from cultured proliferating Drosophila wing disc epithelia (Dye et al.; data of Dye et al. 2017 Development and Dye et al. 2021 eLife; MPI-CBG Dresden)" ;
+    dct:description "five independent ex vivo cultured mid-third-instar wing disc pouches, segmented with TissueAnalyzer and manually corrected; the same files as the ch07-09 test, stored in that test's data/ folder" ;
+    delphi:hasChecksum "sha256:0eb41b1e0fbfb23b1af3950c14ad06834c40c6debf639ab572c2ecff006fb478" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20141010_P2.zip/content> ;
+    delphi:hasChecksum "sha256:07b74f7594a99bd3243e7fde4f1c23967f7256db7db91cccc4a4eb0dd0de4a0c" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150310_P2.zip/content> ;
+    delphi:hasChecksum "sha256:dcfc9f79b387b0657723731bcf79fab0d600600161f57577cb54748239a1ef69" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150418_P1.zip/content> ;
+    delphi:hasChecksum "sha256:79c52b04b414fc0f4dcb1a73053c2e96f5db02b39b9dff3e0eb25a54e2d25f2d" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150608_P1.zip/content> ;
+    delphi:hasChecksum "sha256:8a3ee532c89950bc0f4880ff243593e0c7917f080e352bd41ac6f215ac9da6c0" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20161213_F0.zip/content> ;
+    prov:wasDerivedFrom <https://zenodo.org/records/22760592> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--wing-disc-timelapse> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/wing-disc-timelapse/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor local session, hexagon follow-up)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.982Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch07-08 (wing-disc-timelapse): refutes, confidence 0.55" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test--wing-disc-timelapse> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

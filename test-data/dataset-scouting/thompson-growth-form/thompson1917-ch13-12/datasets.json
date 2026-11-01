@@ -1,0 +1,84 @@
+{
+  "claim_id": "thompson1917-ch13-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T07:23:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "3D meshes or CT of paired antlers (both sides attached to the skull, or both shed antlers of one animal)",
+    "3D coordinates of tine tips and branch centerlines",
+    "species and age/antler-stage metadata (tine completeness, velvet vs. hard antler)",
+    "several cervid species, since the claim is about deer antlers generally"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource-antler-cervidae",
+      "name": "MorphoSource media and physical objects: antler and named cervid species",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=antler&per_page=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T07:22:00Z", "method": "GET /api/media?q=antler (pages.total_count 24) and /api/physical-objects?q=antler (22); media counts by species name: Cervus elaphus 10, Dama dama 2, Rangifer tarandus 2, Odocoileus virginianus 2, Capreolus capreolus 8, Alces alces 0, Cervidae 0", "http_status": 200 },
+      "variables_present": [
+        "24 media records matching 'antler', e.g. 'Left Shed Antler [Mesh]', 'Cranium With Right Antler [Mesh]', 'Cranium Of Pseudodama Nestii [Mesh]' (media type Mesh)",
+        "10 media for Cervus elaphus, mostly micro-CT image series ('A [CTImageSeries] [CT]', modality MicroNanoXRayComputedTomography)"
+      ],
+      "variables_missing": [
+        "keyword search only: which 'antler' hits are complete paired antlers was not checked",
+        "the counts show few specimens per species; Alces alces returned 0",
+        "per-media licences not read"
+      ],
+      "scope": "MorphoSource keyword hits; mixed anatomical elements",
+      "evidence": "pages.total_count values as listed; titles and media types from the first hits arrays",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-cervidae-images",
+      "name": "iDigBio specimen records of Cervidae with images",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq=%7B%22family%22:%22cervidae%22,%22hasImage%22:true%7D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T07:22:06Z", "method": "GET search/records with family=cervidae and hasImage=true, limit=1", "http_status": 200 },
+      "variables_present": ["3,229 Cervidae specimen records with images (itemCount)"],
+      "variables_missing": ["2D photographs of mixed elements, not 3D tine coordinates; calibration and view not checked"],
+      "scope": "US-centred museum records",
+      "evidence": "API returned itemCount 3229",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "smithsonian-open-access",
+      "name": "Smithsonian Open Access",
+      "landing_url": "https://www.si.edu/openaccess",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:22:03Z", "method": "HEAD landing page", "http_status": 403, "note": "request blocked (403) for this client; the API needs a key, not attempted" },
+      "variables_present": [],
+      "variables_missing": ["not inspected"],
+      "scope": null,
+      "evidence": "HTTP 403",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource", "query": "media q=antler", "url": "https://www.morphosource.org/api/media?q=antler&per_page=3", "hits": 24, "note": "mesh records of shed antlers and crania" },
+    { "source": "MorphoSource", "query": "physical-objects q=antler", "url": "https://www.morphosource.org/api/physical-objects?q=antler&per_page=1", "hits": 22, "note": "physical specimens" },
+    { "source": "MorphoSource", "query": "media q=Cervus elaphus", "url": "https://www.morphosource.org/api/media?q=Cervus%20elaphus&per_page=3", "hits": 10, "note": "micro-CT image series" },
+    { "source": "MorphoSource", "query": "media q=Capreolus capreolus", "url": "https://www.morphosource.org/api/media?q=Capreolus%20capreolus&per_page=1", "hits": 8, "note": "roe deer; other species 0-2" },
+    { "source": "iDigBio", "query": "family cervidae hasImage", "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22family%22:%22cervidae%22,%22hasImage%22:true%7D&limit=1", "hits": 3229, "note": "image records" },
+    { "source": "Smithsonian Open Access", "query": "landing page HEAD", "url": "https://www.si.edu/openaccess", "hits": null, "note": "HTTP 403" }
+  ],
+  "status": "partial",
+  "summary": "MorphoSource lists a few dozen antler meshes and CT series (24 media and 22 physical objects matching 'antler'; 10 media for Cervus elaphus, 8 for Capreolus capreolus, 0 for Alces alces) and iDigBio holds 3,229 imaged Cervidae records. That is thin coverage per species and it was not established how many hits are complete paired antlers; no tine-tip coordinate table exists. Smithsonian Open Access returned HTTP 403.",
+  "next_step": "List the 24 antler media with their specimen and element fields to see which are bilateral antler pairs, and decide a landmark protocol for tine tips before any ellipsoid fit.",
+  "obstacles_confirmed": [
+    "3D antler coverage is a handful of specimens per species; moose returned no MorphoSource media.",
+    "Many records are a single shed antler or a skull, not a bilateral pair."
+  ]
+}

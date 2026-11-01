@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Repeat the overlap using only pre-2015 annotations" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    dct:description "Annotation fashion after Levin's papers would inflate overlap. Repeat the matched odds-ratio test using only GO annotations whose assignment date is before 2015, if QuickGO exposes that date. Keep the same sets, the same exclusion of IEA, and the same thresholds. If dates are not in the download, the approach stops as inconclusive rather than using a proxy such as the paper's publication year. A signal present in the full ontology and absent before 2015 is evidence of later annotation, not of a standing shared gene set. A signal present before 2015 survives that objection." ;
+
+    delphi:proposedTest "The pre-2015 odds ratio either clears the same threshold as the full test or it does not. Clearing it supports overlap that predates the recent annotation wave." ;
+    delphi:context "Fails if: The pre-2015 odds ratio falls inside the null while the full-ontology test does not. The apparent overlap is then carried by later annotations." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Check whether annotation dates are present before computing the odds ratio. 2. Restrict to dates before 2015. 3. Reuse the matched permutation null. 4. Apply the odds-ratio and p-value thresholds. 5. If dates are absent, record inconclusive and stop." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: GO assignment dates may be absent from the query used. The approach then cannot run, and that is a stated stop." ;
+    skos:note "Tool: gene-set-statistics" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://geneontology.org/> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fnsys.2022.768201> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" .
+
+  <https://geneontology.org/> dct:title "Gene Ontology" ;
+    dct:description "Annotation dates, used only if the download actually contains them." .
+  <https://doi.org/10.3389/fnsys.2022.768201> dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:bibliographicCitation "Levin 2022, the date cut is chosen to precede this paper" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to morphogenesis-cognition-gene-overlap, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.343Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to morphogenesis-cognition-gene-overlap: Repeat the overlap using only pre-2015 annotations" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

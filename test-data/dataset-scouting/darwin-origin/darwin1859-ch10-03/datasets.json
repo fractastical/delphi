@@ -1,0 +1,79 @@
+{
+  "claim_id": "darwin1859-ch10-03",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:05:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "fossil occurrences with first/last appearance ages per taxon (species/genus)",
+    "environment coding (marine vs terrestrial) per occurrence or taxon",
+    "sampling effort per time bin / per environment (for standardisation)",
+    "taxonomic hierarchy to match clades across environments"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database-environment-coded-occurrences",
+      "name": "Paleobiology Database (PBDB) occurrences with envtype filter",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Metazoa&envtype=terrestrial&limit=1&rowcount",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T08:00:00Z", "method": "GET PBDB data1.2 occs/list.json with rowcount, envtype=marine vs envtype=terrestrial (landing page GET -> 200)", "http_status": 200 },
+      "variables_present": [
+        "occurrence ages (eag/lag early/late age bounds in Ma, e.g. 5.333-2.58 for a returned record)",
+        "marine vs terrestrial environment filter (envtype)",
+        "taxon name, rank and taxon id per occurrence",
+        "genus-level taxon records (taxa/list rank=genus base_name=Mammalia: 9031 records)"
+      ],
+      "variables_missing": ["pre-computed origination/extinction rates (must be derived)", "preservation-rate correction (derived from the data)"],
+      "scope": "Metazoa: records_found 1,090,143 with envtype=marine and 246,436 with envtype=terrestrial; Tetrapoda: 30,060 marine and 174,617 terrestrial. Uneven sampling between environments is visible in these counts.",
+      "evidence": "Direct API responses (HTTP 200) with records_found counts quoted above; the first call with envtype=terr was rejected ('bad value') and envtype=terrestrial accepted. Each record has eag/lag age bounds and a taxon id.",
+      "verdict": "holds"
+    },
+    {
+      "id": "now-new-and-old-worlds-fossil-mammals",
+      "name": "NOW: New and Old Worlds database of fossil mammals",
+      "landing_url": "https://nowdatabase.org/",
+      "access_url": "https://nowdatabase.org/now/database/",
+      "doi": null,
+      "license": "CC BY 4.0 (stated on site pages)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:01:00Z", "method": "GET /now/database/ and parse text; landing -> 200", "http_status": 200 },
+      "variables_present": ["locality table, species table and species-locality lists with ages, environment interpretation and species attributes (diet, locomotion)"],
+      "variables_missing": ["marine taxa", "pre-Cenozoic data"],
+      "scope": "Fossil land mammals, Eurasia post-Oligocene plus North America from 2016 (page text: spanning the last 66 million years); a page notice says the new UI is available for reads and downloads.",
+      "evidence": "Page text describes a locality table, species table and correlation table, and gives the CC BY 4.0 citation line. No row count was fetched.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-near-stasis-mesozoic-tetrapods",
+      "name": "Near-stasis in the long-term diversification of Mesozoic tetrapods (Dryad data)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.9fr76",
+      "access_url": null,
+      "doi": "10.5061/dryad.9fr76",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T08:03:00Z", "method": "GET Dryad API dataset metadata", "http_status": 200, "bytes": 3322393 },
+      "variables_present": ["fossil diversity data for Mesozoic tetrapods (land vertebrates)"],
+      "variables_missing": ["marine comparison group in this deposit", "full Phanerozoic coverage"],
+      "scope": "Mesozoic tetrapods; storageSize 3322393 bytes (file contents not opened). Found by Dryad search.",
+      "evidence": "Dryad API metadata: title and abstract contrast terrestrial vertebrate diversification with constrained diversification in marine animals; published 2016-12-16.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB", "query": "occs/list base_name=Metazoa envtype=marine", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Metazoa&envtype=marine&limit=1&rowcount", "hits": 1090143, "note": "records_found" },
+    { "source": "PBDB", "query": "occs/list base_name=Metazoa envtype=terrestrial", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Metazoa&envtype=terrestrial&limit=1&rowcount", "hits": 246436, "note": "records_found; envtype=terr was rejected as a bad value" },
+    { "source": "PBDB", "query": "occs/list base_name=Tetrapoda envtype=terrestrial", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Tetrapoda&envtype=terrestrial&limit=1&rowcount", "hits": 174617, "note": "marine tetrapod count 30060 from the matching envtype=marine call" },
+    { "source": "PBDB", "query": "taxa/list base_name=Mammalia rank=genus", "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mammalia&rank=genus&limit=1&rowcount", "hits": 9031, "note": "genus records for Mammalia (the single record returned was tdf 'nomen dubium', so the count is not restricted to valid genera)" },
+    { "source": "DataCite", "query": "marine terrestrial origination extinction rates fossil", "url": "https://api.datacite.org/dois?query=marine%20terrestrial%20origination%20extinction%20rates%20fossil&page%5Bsize%5D=5", "hits": 5, "note": "crocodyliform extinction (Dryad dd0b3), Contemporary and phanerozoic patterns of global biodiversity (10.20381/ruor-19846); not opened" },
+    { "source": "Dryad", "query": "terrestrial marine extinction origination rates", "url": "https://datadryad.org/api/v2/search?q=terrestrial%20marine%20extinction%20origination%20rates", "hits": 2, "note": "found doi:10.5061/dryad.9fr76 (opened) and doi:10.5061/dryad.dd0b3 (not opened)" }
+  ],
+  "status": "data-ready",
+  "summary": "PBDB has dated, taxon-resolved fossil occurrences with a marine/terrestrial environment filter (about 1.09 M marine and 246 k terrestrial Metazoa occurrences), which covers the needed variables; rates and sampling correction must be derived, and terrestrial sampling is visibly thinner.",
+  "next_step": "Pre-register the clade matching, time bins and sampling standardisation, then download a stratified PBDB occurrence extract (the full set is far larger than 1 MB) and compute durations/origination/extinction per environment.",
+  "obstacles_confirmed": [
+    "Terrestrial occurrences are about a quarter of marine Metazoa occurrences in PBDB (246,436 vs 1,090,143), so preservation bias is real.",
+    "PBDB is a compilation of nomenclature that differs between land and sea taxa; taxonomic splitting not assessed here."
+  ]
+}

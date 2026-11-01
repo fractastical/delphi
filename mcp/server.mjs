@@ -7,15 +7,24 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { GROUP_KEYS, SORT_KEYS, browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { NETWORK_ENDPOINT, PREFIXES, sparql } from "./lib.mjs";
-import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, POST_KINDS, REQUEST_STATUSES, VERDICTS, forumPost, forumRead, forumRegister, forumRespond, logTestResult, proposeClaim } from "./forum.mjs";
+import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, LEADERBOARD_SORTS, POST_KINDS, REQUEST_STATUSES, VERDICTS, forumPost, forumRead, forumRegister, forumRespond, logTestResult, proposeClaim } from "./forum.mjs";
 import { observeToolCall } from "./metrics.mjs";
 import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { MORPHOLIB_VIEWS, REGISTRIES, RELATIONS, morpholibTool } from "./morpholib.mjs";
+import { replicationsTool } from "./federation.mjs";
+import { LEAN_TOOLS } from "../sim-engine/tools/lean-tools.mjs";
+import { LEANBIO_TOOLS } from "../pipeline/leanbio/tools.mjs";
+import { OMICS_TOOLS } from "../sim-engine/tools/omics-tools.mjs";
+import { VALIDATE_TOOLS } from "../sim-engine/tools/validate-tools.mjs";
 
 const TOOLS = [];
+export const VERSION = "0.6.1";
+// Hosted (HTTP) mode never offers tools that run a Lean build or write files.
+const HOSTED = !!process.env.DELPHI_HTTP_PORT;
 
 export function createServer() {
-  const server = new McpServer({ name: "delphisci", version: "0.2.0" });
+  const server = new McpServer({ name: "delphisci", version: VERSION });
   for (const [name, description, inputSchema, fn, annotations = { readOnlyHint: true }] of TOOLS) {
     server.registerTool(name, { description, inputSchema, annotations }, async (args, extra) => {
       const start = performance.now();
@@ -52,7 +61,7 @@ tool("delphi_overview",
   ({ source }) => overviewWithGraph(source));
 
 tool("delphi_search_claims",
-  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math, nanopub and `status`: whether it is proved (Lean-checked or in the literature), its data-test verdict, and whether it is published. To filter by status, use delphi_graph.",
+  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math, nanopub and `status`: whether it is proved (Lean-checked or in the literature), its data-test verdict, and whether it is published. Claims with a completed data test also carry `testContract` (expected observation, disconfirming observation, admissible dataset constraints, inference method; `explicit` is false when derived from the pre-registration fields) and any `revisions` of the verdict with who prompted them. To filter by status, use delphi_graph.",
   {
     text: z.string().optional().describe("Case-insensitive substring, e.g. \"fixation\" or \"\\\\sqrt\""),
     domain: z.string().optional().describe("Substring of the domain IRI, e.g. \"math\", \"turing\", \"darwin\""),
@@ -95,8 +104,12 @@ tool("delphi_graph",
       .describe("Data-test verdict; any = tested, none = not tested"),
     evidenceKind: z.enum(["biological", "physical", "computational", "none"]).optional()
       .describe("What the test's data measured: biological = organisms (shows the claim holds in biology), computational = simulation or mathematics. E.g. math: true, evidence: \"supports\", evidenceKind: \"biological\" lists math shown to hold in organisms"),
+    morpholib: z.enum(["tests", "models", "any"]).optional()
+      .describe("Only claims linked to a MorphoEval audit in github.com/fractastical/morpholib: tests = it measured the claim's assertion on specimens, models = it simulates the claim's mechanism"),
     math: z.boolean().optional().describe("true = only math claims (formal notation, a Lean formalization, or a mathematical kind)"),
     theorem: z.boolean().optional().describe("true = only theorems: math claims that are Lean-checked or proved in the literature"),
+    formalization: z.enum(["one", "several", "identity", "contingent", "not-mathematical", "any", "none"]).optional()
+      .describe("How a math claim maps onto formal statements: one = a single agreed formalization; several = non-equivalent readings (listed in formalization.readings), so a proof of one says nothing about the others; identity = provable from the model's own bookkeeping, true and uninformative about organisms; contingent = a dataset can touch it; not-mathematical; any = classified; none = not yet classified. A claim can carry several tags (the Price equation is identity + contingent)"),
     kind: z.string().optional().describe("Substring of the claim kind, e.g. \"mechanism\", \"theorem\""),
     yearFrom: z.number().int().optional(),
     yearTo: z.number().int().optional(),
@@ -112,7 +125,7 @@ tool("delphi_graph",
   rejectNetwork("delphi_graph", browseClaims));
 
 tool("delphi_claim_tests",
-  "Tests of claims against data (test-data/claim-tests/): how many claims are tested, with what verdicts, on what kind of data, and which to test next. view \"summary\" (default with no arguments) = counts per thinker by verdict and data kind, plus pre-registered tests awaiting data; \"list\" = test runs with filters, each with hypothesis and a GitHub link to its result.json; \"claim\" = every run for one claim id with the full result.json (criteria, datasets with checksums, method, measured values, caveats); \"candidates\" = untested claims ranked by testability, i.e. what to test next. A claim with several runs counts once in the summary. Only dataKind \"biological\" shows a claim holds in organisms.",
+  "Tests of claims against data (test-data/claim-tests/): how many claims are tested, with what verdicts, on what kind of data, and which to test next. view \"summary\" (default with no arguments) = counts per thinker by verdict and data kind, plus pre-registered tests awaiting data; \"list\" = test runs with filters, each with hypothesis and a GitHub link to its result.json; \"claim\" = every run for one claim id with the full result.json (criteria, datasets with checksums, method, measured values, caveats); \"candidates\" = untested claims ranked by testability, i.e. what to test next, each with its dataset-scouting status and located datasets when a scout has checked it. A claim with several runs counts once in the summary. Only dataKind \"biological\" shows a claim holds in organisms.",
   {
     view: z.enum(TEST_VIEWS).optional().describe("summary | list | claim | candidates. Defaults to claim if id is given, list if any filter is given, else summary"),
     id: z.string().optional().describe("Claim id for view \"claim\", e.g. \"darwin1859-ch12-11\""),
@@ -123,11 +136,39 @@ tool("delphi_claim_tests",
     status: z.enum(["complete", "preregistered", "abandoned", "any"]).optional().describe("For view \"list\"; default complete"),
     math: z.boolean().optional().describe("true = only math claims"),
     minTestability: z.number().min(0).max(1).optional().describe("For view \"candidates\""),
+    scouted: z.enum(["data-ready", "partial", "gap", "not-empirically-resolvable", "any", "none"]).optional().describe("For view \"candidates\": filter by dataset-scouting status (test-data/dataset-scouting/), i.e. whether public data for the claim has been located"),
+    sort: z.enum(["testability", "data"]).optional().describe("For view \"candidates\": \"data\" puts claims whose data has been located first"),
     text: z.string().optional().describe("Substring of claim id, title, statement or hypothesis"),
     limit: z.number().int().min(1).max(500).optional(),
     source: localOnly("test-data/claim-tests"),
   },
   rejectNetwork("delphi_claim_tests", claimTestsTool));
+
+tool("delphi_morpholib",
+  "MorphoEval audits from github.com/fractastical/morpholib: published morphogenesis models (Turing, Murray, Vogel, Raup, Thompson's transformations, ...) run against real specimens, each a claim nanopub with rubric assessments, and which claims here they test (measured the claim's assertion on specimens) or model (simulate its mechanism). view \"summary\" (default) = counts by registry, verdict and relation; \"list\" = audits with filters; \"audit\" = one audit with its linked claims; \"claim\" = the audits linked to one delphisci claim id; \"live\" = what is published on the network now, and what test-data/morpholib/links.json is missing. An audit's verdict grades the simulation, not the claim; thompsonVerdict is the verdict on Thompson's claim.",
+  {
+    view: z.enum(MORPHOLIB_VIEWS).optional().describe("Defaults to audit or claim if id is given, list if any filter is given, else summary"),
+    id: z.string().optional().describe("Audit id (e.g. \"thompson1917-t1917-027\", \"vogel-phyllotaxis\") or a delphisci claim id (e.g. \"thompson1917-ch11-08\")"),
+    text: z.string().optional().describe("Substring of audit id, label, organism or Thompson claim"),
+    registry: z.enum(REGISTRIES).optional(),
+    verdict: z.string().optional().describe("Substring of the audit verdict, e.g. \"mostly\", \"not faithful\""),
+    relation: z.enum(RELATIONS).optional().describe("tests / models = audits with such a link; any = linked; none = linked to no claim here"),
+    thompson: z.boolean().optional().describe("true = only audits of a specific Thompson (1917) claim"),
+    thinker: z.string().optional().describe("Only audits linked to a claim by this thinker, e.g. \"thompson\""),
+    sort: z.enum(["score", "woe", "links"]).optional().describe("score (default), woe = weight of evidence, links = most linked"),
+    limit: z.number().int().min(1).max(500).optional(),
+  },
+  morpholibTool);
+
+tool("delphi_replications",
+  "Independent re-runs of a claim's Lean proof or data test, as signed attestations (ed25519, content-addressed, verified here), and what they add up to. Without `claim`: how many claims with an executable test are replicated, contested, single-witness or unattested, and which have witnesses. With `claim`: each of its tests with every witness (signer, operator, outcome, time, repo commit). Status counts only attestations of the test's current hash, one vote per signer, quorum over distinct operators: replicated = quorum or more operators reproduced it and none diverged; contested = some reproduced and some drifted or failed; single-witness = fewer than quorum; stale-only = witnesses exist but the test has since changed. Signers are keys, not verified people, and operators are self-declared: pass `trusted` to count only keys you choose. includePeers also asks this node's configured peers (mcp/peers.json, DELPHI_PEERS) and verifies what they return. To add a witness, re-run with `node scripts/exec/run.mjs --claim ID`, then `node scripts/federation/cli.mjs attest`.",
+  {
+    claim: z.string().optional().describe("Claim id, e.g. \"darwin1859-ch01-09\""),
+    quorum: z.number().int().min(1).max(20).default(2).describe("Distinct operators that must reproduce a test for status \"replicated\""),
+    trusted: z.array(z.string().regex(/^ed25519:[0-9a-f]{64}$/)).max(200).optional().describe("Only count attestations signed by these public keys (\"ed25519:<hex>\")"),
+    includePeers: z.boolean().default(false).describe("Also query this node's configured federation peers"),
+  },
+  replicationsTool);
 
 const axis = z.enum(AXIS_IDS);
 tool("delphi_organisms",
@@ -170,9 +211,10 @@ const apiKey = z.string().optional().describe("Forum API key from delphi_forum_r
 const claimIds = z.array(z.string()).describe("delphisci claim ids, e.g. [\"levin-2022-tame-19\"]; find them with delphi_search_claims");
 
 tool("delphi_forum_read",
-  `Read the Science Claw forum (${FORUM_URL}), where agents log tests, proposed claims and requests for collaborators. view "claim" = every post tagged with a claim id (tests, discussion, requests); "requests" = open calls for help; "feed" = latest posts; "search" = full text; "post" = one post with comments. Posts logged through delphi_propose_claim or delphi_log_test_result come back with \`structured\` (the claims.json or result.json payload).`,
+  `Read the Science Claw forum (${FORUM_URL}), where agents log tests, proposed claims and requests for collaborators. view "claim" = every post tagged with a claim id (tests, discussion, requests); "requests" = open calls for help; "feed" = latest posts; "search" = full text; "post" = one post with comments; "leaderboard" = agents ranked by points (claims tested, proposals, artifacts, collaborations, karma) with their GitHub repos and how many of their tests were merged into the repo, plus who produced the tests in test-data/claim-tests. Posts logged through delphi_propose_claim or delphi_log_test_result come back with \`structured\` (the claims.json or result.json payload).`,
   {
-    view: z.enum(["claim", "requests", "feed", "search", "post"]).default("feed"),
+    view: z.enum(["claim", "requests", "feed", "search", "post", "leaderboard"]).default("feed"),
+    rankBy: z.enum(LEADERBOARD_SORTS).optional().describe("For view \"leaderboard\": points (default), tests, proposals, karma"),
     claim: z.string().optional().describe("Claim id for view \"claim\""),
     q: z.string().optional().describe("Query for view \"search\""),
     postId: z.string().optional().describe("Post id for view \"post\""),
@@ -229,6 +271,9 @@ tool("delphi_log_test_result",
     passCriterion: z.string().describe("Pre-registered measured value and threshold that confirm it"),
     failCriterion: z.string().describe("Pre-registered result that refutes it"),
     preregistration: z.string().optional().describe("Link or commit where the criteria were fixed before the analysis"),
+    testContract: z.object({
+      expected_observation: z.string(), disconfirming_observation: z.string(), admissible_datasets: z.string(), inference_method: z.string(),
+    }).optional().describe("What the data should show if the claim holds, what would show it false, constraints a dataset must meet to count, and how the observation becomes a verdict (test-data/claim-tests/README.md)"),
     datasets: z.array(z.object({
       id: z.string(), name: z.string(), landing_url: z.string().optional(), doi: z.string().nullable().optional(),
       version: z.string().optional(), license: z.string().optional(),
@@ -244,9 +289,10 @@ tool("delphi_log_test_result",
     }),
     verdict: z.enum(VERDICTS),
     reason: z.enum(INCONCLUSIVE_REASONS).optional().describe("Required when verdict is inconclusive"),
+    dataKind: z.enum(TEST_DATA_KINDS).describe("What the data the verdict rests on measured: biological = organisms (the only kind that shows a claim holds in biology), physical, computational = simulation or mathematics, none = no data used"),
     confidence: z.number().min(0).max(1),
     caveats: z.array(z.string()).optional(),
-    codeUrl: z.string().optional().describe("Repo or file with the analysis script"),
+    codeUrl: z.string().optional().describe("Repo or file with the analysis script that produced `measured`; needed for the test to be merged into the repo"),
     apiKey,
   },
   logTestResult,
@@ -282,9 +328,114 @@ tool("delphi_forum_respond",
   forumRespond,
   WRITE);
 
+// ── Lean laws ──────────────────────────────────────────────────────────────
+// Handlers and descriptions come from sim-engine/tools/lean-tools.mjs, which reads every law through the one
+// loader lib/lean-source.mjs (lean/registry/, or lean/laws.json + constraints.json until it exists). Results
+// are the provenance envelope { result, provenance, scope }. lean/registry/check-exposed.mjs fails if a law
+// is missing here.
+const leanT = Object.fromEntries(LEAN_TOOLS.map(t => [t.name, t]));
+const lawStatus = z.enum(["proposed", "candidate", "accepted", "contested", "retired"]);
+const leanTool = (name, shape) => tool(name, leanT[name].description, shape, args => leanT[name].handler(args));
+
+leanTool("lean_laws_list", {
+  kind: z.enum(["physical", "biological"]).optional(),
+  status: z.union([lawStatus, z.array(lawStatus)]).optional().describe("One status or a list"),
+  scope: z.string().optional().describe("Substring of the law level or scope, e.g. \"genotype\""),
+  lawset: z.string().optional().describe("Only laws in this lawset version, or \"current\""),
+  text: z.string().optional().describe("Substring of law_id, label or statement"),
+});
+leanTool("lean_law_get", {
+  id: z.string().describe("law_id from lean_laws_list, e.g. \"kimura-substitution-rate\""),
+  version: z.string().optional().describe("A specific (e.g. archived) law version; omit for the current one"),
+});
+leanTool("lean_lawset_get", { version: z.string().default("current").describe("Semver, or \"current\"") });
+leanTool("lean_check", {
+  design: z.record(z.string(), z.any()).optional().describe("SI-unit design: SL_m, mass_kg, finArea_m2, CLmax, airspeed_m_s, genotype_edits, ..."),
+  spec: z.record(z.string(), z.any()).optional().describe("Alias of design"),
+  lawset: z.string().default("current"),
+});
+leanTool("lean_verify", {});
+// Self-update: where the laws come from (local files, or a remote mirror/github ref re-checked every TTL), and
+// what changed between lawsets. See lean/registry/SELF-UPDATE.md.
+leanTool("lean_source_status", {
+  refresh: z.boolean().optional().describe("Check the remote now instead of waiting for the TTL (at most once per 30 s)"),
+});
+leanTool("lean_changes", {
+  since_version: z.string().optional().describe("Lawset version you last saw, e.g. \"1.3.0\" (exclusive), or \"current\"; omit for all releases"),
+});
+if (!HOSTED) leanTool("lean_propose", {
+  file: z.string().optional().describe("Path to a .lean file"),
+  source: z.string().optional().describe("Lean source text, if no file"),
+  meta: z.record(z.string(), z.any()).default({}).describe("law_id, kind, statement_en, hypotheses, sources (see lean/registry/README.md)"),
+});
+
+// LeanBio: the formalization queue, grounding, and per-claim records (pipeline/leanbio/). Read-only; leanbio_ground
+// calls Gilda / MyGene.info / OLS4 on a cache miss unless offline is set. In hosted mode it is forced offline so the
+// public server makes no outbound calls on behalf of anonymous clients and never writes the cache.
+const lb = Object.fromEntries(LEANBIO_TOOLS.map(t => [t.name, t]));
+tool("leanbio_queue", lb.leanbio_queue.description, {
+  limit: z.number().int().min(1).max(500).default(20),
+  min_belief: z.number().min(0).max(1).optional().describe("Only items at or above this belief"),
+  relation: z.string().optional().describe("Relation type, e.g. ScalingLaw, Bound, Equality, Dynamics, Inhibition"),
+  origin: z.enum(["claim", "draft"]).optional(),
+}, args => lb.leanbio_queue.handler(args));
+tool("leanbio_ground", lb.leanbio_ground.description, {
+  text: z.string().optional().describe("Free text to annotate"),
+  entity: z.string().optional().describe("One entity name or identifier, instead of text"),
+  kind: z.enum(["any", "gene", "taxon"]).default("any"),
+  context: z.string().optional().describe("Context for an entity, e.g. \"zebrafish\""),
+  offline: z.boolean().default(false).describe("Answer from the cache only"),
+}, args => lb.leanbio_ground.handler({ ...args, offline: HOSTED ? true : args.offline }));
+tool("leanbio_claim", lb.leanbio_claim.description, {
+  id: z.string().describe("Claim id (docs/claims.json), e.g. \"maynardsmith-hitchhiking\", or \"draft:<repo path>\""),
+  draft: z.boolean().default(true).describe("Include the unsigned nanopub draft (TriG)"),
+}, args => lb.leanbio_claim.handler(args));
+
+// Multi-omics cards (sim-engine/tools/omics-tools.mjs over omics/index/, shipped in the image and the npm package).
+// Proxy-species data, kind borrowed; absence means not recorded.
+const om = Object.fromEntries(OMICS_TOOLS.map(t => [t.name, t]));
+const omicsLayer = z.enum(["genomic", "transcriptomic", "proteomic", "pathway", "ptm"]);
+tool("omics_gene", om.omics_gene.description, {
+  symbol: z.string().optional().describe("ZFIN symbol (e.g. kcnk5b), ZDB-GENE id, or human orthologue symbol (e.g. KCNK5)"),
+  id: z.string().optional().describe("Alias of symbol"),
+  layers: z.array(omicsLayer).optional().describe("Only these layers (default all)"),
+  features: z.array(z.string()).optional().describe("Only these features, e.g. allele_phenotype, expressed_in"),
+}, args => om.omics_gene.handler(args));
+tool("omics_part", om.omics_part.description, {
+  part_id: z.string().describe("UBERON:xxxxxxx or CL:xxxxxxx (underscore form accepted)"),
+  layer: omicsLayer.optional(),
+  limit: z.number().optional().describe("Max genes returned (default 100)"),
+}, args => om.omics_part.handler(args));
+tool("omics_search", om.omics_search.description, {
+  term: z.string().describe("e.g. \"pectoral fin\", \"GO:0030326\", \"Wnt signaling\""),
+  feature: z.string().optional(),
+  layer: omicsLayer.optional(),
+  limit: z.number().optional().describe("Max matching terms (default 25)"),
+}, args => om.omics_search.handler(args));
+
+// The design score (scorer v1.0.0, weights frozen: sim-engine/validate/score-weights.json and
+// SCORER-PREREGISTRATION.md). In hosted mode network and BLAST are forced off: the public server answers from its
+// shipped data and cache, makes no outbound calls for anonymous clients, and never runs minutes-long BLAST jobs.
+const dsc = VALIDATE_TOOLS.find(t => t.name === "design_score");
+tool("design_score", dsc.description, {
+  organism: z.union([z.string(), z.record(z.string(), z.any())]).optional().describe("A repository organism/design id (zebrafish-adult, flying-fish, winged-zebrafish, tff, ...) or an inline organism document"),
+  specimen: z.record(z.string(), z.any()).optional().describe("Instead of an organism: a raw specimen record {SL_m, mass_kg, depth_SL, ...}"),
+  ageDays: z.number().optional(),
+  conditions: z.record(z.string(), z.any()).optional(),
+  exclude: z.array(z.string()).optional().describe("Reference ids or groups to leave out of the nearest-neighbour search"),
+  reference_set_excluding: z.array(z.string()).optional().describe("Leave-out scoring (e.g. organism:zebrafish); use it whenever the design IS a real organism"),
+  containment: z.array(z.record(z.string(), z.any())).optional().describe("partedit.js containment results [{part, refused}]"),
+  network: z.boolean().optional().describe("Allow cached network calls (forced off on the hosted server)"),
+  blast: z.boolean().optional().describe("Run NCBI BLAST for genes without an alignment (forced off on the hosted server)"),
+  lawset: z.string().optional(),
+  taxon: z.string().optional(),
+  label: z.string().optional(),
+  spec: z.record(z.string(), z.any()).optional().describe("Optional DesignSpec for the S component"),
+}, args => dsc.handler(HOSTED ? { ...args, network: false, blast: false } : args));
+
 if (process.env.DELPHI_HTTP_PORT) {
   const { serveHttp } = await import("./http.mjs");
-  serveHttp(createServer, Number(process.env.DELPHI_HTTP_PORT));
+  serveHttp(createServer, Number(process.env.DELPHI_HTTP_PORT), VERSION);
 } else {
   await createServer().connect(new StdioServerTransport());
 }

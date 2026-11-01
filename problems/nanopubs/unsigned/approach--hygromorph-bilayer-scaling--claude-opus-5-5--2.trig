@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "FE correction factors for fibre angle, gradients and poroelastic lag" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "Quantify, before looking at data, how far real hygromorph features push curvature and response time from the Timoshenko and h^2/D predictions. Run FEniCSx models of strips with (a) misaligned swelling direction at angle phi (reducing bending and adding twist, consistent with the Lean-checked antisymmetric-twist theorems), (b) continuously graded modulus and eigenstrain through the thickness, (c) imperfect bonding via a compliant interlayer, (d) poroelastic coupling with layer-specific diffusivities, and (e) linear viscoelastic relaxation. Produce dimensionless correction maps kappa_FE/kappa_Timoshenko and tau_FE/(h^2/D) over the parameter ranges reported for pine cones, awns and printed bilayers. These maps convert approach 1 from a pass/fail of the ideal model into a test of whether measured deviations are explained by measured structure." ;
+
+    delphi:proposedTest "Correction maps with the boundary of the 10% validity region of the ideal model for each departure, checked for mesh convergence." ;
+    delphi:context "Fails if: Corrections that depend on unmeasured parameters (e.g. interlayer compliance) so strongly that any measured curvature can be fitted, making the corrected model unfalsifiable." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Verify the FE code against the Timoshenko formula (error below 1% for slender, perfectly bonded, uniform layers) and against the first diffusion mode decay rate pi^2 D/h^2. 2. Sweep each departure separately over literature ranges, then in pairs. 3. Publish correction tables and the parameter region where Timoshenko is within 10%. 4. Pre-register their use as the 'structure-corrected' model in approach 1." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: fenicsx" ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1364/josa.11.000233> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1203874> ;
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms2666> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+
+
+  <https://doi.org/10.1364/josa.11.000233> dct:title "Analysis of Bi-Metal Thermostats" ;
+    dct:bibliographicCitation "Timoshenko 1925, Analysis of bi-metal thermostats" .
+  <https://doi.org/10.1126/science.1203874> dct:title "Geometry and Mechanics in the Opening of Chiral Seed Pods" ;
+    dct:bibliographicCitation "Armon et al. 2011, chiral seed pods" .
+  <https://doi.org/10.1038/ncomms2666> dct:title "Self-shaping composites with programmable bioinspired microstructures" ;
+    dct:bibliographicCitation "Erb et al. 2013, Self-shaping composites" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.309Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: FE correction factors for fibre angle, gradients and poroelastic lag" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

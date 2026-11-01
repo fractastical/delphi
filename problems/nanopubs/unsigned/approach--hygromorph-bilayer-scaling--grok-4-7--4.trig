@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--4> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Operator protocol for bilayers at three thicknesses" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "The acceptance criterion allows printed bilayers of at least three thicknesses and two swelling mismatches instead of 20 plant specimens. The swarm can write the protocol and the analysis script; it cannot run it. The protocol, fixed before any print: two swelling mismatches, three thicknesses, at least five replicates of each of the six cells. Modulus, free swelling strain and diffusivity are measured on monolayer strips of each material, not inferred from the bilayer's curvature. Curvature is predicted with the Lean Timoshenko formula and time with h² / D. Pass uses the same thresholds as the literature test: median relative curvature error ≤ 0.50, correct sign in ≥ 90 percent, and a log-log time slope whose interval contains 2 and excludes 1 and 3. An operator with a printer and a humidity chamber would have to execute it." ;
+
+    delphi:proposedTest "Measured curvature and response time on the six-cell design, scored with the pre-registered thresholds. The script alone is not the result." ;
+    delphi:context "Fails if: No operator runs the prints, which is the expected outcome, or the prints are run but the median relative error exceeds 0.50 or the time slope misses 2." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Publish the protocol with the six-cell design and the pass thresholds. 2. Generate the analysis script that reads thicknesses, moduli, swelling strains, diffusivity, curvature and time. 3. Stop. Do not invent measurements. 4. If an operator later deposits a file, run the script unchanged." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: A printer, a humidity chamber and an operator. The swarm has none of these, so the physical arm cannot be completed in agent time." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+
+
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.348Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Operator protocol for bilayers at three thicknesses" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--4> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,71 @@
+{
+ "archive": {
+  "bytes": 24548,
+  "name": "rd-inverse-source.tgz",
+  "sha256": "f4d833ec03c615108d742ab34ce3e160a0fbb401e5df688974274801b33e2b82"
+ },
+ "argv": "tar -xzf rd-inverse-source.tgz && OUT=out bash rd-inverse/engineering/rd_inverse/job.sh",
+ "claim_limits": "synthetic numerical design only, n=6, no biology, no DDPM acceleration claim",
+ "env": {
+  "OMP_NUM_THREADS": "unset",
+  "OUT": "out",
+  "credentials": "none",
+  "network": "none needed"
+ },
+ "expected_outputs": [
+  "control.json",
+  "targets.json",
+  "targets.npz",
+  "traces.json",
+  "evaluated_fields.npz",
+  "selection.json",
+  "validation_controls.json",
+  "independent_checks.json",
+  "receipt.json"
+ ],
+ "files": {
+  "engineering/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engineering/rd_diffusion/config.json": "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210",
+  "engineering/rd_diffusion/rd_ddpm.py": "25455430ef138b49e6bac151a144e338269a81ce5c2f576387f8805bbb1a400a",
+  "engineering/rd_inverse/ADDENDUM_1.md": "5e17b21e687eee6b2352d5b818b6548b4d1f4e0a9ca43cf3115343706e765b43",
+  "engineering/rd_inverse/PREREG.md": "159111964d7bc94841cd719cf2798751d8119a1f8e98e5d7ee0ae770b8438f0c",
+  "engineering/rd_inverse/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "engineering/rd_inverse/design.py": "203a83e8fe47a84d3b3dc441001b2b7fca1b27eaa8001f583055a41098d6310e",
+  "engineering/rd_inverse/job.sh": "c04595f0bf5010323b68d9a97fc21a722da6bdae7a771510e99e43efdaf67d68",
+  "engineering/rd_inverse/protocol.json": "8f6fee6f15856bfeae105bcb73bbeea853e8f52196bf3e59ce80cb938e8ce346",
+  "engineering/rd_numerics/__init__.py": "a92f3a7cb56bf869573a1143e1d075b17341adf4bd513a80ddf37b582a2d676c",
+  "engineering/rd_numerics/audit.py": "ff8fe2498919227dc272c121be1268380af7ba9423e49d872f71e3be64e59e2c"
+ },
+ "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+ "limits": {
+  "gpus": 1,
+  "host_ram": "< 4 GiB",
+  "max_output_mib_compressed": 48,
+  "max_runtime_s": 900,
+  "output_tarball": "out/rd_inverse_outputs.tgz"
+ },
+ "pins": {
+  "config": {
+   "path": "engineering/rd_diffusion/config.json",
+   "sha256": "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210",
+   "use": "K_modes=20, eps=0.05 for the continuous cosine IC"
+  },
+  "projection": {
+   "path": "engineering/rd_numerics/audit.py",
+   "sha256": "ff8fe2498919227dc272c121be1268380af7ba9423e49d872f71e3be64e59e2c",
+   "use": "common_grid analytic cosine projection reused for cross-resolution comparison"
+  },
+  "solver": {
+   "path": "engineering/rd_diffusion/rd_ddpm.py",
+   "sha256": "25455430ef138b49e6bac151a144e338269a81ce5c2f576387f8805bbb1a400a",
+   "use": "imported unmodified: advance, ic_modal, dct_matrix"
+  }
+ },
+ "preflight": {
+  "cmd": "tar -xzf rd-inverse-source.tgz && PREFLIGHT=1 bash rd-inverse/engineering/rd_inverse/job.sh",
+  "no_gpu_needed": true
+ },
+ "protocol_sha256": "8f6fee6f15856bfeae105bcb73bbeea853e8f52196bf3e59ce80cb938e8ce346",
+ "requires": "CUDA; float64; TF32 disabled; the job refuses on CPU. Image provides python3, torch, numpy.",
+ "schema": "frontier.rd-inverse.packet/1"
+}

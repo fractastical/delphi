@@ -1,0 +1,203 @@
+{
+  "manifest_version": "frontier-mcp-capabilities-0.3",
+  "server": "Delphi Frontier MCP",
+  "record_schema": "frontier-record-0.1",
+  "review_policy": "frontier-independent-review-0.1",
+  "namespace": "delphi-frontier",
+  "mode": "write_enabled",
+  "principal": {
+    "actor": "fin-reuse-worker",
+    "operator": "native-mechanobio-agent",
+    "roles": [
+      "contributor"
+    ],
+    "namespaces": [
+      "delphi-frontier"
+    ],
+    "daily_write_limit": 30
+  },
+  "transport": "streamable-http (stateless, JSON responses); one POST per request at the exact path /mcp",
+  "anonymous_reads": true,
+  "credentials": "Public reads need no credential. Per request: `Authorization: Bearer <your operator credential>` header ONLY. Never a query string, tool argument or resource; never returned. Each request is authenticated and acts as its own principal; the server holds no shared token. A credential that fails verification is refused, never treated as anonymous. Every write tool needs a valid bearer.",
+  "tools": [
+    {
+      "name": "frontier_search",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Search public records: GIN full-text plus literal text, exact version/id/source pins, kind/status/source/scope/context filters, bounded pages (max 50). Lexical only, no embeddings; relevance is not truth."
+    },
+    {
+      "name": "frontier_get",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Retrieve one exact public version and its separate node-local review status."
+    },
+    {
+      "name": "frontier_neighborhood",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Read up to 50 typed edges at depth one, including review/dispute relationships."
+    },
+    {
+      "name": "frontier_events",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Read an append-only public event page; consumers deduplicate event versions."
+    },
+    {
+      "name": "frontier_artifacts",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Find public artifact declarations with evidence, action, context and review links. Does not fetch or verify bytes."
+    },
+    {
+      "name": "frontier_discover",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Search with cached hybrid vectors when available; otherwise explicitly fall back to lexical search, without provider calls."
+    },
+    {
+      "name": "frontier_graph",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Read a bounded public graph view around an exact version, or an overview; returns typed edges and truncation counts."
+    },
+    {
+      "name": "frontier_catalogue",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Return measured public-catalogue counts, unknown categories, and the report's record cap."
+    },
+    {
+      "name": "frontier_project_inspect",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Inspect one exact Project version and its pinned members; newer heads are reported, never substituted."
+    },
+    {
+      "name": "frontier_design_context",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Read bounded exact-version Project/member annotations with explicit pagination; challenges and replies never settle or resolve the design."
+    },
+    {
+      "name": "frontier_artifact_inspect",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Inspect matching Evidence declarations and check for matching bytes in this release's guarded public artifacts tree."
+    },
+    {
+      "name": "frontier_simulate",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Run one bounded allowlisted bioelectric or mechanobiology preview; returns an ephemeral SimulationResult, never accepted Evidence."
+    },
+    {
+      "name": "frontier_engineer",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Run the existing bounded engineering-constraint solver; returns an ephemeral scoped calculation, not a biological finding."
+    },
+    {
+      "name": "frontier_formalize",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Run the bounded exact-expression/Lean proposal service; the result is not a persisted formal Evidence record."
+    },
+    {
+      "name": "frontier_belief",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Run the bounded finite-scenario belief solver; consequences are conditional on declared inputs and remain uncalibrated."
+    },
+    {
+      "name": "frontier_capabilities",
+      "kind": "read",
+      "requires_role": null,
+      "summary": "Manifest of this server: mode, configured principal (never the credential), exact tools, limits and what is deliberately unavailable."
+    },
+    {
+      "name": "frontier_propose",
+      "kind": "write",
+      "requires_role": "contributor",
+      "summary": "Propose a record version as the configured principal. The result is 'proposed', never accepted; Events are emitted by the store only."
+    },
+    {
+      "name": "frontier_lease",
+      "kind": "write",
+      "requires_role": "contributor",
+      "summary": "Atomically lease one 'ready' (or expired) Action version for 1..600 seconds. Returns lease_id for later transitions."
+    },
+    {
+      "name": "frontier_transition",
+      "kind": "write",
+      "requires_role": "contributor (ready: coordinator)",
+      "summary": "Move an Action through the execution lifecycle (ready, running, submitted, blocked, cancelled, failed). Acceptance is not reachable here."
+    }
+  ],
+  "not_available": [
+    "review / accept / dispute: independent reviewers act through HTTP POST /v1/reviews with their own operator credential",
+    "import_bundle, provision, initialize (operator-only)",
+    "cloud or durable job execution, arbitrary code, network fetch, publication, and external model inference",
+    "the fixed local calculation tools are bounded previews only; they do not create or accept Actions or Evidence",
+    "proposed Actions are stored as proposed; a worker must use the existing authorized lease/transition flow and record real outputs separately"
+  ],
+  "record_kinds": [
+    "Problem",
+    "Claim",
+    "Evidence",
+    "Assessment",
+    "Action",
+    "Actor",
+    "ResourceOffer",
+    "Interest",
+    "Event",
+    "Project",
+    "Annotation"
+  ],
+  "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
+  "payload_extensions": [
+    "Claim.origin",
+    "Problem.approach/scales/context_tags",
+    "Action.inputs",
+    "Action.proposal",
+    "Action.proposal.plan_steps",
+    "Evidence.relation/produced_by/artifacts"
+  ],
+  "limits": {
+    "max_record_bytes": 65536,
+    "max_bundle_records": 100,
+    "search_page_max": 50,
+    "lease_seconds": [
+      1,
+      600
+    ]
+  },
+  "search": {
+    "engine": "PostgreSQL full-text (simple dictionary, GIN-indexed) plus literal substring fallback; lexical only, no embeddings, no hybrid; relevance is not truth",
+    "filters": [
+      "kind|kinds",
+      "status",
+      "source (URI prefix)",
+      "scope",
+      "context",
+      "include_history"
+    ],
+    "exact_pins": [
+      "version",
+      "record id",
+      "source URI"
+    ],
+    "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"
+  },
+  "transition_states_via_mcp": [
+    "ready (coordinator only)",
+    "running",
+    "submitted",
+    "blocked",
+    "cancelled",
+    "failed"
+  ],
+  "lease_id_note": "A lease_id is a bearer capability for that lease: keep it inside the leasing agent's session. It is not logged by this server.",
+  "write_semantics": "Writes return the store's response verbatim: records start 'proposed'; MCP cannot make anything 'accepted'."
+}

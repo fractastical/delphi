@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered PGLS model comparison: single power law vs curvature vs clade slopes" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    dct:description "Assemble mammal BMR and mass from AnAge (metabolic rate, body mass, body temperature fields) and PanTHERIA (BasalMetRate, AdultBodyMass), deduplicated by species via the organisms layer. Exclude records not meeting basal criteria where flagged, and require n ≥ 300 species with temperature for the temperature-corrected analysis. Phylogeny: Upham et al. 2019 node-dated mammal trees, with analyses integrated over 100 posterior trees. Models: (M1) log B = a + b log M; (M2) M1 + Boltzmann temperature term −E/(kT_b) (Gillooly form) or T_b as covariate; (M3) quadratic in log M (Kolokotrones curvature); (M4) order-level random slopes. Fit by PGLS with Pagel's λ, compare by AICc and by leave-one-order-out predictive log-likelihood. Pre-registered decision: 'single exponent' if M1 or M2 wins and the 95% CI of b excludes one of 2/3 or 3/4 (reported as such); 'no universal exponent' if M3 or M4 improves predictive log-likelihood by > 10 units summed over orders; 'underdetermined' if the CI contains both." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--1#n_species> ;
+    delphi:proposedTest "A verdict among 'exponent b with CI excluding 2/3 (or 3/4)', 'curved or clade-specific model wins by > 10 log-likelihood units out of sample', or 'underdetermined', with effect sizes. Mammals alone give n of several hundred species, enough to separate 2/3 from 3/4 if the relation is linear (White and Seymour's CI was about ±0.03)." ;
+    delphi:context "Fails if: Strong dependence of b on inclusion criteria (basal versus resting, captive versus wild) that the pre-registered criteria cannot resolve; the verdict then rests on data curation rather than biology." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with models, decision rule and minimum n before downloading. 2. Download AnAge (dataset.zip) and PanTHERIA; record SHA-256; merge and resolve taxa. 3. Prune Upham trees to the matched species; fit M1–M4 over 100 trees. 4. Report b with CI, curvature coefficient, order-slope variance and the verdict." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: anage" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+    rdfs:seeAlso <https://genomics.senescence.info/species/dataset.zip> ;
+    rdfs:seeAlso <https://esapubs.org/archive/ecol/E090/184/> ;
+    rdfs:seeAlso <https://vertlife.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0436428100> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature08920> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.3000494> ;
+    rdfs:seeAlso <https://cran.r-project.org/package=phylolm> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" .
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--1#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 300 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://genomics.senescence.info/species/dataset.zip> dct:title "AnAge database of animal ageing and longevity" ;
+    dct:description "Body mass, metabolic rate and body temperature fields" .
+  <https://esapubs.org/archive/ecol/E090/184/> dct:title "PanTHERIA (Ecological Archives E090-184)" ;
+    dct:description "Mammal basal metabolic rate and adult body mass" .
+  <https://vertlife.org/> dct:title "VertLife mammal phylogenies (Upham et al. 2019)" ;
+    dct:description "Posterior distribution of node-dated mammal trees" .
+  <https://doi.org/10.1073/pnas.0436428100> dct:title "Mammalian basal metabolic rate is proportional to body mass\n                    <sup>2/3</sup>" ;
+    dct:bibliographicCitation "White and Seymour 2003, mammalian BMR ∝ M^(2/3)" .
+  <https://doi.org/10.1038/nature08920> dct:title "Curvature in metabolic scaling" ;
+    dct:bibliographicCitation "Kolokotrones et al. 2010, Curvature in metabolic scaling" .
+  <https://doi.org/10.1371/journal.pbio.3000494> dct:title "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation" ;
+    dct:bibliographicCitation "Upham, Esselstyn and Jetz 2019, mammal tree" .
+  <https://cran.r-project.org/package=phylolm> dct:bibliographicCitation "phylolm, phylogenetic regression" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to metabolic-scaling-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.299Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to metabolic-scaling-exponent: Pre-registered PGLS model comparison: single power law vs curvature vs clade slopes" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-CLAIMS = ROOT / "docs" / "claims.json"
+CLAIMS = ROOT.parent / "site" / "claims.json"
 OUT = Path(__file__).parent / "routing-results.json"
 TAU_PERCENTILE = 70
 CONFIDENT_MARGIN = 0.2

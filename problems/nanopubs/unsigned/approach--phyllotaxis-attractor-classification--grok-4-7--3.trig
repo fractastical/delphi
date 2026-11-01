@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Monte Carlo basin volumes on the disc" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "The disc geometry is the gap the cylindrical theorem does not close. Implement the Douady–Couder disc rule: each new primordium is placed at the angular minimum of the repulsive field of the existing primordia on a growing disc, with the growth parameter in the same role as in their 1992 simulations. Sweep 200 parameter values. At each, launch 500 random initial angles and place 300 primordia. Classify the last 50 divergence angles by distance to the golden angle, the Lucas angle, and the bijugate angles. Estimate basin volume as the fraction of seeds in each class, with a bootstrap percentile interval of 1000 resamples. An unclassified attractor has angular error above 10^{-3} radians from every listed noble angle over those 50 primordia and estimated measure above 0.01. This atlas can falsify a proposed complete list and cannot prove full measure." ;
+
+    delphi:proposedTest "A basin-volume table with bootstrap intervals. The classified list fails if any unclassified class has estimated measure above 0.01." ;
+    delphi:context "Fails if: Discovery of such an unclassified attractor. Failure of a different kind is a simulator bug: two implementations disagree on the terminal angle of a shared seed by more than 10^{-3} radians." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement the disc placement rule from Douady and Couder 1992. 2. Sweep 200 growth parameters and 500 seeds, 300 primordia each. 3. Classify terminal divergence angles against the noble list. 4. Bootstrap the basin-volume estimates. 5. Flag any class with measure above 0.01 that is not on the list." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: dynamical-systems" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevLett.68.2098> ;
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevLett.66.224> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+  <https://doi.org/10.1103/PhysRevLett.68.2098> dct:title "Phyllotaxis as a physical self-organized growth process" ;
+    dct:bibliographicCitation "Douady and Couder 1992, Phyllotaxis as a physical self-organized growth process" .
+  <https://doi.org/10.1103/PhysRevLett.66.224> dct:title "Phyllotaxis of flux lattices in layered superconductors" ;
+    dct:bibliographicCitation "Levitov 1991, Energetic approach to phyllotaxis" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.338Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Monte Carlo basin volumes on the disc" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

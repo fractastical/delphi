@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" ;
+    dct:description "For single-cell skeletons (radiolarian lattices, foraminiferal chambers, sponge spicules, coccoliths) and sea urchin spicules, which geometric features of the mineral are predicted by surface-tension and packing physics alone, and which require a matrix template or cellular control? Does the same geometry appear when different minerals are laid down on the same vesicle pattern?" ;
+
+    skos:historyNote "Known state: Thompson (1917, ch. 9) holds that skeletal elements the size of a cell are shaped by molecular forces such as surface tension, and that the hexagonal lattice shells of Radiolaria, Acantharia and Clathrulina are equally regular in silica, strontium sulphate and an organic substance (ch. 9-15). Modern work shows that many biominerals form through a transient amorphous precursor that is moulded and then crystallizes (Politi et al. 2004; Weiner and Addadi 2011), which supports cellular control of shape and of polymorph, but does not directly test the physical-forces claims. No quantitative comparison of the predicted foam-packing geometry against measured lattice geometry across taxa exists." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-C" ;
+    skos:scopeNote "Resolved when: A pre-registered comparison of mesh geometry (polygon-side distribution, vertex angles, spacing) in at least 30 radiolarian, acantharian and related lattice shells from open image archives against the foam-packing prediction and against a null of random Voronoi tessellation, with the match criterion stated in advance." ;
+    skos:scopeNote "Refuted if: If measured lattices are no closer to the foam-packing prediction than to a random Voronoi null, Thompson's physical-forces explanation is refuted for these taxa." ;
+    skos:scopeNote "Refuted if: If mineral identity predicts geometry once vesicle pattern is fixed, the claim of mineral-independence is refuted." ;
+    skos:note "Data access: Open radiolarian and foraminiferal plates (Haeckel's Challenger monographs and modern SEM archives), micrographs in the repo's cell-geometry project, and published SEM of sea urchin spicules; the availability of paired mineral and vesicle data is uncertain and has to be scouted." ;
+    skos:note "Requires: image-segmentation" ;
+    skos:note "Requires: geometry-statistics" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: cell" ;
+    skos:note "Scale: tissue" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1102289> ;
+    rdfs:seeAlso <https://doi.org/10.1146/annurev-matsci-062910-095803> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1126/science.1102289> dct:title "Sea Urchin Spine Calcite Forms via a Transient Amorphous Calcium Carbonate Phase" ;
+    dct:bibliographicCitation "Politi et al. 2004, Sea urchin spine calcite forms via a transient amorphous calcium carbonate phase" .
+  <https://doi.org/10.1146/annurev-matsci-062910-095803> dct:title "Crystallization Pathways in Biomineralization" ;
+    dct:bibliographicCitation "Weiner and Addadi 2011, Crystallization pathways in biomineralization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.293Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: How much of biomineral form is physical, and how much is cell-controlled?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,38 @@
+{
+  "schema":"frontier.behavior.interface/1",
+  "model_id":"phase_cpg_joint_servo",
+  "studio_anchors":["flying-fish:neural","flying-fish:organism"],
+  "region_ids":["body","caudal"],
+  "membership":"Coarse engineering joint-chain annotation only; not calibrated anatomical or neural segmentation",
+  "entrypoint":"engineering.behavior.simulate",
+  "ports":[
+    {"id":"frequency_Hz","direction":"in","unit":"Hz","dimension":{"s":-1},"quantity":"oscillator intrinsic frequency","basis":"design-selected inside discussed zebrafish locomotor context; not a fitted measurement","bounds":[15,45]},
+    {"id":"amplitude_rad","direction":"in","unit":"rad","dimension":{},"quantity":"joint-angle setpoint amplitude","basis":"design-selected","bounds":[0.02,0.15]},
+    {"id":"phase_rad","direction":"out","unit":"rad","dimension":{},"quantity":"unwrapped oscillator phase by coarse segment","basis":"simulated"},
+    {"id":"reference_angle_rad","direction":"out","unit":"rad","dimension":{},"quantity":"opponent-oscillator angle setpoint","basis":"simulated"},
+    {"id":"actual_angle_rad","direction":"out","unit":"rad","dimension":{},"quantity":"independent inertial-damped elastic joint angle","basis":"simulated"},
+    {"id":"angular_velocity_rad_s","direction":"out","unit":"rad/s","dimension":{"s":-1},"quantity":"proxy joint angular velocity","basis":"simulated"},
+    {"id":"actuator_torque_Nm","direction":"out","unit":"N*m","dimension":{"kg":1,"m":2,"s":-2},"quantity":"bounded actuator torque","basis":"simulated; assumes known nominal plant"}
+  ],
+  "proposed_coupling":{"from":"actual_angle_rad","to":"windtunnel.angle_of_attack_rad","status":"unsupported_dynamic_transfer","static_angle_envelope_rad":[-0.262,0.262],"frequency_transfer":"unknown; current wind tunnel has rigid static silhouette only","need":"Moving-wall fluid solver, anatomical mapping, actuation/load calibration and oscillating-body control. Do not infer forces/thrust from these ports."},
+  "parameter_registry":[
+    {"name":"frequency_Hz","value":35,"unit":"Hz","basis":"assumed scenario; Roussel2021 discussion20–65Hz, not fitted"},
+    {"name":"amplitude_rad","value":0.1,"unit":"rad","basis":"assumed"},
+    {"name":"coupling_s","value":80,"unit":"1/s","basis":"assumed oscillator coupling; normalized amplitudes are dimensionless"},
+    {"name":"amplitude_rate_s","value":80,"unit":"1/s","basis":"assumed critically damped amplitude convergence"},
+    {"name":"phase_lag_rad","value":"2*pi/7","unit":"rad","basis":"chosen one-wave coarse-chain target, not a measured somite delay"},
+    {"name":"J","value":1e-8,"unit":"kg*m^2","basis":"assumed nominal joint inertia"},
+    {"name":"B","value":2e-7,"unit":"N*m*s/rad","basis":"assumed joint damping"},
+    {"name":"K","value":1e-5,"unit":"N*m/rad","basis":"assumed joint stiffness"},
+    {"name":"KP","value":0.003,"unit":"N*m/rad","basis":"designed PD gain"},
+    {"name":"KD","value":1e-5,"unit":"N*m*s/rad","basis":"designed PD gain"},
+    {"name":"TORQUE_MAX","value":0.0001,"unit":"N*m","basis":"declared actuator bound"}
+  ],
+  "equations":[
+    {"id":"eq-behavior-phase","latex":"\\dot\\theta_i=2\\pi f_i+r_{i-1}w\\sin(\\theta_{i-1}-\\theta_i-\\phi)","variables":[["theta","rad","state"],["f","Hz","input"],["r","1","normalized-amplitude-state"],["w","1/s","assumed-coupling"],["phi","rad","desired-lag"]],"source":"10.1126/science.1138353,p1416; restricted directed-chain topology","implementation":"model.py#cpg"},
+    {"id":"eq-behavior-amplitude","latex":"\\ddot r=a[a(1-r)/4-\\dot r]","variables":[["r","1","state"],["a","1/s","assumed-rate"]],"source":"10.1126/science.1138353,p1416 with normalized target R=1","implementation":"model.py#cpg"},
+    {"id":"eq-behavior-opponent-output","latex":"x_L=r(1+\\cos\\theta),\\quad x_R=r(1-\\cos\\theta),\\quad\\alpha_{ref}=A(x_L-x_R)/2","variables":[["x_L,x_R","1","abstract-activation"],["A","rad","assumed-scale"],["alpha_ref","rad","output"]],"source":"10.1126/science.1138353,p1416 burst equation and p1417Fig1/1418 opponent angle-setpoint description; exact anti-phase and scaling are imposed assumptions","implementation":"model.py#cpg"},
+    {"id":"eq-behavior-joint","latex":"J\\ddot\\alpha+B\\dot\\alpha+K\\alpha=\\tau_{act}+\\tau_{dist}","variables":[["J","kg*m^2","assumed-inertia"],["B","N*m*s/rad","assumed-damping"],["K","N*m/rad","assumed-stiffness"],["alpha","rad","state"],["tau_act,tau_dist","N*m","actuation/disturbance"]],"source":"Designed dimensioned inertial-damped elastic plant; Roussel2021 Eq6 gives contextual damped-angle model, not these parameters","implementation":"model.py#rhs"},
+    {"id":"eq-behavior-servo","latex":"\\tau_{act}=clip[J_0\\ddot\\alpha_{ref}+B_0\\dot\\alpha_{ref}+K_0\\alpha_{ref}+K_P(\\alpha_{ref}-\\alpha)+K_D(\\dot\\alpha_{ref}-\\dot\\alpha),\\pm\\tau_{max}]","variables":[["K_P","N*m/rad","designed-gain"],["K_D","N*m*s/rad","designed-gain"],["tau_max","N*m","declared-bound"]],"source":"PD architecture:10.1126/science.1138353Fig1; feedforward compensation and actuator constants are own engineering assumptions","implementation":"model.py#torque"}
+  ]
+}

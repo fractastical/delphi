@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Plot every measured tube on the mass and buckling curves" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "Even if the four-type bar fails, the mass curve itself can be drawn for every structure that has both k and a same-paper modulus. Evaluate μ(k) from the Lean definition at fixed second moment, for q = 0 and for the marrow ratio if one has been fetched, and draw the buckling boundary t/R = C σ/E with C symbolic at three stated values (the value read from Gibson, Ashby, Wegst and Olive 1995 if the fetched text gives it, otherwise the three placeholders 0.1, 0.3 and 1 are not used; the script plots the boundary as a function of C and does not pick a favourite after seeing the data). Place each measured (k, E) on that plot. This computation does not declare the biological claim settled when n is small. It does say, for the structures in hand, whether they sit nearer the descending mass curve's thin-wall end or nearer a buckling boundary." ;
+
+    delphi:proposedTest "One plot of μ(k) and the buckling boundary with every modulus-matched structure marked, and the median |k − k-star| and median distance to the boundary. A type is called buckling-limited only if its median is within 0.10 of the boundary and more than 0.10 from k-star." ;
+    delphi:context "Fails if: Fewer than 20 structures have both k and a same-paper modulus, so the plot is an illustration and the approach fails its own sample gate; or the ranking of the two distances flips when C is varied across the values the shell formula allows." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Import μ(k, q) from the same definition the Lean file uses. 2. Plot μ against k for q = 0 and for any fetched marrow ratio. 3. Overlay buckling boundaries for the C values the fetched shell formula supports. 4. Drop any structure without a same-paper modulus. 5. Report distances to k-star and to the boundary without refitting C." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: A specimen-matched modulus for the mammal humeri is not in the Amson table. The curve can still be drawn; most mammal points will lack a buckling coordinate." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.12600440.v3> ;
+    rdfs:seeAlso <http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2014.0321> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+  <https://doi.org/10.6084/m9.figshare.12600440.v3> dct:title "Amson and Bibi 2021 humeral structure table" ;
+    dct:description "Hollowness only, and only if MeanC is compactness. Modulus is not in this file, so these rows cannot enter the buckling overlay unless a matched modulus is fetched." .
+  <http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv> dct:title "Elegant Experiments bamboo internode table" ;
+    dct:description "Geometry of one culm. Modulus must come from a fetched bamboo paper, not from this file." .
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" .
+  <https://doi.org/10.1098/rsif.2014.0321> dct:title "The structure and mechanics of Moso bamboo material" ;
+    dct:bibliographicCitation "Dixon and Gibson 2014, The structure and mechanics of Moso bamboo material" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.347Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Plot every measured tube on the mass and buckling curves" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

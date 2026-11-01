@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Decidability via bounded crossing sequences" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    dct:description "Seek a negative result for eventually periodic tapes. Define crossing sequences at cell boundaries and prove that the 2-state control plus periodic tails forces either bounded crossing complexity or a pumpable translation cycle. A finite quotient of boundary state, tape color and tail phase would then decide halting and exclude conventional universality." ;
+
+    delphi:proposedTest "A Lean theorem that every eventually periodic input either enters a computably detected cycle or halts, with an explicit computable bound from the finite defect and periods." ;
+    delphi:context "Fails if: A generated family has unbounded nonrepeating crossing sequences or simulates an unbounded counter, directly refuting the proposed bounded-crossing lemma." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Enumerate local boundary-return types for each left and right tail period up to symbolic period p. 2. Conjecture a monotone measure or pumping lemma from exhaustive runs up to 10^9 steps. 3. Formalize crossing sequences and the tail-phase quotient in Lean. 4. Derive a halting decider if the bounded-crossing lemma is proved." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: A viable global invariant; finite experiments cannot establish decidability." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: turing-machine-enumeration" ;
+    skos:note "Tool: computability-theory" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to smallest-universal-turing-machine-2-3, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.320Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to smallest-universal-turing-machine-2-3: Decidability via bounded crossing sequences" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

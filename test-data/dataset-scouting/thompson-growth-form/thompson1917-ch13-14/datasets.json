@@ -1,0 +1,112 @@
+{
+  "claim_id": "thompson1917-ch13-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:16:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "3D tusk centerline or mesh for complete (or near-complete) tusks of living elephants (Loxodonta, Elephas), Mammut americanum and Mammuthus",
+    "tusk length or arc length and taxon, sex and age of each specimen",
+    "completeness / breakage status of each tusk"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource-proboscidean-tusk-media",
+      "name": "MorphoSource: tusk media for Elephantidae and Mammutidae (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=tusk&per_page=25",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:12:03Z", "method": "GET /api/media?q=tusk&per_page=25 (25 media; physical_object_taxonomy_name read per item) plus counts for q=Mammuthus (7), Mammut (43), Loxodonta (27; 26 open), Elephas (25, all open), Proboscidea (3)", "http_status": 200 },
+      "variables_present": [
+        "proboscidean tusk meshes among the 25 'tusk' hits: Mammuthus primigenius 'Cranium With Tusks' (open, file_size 467,384,784), Loxodonta africana 'Tusk (Upper Left Incisor)' (open), Elephantidae indet. 'Tip Of Tusk' (open), Elephas sp. 'Left Tusk [CT]' (restricted), Mammut americanum 'Mandible Tusk' CT series x2 (restricted), Mammut pacificus tusk meshes x3 and Mammut matthewi right and left tusks (open), Mammut obscurum (restricted)",
+        "physical_object_taxonomy_name, part, side, license and visibility fields on each media record"
+      ],
+      "variables_missing": [
+        "the open tusk media for Mammut are other species (pacificus, matthewi), and the Mammut americanum tusk items returned are restricted mandibular tusk CT series, not erupted upper tusks",
+        "no completeness flag for each tusk; one Elephantidae item is a tip only",
+        "other taxa also match the query (Monodon, Dentalium, Gnathabelodon, Odontocyclops, Perissodactyla indet.)"
+      ],
+      "scope": "full-text hits on the media API; of the 25 'tusk' hits, 12 are Elephantidae or Mammut by taxonomy field (4 more are Gnathabelodon thorpei, not counted)",
+      "evidence": "pages.total_count 25 for q=tusk with title, visibility and physical_object_taxonomy_name per item as listed; facets for Loxodonta and Elephas show 26 and 25 open-download media (not all are tusks)",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-media-2026-10-31"
+    },
+    {
+      "id": "pbdb-proboscidea-occurrences",
+      "name": "Paleobiology Database: Mammut americanum and Mammuthus occurrence counts",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Mammut%20americanum&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:12:09Z", "method": "GET taxa/single.json: Mammut americanum txn:46016 noc 377; Mammuthus txn:43266 noc 693", "http_status": 200 },
+      "variables_present": [
+        "occurrence counts and taxonomy for the fossil taxa"
+      ],
+      "variables_missing": [
+        "no tusk geometry; occurrences only locate and date specimens"
+      ],
+      "scope": "fossil occurrences worldwide",
+      "evidence": "noc values in the two single-taxon records",
+      "verdict": "rejected",
+      "reuses_organism_dataset": "pbdb-occurrences-elephantidae-2026-10-31"
+    },
+    {
+      "id": "idigbio-proboscidea-records",
+      "name": "iDigBio: Elephantidae, Mammutidae and Mammuthus records",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/summary/count/records?rq={\"family\":\"elephantidae\"}",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:26Z", "method": "GET summary/count: family elephantidae 15,460 (2,233 with images), family mammutidae 3,642, genus mammuthus 7,026", "http_status": 200 },
+      "variables_present": [
+        "specimen records and some images for proboscidean specimens"
+      ],
+      "variables_missing": [
+        "no tusk geometry; part of specimen (tusk versus other element) not queried"
+      ],
+      "scope": "museum specimen metadata",
+      "evidence": "itemCount values as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "smithsonian-open-access-mammoth-tusk",
+      "name": "Smithsonian Open Access API: mammoth tusk objects",
+      "landing_url": "https://www.si.edu/openaccess",
+      "access_url": "https://api.si.edu/openaccess/api/v1.0/search?q=mammoth%20tusk",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:12:10Z", "method": "GET api.si.edu search q='mammoth tusk' with DEMO_KEY: rowCount 19; first three titles 'Section Of Mammoth Tusk', 'Section Of Mammoth Tusk', 'Pc. Of Mammoth Tusk' (NMNH Anthropology Dept.)", "http_status": 200 },
+      "variables_present": [
+        "19 catalogue objects matching 'mammoth tusk'"
+      ],
+      "variables_missing": [
+        "the three titles seen are cut sections or pieces (anthropology objects), not complete tusks; no 3D or centerline data seen"
+      ],
+      "scope": "search hits only",
+      "evidence": "response.rowCount 19 and the titles above",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "media q=tusk (taxonomy of each of 25 hits read)", "url": "https://www.morphosource.org/api/media?q=tusk&per_page=25", "hits": 25, "note": "12 Elephantidae or Mammut items" },
+    { "source": "Dryad", "query": "tusk curvature; mammoth tusk; proboscidean tusk shape", "url": "https://datadryad.org/api/v2/search?q=mammoth%20tusk&per_page=6", "hits": 0, "note": "all three queries returned 0" },
+    { "source": "DataCite", "query": "tusk shape logarithmic spiral mammoth mastodon elephant", "url": "https://api.datacite.org/dois?query=tusk%20shape%20logarithmic%20spiral%20mammoth%20mastodon%20elephant&page[size]=6", "hits": 0, "note": "a second query 'mammoth tusk 3D scan' returned a response too large to parse and was not used" },
+    { "source": "PBDB taxa API", "query": "Mammut americanum, Mammuthus", "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Mammuthus&show=attr", "hits": 1, "note": "693 occurrences for Mammuthus" },
+    { "source": "iDigBio", "query": "family elephantidae / mammutidae, genus mammuthus", "url": "https://search.idigbio.org/v2/summary/count/records?rq={\"family\":\"mammutidae\"}", "hits": 3642, "note": "" },
+    { "source": "Smithsonian Open Access API", "query": "mammoth tusk", "url": "https://api.si.edu/openaccess/api/v1.0/search?q=mammoth%20tusk&api_key=DEMO_KEY&rows=3", "hits": 19, "note": "" }
+  ],
+  "status": "partial",
+  "summary": "Open 3D tusk meshes exist on MorphoSource for Loxodonta, a Mammuthus primigenius cranium with tusks, and several Mammut species, but the American mastodon (Mammut americanum) tusk items returned are restricted mandibular CT series and no repository holds extracted centerlines or spiral parameters; completeness of each tusk is not recorded.",
+  "next_step": "Filter MorphoSource to open-download media whose taxonomy field is Loxodonta africana, Elephas maximus, Mammut americanum or Mammuthus and whose part is tusk or cranium with tusks, then inspect each mesh for completeness before any centerline extraction.",
+  "obstacles_confirmed": [
+    "Mammut americanum tusk media found are restricted download.",
+    "The open mammoth item is a 467 MB cranium mesh, over the 1 MB scouting limit and not downloaded.",
+    "No tusk completeness metadata in the MorphoSource fields."
+  ]
+}

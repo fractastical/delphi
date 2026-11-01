@@ -1,0 +1,163 @@
+{
+  "claim_id": "levin-2023-glue-04",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "live resting/firing voltage features per cell or tissue",
+    "matched transcript (and ideally protein) levels in the same cells or tissue",
+    "cell history / state labels"
+  ],
+  "datasets": [
+    {
+      "id": "allen-brain-cell-types",
+      "name": "Allen Cell Types Database (electrophysiology features and specimen metadata)",
+      "landing_url": "https://celltypes.brain-map.org/",
+      "access_url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::ApiCellTypesSpecimenDetail",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET RMA API model::ApiCellTypesSpecimenDetail (count query and one-row field list)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "electrophysiology features per neuron (ef__vrest, ef__avg_firing_rate, ef__f_i_curve_slope, ef__threshold_i_long_square, ef__ri, ef__tau, ...)",
+        "cell metadata (structure, layer, donor species)"
+      ],
+      "variables_missing": [
+        "per-cell transcript counts in this table"
+      ],
+      "scope": "2,333 specimen records (mouse and human, cortical neurons); the 54 fields returned include 11 ef__ ephys fields, none are expression fields",
+      "evidence": "RMA response total_rows 2333; first record lists fields ef__adaptation, ef__avg_firing_rate, ef__avg_isi, ef__f_i_curve_slope, ef__fast_trough_v_long_square, ef__peak_t_ramp, ef__ri, ef__tau, ef__threshold_i_long_square, ef__upstroke_downstroke_ratio_long_square, ef__vrest; m__biophys, m__glif model ids; no transcript fields.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dandi-000020-patch-seq-mouse-visual-cortex",
+      "name": "DANDI:000020 Patch-seq recordings from mouse visual cortex (Allen Institute)",
+      "landing_url": "https://dandiarchive.org/dandiset/000020",
+      "access_url": "https://api.dandiarchive.org/api/dandisets/000020/versions/draft/",
+      "doi": null,
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET DANDI API dandiset 000020 draft version record",
+        "http_status": 200,
+        "bytes": 2748
+      },
+      "variables_present": [
+        "whole-cell Patch-seq recordings (electrophysiology) from mouse visual cortex neurons"
+      ],
+      "variables_missing": [
+        "whether the transcriptomic reads are in this dandiset (not verified)",
+        "non-neuronal or developmental slow voltage patterns"
+      ],
+      "scope": "mostly GABAergic interneurons plus a few layer 2/3 glutamatergic neurons; 4,435 files, 1,040 subjects, 141,856,436,428 bytes",
+      "evidence": "API record: name 'Patch-seq recordings from mouse visual cortex', access dandi:OpenAccess, license spdx:CC-BY-4.0, keywords Patch-seq, mouse, visual cortex, interneuron; description 'Whole-cell Patch-seq recordings from neurons of the mouse visual cortex from the Allen Institute for Brain Science, released in June 2020'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-gene-expression-omnibus",
+      "name": "NCBI GEO (Patch-seq series)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "E-utilities esearch/esummary on db=gds for Patch-seq series; GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [
+        "single-cell transcriptomes from Patch-seq cells, some series also describing ephys recordings"
+      ],
+      "variables_missing": [
+        "voltage values inside the GEO records (not verified)"
+      ],
+      "scope": "44 GEO series match Patch-seq; 9 also match 'electrophysiology'; e.g. GSE350772 has samples titled 'Patch-seq of cell NDF231229 (TRAP-labeled)' and one '(TRAP-labeled - no-ephys)'",
+      "evidence": "esearch counts 44 and 9; esummary on GSE350772 samples shows per-cell Patch-seq records, some flagged no-ephys.",
+      "verdict": "partial"
+    },
+    {
+      "id": "pride",
+      "name": "PRIDE proteomics archive",
+      "landing_url": "https://www.ebi.ac.uk/pride/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; GET archive v2 projects API with keyword filters",
+        "http_status": 200
+      },
+      "variables_present": [
+        "proteomes (general)"
+      ],
+      "variables_missing": [
+        "paired live voltage measurement",
+        "paired transcriptome"
+      ],
+      "scope": "general proteomics repository; no project with paired voltage found",
+      "evidence": "projects API returned records for keyword queries but the keyword did not filter results (first record: a dental-calculus milk study); no paired-voltage project located.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Allen Brain Map RMA API",
+      "query": "model::ApiCellTypesSpecimenDetail (count)",
+      "url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::ApiCellTypesSpecimenDetail&num_rows=0&count=true",
+      "hits": 2333,
+      "note": "specimens with ef__ electrophysiology features"
+    },
+    {
+      "source": "DANDI Archive",
+      "query": "patch-seq",
+      "url": "https://api.dandiarchive.org/api/dandisets/?search=patch-seq&page_size=5",
+      "hits": 41,
+      "note": "dandisets 000008, 000020, 000023, 000035, 000043 among the first five"
+    },
+    {
+      "source": "NCBI GEO (gds)",
+      "query": "Patch-seq AND gse[entrytype]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Patch-seq+AND+gse%5Bentrytype%5D&retmode=json&retmax=8",
+      "hits": 44,
+      "note": "GEO series mentioning Patch-seq"
+    },
+    {
+      "source": "NCBI GEO (gds)",
+      "query": "Patch-seq AND electrophysiology AND gse[entrytype]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Patch-seq+AND+electrophysiology+AND+gse%5Bentrytype%5D&retmode=json&retmax=5",
+      "hits": 9,
+      "note": ""
+    },
+    {
+      "source": "PRIDE archive API",
+      "query": "keyword=patch-clamp / membrane potential",
+      "url": "https://www.ebi.ac.uk/pride/ws/archive/v2/projects?keyword=membrane%20potential&pageSize=3",
+      "hits": null,
+      "note": "keyword filter did not narrow results (first record was a dental-calculus milk study); no project with paired voltage recordings found"
+    }
+  ],
+  "status": "partial",
+  "summary": "Matched electrophysiology and transcriptomes exist as neuronal Patch-seq data (DANDI:000020 CC-BY-4.0, 4,435 files; 44 GEO series mention Patch-seq, 9 also electrophysiology), and Allen's API gives 2,333 neurons' ephys features. All are spiking neurons, not slow developmental voltage patterns; no matched voltage-plus-proteome data were found and history dependence is not covered.",
+  "next_step": "Pull one Patch-seq set with both reads and NWB ephys (DANDI:000020 and its transcriptome companion; verify location) and pre-register a prediction-versus-permutation test of resting/firing features from transcripts.",
+  "obstacles_confirmed": [
+    "Matched live voltage and omics measurements exist for neurons only.",
+    "Proteins are not paired with voltage in the resources I checked."
+  ]
+}

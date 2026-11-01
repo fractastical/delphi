@@ -1,0 +1,88 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered GBIF island SAR test with coverage-standardized richness" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    dct:description "Archipelagos: Canary Islands, Galápagos, Hawaiian main islands, Azores, Balearic Islands, Cape Verde, chosen before looking at data because they have island areas in GIFT and dense GBIF sampling. Taxa: vascular plants, land birds and land snails, analysed separately. For each island × taxon, estimate richness from GBIF occurrences by coverage-based rarefaction to a common sample coverage of 0.95 (iNEXT), and also use GIFT checklists for plants as a sampling-independent check. Fit with the sars package, using identical richness estimates for every model: power (S = cA^z), logarithmic, Weibull-3 and the METE-predicted island curve (Harte et al. 2009 form, anchored at the largest island with its total abundance proxy). Pre-registered rules: 'universal power law' if the power model has the lowest AICc in ≥ 70% of archipelago × taxon sets and all z 95% CIs overlap a common interval of width ≤ 0.1; 'scale-dependent form' if METE or a curved model wins in ≥ 50% and local slope declines with area as METE predicts; otherwise 'neither'." ;
+
+    delphi:proposedTest "For 18 archipelago × taxon sets (6 × 3), the share where the power law wins and whether z intervals overlap, giving a pre-registered verdict among 'universal power law', 'scale-dependent form' or 'neither'." ;
+    delphi:context "Fails if: GBIF coverage is too low on small islands for coverage standardization to reach 0.95 in most sets, and plant results disagree with GIFT checklists by more than the CI widths: inconclusive, data quality." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with archipelagos, taxa, coverage target, models and decision rules. 2. Resolve island polygons and areas from GIFT; download GBIF occurrences per island polygon with a fetch script and checksums. 3. Compute coverage-standardized richness (and GIFT checklist richness for plants). 4. Fit all models with sars; compute AICc ranks and z intervals; apply the decision rule." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: GBIF sampling bias across islands is severe for snails; METE needs abundance totals that occurrence data only approximate." ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: macroecology" ;
+    skos:note "Tool: model-comparison" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> ;
+    rdfs:seeAlso <https://api.gbif.org/v1/occurrence/search?limit=1> ;
+    rdfs:seeAlso <https://gift.uni-goettingen.de/> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1365-2699.2011.02652.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2009.01328.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/ecog.04271> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" .
+
+  <https://api.gbif.org/v1/occurrence/search?limit=1> dct:title "GBIF occurrence API" ;
+    dct:description "Occurrence records per island polygon" .
+  <https://gift.uni-goettingen.de/> dct:title "GIFT – Global Inventory of Floras and Traits" ;
+    dct:description "Island geometries and areas, plant checklists" .
+  <https://doi.org/10.1111/j.1365-2699.2011.02652.x> dct:title "The island species–area relationship: biology and statistics" ;
+    dct:bibliographicCitation "Triantis, Guilhaumon and Whittaker 2012, island SAR across 601 datasets" .
+  <https://doi.org/10.1111/j.1461-0248.2009.01328.x> dct:title "Biodiversity scales from plots to biomes with a universal species–area curve" ;
+    dct:bibliographicCitation "Harte et al. 2009, universal species–area curve (METE)" .
+  <https://doi.org/10.1111/ecog.04271> dct:title "sars: an R package for fitting, evaluating and comparing species–area relationship models" ;
+    dct:bibliographicCitation "Matthews et al. 2019, sars R package" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to species-area-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.300Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to species-area-exponent: Pre-registered GBIF island SAR test with coverage-standardized richness" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,108 @@
+{
+  "claim_id": "darwin1859-ch13-19",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "embryonic or larval character matrix (stage-matched) for groups whose adults are highly modified",
+    "adult character matrix for the same taxa",
+    "independent molecular sequences or tree for the same taxa",
+    "developmental gene-expression data across stages and species (alternative measure of embryonic similarity)"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank-portal",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T11:59:00Z", "method": "GET morphobank.org and www.morphobank.org", "http_status": 403, "note": "CloudFront 403 'Request blocked' to a script client on every attempt; contents not confirmed" },
+      "variables_present": [],
+      "variables_missing": ["not verified: no response body beyond the 403 page"],
+      "scope": "Unknown from this run",
+      "evidence": "HTTP 403, 919 bytes, CloudFront error page.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-nuccore-cirripedia",
+      "name": "GenBank / NCBI Nucleotide (Cirripedia sequences via E-utilities)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Cirripedia%5BOrganism%5D&retmode=json&rettype=count",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:08:00Z", "method": "GET GenBank landing page (200, 37,829 bytes); GET esearch nuccore term Cirripedia[Organism]", "http_status": 200 },
+      "variables_present": ["molecular sequences for building an independent tree: 144,139 nuccore records for Cirripedia[Organism] (JSON count)"],
+      "variables_missing": ["no larval or adult characters; sequence coverage per species and locus not assessed"],
+      "scope": "Barnacles (the example group); other modified groups not queried",
+      "evidence": "esearchresult count 144139.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bgee-species-list",
+      "name": "Bgee gene expression database (API species list)",
+      "landing_url": "https://www.bgee.org/",
+      "access_url": "https://www.bgee.org/api/?display_type=json&page=species&action=list_species",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:08:00Z", "method": "GET API list_species and count the entries", "http_status": 200, "bytes": 26929 },
+      "variables_present": ["expression calls across anatomical and developmental stages for 52 species (species list length)"],
+      "variables_missing": ["only 52 species; the first entries are Homo sapiens and Mus, and whether barnacles or tunicates are present was not checked"],
+      "scope": "52 species in the API response",
+      "evidence": "JSON 'List of species in Bgee' with 52 entries (first entries Homo sapiens, Mus).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-geo-developmental-series",
+      "name": "NCBI Gene Expression Omnibus (GEO DataSets)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=embryonic+development+AND+gse%5BETYP%5D&retmode=json&retmax=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:08:00Z", "method": "GET GEO landing page (200, 21,423 bytes); GET esearch db=gds for 'embryonic development' restricted to series", "http_status": 200 },
+      "variables_present": ["expression series on embryonic development: 7,791 gds records matching the query (count)"],
+      "variables_missing": ["not matched to a comparative design across clades; the query count includes many single-species studies"],
+      "scope": "All species in GEO",
+      "evidence": "esearchresult count 7791.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life-synthetic-tree",
+      "name": "Open Tree of Life synthetic tree (API)",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "POST /v3/tree_of_life/about (GET returns 400: only POST forwarded)", "http_status": 200 },
+      "variables_present": ["synthetic tree synth_id opentree16.1 with 2,385,875 tips from 1,931 source studies, as an independent topology for clade membership (JSON)"],
+      "variables_missing": ["no characters"],
+      "scope": "All life",
+      "evidence": "JSON: synth_id opentree16.1, num_tips 2385875.",
+      "verdict": "holds",
+      "reuses_organism_dataset": "opentree-tnrs-ott3-7-2026-10-31"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "larval morphology phylogeny Cirripedia barnacle", "url": "https://datadryad.org/api/v2/search?q=larval%20morphology%20phylogeny%20Cirripedia%20barnacle&per_page=5", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "larval characters adult characters phylogenetic congruence molecular", "url": "https://datadryad.org/api/v2/search?q=larval%20characters%20adult%20characters%20phylogenetic%20congruence%20molecular&per_page=6", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "ontogenetic stages character matrix phylogeny larvae", "url": "https://datadryad.org/api/v2/search?q=ontogenetic%20stages%20character%20matrix%20phylogeny%20larvae&per_page=5", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "larval and adult morphological characters phylogeny matrix", "url": "https://api.datacite.org/dois?query=larval%20and%20adult%20morphological%20characters%20phylogeny%20matrix&page%5Bsize%5D=5", "hits": 10, "note": "dragonfly revision (10.5061/dryad.ncjsxkt73), frogs and salamanders (10.7916/d8gx4bsn); neither confirmed to separate embryonic from adult characters; not opened" },
+    { "source": "Zenodo", "query": "embryonic morphological characters phylogeny molecular tree comparison", "url": "https://zenodo.org/api/records?q=embryonic%20morphological%20characters%20phylogeny%20molecular%20tree%20comparison&size=4", "hits": 595744, "note": "broad OR; no relevant embryonic-matrix hit in the top four" }
+  ],
+  "status": "partial",
+  "summary": "Molecular side is covered (GenBank has 144,139 Cirripedia sequence records; Open Tree gives a synthetic topology) and developmental expression data exist (Bgee 52 species, GEO 7,791 embryonic-development series), but no stage-partitioned embryonic or larval character matrix was found in an openly reachable repository (MorphoBank returned 403 to scripts, and three Dryad searches returned no hits).",
+  "next_step": "Compile larval versus adult character partitions for a few modified-adult clades (barnacles, Rhizocephala, tunicates, parasitic copepods) from the original literature, or retry MorphoBank from a browser to see whether any project partitions characters by life stage.",
+  "obstacles_confirmed": [
+    "Comparative embryology matrices exist for scattered groups, not for animal groups in general.",
+    "No stage-partitioned character matrix was found in a reachable repository; Bgee covers only 52 species."
+  ]
+}

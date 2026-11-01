@@ -15,6 +15,16 @@ sys.path.insert(0, str(HERE.parents[3] / "plugins" / "nebius"))
 from fold import Client, uniprot, submit_esmfold, wait_all  # noqa: E402
 
 PANEL = json.loads((HERE / "panel.json").read_text())
+# PIEZO2 (2752 aa) runs out of GPU memory in one piece; longer chains are folded as two
+# overlapping windows, named <acc>_w1 and <acc>_w2.
+MAX_LEN, OVERLAP = 1500, 100
+
+
+def windows(acc, seq):
+    if len(seq) <= MAX_LEN:
+        return {acc: seq}
+    half = (len(seq) + OVERLAP) // 2
+    return {f"{acc}_w1": seq[:half], f"{acc}_w2": seq[len(seq) - half:]}
 
 
 def main():
@@ -26,15 +36,17 @@ def main():
         for acc in group:
             seqs[acc] = uniprot(acc, data / "sequences")
     runs_path = HERE / "derived" / "runs.json"
-    known = json.loads(runs_path.read_text()) if runs_path.exists() else {}
+    parts = {}
     for acc, s in seqs.items():
-        ops[acc] = (known.get(acc) or {}).get("operation_id") or submit_esmfold(client, acc, s["sequence"], data / "tmp")
-        print(f"{acc} ({len(s['sequence'])} aa): {ops[acc]}", flush=True)
+        for tag, seq in windows(acc, s["sequence"]).items():
+            parts[tag] = (acc, seq)
+            ops[tag] = submit_esmfold(client, tag, seq, data / "tmp")
+            print(f"{tag} ({len(seq)} aa): {ops[tag]}", flush=True)
     runs_path.parent.mkdir(exist_ok=True)
     runs_path.write_text(json.dumps({a: {"operation_id": o} for a, o in ops.items()}, indent=1))
     done = wait_all(client, ops, data / "structures")
-    out = {acc: {"uniprot": {k: v for k, v in seqs[acc].items() if k != "sequence"},
-                 "length": len(seqs[acc]["sequence"]), **done[acc]} for acc in ops}
+    out = {tag: {"uniprot": {k: v for k, v in seqs[acc].items() if k != "sequence"},
+                 "length": len(seq), **done[tag]} for tag, (acc, seq) in parts.items()}
     runs_path.write_text(json.dumps(out, indent=1))
 
 

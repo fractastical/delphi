@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Size of curvature and time errors when the assumptions fail" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "Quantify the deviations the problem asks about, as a model bound rather than a plant measurement. Start from the two-layer Euler-Bernoulli equilibrium already proved in Lean and check that a numerical beam recovers κ = (3/2) Δε / h when thicknesses and moduli are equal, to within 1 percent. Then solve three extensions the theorems do not cover: a linear through-thickness modulus gradient, a standard-linear-solid viscoelastic branch in the active layer, and a fibre angle that adds the shear mismatch already defined for the antisymmetric-twist claim. On a grid of modulus ratio from 0.1 to 10, gradient strength, viscosity ratio and fibre angle from 0 to 45 degrees, record κ divided by the Timoshenko value and the apparent exponent d log τ / d log h." ;
+
+    delphi:proposedTest "The grid of κ / κ_Timoshenko and of the apparent time exponent. Deviations are large, by the pre-registered rule, where the absolute relative curvature error exceeds 0.50 or the time exponent leaves [1.5, 2.5]. The symmetric-case check must pass or the grid is void." ;
+    delphi:context "Fails if: The solver misses the Lean symmetric curvature by more than 1 percent, or the error changes sign when the mesh is refined by two, so the deviation table is a discretisation artefact." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Verify the numerical beam against bilayerCurvature_symmetric to 1 percent. 2. Add the modulus gradient, the viscoelastic branch and the fibre angle one at a time. 3. Sweep the pre-registered grid. 4. Tabulate relative curvature error and the apparent time exponent. 5. Mark cells where the absolute relative curvature error exceeds 0.50 or the time exponent leaves [1.5, 2.5]." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: fenics" ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1364/josa.11.000233> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+
+
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1364/josa.11.000233> dct:title "Analysis of Bi-Metal Thermostats" ;
+    dct:bibliographicCitation "Timoshenko 1925, Analysis of bi-metal thermostats" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.348Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Size of curvature and time errors when the assumptions fail" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

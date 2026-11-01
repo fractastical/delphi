@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Theorems — delphisci</title>
+<meta name="description" content="The theorems of delphisci: every claim, from any source, whose mathematical content has been proved, either machine-checked in Lean 4 or established in the literature. Formal notation rendered as mathematics, assumptions, the Lean declarations, proposed tests and links to the papers and live nanopubs.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<link rel="stylesheet" href="css/delphi.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous" onload="window.__katexReady && __katexReady()"></script>
+<style>
+input[type=search]{width:220px}
+.criterion{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;padding:9px 14px;border-left:2px solid var(--rule);background:var(--paper-2);border-radius:0 8px 8px 0}
+#timeline{border:1px solid var(--grid);border-radius:10px;background:var(--paper-2);padding:6px 14px 2px;margin-bottom:14px;overflow-x:auto}
+#timeline svg{display:block;width:100%;height:auto;min-width:640px}
+#timeline circle{cursor:pointer}#timeline circle:hover{stroke:var(--ink)}
+#timeline text{font-family:var(--sans);fill:var(--ink-3);font-size:10px}
+#timeline .yr{fill:var(--ink-2)}
+#timeline .dim{opacity:.18}
+.thinker-head{display:flex;align-items:baseline;gap:12px;margin:28px 0 8px;border-bottom:1px solid var(--grid);padding-bottom:8px}
+.thinker-head h2{margin:0}.thinker-head .sub{font-size:12px;color:var(--ink-3)}
+.thm{position:relative;border:1px solid var(--grid);border-radius:10px;background:var(--paper-2);margin:12px 0;padding:16px 20px 12px;box-shadow:var(--shadow);scroll-margin-top:90px;transition:border-color .3s,box-shadow .3s}
+.thm:target,.thm.hi{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.thm .head{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.thm .num{font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);white-space:nowrap;margin-top:5px}
+.thm .title{font-size:17px;font-weight:500;letter-spacing:-.01em;margin:0;flex:1 1 320px;line-height:1.3}
+.thm .title a{color:inherit;text-decoration:none}.thm .title a:hover{text-decoration:underline}
+.thm .badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.statement{font-family:var(--serif);font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink);margin:12px 0 6px;padding-left:14px;border-left:2px solid var(--accent)}
+.statement::before{content:'Statement. ';font-style:normal;font-weight:600;color:var(--accent);font-family:var(--sans);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase}
+.formula{position:relative;margin:10px 0 4px;padding:14px 18px;border-radius:10px;background:var(--code-bg);border:1px solid var(--code-line);overflow-x:auto;font-size:16px;color:#fff}
+.formula .katex{font-size:1.08em}.formula .katex-display{margin:4px 0}
+.formula .clause{display:block;margin:4px 0;text-align:center}
+.formula .clause.mixed{font-family:var(--serif);font-size:15px;line-height:1.9;color:#e6edff;text-align:left;padding:0 6px}
+.formula .clause.mixed .m{margin:0 .25em;color:#fff}
+.formula .clause + .clause.mixed,.formula .clause.mixed + .clause{border-top:1px dashed #2c3d58;padding-top:6px;margin-top:6px}
+.formula.raw{font-family:var(--mono);font-size:12.5px;white-space:pre-wrap;color:var(--code-ink);text-align:left}
+.formula .err{color:#e9bc78;font-family:var(--mono);font-size:12px}
+.fx{position:absolute;top:6px;right:8px;font-size:10.5px;min-height:0;padding:1px 8px;opacity:.65}.fx:hover{opacity:1}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+@media(max-width:760px){.cols{grid-template-columns:1fr}input[type=search]{width:150px}.thm{padding:12px 14px 10px}}
+.thm.compact .cols,.thm.compact .foot .links,.thm.compact .statement{display:none}
+.thm.compact .formula{margin-bottom:8px}
+.foot{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--grid);font-size:12px;color:var(--ink-3)}
+.foot .links{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.foot .right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill.none{background:var(--grid);color:var(--ink-3)}
+.bar{display:inline-block;width:90px;height:6px;background:var(--grid);border-radius:4px;overflow:hidden;vertical-align:middle}.bar>i{display:block;height:6px;background:var(--accent)}
+.lean{font-family:var(--mono);font-size:11.5px;line-height:1.7;color:var(--ink-2);word-break:break-all}
+.empty{text-align:center;color:var(--ink-3);padding:40px 0;font-family:var(--serif);font-style:italic}
+</style></head><body>
+<!--__SITE_HEAD__-->
+<main>
+<header class="page-head"><div><div class="eyebrow accent">Claims atlas</div><h1>Theorems</h1>
+<p class="subtitle" id="subtitle"></p></div>
+<nav class="nav"><a class="btn" href="claims.json" title="Every claim with its scores as plain JSON">claims.json</a></nav></header>
+
+<p class="criterion">A claim is listed here only when it is <b>math-centred</b> (it has a formal statement, a Lean formalization, or is a mathematical law or model theorem) and its mathematical content has been <b>proved</b>: either machine-checked in Lean 4 (module compiled with no <code>sorry</code> and only Lean's standard axioms) or recorded as proved in the literature. Being from a mathematical-biology paper, carrying a formula, scoring high with the truth assessors, or being called a theorem by its author does not qualify on its own. The math claims still waiting for a proof are in the <a href="claim-graph.html?math=yes&amp;level=untested">claim graph</a>. A proof shows the statement follows from its assumptions; whether living systems satisfy those assumptions is left to the <a href="claim-graph.html">claim graph</a> and the claim tests.</p>
+<div class="toolbar">
+ <span class="lab">Thinker</span><span class="group" id="f-thinker"></span>
+ <span class="sep"></span>
+ <span class="lab">Proof</span><span class="group" id="f-proof"></span>
+ <span class="sep"></span>
+ <span class="lab">Sort</span><span class="group" id="f-sort"></span>
+ <span class="sep"></span>
+ <input id="search" type="search" placeholder="Search statements, formulas…" aria-label="Search">
+ <span class="sep"></span>
+ <button id="b-compact" onclick="toggleCompact()" title="Show only titles and formulas">Compact</button>
+ <button id="b-raw" onclick="toggleRaw()" title="Show the notation as written in the claim file">LaTeX source</button>
+ <span class="small mut" id="shown" style="margin-left:auto"></span>
+</div>
+<div id="timeline"></div>
+<div id="list"></div>
+<div class="footer">✦ Distributed Epistemic Layer for Probabilistic Hypothesis Inference ✦</div>
+</main>
+<script>
+const DATA = /*__DATA__*/null;
+const CLAIMS = DATA.claims;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Every claim in DATA has status `proved`; PROOF says how the proof was established.
+const lum = c => { const m = /^#([0-9a-f]{6})$/i.exec(c); if (!m) return 0; const n = parseInt(m[1], 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
+const PROOF = { lean: { label: 'Machine-checked (Lean 4)', col: '#2f8f6b' }, literature: { label: 'Proved in the literature', col: '#6f93f0' } };
+const KIND = { 'model-theorem': 'model theorem', 'principle-or-framework': 'framework', 'empirical-law': 'empirical law', conjecture: 'conjecture',
+  'mathematical-law': 'mathematical law', mechanism: 'mechanism', 'empirical-generalization': 'empirical generalization', prediction: 'prediction',
+  'general-principle': 'general principle', 'model-of-nature': 'model of nature', 'physical-hypothesis': 'physical hypothesis', conceptual: 'conceptual' };
+const THINKERS = [...new Set(CLAIMS.map(c => c.thinker))];
+const surname = t => /Maynard Smith/.test(t) ? 'Maynard Smith' : t.split(' ').at(-1);
+const state = { thinker: null, proof: null, sort: 'year', q: '', compact: false, raw: false };
+
+/* ---- notation → LaTeX ----
+   key-claims.json writes notation as LaTeX fragments joined by prose ("... for Malthusian fitness m"),
+   separated by ';' into clauses. Each clause is tokenised on whitespace; runs of plain English words are
+   wrapped in \text{} so KaTeX sets them upright, everything else is left as mathematics. */
+const PROSE_SINGLE = new Set(['a']);
+const isProseCore = w => /^[A-Za-z][A-Za-z'’-]+$/.test(w) && !/^(tr|ln|Cov|sgn|det|exp|log|dN|dS)$/.test(w);
+// A clause becomes alternating segments: { p: 'prose' } rendered as plain text, { m: 'tex' } rendered by KaTeX.
+function segments(clause) {
+  const s = clause.trim()
+    .replace(/\bCov\(/g, '\\operatorname{Cov}(')
+    .replace(/(?<!\\)\btr J\b/g, '\\operatorname{tr} J')
+    .replace(/(?<!\\)\bdet J\b/g, '\\det J')
+    .replace(/_\{([a-z]{3,}(?:,[a-z]{3,})*)\}/g, (_, w) => `_{\\text{${w}}}`);
+  const toks = s.split(/\s+/);
+  const kind = toks.map(t => isProseCore(t.replace(/^[(\[]+/, '').replace(/[)\],.:]+$/, '')) ? 'p' : 'm');
+  for (let i = 0; i < toks.length; i++) if (PROSE_SINGLE.has(toks[i]) && kind[i - 1] === 'p' && kind[i + 1] === 'p') kind[i] = 'p';
+  const out = [];
+  toks.forEach((t, i) => { const last = out.at(-1); if (last && last.k === kind[i]) last.t += ' ' + t; else out.push({ k: kind[i], t }); });
+  return out;
+}
+const clauses = n => n.split(/;\s+/);
+function renderFormula(el, c) {
+  if (state.raw || !window.katex) { el.classList.add('raw'); el.textContent = c.notation; return; }
+  el.classList.remove('raw'); el.innerHTML = '';
+  for (const cl of clauses(c.notation)) {
+    const segs = segments(cl), pureMath = segs.length === 1 && segs[0].k === 'm';
+    const line = document.createElement('span'); line.className = 'clause' + (pureMath ? ' display' : ' mixed');
+    for (const seg of segs) {
+      if (seg.k === 'p') { line.appendChild(document.createTextNode(seg.t)); continue; }
+      const span = document.createElement('span'); span.className = 'm';
+      try { katex.render((pureMath ? '' : '\\displaystyle ') + seg.t, span, { displayMode: pureMath, throwOnError: true, strict: 'ignore', trust: false }); }
+      catch (e) { span.innerHTML = `<span class="err" title="${esc(e.message)}">${esc(seg.t)}</span>`; }
+      line.appendChild(span);
+    }
+    el.appendChild(line);
+  }
+}
+window.__katexReady = () => document.querySelectorAll('.formula').forEach(el => renderFormula(el, CLAIMS.find(c => c.id === el.dataset.id)));
+
+/* ---- context → assumptions + formal status ---- */
+function splitContext(ctx) {
+  const m = ctx.match(/^(?:Assumptions:\s*([^]*?))?\s*(?:Formal status:\s*([^]*))?$/);
+  return { assumptions: (m?.[1] || '').trim(), formal: (m?.[2] || '').trim() };
+}
+
+/* ---- filtering & rendering ---- */
+const matches = c => (!state.thinker || c.thinker === state.thinker) && (!state.proof || c.proof === state.proof) &&
+  (!state.q || [c.label, c.text, c.notation, c.context, c.test, c.work, c.thinker, c.lean?.assumptions, c.lean?.scopeNote, ...(c.lean?.theorems || [])].join(' ').toLowerCase().includes(state.q));
+const sorters = { year: (a, b) => a.year - b.year || a.thinker.localeCompare(b.thinker) || a.id.localeCompare(b.id), thinker: (a, b) => THINKERS.indexOf(a.thinker) - THINKERS.indexOf(b.thinker) || a.year - b.year || a.id.localeCompare(b.id),
+  truth: (a, b) => (b.truth ?? -1) - (a.truth ?? -1) || a.year - b.year, proof: (a, b) => Object.keys(PROOF).indexOf(a.proof) - Object.keys(PROOF).indexOf(b.proof) || a.year - b.year || a.id.localeCompare(b.id) };
+
+function card(c, n) {
+  const ctx = splitContext(c.context || '');
+  const assumptions = ctx.assumptions || c.lean?.assumptions || '';
+  const pf = PROOF[c.proof] || { label: 'Proved', col: '#2f8f6b' };
+  const truth = c.truth != null ? `<span class="pill" title="${esc(c.truthBy.map(x => `${x.who}: ${x.p}`).join(' · '))}">P ${c.truth.toFixed(2)}</span><span class="bar"><i style="width:${Math.round(c.truth * 100)}%"></i></span>` : `<span class="pill none">P —</span>`;
+  const np = c.uri ? `<a href="${esc(c.uri)}" target="_blank" rel="noopener" class="${c.registry === 'production' ? 'live' : 'test'}">${c.registry === 'production' ? '● live nanopub' : '○ test nanopub'}</a>` : '<span class="mut">unpublished</span>';
+  const paper = c.doi ? `<a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">${esc(c.work)} (${c.year})</a>` : `${esc(c.work)} (${c.year})`;
+  const where = c.section && c.section !== `${c.work} (${c.year})` ? ` · ${esc(c.section)}${c.locator ? `, ${esc(c.locator)}` : ''}` : '';
+  const seeAlso = (c.seeAlso || []).map(d => `<a href="https://doi.org/${esc(d)}" target="_blank" rel="noopener" title="${esc(d)}">doi</a>`).join(', ');
+  const lean = c.lean ? `<h3>Lean 4 proof</h3><p class="lean">${esc(c.lean.module)}<br>${esc(c.lean.declaration)}<br>${c.lean.theorems.map(esc).join('<br>')}</p>${c.lean.scopeNote ? `<p class="small mut">${esc(c.lean.scopeNote)}</p>` : ''}` : '';
+  return `<article class="thm${state.compact ? ' compact' : ''}" id="${esc(c.id)}">
+  <div class="head"><span class="num">Theorem ${n}</span>
+   <h2 class="title"><a href="#${esc(c.id)}">${esc(c.label)}</a></h2>
+   <span class="badges"><span class="badge kind">${esc(KIND[c.kind] || c.kind)}</span><span class="badge" style="background:${pf.col};border-color:transparent;color:${lum(pf.col) > .6 ? '#172945' : '#fff'}">${pf.label}</span></span></div>
+  <p class="statement">${esc(c.text)}</p>
+  ${c.notation ? `<div class="formula" data-id="${esc(c.id)}"></div>` : ''}
+  <div class="cols">
+   <div>${assumptions ? `<h3>Assumptions</h3><p>${esc(assumptions)}</p>` : ''}
+    ${ctx.formal ? `<h3>Formal status</h3><p>${esc(ctx.formal)}</p>` : ''}${lean}</div>
+   <div>${c.test ? `<h3>Proposed test</h3><p>${esc(c.test)}</p>` : ''}${c.quote ? `<h3>Source text</h3><p class="small mut">“${esc(c.quote)}”</p>` : ''}</div>
+  </div>
+  <div class="foot"><span>${esc(surname(c.thinker))} · ${paper}${where}${seeAlso ? ` · see also ${seeAlso}` : ''}</span>
+   <span class="right"><span class="links">${np} · <a href="claim-graph.html?claim=${encodeURIComponent(c.id)}">graph</a> · <code>${esc(c.id)}</code></span>${truth}</span></div>
+ </article>`;
+}
+
+function render() {
+  const rows = CLAIMS.filter(matches).sort(sorters[state.sort]);
+  const list = $('list'); let html = '', n = 0, lastThinker = null;
+  for (const c of rows) {
+    if (state.sort === 'thinker' && c.thinker !== lastThinker) {
+      lastThinker = c.thinker; const mine = rows.filter(x => x.thinker === c.thinker);
+      const yrs = [...new Set(mine.map(x => x.year))].sort();
+      html += `<div class="thinker-head"><h2>${esc(c.thinker)}</h2><span class="sub">${mine.length} theorem${mine.length > 1 ? 's' : ''} · ${yrs.length > 1 ? `${yrs[0]}–${yrs.at(-1)}` : yrs[0]}</span></div>`;
+    }
+    html += card(c, ++n);
+  }
+  list.innerHTML = html || '<p class="empty">No theorem matches.</p>';
+  list.querySelectorAll('.formula').forEach(el => renderFormula(el, CLAIMS.find(c => c.id === el.dataset.id)));
+  $('shown').textContent = `${rows.length} of ${CLAIMS.length}`;
+  drawTimeline(new Set(rows.map(c => c.id)));
+}
+
+/* ---- timeline ---- */
+function drawTimeline(visible) {
+  const years = CLAIMS.map(c => c.year), y0 = Math.min(...years) - 2, y1 = Math.max(...years) + 2;
+  const W = 1100, L = 30, R = 30, top = 24, PER_ROW = 12, STEP = 9;
+  // One lane per thinker; a book's theorems all share its year, so dots wrap into rows of PER_ROW.
+  const lanes = THINKERS.map(t => { const mine = CLAIMS.filter(c => c.thinker === t); const perYear = {}; for (const c of mine) perYear[c.year] = (perYear[c.year] || 0) + 1;
+    return { t, mine, rows: Math.max(1, Math.ceil(Math.max(...Object.values(perYear)) / PER_ROW)) }; });
+  const laneH = l => 10 + l.rows * STEP + 3, H = top + lanes.reduce((s, l) => s + laneH(l), 0) + 10;
+  const x = y => L + (y - y0) / (y1 - y0) * (W - L - R);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Timeline of theorems by thinker">`;
+  for (let y = Math.ceil(y0 / 10) * 10; y <= y1; y += 10) s += `<line x1="${x(y)}" y1="${top - 6}" x2="${x(y)}" y2="${H - 8}" stroke="currentColor" stroke-opacity=".12"/><text class="yr" x="${x(y)}" y="12" text-anchor="middle">${y}</text>`;
+  let yTop = top;
+  for (const lane of lanes) {
+    const cy = yTop + 6;
+    s += `<text x="0" y="${cy + 3}">${esc(surname(lane.t))}</text><line x1="${L + 30}" y1="${cy}" x2="${W - R}" y2="${cy}" stroke="currentColor" stroke-opacity=".08"/>`;
+    const seen = {};
+    for (const c of lane.mine.sort((a, b) => a.year - b.year || a.id.localeCompare(b.id))) {
+      const k = seen[c.year] = (seen[c.year] ?? -1) + 1, dx = (k % PER_ROW) * STEP, dy = Math.floor(k / PER_ROW) * STEP;
+      const pf = PROOF[c.proof] || { col: '#2f8f6b', label: 'Proved' };
+      s += `<circle class="${visible.has(c.id) ? '' : 'dim'}" cx="${x(c.year) + dx}" cy="${cy + dy}" r="4" fill="${pf.col}" stroke="var(--paper-2)" stroke-width="1" data-id="${esc(c.id)}"><title>${esc(c.label)} (${c.year}) — ${pf.label}</title></circle>`;
+    }
+    yTop += laneH(lane);
+  }
+  $('timeline').innerHTML = s + '</svg>';
+  $('timeline').querySelectorAll('circle').forEach(el => el.onclick = () => jump(el.dataset.id));
+}
+function jump(id) {
+  if (!document.getElementById(id)) { state.thinker = null; state.proof = null; state.q = ''; $('search').value = ''; syncButtons(); render(); }
+  const el = document.getElementById(id); if (!el) return;
+  history.replaceState(null, '', '#' + id); el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.thm.hi').forEach(x => x.classList.remove('hi')); el.classList.add('hi');
+}
+
+/* ---- controls ---- */
+function buttons(id, items, key) {
+  $(id).innerHTML = items.map(([v, label, title]) => `<button data-v="${esc(v ?? '')}" title="${esc(title || '')}">${esc(label)}</button>`).join('');
+  $(id).querySelectorAll('button').forEach(b => b.onclick = () => { const v = b.dataset.v || null; state[key] = key === 'sort' ? v : (state[key] === v ? null : v); syncButtons(); render(); });
+}
+function syncButtons() {
+  for (const [id, key] of [['f-thinker', 'thinker'], ['f-proof', 'proof'], ['f-sort', 'sort']])
+    $(id).querySelectorAll('button').forEach(b => b.classList.toggle('on', (b.dataset.v || null) === state[key]));
+  $('b-compact').classList.toggle('on', state.compact); $('b-raw').classList.toggle('on', state.raw);
+}
+function toggleCompact() { state.compact = !state.compact; document.querySelectorAll('.thm').forEach(el => el.classList.toggle('compact', state.compact)); syncButtons(); }
+function toggleRaw() { state.raw = !state.raw; document.querySelectorAll('.formula').forEach(el => renderFormula(el, CLAIMS.find(c => c.id === el.dataset.id))); syncButtons(); }
+
+buttons('f-thinker', [[null, 'All'], ...THINKERS.map(t => [t, surname(t), `${CLAIMS.filter(c => c.thinker === t).length} theorems`])], 'thinker');
+buttons('f-proof', [[null, 'All'], ...Object.entries(PROOF).map(([s, d]) => [s, `${d.label} (${CLAIMS.filter(c => c.proof === s).length})`])], 'proof');
+buttons('f-sort', [['year', 'Year'], ['thinker', 'Thinker'], ['proof', 'Proof'], ['truth', 'Truth']], 'sort');
+$('search').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); render(); });
+const live = CLAIMS.filter(c => c.registry === 'production').length, nLean = CLAIMS.filter(c => c.proof === 'lean').length, nLit = CLAIMS.filter(c => c.proof === 'literature').length;
+$('subtitle').textContent = `${CLAIMS.length} of ${DATA.total} claims${DATA.math ? ` (${DATA.math} with mathematical content)` : ''} have reached proof: ${nLean} machine-checked in Lean 4, ${nLit} proved in the literature · ${THINKERS.length} thinkers · ${live} published as nanopubs · built ${DATA.built}`;
+syncButtons(); render();
+if (location.hash.length > 1) setTimeout(() => jump(decodeURIComponent(location.hash.slice(1))), 50);
+</script></body></html>

@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Phylogenetic decomposition of diversity constraints" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Pre-register a phylogenetic hierarchical model for autosomal synonymous diversity across at least 150 animal species. Predict log diversity from log census proxy, recombination-map length, functional genomic density, body size, range area from GBIF, and generation time, with clade random slopes and measurement error. Compare neutral, linked-selection and boom-bust models by leave-one-clade-out expected log predictive density." ;
+
+    delphi:proposedTest "Linked selection closes the gap only if its model improves leave-one-clade-out ELPD by at least 10 and leaves an absolute census-diversity slope residual below 0.05; otherwise the residual is quantitatively unresolved." ;
+    delphi:context "Fails if: Fewer than 30 independent recombination landscapes or posterior predictions dominated by range-size measurement error make the mechanism comparison underpowered." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze taxon inclusion, one diversity estimate per species and GBIF coverage rules before fitting. 2. Require at least 30 species with measured recombination maps and 150 total with range proxies. 3. Fit matched neutral, background-selection and recurrent-sweep models with a fixed phylogeny. 4. Report slope residuals, variance explained and held-out calibration." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Comparable recombination maps and defensible census sizes are sparse outside model organisms." ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.324Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Phylogenetic decomposition of diversity constraints" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

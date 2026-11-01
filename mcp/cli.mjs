@@ -17,17 +17,33 @@
 //   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species
 //   node mcp/cli.mjs organisms --group-by class
 //   node mcp/cli.mjs organism columba-livia
+//   node mcp/cli.mjs morpholib                         (MorphoEval audits and the claims they test or model)
+//   node mcp/cli.mjs morpholib list --relation tests --thinker thompson
+//   node mcp/cli.mjs morpholib --id thompson1917-ch11-08
+//   node mcp/cli.mjs morpholib live                     (what is published now vs test-data/morpholib/links.json)
+//   node mcp/cli.mjs replications [claim-id] [--quorum 2] [--trusted ed25519:..] [--peers]
 //   node mcp/cli.mjs forum --view claim --claim levin-2022-tame-19
 //   node mcp/cli.mjs forum --view requests
 //   node mcp/cli.mjs propose-claim proposal.json      (fields as in delphi_propose_claim)
 //   node mcp/cli.mjs log-result result.json            (fields as in delphi_log_test_result)
+//   node mcp/cli.mjs laws --kind biological --status accepted     (Lean laws; same handlers as sim-engine/lean-cli.mjs)
+//   node mcp/cli.mjs law kimura-substitution-rate
+//   node mcp/cli.mjs lawset current
+//   node mcp/cli.mjs check design.json --lawset current
+//   node mcp/cli.mjs propose Law.lean --meta meta.json
+//   node mcp/cli.mjs verify
+//   node mcp/cli.mjs source [--refresh]                         (Lean law source: local, or remote mirror/github)
+//   node mcp/cli.mjs changes 1.3.0                              (lawset releases after 1.3.0)
 
 import { readFileSync } from "node:fs";
+import { replicationsTool } from "./federation.mjs";
 import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
 import { browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { morpholibTool } from "./morpholib.mjs";
 import { claimTestsTool } from "./tests.mjs";
+import { COMMANDS as LEAN } from "../sim-engine/lean-cli.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -54,11 +70,22 @@ const commands = {
     missingAxis: opts.missingAxis ? String(opts.missingAxis).split(",") : [],
   }),
   tests: () => claimTestsTool({ view: positional[0], ...opts }),
+  morpholib: () => morpholibTool({ view: positional[0], ...opts }),
+  replications: () => replicationsTool({ claim: positional[0] ?? opts.claim, quorum: opts.quorum, trusted: opts.trusted ? String(opts.trusted).split(",") : undefined, includePeers: Boolean(opts.peers) }),
   organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
   forum: () => forumRead({ view: positional[0] ?? opts.view ?? "feed", limit: 25, ...opts }),
   "propose-claim": () => proposeClaim(JSON.parse(readFileSync(positional[0], "utf8"))),
   "log-result": () => logTestResult(JSON.parse(readFileSync(positional[0], "utf8"))),
 };
+// Lean law subcommands: parsed again from raw argv by the shared CLI so numbers stay strings (lawset "1.2.0").
+const { parseArgs } = await import("../sim-engine/lean-cli.mjs");
+for (const [name, fn] of Object.entries(LEAN)) commands[name] = () => fn(parseArgs(rest));
+// LeanBio subcommands (pipeline/leanbio/tools.mjs), for parity with the leanbio_* MCP tools.
+const { LEANBIO_TOOLS } = await import("../pipeline/leanbio/tools.mjs");
+const lb = Object.fromEntries(LEANBIO_TOOLS.map(t => [t.name, t]));
+commands["leanbio-queue"] = () => lb.leanbio_queue.handler({ limit: Number(positional[0] || 20) });
+commands["leanbio-ground"] = () => lb.leanbio_ground.handler({ text: positional.join(" ") });
+commands["leanbio-claim"] = () => lb.leanbio_claim.handler({ id: positional[0] });
 
 if (!commands[cmd]) {
   console.error(`Usage: node mcp/cli.mjs <${Object.keys(commands).join("|")}> [args] [--source local|network]`);

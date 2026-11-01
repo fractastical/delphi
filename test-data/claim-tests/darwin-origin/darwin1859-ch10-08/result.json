@@ -1,0 +1,111 @@
+{
+  "claim_id": "darwin1859-ch10-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-08",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Extinct animal families in the fossil record are bottom-heavy: their genus diversity peaks early in their history and tapers over a longer decline, so the centre of gravity of the diversity trajectory lies in the first half of the family's duration.",
+  "pass_criterion": "Pre-registered: from the Paleobiology Database taxa API, all accepted animal (Metazoa) genera with first and last appearance ages and family assignment. A family is extinct if none of its genera is flagged extant and every genus has lastapp_min_ma > 0. Each genus ranges from firstapp_max_ma to lastapp_min_ma; the family's range is the union. Diversity D(t) = number of genera ranging through t on a 0.1 Myr grid. Centre of gravity CG = sum(D(t) * tau(t)) / sum(D(t)), tau = (family origin - t) / (family origin - family end), so CG < 0.5 means diversity is concentrated early and decline is slower than rise. Families qualify with >= 5 genera and duration >= 10 Myr. SUPPORTS if the median CG < 0.5, the one-sided Wilcoxon signed-rank test of CG - 0.5 < 0 has p < 0.01, and at least 55% of families have CG < 0.5.",
+  "fail_criterion": "Pre-registered: REFUTES if the median CG >= 0.5. Any other outcome is MIXED. Fewer than 100 qualifying families: inconclusive (underpowered); PBDB API unreachable: inconclusive (data-unavailable). Descriptive secondary statistics: median CG and share below 0.5 for families ending at the five big mass extinctions (end-Ordovician 443.8, Late Devonian 372.2, end-Permian 251.9, end-Triassic 201.4, end-Cretaceous 66.0 Ma, within 2 Myr) versus all others, and for Paleozoic-, Mesozoic- and Cenozoic-originating families.",
+  "planned_datasets": [
+    "pbdb-taxa-api"
+  ],
+  "interpretation": "Darwin's 'complete extinction of the species of a group is generally a slower process than their production' is read through clade shape (Gould et al. 1977): if production is fast and extermination slow, the diversity trajectory rises steeply and tapers, giving a centre of gravity in the first half of the clade's duration. Groups are extinct animal families as classified in PBDB (Darwin's 'groups' of genera and families); diversity is counted in genera, because Darwin's species are rarely resolved in the fossil record. Range-through ranges from database first and last appearances are used without sampling correction; the Signor-Lipps effect pulls last appearances earlier and can shorten or lengthen the tail, so the test measures the record as compiled.",
+  "test_contract": {
+    "expected_observation": "Most extinct families have a diversity centre of gravity below 0.5 of their duration (early peak, longer decline).",
+    "disconfirming_observation": "Extinct families are symmetric or top-heavy (median centre of gravity at or above 0.5).",
+    "admissible_datasets": "A community fossil occurrence database giving first and last appearance ages for genera with family classification, compiled independently of Darwin; open access; at least 100 extinct families with five or more genera.",
+    "inference_method": "Range-through genus diversity per family on a 0.1 Myr grid; centre of gravity relative to family duration; one-sided Wilcoxon signed-rank test against 0.5 with p < 0.01, median < 0.5 and share below 0.5 >= 55% for support; median >= 0.5 refutes."
+  },
+  "datasets": [
+    {
+      "id": "pbdb-taxa-api",
+      "name": "Paleobiology Database data service 1.2, taxa/list: accepted Metazoa genera with first and last appearance ages (show=app) and classification (show=class)",
+      "landing_url": "https://paleobiodb.org/data1.2/taxa/list_doc.html",
+      "doi": null,
+      "version": "live API, retrieved 2026-10-31T21:18:48Z",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Metazoa&rank=genus&taxon_status=accepted&show=app,class",
+          "retrieved_at": "2026-10-31T21:18:48Z",
+          "byte_size": 22250470,
+          "sha256": "3eccaf17a012bf19b9726439c5dd5005402291d7d30f32ccfa1a3955d706a70c"
+        }
+      ],
+      "role": "first and last appearance ages, extant flag and family of 79,166 accepted animal genera"
+    }
+  ],
+  "method": "All 79,166 accepted Metazoa genera were fetched from the PBDB taxa API; genera without ages or family were dropped. A family was taken as extinct when none of its genera is flagged extant and none has a last appearance at 0 Ma. Each genus ranges through from firstapp_max_ma to lastapp_min_ma; genus diversity D(t) was counted on a 0.1 Myr grid between the family's first origin and final extinction, and the centre of gravity CG of D over relative time (0 = origin, 1 = extinction) was computed for the 1,866 extinct families with >= 5 genera and >= 10 Myr duration. The median CG, the share below 0.5 and a one-sided Wilcoxon signed-rank test of CG - 0.5 were compared with the pre-registered thresholds; families ending within 2 Myr of the five big mass extinctions and families by era of origin are reported separately.",
+  "measured": {
+    "value": 0.477,
+    "unit": "median centre of gravity of range-through genus diversity of extinct animal families (0 = origin, 1 = extinction; < 0.5 = slow decline)",
+    "n": 1866,
+    "uncertainty": "Wilcoxon one-sided p (CG < 0.5) = 1.06e-18; IQR 0.409-0.547",
+    "extra": {
+      "share_cg_below_0.5": 0.594855305466238,
+      "mean_cg": 0.47833195724551536,
+      "wilcoxon_p_one_sided": 1.0629807809347155e-18,
+      "median_peak_tau": 0.508693484954406,
+      "genera_records_total": 79166,
+      "ending_at_big_five": {
+        "n": 359,
+        "median_cg": 0.5225998114172795,
+        "share_cg_below_0.5": 0.40947075208913647
+      },
+      "ending_elsewhere": {
+        "n": 1507,
+        "median_cg": 0.4679996699577979,
+        "share_cg_below_0.5": 0.6390179163901791
+      },
+      "paleozoic_origin": {
+        "n": 1137,
+        "median_cg": 0.4765601594203019,
+        "share_cg_below_0.5": 0.5989445910290238
+      },
+      "mesozoic_origin": {
+        "n": 567,
+        "median_cg": 0.48233575498418857,
+        "share_cg_below_0.5": 0.5749559082892416
+      },
+      "cenozoic_origin": {
+        "n": 162,
+        "median_cg": 0.47498711132508886,
+        "share_cg_below_0.5": 0.6358024691358025
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.6,
+  "caveats": [
+    "The asymmetry is real but small: median CG 0.477 (IQR 0.41-0.55), 59% of families below 0.5. It holds in every large phylum (Chordata 0.485, Arthropoda 0.473, Mollusca 0.462, Brachiopoda 0.489, Echinodermata 0.456, Cnidaria 0.473) and in Paleozoic-, Mesozoic- and Cenozoic-originating families (0.477, 0.482, 0.475). The test passes the pre-registered thresholds, but 'generally a slower process' is supported only as a modest tendency, not a strong rule.",
+    "As Darwin himself noted for ammonites, families ending at the big five mass extinctions are the exception: their median CG is 0.523 and only 41% are below 0.5 (n = 359), against 0.468 and 64% for families ending at other times (n = 1,507).",
+    "No sampling correction was applied. Range-through ranges from database first and last appearances are affected by the Signor-Lipps effect (last appearances drawn earlier); the 'pull of the Recent' does not apply because only extinct families are used. The grok assessor warned that sampling bias can manufacture slow-looking declines; the opposite bias (late-Lazarus truncation) also exists, so the direction of net bias is not known.",
+    "Genus first and last appearance ages are taken at the outer bounds of the first and last intervals (firstapp_max_ma, lastapp_min_ma), which lengthens every genus range by up to one interval at each end symmetrically.",
+    "Families are PBDB's classification, which includes paraphyletic families; Darwin's 'group' could also be read at the order or class level, which was not tested.",
+    "PBDB is a live database; re-running reproduces the method but counts drift as records are added."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  },
+  "preregistration": {
+    "api_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Metazoa&rank=genus&taxon_status=accepted&show=app,class",
+    "min_genera": 5,
+    "min_duration_myr": 10,
+    "grid_myr": 0.1,
+    "min_families": 100,
+    "alpha": 0.01,
+    "share_threshold": 0.55,
+    "mass_extinctions_ma": [
+      443.8,
+      372.2,
+      251.9,
+      201.4,
+      66.0
+    ],
+    "mass_extinction_window_myr": 2
+  }
+}

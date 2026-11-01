@@ -13,6 +13,14 @@ export const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
 // What a test's data measured (test-data/claim-tests/README.md). Only `biological` shows that a
 // claim holds in organisms; `computational` shows it holds in simulation or mathematics.
 export const DATA_KINDS = ["biological", "physical", "computational", "none"];
+// How a math claim maps onto formal statements (`formalization.tags` on a claim in its source file).
+// `one`: a single formalization everyone agrees on. `several`: non-equivalent readings, listed in
+// `formalization.readings`, so a proof of one says nothing about the others. `identity`: provable
+// from the model's own bookkeeping, so true and carrying no information about organisms.
+// `contingent`: a dataset can touch it. `not-mathematical`: no formalization. A claim may carry
+// several tags (the Price equation is an identity whose selection/transmission split is contingent).
+// A proof never changes the tags; the tags say which statement a proof is a proof of.
+export const FORMALIZATION = ["one", "several", "identity", "contingent", "not-mathematical"];
 const UNTESTED_NOTE = "Extracted from the text; not yet tested against data.";
 export const claimKey = c => createHash("sha256").update(`${c.label}\n${c.text}`.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 16);
 
@@ -38,7 +46,7 @@ export function loadClaims() {
   const projects = readdirSync(join(ROOT, "claim-sources")).map(d => `claim-sources/${d}`);
   for (const dir of projects.filter(d => existsSync(join(ROOT, d, "lean/reports")))) {
     for (const f of ls(join(ROOT, dir, "lean/reports"), /\.json$/)) {
-      const module = `${dir}/lean/${readJson(join(ROOT, dir, "lean/reports", f))[0]?.lean_declaration?.split(".")[0] ?? "Lean"}/${f.replace(/\.json$/, ".lean")}`;
+      const module = `${dir}/lean/${readJson(join(ROOT, dir, "lean/reports", f)).find(r => r.lean_declaration)?.lean_declaration.split(".")[0] ?? "Lean"}/${f.replace(/\.json$/, ".lean")}`;
       for (const r of readJson(join(ROOT, dir, "lean/reports", f))) {
         if (r.status === "not-formalized" && r.reason) leanDeclined[r.claim_id] = r.reason;
         if (r.status !== "formalized" || !r.lean_theorems?.length) continue;
@@ -99,7 +107,7 @@ export function loadClaims() {
         status: l ? "proved" : "untested", proof: l ? "lean" : null,
         statusNote: l ? `Mathematical core machine-checked in Lean 4 (${l.module}: ${l.theorems.join(", ")}). ${l.scopeNote}`.trim()
           : leanDeclined[c.id] ? `Lean formalization attempted and declined: ${leanDeclined[c.id]}` : UNTESTED_NOTE,
-        lean: l,
+        lean: l, formalization: c.formalization ?? null,
         draft, assess: a, resolvability: mean(a.map(x => x.overall).filter(v => v != null)), confidence: mean(a.map(x => x.confidence).filter(v => v != null)),
         uri, registry,
         ...perClaim(c),
@@ -131,27 +139,38 @@ export function loadClaims() {
       return p ? { work: p.title, year: p.year, doi: p.doi, section: `${p.authors.split(",")[0]} ${p.year}, ${p.title}${c.section ? ` › ${c.section}` : ""}` } : {};
     } });
 
-  // Mathematical-biology key claims: formal status as recorded in key-claims.json. Being in this
+  // Aristotle: three works in one project; the year is the conventional dating (c. 350 BCE) as a negative number.
+  const ARISTOTLE = "claim-sources/aristotle-biology";
+  const aristotleWorks = existsSync(join(ROOT, ARISTOTLE, "inputs/sources.json")) ? readJson(join(ROOT, ARISTOTLE, "inputs/sources.json")).works : [];
+  const aristotleWork = Object.fromEntries(aristotleWorks.map(w => [w.key, w]));
+  addBook({ dir: ARISTOTLE, thinker: "Aristotle", year: -350, idPrefix: "aristotle", chapterOf: () => "", titles: {},
+    perClaim: c => {
+      const w = aristotleWork[c.work];
+      return w ? { work: w.title, section: `${w.title}, Book ${c.book}${c.section ? `, ${c.section}` : ""}` } : {};
+    } });
+
+  // Key-claim projects (claim-sources/<project>/claims/key-claims.json: math-bio-claims,
+  // plant-hygromorph-mechanics): formal status as recorded in each claim's context. Being in such a
   // project does not make a claim a theorem; only a recorded proof (or a Lean report) does.
-  const MATH = join(ROOT, "claim-sources/math-bio-claims");
-  const keyClaims = readJson(join(MATH, "claims/key-claims.json")).claims;
-  const mathManifest = readJson(join(MATH, "nanopubs/manifest.json")).nanopubs;
   const formalStatus = c => {
     const fs = (c.context.match(/Formal status:\s*([^]*)$/) || [, ""])[1].toLowerCase();
     if (/refuted as stated|largely abandoned/.test(fs)) return "refuted";
     if (/not a mathematical|framework rather than/.test(fs) || c.kind !== "model-theorem") return "untested";
-    if (/not in general|is open|conjectur/.test(fs)) return "partial";
+    if (/^partial|not in general|is open|conjectur/.test(fs)) return "partial";
     return "proved";
   };
-  for (const c of keyClaims) {
-    const m = mathManifest.find(n => n.claim.endsWith(`/${c.id}`));
+  const keyClaimProjects = projects.filter(d => existsSync(join(ROOT, d, "claims/key-claims.json")));
+  for (const dir of keyClaimProjects) for (const c of readJson(join(ROOT, dir, "claims/key-claims.json")).claims) {
+    const manifestFile = join(ROOT, dir, "nanopubs/manifest.json");
+    const m = existsSync(manifestFile) ? readJson(manifestFile).nanopubs.find(n => n.claim.endsWith(`/${c.id}`)) : null;
     const fsText = (c.context.match(/Formal status:\s*([^]*)$/) || [, ""])[1];
     const l = lean[c.id] ?? null, status = l ? "proved" : formalStatus(c);
     claims.push({
       id: c.id, label: c.label, text: c.statement, notation: c.notation, context: c.context, test: c.proposed_test, kind: c.kind,
       thinker: c.thinker, year: c.paper.year, work: c.paper.title, section: `${c.paper.title} (${c.paper.year})`,
       doi: c.paper.doi, seeAlso: c.see_also ?? [], status, proof: l ? "lean" : status === "proved" ? "literature" : null, lean: l,
-      statusNote: fsText ? `Formal status recorded in key-claims.json: ${fsText}` : "",
+      formalization: c.formalization ?? null,
+      statusNote: fsText ? `Formal status recorded in ${dir}/claims/key-claims.json: ${fsText}` : "",
       draft: false, assess: [], resolvability: null, confidence: null,
       uri: m?.trustyUri ?? null, registry: m?.productionRegistry ? "production" : m?.trustyUri ? "test" : null,
     });
@@ -185,11 +204,44 @@ export function loadClaims() {
           disconfirming_observation: r.test_contract?.disconfirming_observation ?? r.fail_criterion ?? "",
           admissible_datasets: r.test_contract?.admissible_datasets ?? (r.planned_datasets?.length ? `Planned datasets: ${r.planned_datasets.join(", ")}` : ""),
           inference_method: r.test_contract?.inference_method ?? r.method ?? "", explicit: !!r.test_contract },
-        revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })) };
+        revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })),
+        // A9 faithfulness (test-data/claim-tests/FAITHFULNESS.md): does the analysis measure what the claim asserts?
+        // faithfulness.json is the first assessor, faithfulness.<assessor>.json a blind second opinion. `agreed` when
+        // every assessor gave the same verdict; `contested` otherwise. A not-representative verdict never changes
+        // `evidence` here; it is a published finding about the test.
+        faithfulness: (() => {
+          const files = ls(join(dir, rel), /^faithfulness(\.[a-z0-9-]+)?\.json$/).sort((a, b) => (a === "faithfulness.json" ? -1 : b === "faithfulness.json" ? 1 : a.localeCompare(b)));
+          if (!files.length) return null;
+          const by = files.map(f => { const a = readJson(join(dir, rel, f)); return { assessor: a.assessor?.model ?? f, verdict: a.verdict, confidence: a.confidence ?? null, file: join("test-data/claim-tests", p, id, rel, f) }; });
+          const verdicts = new Set(by.map(a => a.verdict));
+          return { verdict: by[0].verdict, assessors: by, status: verdicts.size === 1 ? "agreed" : "contested" };
+        })() };
     }
   }
   if (unkinded.length) throw new Error(`Complete claim tests without data_kind (${DATA_KINDS.join(" | ")}):\n  ${unkinded.join("\n  ")}`);
+  // MorphoEval audits in github.com/fractastical/morpholib that bear on a claim (test-data/morpholib/README.md).
+  // `tests` = the audit measured the claim's own assertion on specimens; `models` = it simulates the
+  // claim's mechanism. Their `verdict` grades the simulation, not the claim; `thompsonVerdict` is the
+  // verdict on Thompson's claim itself. Like truth scores, neither changes `evidence`.
+  const MORPHO = join(ROOT, "test-data/morpholib/links.json");
+  const morpho = {};
+  if (existsSync(MORPHO)) {
+    const { claims: audits, links } = readJson(MORPHO);
+    const byId = Object.fromEntries(audits.map(a => [a.id, a]));
+    const ids = new Set(claims.map(c => c.id));
+    const stale = links.filter(l => !ids.has(l.claim) || !byId[l.morpholib]).map(l => `${l.claim} <- ${l.morpholib}`);
+    if (stale.length) throw new Error(`test-data/morpholib/links.json links unknown claims:\n  ${stale.join("\n  ")}`);
+    for (const l of links) {
+      const a = byId[l.morpholib];
+      (morpho[l.claim] ??= []).push({ id: a.id, relation: l.relation, note: l.note, label: a.label, organism: a.organism,
+        verdict: a.verdict, score: a.score, thompsonVerdict: a.thompson?.verdict ?? null, nanopub: a.nanopub, registry: a.registry, report: a.report });
+    }
+  }
+  const badTags = claims.filter(c => c.formalization && !(Array.isArray(c.formalization.tags) && c.formalization.tags.length && c.formalization.tags.every(t => FORMALIZATION.includes(t))));
+  if (badTags.length) throw new Error(`formalization.tags must be non-empty and from ${FORMALIZATION.join(" | ")}: ${badTags.map(c => c.id).join(", ")}`);
   for (const c of claims) {
+    c.formalization ??= null;
+    c.morpholib = morpho[c.id] ?? [];
     c.key = claimKey(c);
     c.verification = c.status === "proved" ? c.proof : c.status;
     c.math = !!(c.notation || c.lean || MATH_KINDS.has(c.kind));

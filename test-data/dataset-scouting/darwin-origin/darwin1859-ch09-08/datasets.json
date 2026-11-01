@@ -1,0 +1,83 @@
+{
+  "claim_id": "darwin1859-ch09-08",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:35:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "duration (top and base ages) of individual stratigraphic formations or units",
+    "fossil species durations (first and last appearance) or speciation timescales",
+    "within-formation ancestor-descendant morphological series (rare; occurrence-level data with stratigraphic position)"
+  ],
+  "datasets": [
+    {
+      "id": "macrostrat",
+      "name": "Macrostrat API v2 (units)",
+      "landing_url": "https://macrostrat.org/",
+      "access_url": "https://macrostrat.org/api/v2/units?all&response=short&format=json",
+      "doi": null,
+      "license": "CC-BY 4.0",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:34:20Z", "method": "GET units?all&response=short; the limit parameter was ignored so the full 17,435,801-byte response was downloaded once to /tmp (over the 1 MB guideline), parsed locally and deleted", "http_status": 200, "bytes": 17435801 },
+      "variables_present": ["t_age and b_age (Ma) per unit", "Fm, Gp, Mbr, SGp names", "max_thick and min_thick", "pbdb_collections and pbdb_occurrences counts per unit", "col_id (column) and col_area"],
+      "variables_missing": ["formation-level (rather than unit-level) durations are not given directly; formations must be aggregated from units"],
+      "scope": "35,481 unit records returned, of which 22,102 carry a non-empty Fm name. API response states licence CC-BY 4.0.",
+      "evidence": "Parsed JSON keys: Fm, Gp, Mbr, SGp, b_age, col_area, col_id, max_thick, min_thick, outcrop, pbdb_collections, pbdb_occurrences, project_id, section_id, strat_name_id, t_age, unit_id, unit_name. Also GET defs/columns returned 200 and defs/intervals returned 200 (7,332 bytes).",
+      "verdict": "holds"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service 1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Bivalvia&show=time",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:34:40Z", "method": "GET occs/list.csv base_name=Bivalvia limit=0 show=time rowcount", "http_status": 200, "bytes": null },
+      "variables_present": ["occurrence-level early_interval/late_interval and max_ma/min_ma", "accepted taxon name and rank", "collection_no linking to stratigraphic data", "taxa/list n_occs per taxon"],
+      "variables_missing": ["independent estimates of speciation duration", "explicit ancestor-descendant series"],
+      "scope": "Records Found 211,953 occurrences for Bivalvia. Metazoa taxon record reports 1,361,166 occurrences.",
+      "evidence": "CSV header begins occurrence_no, record_type, reid_no, flags, collection_no, identified_name, identified_rank, identified_no, difference, accepted_name, accepted_rank, accepted_no, early_interval, late_interval, max_ma...",
+      "verdict": "holds"
+    },
+    {
+      "id": "international-commission-on-stratigraphy",
+      "name": "International Commission on Stratigraphy",
+      "landing_url": "https://stratigraphy.org/",
+      "access_url": "https://macrostrat.org/api/v2/defs/intervals?timescale=international%20periods&format=json",
+      "doi": null,
+      "license": "CC-BY 4.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:34:30Z", "method": "HEAD -L stratigraphy.org; GET Macrostrat defs/intervals for the international periods timescale", "http_status": 200, "bytes": 7332 },
+      "variables_present": ["interval names with t_age and b_age (e.g. Quaternary 0 to 2.58 Ma) via Macrostrat's copy of the international timescale"],
+      "variables_missing": ["radiometric dates of individual formation boundaries"],
+      "scope": "Landing page reachable (200). Interval ages are served through Macrostrat, not by stratigraphy.org directly.",
+      "evidence": "Macrostrat JSON lists int_id 421 Quaternary, t_age 0, b_age 2.58, int_type period.",
+      "verdict": "partial"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["molecular divergence times (not inspected; landing page only)"],
+      "variables_missing": [],
+      "scope": "http://www.timetree.org/ redirected to https://timetree.org/. API and download terms not examined.",
+      "evidence": "HTTP 200 only.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Macrostrat", "query": "units all, response=short", "url": "https://macrostrat.org/api/v2/units?all&response=short&format=json", "hits": 35481, "note": "units with t_age/b_age; 22,102 with Fm name" },
+    { "source": "Macrostrat", "query": "defs/intervals international periods", "url": "https://macrostrat.org/api/v2/defs/intervals?timescale=international%20periods&format=json", "hits": null, "note": "HTTP 200, interval ages in Ma" },
+    { "source": "PBDB", "query": "occs/list base_name=Bivalvia show=time", "url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Bivalvia&limit=0&show=time&rowcount", "hits": 211953, "note": "occurrence count for Bivalvia" },
+    { "source": "DataCite", "query": "macrostrat", "url": "https://api.datacite.org/dois?query=macrostrat&page%5Bsize%5D=1", "hits": null, "note": "HTTP 200; results not read" }
+  ],
+  "status": "data-ready",
+  "summary": "Macrostrat (CC-BY 4.0) supplies base and top ages for 35,481 units, 22,102 named by formation, with PBDB occurrence counts per unit, and PBDB supplies occurrence-level first/last appearances (211,953 for Bivalvia), so formation durations and fossil species durations are both obtainable; an independent speciation-time estimate is not.",
+  "next_step": "Aggregate Macrostrat units to formations, pick clades in PBDB for species durations, and pre-register what counts as an adequately sampled within-formation series; do not use the molecular speciation arm until TimeTree access is checked.",
+  "obstacles_confirmed": ["Macrostrat's limit parameter was ignored in the call used, so a single call returned 17 MB (over the 1 MB guideline); it was parsed locally and deleted.", "No dataset found gives independent speciation durations."]
+}

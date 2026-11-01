@@ -1,0 +1,244 @@
+{
+  "claim_id": "thompson1917-ch07-01",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "segmented cell aggregates with cell-contact surfaces (wall areas, junction angles) in 3D",
+    "cell volumes to compute minimal-area comparison",
+    "independent tension measurement (e.g. micropipette aspiration, laser ablation) on the same tissue",
+    "tissues from more than one kingdom or organ"
+  ],
+  "datasets": [
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "HEAD landing page (302 to the web client login URL); GET /api/v0/m/projects/ and /api/v0/m/screens/ with limit=1 (200)",
+        "http_status": 200,
+        "note": "Landing page redirects to a login URL, but the JSON API answered 200 without credentials."
+      },
+      "variables_present": [
+        "public API answers without login: 147 projects and 105 screens (totalCount)"
+      ],
+      "variables_missing": [
+        "I did not identify a plant-parenchyma, cell-aggregate-segmentation or early-embryo study inside IDR within my request budget"
+      ],
+      "scope": "Archive-wide; mostly cell-culture screens and tissue imaging",
+      "evidence": "Landing page HEAD returned 302 to https://idr.openmicroscopy.org/webclient/login/?url=%2Fwebclient%2F%3Fexperimenter%3D-1; https://idr.openmicroscopy.org/api/v0/m/projects/?limit=1 returned meta totalCount 147, .../screens/?limit=1 totalCount 105.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "arabidopsis-embryo-image-collection",
+      "name": "A collection of 3D images of Arabidopsis thaliana embryos (INRAE)",
+      "landing_url": "https://doi.org/10.15454/HIIBKW",
+      "access_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.15454/HIIBKW",
+      "doi": "10.15454/HIIBKW",
+      "license": "etalab-2.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "HEAD doi.org (200, redirects to entrepot.recherche.data.gouv.fr); GET Dataverse API and DataCite API for the DOI",
+        "http_status": 200,
+        "bytes": 3184394240
+      },
+      "variables_present": [
+        "~100 3D confocal stacks of Arabidopsis thaliana embryos with cell walls stained (mPS-PI), voxel 0.17 x 0.17 x 0.35 um, 8-bit"
+      ],
+      "variables_missing": [
+        "no cell segmentation or face/neighbour counts in the record: raw image stacks only",
+        "embryo cells are a young growing subset, not mature parenchyma",
+        "no tension, adhesion or growth measurement"
+      ],
+      "scope": "One species, embryos from the one-cell stage upward (description says stages vary; text truncated in my output)",
+      "evidence": "Dataverse JSON: versionState RELEASED, 1 file at-embryo-collection.tar of 3,184,394,240 bytes (not downloaded), licence etalab-2.0; DataCite title 'A collection of 3D images of Arabidopsis thaliana embryos', publisher Portail Data INRAE, 2022.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "arabidopsis-shoot-meristem-segmentations",
+      "name": "Research data supporting 'Cell size and growth regulation in the Arabidopsis thaliana apical stem cell niche' (Apollo, Cambridge)",
+      "landing_url": "https://www.repository.cam.ac.uk/handle/1810/262530",
+      "access_url": "https://www.repository.cam.ac.uk/items/f7cdcf20-e8ca-4cf5-b7ab-90350a8d00b2",
+      "doi": "10.17863/CAM.7793",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET handle URL (200, redirected to the items/ page); read item metadata",
+        "http_status": 200
+      },
+      "variables_present": [
+        "confocal membrane stacks, segmentation data and cell lineage information for cells of the shoot apical meristem (6 plants)"
+      ],
+      "variables_missing": [
+        "plants were NPA-treated (per description), so not an untreated reference",
+        "not parenchyma and not equal-sized cells",
+        "no tension or independent mechanical measurement"
+      ],
+      "scope": "6 Arabidopsis thaliana shoot apical meristems",
+      "evidence": "Item page: files README.txt (1.66 KB) and PNAS.zip (4.89 GB, not downloaded); repository DOI https://doi.org/10.17863/CAM.7793; description 'Confocal membrane data, segmentation data, and cell lineage information for cells in the shoot apical meristem of 6 NPA-treated Arabidopsis plants'; licence CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=3D%20cell%20segmentation%20epithelium%20cell%20contacts",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET BioStudies search '3D cell segmentation epithelium cell contacts' (2,351 hits); GET study JSON for S-BIAD3120 and S-BIAD1057",
+        "http_status": 200
+      },
+      "variables_present": [
+        "animal epithelium segmentation masks (S-BIAD3120) and mouse embryo cell-contact imaging with micropipette measurements (S-BIAD1057)"
+      ],
+      "variables_missing": [
+        "no single study with segmentation and tension on the same tissue was identified"
+      ],
+      "scope": "Archive-wide",
+      "evidence": "totalHits 2351; top titles include '3D epithelial cell topology tunes signalling range to promote precise patterning' (S-BIAD3120), S-BIAD2407 diatom EM segmentation, S-BIAD2822 nuclei segmentation.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad3120-wing-disc-topology",
+      "name": "S-BIAD3120: 3D epithelial cell topology tunes signalling range (Drosophila wing discs)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD3120",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD3120",
+      "doi": "10.6019/S-BIAD3120",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET BioStudies study JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "2-photon 3D images of 3rd-instar Drosophila wing discs (3 control, 3 Mbs-RNAi) with expert-curated instance segmentation masks of individual cells"
+      ],
+      "variables_missing": [
+        "no tension measurement",
+        "6 discs, one organ, animal only",
+        "licence not seen in the fields I read"
+      ],
+      "scope": "Drosophila wing disc epithelium",
+      "evidence": "Study JSON: DOI 10.6019/S-BIAD3120, ReleaseDate 2026-04-22, PNAS 2026, annotation 'Cell segmentation masks', Leica Stellaris 8 DIVE two-photon at 63x.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad1057-mouse-compaction",
+      "name": "S-BIAD1057: Mechanical strengthening of cell-cell adhesion during mouse embryo compaction",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1057",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1057",
+      "doi": "10.6019/S-BIAD1057",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET BioStudies study JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "immunostaining and time-lapse of mouse 8-cell doublets, with analysis of 'pipette size, contact size and shape'"
+      ],
+      "variables_missing": [
+        "2-cell doublets, not aggregates",
+        "no 3D segmentation masks seen in the metadata"
+      ],
+      "scope": "Mouse 8-cell stage doublets (391 files per search listing)",
+      "evidence": "Study JSON: DOI 10.6019/S-BIAD1057, ReleaseDate 2024-04-01, Biosample '8-cell stage doublet compaction', image analysis text mentions micropipette size and contact shape.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-zebrafish-neural-tube-packing",
+      "name": "Data from: Feedback between tissue packing and neurogenesis in the zebrafish neural tube",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.212777q",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.212777q",
+      "doi": "10.5061/dryad.212777q",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET Dryad dataset API",
+        "http_status": 200,
+        "bytes": 10378829008
+      },
+      "variables_present": [
+        "timelapse imaging of cell geometry and tissue packing in developing zebrafish neural tube (per abstract)"
+      ],
+      "variables_missing": [
+        "no tension measurement",
+        "one organ",
+        "file contents not opened"
+      ],
+      "scope": "Zebrafish neural tube",
+      "evidence": "API: CC0-1.0, storageSize 10,378,829,008 bytes (not downloaded), published 2018-04-28; abstract about cell geometry and packing.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive",
+      "query": "3D cell segmentation epithelium cell contacts",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=3D%20cell%20segmentation%20epithelium%20cell%20contacts&pageSize=5",
+      "hits": 2351,
+      "note": "unranked broad match"
+    },
+    {
+      "source": "Dryad",
+      "query": "cell shape tissue segmentation 3D",
+      "url": "https://datadryad.org/api/v2/search?q=cell%20shape%20tissue%20segmentation%203D&per_page=5",
+      "hits": 2,
+      "note": "Ellipsoid segmentation model (0m9n7) and zebrafish X-ray histotomography (4nb12g2), not inspected"
+    },
+    {
+      "source": "Zenodo",
+      "query": "cell packing face number polyhedra tissue",
+      "url": "https://zenodo.org/api/records?q=cell%20packing%20face%20number%20polyhedra%20tissue&size=5",
+      "hits": 576151,
+      "note": "unranked broad match; relevant top hit is the zebrafish neural-tube packing set, also on Dryad"
+    },
+    {
+      "source": "DataCite",
+      "query": "shoot apical meristem cell segmentation 3D",
+      "url": "https://api.datacite.org/dois?query=shoot%20apical%20meristem%20cell%20segmentation%203D&page[size]=5",
+      "hits": 3,
+      "note": "no datasets"
+    }
+  ],
+  "status": "partial",
+  "summary": "Segmented 3D cell aggregates are available (Drosophila wing disc masks in S-BIAD3120; Arabidopsis embryo and meristem stacks; zebrafish neural-tube packing), but none is paired with a tension measurement on the same tissue, and the tissue set is a few animal epithelia and plant meristems rather than tissues in general. The mouse compaction study S-BIAD1057 has micropipette-linked contact measurements on doublets.",
+  "next_step": "Pick one segmented set (S-BIAD3120 is the cleanest, CC licence to be confirmed) and decide the independent tension source (laser ablation or aspiration papers) before pre-registering.",
+  "obstacles_confirmed": [
+    "Minimal area can emerge from several interacting processes.",
+    "Plant meristems and a few animal epithelia stand in for tissues in general."
+  ]
+}

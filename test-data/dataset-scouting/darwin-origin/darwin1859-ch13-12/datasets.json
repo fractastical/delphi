@@ -1,0 +1,180 @@
+{
+  "claim_id": "darwin1859-ch13-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "morphological character matrix (or trait measurements) for extant members of vertebrate classes",
+    "the same matrix extended with extinct stem-group taxa that sit between classes",
+    "stratigraphic ages / occurrences of those stem taxa",
+    "a phylogeny placing stem fossils relative to living classes"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "curl -sL https://morphobank.org/ and https://www.morphobank.org/ (also with a browser User-Agent)",
+        "http_status": 403,
+        "note": "CloudFront 403 to non-browser clients; portal content (project/matrix counts) not verified."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "character matrices (portal not reachable)"
+      ],
+      "scope": "Not inspected: the site refused every request from this client.",
+      "evidence": "Both URLs returned HTTP 403 with a 919-byte CloudFront error page (server: CloudFront, x-cache: Error from cloudfront); no project list or matrix could be fetched.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service v1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET PBDB occs/list.json and taxa/list.json with &rowcount&limit=0 (counts only)",
+        "http_status": 200,
+        "note": "Landing page HTTP 200; API calls below also HTTP 200."
+      },
+      "variables_present": [
+        "stratigraphic occurrences and age bounds of extinct vertebrate taxa",
+        "extant flag per taxon",
+        "first/last appearance per taxon"
+      ],
+      "variables_missing": [
+        "morphological characters or measurements",
+        "any measure of morphological gap between classes"
+      ],
+      "scope": "273,750 vertebrate occurrences; 15,225 Aves and 128,307 Mammalia occurrences; 1,911 Aves genera; Archaeopteryx has 10 occurrences (Early Tithonian, 149.2-145.06 Ma)",
+      "evidence": "occs/list.json?base_name=Vertebrata&rowcount&limit=0 -> records_found 273750; base_name=Aves -> 15225; base_name=Mammalia -> 128307; taxa/list.json?base_name=Aves&rank=genus -> 1911; occs/list.json?base_name=Archaeopteryx -> 10, fields include eag, lag, cll (class), gnl.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthesis tree, taxonomy, studies API)",
+      "landing_url": "https://opentreeoflife.github.io/",
+      "access_url": "https://api.opentreeoflife.org/v3/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://opentreeoflife.github.io/; POST https://api.opentreeoflife.org/v3/tree_of_life/about; POST /v3/tnrs/match_names",
+        "http_status": 200,
+        "note": "tree.opentreeoflife.org (the URL the assessors gave) returned no HTTP response (curl status 000) at check time; the API host and project site answered HTTP 200."
+      },
+      "variables_present": [
+        "synthetic tree placing living and sampled extinct taxa",
+        "extinct flag on taxa"
+      ],
+      "variables_missing": [
+        "morphological characters",
+        "branch lengths/ages (not checked)"
+      ],
+      "scope": "All life; 2,385,875 tips in the synthesis tree; includes taxonomy ranks and an 'extinct' flag on taxa",
+      "evidence": "POST /v3/tree_of_life/about returned synth_id opentree16.1, taxonomy_version 3.7draft3, num_source_studies 1931, num_source_trees 2064, root 'cellular organisms' with num_tips 2385875. POST /v3/tnrs/match_names resolved Aves=ott81461 (class), Mammalia=ott244265, Dipnoi=ott29500, Polypteridae=ott458429, Actinopterygii=ott773483 and Archaeopteryx=ott3604083 (flags: extinct, incertae_sedis).",
+      "verdict": "partial"
+    },
+    {
+      "id": "lloyd-2018-coelurosaur-phylomorphospace",
+      "name": "Data from: Journeys through discrete-character morphospace (Lloyd 2018) - code and data zip",
+      "landing_url": "https://doi.org/10.5061/dryad.1j5h875",
+      "access_url": null,
+      "doi": "10.5061/dryad.1j5h875",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.1j5h875 and its /files listing; GET https://doi.org/10.5061/dryad.1j5h875 (final HTTP 200 at datadryad.org)",
+        "http_status": 200,
+        "bytes": 5269998
+      },
+      "variables_present": [
+        "discrete morphological character-taxon matrix including fossil non-avian theropods and birds (152 coelurosaurian taxa, 853 characters, per abstract)"
+      ],
+      "variables_missing": [
+        "other class boundaries (mammal-reptile, tetrapod-fish)",
+        "crown-group-only matrix for comparison with and without fossils"
+      ],
+      "scope": "Coelurosaurian theropods only (the dinosaur-bird transition); one clade, not whole vertebrate classes",
+      "evidence": "Dryad metadata: CC0 licence, storageSize 5,270,665, published 2019-06-14; files CodeAndData.zip (5,269,998 bytes) and README_for_CodeAndData.txt (667 bytes). Zip contents not opened (over 1 MB).",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB data1.2",
+      "query": "occs/taxa counts for Vertebrata, Aves, Mammalia, Archaeopteryx",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Vertebrata&rowcount&limit=0",
+      "hits": 273750,
+      "note": "also Aves 15225, Mammalia 128307, Archaeopteryx 10"
+    },
+    {
+      "source": "Open Tree of Life API",
+      "query": "tree_of_life/about and tnrs/match_names for class names",
+      "url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "hits": 6,
+      "note": "6 names submitted; all matched"
+    },
+    {
+      "source": "DataCite",
+      "query": "morphological character matrix fossil extant vertebrate disparity",
+      "url": "https://api.datacite.org/dois?query=morphological%20character%20matrix%20fossil%20extant%20vertebrate%20disparity",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "morphological disparity morphospace fossil stem",
+      "url": "https://datadryad.org/api/v2/search?q=morphological%20disparity%20morphospace%20fossil%20stem",
+      "hits": 2,
+      "note": "relevant: Lloyd 2018 doi:10.5061/dryad.1j5h875; also Triassic-Early Cretaceous neopterygian fish body shape doi:10.5061/dryad.p58c0 (not opened)"
+    },
+    {
+      "source": "Dryad",
+      "query": "avian body plan theropod morphological characters",
+      "url": "https://datadryad.org/api/v2/search?q=avian%20body%20plan%20theropod%20morphological%20characters",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Zenodo",
+      "query": "morphospace occupation extinct stem groups birds reptiles",
+      "url": "https://zenodo.org/api/records?q=morphospace%20occupation%20extinct%20stem%20groups%20birds%20reptiles",
+      "hits": 266471,
+      "note": "query matched loosely; only Dryad egg-shape theropod-bird dataset doi:10.5061/dryad.s9227 looked related by title (not opened)"
+    }
+  ],
+  "status": "partial",
+  "summary": "Stratigraphic occurrences of extinct vertebrates (PBDB, 273,750 occurrences) and a phylogenetic framework (Open Tree) are open and queryable, but the morphological character matrices needed to measure gaps between classes were not reachable (MorphoBank returned 403 to every request). The one matrix found, Lloyd 2018 on Dryad, covers coelurosaurian theropods (the bird side of the dinosaur-bird transition) only.",
+  "next_step": "Obtain MorphoBank matrices (or the underlying publications' supplements) for theropod-bird, synapsid-mammal and fish-tetrapod transitions via a browser or the MorphoBank project API, then pre-register disparity with and without stem fossils.",
+  "obstacles_confirmed": [
+    "MorphoBank blocks non-browser clients (HTTP 403), so no class-spanning matrix could be confirmed.",
+    "PBDB records occurrences and ages but no morphology."
+  ]
+}

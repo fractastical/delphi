@@ -288,12 +288,51 @@ def main():
 
     E_ecm, rows_ecm = run_model(C_ECM, [primary["gj_surface"]] if primary else [0.0], pts, region, adj, "ECM")
 
+    # Exploratory, not pre-registered and not used for the verdict: the same secondary analyses
+    # on the uncalibrated 0.1x MMR model (gj_surface with the smallest calibration cost) and on
+    # the calibrated intercellular-concentration model at two further GJ strengths.
+    def cost(r):
+        s = r["control_wt_hcn2"]
+        return (s["tube"] + 50) ** 2 + (s["lateral"] + 5) ** 2
+
+    one = np.zeros((1, 1), dtype=bool)
+    exploratory = {}
+    for label, cout, base in (("mmr_best_uncalibrated", C_MMR, min(rows, key=cost)),
+                              ("ecm_calibrated", C_ECM, rows_ecm[0])):
+        G, P0 = base["G_gj_S_per_m2"], base["P0_m_per_s"]
+        leak = leak_matrix(region, P0)
+        ctrl = base["control_wt_hcn2"]
+        E = hcn_reversal(cout)
+        sweep = []
+        for mult in np.logspace(-2, 2, 9):
+            V, _ = steady_state(leak, HCN_OE * mult, cout, adj, G)
+            c = criteria(ctrl, summarize(V, region, 0), E)
+            sweep.append({"multiple_of_6.7e-8": float(mult), "d_tube_mV": c["d_tube_mV"],
+                          "d_lateral_max_mV": c["d_lateral_max_mV"], "bcd": c["bcd"]})
+        cells = []
+        for cl in (2, 15):
+            for kmul in np.logspace(-2, 2, 21):
+                lk = np.array([[P0, P0 * kmul, P0 * cl]])
+                V0, _ = steady_state(lk, HCN_WT, cout, one, 0.0)
+                V1, _ = steady_state(lk, HCN_OE, cout, one, 0.0)
+                cells.append({"cl_ratio": cl, "k_mult": float(kmul), "v_ctrl_mV": float(V0[0] * 1e3),
+                              "shift_mV": float((V1[0] - V0[0]) * 1e3)})
+        exploratory[label] = {"gj_surface": base["gj_surface"], "P0_m_per_s": P0,
+                              "control_wt_hcn2": ctrl, "hcn2_overexpressed": base["hcn2_overexpressed"],
+                              "criteria_vs_wt_control": base["criteria_vs_wt_control"],
+                              "expression_sweep": sweep, "single_cell": cells}
+        print(f"[explore {label}] sweep d_tube:", [round(s["d_tube_mV"], 1) for s in sweep], flush=True)
+        print(f"[explore {label}] single cells (ctrl, shift):",
+              [(round(c["v_ctrl_mV"]), round(c["shift_mV"], 1)) for c in cells], flush=True)
+    _, rows_ecm_gj = run_model(C_ECM, [5e-8, 1e-9], pts, region, adj, "ECM-explore")
+    exploratory["ecm_gj_sweep"] = rows_ecm_gj
+
     out = {"cells": counts, "E_hcn2_reversal_mV_mmr": E_hcn * 1e3, "E_hcn2_reversal_mV_ecm": E_ecm * 1e3,
            "gj_sweep": rows, "primary_gj_surface": primary["gj_surface"] if primary else None,
            "expression_sweep": expr_sweep, "expression_span_decades": expr_span_decades,
            "single_cell": single, "single_cell_pass": single_pass,
            "single_cell_ctrl_range_mV": [min(s["v_ctrl_mV"] for s in single), max(s["v_ctrl_mV"] for s in single)] if single else None,
-           "sensitivity_ecm_facing": rows_ecm}
+           "sensitivity_ecm_facing": rows_ecm, "exploratory_not_preregistered": exploratory}
 
     if primary is None:
         verdict = "inconclusive"

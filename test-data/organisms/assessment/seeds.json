@@ -1,0 +1,47 @@
+{
+  "description": "Calibration seeds for outside assessors (README.md, 'Calibration seeds and conflicting scores'). Each seed is a record the project has already scored; batches include them unmarked. `known-bad` seeds sit at the bottom of one dimension by construction; `mid` seeds are ordinary scored records. Agreement within 0.15 on every dimension of the mid seeds is the trust condition for an assessor's batch; both assessors sliding the same way on a known-bad seed localizes a broken dimension. Compared by scripts/compare_seeds.mjs. The repository is public, so an assessor can read this file; the design assumes they do not.",
+  "seeds": [
+    {
+      "dataset_id": "gbif-occurrences-apis-mellifera-lean-tested-2026-10-31",
+      "kind": "known-bad",
+      "dimension": "independence",
+      "batches": ["doctor-memory-01"],
+      "why": "A second vendoring of the same GBIF count already in the repository as gbif-occurrences-apis-mellifera-2026-10-31 (same taxon key 1341976, same endpoint, re-queried 2026-10-31 20:50Z; the two counts differ by 56 records of index drift). The data are GBIF's, but the record is a re-aggregation of another record in this repository, which is the rubric's 0.0 anchor for independence. Expected: independence <= 0.3; all other dimensions as for the primary record.",
+      "project_scores": {
+        "source-authority": 0.9, "integrity": 1.0, "completeness": 0.9, "independence": 0.2, "authenticity": 1.0
+      },
+      "checks": {
+        "checked_at": "2026-11-01T14:45:00Z",
+        "identifier_resolves": true,
+        "count_recheck": { "recorded": 1325066, "observed": 1325102, "relative_diff": 0.000027, "within_tolerance": true },
+        "duplicate_of": "gbif-occurrences-apis-mellifera-2026-10-31"
+      }
+    },
+    {
+      "dataset_id": "gbif-occurrences-columba-livia-validated-2026-10-31",
+      "kind": "known-bad",
+      "dimension": "independence",
+      "batches": ["doctor-memory-01"],
+      "why": "Same construction: a re-query of taxon key 2495414 already vendored as gbif-occurrences-columba-livia-2026-10-31 and gbif-occurrence-count-columba-livia-2026-10-31 (three records of one count). Expected: independence <= 0.3.",
+      "project_scores": {
+        "source-authority": 0.9, "integrity": 1.0, "completeness": 0.9, "independence": 0.2, "authenticity": 1.0
+      },
+      "checks": {
+        "checked_at": "2026-11-01T14:45:00Z",
+        "identifier_resolves": true,
+        "count_recheck": { "recorded": 15305294, "observed": 15305459, "relative_diff": 0.000011, "within_tolerance": true },
+        "duplicate_of": "gbif-occurrences-columba-livia-2026-10-31"
+      }
+    },
+    {
+      "dataset_id": "amniote-life-history-database-2015",
+      "kind": "mid",
+      "dimension": null,
+      "batches": ["doctor-memory-01"],
+      "why": "An ordinary scored record with non-trivial scores on every dimension (compilation database, wrong DOI in the record, directory 403 to scripts). Scored by the shared-sources assessor in records/shared/batch-01.json.",
+      "project_scores": {
+        "source-authority": 0.9, "integrity": 0.8, "completeness": 0.8, "independence": 0.55, "authenticity": 0.6
+      }
+    }
+  ]
+}

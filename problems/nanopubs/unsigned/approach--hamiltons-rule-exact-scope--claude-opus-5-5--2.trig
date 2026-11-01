@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Formal counterexamples: synergistic games where parameter-based rb > c mispredicts" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> ;
+    dct:description "Settle reading (iii), when the rule is false, by explicit, Lean-checked counterexamples in standard population-genetic models. Model: a two-player game with payoffs to a focal individual: cooperate against cooperate R = b − c + d, cooperate against defect −c, defect against cooperate b, defect against defect 0. Here d is the synergy term, and assortment is given by relatedness r through the probability that partners share type. Under weak selection, with linear fitness and the probability of a cooperator partner given focal type p_C = r + (1 − r)p, the expected change in cooperator frequency has sign (r b − c) + d·φ(r, p), with φ an explicit polynomial. Choose rational (b, c, d, r, p) with r b > c but Δp < 0, and the reverse, and prove both in Lean by norm_num. Also prove the general form, the generalized Hamilton's rule with the synergy correction (Queller's form), as a theorem, so the counterexample marks where the simple rule's scope ends. Second family: a frequency-dependent threshold game where the sign of Δp flips with p at fixed (b, c, r), showing that no fixed parameter pair predicts the direction everywhere." ;
+
+    delphi:proposedTest "Lean theorems exhibiting model states in which the parameter-based rule r b > c and the actual direction of selection disagree, alongside a theorem stating the corrected rule. This is the formal refutation the problem's falsifier asks about for the parameter reading, while approach 1 shows the regression reading is never refuted." ;
+    delphi:context "Fails if: None for the mathematics. The approach fails as a contribution if reviewers judge the model class non-standard; mitigate by using the exact models of van Veelen et al. 2017 and Lehmann and Keller 2006." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Define the game, assortment and expected allele-frequency change in Lean. 2. Derive the closed form for Δp and prove the synergy-corrected rule. 3. Prove two explicit counterexample instances and the frequency-flip instance with norm_num. 4. Add these as the (iii) entries of the approach-1 mapping table." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: evolutionary-game-theory" ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-rule> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-haplodiploidy> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-lmc> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.jtbi.2016.08.019> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1420-9101.2006.01119.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1558-5646.1992.tb02045.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> a delphi:Concept, schema:Question ;
+    rdfs:label "The exact scope of Hamilton's rule" .
+
+
+  <https://doi.org/10.1016/j.jtbi.2016.08.019> dct:title "Hamilton's rule" ;
+    dct:bibliographicCitation "van Veelen, Allen, Hoffman, Simon and Veller 2017, Hamilton's rule" .
+  <https://doi.org/10.1111/j.1420-9101.2006.01119.x> dct:title "The evolution of cooperation and altruism – a general framework and a classification of models" ;
+    dct:bibliographicCitation "Lehmann and Keller 2006, classification of models of cooperation and altruism" .
+  <https://doi.org/10.1111/j.1558-5646.1992.tb02045.x> dct:title "A GENERAL MODEL FOR KIN SELECTION" ;
+    dct:bibliographicCitation "Queller 1992, general model for kin selection" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hamiltons-rule-exact-scope, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.298Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hamiltons-rule-exact-scope: Formal counterexamples: synergistic games where parameter-based rb > c mispredicts" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

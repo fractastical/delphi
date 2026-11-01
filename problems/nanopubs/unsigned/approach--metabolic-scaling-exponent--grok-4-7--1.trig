@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "PGLS of PanTHERIA basal rate against body mass" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    dct:description "Use PanTHERIA 1.0, Wilson and Reeder 2005 file, columns 18-1_BasalMetRate_mLO2hr and the paired mass 5-2_BasalMetRateMass_g. The Ecological Archives metadata says metabolic rate was accepted only with a mass from the same individuals, measured resting, post-absorptive, in the thermoneutral zone. Drop the missing-value code -999. Primary regression is log10(BMR) on log10(paired mass), PGLS with Pagel's lambda, repeated on 100 trees from the Upham credible set. A species-typical mass sensitivity uses 5-1_AdultBodyMass_g and is reported separately. Model comparison, pre-registered: a single slope, order-specific slopes, and a quadratic term in log mass. The curved or order-specific model wins if its AIC beats the single power law by more than 10 on at least 95 of the 100 trees. The single-exponent claim is decided by the 95 percent interval of the single slope: it must exclude either 2/3 or 3/4. If the interval contains both, the question is underdetermined, which is the problem's own falsifier. Geographic mean temperature in PanTHERIA is not body temperature and is not used as a thermoregulatory control." ;
+
+    delphi:proposedTest "On at least 95 of 100 trees, either a single-slope 95 percent interval that excludes 2/3 or excludes 3/4, or an order-specific or quadratic model that beats the power law by AIC of more than 10." ;
+    delphi:context "Fails if: The single-slope interval contains both 2/3 and 3/4 and no alternative model beats the power law by the AIC gap. The universality question is then underdetermined on PanTHERIA." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the columns, the missing code, the AIC gap and the two target exponents. 2. Drop -999 and match species to the Upham trees. 3. Fit Pagel's lambda PGLS on 100 trees for the paired-mass regression. 4. Compare single-slope, order-specific and quadratic models by AIC. 5. Repeat with adult body mass as a labeled sensitivity and do not pool the two masses." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: A species-level body-temperature table joined to this taxonomy. PanTHERIA's geographic temperature is not a substitute, so the White and Seymour control is not replicated here." ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: allometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+    rdfs:seeAlso <https://esapubs.org/archive/ecol/E090/184/metadata.htm> ;
+    rdfs:seeAlso <https://vertlife.org/data/mammals/> ;
+    rdfs:seeAlso <https://doi.org/10.1890/08-1494.1> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.3000494> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.276.5309.122> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0436428100> ;
+    rdfs:seeAlso <https://doi.org/10.3733/hilg.v06n11p315> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" .
+
+  <https://esapubs.org/archive/ecol/E090/184/metadata.htm> dct:title "PanTHERIA 1.0 Ecological Archives E090-184" ;
+    dct:description "Basal metabolic rate in mL O2/hr and the paired body mass; missing code -999; Wilson and Reeder 2005 file has 5416 species records." .
+  <https://vertlife.org/data/mammals/> dct:title "Upham mammal phylogenies" ;
+    dct:description "One hundred trees for Pagel's lambda PGLS." .
+  <https://doi.org/10.1890/08-1494.1> dct:title "PanTHERIA: a species‐level database of life history, ecology, and geography of extant and recently extinct mammals" ;
+    dct:bibliographicCitation "Jones et al. 2009, PanTHERIA" .
+  <https://doi.org/10.1371/journal.pbio.3000494> dct:title "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation" ;
+    dct:bibliographicCitation "Upham, Esselstyn and Jetz 2019, mammal phylogenies" .
+  <https://doi.org/10.1126/science.276.5309.122> dct:title "A General Model for the Origin of Allometric Scaling Laws in Biology" ;
+    dct:bibliographicCitation "West, Brown and Enquist 1997, the 3/4 prediction" .
+  <https://doi.org/10.1073/pnas.0436428100> dct:title "Mammalian basal metabolic rate is proportional to body mass\n                    <sup>2/3</sup>" ;
+    dct:bibliographicCitation "White and Seymour 2003, the 2/3 claim after physiological controls" .
+  <https://doi.org/10.3733/hilg.v06n11p315> dct:title "Body size and metabolism" ;
+    dct:bibliographicCitation "Kleiber 1932, Body size and metabolism" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to metabolic-scaling-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.339Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to metabolic-scaling-exponent: PGLS of PanTHERIA basal rate against body mass" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

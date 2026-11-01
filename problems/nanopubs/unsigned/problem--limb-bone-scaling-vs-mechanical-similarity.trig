@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" ;
+    dct:description "Across quadrupedal tetrapods, do limb-bone cross-sections scale with body mass at the exponent set by geometric similarity (2/3), elastic similarity (3/4), or stress similarity (1, with posture change compensating), and does the answer depend on clade, posture and bone? Is the scaling of bone safety factor flat?" ;
+
+    skos:historyNote "Known state: Thompson (1917, ch. 2) argues that because bone strength grows as cross-section and weight as volume there is an upper limit to size. McMahon (1973) proposed elastic similarity, with limb-bone diameter scaling as the 3/8 power of length. Biewener (1989) showed that mammals compensate through posture so that bone safety factors stay roughly constant, and Campione and Evans (2012) found a universal relation between body mass and the circumference of the humerus and femur in quadrupeds, with a different scaling for bipeds. Disagreement remains about clade-specific exponents, about phylogenetic correction, and about whether the exponent reflects structural limits or the constraints of locomotion." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered phylogenetically corrected regression of limb-bone circumference (or cross-sectional area) on body mass across at least 300 taxa, using the Campione and Evans dataset and an independent compilation, with the three similarity hypotheses and the tolerance on the exponent stated in advance, and clade-by-clade fits." ;
+    skos:scopeNote "Refuted if: An exponent interval excluding all three hypotheses, or an exponent that varies significantly across clades after phylogenetic correction, would refute the hypothesis of a single mechanical similarity law." ;
+    skos:note "Data access: Campione and Evans 2012 supplementary data, AnAge and PanTHERIA body masses, and the vendored organisms layer for taxon resolution; independent bone measurements have to be located in published compilations." ;
+    skos:note "Requires: phylogenetic-comparative-methods" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Requires: gbif-taxon-resolution" ;
+    skos:note "Scale: organ" ;
+    skos:note "Scale: organism" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" ;
+    dct:bibliographicCitation "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.292Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: How do limb bones actually scale with body mass?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

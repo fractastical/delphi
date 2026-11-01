@@ -1,0 +1,299 @@
+{
+  "claim_id": "thompson1917-ch12-11",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "shell-shape classes (chamber arrangement) per species or lineage",
+    "molecular tree for the same lineages (sequences)",
+    "stratigraphic ranges or occurrences of the shape classes",
+    "explicit morphometric tolerance for 'identical form'"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database: Foraminifera",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Foraminifera&show=attr,size",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET data1.2 taxa/single.json?name=Foraminifera&show=attr,size (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxon record txn:71228 with noc=196,776, siz=6,711, exs=1,478 as returned; occurrences carry taxon, stratigraphic age and locality"
+      ],
+      "variables_missing": [
+        "no quantified shell shape; taxonomic assignment of fossil forms follows the classification being tested"
+      ],
+      "scope": "Fossil and extant Foraminifera occurrences",
+      "evidence": "JSON fields noc 196776, siz 6711, exs 1478",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "genbank",
+      "name": "GenBank / NCBI nucleotide (Foraminifera)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&retmode=json&term=Foraminifera%5BOrganism%5D",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET Entrez esearch db=nuccore: Foraminifera[Organism] (315,003), 'Foraminifera[Organism] AND SSU[All Fields]' (2,387), Peneroplis[Organism] (24), Soritidae[Organism] (501), Globigerinida[Organism] (0)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "foraminiferal nucleotide records: 315,003 for Foraminifera[Organism]; 2,387 matching SSU; 24 for Peneroplis; 501 for Soritidae"
+      ],
+      "variables_missing": [
+        "no shell morphometrics in GenBank; link between each sequence and a measured shell was not checked",
+        "Globigerinida[Organism] returned 0 (name not used in NCBI taxonomy under that string)"
+      ],
+      "scope": "Sequences of benthic and planktonic foraminifera; counts include non-rDNA records",
+      "evidence": "esearchresult.count values from five queries",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pforams-mikrotax",
+      "name": "pforams@mikrotax",
+      "landing_url": "https://www.mikrotax.org/pforams/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD landing page (200, 9,529 bytes)",
+        "http_status": 200,
+        "note": "only the landing page was checked"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "species pages, images and ranges were not enumerated or opened"
+      ],
+      "scope": "Planktonic foraminifera taxonomy (per assessor)",
+      "evidence": "HTTP 200 on landing page only",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "world-foraminifera",
+      "name": "World Foraminifera Database / WoRMS REST",
+      "landing_url": "https://www.marinespecies.org/foraminifera/",
+      "access_url": "https://www.marinespecies.org/rest/AphiaRecordsByName/Peneroplis?like=false&marine_only=false",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET WoRMS REST AphiaRecordsByName/Peneroplis (200); GET AphiaChildrenByAphiaID/112066 (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Peneroplis AphiaID 112066, accepted genus, family Peneroplidae; first page of children lists 34 names including subgenera (Dendritina, Monalysidium, Peneroplis, Spirolina) and species such as P. antillarum, P. arbusculus, P. arietinus, P. bradyi"
+      ],
+      "variables_missing": [
+        "names and status only; no morphometrics or genetics"
+      ],
+      "scope": "Names; only the Peneroplis lookup was queried",
+      "evidence": "REST JSON as quoted",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-165514-sixty-one-thousand-planktonic-forams",
+      "name": "Sixty-one thousand Recent planktonic foraminifera from the Atlantic Ocean (Zenodo 165514)",
+      "landing_url": "https://zenodo.org/records/165514",
+      "access_url": "https://zenodo.org/api/records/165514",
+      "doi": "10.5281/zenodo.165514",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.5281/zenodo.165514 (200); GET Zenodo API records/165514 (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "image library with 2D coordinates, 3D coordinates and morphometric measurements; 13 files, including 2d_coordinates.tar.gz (467,695,927 bytes) and 3D .obj archives of 31-44 GB each; CC BY 4.0"
+      ],
+      "variables_missing": [
+        "planktonic only; no genetic data; species labels not checked"
+      ],
+      "scope": "Recent planktonic foraminifera, Atlantic; nothing downloaded",
+      "evidence": "Zenodo API: 13 files, sizes as listed, license cc-by-4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "endless-forams",
+      "name": "Endless Forams (planktonic foraminifera image set; Zenodo 3996436)",
+      "landing_url": "http://www.endlessforams.org/",
+      "access_url": "https://zenodo.org/api/records/3996436",
+      "doi": "10.5281/zenodo.3996436",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD endlessforams.org (200, 2,319 bytes); GET Zenodo API records/3996436 (200); HEAD zenodo.org/records/3996436 (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Zenodo 3996436 'Endless Foram, MD022508 and MD9712138 training datasets': 3 zip files of 824,795,913 / 714,725,290 / 676,336,889 bytes, CC BY 4.0",
+        "companion Zenodo 7270253: 26,663 machine-labelled images in one 909,253,708-byte zip, CC BY 4.0"
+      ],
+      "variables_missing": [
+        "planktonic species only; no Peneroplis or other benthic taxa",
+        "no genetic data attached to the images"
+      ],
+      "scope": "Modern planktonic foraminifera from Atlantic coretops (per record descriptions); files not downloaded (over 1 MB)",
+      "evidence": "Zenodo API file sizes and licences as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (API v3)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "POST tnrs/match_names for Peneroplis planatus, Globigerinoides ruber, Foraminifera (200); POST studies/find_studies focal clade Foraminifera (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "name matching: Peneroplis planatus ott971592 (species), Globigerinoides ruber ott497581 (species), Foraminifera ott936399 (phylum)"
+      ],
+      "variables_missing": [
+        "find_studies for focal clade 'Foraminifera' returned matched_studies []",
+        "synthetic-tree tip coverage of foraminifera not checked"
+      ],
+      "scope": "Taxon matching only",
+      "evidence": "TNRS and find_studies JSON",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-7898373-3d-fossil-planktonic-forams-western-pacific",
+      "name": "3D images of fossil planktonic foraminifera from the western Pacific Ocean (Zenodo 7898373)",
+      "landing_url": "https://zenodo.org/api/records/7898373",
+      "access_url": null,
+      "doi": "10.5281/zenodo.7898373",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "title, DOI and licence read from the Zenodo search response (200); record page not fetched",
+        "http_status": null,
+        "note": "listed in Zenodo search API response (HTTP 200); record URL itself not requested"
+      },
+      "variables_present": [
+        "3D images of fossil planktonic foraminifera for two biostratigraphic datums (title)"
+      ],
+      "variables_missing": [
+        "file list and species coverage not opened"
+      ],
+      "scope": "Western Pacific fossil planktonic foraminifera",
+      "evidence": "Zenodo search hit: title, DOI 10.5281/zenodo.7898373, license cc-by-4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "NCBI Entrez",
+      "query": "Foraminifera[Organism] / SSU / Peneroplis / Soritidae / Globigerinida (db=nuccore)",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&retmode=json&term=Foraminifera%5BOrganism%5D",
+      "hits": 315003,
+      "note": "2,387 with SSU; Peneroplis 24; Soritidae 501; Globigerinida 0"
+    },
+    {
+      "source": "NCBI Entrez",
+      "query": "Foraminifera[Organism], Peneroplis[Organism] (db=sra)",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&retmode=json&term=Foraminifera%5BOrganism%5D",
+      "hits": 1665,
+      "note": "Peneroplis 6"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Endless Forams planktonic foraminifera images, type=dataset",
+      "url": "https://zenodo.org/api/records?q=Endless%20Forams%20planktonic%20foraminifera%20images&type=dataset&size=5",
+      "hits": 28001,
+      "note": "3996436, 7270253, 165514, 15660764 (Foram3D synthetic, 7 species), 7898373 (3D fossil planktonic foraminifera, western Pacific)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "foraminifera SSU rDNA phylogeny Peneroplis Soritidae, type=dataset",
+      "url": "https://zenodo.org/api/records?q=foraminifera%20SSU%20rDNA%20phylogeny%20Peneroplis%20Soritidae&type=dataset&size=6",
+      "hits": 7582,
+      "note": "loose; top hits are diatom/green-algae supplements, not foraminifera"
+    },
+    {
+      "source": "DataCite",
+      "query": "Peneroplis foraminifera (resource type dataset)",
+      "url": "https://api.datacite.org/dois?query=Peneroplis%20foraminifera&resource-type-id=dataset",
+      "hits": 27,
+      "note": "PANGAEA 10.1594/pangaea.947963 test density and trace elements of Peneroplis spp; no genetic dataset in the top 6"
+    },
+    {
+      "source": "DataCite",
+      "query": "planktonic foraminifera morphometric shape dataset",
+      "url": "https://api.datacite.org/dois?query=planktonic%20foraminifera%20morphometric%20shape%20dataset&resource-type-id=dataset",
+      "hits": 3,
+      "note": "Zenodo 165514, 1169317, 1169318"
+    },
+    {
+      "source": "Dryad",
+      "query": "foraminifera phylogeny SSU rDNA",
+      "url": "https://datadryad.org/api/v2/search?q=foraminifera%20phylogeny%20SSU%20rDNA",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "PBDB",
+      "query": "taxa/single Foraminifera",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Foraminifera&show=attr,size",
+      "hits": 1,
+      "note": "noc 196776, siz 6711, exs 1478"
+    },
+    {
+      "source": "Open Tree of Life",
+      "query": "tnrs/match_names; studies/find_studies focal clade Foraminifera",
+      "url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "hits": 3,
+      "note": "no foraminiferal source studies"
+    }
+  ],
+  "status": "partial",
+  "summary": "Fossil occurrences with ages are open (PBDB: Foraminifera taxon record with 196,776 occurrences, 6,711 in 'siz', 1,478 in 'exs'), molecular sequences are open (GenBank 315,003 records; PR2), and planktonic shell images/morphometrics are open (Zenodo 165514, 7898373). What is missing is a coded shell-form character matrix for foraminifera and a combined fossil-plus-molecular tree with the forms mapped; the planktonic subset is the tractable scope, and benthic molecular coverage was not measured.",
+  "next_step": "Define 'identical form' as classes of a published chamber-arrangement scheme, code them for a set of genera from pforams@mikrotax or PBDB, and map them onto a PR2- or GenBank-derived tree.",
+  "obstacles_confirmed": [
+    "What counts as an 'identical form' depends on the morphological resolution chosen.",
+    "Molecular trees are dense for planktonic clades and sparse for long-ranging benthic groups.",
+    "Many benthic genera are still classified by the shell form whose homology is in question."
+  ]
+}

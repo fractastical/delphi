@@ -1,0 +1,249 @@
+{
+  "claim_id": "darwin1859-ch02-03",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:03:11Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "taxa whose rank (species vs subspecies/variety) is disputed between authorities, for highly mobile animals",
+    "geographic range or georeferenced occurrences per taxon to score sympatry within a country versus allopatry",
+    "a comparison group of low-mobility/sessile organisms and a measure of study effort"
+  ],
+  "datasets": [
+    {
+      "id": "gbif-clements-checklist",
+      "name": "The Clements Checklist (GBIF-hosted checklist dataset)",
+      "landing_url": "https://www.gbif.org/dataset/47f16512-bf31-410f-b272-d151c996b2f6",
+      "access_url": "https://api.gbif.org/v1/dataset/47f16512-bf31-410f-b272-d151c996b2f6",
+      "doi": "10.15468/3jnxf3",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET api.gbif.org/v1/dataset/47f16512-.../metrics and /dataset/47f16512-...",
+        "http_status": 200
+      },
+      "variables_present": [
+        "bird taxa with rank (species vs subspecies) under the Clements treatment"
+      ],
+      "variables_missing": [
+        "distribution polygons",
+        "dispute flags"
+      ],
+      "scope": "Birds; GBIF-ingested usages 34,469",
+      "evidence": "GBIF API 200: countByRank SPECIES 10,550, SUBSPECIES 18,209, FORM 111; license CC BY 4.0; DOI 10.15468/3jnxf3. Can be set against the IOC list to find names ranked differently.",
+      "verdict": "holds"
+    },
+    {
+      "id": "gbif-ioc-world-bird-list",
+      "name": "IOC World Bird List (GBIF-hosted checklist dataset)",
+      "landing_url": "https://www.gbif.org/dataset/c696e5ee-9088-4d11-bdae-ab88daffab78",
+      "access_url": null,
+      "doi": "10.15468/anfqn6",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET api.gbif.org/v1/dataset/c696e5ee-.../metrics and /dataset/c696e5ee-...",
+        "http_status": 200
+      },
+      "variables_present": [
+        "bird taxa with rank under the IOC treatment"
+      ],
+      "variables_missing": [
+        "distribution polygons",
+        "dispute flags"
+      ],
+      "scope": "Birds; GBIF-ingested usages 33,654",
+      "evidence": "GBIF API 200: countByRank SPECIES 11,161, SUBSPECIES 19,818, GENUS 2,376; license CC BY 4.0; DOI 10.15468/anfqn6. Its species count (11,161) differs from Clements (10,550), which is the kind of cross-checklist disagreement operationalization (gemini) uses.",
+      "verdict": "holds"
+    },
+    {
+      "id": "gbif-occurrences",
+      "name": "GBIF occurrence records and backbone taxonomy",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET api.gbif.org/v1/occurrence/search?taxonKey=212&limit=0 and taxonKey=797; GET api.gbif.org/v1/species/search (backbone d7dddbf4-...)",
+        "http_status": 200,
+        "note": "API endpoints returned 200; the web landing www.gbif.org returned 403 to curl"
+      },
+      "variables_present": [
+        "georeferenced occurrences for Aves (taxonKey 212) and Lepidoptera (797)",
+        "backbone taxonomic status incl. DOUBTFUL and subspecies rank"
+      ],
+      "variables_missing": [
+        "a curated flag of 'ranked as species by some, variety by others' (backbone DOUBTFUL status is a technical status for names, not Darwin's sense)",
+        "study-effort-free ranges"
+      ],
+      "scope": "Global",
+      "evidence": "API 200: Aves occurrences 2,265,176,440 (all); Lepidoptera with coordinates 168,121,548; backbone: Aves SUBSPECIES 30,078, accepted SPECIES 14,641, status DOUBTFUL 5,930 (Aves, backbone); Lepidoptera SUBSPECIES 49,484. Records are sampling-effort biased.",
+      "verdict": "partial"
+    },
+    {
+      "id": "catalogue-of-life-checklistbank",
+      "name": "Catalogue of Life (ChecklistBank API)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET www.catalogueoflife.org; GET api.checklistbank.org/dataset/3LR and /dataset/3LR/taxon?rank=subspecies&limit=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "names and synonymy, infraspecific ranks"
+      ],
+      "variables_missing": [
+        "distribution at range resolution",
+        "flag of disputed rank"
+      ],
+      "scope": "All kingdoms",
+      "evidence": "ChecklistBank dataset 3LR title 'Catalogue of Life'; subspecies-rank taxon total 2,717,042.",
+      "verdict": "partial"
+    },
+    {
+      "id": "avibase",
+      "name": "Avibase (Bird Checklists of the World)",
+      "landing_url": "https://avibase.bsc-eoc.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET avibase.bsc-eoc.org and /avibase.jsp?lang=EN",
+        "http_status": 403
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "everything: not reachable"
+      ],
+      "scope": "Birds, cross-walked checklists (not verified)",
+      "evidence": "Both URLs returned HTTP 403 with a Cloudflare 'Just a moment...' challenge.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "birdlife-data-zone",
+      "name": "BirdLife DataZone (species distribution data)",
+      "landing_url": "https://datazone.birdlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET datazone.birdlife.org; GET datazone.birdlife.org/species/requestdis",
+        "http_status": 200
+      },
+      "variables_present": [
+        "bird range maps (by request)"
+      ],
+      "variables_missing": [
+        "open download; subspecies-level ranges"
+      ],
+      "scope": "Birds",
+      "evidence": "Landing 200; 'Request Our Data' page (200) is the route for range data, i.e. not openly downloadable.",
+      "verdict": "partial"
+    },
+    {
+      "id": "map-of-life",
+      "name": "Map of Life",
+      "landing_url": "https://mol.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:03:11Z",
+        "method": "GET mol.org",
+        "http_status": 200
+      },
+      "variables_present": [
+        "range products for many animal groups (per landing page)"
+      ],
+      "variables_missing": [
+        "verified downloadable ranges",
+        "rank-dispute flags"
+      ],
+      "scope": "Multi-taxon",
+      "evidence": "Landing page 200 titled 'Map of Life Platform'; no API/data file inspected.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GBIF datasets",
+      "query": "Clements checklist",
+      "url": "https://api.gbif.org/v1/dataset/search?q=Clements+checklist&limit=4",
+      "hits": 1787,
+      "note": "found The Clements Checklist"
+    },
+    {
+      "source": "GBIF datasets",
+      "query": "IOC world bird list",
+      "url": "https://api.gbif.org/v1/dataset/search?q=IOC+world+bird+list&limit=4",
+      "hits": 76,
+      "note": "found IOC World Bird List"
+    },
+    {
+      "source": "GBIF species API",
+      "query": "Aves subspecies, species, DOUBTFUL counts in backbone",
+      "url": "https://api.gbif.org/v1/species/search?rank=SUBSPECIES&higherTaxonKey=212&limit=0&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "hits": 30078,
+      "note": "subspecies count; species 14,641; DOUBTFUL 5,930"
+    },
+    {
+      "source": "DataCite",
+      "query": "subspecies sympatry allopatry birds range overlap",
+      "url": "https://api.datacite.org/dois?query=subspecies+sympatry+allopatry+birds+range+overlap",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "subspecies sympatry allopatry range overlap birds",
+      "url": "https://datadryad.org/api/v2/search?q=subspecies+sympatry+allopatry+range+overlap+birds&per_page=3",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "taxonomic disagreement bird species limits checklists",
+      "url": "https://api.datacite.org/dois?query=%22taxonomic+disagreement%22+bird+species+limits+checklists",
+      "hits": 0,
+      "note": "nothing"
+    }
+  ],
+  "status": "partial",
+  "summary": "Two bird checklists with ranks (Clements, IOC) are openly available through GBIF with CC BY 4.0, so taxa ranked differently can be listed; GBIF occurrences give geography for birds and Lepidoptera. No dataset records subspecies-level range overlap or sessile comparison taxa, and Avibase, the best cross-walk of concepts, was blocked (403).",
+  "next_step": "Diff Clements vs IOC species/subspecies ranks, pull GBIF occurrences per disputed pair, and pre-register a sympatry metric and effort correction; add a sessile comparison group.",
+  "obstacles_confirmed": [
+    "Allopatry is itself a criterion for ranking forms (circularity)",
+    "No uniform encoding of taxonomic disagreement",
+    "Mobile-animal scope covered well only for birds"
+  ]
+}

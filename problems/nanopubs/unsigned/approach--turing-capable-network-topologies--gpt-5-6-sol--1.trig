@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Quantifier-eliminate all three-node sign patterns" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> ;
+    dct:description "Represent a three-species Jacobian with prescribed zero/sign entries and diagonal diffusion with one to three positive diffusivities. Turing capability is an existential semialgebraic formula: stability at wave number zero plus instability for some q > 0. Use cylindrical algebraic decomposition per sign pattern, then translate compact certificates into determinant, trace and Routh-Hurwitz lemmas checked in Lean." ;
+
+    delphi:proposedTest "Necessary and sufficient conditions for every canonical 3-node sign pattern, with exact rational witnesses for capable classes and checked algebraic contradictions for incapable classes." ;
+    delphi:context "Fails if: Quantifier elimination cannot finish after decomposition, or numerical capability disagrees with an exact certificate, exposing an encoding error." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Canonicalize all 3-node signed directed graphs under permutation and global rescaling. 2. Write exact Routh-Hurwitz and diffusion-shift inequalities. 3. Run exact quantifier elimination and extract parameter witnesses or infeasibility certificates. 4. Prove the classification theorem and check every graph against numerical witnesses." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Efficient proof-certificate translation from quantifier elimination into Lean." ;
+    skos:note "Tool: symbolic-computation" ;
+    skos:note "Tool: enumeration" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: linear-algebra" ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-ddi> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-wavelength> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-morphogen-hypothesis> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> a delphi:Concept, schema:Question ;
+    rdfs:label "Classify the network topologies that admit diffusion-driven instability" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to turing-capable-network-topologies, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.322Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to turing-capable-network-topologies: Quantifier-eliminate all three-node sign patterns" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

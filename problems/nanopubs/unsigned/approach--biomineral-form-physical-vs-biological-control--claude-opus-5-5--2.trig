@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Equivalence test of lattice regularity across silica, SrSO4 and organic shells" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    dct:description "Test the mineral-independence claim (thompson1917-ch09-15) directly: compare mesh-regularity metrics from approach 1 (vertex-angle SD, mu2, hexagon fraction at matched polydispersity) between silica lattice shells (Spumellaria), strontium sulphate lattice shells (Acantharia with latticed shells) and the organic lattice of Clathrulina. Use two one-sided tests (TOST) with an equivalence margin fixed in advance from a pilot on synthetic lattices (the margin is set to half the difference in each metric between the matched foam reference and the hard-core Voronoi null of approach 1, so 'equivalent' means closer than the physics-versus-packing distinction can resolve), with mixed models by taxon. Equivalence supports mineral-independent moulding; a mineral effect beyond the margin refutes it. The underlying vesicle pattern is not observable in fixed shells, so this tests mineral-independence of the final geometry, not 'given the same vesicle pattern'; that limitation is stated." ;
+
+    delphi:proposedTest "TOST result per metric across the three mineral groups, with at least 10 shells each." ;
+    delphi:context "Fails if: Fewer than 10 usable Clathrulina or latticed acantharian images, leaving the comparison underpowered." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Scout images for each mineral group, with at least 10 shells per group; Clathrulina SEM is the likely bottleneck. 2. Pre-register metrics, margin and the mixed-model TOST. 3. Run approach 1's pipeline on all shells. 4. Report equivalence or difference per metric." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Open micrographs of Acantharia lattice shells and Clathrulina in sufficient number; no culture or microscope to generate them." ;
+    skos:note "Tool: cellpose" ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: r-lme4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+    rdfs:seeAlso <https://www.mikrotax.org/radiolaria/> ;
+    rdfs:seeAlso <https://doi.org/10.1146/annurev-matsci-062910-095803> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" .
+
+  <https://www.mikrotax.org/radiolaria/> dct:title "mikrotax Radiolaria" ;
+    dct:description "Silica radiolarian images." .
+  <https://doi.org/10.1146/annurev-matsci-062910-095803> dct:title "Crystallization Pathways in Biomineralization" ;
+    dct:bibliographicCitation "Weiner and Addadi 2011, Crystallization pathways in biomineralization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biomineral-form-physical-vs-biological-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.310Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biomineral-form-physical-vs-biological-control: Equivalence test of lattice regularity across silica, SrSO4 and organic shells" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

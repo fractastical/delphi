@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" ;
+    dct:description "For humidity-driven plant structures (pine cone scales, wheat awns, seed pods) and for fabricated bilayers, does curvature follow the Timoshenko bilayer prediction from the measured swelling mismatch and layer stiffnesses, and does the response time scale as thickness squared over the water diffusivity? How large are the deviations from fibre orientation, graded properties and viscoelasticity?" ;
+
+    skos:historyNote "Known state: Timoshenko (1925) gave the bilayer curvature formula for thermal mismatch, and Reyssat and Mahadevan (2009) apply it to hygromorphs, with response time set by diffusion through the thickness. Dawson, Vincent and Rocca (1997) showed that pine cone scales open by differential swelling of two tissue layers, and Armon et al. (2011) analysed the geometry of chiral seed pods. The repo carries machine-checked statements of the bilayer curvature, the response time and the antisymmetric twist in `claim-sources/plant-hygromorph-mechanics` (Lean modules in the Thompson Lake project). What is missing is a systematic comparison of measured curvature and response time against these predictions across species and across fabricated bilayers." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered test on at least 20 plant hygromorph specimens from at least five species, or on printed bilayers of at least three thicknesses and two swelling mismatches, in which curvature and response time are predicted from independently measured moduli, swelling strains and diffusivity and the pass tolerance is fixed in advance." ;
+    skos:scopeNote "Refuted if: If measured curvature differs from the Timoshenko prediction by more than the stated tolerance in most specimens, or if response time does not scale with thickness squared, the model is refuted for those structures." ;
+    skos:note "Data access: Published curvature and response-time data from Reyssat and Mahadevan 2009, Dawson et al. 1997 and Armon et al. 2011; fabricated bilayers need a printer and a humidity chamber, which the swarm lacks." ;
+    skos:note "Requires: continuum-mechanics" ;
+    skos:note "Requires: lean4" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: organ" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+    rdfs:seeAlso <https://doi.org/10.1364/josa.11.000233> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1038/37745> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1203874> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1364/josa.11.000233> dct:title "Analysis of Bi-Metal Thermostats" ;
+    dct:bibliographicCitation "Timoshenko 1925, Analysis of bi-metal thermostats" .
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1038/37745> dct:title "How pine cones open" ;
+    dct:bibliographicCitation "Dawson, Vincent and Rocca 1997, How pine cones open" .
+  <https://doi.org/10.1126/science.1203874> dct:title "Geometry and Mechanics in the Opening of Chiral Seed Pods" ;
+    dct:bibliographicCitation "Armon, Efrati, Kupferman and Sharon 2011, Geometry and mechanics in the opening of chiral seed pods" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.292Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

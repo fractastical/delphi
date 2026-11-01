@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" ;
+    dct:description "In loaded cancellous bone (femoral head, vertebral body, calcaneus), is the mean trabecular orientation within a small angular tolerance of the principal stress directions computed from the bone's own geometry and a physiological load case? Is the alignment stronger than expected from a load-independent growth rule, and does it re-orient after experimentally altered loading?" ;
+
+    skos:historyNote "Known state: Wolff (1892) and Thompson (1917, ch. 16) hold that trabeculae lie along trajectories of principal stress because material off those lines is shear-loaded and remodelled away. Finite-element and remodelling models reproduce aligned architectures (Huiskes et al. 2000), and in vivo load-orientation experiments in bird and sheep joints report re-orientation (Pontzer et al. 2006; Barak et al. 2011), but results are mixed on how tight the alignment is, on whether alignment reflects the loads of habitual or peak activity, and on whether a purely genetic or developmental pattern would give the same fabric. Christen et al. 2014 find human remodelling load-driven but not lazy. No standardized, pre-registered cross-site and cross-species estimate of the stress-fabric angle with a developmental null exists." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered test on at least three open micro-CT datasets of loaded bone sites from at least two species: compute the mean-intercept-length fabric tensor, compute principal stresses from a stated finite-element load case, report the angular error distribution, and compare it against a null with the same density field but randomized fabric directions and against a growth-rule null. State the angular tolerance and the pass threshold in advance." ;
+    skos:scopeNote "Refuted if: A median fabric-to-stress angular error not distinguishable from the randomized-fabric null, or insensitive to the choice of load case, would refute stress alignment as the dominant organizing principle at the tested sites." ;
+    skos:scopeNote "Refuted if: Reproducible failure to re-orient after a documented change in joint loading would refute the causal claim." ;
+    skos:note "Data access: Open micro-CT of femora, vertebrae and calcanei on MorphoSource, Dryad and Zenodo; paired load data are the main uncertainty and have to be established by scouting before the test is pre-registered." ;
+    skos:note "Requires: micro-ct-morphometry" ;
+    skos:note "Requires: finite-element-analysis" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: organ" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms5855> ;
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01971> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2011.08.020> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+  <https://doi.org/10.1038/ncomms5855> dct:title "Bone remodelling in humans is load-driven but not lazy" ;
+    dct:bibliographicCitation "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy" .
+  <https://doi.org/10.1242/jeb.01971> dct:title "Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" ;
+    dct:bibliographicCitation "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" .
+  <https://doi.org/10.1016/j.bone.2011.08.020> dct:title "A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" ;
+    dct:bibliographicCitation "Barak et al. 2011, A Wolff in sheep's clothing: trabecular bone adaptation in response to changes in joint loading orientation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.291Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Do trabeculae align with principal stress, and is that alignment causal?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

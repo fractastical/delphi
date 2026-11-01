@@ -1,0 +1,32 @@
+{
+  "schema": "frontier.release.checks/1",
+  "sha": "d5313306ce95d8b7f9ca945b641c1e10b26a352e",
+  "checks": [
+    {
+      "name": "Contributor credentials, lineage and current availability",
+      "command": ".venv/bin/python -m pytest tests/test_site_browser.py -q -k 'contributor_credential or fish_history or stale_sentences'",
+      "exit": 0,
+      "passed": 3,
+      "total": 3,
+      "result": "3 passed,81 deselected in4.73s; exact committed tree.",
+      "at": "2026-11-01T00:17:24.722980+00:00",
+      "tested_commit": "d5313306ce95d8b7f9ca945b641c1e10b26a352e"
+    },
+    {
+      "name": "Snapshot reproducibility",
+      "command": ".venv/bin/python scripts/build_site.py --check",
+      "exit": 0,
+      "result": "stale=[]",
+      "at": "2026-11-01T00:17:24.722980+00:00",
+      "tested_commit": "d5313306ce95d8b7f9ca945b641c1e10b26a352e"
+    },
+    {
+      "name": "Incremental secret scan",
+      "command": "gitleaks git --redact --log-opts=52cda98..HEAD",
+      "exit": 0,
+      "result": "34 commits,1070340bytes,0findings. Binary model weights are outside textual secret-scan scope.",
+      "at": "2026-11-01T00:17:24.722980+00:00",
+      "tested_commit": "d5313306ce95d8b7f9ca945b641c1e10b26a352e"
+    }
+  ]
+}

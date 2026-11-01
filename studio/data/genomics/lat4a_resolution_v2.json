@@ -1,0 +1,73 @@
+{
+ "evidence_against_or_unresolved": [
+  {
+   "source": "lat4a_resolution.json (UniProt, 2026-10-31)",
+   "weight": "protein-name annotation, weaker than the authors' mapping",
+   "what": "UniProt names the slc43a2b product 'Large neutral amino acids transporter small subunit 4' (the LAT4 name), while slc43a2a carries only 'Solute carrier family 43 member 2a'"
+  },
+  {
+   "what": "the paper prints no ZFIN or Ensembl identifier for lat4a in the text read; its mapping interval is in Figures S2D-S2F, which are in the supplement and were not retrieved"
+  },
+  {
+   "what": "the residue check could not test slc43a2a (RefSeq model too short) and is negative for slc43a2b"
+  }
+ ],
+ "evidence_for": [
+  {
+   "quote": "lat4a_map",
+   "what": "the paper maps nr21 to chromosome 15"
+  },
+  {
+   "source": "genes.csv from ZFIN GFF3",
+   "what": "ZFIN (GRCz11) puts slc43a2a on chromosome 15 and its paralog slc43a2b on chromosome 10"
+  },
+  {
+   "quote": "lat4_slc43a2_ref",
+   "what": "the paper's lat4a is the zebrafish counterpart of mammalian Lat4, whose gene name is Slc43a2"
+  },
+  {
+   "weight": "weak",
+   "what": "the 'a' suffix matches"
+  }
+ ],
+ "paper_accessions": {
+  "BioProject": "PRJNA743939",
+  "SRA (longfin PacBio reads)": "ERX1428166",
+  "Zenodo": "10.5281/zenodo.5082978",
+  "reference genome": "Zv11 (= GRCz11)"
+ },
+ "question": "Which ZFIN gene is Daane et al. 2021's lat4a?",
+ "reading": "Use slc43a2a as the working zebrafish gene for 'lat4a' and label it inferred; do not present it as the paper's stated identifier.",
+ "residue_check": {
+  "paper_positions": {
+   "natural": "F326L (flying fishes, Figure 2D)",
+   "nr21": "T200K (zebrafish lab mutation)"
+  },
+  "slc43a2a": {
+   "aa200": null,
+   "aa326": null,
+   "length": 153,
+   "refseq_protein": "NP_956545.1",
+   "translation_from_danrer11_matches_ncbi_protein_length": true,
+   "ucsc_refseq_model": "NM_200251.2 chr15:28368836-28408713 CDS 28370863-28406135, 5 exons, CDS 462 nt",
+   "verdict": "INCONCLUSIVE: the RefSeq model is 153 residues, too short to contain residues 200 or 326",
+   "zfin_chr": "15"
+  },
+  "slc43a2b": {
+   "aa200": "M",
+   "aa326": "D",
+   "length": 592,
+   "refseq_protein": "NP_001008585.1",
+   "verdict": "does NOT have T at 200 or F at 326 in this RefSeq numbering (numbering across isoforms may differ)",
+   "zfin_chr": "10"
+  }
+ },
+ "schema": "lat4a-resolution-0.2 (connector-local)",
+ "status": "PROBABLE slc43a2a (ZDB-GENE-040426-964, ENSDARG00000036848); NOT confirmed by an accession",
+ "supersedes": "data/genomics/lat4a_resolution.json (kept unchanged; records are append-only)",
+ "what_would_confirm": [
+  "Figure S2D-S2F mapping interval and the Lat4a alignment (Figure 3C, which labels T200K) against the slc43a2a gene model",
+  "the authors' transcript or protein accession",
+  "a longer slc43a2a protein (Ensembl transcript) in which residue 200 is T"
+ ]
+}

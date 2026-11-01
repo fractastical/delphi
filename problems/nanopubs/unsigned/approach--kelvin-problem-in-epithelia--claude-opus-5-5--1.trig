@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Computer-assisted proof that Weaire–Phelan is a strict local minimum among periodic foams" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> ;
+    dct:description "Prove local optimality of the Weaire–Phelan (WP) partition within its periodic class, the result the problem asks for. Setting: partitions of the 3-torus ℝ³/Λ (the WP cubic cell, 8 cells) into cells of equal volume. WP's faces are constant-mean-curvature surfaces meeting at Plateau angles. Plan: (a) compute the WP equilibrium with Surface Evolver at high refinement with an a-posteriori error bound; (b) compute the second variation (the Jacobi operator on faces with the Plateau-border coupling conditions and volume constraints) discretized by finite elements; (c) certify, with interval arithmetic in Arb, a lower bound λ_min > 0 on the constrained Hessian's smallest non-trivial eigenvalue, modulo translations, using a residual-based enclosure (Kato–Temple or Lehmann–Goerisch bounds) that converts discrete eigenvalue estimates into rigorous bounds for the continuous operator. A positive bound proves WP is a strict local minimum against all smooth volume-preserving perturbations periodic on Λ. The same pipeline applied to Kelvin's foam reproduces known stability as a validation." ;
+
+    delphi:proposedTest "A certified bound λ_min > 0 for WP's constrained second variation on its periodic cell, proving strict local optimality among equal-volume partitions with that period, the first rigorous optimality-type statement for WP." ;
+    delphi:context "Fails if: The discrete-to-continuous error bound for curved faces with Plateau-border junctions cannot be made rigorous with available eigenvalue-enclosure methods, or the certified margin is negative within error, leaving the result unproved." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Compute WP and Kelvin equilibria in Surface Evolver; validate surface areas against published values (Kelvin 5.306, WP 5.288 in units of V^(2/3) for total cell surface). 2. Discretize the constrained second variation; compute the lowest eigenvalues numerically. 3. Derive rigorous eigenvalue lower bounds with Lehmann–Goerisch and Arb interval arithmetic. 4. Validate on Kelvin; publish the certificate and code." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Rigorous spectral enclosure for operators on foam networks with singular junction lines is research-level numerical analysis." ;
+    skos:note "Tool: surface-evolver" ;
+    skos:note "Tool: interval-arithmetic" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1080/09500839408241577> ;
+    rdfs:seeAlso <https://doi.org/10.1080/10586458.1992.10504253> ;
+    rdfs:seeAlso <https://kenbrakke.com/evolver/evolver.html> ;
+    rdfs:seeAlso <https://arblib.org/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> a delphi:Concept, schema:Question ;
+    rdfs:label "Kelvin's problem in epithelia" .
+
+
+  <https://doi.org/10.1080/09500839408241577> dct:title "A counter-example to Kelvin's conjecture on minimal surfaces" ;
+    dct:bibliographicCitation "Weaire and Phelan 1994, A counter-example to Kelvin's conjecture on minimal surfaces" .
+  <https://doi.org/10.1080/10586458.1992.10504253> dct:title "The Surface Evolver" ;
+    dct:bibliographicCitation "Brakke 1992, The Surface Evolver" .
+  <https://kenbrakke.com/evolver/evolver.html> dct:bibliographicCitation "Surface Evolver software" .
+  <https://arblib.org/> dct:bibliographicCitation "Arb ball arithmetic" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to kelvin-problem-in-epithelia, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.306Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to kelvin-problem-in-epithelia: Computer-assisted proof that Weaire–Phelan is a strict local minimum among periodic foams" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

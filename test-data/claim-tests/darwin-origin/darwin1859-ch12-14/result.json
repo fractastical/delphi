@@ -1,0 +1,251 @@
+{
+  "claim_id": "darwin1859-ch12-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-14",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "In well-documented regional floras, vascular plant species naturalised in a region belong to genera that have no native species there more often than do the species that have naturalised elsewhere in the world but not in that region (the pool of proven colonists that could have joined it).",
+  "pass_criterion": "Pre-registered: using WCVP (World Checklist of Vascular Plants, Kew) accepted non-hybrid species and their non-doubtful TDWG level-3 distribution records, for each of 24 fixed regions R: native genera G_R = genera with >= 1 species recorded native (introduced = 0, extinct = 0) in R; naturalised set N_R = species recorded introduced in R and not native in R; pool P_R = species recorded introduced in >= 1 other level-3 region and with no record (native or introduced) in R. 'Novel' = genus not in G_R. Odds ratio OR_R = odds(novel | N_R) / odds(novel | P_R), Fisher exact test one-sided in each direction. Regions with |N_R| < 50 are dropped. SUPPORTS if, among the remaining regions, at least two thirds have OR_R > 1 with one-sided p < 0.05 (naturalised species over-represented in genera absent from the native flora).",
+  "fail_criterion": "Pre-registered: REFUTES if at least two thirds of the remaining regions have OR_R < 1 with one-sided p < 0.05 (naturalised species significantly more likely than the colonist pool to have native congeners). Any other outcome is MIXED. If fewer than 12 regions remain the result is inconclusive (underpowered); if WCVP cannot be downloaded, inconclusive (data-unavailable). The fraction of naturalised species in novel genera (Darwin's and de Candolle's 'large proportion ... distinct genera') is recorded per region as a descriptive statistic and does not enter the verdict.",
+  "planned_datasets": [
+    "wcvp-kew-checklist"
+  ],
+  "interpretation": "Darwin's 'not closely allied to the aboriginal inhabitants ... belonging in a large proportion of cases ... to distinct genera' is read at the genus level (the level de Candolle used): a naturalised species is 'closely allied' to the natives if its genus has a native species in the region. The claim is comparative in substance (closely allied species 'tend to keep separate'), so the test compares naturalised species with a colonist pool rather than with zero; the pool is all species proven able to naturalise somewhere, which controls for the fact that only some plants become weeds at all. WCVP 'introduced' records are taken as naturalised occurrences. Restricted to vascular plants, the group de Candolle and Darwin discussed; animals are out of scope of this test. The 24 regions are TDWG level-3 units with well-documented floras on every continent and oceanic islands: NZN, NZS, HAW, GRB, IRE, FRA, GER, SPA, ITA, CAL, TEX, FLA, NSW, VIC, WAU, TAS, CPP, CLC, AGE, JAP, MAU, REU, CNY, AZO; codes absent from WCVP are dropped and reported.",
+  "test_contract": {
+    "expected_observation": "Species naturalised in a region are more often in genera absent from its native flora than proven colonists that did not naturalise there.",
+    "disconfirming_observation": "Naturalised species are as likely or significantly more likely than the colonist pool to belong to genera already native to the region.",
+    "admissible_datasets": "A global, expert-curated vascular plant checklist that codes native versus introduced status per region on a fixed geographic scheme, compiled independently of Darwin and de Candolle; open licence; regions with at least 50 naturalised species.",
+    "inference_method": "Per region, Fisher exact test of genus novelty (genus without native species in the region) for naturalised species versus the pool of species naturalised elsewhere but absent from the region; verdict from the share of regions significant (p < 0.05) in each direction, two-thirds threshold."
+  },
+  "datasets": [
+    {
+      "id": "wcvp-kew-checklist",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv",
+      "landing_url": "https://sftp.kew.org/pub/data-repositories/WCVP/",
+      "doi": null,
+      "version": "release dated 2026-06-04 (Last-Modified of wcvp.zip)",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+          "retrieved_at": "2026-10-31T21:22:51Z",
+          "byte_size": 88179649,
+          "sha256": "d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa"
+        }
+      ],
+      "role": "native and introduced status of accepted vascular plant species in TDWG level-3 regions; genus membership"
+    }
+  ],
+  "method": "WCVP accepted non-hybrid species and their non-doubtful level-3 distribution records were loaded. For each of the 24 pre-registered regions (all present, all with >= 457 naturalised species), the native genera were those with a native, non-extinct species in the region; the naturalised set was the species recorded as introduced and not native there; the pool was every species recorded as introduced in at least one other region and with no record in the region. The share of each set in genera without native species was compared by odds ratio and one-sided Fisher exact tests in both directions, and regions significant in each direction were counted against the two-thirds threshold.",
+  "measured": {
+    "value": 0.9583,
+    "unit": "fraction of regions where naturalised plants are significantly MORE likely than the colonist pool to belong to genera already native (OR < 1, one-sided p < 0.05)",
+    "n": 24,
+    "uncertainty": "regions significant in Darwin's direction: 0/24; opposite direction: 23/24",
+    "extra": {
+      "n_regions_supporting_direction": 0,
+      "n_regions_opposite_direction": 23,
+      "median_odds_ratio": 0.6014819568300778,
+      "median_frac_naturalised_in_novel_genera": 0.5569985691054926,
+      "median_frac_pool_in_novel_genera": 0.678153231586956,
+      "regions_missing_from_wcvp": [],
+      "regions_dropped_lt_min_naturalised": [],
+      "per_region": {
+        "NZN": {
+          "OR": 0.574,
+          "novel_nat": 0.723,
+          "novel_pool": 0.82,
+          "n_nat": 1079
+        },
+        "NZS": {
+          "OR": 0.55,
+          "novel_nat": 0.741,
+          "novel_pool": 0.839,
+          "n_nat": 814
+        },
+        "HAW": {
+          "OR": 0.723,
+          "novel_nat": 0.765,
+          "novel_pool": 0.818,
+          "n_nat": 1384
+        },
+        "GRB": {
+          "OR": 0.381,
+          "novel_nat": 0.476,
+          "novel_pool": 0.705,
+          "n_nat": 2166
+        },
+        "IRE": {
+          "OR": 0.457,
+          "novel_nat": 0.544,
+          "novel_pool": 0.723,
+          "n_nat": 913
+        },
+        "FRA": {
+          "OR": 0.423,
+          "novel_nat": 0.414,
+          "novel_pool": 0.626,
+          "n_nat": 980
+        },
+        "GER": {
+          "OR": 0.3,
+          "novel_nat": 0.419,
+          "novel_pool": 0.706,
+          "n_nat": 2764
+        },
+        "SPA": {
+          "OR": 0.777,
+          "novel_nat": 0.532,
+          "novel_pool": 0.594,
+          "n_nat": 921
+        },
+        "ITA": {
+          "OR": 0.615,
+          "novel_nat": 0.486,
+          "novel_pool": 0.606,
+          "n_nat": 842
+        },
+        "CAL": {
+          "OR": 0.68,
+          "novel_nat": 0.504,
+          "novel_pool": 0.599,
+          "n_nat": 1413
+        },
+        "TEX": {
+          "OR": 0.682,
+          "novel_nat": 0.449,
+          "novel_pool": 0.544,
+          "n_nat": 824
+        },
+        "FLA": {
+          "OR": 0.678,
+          "novel_nat": 0.48,
+          "novel_pool": 0.576,
+          "n_nat": 1240
+        },
+        "NSW": {
+          "OR": 0.891,
+          "novel_nat": 0.617,
+          "novel_pool": 0.644,
+          "n_nat": 1047
+        },
+        "VIC": {
+          "OR": 0.682,
+          "novel_nat": 0.633,
+          "novel_pool": 0.717,
+          "n_nat": 809
+        },
+        "WAU": {
+          "OR": 0.834,
+          "novel_nat": 0.64,
+          "novel_pool": 0.681,
+          "n_nat": 742
+        },
+        "TAS": {
+          "OR": 0.551,
+          "novel_nat": 0.674,
+          "novel_pool": 0.79,
+          "n_nat": 829
+        },
+        "CPP": {
+          "OR": 0.843,
+          "novel_nat": 0.57,
+          "novel_pool": 0.611,
+          "n_nat": 718
+        },
+        "CLC": {
+          "OR": 0.423,
+          "novel_nat": 0.468,
+          "novel_pool": 0.676,
+          "n_nat": 457
+        },
+        "AGE": {
+          "OR": 0.922,
+          "novel_nat": 0.532,
+          "novel_pool": 0.553,
+          "n_nat": 725
+        },
+        "JAP": {
+          "OR": 0.574,
+          "novel_nat": 0.404,
+          "novel_pool": 0.541,
+          "n_nat": 760
+        },
+        "MAU": {
+          "OR": 0.523,
+          "novel_nat": 0.695,
+          "novel_pool": 0.813,
+          "n_nat": 829
+        },
+        "REU": {
+          "OR": 0.546,
+          "novel_nat": 0.69,
+          "novel_pool": 0.803,
+          "n_nat": 723
+        },
+        "CNY": {
+          "OR": 0.843,
+          "novel_nat": 0.624,
+          "novel_pool": 0.663,
+          "n_nat": 841
+        },
+        "AZO": {
+          "OR": 0.588,
+          "novel_nat": 0.623,
+          "novel_pool": 0.737,
+          "n_nat": 496
+        }
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.75,
+  "caveats": [
+    "The comparative part of the claim is refuted: in 23 of 24 regions (all but north-eastern Argentina, which is not significant) naturalised species are significantly more likely than the pool of proven colonists to belong to a genus already native to the region (median odds ratio 0.60; in Great Britain 48% of naturalised species are in novel genera against 70% of the pool, in Germany 42% against 71%). No region shows Darwin's direction. This agrees with the modern literature on 'Darwin's naturalisation hypothesis', which usually finds naturalised plants closer to natives than expected.",
+    "The descriptive part that Darwin attributes to de Candolle holds: a median 56% of naturalised species per region belong to genera with no native species (40% in Japan to 77% on Hawaii), which is 'a large proportion of cases'. The verdict rests on the pre-registered comparative criterion, because only it tests 'not closely allied ... whereas closely allied species ... tend to keep separate'.",
+    "The colonist pool is not climate-matched: many pool species come from climates where a region's native genera are absent and could not naturalise there for climatic reasons, which inflates the pool's novelty and biases the test against Darwin. Humans also preferentially introduce plants from floras similar to the recipient region (e.g. European weeds to other temperate regions), which creates congener overlap independent of establishment success.",
+    "WCVP 'introduced' covers naturalised occurrences without separating casual from established populations; genus is a coarse measure of being 'closely allied' and genus concepts vary across families.",
+    "Plants only; Darwin's statement also covers animals."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  },
+  "preregistration": {
+    "wcvp_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+    "regions_l3": [
+      "NZN",
+      "NZS",
+      "HAW",
+      "GRB",
+      "IRE",
+      "FRA",
+      "GER",
+      "SPA",
+      "ITA",
+      "CAL",
+      "TEX",
+      "FLA",
+      "NSW",
+      "VIC",
+      "WAU",
+      "TAS",
+      "CPP",
+      "CLC",
+      "AGE",
+      "JAP",
+      "MAU",
+      "REU",
+      "CNY",
+      "AZO"
+    ],
+    "species_filter": "taxon_rank == Species, taxon_status == Accepted, no genus or species hybrid marker",
+    "distribution_filter": "location_doubtful == 0",
+    "min_naturalised_per_region": 50,
+    "min_regions": 12,
+    "alpha_one_sided": 0.05,
+    "region_share_threshold": 0.6667
+  }
+}

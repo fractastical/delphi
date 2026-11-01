@@ -1,0 +1,33 @@
+{
+  "claim_id": "wolfram2002-ch12-23",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:44:08Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.77,
+  "variables": {
+    "claim_asserts": "For all 4096 two-state two-colour machines under Wolfram's one-sided halting convention, maximum steps T versus input length takes only linear, square, or exponential rates, and every exponential case has another machine computing the same function in bounded steps.",
+    "test_measures": "T(n) = max halting time on inputs of length n, then a pre-registered least-squares class (exact fit, else relative RMS ≤ 0.15, order constant/linear/quadratic/exponential, else 'other') on n = 3..10, plus whether each exponential (function, time) pair has a partner classed constant on all of x = 0..1023, including inputs where the exponential machine does not halt.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "analysis.py enumerates all 4096 machines in the NKS numbering and runs the one-sided convention of the book (binary digits on cells 1, 2, …, head starts at cell 1 in state 1, halt when the head reaches cell 0). The census matches the book exactly: never/sometimes/always 748/3348/1683, 149 total functions, 230 total (function, time) pairs, 17 machines computing x+1, and the eleven example formulas including machine 1953 as 2^(n+2)-3."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The enumeration convention is the author's. The verdict is not. Class 'other' is whatever misses relative RMS 0.15 on a single polynomial in n. Bounded parity oscillation is still a linear or square rate on the author's standard; the code does not require a cubic or super-exponential fit, which is the failure mode the fail_criterion itself gives as the example."
+  },
+  "scope": {
+    "claim_scope": "All 4096 two-state two-colour Turing machines under Wolfram's halting convention.",
+    "test_scope": "The same 4096 machines, inputs x = 0..1023 (lengths 3..10) and a rerun of the 61 'other' machines on x = 0..16383 with cutoff 2^17 rather than the pre-registered 2^20.",
+    "narrower": true
+  },
+  "reasons": [
+    "Criterion (a) fails because growth_classes_over_pairs_preregistered_fit has other = 49 of 493 pairs, and extended_run_other_machines leaves 56 of 61 machines 'other' at lengths 3..14. The tabulated times are not a new rate. Machine 791 has T = 7,19,15,27,23,35,31,43,39,51,47,59: the odd lengths and the even lengths are each arithmetic with difference 8. Machines 913 and 915 are the same pattern (5,11,9,15,…). The two machines still 'other' under the supplementary parity fit, 2242 and 2439, are described in result.json as quadratic growth with a period-4 modulation. No cubic or super-exponential T(n) is reported, and the longest halting time on the extension is 303.",
+    "The test's own supplementary parity-aware classifier, which fits odd and even n separately, yields constant 162, linear 296, quadratic 28, exponential 6 and other 0, against the book's 164, 295, 27, 6. That is the book's census of rates. The pre-registered residual class is what the verdict treats as a refutation. Wolfram's stated standard is that the only rates seen are linear, square, and exponential; a bounded wobble about those rates is not a rate he excluded.",
+    "Criterion (b) fails because b_every_exponential_pair_has_constant_partner is false. The three exponential pairs that compute total functions (machines 378 with 1351, 1953, and 2289) have 261, 269, and 269 constant-time partners, which is the book's exponential-total list plus 1351. The three partial-function pairs (924 undefined at x = 0, 2142 undefined at x = 1, 3626 with 3717 undefined at x = 0) have n_constant_time_partners_same_function = 0 only because function identity includes inputs where they do not halt. On the halting domain, b_supplementary_every_exponential_pair_has_constant_partner_on_halting_domain is true (261–269 one-step partners). The claim asks for the same function in bounded steps, not for constant time on the non-halting inputs."
+  ],
+  "what_would_change_it": "Class growth so that a bounded parity or period-4 modulation stays linear or quadratic, as the supplementary parity-aware fit already does (other = 0 on n = 3..10), and read 'the same function' and 'bounded steps' on the halting domain rather than requiring constant time on inputs where the exponential machine never halts. The same T(n) tables would then be faithful. They would stay not-representative only if a machine's times were actually cubic or faster than exponential under that reading, or an exponential function had no bounded-time partner on its halting domain.",
+  "files_read": ["result.json", "analysis.py", "derived/measurements.json", "derived/machines.csv"]
+}

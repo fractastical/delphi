@@ -1,0 +1,136 @@
+{
+  "claim_id": "thompson1917-ch08-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "mature pollen or spore shape (sphericity, facets, angles) per taxon",
+    "dispersal unit (monad vs permanent tetrad) per taxon",
+    "timing of wall solidification relative to tetrad separation per taxon (developmental series)"
+  ],
+  "datasets": [
+    {
+      "id": "paldat",
+      "name": "PalDat - Palynological Database",
+      "landing_url": "https://www.paldat.org/",
+      "access_url": "https://www.paldat.org/pub/Pentas_lanceolata/307106",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET landing page (200); GET sample record https://www.paldat.org/pub/Pentas_lanceolata/307106 (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "per-taxon pollen description fields including 'pollen unit' and 'dispersal unit and peculiarities', size, polar axes and shape/aperture descriptors (seen on the one record I opened)"
+      ],
+      "variables_missing": [
+        "developmental timing of wall hardening relative to separation",
+        "fern and red-algal spores",
+        "bulk download not confirmed; records are web pages"
+      ],
+      "scope": "Recent pollen of seed plants; landing page lists dozens of recent publications",
+      "evidence": "Sample record text: 'Pollen Description Shape, Size and Aperture pollen unit: monad, dispersal unit and peculiarities: monad, size (pollen unit): small (10-25 um) ...'; the landing page links /search and /terminology.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=pollen%20tetrad",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET BioStudies search 'pollen tetrad' (9 hits)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "none of the 9 hits is a tetrad wall-formation series"
+      ],
+      "scope": "Archive-wide",
+      "evidence": "totalHits 9; top titles: Four shades of pollen allergy; pollen tube integrity thermotolerance; bioenergetics of pollen tube growth; one-to-one pollen tube guidance; H3K9me2 in the pollen vegetative nucleus.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-pollen-malformations-conifers",
+      "name": "Fossilized pollen malformations as indicators of past environmental stress and meiotic disruption: insights from modern conifers",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3r2280ghs",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3r2280ghs",
+      "doi": "10.5061/dryad.3r2280ghs",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET Dryad dataset API; found via Dryad search 'pollen tetrad' (4 hits)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "malformation frequencies and assemblages in 14 extant conifer genera (Pinaceae, Podocarpaceae), linked in the abstract to meiotic disruption"
+      ],
+      "variables_missing": [
+        "not about tetrad facet retention versus spherical separation",
+        "conifers only"
+      ],
+      "scope": "14 conifer genera",
+      "evidence": "API: CC0-1.0, storageSize 6,508 bytes, published 2022-12-09.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive",
+      "query": "pollen tetrad",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=pollen%20tetrad&pageSize=5",
+      "hits": 9
+    },
+    {
+      "source": "Dryad",
+      "query": "pollen tetrad",
+      "url": "https://datadryad.org/api/v2/search?q=pollen%20tetrad&per_page=5",
+      "hits": 4,
+      "note": "phylogenetics, watermelon pollen, conifer malformations, orchid pollinia"
+    },
+    {
+      "source": "Dryad",
+      "query": "pollen shape sphericity",
+      "url": "https://datadryad.org/api/v2/search?q=pollen%20shape%20sphericity&per_page=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "pollen tetrad pollen unit palynology database morphology",
+      "url": "https://api.datacite.org/dois?query=pollen%20tetrad%20pollen%20unit%20palynology%20database%20morphology&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "pollen shape P/E ratio traits",
+      "url": "https://api.datacite.org/dois?query=pollen%20shape%20P/E%20ratio%20traits&page[size]=5",
+      "hits": 9,
+      "note": "plant-trait datasets with pollen as a side variable, none a pollen morphology table"
+    }
+  ],
+  "status": "partial",
+  "summary": "PalDat records mature pollen shape and dispersal unit (monad or otherwise) per taxon, which covers the outcome side of the claim, but no repository record links this to when the wall hardens relative to tetrad separation; BioImage Archive has no tetrad-development series (9 'pollen tetrad' hits, all about tubes or nuclei) and Dryad's closest set concerns conifer malformations.",
+  "next_step": "Take shape and unit type from PalDat for taxa with permanent tetrads versus monads, and compile wall-timing evidence (callose and exine formation stages) from developmental papers for the same taxa; mature morphology alone cannot supply the mechanism.",
+  "obstacles_confirmed": [
+    "PalDat records shape and whether grains are united, not the developmental timing of wall hardening relative to separation.",
+    "Mature shape alone cannot establish wall-hardening time."
+  ]
+}

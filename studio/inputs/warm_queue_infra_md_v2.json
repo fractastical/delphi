@@ -1,0 +1,19 @@
+{
+  "queue_id": "infra-collagen-md-reference-oracle-v2",
+  "max_wall_s": 1800,
+  "margin_s": 60,
+  "max_part_bytes": 16000000,
+  "workloads": [
+    {
+      "id": "collagen-md-v2-controls-then-cuda",
+      "argv": [
+        "python3",
+        "-I",
+        "-c",
+        "from pathlib import Path; import shutil,runpy; Path('inputs/molecular').mkdir(parents=True,exist_ok=True); shutil.copyfile('artifacts/molecular/portable-md-v2.tar.xz','inputs/molecular/portable-md.tar.xz'); shutil.copyfile('artifacts/molecular/portable-md-v2.json','inputs/molecular/portable-md.json'); runpy.run_path('engineering/molecular/entry.py',run_name='__main__')"
+      ],
+      "timeout_s": 1500,
+      "max_part_bytes": 16000000
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-09--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch07-09: mixed, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "If cells of similar size in complete surface contact under a uniform force (cortical tension) tend to form a pattern of hexagons, then in a living, expert-segmented and cell-tracked epithelium (Drosophila wing imaginal disc pouch, cultured ex vivo over hours) hexagons must be the clearly dominant polygon class (well above the ~0.29 six-sided fraction of a random Poisson-Voronoi partition and at least a majority), the hexagon fraction must not fall over time while the force keeps acting, and a cell's neighbour number should follow its relative size and local force rather than its division history." ;
+    delphi:passCriterion "Pre-registered. For each of the five movies, use the TissueMiner database (tables cells, directed_bonds, vertices, cell_histories) to compute, per frame, the number of neighbours of every interior cell (cells sharing a bond with the margin/background cell are excluded), its area and whether it or its sister arose from a division within the preceding 60 min. Per movie report the time-averaged fraction of six-sided cells f6, mean and SD of neighbour number, the Spearman rho between f6 and frame time, and the coefficient of variation of cell area CV_A. The claim is supported if in at least four of the five movies f6 >= 0.60 (hexagons dominate as in the retinal pigment epithelium and the compound eye) and rho(f6, time) >= 0 (packing does not drift away from hexagons while tension acts), with mean neighbour number in [5.8, 6.2] and interior junctions predominantly three-way (>= 95%)." ;
+    delphi:failCriterion "Pre-registered. The claim is refuted if in at least four of the five movies f6 < 0.50 (hexagons are not even a majority in a tissue that satisfies Thompson's conditions of complete contact and uniform cortical tension) or rho(f6, time) < -0.3 with p < 0.05 (packing drifts away from hexagons). Results between the two thresholds (f6 in [0.50, 0.60), or movies split) are 'mixed'. As a pre-registered guard on Thompson's 'similar size' condition: if CV_A >= 0.6 (the level of a random partition) in the majority of movies the cells are not of similar size and the verdict is inconclusive with reason not-operationalizable. Diagnostic, not part of the verdict: the mean neighbour number of cells that divided within the preceding 60 min versus all other interior cells, and the Spearman rho between neighbour number and area relative to the frame median; a gap of >= 0.5 sides between recently divided and other cells, exceeding what area predicts, attributes departures from hexagons to division topology rather than to packing forces." ;
+    delphi:expectedObservation "In an epithelium of similar-sized cells in complete contact under cortical tension, six-sided cells are the clearly dominant class (fraction >= 0.60), the mean neighbour number is 6 with three-way junctions, and the hexagon fraction does not decline while the tissue is observed." ;
+    delphi:disconfirmingObservation "Six-sided cells are a minority (< 0.50) in such an epithelium, or the hexagon fraction declines over time while the cells remain in contact under tension, or the neighbour number is explained by division history rather than by cell size and forces." ;
+    delphi:admissibleDatasets "Public, licensed, expert-corrected cell-boundary segmentations of a living epithelium in which every cell is in full contact with its neighbours, with per-cell neighbour relations (or masks from which they follow), cell areas and, for the mechanism diagnostic, lineage over time; the tissue must not be one the claim's author used as his example (bee comb, coral, RPE) and the segmentation must not be produced by a method shown in this repo to round off junctions (Cellpose)." ;
+    delphi:inferenceMethod "Per movie: time-averaged f6, mean and SD of neighbour number, Spearman rho of f6 against frame time, CV of cell area, fraction of three-way vertices; verdict by majority of movies against the fixed thresholds; a Poisson-Voronoi partition (f6 ~ 0.29, CV_A ~ 0.62) computed in the analysis script is the random baseline, and the published proliferating-epithelium polygon distribution (about 45% hexagons, Gibson et al. 2006) is the literature reference." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "For each of the five TissueMiner databases, every directed bond was joined to its conjugate to list each cell's neighbours per frame; cells sharing a bond with the margin cell (id 10000) were dropped, leaving 1,900-2,700 interior cells per frame (1.76 million cell-frames in all). Per frame: fraction of six-sided cells f6, mean and SD of neighbour number, CV of cell area; per movie: their time averages, Spearman rho of f6 against time, the fraction of interior vertices with three bonds, the polygon distribution, and the mean neighbour number of cells that appeared by division within the preceding 60 min versus other cells, plus Spearman rho between neighbour number and area relative to the frame median. A Poisson-Voronoi partition of 20,000 points (interior 12,812 cells) gave the random baseline. Two non-pre-registered sensitivity analyses were added after the main run: the division effect at matched relative area (mean over area quintiles), and the junction angles at interior three-way vertices in every 20th frame, taken between straight chords from the vertex to the far end of each bond." ;
+    rdfs:comment "Measured: 0.3915 median over movies of the time-averaged fraction of six-sided interior cells (n = 5 movies, 1,758,719 interior cell-frames, range 0.379-0.403 across movies). Interpretation: Thompson's statement names epithelia in its scope and gives the sufficient conditions: similar size, complete surface contact, a uniform force. The Drosophila wing disc pouch is a columnar monolayer whose apical surfaces tile the plane without gaps under actomyosin cortical tension, so the conditions hold apart from the size uniformity that the pre-registered CV_A guard checks. 'A pattern of hexagons' is read as hexagons being the clearly dominant polygon class; the thresholds 0.60 and 0.50 are chosen so that the tissues Thompson cites as regular (RPE 0.67, compound eye 0.99 in claim-sources/cell-geometry) pass and a random partition (0.29) fails. The Lean proof of this claim (ThompsonLaws.Cells.hexagon_of_120) shows that 120 degree three-way junctions force six neighbours on average; this test asks whether living cells meeting Thompson's conditions actually are hexagons, and uses the lineage information to see whether departures come from cell division, a cause Thompson does not mention." ;
+    delphi:evidenceAgainst "Pre-registered refutation criterion met in 5 of 5 movies: f6 = 0.379-0.403, below 0.50, while hexagons are still the modal class (pentagons 0.27, heptagons 0.21) and f6 exceeds the Poisson-Voronoi baseline (0.29). Three of five movies also show a significant decline of f6 over culture time (rho -0.41 to -0.58); the other two are flat. Mean neighbour number (5.90-5.93) and three-way vertices (98.4-98.8%) satisfy the supporting sub-criteria, as topology requires." ;
+    delphi:evidenceAgainst "Thompson's 'similar size' condition is only marginally met: the CV of apical cell area is 0.49-0.66 (pre-registered guard 0.6 tripped by one movie only), as variable as a random partition (0.53) and far above the tissues where Thompson's regular hexagons are seen (compound eye 0.09, corneal endothelium 0.30 in claim-sources/cell-geometry). Neighbour number correlates with relative area at rho 0.43-0.51 (Lewis's law), so much of the departure from hexagons is the size variation of cycling cells, which is what the companion claim thompson1917-ch07-08 predicts. The verdict therefore refutes the claim as a sufficient rule for epithelia in general; it does not touch post-mitotic epithelia with uniform cells." ;
+    delphi:evidenceAgainst "Division is a cause Thompson does not mention: cells that appeared by division within the last 60 min have 0.16-0.42 fewer sides than other cells (pre-registered diagnostic gap below the 0.5 threshold), and 0.21-0.31 fewer at matched relative area (non-pre-registered sensitivity), so division lowers the hexagon fraction beyond its effect through size." ;
+    delphi:evidenceAgainst "Junction angles (non-pre-registered) have SD 24-28 degrees with 42-48% of angles within 15 degrees of 120 and only 16-21% of junctions with all three angles within 15 degrees, close to the random control of claim-sources/cell-geometry (14%) and far from corneal endothelium (75%); but the angle here is between straight chords between vertices, which misstates the angle at curved bonds, and the method differs from the cell-geometry pipeline." ;
+    delphi:evidenceAgainst "Tissues were cultured ex vivo in Grace's medium with ecdysone (Dye et al. 2017); the slow decline of f6 in three movies may reflect culture rather than in vivo dynamics. Mean neighbour number below 6 reflects the ~1.5% four-way vertices and tracking gaps." ;
+    delphi:evidenceAgainst "Analysis uses TissueAnalyzer segmentations corrected by the authors; no Cellpose step, so the junction-rounding bias documented in claim-sources/cell-geometry does not apply. Data were downloaded after the pre-registration commit (e77f4bcf) and are not committed (2.9 GB); SHA-256 of each zip is recorded." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-09--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-09--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Timelapse imaging, boundary segmentation, and cell tracking data from cultured proliferating Drosophila wing disc epithelia (Dye et al.; data of Dye et al. 2017 Development and Dye et al. 2021 eLife; MPI-CBG Dresden)" ;
+    dct:description "five independent ex vivo cultured mid-third-instar wing disc pouches, E-cadherin-GFP, 5 min frames over 12-17 h, segmented with TissueAnalyzer and manually corrected, cells tracked with lineage" ;
+    delphi:hasChecksum "sha256:0eb41b1e0fbfb23b1af3950c14ad06834c40c6debf639ab572c2ecff006fb478" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20141010_P2.zip/content> ;
+    delphi:hasChecksum "sha256:07b74f7594a99bd3243e7fde4f1c23967f7256db7db91cccc4a4eb0dd0de4a0c" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150310_P2.zip/content> ;
+    delphi:hasChecksum "sha256:dcfc9f79b387b0657723731bcf79fab0d600600161f57577cb54748239a1ef69" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150418_P1.zip/content> ;
+    delphi:hasChecksum "sha256:79c52b04b414fc0f4dcb1a73053c2e96f5db02b39b9dff3e0eb25a54e2d25f2d" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150608_P1.zip/content> ;
+    delphi:hasChecksum "sha256:8a3ee532c89950bc0f4880ff243593e0c7917f080e352bd41ac6f215ac9da6c0" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20161213_F0.zip/content> ;
+    prov:wasDerivedFrom <https://zenodo.org/records/22760592> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/activity/thompson1917-ch07-09--claim-test--revision-1> a prov:Activity ;
+    rdfs:label "Revision 1 of the thompson1917-ch07-09 claim test (2026-11-01)" ;
+    dct:description "Second run in pupal-wing-timelapse/ (pre-registered 1805066a, run 1dba6bb2) on the three Etournay et al. 2015 wild-type pupal wings: f6 rises from 0.435-0.479 to 0.742-0.773 over about 17 h from 16 h APF, with rho(f6, division rate) -0.65 to -0.91, rho(f6, area CV) -0.57 to -0.79, and the near-120-degree junction fraction doubling. Thompson's statement names epithelia in general; in a dividing epithelium its conditions are only marginally met (area CV about 0.5) and hexagons are a minority, in a post-mitotic one they are met and hexagons are a 3:1 majority. The claim is a historical statement by Thompson about close packing, and the fair verdict across its stated scope is mixed: true of post-mitotic confluent epithelia, false of proliferating ones, with the mechanism (isotropic surface tension) untested and the literature attributing the pupal repacking to planar-cell-polarity-dependent junction remodelling under anisotropic tension (Classen et al. 2005; Etournay et al. 2015). Within-tissue, local size uniformity does not predict hexagons (thompson1917-ch07-08/wing-disc-timelapse), so the size condition acts through the cell cycle, not through packing." ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    prov:used <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/result.json> ;
+    delphi:evidenceAgainst "Before: five proliferating wing discs: 38-40% hexagons, flat or falling over 12-17 h (confidence 0.7). After: refuted as a sufficient rule while cells divide (38-40% hexagons); supported once division stops (45% to 76% hexagons in three pupal wings, tracking division rate and size variation) (confidence 0.75)." .
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-09--claim-test> prov:qualifiedRevision <https://w3id.org/delphi/resource/activity/thompson1917-ch07-09--claim-test--revision-1> .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch07-09> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-09--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/result.json>, <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor local session, hexagon follow-up)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.983Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch07-09: mixed, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-09--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

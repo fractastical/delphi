@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2015-girardia-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2015-girardia-02: supports, confidence 0.5" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.5"^^xsd:double ;
+    delphi:hypothesis "In the published Procrustes distances between head-shape groups, each octanol-induced G. dorotocephala head-shape group is closer to the wild-type head shape of the species it resembles than to the wild-type G. dorotocephala head shape." ;
+    delphi:passCriterion "Pre-registered: for every induced group in the published table (e.g. D. japonica-like, S. mediterranea-like, P. felina-like), the Procrustes distance to the resembled species' wild type is smaller than its distance to wild-type G. dorotocephala; if the table also reports significance of between-group distances (permutation p-values), the induced-vs-G. dorotocephala distance is significant (p < 0.05) for every induced group." ;
+    delphi:failCriterion "Pre-registered: at most one of the induced groups (or, with two groups, neither) is closer to its resembled species than to wild-type G. dorotocephala. If all are closer by distance but a reported significance test fails for some group, or exactly one of three groups violates the ordering, the verdict is 'mixed'. If no distance table can be retrieved, 'inconclusive' (data-unavailable)." ;
+    delphi:expectedObservation "Every induced head-shape group has a smaller Procrustes distance to the species it resembles than to wild-type G. dorotocephala." ;
+    delphi:disconfirmingObservation "Two or more of three induced groups (or both of two) are closer to wild-type G. dorotocephala than to the species they resemble." ;
+    delphi:admissibleDatasets "Published Procrustes distances (or landmark data from which they can be computed) for octanol-induced G. dorotocephala head shapes and wild-type heads of the resembled species; the source paper's table is admissible but not independent." ;
+    delphi:inferenceMethod "Read the pairwise distance matrix; for each induced group compare its distance to the resembled species with its distance to G. dorotocephala; count groups satisfying the inequality and check any reported permutation p-values; apply the thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py downloads the paper's Europe PMC full-text XML, parses Table 1 into a symmetric distance matrix (keeping which cells are bold) and, for each pseudo group (D. japonica-, P. felina- and S. mediterranea-like), compares its distance to the resembled species' wild type with its distance to wild-type G. dorotocephala. As a secondary measure, not part of the verdict, it lists each pseudo group's nearest wild-type group among all five wild-type groups, including G. dorotocephala regenerated for 10 days in water." ;
+    rdfs:comment "Measured: 3 of 3 octanol-induced pseudo-species groups closer (Procrustes distance) to the resembled species' wild type than to wild-type G. dorotocephala (n = 3, published distances to two decimals; no dispersion or per-pair test reported in the table). Interpretation: The claim is tested exactly as an inequality on the published Procrustes distance table: for each induced group, d(induced, resembled species) < d(induced, G. dorotocephala). Raw landmark coordinates are not deposited, so the distances cannot be recomputed from specimens; this is an audit of the source paper's own measurements, not an independent test. Group membership of the induced animals was assigned by eye from the same morphology that is then measured, which the test cannot remove." ;
+    delphi:evidenceAgainst "The literal inequality holds for all three groups (D. japonica-like 0.14 vs 0.19, P. felina-like 0.09 vs 0.40, S. mediterranea-like 0.22 vs 0.25), so the pre-registered rule gives 'supports'. The table reports no dispersion and no per-pair significance test, so the significance clause of the pass criterion could not be applied; the only reported tests are ANOVAs across all groups (centroid size F = 7.94, shape F = 7.40, both p < 0.0001)." ;
+    delphi:evidenceAgainst "Two of the three margins are small (0.05 and 0.03 Procrustes units) relative to the distance between intact and regenerated wild-type G. dorotocephala (0.10), and the groups have only 5-13 animals." ;
+    delphi:evidenceAgainst "Outside the verdict, the full matrix weakens the 'species-specific' reading. Only the P. felina-like group is nearest its resembled species. The D. japonica-like group is as close to G. dorotocephala regenerated in water (0.14) as to D. japonica (0.14), and regenerated G. dorotocephala is arguably the right control for regenerates. The S. mediterranea-like group is nearer wild-type D. japonica (0.17) and the D. japonica-like group (0.09) than wild-type S. mediterranea (0.22)." ;
+    delphi:evidenceAgainst "Not independent: this audits the source paper's own table. Raw landmarks are not deposited, so the distances cannot be recomputed, and induced animals were assigned to groups by eye from the same head shape that is then measured, which biases each group toward its label." ;
+    delphi:evidenceAgainst "The table footnote abbreviates P. felina as 'P. feline'; the analysis follows the table's group labels." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2015-girardia-02--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2015-girardia-02/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2015-girardia-02--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Emmons-Bell et al. 2015, Int J Mol Sci 16:27865-27896, Table 1: Procrustes distances between head-shape groups (Europe PMC full text XML, PMC4661923)" ;
+    dct:description "lower-triangular matrix of mean Procrustes distances among wild-type G. dorotocephala (intact and regenerated in water), wild-type D. japonica, P. felina, S. mediterranea and the octanol-induced pseudo groups; group sizes from the Figure 2 legend" ;
+    delphi:hasChecksum "sha256:91d802a4e95a842df2e9782229731abd239676729022aab0dc7df23354b6c3e4" ;
+    prov:atLocation <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4661923/fullTextXML> ;
+    prov:wasDerivedFrom <https://doi.org/10.3390/ijms161126065> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/levin-2015-girardia-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2015-girardia-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2015-girardia-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.955Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2015-girardia-02: supports, confidence 0.5" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2015-girardia-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

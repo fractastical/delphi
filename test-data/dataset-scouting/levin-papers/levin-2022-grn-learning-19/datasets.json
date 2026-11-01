@@ -1,0 +1,140 @@
+{
+  "claim_id": "levin-2022-grn-learning-19",
+  "variables_needed": [
+    "biological pathway ODE models and their node count, edge count, in-/out-degree, betweenness, PageRank, hubness",
+    "random ODE networks matched on those topology measures",
+    "memory scores (associative or pavlovian-style) for biological and for matched random networks"
+  ],
+  "datasets": [
+    {
+      "id": "grn-ode",
+      "name": "GRN_ODE (code for Biswas, Clawson and Levin 2022)",
+      "landing_url": "https://github.com/wesleypclawson/GRN_ODE",
+      "access_url": "https://api.github.com/repos/wesleypclawson/GRN_ODE/contents/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GitHub REST repo and contents listing; GET raw README.md",
+        "http_status": 200
+      },
+      "variables_present": [
+        "MATLAB files incl. Randomize_ODE_Expressions.m and MEMORY_EVALUATOR_*.m",
+        "data files incl. ODE_New.mat (175,993 bytes), Degree_BioModel.mat (593 bytes), forST.mat, DrugResisSensit.mat, BreakResis.mat"
+      ],
+      "variables_missing": [
+        "a confirmed table of memory scores per matched random network (the .mat contents were not opened)",
+        "betweenness, PageRank and hubness values were not confirmed"
+      ],
+      "scope": "repo size 266 KB per GitHub API; no licence in the GitHub API response (license null); README says the code is kept temporarily while refactored; last push 2022-11-23",
+      "evidence": "GitHub contents API listed the files above with sizes; README: 'This is the code used by Biswas in the 2022 paper on biological networks... kept here temporarily as it is refactored.'",
+      "verdict": "partial"
+    },
+    {
+      "id": "biomodels",
+      "name": "BioModels repository",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "access_url": "https://www.ebi.ac.uk/biomodels/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET search endpoint with format=json (HTTP 301 then 200 with -L)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "source biological network models (3,217 results for query *:*; 63 for 'transcription network')"
+      ],
+      "variables_missing": [
+        "identification of which BioModels entries the paper used",
+        "matched random networks"
+      ],
+      "scope": "repository of SBML and other models; ids used in the paper not confirmed",
+      "evidence": "Search API: matches 3217 for *:*; matches 63 for 'transcription network'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paper-pmc9820177",
+      "name": "Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions (open-access article, supplements flagged)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.3390/ijms24010285&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.3390/ijms24010285",
+      "license": "cc by",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record for DOI (doi.org itself returned HTTP 403)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "article text and supplement (hasSuppl Y); license cc by"
+      ],
+      "variables_missing": [
+        "supplement contents were not opened; whether matched-ensemble memory values are tabulated is unknown"
+      ],
+      "scope": "single article, PMCID PMC9820177",
+      "evidence": "Europe PMC core record: license 'cc by', hasSuppl 'Y'.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GitHub API",
+      "query": "wesleypclawson/GRN_ODE contents",
+      "url": "https://api.github.com/repos/wesleypclawson/GRN_ODE/contents/",
+      "hits": null,
+      "note": "file listing (see dataset evidence)"
+    },
+    {
+      "source": "BioModels",
+      "query": "*:*",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=*%3A*&numResults=1&format=json",
+      "hits": 3217,
+      "note": "all models"
+    },
+    {
+      "source": "BioModels",
+      "query": "transcription network",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=transcription+network&numResults=3&format=json",
+      "hits": 63,
+      "note": "first hits are unrelated metabolic and signalling models"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"transcriptional network\" AND memory AND associative",
+      "url": "https://zenodo.org/api/records?q=%22transcriptional+network%22+AND+memory+AND+associative&size=3",
+      "hits": 1,
+      "note": "unrelated"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"GRN_ODE\"",
+      "url": "https://zenodo.org/api/records?q=%22GRN_ODE%22&size=3",
+      "hits": 0,
+      "note": "no archived copy of the repo"
+    }
+  ],
+  "status": "partial",
+  "summary": "The authors' MATLAB code and several .mat data files are public on GitHub (no licence, repo flagged temporary), and BioModels holds candidate source models; no archived copy with licence and no confirmed table of matched-random-network memory scores was found, so the test would need a re-run of the generator.",
+  "next_step": "Open the .mat files and the paper's supplement to see whether memory scores of the matched random ensemble are stored; otherwise re-run Randomize_ODE_Expressions.m and the memory evaluators.",
+  "obstacles_confirmed": [
+    "Nonsufficiency in this ensemble does not cover all design procedures (scope, not a data issue).",
+    "No Zenodo/DataCite archive of the code was found; the repo has no licence."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

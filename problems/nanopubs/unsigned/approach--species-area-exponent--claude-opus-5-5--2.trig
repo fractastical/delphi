@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Sampling-only null: do lognormal SADs and random placement reproduce z?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    dct:description "Before asking what mechanism sets z ≈ 0.25, establish what z distribution arises with no mechanism beyond the species-abundance distribution and random placement. Preston (1962) and later May argued that a canonical lognormal yields z ≈ 0.26 for isolates. Compute this exactly over the range of conditions in real datasets. For each of a grid of total individuals J (10^3–10^9), species pools S₀ and SAD shapes (lognormal with σ ∈ [1, 3], log-series with α ∈ [5, 500], and Preston's canonical constraint), place individuals on islands proportional to area (Coleman random placement, expected richness E[S(a)] = Σ_i 1 − (1 − a)^{n_i}). Fit z over island-area spans matching each dataset in the Triantis et al. compilation (area range, number of islands), producing the null distribution of z per dataset. Compare the observed z distribution with the null by quantile regression and a two-sample Anderson–Darling test." ;
+
+    delphi:proposedTest "The fraction of the between-dataset variance in z explained by SAD shape and area span alone. If the sampling null reproduces the observed z distribution (Anderson–Darling p > 0.05 under a plausible SAD), z ≈ 0.25 needs no ecological mechanism; if observed z is systematically higher (for example on isolated archipelagos), the excess quantifies the mechanism's contribution." ;
+    delphi:context "Fails if: The null z depends so strongly on unobservable SAD parameters that a plausible SAD can be found to fit any observed z, so the null has no discriminating power." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Pre-register the SAD families, parameter grid and comparison statistics. 2. Compute expected richness curves analytically (Coleman formula) and stochastically for small J. 3. Match null conditions to each published dataset's area span and island count; generate null z. 4. Compare observed and null z distributions; report the variance in z the null explains." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: macroecology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1365-2699.2011.02652.x> ;
+    rdfs:seeAlso <https://doi.org/10.2307/1931976> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1365-2699.2011.02652.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2005.00848.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" .
+
+  <https://doi.org/10.1111/j.1365-2699.2011.02652.x> dct:title "Triantis et al. 2012 island SAR compilation (supplementary data)" ;
+    dct:description "Area spans, island counts and fitted z for 601 island datasets" .
+  <https://doi.org/10.2307/1931976> dct:title "The Canonical Distribution of Commonness and Rarity: Part I" ;
+    dct:bibliographicCitation "Preston 1962, The canonical distribution of commonness and rarity" .
+  <https://doi.org/10.1111/j.1365-2699.2011.02652.x> dct:title "The island species–area relationship: biology and statistics" ;
+    dct:bibliographicCitation "Triantis, Guilhaumon and Whittaker 2012" .
+  <https://doi.org/10.1111/j.1461-0248.2005.00848.x> dct:title "The imprint of the geographical, evolutionary and ecological context on species–area relationships" ;
+    dct:bibliographicCitation "Drakare, Lennon and Hillebrand 2006, 794 SAR curves" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to species-area-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.300Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to species-area-exponent: Sampling-only null: do lognormal SADs and random placement reproduce z?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/species-area-exponent--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

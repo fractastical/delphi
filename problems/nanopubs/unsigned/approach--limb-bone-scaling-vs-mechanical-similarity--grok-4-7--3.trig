@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Does the area-mass exponent differ by lifestyle?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "The problem asks whether the exponent depends on posture. These tables do not contain effective mechanical advantage. Amson and Bibi do code lifestyle (aerial, terrestrial, aquatic, subterranean) and deposit a timetree. Fit log(MeanArea) = α_L + β_L log(mass) by PGLS inside each lifestyle with at least 20 species, using their tree. Posture dependence, in this proxy, is supported if at least one pair of lifestyles has slope estimates differing by more than 0.08 (the gap between 2/3 and 3/4) and non-overlapping 95 percent intervals. Lifestyle is not joint posture, and the write-up says so. This does not test safety-factor flatness." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--3#n_species> ;
+    delphi:proposedTest "Four lifestyle slopes with intervals. Dependence is accepted only if some pair differs by more than 0.08 with disjoint intervals. Otherwise the deposited lifestyle codes do not identify a different similarity law." ;
+    delphi:context "Fails if: Every lifestyle with at least 20 species has an interval that overlaps all three of 2/3, 3/4 and 1, or a lifestyle class falls under 20 species so the comparison cannot be made." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the 0.08 gap and the minimum of 20 species before fitting. 2. Split the humerus table by the deposited lifestyle codes. 3. Fit one PGLS slope per lifestyle on the deposited timetree. 4. Compare intervals pairwise. 5. State that the covariate is lifestyle, not effective mechanical advantage." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Effective mechanical advantage and in vivo strain are not in this file, so the safety-factor claim stays open." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.12600440.v3> ;
+    rdfs:seeAlso <https://doi.org/10.1186/s12915-021-01016-1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--3#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 20 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://doi.org/10.6084/m9.figshare.12600440.v3> dct:title "Amson and Bibi 2021 humeral structure and timetree" ;
+    dct:description "Lifestyle codes and AlteredTimetree.nex are in the deposit. Body mass and MeanArea are the regression pair." .
+  <https://doi.org/10.1186/s12915-021-01016-1> dct:title "Differing effects of size and lifestyle on bone structure in mammals" ;
+    dct:bibliographicCitation "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.348Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Does the area-mass exponent differ by lifestyle?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

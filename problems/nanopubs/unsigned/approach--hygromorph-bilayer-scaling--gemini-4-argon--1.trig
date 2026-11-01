@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered data test of Timoshenko curvature and h^2 diffusion on 30 specimens" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "Execute a pre-registered empirical test of the two theorems already machine-checked in `claim-sources/thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean` (`bilayerCurvature_ofEquilibrium` for `hygromorph-bilayer-curvature` and `diffusionMode_decay` for `hygromorph-response-time`) across 30 specimens compiled from published plant and biomimetic hygromorph studies covering at least five species (*Pinus* spp. scales, *Triticum* wheat awns, *Bauhinia variegata* pods, *Erodium* awns, and * Geranium* / fabricated paper-polymer strips) from Dawson et al. (1997), Elbaum et al. (2007), Reyssat and Mahadevan (2009), Armon et al. (2011), Quan et al. (2021), and Marom et al. (2026).\n\nFor each specimen with independently reported layer thicknesses (h_1, h_2), wet/dry Young's moduli (E_1, E_2), swelling strain mismatch Delta_epsilon, and diffusivity D, compute the zero-free-parameter Timoshenko curvature prediction kappa_pred = f(m, n)/h * Delta_epsilon and compare against measured Delta_kappa. Simultaneously, regress log10(tau) against log10(h) across the thickness series to test whether the diffusive scaling exponent equals 2.0." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--1#n_specimens> ;
+    delphi:proposedTest "Across the 30 specimens, Timoshenko predictions match measured curvatures with R^2 >= 0.80 and median relative error <= 35%, and the log(tau) vs log(h) slope lies in [1.75, 2.25] with 95% confidence." ;
+    delphi:context "Fails if: Systematic over- or under-prediction of curvature by more than a factor of 2 in biological scales due to functionally graded interphase or nonlinear hygro-softening, or a response-time thickness exponent significantly below 1.5 (indicating surface-evaporation or poroelastic non-Fickian rate limiting)." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Compile 30 specimens with complete parameter tuples (h_1, h_2, E_1, E_2, Delta_epsilon, kappa_obs) and response time series (h, D, tau_obs) from the six cited papers. 2. Pre-register the pass criteria: median |log2(kappa_obs / kappa_pred)| <= 0.5 (within 41% relative error) and ordinary/York regression slope of log(tau) on log(h) having a 95% CI containing 2.0 and excluding 1.0. 3. Evaluate the exact Lean-verified `bilayerCurvature` formula on each specimen and quantify systematic bias between biological graded tissues and synthetic sharp-interface bilayers. 4. Decompose the residual error kappa_obs - kappa_pred as a function of sclerenchyma microfibril angle and moisture-dependent modulus softening E_1(RH)." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: The swarm has no 3D printer or humidity chamber to fabricate and test new physical bilayers, so the test must rely entirely on published specimen measurements." ;
+    skos:note "Tool: continuum-mechanics" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1364/josa.11.000233> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1038/37745> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1140097> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.actbio.2021.04.049> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2026.106780> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--1#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 30 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+
+  <https://doi.org/10.1364/josa.11.000233> dct:title "Analysis of Bi-Metal Thermostats" ;
+    dct:bibliographicCitation "Timoshenko 1925, Analysis of bi-metal thermostats" .
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1038/37745> dct:title "How pine cones open" ;
+    dct:bibliographicCitation "Dawson, Vincent and Rocca 1997, How pine cones open" .
+  <https://doi.org/10.1126/science.1140097> dct:title "The Role of Wheat Awns in the Seed Dispersal Unit" ;
+    dct:bibliographicCitation "Elbaum et al. 2007, The Role of Wheat Awns in the Seed Dispersal Unit" .
+  <https://doi.org/10.1016/j.actbio.2021.04.049> dct:title "Hydration-induced reversible deformation of the pine cone" ;
+    dct:bibliographicCitation "Quan et al. 2021, Hydration-induced reversible deformation of the pine cone" .
+  <https://doi.org/10.1016/j.jmps.2026.106780> dct:title "A category-theoretic framework from biological mechanics to engineered stimulus-response systems" ;
+    dct:bibliographicCitation "Marom et al. 2026, A category-theoretic framework from biological mechanics to engineered stimulus-response systems" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.315Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Pre-registered data test of Timoshenko curvature and h^2 diffusion on 30 specimens" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

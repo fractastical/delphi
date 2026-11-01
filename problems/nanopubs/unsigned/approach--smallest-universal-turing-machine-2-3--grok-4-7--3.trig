@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Search a bounded periodic-background encoding family" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    dct:description "Search for a positive construction inside an explicit family, so exhaustion is a real partial result. The family is: a right-infinite periodic background of period at most 32 over the alphabet {0,1,2}, a finite program region of length at most 10^4, and a block encoding that uses only the block sizes already appearing in Smith's system-0 to system-3 schedule. For each candidate, simulate machine 596440 and test whether the successive visits of the head to the left end reproduce one full step of a fixed universal cyclic tag system (two appendants, the smallest Cook system that is already universal once cyclic-tag universality is granted) for at least 100 tag steps, with the background period unchanged outside the program. The search is exhaustive over periods and over program regions drawn from that block grammar, not over all strings of length 10^4. Publish the grammar, the seed, and the list of simulated candidates." ;
+
+    delphi:proposedTest "Either an explicit periodic-background initial tape, of period at most 32 and program length at most 10^4, that emulates 100 steps of the chosen cyclic tag system, or a machine-readable exhaustion certificate for that grammar." ;
+    delphi:context "Fails if: Exhaustion of this grammar does not refute conventional universality. The approach has failed to settle the question if the grammar is exhausted, and it has failed as a search if a candidate is accepted by one simulator and rejected by an independent reimplementation." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Fix the target cyclic tag system and the block grammar before any simulation. 2. Enumerate background periods from 1 to 32 and program blocks within the grammar up to length 10^4. 3. Simulate machine 596440 from each candidate for enough steps to cover 100 tag steps or until the background is corrupted. 4. Accept a candidate only if the decoded tag step matches and the background period is intact. 5. If the grammar is exhausted with no accept, report the bound as a negative partial result." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: turing-machine-enumeration" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+    rdfs:seeAlso <https://www.wolframscience.com/prizes/tm23/technicaldetails.html> ;
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.29.1.1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" .
+
+  <https://www.wolframscience.com/prizes/tm23/technicaldetails.html> dct:title "Wolfram 2,3 Turing machine technical details" ;
+    dct:description "Machine 596440 transition table used as the simulator specification." .
+  <https://doi.org/10.25088/ComplexSystems.29.1.1> dct:title "Universality of Wolfram’s 2, 3 Turing Machine" ;
+    dct:bibliographicCitation "Smith 2020, source of the block sizes the grammar is allowed to use" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to smallest-universal-turing-machine-2-3, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.336Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to smallest-universal-turing-machine-2-3: Search a bounded periodic-background encoding family" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,196 @@
+{
+  "claim_id": "darwin1859-ch13-10",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:07Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "living species count per clade (order/family) and phylogenetic isolation measure (stem length, evolutionary distinctiveness) computed independently of species count",
+    "fossil/extinct diversity through time for the same clades",
+    "divergence times within each clade and a birth-death null"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-clade-records",
+      "name": "Paleobiology Database taxon records (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:07Z",
+        "method": "GET paleobiodb.org/data1.2/taxa/single.json?name={Monotremata,Rhynchocephalia,Dipnoi,Ginkgoales}&show=attr,size",
+        "http_status": 200
+      },
+      "variables_present": [
+        "occurrence counts (noc) per clade",
+        "taxon size fields siz/exs",
+        "first/last appearance fields fea/lea (seen for Aves with show=attr,app)"
+      ],
+      "variables_missing": [
+        "a pre-built extinction-rate series per clade (derivable from occurrences)"
+      ],
+      "scope": "Global fossil record, queryable per clade",
+      "evidence": "API 200, per clade (noc/siz/exs): Monotremata 42/55/25; Rhynchocephalia 132/86/7; Dipnoi 835/505/23; Ginkgoales 1,671/96/3. Field meanings are PBDB's; not interpreted here.",
+      "verdict": "holds"
+    },
+    {
+      "id": "timetree-api",
+      "name": "TimeTree (api.timetree.org)",
+      "landing_url": "https://www.timetree.org/",
+      "access_url": "https://api.timetree.org/pairwise/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:07Z",
+        "method": "GET timetree.org/api/; GET api.timetree.org/pairwise/9258/9606",
+        "http_status": 200
+      },
+      "variables_present": [
+        "pairwise divergence times with CI (precomputed_age, ci_low, ci_high) by NCBI taxon id"
+      ],
+      "variables_missing": [
+        "clade species counts",
+        "fossil diversity"
+      ],
+      "scope": "Molecular timetrees across life",
+      "evidence": "API 200: CSV header taxon_a_id, taxon_b_id, scientific_name_a/b, all_total, precomputed_age, precomputed_ci_low, precomputed_ci_high, adjusted_age; a platypus-human query returned one row.",
+      "verdict": "holds"
+    },
+    {
+      "id": "catalogue-of-life-checklistbank",
+      "name": "Catalogue of Life (ChecklistBank)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:07Z",
+        "method": "GET api.checklistbank.org/dataset/3LR/nameusage/search?q=Monotremata&rank=order; /taxon/3L5; nameusage/search?rank=species&TAXON_ID=3L5&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "accepted taxa and extant flag (Monotremata id 3L5, extinct:false)",
+        "species-rank counts under a taxon (query returned total 10 for Monotremata)"
+      ],
+      "variables_missing": [
+        "fossil diversity",
+        "phylogenetic isolation measures"
+      ],
+      "scope": "All kingdoms",
+      "evidence": "API 200 for all three calls.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:07Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic tree topology with 2,385,875 tips, usable for sister-group sizes"
+      ],
+      "variables_missing": [
+        "branch lengths/evolutionary distinctiveness (not checked)",
+        "fossils"
+      ],
+      "scope": "All life",
+      "evidence": "API 200: 1,931 source studies, 2,064 source trees.",
+      "verdict": "partial"
+    },
+    {
+      "id": "edge-style-distinctiveness-search",
+      "name": "Datasets of evolutionary distinctiveness (search results)",
+      "landing_url": "https://api.datacite.org/dois?query=EDGE+evolutionary+distinctiveness+species+list",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:07Z",
+        "method": "GET api.datacite.org/dois?query=EDGE+evolutionary+distinctiveness+species+list",
+        "http_status": 200
+      },
+      "variables_present": [
+        "few hits; none opened (e.g. an avian EcoDGE figshare deposit)"
+      ],
+      "variables_missing": [
+        "an inspected global ED table"
+      ],
+      "scope": "Unknown",
+      "evidence": "DataCite total 20, titles seen include an avian 'EcoDGE Framework' figshare deposit (10.6084/m9.figshare.32232915); contents not inspected.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB API",
+      "query": "taxa/single for four named aberrant clades",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Dipnoi&show=attr,size",
+      "hits": 4,
+      "note": "records returned"
+    },
+    {
+      "source": "DataCite",
+      "query": "EDGE evolutionary distinctiveness species list",
+      "url": "https://api.datacite.org/dois?query=EDGE+evolutionary+distinctiveness+species+list&page%5Bsize%5D=4",
+      "hits": 20,
+      "note": "one avian deposit"
+    },
+    {
+      "source": "DataCite",
+      "query": "evolutionary distinctiveness tetrapods phylogeny dataset",
+      "url": "https://api.datacite.org/dois?query=%22evolutionary+distinctiveness%22+tetrapods+phylogeny+dataset&page%5Bsize%5D=4",
+      "hits": 3,
+      "note": "not relevant"
+    },
+    {
+      "source": "ChecklistBank",
+      "query": "Monotremata order",
+      "url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?q=Monotremata&rank=order&limit=1",
+      "hits": 1,
+      "note": "id 3L5"
+    },
+    {
+      "source": "TimeTree API",
+      "query": "pairwise 9258/9606",
+      "url": "https://api.timetree.org/pairwise/9258/9606",
+      "hits": 1,
+      "note": "CSV row returned"
+    }
+  ],
+  "status": "partial",
+  "summary": "Open APIs cover three of the needed ingredients separately: PBDB for fossil records per clade, TimeTree for divergence times, Catalogue of Life/Open Tree for living species counts. No ready table of per-clade evolutionary distinctiveness vs species count vs fossil richness exists; it would need assembly across clades with fossil records.",
+  "next_step": "Choose ~20 clades (include Monotremata, Rhynchocephalia, Dipnoi, Ginkgoales plus species-rich controls); compute isolation from a dated tree, species counts from CoL, fossil richness from PBDB; pre-register a birth-death null.",
+  "obstacles_confirmed": [
+    "Fossil preservation bias for small/soft-bodied/tropical taxa",
+    "Low speciation rates can give species-poor clades without major extinction",
+    "Circularity if aberrance defined by distinctness"
+  ]
+}

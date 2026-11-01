@@ -1,0 +1,105 @@
+{
+  "claim_id": "darwin1859-ch07-07",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:25:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "time-calibrated phylogeny of Cuculidae (and cowbirds, honeyguides) with species tips",
+    "breeding strategy per species coded as own-nest builder / facultative brood parasite / obligate brood parasite",
+    "reproductive success (fledging) of parasitic vs host-reared young",
+    "nest-building and egg-laying behaviour records for putative intermediate species"
+  ],
+  "datasets": [
+    {
+      "id": "avonet-tobias-2022",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.16586228",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0 (per Figshare API)",
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T09:15:00Z", "method": "GET doi.org (resolved to figshare.com, 202) and Figshare API article record with file list", "http_status": 200 },
+      "variables_present": ["species-level morphological, ecological and geographical traits for all birds (per title)"],
+      "variables_missing": ["brood-parasitism or nest-building coding (column list not opened: files are over 1 MB)", "reproductive success"],
+      "scope": "Files: AVONET Supplementary dataset 1.xlsx (21,524,673 bytes), Supplementary dataset 2.xlsx (1,241,301), ELEData.zip (17,758,930), ELECode.zip (38,817). Not downloaded.",
+      "evidence": "Figshare API listing of four files with sizes. The assessor describes life-history data; this scout did not verify a parasitism field.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-2022"
+    },
+    {
+      "id": "birdtree-vertlife-bird-phylogenies",
+      "name": "BirdTree / VertLife bird phylogeny subsets (Jetz et al.)",
+      "landing_url": "https://birdtree.org/",
+      "access_url": "https://birdtree.org/subsets/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T09:16:00Z", "method": "GET birdtree.org landing (200), birdtree.org/subsets/ (200, 270,835 bytes), data.vertlife.org (200), vertlife.org/data/birds/ (200)", "http_status": 200 },
+      "variables_present": ["phylogenies of birds (tree subsets service; contents not parsed here)"],
+      "variables_missing": ["breeding strategy coding", "reproductive success"],
+      "scope": "Phylogenetic framework only. Ages and species coverage of cuckoos were not queried.",
+      "evidence": "Pages respond with HTTP 200; page text did not state counts when scraped.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-api-birds",
+      "name": "Open Tree of Life synthetic tree",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T07:38:00Z", "method": "POST /v3/tree_of_life/about (200); GET landing page returned 503", "http_status": 200 },
+      "variables_present": ["tree topology (2,385,875 tips in the synthetic tree)"],
+      "variables_missing": ["trait coding for parasitism", "divergence times"],
+      "scope": "Topology only; ancestral-state reconstruction of behaviour needs an external trait table.",
+      "evidence": "about response: num_source_studies 1931; the landing page web UI returned 503.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ebird-landing",
+      "name": "eBird (distribution and breeding-season occurrence)",
+      "landing_url": "https://ebird.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:50:00Z", "method": "GET landing page", "http_status": 200, "bytes": 7200 },
+      "variables_present": [],
+      "variables_missing": ["breeding strategy", "phylogeny"],
+      "scope": "Occurrence/abundance context; a portal.",
+      "evidence": "Landing page only; access to data requires a request process not checked here.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad-brush-cuckoo-egg-morphs",
+      "name": "Empirical evidence of different egg morphs that match host eggs in the brush cuckoo (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/search?q=obligate%20brood%20parasitism%20birds%20evolution",
+      "access_url": null,
+      "doi": "10.5061/dryad.9zw3r22cp",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T09:17:00Z", "method": "Dryad search result listing (title and DOI only; metadata not fetched)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["comparative coverage: a single parasite species study"],
+      "scope": "One species; found alongside three other single-species Dryad deposits on cuckoo host races and egg rejection (e.g. doi:10.5061/dryad.7992 on common cuckoo host races).",
+      "evidence": "Search hit titles only.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "brood parasitism cuckoo phylogeny comparative", "url": "https://datadryad.org/api/v2/search?q=brood%20parasitism%20cuckoo%20phylogeny%20comparative", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "obligate brood parasitism birds evolution", "url": "https://datadryad.org/api/v2/search?q=obligate%20brood%20parasitism%20birds%20evolution", "hits": 4, "note": "all single-species / host-race / egg-rejection studies" },
+    { "source": "DataCite", "query": "avian brood parasitism database host parasite", "url": "https://api.datacite.org/dois?query=avian%20brood%20parasitism%20database%20host%20parasite&page%5Bsize%5D=6", "hits": 0, "note": "nothing" },
+    { "source": "DataCite", "query": "Cuculidae nest building brood parasite traits", "url": "https://api.datacite.org/dois?query=Cuculidae%20nest%20building%20brood%20parasite%20traits&page%5Bsize%5D=6", "hits": 0, "note": "nothing" },
+    { "source": "Figshare", "query": "article 16586228 file list (AVONET)", "url": "https://api.figshare.com/v2/articles/16586228", "hits": 4, "note": "four files, 21.5 MB, 1.2 MB, 17.8 MB, 38.8 KB" }
+  ],
+  "status": "partial",
+  "summary": "Bird phylogenies (BirdTree/VertLife, Open Tree) and AVONET species traits are open, but no repository table coding nest-building, facultative and obligate brood parasitism per cuckoo species or fledging success of fostered young was found; those must be coded from monographs.",
+  "next_step": "Code breeding strategy for Cuculidae, cowbirds and honeyguides from the literature (e.g. Payne's cuckoo monograph), join to a BirdTree sample, then pre-register the ancestral-state reconstruction and sensitivity checks across trees.",
+  "obstacles_confirmed": [
+    "Parasitic status and nesting behaviour are not columns in the tree repositories.",
+    "Dryad/DataCite searches returned only single-species studies, not comparative codings.",
+    "The selective-advantage clause (fostered young fared better) is not testable from presence/absence codings."
+  ]
+}

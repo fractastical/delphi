@@ -1,0 +1,93 @@
+{
+  "claim_id": "thompson1917-ch02-10",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:55:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "characteristic speed per species, separately for swimming, flight and walking (ideally sustained/cruising, minimum flight speed, or pendulum walking speed)",
+    "body length per species (same individuals or species means)",
+    "locomotor mode and construction class to group similarly built animals"
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-speed-table",
+      "name": "FishBase 'speed' table (swimming speed records with fish length), rfishbase parquet snapshot v25.04",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/speed.parquet",
+      "doi": null,
+      "license": "CC BY-NC 4.0",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:50:00Z", "method": "HEAD www.fishbase.se (200); GET HF tree listing of data/fb/v24.07/parquet; GET speed.parquet (13,097 bytes) and read with pyarrow", "http_status": 200, "bytes": 13097 },
+      "variables_present": ["swimming speed per record (Speedms m/s, SpeedLS body lengths/s)", "fish length per record (Length, LengthType)", "Mode (e.g. burst, sustained)"],
+      "variables_missing": ["flight and walking speeds (other modes)"],
+      "scope": "269 speed records for 89 species (SpecCode); HF tree also lists swimming.parquet (24,085 bytes) and larvalswimspeed.parquet (4,812 bytes)",
+      "evidence": "speed.parquet: 269 rows, columns autoctr, StockCode, SpecCode, SpeedRefNo, Length, LengthType, SpeedLS, LengthTypeSpeed, Speedms, Mode, DataRef, Reliable, Comment, ...; first row Length 25.0 SL, SpeedLS 6.97, Speedms 1.7425, Mode 'burst'. Licence as recorded in test-data/organisms/claim-tests/fetch.py for FishBase.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank animal tracking database",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": "https://www.movebank.org/movebank/service/direct-read?entity_type=study&i_have_download_access=true",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:50:30Z", "method": "HEAD landing_url (302 then 200); GET REST direct-read study list without credentials", "http_status": 401, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["could not inspect: speeds must be derived from GPS fixes; body length is not a Movebank field"],
+      "scope": "Thousands of tracking studies, many only with login; REST API returned HTTP 401 Unauthorized without an account",
+      "evidence": "Landing page reachable (302 -> 200). REST endpoint returned Tomcat 'HTTP Status 401 – Unauthorized'. Movebank requires a free account for the API; raw tracks give routine movement speed, not characteristic speed, and no length.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "avonet",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022)",
+      "landing_url": "https://opentraits.org/datasets/avonet.html",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:53:00Z", "method": "HEAD opentraits landing (200); figshare API search ':title: AVONET' and GET articles/16586228", "http_status": 200, "bytes": 21524673 },
+      "variables_present": ["body mass and wing/tail/tarsus linear measurements per bird species (~11,000 species)", "hand-wing index"],
+      "variables_missing": ["any measured flight speed"],
+      "scope": "All extant bird species; morphology only",
+      "evidence": "figshare article 16586228 title 'AVONET: morphological, ecological and geographical data for all birds', licence CC BY 4.0, files 'AVONET Supplementary dataset 1.xlsx' (21,524,673 bytes), 'Supplementary dataset 2.xlsx', ELEData.zip, ELECode.zip.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-procellariiform-flight-speed-review",
+      "name": "Data from: A global review of Procellariiform flight height, flight speed and nocturnal activity",
+      "landing_url": "https://doi.org/10.5061/dryad.tx95x6b84",
+      "access_url": null,
+      "doi": "10.5061/dryad.tx95x6b84",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:54:00Z", "method": "DataCite API search hit (metadata only; landing page not fetched)", "http_status": 200, "bytes": null },
+      "variables_present": ["compiled flight speeds for Procellariiform seabirds (per DataCite title)"],
+      "variables_missing": ["body length", "other modes and taxa"],
+      "scope": "One seabird order; a literature compilation",
+      "evidence": "Returned by DataCite query for bird 'flight speed' tracking radar, resource type dataset (1 hit). Only the DataCite title was inspected.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Hugging Face (rfishbase snapshot)", "query": "tree listing data/fb/v24.07/parquet, files matching swim/speed/species/popchar", "url": "https://huggingface.co/api/datasets/cboettig/fishbase/tree/main/data/fb/v24.07/parquet", "hits": 215, "note": "speed.parquet 12,647 B, swimming.parquet 24,085 B, larvalswimspeed.parquet 4,812 B, species.parquet 5.47 MB" },
+    { "source": "figshare", "query": ":title: AVONET", "url": "https://api.figshare.com/v2/articles/search", "hits": 1, "note": "article 16586228" },
+    { "source": "Dryad", "query": "bird flight speed radar body mass", "url": "https://datadryad.org/api/v2/search?q=bird+flight+speed+radar+body+mass&per_page=5", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "preferred walking speed body mass terrestrial animals scaling", "url": "https://datadryad.org/api/v2/search?q=preferred+walking+speed+body+mass+terrestrial+animals+scaling&per_page=5", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "\"maximum speed\" body mass", "url": "https://datadryad.org/api/v2/search?q=%22maximum+speed%22+body+mass&per_page=5", "hits": 4, "note": "single-species studies (tern flight, pipistrelle bat, quoll agility, fish metabolic scope); no cross-species speed table" },
+    { "source": "Zenodo", "query": "\"maximum speed\" animals body mass", "url": "https://zenodo.org/api/records?q=%22maximum%20speed%22%20animals%20body%20mass&size=5", "hits": 383622, "note": "first page irrelevant (body condition, biologgers, neutron stars)" },
+    { "source": "DataCite", "query": "bird \"flight speed\" tracking radar, resource type dataset", "url": "https://api.datacite.org/dois?query=bird+%22flight+speed%22+tracking+radar&resource-type-id=dataset&page%5Bsize%5D=5", "hits": 1, "note": "10.5061/dryad.tx95x6b84 Procellariiform flight review" }
+  ],
+  "status": "partial",
+  "summary": "The swimming case is directly testable from FishBase's open 'speed' table (269 records, 89 species, Speedms with fish Length and Mode). For flight, AVONET gives mass and wing dimensions for all birds but no speeds, and the only repository speed dataset found is a Procellariiform compilation; the classic cross-species flight-speed sets (Alerstam et al. 2007 radar data) are paper supplements. For walking, no repository table of characteristic speed vs. leg length or body length across species was found; Movebank's API needs a login (401) and gives routine GPS speeds without length.",
+  "next_step": "Pre-register the swimming exponent test on FishBase speed.parquet (log Speedms vs log Length, by Mode); for flight and walking compile Alerstam 2007 S1 and a published mammal walking-speed table into a repository dataset before testing.",
+  "obstacles_confirmed": [
+    "Tracked speeds are mostly routine movement, not minimum flight speed, sprint speed, or pendulum walking speed.",
+    "Characteristic speed must be standardized across tracking studies (FishBase mixes burst and sustained modes in one table)."
+  ]
+}

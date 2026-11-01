@@ -1,0 +1,191 @@
+{
+  "claim_id": "darwin1859-ch04-24",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:48:55Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "discrete morphological character matrices coding fossil and extant taxa of the same clade",
+    "fossil age and taxonomic assignment per taxon",
+    "phylogeny placing fossils relative to living subgroups, and a null model (random extinction/preservation)"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:55Z",
+        "method": "GET morphobank.org and www.morphobank.org (with and without browser User-Agent); GET morphobank.org/index.php/Projects/Index",
+        "http_status": 403,
+        "note": "403 from CloudFront on every URL tried"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "everything: nothing could be inspected"
+      ],
+      "scope": "Repository of morphological matrices (not verified)",
+      "evidence": "All requests returned HTTP 403 from CloudFront; api.morphobank.org did not resolve. The number of matrices with fossil+extant taxa is therefore unknown from this scout.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "pbdb-api",
+      "name": "Paleobiology Database (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:55Z",
+        "method": "GET paleobiodb.org/data1.2/taxa/list.json?base_name=Tetrapoda&limit=1&rowcount; occs/list.json?base_name=Aves&limit=1&rowcount; taxa/single.json?name=Aves&show=attr,app",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil taxonomy and occurrences with age bins (e.g. Aves: 15,225 occurrences, first appearance 161.5 Ma in the taxon record)",
+        "taxon ages"
+      ],
+      "variables_missing": [
+        "morphological character states",
+        "phylogeny"
+      ],
+      "scope": "Global fossil occurrences",
+      "evidence": "API 200: Tetrapoda records_found 66,210; Aves occurrences records_found 15,225; taxon Aves has fea 161.5, lea 0.0117, tei Oxfordian.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-gavialis-matrix",
+      "name": "Data from: Morphology, fossils, divergence timing, and the phylogenetic relationships of Gavialis (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.775",
+      "access_url": null,
+      "doi": "10.5061/dryad.775",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:48:55Z",
+        "method": "GET datadryad.org/api/v2/datasets/doi:10.5061/dryad.775",
+        "http_status": 200,
+        "bytes": 42670
+      },
+      "variables_present": [
+        "matrix of 164 discrete morphological characters with fossils added to extant crocodylians (per abstract)"
+      ],
+      "variables_missing": [
+        "other clades"
+      ],
+      "scope": "Crocodylia only",
+      "evidence": "Dryad API 200; 42,670 bytes; CC0-1.0; published 2009-07-31.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-morphology-matrix-search",
+      "name": "Dryad: morphological character matrices combining fossil and extant taxa (search results)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:48:55Z",
+        "method": "GET datadryad.org/api/v2/search?q=morphological+character+matrix+fossil+and+extant+taxa+phylogenetic",
+        "http_status": 200
+      },
+      "variables_present": [
+        "clade-specific matrices (8 hits)"
+      ],
+      "variables_missing": [
+        "a pooled, cross-clade matrix collection"
+      ],
+      "scope": "Clade-specific",
+      "evidence": "Search total 8; titles include Gavialis, extant Rhynchonellida (Brachiopoda), geometric morphometric character suites, posterior predictive simulations of morphological models.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:55Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic extant-biased phylogenetic backbone (2,385,875 tips)"
+      ],
+      "variables_missing": [
+        "morphological characters",
+        "fossil placement"
+      ],
+      "scope": "All life",
+      "evidence": "API 200: num_tips 2,385,875; 1,931 source studies.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "morphological character matrix fossil and extant taxa phylogenetic",
+      "url": "https://datadryad.org/api/v2/search?q=morphological+character+matrix+fossil+and+extant+taxa+phylogenetic&per_page=4",
+      "hits": 8,
+      "note": "clade-specific matrices"
+    },
+    {
+      "source": "Dryad",
+      "query": "morphospace disparity fossil extant discrete characters matrix",
+      "url": "https://datadryad.org/api/v2/search?q=morphospace+disparity+fossil+extant+discrete+characters+matrix&per_page=4",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "character matrix fossil extant morphological phylogeny nexus",
+      "url": "https://api.datacite.org/dois?query=%22character+matrix%22+fossil+extant+morphological+phylogeny+nexus&page%5Bsize%5D=4",
+      "hits": 6,
+      "note": "Zenodo supporting data for recent morphological phylogenies"
+    },
+    {
+      "source": "Zenodo",
+      "query": "morphological matrix fossil extant",
+      "url": "https://zenodo.org/api/records?q=%22morphological+matrix%22+fossil+extant&size=1",
+      "hits": 58662,
+      "note": "loose phrase matching, noisy"
+    },
+    {
+      "source": "PBDB",
+      "query": "Tetrapoda taxa, Aves occurrences",
+      "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Tetrapoda&limit=1&rowcount",
+      "hits": 66210,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "Fossil taxonomy and ages are open via the PBDB API, and clade-specific fossil+extant matrices are scattered across Dryad/Zenodo/Figshare (one example verified: Gavialis, 164 characters). MorphoBank, the main repository, returned 403 for every URL, so its holdings could not be checked. No pooled cross-clade dataset exists.",
+  "next_step": "Pick 3-5 clades with fossil+extant matrices (Dryad/Zenodo or MorphoBank when reachable), pre-register an intermediacy metric and a random-extinction null.",
+  "obstacles_confirmed": [
+    "Matrices are clade-specific and unevenly published",
+    "Stem placement may be circular with tree-based coding",
+    "Soft-bodied groups absent"
+  ]
+}

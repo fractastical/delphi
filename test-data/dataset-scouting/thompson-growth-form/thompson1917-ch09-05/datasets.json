@@ -1,0 +1,148 @@
+{
+  "claim_id": "thompson1917-ch09-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "increment or zone counts per structure (scale, otolith, bone, starch grain) in specimens of known age or known capture date",
+    "independent external period markers (daily, seasonal or annual: temperature, upwelling, chemical or thermal marks)",
+    "environmental time series covering the same interval",
+    "structures other than otoliths and bivalve shells (bone, scales, starch grains)"
+  ],
+  "datasets": [
+    {
+      "id": "pangaea",
+      "name": "PANGAEA (data publisher): otolith microstructure and bivalve increment series",
+      "landing_url": "https://www.pangaea.de/",
+      "access_url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=otolith%20increment%20width&size=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD pangaea.de (200); GET PANGAEA Elasticsearch panmd: 'otolith increment width' (56,584 hits), 'sclerochronology growth increments bivalve' (4,904), 'fish scale annuli growth zones daily increments' (36,307); HEAD doi.org for 711742, 982536, 816210 (all 200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "otolith microstructure of Sprattus sprattus from several cruises, e.g. PANGAEA 711742 (95,210 data points), 711744 (97,775), 711746 (130,226)",
+        "bivalve increment widths: 982536 English Channel Glycymeris glycymeris (200 data points), 816210 Arctica islandica North Icelandic Shelf 1357-year proxy archive, 816206 birth/death dates of individual A. islandica (87 data points)"
+      ],
+      "variables_missing": [
+        "no starch-grain, bone or scale record seen among top hits",
+        "paired external-cycle markers per series were not opened"
+      ],
+      "scope": "Fish otoliths and bivalves; marine",
+      "evidence": "ES hits titles/nDataPoints as listed; DOI landing pages return 200",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-t4b8gtj4s-cod-otolith-annual-increments",
+      "name": "Otolith annual growth increments for cod populations in the Northeast Atlantic (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.t4b8gtj4s",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.t4b8gtj4s",
+      "doi": "10.5061/dryad.t4b8gtj4s",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.5061/dryad.t4b8gtj4s (200); GET Dryad API datasets/doi (200) and versions/199776/files (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "annual growth-increment data for cod otoliths; files Ecology_data_Campana.csv (5,283,039 bytes) and README_Campana_data.txt (6,710 bytes); CC0; published 2022-10-06"
+      ],
+      "variables_missing": [
+        "abstract concerns climate-induced synchrony; independent external markers not confirmed in the record seen",
+        "annual not daily/seasonal resolution"
+      ],
+      "scope": "One species complex, Northeast Atlantic; file not downloaded (over 1 MB)",
+      "evidence": "Dryad API: license CC0-1.0, storageSize 5289749, file list as above",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "noaa-wds-paleo-splitnose-rockfish-otolith-growth",
+      "name": "NOAA/WDS Paleoclimatology - California Current Splitnose Rockfish Otolith Growth Data",
+      "landing_url": "https://doi.org/10.25921/1k6d-tf95",
+      "access_url": "https://api.datacite.org/dois/10.25921/1k6d-tf95",
+      "doi": "10.25921/1k6d-tf95",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.25921/1k6d-tf95 (200, redirects to NCEI geoportal); GET DataCite dois/10.25921/1k6d-tf95 (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "otolith growth series linked in the description to monthly coastal upwelling intensities (two seasonal modes), publication year 2011"
+      ],
+      "variables_missing": [
+        "file list and column set not opened",
+        "one species"
+      ],
+      "scope": "California Current splitnose rockfish",
+      "evidence": "DataCite title and description beginning 'Analysis of monthly coastal upwelling intensities revealed two seasonal and biologically relevant upwelling modes'",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PANGAEA Elasticsearch",
+      "query": "otolith increment width",
+      "url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=otolith%20increment%20width&size=5",
+      "hits": 56584,
+      "note": "Sprattus sprattus microstructure series 711702-711746"
+    },
+    {
+      "source": "PANGAEA Elasticsearch",
+      "query": "sclerochronology growth increments bivalve",
+      "url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=sclerochronology%20growth%20increments%20bivalve&size=4",
+      "hits": 4904,
+      "note": "Glycymeris, Arctica islandica series"
+    },
+    {
+      "source": "PANGAEA Elasticsearch",
+      "query": "fish scale annuli growth zones daily increments",
+      "url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=fish%20scale%20annuli%20growth%20zones%20daily%20increments&size=6",
+      "hits": 36307,
+      "note": "loose OR matching; not opened"
+    },
+    {
+      "source": "Dryad",
+      "query": "otolith increment daily seasonal validation",
+      "url": "https://datadryad.org/api/v2/search?q=otolith%20increment%20daily%20seasonal%20validation",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "otolith growth increments daily validation known age, type=dataset",
+      "url": "https://zenodo.org/api/records?q=otolith%20growth%20increments%20daily%20validation%20known%20age&type=dataset&size=8",
+      "hits": 72552,
+      "note": "top hits include Dryad mirrors: 4913714 sole otolith microstructures, 6800044 cod annual increments, 4931935 stocked Shoal Bass age and growth"
+    },
+    {
+      "source": "DataCite",
+      "query": "otolith increment width time series (resource type dataset)",
+      "url": "https://api.datacite.org/dois?query=otolith%20increment%20width%20time%20series&resource-type-id=dataset",
+      "hits": 5,
+      "note": "cod increments, rockfish larvae, NOAA rockfish otolith growth"
+    }
+  ],
+  "status": "partial",
+  "summary": "Repository data exist for otolith and bivalve increments with dates or environmental context (PANGAEA Sprattus otolith microstructure series, Glycymeris and Arctica islandica increments; Dryad cod annual increments, 5.3 MB CSV; NOAA rockfish otolith growth linked to upwelling). Nothing was found for starch grains or bones, and I did not confirm that any one record pairs increments with an independent seasonal or diel marker per specimen.",
+  "next_step": "Open PANGAEA 982536 and 816206 and the Dryad cod CSV header to see which have an independent time axis; pre-register on bivalve/otolith series only and state that scales, bones and starch grains are untested.",
+  "obstacles_confirmed": [
+    "Starch grains and most bones are poorly represented next to commercial fish otoliths and bivalve bands.",
+    "Environmental covariates and internal rhythms can be correlated, so records with only an environmental series do not separate the two."
+  ]
+}

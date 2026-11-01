@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule30-center-column--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Extend the column to 10^10–10^11 bits with a pre-registered density and period test" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule30-center-column> ;
+    dct:description "Extend the known prefix beyond the published billion bits and pre-register what the extension can and cannot show. Computing n center bits needs about n²/2 cell updates, but the light cone can be trimmed: cells at distance d from the center at time t only matter if d ≤ n − t. With bit-sliced 64-wide words on GPUs this gives roughly 10^19 to 10^20 word operations for n = 10^10, which is feasible on a modest cluster. Pre-register: (a) exclusion of every eventual period p ≤ n/3 with transient ≤ n/3, using a suffix-array or Z-function scan; (b) a density test, the running deviation D(n) = #1s − n/2 compared with the law-of-iterated-logarithm envelope √(2n log log n)/2 expected for an i.i.d. fair sequence, with pass and fail bands fixed in advance; (c) block-frequency and linear-complexity profiles (Berlekamp–Massey) at block lengths 1 to 20. The result is computational evidence, recorded as data_kind 'computational', not a proof." ;
+
+    delphi:proposedTest "A certified statement that no eventual period with transient and period each ≤ n/3 exists in the first n = 10^10 bits, and density deviations inside or outside the pre-registered LIL band. A detected period would refute problem 1 outright." ;
+    delphi:context "Fails if: Compute or memory limits stop the run below 10^10, so it adds little beyond the published billion bits; or the trimming is shown to be wrong because the result disagrees with the reference prefix." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Validate the simulator against the published billion-bit dataset (SHA-256 match). 2. Write result.json with hypotheses, bands and planned outputs before running beyond 10^9. 3. Run to n = 10^10 (stretch 10^11) with checkpointing; publish the prefix checksum and a fetch script, not the data. 4. Run the period-exclusion scan, the LIL density test and Berlekamp–Massey linear complexity; record verdicts." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: GPU time on the order of 10^4 GPU-hours for 10^10 bits; less if a better light-cone trimming is found." ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: gpu" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-14> ;
+    rdfs:seeAlso <https://datarepository.wolframcloud.com/resources/A-Billion-Bits-of-the-Center-Column-of-the-Rule-30-Cellular-Automaton> ;
+    rdfs:seeAlso <https://writings.stephenwolfram.com/2019/10/announcing-the-rule-30-prizes/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule30-center-column> a delphi:Concept, schema:Question ;
+    rdfs:label "The Rule 30 center column" .
+
+  <https://datarepository.wolframcloud.com/resources/A-Billion-Bits-of-the-Center-Column-of-the-Rule-30-Cellular-Automaton> dct:title "A Billion Bits of the Center Column of the Rule 30 Cellular Automaton (Wolfram Data Repository)" ;
+    dct:description "Reference prefix to validate the simulator and as the starting baseline" .
+  <https://writings.stephenwolfram.com/2019/10/announcing-the-rule-30-prizes/> dct:bibliographicCitation "States that the column is known non-periodic for the first billion steps" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule30-center-column, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.297Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule30-center-column: Extend the column to 10^10–10^11 bits with a pre-registered density and period test" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule30-center-column--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

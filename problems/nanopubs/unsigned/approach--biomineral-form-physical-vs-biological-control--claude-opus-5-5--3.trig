@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Spherical vesicle-foam simulation with Plateau-border deposition" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    dct:description "Generate the physical prediction explicitly rather than borrowing planar foam statistics. Simulate a monolayer of N vesicles on a sphere with a 2D vertex model (line tension on edges, area constraint per vesicle, polydispersity parameter s), relax to equilibrium, and deposit mineral along edges (Plateau borders). Vary N and s. Record pore polygon distribution, vertex angles, defect (non-hexagon) positions and their spacing. Two physics checks that are not discriminating, and should be reported as such: on any trivalent spherical net the sum over faces of (6 - n) is exactly 12 (Euler), and mean sides approach 6 as N grows. The discriminating outputs are the vertex-angle distribution, the defect-correlation length (defects in relaxed foams arrange in scars or are spread; in random packings they are uncorrelated) and Lewis-law slope at a given s. Fit s per real shell and test whether a single s reproduces all statistics jointly (posterior predictive check)." ;
+
+    delphi:proposedTest "Posterior predictive p-values for the joint statistics of each shell under the fitted foam model; most shells reproduced (p > 0.05) supports the physical explanation, systematic failure in vertex angles or defect correlation refutes it." ;
+    delphi:context "Fails if: Model statistics insensitive to line tension versus pure packing at realistic N, so no observable can separate them; or approach 1 data unavailable." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement a spherical vertex model in Python (or use Surface Evolver if available) and verify against known results for monodisperse 2D foams. 2. Prove or cite the Euler identity sum (6 - n) = 12 for trivalent spherical nets (a short Lean lemma assuming V - E + F = 2 and trivalence). 3. Sweep N in 20..500 and s in 0..0.5; build summary-statistic emulators. 4. Fit s per shell from approach 1 data by approximate Bayesian computation and run joint posterior predictive checks." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Depends on approach 1's measured shells for the comparison step; the simulation alone is tractable." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: surface-evolver" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+
+    rdfs:seeAlso <https://doi.org/10.1080/00107518408210979> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1102289> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" .
+
+
+  <https://doi.org/10.1080/00107518408210979> dct:title "Soap, cells and statistics—random patterns in two dimensions" ;
+    dct:bibliographicCitation "Weaire and Rivier 1984, Soap, cells and statistics" .
+  <https://doi.org/10.1126/science.1102289> dct:title "Sea Urchin Spine Calcite Forms via a Transient Amorphous Calcium Carbonate Phase" ;
+    dct:bibliographicCitation "Politi et al. 2004, Sea urchin spine calcite forms via a transient amorphous calcium carbonate phase" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biomineral-form-physical-vs-biological-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.310Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biomineral-form-physical-vs-biological-control: Spherical vesicle-foam simulation with Plateau-border deposition" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

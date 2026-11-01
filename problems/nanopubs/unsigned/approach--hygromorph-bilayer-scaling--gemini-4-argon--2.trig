@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 extension of Hygromorphs.lean to graded layers and transient diffusion" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> ;
+    dct:description "Extend `claim-sources/thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean` beyond piecewise-constant two-layer strips to cover the three physical effects cited in the problem question: continuous through-thickness property gradients E(z) and epsilon_swelling(z), moisture-dependent modulus softening E(c(z,t)), and coupled transient Fickian diffusion c(z,t). In Euler-Bernoulli beam theory with depth coordinate z in [-h/2, h/2], equilibrium requires vanishing axial force integral E(z)(epsilon_0 + kappa z - epsilon_s(z)) dz = 0 and vanishing bending moment integral z E(z)(epsilon_0 + kappa z - epsilon_s(z)) dz = 0.\n\nProve in Lean 4 the general continuous-profile curvature theorem `gradedCurvature_ofEquilibrium`: kappa(t) = (E_0 I_1(t) - E_1 I_0(t)) / (E_0 E_2 - E_1^2), where E_k = integral z^k E(z) dz and I_k(t) = integral z^k E(z) epsilon_s(z, t) dz. Then prove two quantitative perturbation bounds: (1) replacing a sharp interface with a linear graded interphase of thickness delta*h reduces steady-state curvature by a bounded factor 1 - O((delta)^2), and (2) under one-sided Fickian diffusion `diffusionMode`, transient curvature kappa(t)/kappa_inf overshoots or lags the pure exponential `exp(-pi^2 D t / h^2)` by a bounded early-time term proportional to t^(1/2) / h." ;
+
+    delphi:proposedTest "A zero-`sorry` Lean 4 extension of `ThompsonLaws/Hygromorphs.lean` proving the exact graded-profile curvature formula, its reduction to Timoshenko's formula in the sharp-interface limit, and an explicit algebraic bound on the error caused by finite interphase thickness and fibre angle." ;
+    delphi:context "Fails if: The derived graded-layer and fibre-angle correction bounds are too small (< 10%) to account for the observed discrepancy between ideal Timoshenko predictions and real pine cone scale curvatures, proving that geometric nonlinearity or viscoelastic creep dominates." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Formalize the moment-integral operators E_0, E_1, E_2 and hygroscopic loading moments I_0, I_1 in `ThompsonLaws/Hygromorphs.lean`. 2. Prove that `gradedCurvature_ofEquilibrium` reduces exactly to `bilayerCurvature` when E(z) and epsilon_s(z) are step functions on [-h_2, 0] and [0, h_1]. 3. Prove the graded-interphase reduction inequality showing how an interphase layer of width w_i attenuates curvature relative to Timoshenko's ideal formula. 4. Couple the spatial diffusion mode from `diffusionMode_heat` into I_1(t) to prove the exact transient curvature decay rate." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: continuum-mechanics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch10-01> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2009.0184> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1203874> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.actbio.2021.04.049> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/hygromorph-bilayer-scaling> a delphi:Concept, schema:Question ;
+    rdfs:label "Do real hygromorphs follow bilayer curvature and diffusive response-time scaling?" .
+
+
+  <https://doi.org/10.1098/rsif.2009.0184> dct:title "Hygromorphs: from pine cones to biomimetic bilayers" ;
+    dct:bibliographicCitation "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers" .
+  <https://doi.org/10.1126/science.1203874> dct:title "Geometry and Mechanics in the Opening of Chiral Seed Pods" ;
+    dct:bibliographicCitation "Armon, Efrati, Kupferman and Sharon 2011, Geometry and mechanics in the opening of chiral seed pods" .
+  <https://doi.org/10.1016/j.actbio.2021.04.049> dct:title "Hydration-induced reversible deformation of the pine cone" ;
+    dct:bibliographicCitation "Quan et al. 2021, Hydration-induced reversible deformation of the pine cone" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hygromorph-bilayer-scaling, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.315Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hygromorph-bilayer-scaling: Lean 4 extension of Hygromorphs.lean to graded layers and transient diffusion" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hygromorph-bilayer-scaling--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

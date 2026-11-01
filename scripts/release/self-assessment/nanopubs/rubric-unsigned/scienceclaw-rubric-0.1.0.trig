@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> a delphi:Concept, skos:Concept ;
+    rdfs:label "Science Claw Hackathon judging rubric, applied to a project snapshot, v0.1.0" ;
+    dct:description "Scores a project snapshot (a repository at a pinned commit plus a frozen evidence pack) on the five criteria and weights published by the ScienceClaw Hackathon (scienceclawhack.ai, Judging section, Oct 30 - Nov 1 2026, MIT Media Lab), plus the separate collaboration bonus. Each criterion is a graded judgement in [0,1] (delphi:hasScore), never a probability; assessors report it on a 0-10 scale and the pipeline divides by 10. The weighted total is the weight-weighted sum of the five criteria on a 0-100 scale, computed by the pipeline from the assessor's criterion scores; the bonus is reported separately on 0-10 and is not part of the total. The assessor must cite concrete files, IRIs or issue numbers from the evidence pack for every score and must list the concrete changes that would raise it." ;
+    dct:source <https://scienceclawhack.ai/> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphi/blob/6f35affcd8dca74d5db93ed8ed94f6c0519f93c2/scripts/release/self-assessment/rubric.json> ;
+    skos:narrower <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-problem-significance>, <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-scientific-impact>, <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-decentralized-agency>, <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-collective-capability>, <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-execution-validation>, <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-collaboration-bonus> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-problem-significance> a delphi:Concept, skos:Concept ;
+    rdfs:label "Problem significance & complexity (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Weight 0.2. How difficult, open-ended, consequential and scientifically meaningful is the problem? Does solving it meaningfully advance a scientific or technical goal? Anchors (0-10): 0 = a toy or already-solved problem, or one whose solution would change nothing; 5 = a real problem, but narrow, incremental, or one whose scientific stakes are asserted rather than shown; 10 = a hard, open, consequential problem whose progress would matter to working scientists, and the snapshot shows why." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-scientific-impact> a delphi:Concept, skos:Concept ;
+    rdfs:label "Scientific/technical impact (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Weight 0.25. What was actually achieved? Is the result novel, meaningful, rigorous and potentially useful? Anchors (0-10): 0 = no result beyond infrastructure or restated inputs; 5 = real outputs exist but their novelty, rigour or usefulness is unclear or unverified; 10 = results that are new, checked (proofs, data tests, external verification) and that someone outside the team could use today." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-decentralized-agency> a delphi:Concept, skos:Concept ;
+    rdfs:label "Decentralized agency (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Weight 0.2. Are decision-making and capabilities meaningfully distributed across agents? Do agents have distinct information, resources or capabilities? Can they coordinate and adapt without a central planner prescribing the entire trajectory? Anchors (0-10): 0 = one agent, or several agents executing a fixed script written by one planner; 5 = several agents with different roles or models, but a single planner (human or agent) decides what each does and when; 10 = agents with distinct information, tools and incentives that pick up, hand off and revise work through shared state, with no one prescribing the trajectory." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-collective-capability> a delphi:Concept, skos:Concept ;
+    rdfs:label "Collective capability (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Weight 0.25. Does organizing agents collectively add measurable capability? Where possible, is this demonstrated through a simple comparison such as multi-agent vs single-agent, collaborative vs isolated, or decentralized vs centralized? Anchors (0-10): 0 = no evidence that the collective does anything one agent could not; 5 = plausible argument or anecdote that the collective helps, but no measured comparison; 10 = a measured comparison in the snapshot (same task, collective vs single agent or isolated agents) showing a clear gain." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-execution-validation> a delphi:Concept, skos:Concept ;
+    rdfs:label "Execution and validation (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Weight 0.1. Is there a functioning system rather than just a concept? Is its performance demonstrated with convincing evidence, benchmarks or real-world validation? Anchors (0-10): 0 = slides and architecture only; 5 = a running system with outputs, but validation is self-reported or untested; 10 = a running, externally usable system whose outputs are validated by reproducible tests, independent checks or real-world use." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+  <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0-collaboration-bonus> a delphi:Concept, skos:Concept ;
+    rdfs:label "Collaboration bonus (scienceclaw-rubric 0.1.0)" ;
+    dct:description "Scored separately, up to 10, not part of the weighted total. Did the team create capabilities that materially strengthen other teams: a tool or agent successfully reused by another team, data or experiments that enable another team's result, infrastructure that improves multiple systems, capabilities that propagate through the ecosystem? Anchors (0-10): 0 = nothing offered to other teams, or offers with no uptake; 5 = tools or data published and offered, with contact but no documented use by another team; 10 = documented reuse of a tool, dataset or result by at least one other team that fed into their result." ;
+    skos:broader <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-self-assessment-builder> , <https://orcid.org/0009-0007-4948-9192> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/6f35affcd8dca74d5db93ed8ed94f6c0519f93c2/scripts/release/self-assessment/rubric.json> , <https://scienceclawhack.ai/> .
+  <https://w3id.org/delphi/resource/agent/delphisci-self-assessment-builder> a prov:SoftwareAgent ;
+    rdfs:label "delphisci self-assessment pipeline builder" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:20:02.204Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Rubric: Science Claw Hackathon judging rubric, applied to a project snapshot, v0.1.0" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/concept/scienceclaw-rubric-0.1.0> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/delphisci-project> .
+  <https://w3id.org/delphi/resource/domain/delphisci-project> rdfs:label "delphisci project self-assessment" .
+}

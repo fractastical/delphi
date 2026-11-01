@@ -1,0 +1,224 @@
+{
+  "claim_id": "darwin1859-ch06-14",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "introduced (naturalized) and native species lists per region, including islands and continents",
+    "direction of introduction (donor biota to recipient biota) and the size of each biota",
+    "outcome per introduced species: establishment, spread, impact, or displacement/extinction of natives",
+    "propagule pressure and human disturbance covariates"
+  ],
+  "datasets": [
+    {
+      "id": "glonaf",
+      "name": "Global Naturalized Alien Flora (GloNAF) v2.02 snapshot (Zenodo)",
+      "landing_url": "https://glonaf.org/",
+      "access_url": "https://zenodo.org/api/records/17105725",
+      "doi": "10.5281/zenodo.17105725",
+      "license": "cc-by-4.0",
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:01Z",
+        "method": "GET glonaf.org landing (200); GET Zenodo records API for 17105725 (200 at 08:07:16Z)",
+        "http_status": 200,
+        "bytes": 31795097
+      },
+      "variables_present": [
+        "naturalized and invasive vascular plant taxa by region: 16,429 taxa, 1,343 regions including 427 islands, 336 sources",
+        "region table (glonaf_region.csv), taxon-by-region table (glonaf_TxR.csv, 31,795,097 bytes), references, data dictionaries"
+      ],
+      "variables_missing": [
+        "non-plant taxa",
+        "impact or displacement outcomes",
+        "propagule pressure"
+      ],
+      "scope": "Vascular plants only",
+      "evidence": "Zenodo record title \"Global Naturalized Alien Flora (GloNAF)...\"; description: \"16,429 unique taxa ... covers 1,343 regions (including 427 islands) from 336 data sources\"; publication_date 2025-09-12; files listed with sizes.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "griis",
+      "name": "Global Register of Introduced and Invasive Species (GRIIS), via GBIF checklists",
+      "landing_url": "https://griis.org/",
+      "access_url": "https://api.gbif.org/v1/species/search?datasetKey=b286f8ee-1e29-4f8a-a041-9106bb1796f3&limit=0",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:04Z",
+        "method": "GET griis.org landing (200); GBIF dataset search \"GRIIS New Zealand\" (18 results); GBIF dataset b286f8ee-1e29-4f8a-a041-9106bb1796f3 and species search count (08:06:57-08:07:17Z)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "country checklists of introduced and invasive species (New Zealand checklist: 2,142 taxa, modified 2026-08-26)"
+      ],
+      "variables_missing": [
+        "outcome or impact scores not confirmed",
+        "native-range donor region not confirmed"
+      ],
+      "scope": "All taxa; per-country or per-territory checklists",
+      "evidence": "GBIF species/search datasetKey b286f8ee...: count 2142; dataset title \"Global Register of Introduced and Invasive Species - New Zealand\", type CHECKLIST, license CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF (occurrence API)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?limit=0&country=NZ",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:06:58Z",
+        "method": "GET occurrence/search limit=0 with country=NZ and establishmentMeans filters (API 200); web landing 403 (Cloudflare) at 05:10:46Z",
+        "http_status": 200,
+        "note": "web landing 403; API fine"
+      },
+      "variables_present": [
+        "New Zealand occurrences (23,162,176 records)"
+      ],
+      "variables_missing": [
+        "establishmentMeans filters INTRODUCED and NATIVE each returned count 0 for country=NZ, so the field is not usable there as queried"
+      ],
+      "scope": null,
+      "evidence": "counts: country=NZ 23162176; country=NZ&establishmentMeans=INTRODUCED 0; country=NZ&establishmentMeans=NATIVE 0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gisd",
+      "name": "Global Invasive Species Database (GISD)",
+      "landing_url": "https://www.iucngisd.org/gisd/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:00Z",
+        "method": "GET landing (200) and /gisd/search.php (200)",
+        "http_status": 200,
+        "note": "landing only"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "record-level fields not queried"
+      ],
+      "scope": null,
+      "evidence": "Search page loads; no data export or record count obtained.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "iucn-red-list",
+      "name": "IUCN Red List of Threatened Species",
+      "landing_url": "https://www.iucnredlist.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:04Z",
+        "method": "GET landing (200); GET api.iucnredlist.org/api/v4/threats/code/8_1 (404 for an anonymous request)",
+        "http_status": 200,
+        "note": "contents unverified"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "bulk threat records need an account (not tested)",
+        "API path tried returned 404"
+      ],
+      "scope": null,
+      "evidence": "Landing page loads; the single API path I tried returned HTTP 404 at 08:07:05Z.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-qfttdz0hd-pacific-introduced-flora",
+      "name": "Pacific Introduced Flora (PacIFLora)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qfttdz0hd",
+      "access_url": null,
+      "doi": "10.5061/dryad.qfttdz0hd",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:52Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 49054395
+      },
+      "variables_present": [
+        "taxonomically and spatially harmonised naturalized plant database for Pacific islands (per abstract)"
+      ],
+      "variables_missing": [
+        "plants only",
+        "Pacific only"
+      ],
+      "scope": "Pacific region",
+      "evidence": "API title \"Pacific Introduced Flora (PacIFLora)\"; abstract: \"The Pacific region has the highest density of naturalized plant species worldwide\"; storage 49054395 B.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GBIF",
+      "query": "dataset search GRIIS New Zealand",
+      "url": "https://api.gbif.org/v1/dataset/search?q=GRIIS+New+Zealand&limit=6",
+      "hits": 18
+    },
+    {
+      "source": "GBIF",
+      "query": "NZ occurrences with establishmentMeans filters",
+      "url": "https://api.gbif.org/v1/occurrence/search?limit=0&country=NZ&establishmentMeans=INTRODUCED",
+      "hits": 0,
+      "note": "NATIVE also 0"
+    },
+    {
+      "source": "DataCite",
+      "query": "Global Naturalized Alien Flora GloNAF",
+      "url": "https://api.datacite.org/dois?query=Global+Naturalized+Alien+Flora+GloNAF&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 27,
+      "note": "GloNAF Zenodo snapshots and island flora datasets (dryad.h44j0zpp5, not opened)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Global Naturalized Alien Flora GloNAF naturalized plant regions checklist",
+      "url": "https://zenodo.org/api/records?q=Global+Naturalized+Alien+Flora+GloNAF+naturalized+plant+regions+checklist&size=8",
+      "hits": 804208,
+      "note": "GloNAF 17105725 and 18191208; PacIFLora"
+    },
+    {
+      "source": "Dryad",
+      "query": "invasive species establishment islands versus continents native range size donor region",
+      "url": "https://datadryad.org/api/v2/search?q=invasive+species+establishment+islands+versus+continents+native+range+size+donor+region&per_page=8",
+      "hits": 0
+    }
+  ],
+  "status": "partial",
+  "summary": "GloNAF (CC BY 4.0 Zenodo snapshot with 1,343 regions including 427 islands) and the GRIIS country checklists give open lists of introduced species by region, but only plants are covered by GloNAF and no source records displacement of natives or controls propagule pressure; GBIF establishmentMeans returned zero for New Zealand as queried.",
+  "next_step": "Open glonaf_region.csv and glonaf_TxR.csv to identify donor/recipient pairs, then decide a comparison of naturalization by direction (large-to-small biota versus reverse) with an explicit propagule-pressure proxy.",
+  "obstacles_confirmed": [
+    "GloNAF covers plants, while the claim is about inhabitants in general.",
+    "Impact on endemics and propagule pressure are not in the lists."
+  ]
+}

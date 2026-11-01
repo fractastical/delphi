@@ -1,0 +1,123 @@
+{
+  "claim_id": "darwin1859-ch02-08",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "genus membership of every accepted species in a region (country-level list), giving genus size",
+    "number of named varieties (infraspecific taxa) per species",
+    "region/country assignment per species",
+    "an effort or sampling covariate (e.g. occurrence records per species) to control for taxonomic attention"
+  ],
+  "datasets": [
+    {
+      "id": "wcvp-world-checklist-of-vascular-plants",
+      "name": "World Checklist of Vascular Plants (WCVP), Kew data-repository bulk download",
+      "landing_url": "http://sftp.kew.org/pub/data-repositories/WCVP/",
+      "access_url": "http://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T05:29:00Z", "method": "HEAD wcvp.zip; HTTP Range requests for the zip central directory and the first 120 KB / 200 KB of each CSV member (header row and two data rows read; archive not downloaded)", "http_status": 200, "bytes": 88179649 },
+      "variables_present": [
+        "genus, species, taxon_rank, taxon_status, infraspecific_rank, infraspecies, accepted_plant_name_id per name (wcvp_names.csv)",
+        "native/introduced distribution by TDWG level-3 area/country per plant_name_id (wcvp_distribution.csv: area_code_l3, area, introduced, extinct, location_doubtful)"
+      ],
+      "variables_missing": ["effort covariate (needs GBIF or similar)", "beetles or any animal group"],
+      "scope": "vascular plants worldwide; zip holds README_WCVP.xlsx (18,112 B), wcvp_distribution.csv (141,657,561 B uncompressed) and wcvp_names.csv (300,826,661 B uncompressed); wcvp.zip is 88,179,649 B and was dated 2026-06-04 in the directory listing",
+      "evidence": "Range request returned 206; central directory lists the three members; wcvp_names.csv header: plant_name_id|ipni_id|taxon_rank|taxon_status|family|genus_hybrid|genus|species_hybrid|species|infraspecific_rank|infraspecies|...|accepted_plant_name_id|...; wcvp_distribution.csv header: plant_locality_id|plant_name_id|continent_code_l1|continent|region_code_l2|region|area_code_l3|area|introduced|extinct|location_doubtful. Whole-file row counts not measured.",
+      "verdict": "holds"
+    },
+    {
+      "id": "catalogue-of-life-checklistbank",
+      "name": "Catalogue of Life via ChecklistBank API (dataset 3LR)",
+      "landing_url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?rank=variety&limit=0",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:14:16Z", "method": "GET nameusage/search?rank=variety&limit=0", "http_status": 200 },
+      "variables_present": ["taxonomic hierarchy with genus and species ranks, plus a variety rank, across kingdoms"],
+      "variables_missing": ["country-level distribution is not part of the queried search result", "variety rank is applied unevenly across clades (assessor obstacle, not measured here)"],
+      "scope": "all kingdoms; total 308,101 name usages of rank variety returned in dataset 3LR",
+      "evidence": "Response: {\"offset\":0,\"limit\":0,\"total\":308101,\"empty\":true,\"last\":false}.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-backbone-taxonomy-ranks",
+      "name": "GBIF Backbone Taxonomy (species/search API by rank)",
+      "landing_url": "https://api.gbif.org/v1/species/search?rank=VARIETY&status=ACCEPTED&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=0",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T05:13:34Z", "method": "GET species/search with datasetKey=GBIF backbone, status=ACCEPTED, rank in {SPECIES, SUBSPECIES, VARIETY}, limit=0; highertaxonKey 6 (Plantae), 7 (Protozoa) and 1 (Animalia), with kingdom keys confirmed via species/6 and species/7", "http_status": 200 },
+      "variables_present": ["accepted-name counts by rank", "per-species occurrence counts via the occurrence API (useful as an effort covariate)"],
+      "variables_missing": ["country-level species membership as a checklist (needs occurrence queries per country)"],
+      "scope": "accepted names in the backbone: SPECIES 2,614,593; SUBSPECIES 193,922; VARIETY 68,948 (varieties by kingdom: Plantae 40,082; Protozoa 416; Animalia 5,898)",
+      "evidence": "count fields 2614593, 193922, 68948, 40082, 416, 5898 in the responses.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gift-global-inventory-of-floras-and-traits",
+      "name": "Global Inventory of Floras and Traits (GIFT) API",
+      "landing_url": "https://gift.uni-goettingen.de/home",
+      "access_url": "https://gift.uni-goettingen.de/api/extended/index.php?query=lists&ids=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:14:37Z", "method": "GET landing (HEAD) and api/extended query=lists&ids=1", "http_status": 200 },
+      "variables_present": ["regional checklist/flora lists with geo_entity (e.g. islands), list type, native/natural flags"],
+      "variables_missing": ["infraspecific taxa and varieties were not observed in the response; species-by-region endpoint not queried"],
+      "scope": "checklists for geographic entities worldwide (only the list metadata for ids=1 was read)",
+      "evidence": "JSON array of list records with fields ref_ID, type, subset, native_indicated, list_ID, entity_ID, geo_entity, entity_class. The API answers openly without a key for this query.",
+      "verdict": "partial"
+    },
+    {
+      "id": "plants-of-the-world-online",
+      "name": "Plants of the World Online (POWO) API",
+      "landing_url": "https://powo.science.kew.org/",
+      "access_url": "https://powo.science.kew.org/api/2/search?q=Carex&f=accepted_names&perPage=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T05:14:16Z", "method": "GET API search", "http_status": 403, "note": "Cloudflare challenge page ('Just a moment...'); same data are available as the WCVP bulk download above" },
+      "variables_present": [],
+      "variables_missing": ["API not usable by script"],
+      "scope": "web portal over WCVP",
+      "evidence": "HTTP 403 with a Cloudflare interstitial.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "world-flora-online",
+      "name": "World Flora Online file server",
+      "landing_url": "https://files.worldfloraonline.org/Files/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:15:00Z", "method": "GET directory listing; www.worldfloraonline.org returned 405 to HEAD and 200 to GET", "http_status": 200 },
+      "variables_present": ["bulk files for the plant taxonomic backbone (directory of dated snapshots and contributor folders; contents not opened)"],
+      "variables_missing": ["file contents and columns not inspected"],
+      "scope": "plants; directory listing only",
+      "evidence": "Index lists dated folders (e.g. 20220210, 20220701) and contributor folders (e.g. Brazilian Flora 2020, Australia, Bryophytes).",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "number of varieties per species genus size Darwin", "url": "https://zenodo.org/api/records?q=number+of+varieties+per+species+genus+size+Darwin&size=4", "hits": 5711350, "note": "top hits irrelevant" },
+    { "source": "DataCite", "query": "genus size infraspecific taxa varieties large genera vary Darwin", "url": "https://api.datacite.org/dois?query=genus+size+infraspecific+taxa+varieties+large+genera+vary+Darwin&page%5Bsize%5D=5", "hits": 0, "note": "none" },
+    { "source": "Dryad", "query": "genus size infraspecific varieties flora", "url": "https://datadryad.org/api/v2/search?q=genus+size+infraspecific+varieties+flora&per_page=5", "hits": null, "note": "HTTP 429 rate limited; not retried" },
+    { "source": "GBIF", "query": "species/search rank counts in backbone", "url": "https://api.gbif.org/v1/species/search?rank=VARIETY&status=ACCEPTED&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=0", "hits": 68948, "note": "accepted varieties" },
+    { "source": "ChecklistBank", "query": "COL 3LR rank=variety", "url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?rank=variety&limit=0", "hits": 308101, "note": "name usages of rank variety" },
+    { "source": "Kew sftp", "query": "WCVP directory", "url": "http://sftp.kew.org/pub/data-repositories/WCVP/", "hits": null, "note": "wcvp.zip, wcvp_dwca.zip (84M each), Archive/, Special_Issue_28_Feb_2022/" }
+  ],
+  "status": "partial",
+  "summary": "For vascular plants the WCVP bulk download holds every variable except an effort covariate: genus, species, taxon_rank, infraspecific_rank and accepted-name links per name, plus country-level (TDWG level 3) distributions. Beetle faunas in Darwin's original scope have no equivalent dataset found; GBIF occurrence counts can supply an effort covariate. Status is partial only because the animal half and the effort control were not located in one table.",
+  "next_step": "Download wcvp.zip (84 MB, outside the scout budget), derive genus size per country from wcvp_distribution.csv joined to wcvp_names.csv, count variety-rank names per accepted species, and pre-register the effort covariate (e.g. GBIF occurrences per species).",
+  "obstacles_confirmed": [
+    "Variety rank is used unevenly across clades and is often absent from global checklists; WCVP records infraspecific_rank but its consistency was not measured.",
+    "POWO API is blocked by Cloudflare (403); the bulk zip is the open route.",
+    "No open beetle checklist with variety counts was found within the request budget."
+  ]
+}

@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> a delphi:Concept, schema:Question ;
+    rdfs:label "Machine-check the universality of Rule 110" ;
+    dct:description "Can Cook's proof that elementary cellular automaton Rule 110 is computationally universal be formalized and checked in Lean 4 with no `sorry` and no added axioms?" ;
+
+    skos:historyNote "Known state: Cook (2004) proved universality by emulating cyclic tag systems with glider collisions; Neary and Woods (2006) sharpened the emulation to polynomial time. Neither proof has been machine-checked. The repo records the claim as inconclusive (wolfram2002-ch11-14) because reproduction tests can only exercise the construction, not verify it." ;
+    dct:subject "mathematics" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: A Lean 4 module whose main theorem states that for every cyclic tag system and input there is an initial configuration of Rule 110 whose evolution encodes the computation, compiled with no sorry and only Lean's standard axioms." ;
+    skos:scopeNote "Resolved when: The glider catalog, collision table and the periodic background are each a checked lemma rather than an assumption." ;
+    skos:scopeNote "Refuted if: A gap in the collision table that cannot be closed (a required collision that does not behave as Cook's table says), which would also be a finding against the published proof." ;
+    skos:note "Data access: No data needed; Rule 110 is fully specified. Cook's glider tables are in the open-access Complex Systems paper." ;
+    skos:note "Requires: lean4" ;
+    skos:note "Requires: cellular-automaton-simulation" ;
+    skos:note "Requires: proof-engineering" ;
+
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch01-07> ;
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.15.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1007/11786986_13> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.25088/ComplexSystems.15.1.1> dct:title "Universality in Elementary Cellular Automata" ;
+    dct:bibliographicCitation "Cook 2004, Universality in elementary cellular automata" .
+  <https://doi.org/10.1007/11786986_13> dct:title "P-completeness of Cellular Automaton Rule 110" ;
+    dct:bibliographicCitation "Neary and Woods 2006, P-completeness of cellular automaton Rule 110" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.287Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Machine-check the universality of Rule 110" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

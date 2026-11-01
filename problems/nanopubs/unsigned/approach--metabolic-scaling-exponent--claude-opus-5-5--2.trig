@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean formalization of the WBE network derivation with the finite-size exponent" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    dct:description "Make the disputed step explicit. Model: a branching network with N levels, branching ratio n, radius ratio β and length ratio γ per level, invariant terminal units (capillaries) and total blood volume V_b ∝ M. Define V_b(N) = Σ_{k=0}^{N} n^k π r_k² l_k with r_k = β^k r₀, l_k = γ^k l₀, so V_b = π r₀² l₀ Σ (nβ²γ)^k. Theorem 1 (exact finite form): with terminal size fixed, N_cap = n^N and V_b = V_cap · ((nβ²γ)^{−(N+1)} − 1)/((nβ²γ)^{−1} − 1) for nβ²γ < 1. Theorem 2 (asymptotic exponent): under area preservation β = n^{−1/2} and space filling γ = n^{−1/3}, and V_b ∝ M, the ratio log N_cap / log M → 3/4 as N → ∞, but for finite N the effective exponent is strictly less than 3/4 with an explicit correction term, matching Savage et al. 2008's finite-size analysis. Theorem 3: if area-preserving branching holds only below a transition level and Poiseuille scaling (β = n^{−1/3}) above it, the limiting exponent is different (explicit formula). The hypotheses V_b ∝ M and invariant terminal units are exactly where Kozłowski and Konarzewski object, and they appear as named hypotheses." ;
+
+    delphi:proposedTest "A Lean module proving that WBE's 3/4 is the N → ∞ limit under four named hypotheses, with the exact finite-N exponent, compiled with only standard axioms. Each published objection then corresponds to dropping a named hypothesis." ;
+    delphi:context "Fails if: The formalization shows that the published derivation needs a hypothesis not listed (for example a specific relation between N and M) to get 3/4, which is a substantive finding about WBE rather than a failure, or the limit proofs in Mathlib take longer than budgeted." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the network sums in Lean (Finset.sum over levels, geometric series). 2. Prove Theorem 1 by geometric-series lemmas, and Theorem 2 by limits (Filter.Tendsto) on logarithms. 3. Prove Theorem 3 for the two-regime network. 4. Write a report with each hypothesis named and linked to Thompson's ch03-07 and ch02-01 claims; state which are empirical." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: allometry" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+
+    rdfs:seeAlso <https://doi.org/10.1126/science.276.5309.122> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.0269-8463.2004.00830.x> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pcbi.1000171> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" .
+
+
+  <https://doi.org/10.1126/science.276.5309.122> dct:title "A General Model for the Origin of Allometric Scaling Laws in Biology" ;
+    dct:bibliographicCitation "West, Brown and Enquist 1997, the derivation to formalize" .
+  <https://doi.org/10.1111/j.0269-8463.2004.00830.x> dct:title "Is West, Brown and Enquist's model of allometric scaling mathematically correct and biologically relevant?" ;
+    dct:bibliographicCitation "Kozłowski and Konarzewski 2004, the objection to encode as a dropped hypothesis" .
+  <https://doi.org/10.1371/journal.pcbi.1000171> dct:title "Sizing Up Allometric Scaling Theory" ;
+    dct:bibliographicCitation "Savage et al. 2008, Sizing up allometric scaling theory (finite-size corrections)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to metabolic-scaling-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.300Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to metabolic-scaling-exponent: Lean formalization of the WBE network derivation with the finite-size exponent" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,300 @@
+{
+ "L_exact": "498672778072869/6250000000000000",
+ "attempts": {
+  "whole_fin_3d_target": {
+   "detail": "SAGITTAL_2D_NOT_3D: target claims whole_fin_3d but the field is 'analytic'; a 2D section is not a 3D fin",
+   "verdict": "refused"
+  }
+ },
+ "evidence_kind": "analytic",
+ "gaps": [
+  {
+   "F_contract_N": 0.0033376196812200964,
+   "F_contract_over_strip": 1.1553834833813563,
+   "F_strip_N": 0.002888754884613883,
+   "M_contract_over_strip": 0.9138518669275828,
+   "declared_width_m": 0.0012546649064203782,
+   "id": "G1-fan-width",
+   "kind": "dimensional",
+   "local_width_chordwise_m": [
+    0.0002695000000000024,
+    0.0007412597357181693,
+    0.0012129889754163205,
+    0.0016028994649795927,
+    0.0019560055556047985
+   ],
+   "meaning": "the contract carries one tributary width per member; on a fan the local width grows from root to tip, so the contract load moves force toward the root. Reported, not corrected: the contract is unchanged"
+  },
+  {
+   "detail": "patch sections are 2D strips; finite span enters only via alpha_eff (elliptic lifting line, assumed; AR 3.67); 2D bracket is 1.54x larger",
+   "id": "G2-section-not-3d",
+   "kind": "cross-scale"
+  },
+  {
+   "detail": "inviscid dCp ~ 1/sqrt(xi) at the leading edge, which IS ray 0; the strip load is finite but a sampled strip under-counts it as sqrt(row width) (measured in tests); a resolved viscous section has no singularity, so the reference is a bracket, not a target",
+   "id": "G3-leading-edge-singularity",
+   "kind": "dimensional"
+  },
+  {
+   "detail": "declared U 5.0 m/s and alpha 5.0 deg are unsourced; v3a pose has alpha 0 (fin plane contains the stream), so its own load is zero; no free surface, body interference, dihedral flow or sweep correction beyond du = cos(lambda) ds",
+   "id": "G4-regime",
+   "kind": "cross-scale"
+  },
+  {
+   "detail": "membrane 0.10 mm and ray_max 0.6 mm are assumed (components.json); taper unknown; the patch therefore carries two declared variants rather than one geometry",
+   "id": "G5-thickness",
+   "kind": "dimensional"
+  },
+  {
+   "detail": "rays 1-14 branch; a straight Euler-Bernoulli member is not their geometry, so only ray 0 is a member",
+   "id": "G6-branched-rays",
+   "kind": "cross-scale"
+  },
+  {
+   "detail": "EI(x) and ray section (c, I) unknown and preserved: loads only, no deflection or stress",
+   "id": "G7-structure-unknown",
+   "kind": "cross-scale"
+  },
+  {
+   "detail": "cfd3d v1 global flow carries the 0.10 mm membrane as a 3.7-cell shell at h 1.8-7.2 mm; its fin jumps are smeared and are not used here (cfd3d's own refusal)",
+   "id": "G8-global-cfd",
+   "kind": "dimensional"
+  }
+ ],
+ "record": {
+  "dimensionality": "analytic",
+  "frame": {
+   "id": "fish3d-v3a/pectoral_L/ray0-local@72f9f5c8f253e502",
+   "length_unit": "m"
+  },
+  "member": {
+   "id": "fish3d-v3a/pectoral_L/ray0",
+   "normal": [
+    "0",
+    "0",
+    "1"
+   ],
+   "root_m": [
+    "0",
+    "0",
+    "0"
+   ],
+   "tip_m": [
+    "498672778072869/6250000000000000",
+    "0",
+    "0"
+   ]
+  },
+  "pressure": {
+   "kind": "dimensional",
+   "reference": "jump p_ventral - p_dorsal, thin-airfoil strip mean over ray 0's local tributary strip; inviscid, attached, flat plate",
+   "unit": "Pa"
+  },
+  "resolution": {
+   "cells_across_member_thickness": null,
+   "cells_along_member": null
+  },
+  "schema": "frontier.coupled.member-pressure/1",
+  "source": {
+   "candidate_sha256": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
+   "evidence_kind": "analytic",
+   "fields_sha256": null,
+   "frame_sha256": "72f9f5c8f253e5029209894e6e46ce38de442dfdc0e3ea482f9f0ff7580ee71e",
+   "geometry_files_sha256": {
+    "components.json": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+    "components/pectoral_L.stl": "220d22253ce104aea9b9be7b23892941e328e7317a19486162f36a2214c309c5",
+    "panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+    "rays.json": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8"
+   },
+   "geometry_sha256": null,
+   "member_sha256": "baea87d8005083ab03d6c1ad686d79c19475add01fda9c64d3759362062f8c73",
+   "pressure_sha256": "93183808c692e5c70443736dc4205b775459abc7085380723893cde53cd2af9e",
+   "producer": "analytic: thin-airfoil strip on the v3a pectoral_L leading-edge ray",
+   "receipt_sha256": "17a24d5509d16c8ddf82efd951a138cd6d43d1b3930f4fdd9b99aa43b9f43755",
+   "units": "Pa jump, m frame; q_dyn = 0.5 rho U^2 from declared rho, U"
+  },
+  "stations": [
+   {
+    "p_neg_Pa": "36.395646188972336",
+    "p_pos_Pa": "0",
+    "s_m": "0"
+   },
+   {
+    "p_neg_Pa": "39.765907485889834",
+    "p_pos_Pa": "0",
+    "s_m": "498672778072869/25000000000000000"
+   },
+   {
+    "p_neg_Pa": "33.934483017568105",
+    "p_pos_Pa": "0",
+    "s_m": "498672778072869/12500000000000000"
+   },
+   {
+    "p_neg_Pa": "29.458904801988997",
+    "p_pos_Pa": "0",
+    "s_m": "1496018334218607/25000000000000000"
+   },
+   {
+    "p_neg_Pa": "24.010588916242593",
+    "p_pos_Pa": "0",
+    "s_m": "498672778072869/6250000000000000"
+   }
+  ],
+  "time": {
+   "kind": "static",
+   "window_s": null
+  },
+  "tributary": {
+   "source": "rays.json ray 0 tributary_width_m (sha256 e644ff48d23e3ab6); a mean over a fan whose local width varies",
+   "status": "from_geometry",
+   "width_m": "0.0012546649064203782"
+  }
+ },
+ "reference": {
+  "alpha_eff_rad": 0.05648454096969436,
+  "alpha_rad": 0.08726646259971647,
+  "aspect": {
+   "AR": 3.669981468252721,
+   "area_m2": 0.002165358447990191,
+   "note": "span = extent of the outline along e_u; S = panels.json area_flat_m2 (derived)",
+   "span_m": 0.08914496831705351
+  },
+  "flow": {
+   "U_m_s": {
+    "source": "fin_mechanics example_request witness V (declared illustration); unsourced",
+    "status": "assumed",
+    "value": 5.0
+   },
+   "alpha_deg": {
+    "source": "declared; v3a pose has the fin plane containing the stream, so its own alpha is 0",
+    "status": "assumed",
+    "value": 5.0
+   },
+   "rho_kg_m3": {
+    "source": "fin_mechanics example_request rho (design_assumption)",
+    "status": "assumed",
+    "value": 1.225
+   }
+  },
+  "lifting_line": true,
+  "q_dyn_Pa": 15.3125,
+  "stations": [
+   {
+    "G": 0.37569263887325205,
+    "chord_m": 0.007546400000000005,
+    "dp_strip_mean_Pa": 36.395646188972336,
+    "q_true_N_per_m": 0.009713169654579426,
+    "ray0_offset_from_le_m": 0.0,
+    "s_over_L": 0.0,
+    "strip_fraction_of_section_lift": 0.23917336223966568,
+    "tributary_local_m": 0.0002695000000000024,
+    "u_m": -1.7328102668923806e-08,
+    "w_aft_m": 0.007546394781852251,
+    "w_le_m": -5.218147754171287e-09,
+    "w_ray0_m": -5.218147754171287e-09,
+    "w_ray1_m": 0.0005389947818522506,
+    "xi_strip": 0.035712392664052024
+   },
+   {
+    "G": 0.3445204168901637,
+    "chord_m": 0.024730371899232877,
+    "dp_strip_mean_Pa": 39.765907485889834,
+    "q_true_N_per_m": 0.029189998899439726,
+    "ray0_offset_from_le_m": 1.734723475976807e-18,
+    "s_over_L": 0.25,
+    "strip_fraction_of_section_lift": 0.21932850937660026,
+    "tributary_local_m": 0.0007412597357181693,
+    "u_m": 0.019752765852120893,
+    "w_aft_m": 0.027506441681085125,
+    "w_le_m": 0.002776069781852247,
+    "w_ray0_m": 0.0027760697818522487,
+    "w_ray1_m": 0.004258589253288587,
+    "xi_strip": 0.029973659059335234
+   },
+   {
+    "G": 0.40221700475265176,
+    "chord_m": 0.029580258609788596,
+    "dp_strip_mean_Pa": 33.934483017568105,
+    "q_true_N_per_m": 0.04076156606115335,
+    "ray0_offset_from_le_m": -3.469446951953614e-18,
+    "s_over_L": 0.5,
+    "strip_fraction_of_section_lift": 0.25605929800800353,
+    "tributary_local_m": 0.0012129889754163205,
+    "u_m": 0.039505549032344454,
+    "w_aft_m": 0.035132403391640844,
+    "w_le_m": 0.005552144781852248,
+    "w_ray0_m": 0.005552144781852245,
+    "w_ray1_m": 0.007978122732684886,
+    "xi_strip": 0.04100670624343085
+   },
+   {
+    "G": 0.46124965487260017,
+    "chord_m": 0.02959042003020715,
+    "dp_strip_mean_Pa": 29.458904801988997,
+    "q_true_N_per_m": 0.04676012368976587,
+    "ray0_offset_from_le_m": 0.0,
+    "s_over_L": 0.75,
+    "strip_fraction_of_section_lift": 0.29364065028962016,
+    "tributary_local_m": 0.0016028994649795927,
+    "u_m": 0.05925833221256801,
+    "w_aft_m": 0.037918639812059396,
+    "w_le_m": 0.008328219781852247,
+    "w_ray0_m": 0.008328219781852247,
+    "w_ray1_m": 0.011534018711811433,
+    "xi_strip": 0.05416954079540896
+   },
+   {
+    "G": 0.5607491782368348,
+    "chord_m": 0.024208537515413645,
+    "dp_strip_mean_Pa": 24.010588916242593,
+    "q_true_N_per_m": 0.04650778612596032,
+    "ray0_offset_from_le_m": 1.734723475976807e-18,
+    "s_over_L": 1.0,
+    "strip_fraction_of_section_lift": 0.3569840142044421,
+    "tributary_local_m": 0.0019560055556047985,
+    "u_m": 0.07901111539279156,
+    "w_aft_m": 0.035312832297265895,
+    "w_le_m": 0.011104294781852249,
+    "w_ray0_m": 0.01110429478185225,
+    "w_ray1_m": 0.015016305893061847,
+    "xi_strip": 0.08079817107330031
+   }
+  ],
+  "sweep_rad": 0.13962642298987651,
+  "tributary_width_declared_m": 0.0012546649064203782
+ },
+ "schema": "frontier.coupled.fin-patch-reference/1",
+ "transfer": {
+  "F_N": 0.0033376196812200964,
+  "F_exact": "834404920305024143732562347746218627207341050479/250000000000000000000000000000000000000000000000000",
+  "M_root_Nm": 0.0001228528605144865,
+  "M_root_exact": "767830378215540560581030724342464357517244580832595175235948373/6250000000000000000000000000000000000000000000000000000000000000000",
+  "deflection": "NOT COMPUTED: EI of the v3a ray is unknown (preserved, not filled)",
+  "dimensionality": "analytic",
+  "evidence_kind": "analytic",
+  "q_N_per_m": [
+   0.04566434001979617,
+   0.049892888594505386,
+   0.042576404959661,
+   0.036961054036634355,
+   0.030125243295695683
+  ],
+  "s_m": [
+   "0",
+   "498672778072869/25000000000000000",
+   "498672778072869/12500000000000000",
+   "1496018334218607/25000000000000000",
+   "498672778072869/6250000000000000"
+  ],
+  "scope": "analytic pressure: adapter check only, no flow model",
+  "stress": "NOT COMPUTED: ray cross-section (c, I) is unknown (preserved, not filled)"
+ },
+ "two_d_bracket_q_N_per_m": [
+  0.015006476848963637,
+  0.04509743557286637,
+  0.06297506572798407,
+  0.07224260859834956,
+  0.07185275668141258
+ ],
+ "verdict": "ANALYTIC REFERENCE ONLY. The resolved patch has not run; ray-0 load from a simulated flow remains BLOCKED until cfd3d returns resolved sections."
+}

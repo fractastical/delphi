@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Dose–response meta-analysis: does Vmem shift size predict penetrance?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    dct:description "A predictive code implies graded dependence: larger, more localized Vmem shifts should give higher penetrance of the predicted phenotype. Code every published bioelectric perturbation experiment in Xenopus and planaria reporting both (a) a quantitative Vmem change (reporter intensity ratio or electrode mV, with dispersion) and (b) phenotype penetrance (k of n animals). Fit a random-effects logistic meta-regression of penetrance on the standardized Vmem shift, with study as a random effect and tissue and perturbation class (channel misexpression, drug, gap-junction block) as covariates. Pre-registered: a positive slope with 95% CI excluding 0, and the shift explaining ≥ 30% of between-condition variance, support the graded predictive form; a slope CI including 0 refutes it. Check small-study effects with funnel plots and Egger's test, since positive results may be preferentially published." ;
+
+    delphi:proposedTest "The meta-regression slope of phenotype penetrance on Vmem shift magnitude with CI, and the variance explained, adjusted for publication bias." ;
+    delphi:context "Fails if: Fewer than 15 conditions report both a quantitative Vmem change and penetrance, or Egger's test shows strong small-study bias making the slope uninterpretable." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register extraction rules, effect-size standardization and the model. 2. Systematically search open-access literature; double-extract data (two independent agents) and reconcile. 3. Fit the meta-regression; run publication-bias diagnostics. 4. Link each coded study to repo claims (levin-2018-hcn2, levin-2019-boundary) and record evidence." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: meta-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.biosystems.2017.08.009> ;
+    rdfs:seeAlso <https://doi.org/10.1242/dev.073759> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" .
+
+
+  <https://doi.org/10.1016/j.biosystems.2017.08.009> dct:title "The bioelectric code: An ancient computational medium for dynamic control of growth and form" ;
+    dct:bibliographicCitation "Levin and Martyniuk 2018, The bioelectric code" .
+  <https://doi.org/10.1242/dev.073759> dct:title "Transmembrane voltage potential controls embryonic eye patterning in\n                    <i>Xenopus laevis</i>" ;
+    dct:bibliographicCitation "Pai et al. 2012, Vmem and eye induction (penetrance data)" .
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, planarian double-head penetrance" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to bioelectric-prepattern-predicts-anatomy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.304Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to bioelectric-prepattern-predicts-anatomy: Dose–response meta-analysis: does Vmem shift size predict penetrance?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

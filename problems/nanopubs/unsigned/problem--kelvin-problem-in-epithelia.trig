@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> a delphi:Concept, schema:Question ;
+    rdfs:label "Kelvin's problem in epithelia" ;
+    dct:description "What is the energy-minimizing partition of space into equal-volume cells (Kelvin's problem, still open), and do cells in curved epithelia adopt the minimal shapes (scutoids) that the corresponding constrained problem predicts?" ;
+
+    skos:historyNote "Known state: Kelvin's 1887 conjecture was beaten by the Weaire-Phelan foam (1994); no proof of optimality for any 3D partition exists, in contrast to Hales's proof of the 2D honeycomb conjecture (2001). Gomez-Galvez et al. (2018) showed that cells in curved epithelia adopt scutoid shapes and argued they minimize energy; Thompson's cell-packing claims (ch07) are the 2D and 3D precursors and the repo's cell-geometry project segments micrographs for them." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-C" ;
+    skos:scopeNote "Resolved when: For the biological part: a pre-registered test on segmented 3D epithelial datasets comparing observed scutoid frequency against energy-minimizing predictions for the measured curvature, with a stated tolerance." ;
+    skos:scopeNote "Resolved when: For the mathematical part: a new rigorous result, for example a Lean-checked lower bound on the surface area of equal-volume partitions in a periodic cell, or a computer-assisted proof of local optimality for Weaire-Phelan." ;
+    skos:scopeNote "Refuted if: A partition with lower surface area than Weaire-Phelan would overturn the biological energy-minimization comparison baseline; scutoid frequencies far from the minimal-energy prediction would refute the energy-minimization account." ;
+    skos:note "Data access: Gomez-Galvez 2018 supplementary data (open); EM epithelial volumes (open repositories)." ;
+    skos:note "Requires: surface-evolver" ;
+    skos:note "Requires: 3d-segmentation" ;
+    skos:note "Requires: cell-geometry" ;
+    skos:note "Requires: lean4" ;
+    skos:note "Scale: cellular" ;
+    skos:note "Scale: tissue" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-16> ;
+    rdfs:seeAlso <https://doi.org/10.1080/09500839408241577> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s004540010071> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41467-018-05376-1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1080/09500839408241577> dct:title "A counter-example to Kelvin's conjecture on minimal surfaces" ;
+    dct:bibliographicCitation "Weaire and Phelan 1994, A counter-example to Kelvin's conjecture on minimal surfaces" .
+  <https://doi.org/10.1007/s004540010071> dct:title "The Honeycomb Conjecture" ;
+    dct:bibliographicCitation "Hales 2001, The honeycomb conjecture" .
+  <https://doi.org/10.1038/s41467-018-05376-1> dct:title "Scutoids are a geometrical solution to three-dimensional packing of epithelia" ;
+    dct:bibliographicCitation "Gomez-Galvez et al. 2018, Scutoids are a geometrical solution to three-dimensional packing of epithelia" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.291Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Kelvin's problem in epithelia" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

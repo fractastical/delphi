@@ -1,0 +1,91 @@
+{
+  "claim_id": "thompson1917-ch03-15",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T02:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-2/thompson-ch01-05" },
+  "variables_needed": [
+    "body mass (wet or dry) immediately before metamorphosis per species or individual",
+    "body mass immediately after metamorphosis for the same species/individuals",
+    "taxonomic breadth across metamorphosing groups (fish such as eels, holometabolous insects, amphibians)",
+    "measurement conditions (hydration, gut contents) to separate tissue loss from water loss"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-vx0k6djrp-werner-complex-life-cycles",
+      "name": "A comparative analysis testing Werner's theory of complex life cycles (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.vx0k6djrp",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.vx0k6djrp",
+      "doi": "10.5061/dryad.vx0k6djrp",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T02:22:00Z", "method": "GET Dryad API dataset record and versions", "http_status": 200, "bytes": 10935354 },
+      "variables_present": ["mass before and after larval-stage transitions and metamorphosis", "growth rate across transitions", "105 species of fish, amphibians, insects, crustaceans and molluscs"],
+      "variables_missing": ["explicit hydration / gut-content controls (not stated in abstract)", "per-individual repeated measures (compiled from literature at species level)"],
+      "scope": "105 species across five animal groups; published 2022-05-06, version 3; storageSize 10935354 bytes",
+      "evidence": "API abstract: 'We quantified how growth rate and mass change across larval stages and metamorphosis for 105 species of fish, amphibians, insects, crustaceans and molluscs ... most species either gained or lost mass when switching to a new stage'. Licence CC0.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) DEB entries for metamorphosing species",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/entries_web/Bombyx_mori/Bombyx_mori_res.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T02:20:00Z", "method": "GET --compressed entry pages for Bombyx mori, Rana temporaria, Anguilla anguilla", "http_status": 200, "bytes": null },
+      "variables_present": ["time–weight (tW, tWe, tWj) and time–length (tL) series per species, with pupation/metamorphosis events referenced"],
+      "variables_missing": ["systematic paired pre/post-metamorphosis masses", "cross-species compiled table"],
+      "scope": "Per-species literature series; Bombyx mori page lists tW/tWe/tWj and mentions pupation; Rana temporaria mentions metamorphosis; Anguilla anguilla has tL and tW",
+      "evidence": "All three entry pages returned 200 (gzip-encoded). Bombyx_mori_res.html contains data-set labels tW, tWe, tWj and terms 'pupa', 'pupation'; Anguilla_anguilla_res.html contains tL, tW.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository, as named by the assessor)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=metamorphosis%20mass&per_page=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T02:20:00Z", "method": "HEAD landing_url; GET search API", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["the repository itself is not a dataset; relevant records listed separately"],
+      "scope": "Repository portal; search 'metamorphosis mass' returned 22 datasets",
+      "evidence": "Landing 200; API search returned total 22, among them dryad.vx0k6djrp (recorded above) and dryad.t4b8gtj6s (anuran size at metamorphosis meta-analysis, CC0, 2603749 bytes: size at metamorphosis only, no pre-metamorphic mass pairing).",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-t4b8gtj6s-anuran-plasticity",
+      "name": "Developmental plasticity in anurans: size at and timing of metamorphosis meta-analysis (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.t4b8gtj6s",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.t4b8gtj6s",
+      "doi": "10.5061/dryad.t4b8gtj6s",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T02:22:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 2603749 },
+      "variables_present": ["size at metamorphosis and timing of metamorphosis in anurans, compiled from >450 studies"],
+      "variables_missing": ["mass immediately before metamorphosis", "non-amphibian taxa"],
+      "scope": "Anurans only; effect sizes from a meta-analysis",
+      "evidence": "API record: title, CC0 licence, storageSize 2603749, abstract on larval environment effects on size at metamorphosis.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "metamorphosis mass", "url": "https://datadryad.org/api/v2/search?q=metamorphosis%20mass&per_page=8", "hits": 22, "note": "dryad.vx0k6djrp (105-species mass change across metamorphosis) and dryad.t4b8gtj6s (anuran size at metamorphosis) relevant." },
+    { "source": "Dryad", "query": "tadpole metamorphosis", "url": "https://datadryad.org/api/v2/search?q=tadpole%20metamorphosis&per_page=8", "hits": 28, "note": "Mostly brain, immunity and lens studies; none with paired pre/post mass in the first page." },
+    { "source": "Zenodo", "query": "metamorphosis \"body mass\" tadpole froglet", "url": "https://zenodo.org/api/records?q=metamorphosis%20%22body%20mass%22%20tadpole%20froglet&size=5", "hits": 15710, "note": "Loose match; first page is Plazi taxonomic figures, no datasets." },
+    { "source": "DataCite", "query": "metamorphosis \"mass loss\"", "url": "https://api.datacite.org/dois?query=metamorphosis%20%22mass%20loss%22&page%5Bsize%5D=5", "hits": 21, "note": "Only dryad.vx0k6djrp relevant; the rest astrophysics." }
+  ],
+  "status": "data-ready",
+  "summary": "Dryad dataset 10.5061/dryad.vx0k6djrp (CC0) compiles mass and growth-rate change across larval transitions and metamorphosis for 105 species of fish, amphibians, insects, crustaceans and molluscs, which is the cross-taxon pre/post comparison the operationalizations ask for; Add-my-Pet supplies per-species weight-at-age series around pupation/metamorphosis for eel, silkworm and frog as supplements.",
+  "next_step": "Download dryad.vx0k6djrp, identify the metamorphosis-transition rows and the pre/post mass columns, and pre-register the frequency of net mass loss by group with a check on whether wet or dry mass was recorded.",
+  "obstacles_confirmed": [
+    "Weight series through metamorphosis are scattered across experimental papers (the Dryad compilation is itself a literature synthesis).",
+    "Hydration and gut evacuation controls are not indicated in the dataset metadata."
+  ]
+}

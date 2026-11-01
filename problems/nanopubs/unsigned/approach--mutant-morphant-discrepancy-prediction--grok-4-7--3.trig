@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Score untested morpholino genes and check calibration" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    dct:description "The acceptance criteria ask for a ranked list of genes not yet tested as mutants. Fit the one-parameter mechanistic score P(discrepancy) = logistic(a + b times maximum paralogue identity + c times the NMD indicator) on the training families from the Boolean-rule split. The score must beat an intercept-only model on held-out families by a likelihood-ratio test at p below 0.01, and the reliability diagram of deciles must be monotone. Only then score genes that have a morpholino phenotype and no mutant allele. Publish the top 50 with the three features and the score. The list is a prediction, not a confirmation. Future experiments are outside the approach. A non-monotone reliability diagram fails the list even if the likelihood-ratio test passes." ;
+
+    delphi:proposedTest "A likelihood-ratio p-value below 0.01 against the intercept, a monotone decile reliability diagram, and a published top-50 list of untested genes." ;
+    delphi:context "Fails if: The likelihood-ratio test misses 0.01, or the reliability diagram is not monotone. No list is published in those cases." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Fit a, b and c on training families only. 2. Likelihood-ratio test against the intercept on held-out families. 3. Build the decile reliability diagram and require monotonicity. 4. Score morpholino genes that have no mutant allele. 5. Publish the top 50 with features and scores." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Laboratory tests of the top 50. The swarm can publish the list and cannot confirm it." ;
+    skos:note "Tool: zfin" ;
+    skos:note "Tool: machine-learning" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://zfin.org/downloads> ;
+    rdfs:seeAlso <https://www.ensembl.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1064-z> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14580> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" .
+
+  <https://zfin.org/downloads> dct:title "ZFIN downloads" ;
+    dct:description "Morpholino genes without mutant alleles are the prediction set; doubly assayed genes are the calibration set." .
+  <https://www.ensembl.org/> dct:title "Ensembl" ;
+    dct:description "Identity and NMD features for the scored genes." .
+  <https://doi.org/10.1038/s41586-019-1064-z> dct:title "Genetic compensation triggered by mutant mRNA degradation" ;
+    dct:bibliographicCitation "El-Brolosy et al. 2019, the mechanism the score encodes" .
+  <https://doi.org/10.1038/nature14580> dct:title "Genetic compensation induced by deleterious mutations but not gene knockdowns" ;
+    dct:bibliographicCitation "Rossi et al. 2015, genetic compensation as the phenotype being ranked" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to mutant-morphant-discrepancy-prediction, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.346Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to mutant-morphant-discrepancy-prediction: Score untested morpholino genes and check calibration" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,185 @@
+{
+  "claim_id": "darwin1859-ch01-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "trait values for several organs (leaf, flower, fruit, other) across varieties of one cultivated species",
+    "an annotation of which organ breeders selected for each variety group",
+    "consistent measurement protocols across varieties and organs"
+  ],
+  "datasets": [
+    {
+      "id": "genesys-pgr",
+      "name": "Genesys Global Portal on Plant Genetic Resources",
+      "landing_url": "https://www.genesys-pgr.org/",
+      "access_url": "https://api.genesys-pgr.org/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:53Z",
+        "method": "GET landing (200, 377,833 bytes); GET api.genesys-pgr.org root (200) and /api/v1/acn/stats (401)",
+        "http_status": 200,
+        "bytes": 377833
+      },
+      "variables_present": [
+        "accession passport data portal (API root text lists accession passport data and BrAPI v1 implementation)"
+      ],
+      "variables_missing": [
+        "measured multi-organ trait values not confirmed",
+        "API stats endpoint needs authorisation (401)"
+      ],
+      "scope": null,
+      "evidence": "API root text: \"About Genesys ... Accession passport data  Genesys API  BrAPI v1 implementation  Login\"; /api/v1/acn/stats returned 401 with empty body.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "usda-grin-global",
+      "name": "USDA-ARS GRIN-Global (npgsweb.ars-grin.gov)",
+      "landing_url": "https://npgsweb.ars-grin.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:55Z",
+        "method": "GET npgsweb landing (200) and /gringlobal/search (200, title \"Search Accessions GRIN-Global\"); grin-global.org landing 200 at 05:10:54Z",
+        "http_status": 200,
+        "note": "landing only"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "descriptor scores not queried"
+      ],
+      "scope": null,
+      "evidence": "Search page titled \"Search Accessions GRIN-Global\"; no descriptor query run within budget.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing and TryWeb/Home.php (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant trait records (22,860,407 records, 306,701 taxa, v7)"
+      ],
+      "variables_missing": [
+        "variety-level and selected-organ annotation not confirmed"
+      ],
+      "scope": null,
+      "evidence": "Home page text with record counts as quoted.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-3d00d-wheat-domestication",
+      "name": "Data from: Shifts in plant functional strategies over the course of wheat domestication",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3d00d",
+      "access_url": null,
+      "doi": "10.5061/dryad.3d00d",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:52Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 50234
+      },
+      "variables_present": [
+        "vegetative and reproductive trait data across wheat lineages (per abstract)"
+      ],
+      "variables_missing": [
+        "one species"
+      ],
+      "scope": "Wheat",
+      "evidence": "API abstract: \"Human selection ... drove the phenotypic trajectory of crops during domestication... The characterization of the crop domestication syndrome lies mostly on reproductive characters.\"",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-gs352-noug",
+      "name": "Data from: Patterns of domestication in the Ethiopian oil-seed crop Noug (Guizotia abyssinica)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.gs352",
+      "access_url": null,
+      "doi": "10.5061/dryad.gs352",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:51Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 279922
+      },
+      "variables_present": [
+        "common-garden trait data on a crop and its wild relatives (per abstract)"
+      ],
+      "variables_missing": [
+        "one species"
+      ],
+      "scope": "Guizotia abyssinica",
+      "evidence": "API abstract: \"we conducted common garden studies and microsatellite a...\"; storage 279922 B.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Genesys",
+      "query": "API root and stats endpoint",
+      "url": "https://api.genesys-pgr.org/api/v1/acn/stats",
+      "hits": null,
+      "note": "HTTP 401"
+    },
+    {
+      "source": "Dryad",
+      "query": "cultivar morphological traits fruit leaf variation among cultivars selected organ",
+      "url": "https://datadryad.org/api/v2/search?q=cultivar+morphological+traits+fruit+leaf+variation+among+cultivars+selected+organ&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "crop cultivars morphometric variation selected organ fruit leaf domestication syndrome among-variety variance",
+      "url": "https://zenodo.org/api/records?q=crop+cultivars+morphometric+variation+selected+organ+fruit+leaf+domestication+syndrome+among-variety+variance&size=8",
+      "hits": 555045,
+      "note": "single-crop domestication deposits (wheat, noug, maize leaf economics)"
+    },
+    {
+      "source": "DataCite",
+      "query": "germplasm accessions morphological descriptors fruit leaf measurements dataset",
+      "url": "https://api.datacite.org/dois?query=germplasm+accessions+morphological+descriptors+fruit+leaf+measurements+dataset&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 0
+    }
+  ],
+  "status": "partial",
+  "summary": "Genebank portals (Genesys, GRIN-Global) are reachable and hold accession-level records, but no descriptor-level multi-organ table was confirmed from them, and the single-crop domestication deposits found cover only one species each.",
+  "next_step": "Query GRIN-Global descriptors for one species with many named varieties (e.g. Brassica oleracea or Solanum lycopersicum) and tabulate descriptors by organ before pre-registering.",
+  "obstacles_confirmed": [
+    "Genebank descriptors are often categorical and uneven across accessions.",
+    "Genesys statistics endpoint requires authorisation."
+  ]
+}

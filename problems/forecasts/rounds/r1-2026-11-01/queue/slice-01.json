@@ -1,0 +1,2225 @@
+{
+ "round": "r1-2026-11-01",
+ "slice": "slice-01",
+ "date": "2026-11-01",
+ "horizons": {
+  "complete_days": 30,
+  "short_days": 30,
+  "long_days": 365
+ },
+ "blind": true,
+ "previous_round": null,
+ "problems": [
+  {
+   "id": "rule110-universality-machine-checked",
+   "title": "Machine-check the universality of Rule 110",
+   "field": "mathematics",
+   "tier": "A",
+   "question": "Can Cook's proof that elementary cellular automaton Rule 110 is computationally universal be formalized and checked in Lean 4 with no `sorry` and no added axioms?",
+   "known_state": "Cook (2004) proved universality by emulating cyclic tag systems with glider collisions; Neary and Woods (2006) sharpened the emulation to polynomial time. Neither proof has been machine-checked. The repo records the claim as inconclusive (wolfram2002-ch11-14) because reproduction tests can only exercise the construction, not verify it.",
+   "acceptance_criteria": [
+    "A Lean 4 module whose main theorem states that for every cyclic tag system and input there is an initial configuration of Rule 110 whose evolution encodes the computation, compiled with no sorry and only Lean's standard axioms.",
+    "The glider catalog, collision table and the periodic background are each a checked lemma rather than an assumption."
+   ],
+   "falsifiers": [
+    "A gap in the collision table that cannot be closed (a required collision that does not behave as Cook's table says), which would also be a finding against the published proof."
+   ],
+   "required_capabilities": [
+    "lean4",
+    "cellular-automaton-simulation",
+    "proof-engineering"
+   ],
+   "data_access": "No data needed; Rule 110 is fully specified. Cook's glider tables are in the open-access Complex Systems paper.",
+   "related_claims": [
+    {
+     "id": "wolfram2002-ch11-14",
+     "label": "Elementary cellular automaton rule 110 is universal",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "inconclusive",
+     "data_test": {
+      "verdict": "inconclusive",
+      "confidence": 0.9,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-14/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch11-27",
+     "label": "A 2-state 5-color Turing machine is universal via rule 110",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.9,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-27/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch01-07",
+     "label": "Universal computation is possible in systems with one-sentence rules",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.8,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch01-07/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "rule110-universality-machine-checked--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Modular Lean proof of Cook's construction via a light-cone splicing lemma",
+     "kind": "formalization",
+     "method": "Formalize Rule 110 as a map on configurations ℤ → Bool and prove Cook's emulation of cyclic tag systems (CTS) as a stack of independent layers. The load-bearing general lemma is locality (light-cone splicing): the restriction of step^[t] x to the interval [a+t, b−t] depends only on x restricted to [a, b]. With it, any finite pattern embedded in the periodic ether can be checked on a finite window by kernel computation (`decide` or `rfl` on List Bool, never `native_decide`), and the result transfers to the infinite configuration. Layers: (1) the ether is spacetime-periodic: it returns to a spatial shift of itself after its temporal period (Cook gives horizontal period 14 and vertical period 7); (2) each glider Cook uses (A through H and the variants in his construction) is a finite word that, spliced into ether, reappears translated after its period; (3) each collision in Cook's table, at each phase and offset the construction uses, produces the stated outgoing gliders, checked on a finite window; (4) a glider calculus: an abstract configuration (a list of glider type, phase and gap triples), an interpretation map into Rule 110 configurations, and a simulation theorem saying that for gaps above a stated threshold the CA evolution realizes the abstract collision rules; (5) Cook's encoding of CTS tape, appendants and the periodic right-hand program stream, with a theorem that one CTS step corresponds to a bounded number of abstract collision rounds.",
+     "steps": [
+      "Define `rule110`, `step`, shift, and prove the light-cone splicing lemma by induction on t.",
+      "Encode the ether word and prove its spacetime periodicity on a finite window; lift to ℤ with the splicing lemma.",
+      "Transcribe Cook's glider catalogue and collision table from the open-access Complex Systems paper into Lean data; prove each entry by bounded kernel computation.",
+      "Define the abstract glider-list semantics and prove the simulation theorem for well-separated configurations.",
+      "Define cyclic tag systems in Lean and Cook's encoding; prove the one-step correspondence and the main theorem by induction on CTS steps.",
+      "Check `#print axioms` lists only propext, Classical.choice and Quot.sound; write a report in the format of the Thompson Lean reports."
+     ],
+     "decisive_result": "A Lean 4 module whose main theorem states: for every cyclic tag system and input word there is an initial Rule 110 configuration (ether plus a finite perturbation on the left and a periodic glider stream on the right) and a decoding map such that the CA evolution encodes every CTS step. It must compile with no sorry and only the three standard axioms, with every glider and collision fact a proved lemma.",
+     "failure_signature": "A collision required by the encoding that the kernel check refutes at the phase or gap the construction needs (a gap in Cook's table, itself a publishable finding), or kernel computations on the required windows that are too large to complete without native_decide, forcing the project to stall at layer 3.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "cellular-automaton-simulation",
+      "proof-engineering"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Proof-engineering volume rather than new mathematics: Cook's construction has many glider spacings and timing constraints, and kernel-only evaluation of large windows may be slow. A month is likely enough for layers 1 to 3, not the full chain."
+    },
+    {
+     "id": "rule110-universality-machine-checked--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Independent exhaustive audit of Cook's glider and collision table",
+     "kind": "computation",
+     "method": "Before or alongside formalization, re-derive from scratch every fact Cook's construction depends on, using code written without reference to Cook's tables except for the final comparison. Enumerate all gliders on the ether background up to period 200 and width 100 using de Bruijn-diagram search for spacetime-periodic patterns. For every ordered pair of gliders used by the construction, simulate the collision at every relative phase and every integer gap in the range the construction allows, and record the outgoing glider multiset with phases. Then run the full construction for small cyclic tag systems (including Cook's worked example and randomly generated CTS with up to 6 appendants of length up to 6) for at least 10^7 generations with bit-parallel simulation, and decode the CTS tape from the glider stream at each emulated step, comparing with a direct CTS interpreter.",
+     "steps": [
+      "Implement a bit-sliced Rule 110 simulator and a de Bruijn-diagram glider finder; verify against the published list of Rule 110 gliders.",
+      "Produce a machine-readable collision table (JSON) over all phases and gaps used by the construction, with SHA-256 of the generating code and output.",
+      "Diff the table against a transcription of Cook's table; classify every discrepancy as transcription error, phase-convention difference or genuine mismatch.",
+      "Run end-to-end emulations of at least 100 random CTS and compare decoded tapes step by step with a reference interpreter."
+     ],
+     "decisive_result": "Either a complete match (every collision the construction needs behaves as stated at every allowed gap, and all end-to-end emulations decode correctly for 10^7 generations), which hands layer 3 of a formal proof a verified target, or a specific (glider pair, phase, gap) triple whose outcome differs from Cook's table and breaks an emulation.",
+     "failure_signature": "The audit cannot settle universality either way by itself; it fails as an approach if the gap ranges the construction needs cannot be extracted unambiguously from the paper, so the audit checks a reconstruction rather than Cook's proof.",
+     "tools": [
+      "large-scale-computation",
+      "cellular-automaton-simulation",
+      "de-bruijn-diagrams"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "rule110-universality-machine-checked--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Verified certificate checker: reduce the proof to a finite spacetime tile set",
+     "kind": "mixed",
+     "method": "Instead of proving Cook's construction lemma by lemma, prove once in Lean that a small checker is sound, and let external search produce the certificate. The spacetime diagram of Cook's construction for an arbitrary CTS is assembled from finitely many rectangular spacetime tiles (ether blocks, glider segments, collision blocks), and the program side is periodic while the data side varies only through which tiles are chosen. Define in Lean a certificate as a finite tile set with edge labels (boundary words) plus a context-free or regular grammar describing admissible tile arrangements for any CTS. The checker verifies (a) each tile is a valid Rule 110 spacetime patch, by kernel computation, (b) adjacent tiles agree on shared boundary words, (c) the grammar generates, for each CTS step, an arrangement whose decoded output equals the CTS successor. Soundness theorem: if the checker accepts, the universality statement holds. This fails differently from approach 1: the human-proof burden shrinks to the soundness lemma and the grammar semantics, while the computational burden moves to certificate generation outside Lean.",
+     "steps": [
+      "Specify tiles, boundary words and the arrangement grammar in Lean; prove the soundness theorem using the light-cone splicing lemma.",
+      "Write an external generator that runs the construction on many CTS, cuts the spacetime diagram into tiles, deduplicates them and infers the arrangement grammar.",
+      "Run the checker inside Lean by kernel reduction on the certificate; iterate on tile size if kernel cost is prohibitive.",
+      "Prove the grammar-to-CTS correspondence by induction on CTS steps."
+     ],
+     "decisive_result": "Lean accepts the certificate, and the soundness theorem plus the checker run yields the universality theorem with only standard axioms. A secondary artifact is the tile count, a compact measure of the construction's complexity.",
+     "failure_signature": "The tile decomposition does not close: arrangements depend on unbounded gap values in a way no regular or context-free grammar captures, or the tile set needed exceeds what kernel reduction can check in reasonable time.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "large-scale-computation",
+      "certificate-checking"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "No existing tile-level description of Cook's construction; the grammar-inference step is research."
+    },
+    {
+     "id": "rule110-universality-machine-checked--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Refinement proof from cyclic tag systems to Rule 110",
+     "kind": "formalization",
+     "method": "Define finite Rule 110 windows with a periodic ether outside, cyclic tag systems, and a decoding relation in Lean 4. Prove a one-step simulation theorem by decomposing each compiled tag step into a finite sequence of glider phases; discharge each collision lemma with a kernel-evaluated finite trace and compose them by induction on tag-system runs.",
+     "steps": [
+      "Formalize Rule 110 evolution on integers and prove locality and light-cone lemmas.",
+      "Encode Cook's ether phases, gliders and compiler from cyclic tag words.",
+      "Generate every required collision trace and prove its decoded precondition and postcondition by decide.",
+      "Prove phase synchronization, noninterference and the global simulation theorem without sorry."
+     ],
+     "decisive_result": "A compiling Lean module whose theorem maps every finite cyclic-tag execution of length k to a Rule 110 execution decoding the same k transitions, with all collision and ether lemmas proved and only standard axioms.",
+     "failure_signature": "A required compiler collision has no finite spacetime trace with Cook's advertised phase and separation constraints, or collision lemmas cannot be composed because debris enters another light cone.",
+     "tools": [
+      "lean4",
+      "cellular-automaton-simulation",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A machine-readable transcription of Cook's complete glider phase table and substantial Lean proof engineering."
+    },
+    {
+     "id": "rule110-universality-machine-checked--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Certified collision-table reconstruction",
+     "kind": "computation",
+     "method": "Independently reconstruct Cook's construction before formalizing it. Enumerate all ether-relative glider phases and pair/triple collisions inside exact light cones, canonicalize traces modulo translation and ether period, and search for a closed macro-transition system implementing the cyclic tag productions. Emit proof certificates containing initial words, horizons and decoded products for Lean replay.",
+     "steps": [
+      "Enumerate minimal periodic-ether defects up to width 80 and classify velocities over 500 steps.",
+      "Enumerate phase-separated collisions up to distance 400 and retain stable products.",
+      "Model compilation as a constraint problem over collision phases and spacings.",
+      "Replay every selected certificate in Lean and compare the reconstructed table with the published construction."
+     ],
+     "decisive_result": "A closed, independently generated set of certified macro-transitions sufficient for both cyclic-tag productions and all routing operations, with every trace replayed by Lean.",
+     "failure_signature": "Exhaustive bounded search finds that at least one required macro-transition has no phase-consistent realization within the stated bounds, leaving no complete emulation certificate.",
+     "tools": [
+      "cellular-automaton-simulation",
+      "large-scale-computation",
+      "lean4"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Completeness beyond finite phase and spacing bounds would still require a mathematical argument."
+    },
+    {
+     "id": "rule110-universality-machine-checked--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Kernel-check Cook's ether, gliders and collision table",
+     "kind": "formalization",
+     "method": "In the repo's Lean 4.35.0 and Mathlib 4.35.0, encode Rule 110 as the Boolean function on (Bool × Bool × Bool) given by Wolfram's 8-bit table number 110. Do not use the formula left XOR (center OR right); that formula is Rule 30. Transcribe the periodic background word and every glider word from Cook 2004, without rewriting them. Prove the background is invariant under the spacetime shift Cook states. For each published collision, evolve the finite word with a pure Lean function and prove equality to Cook's product word by kernel reduction (rfl or decide on a Bool), never native_decide, sorry, or an extra axiom. Split any evolution the kernel cannot reduce in one pass into blocks of a few hundred steps with an intermediate word that is itself a lemma. The glider catalog, the background and the collision table are separate lemmas, as the acceptance criteria require.",
+     "steps": [
+      "Define rule110 : Bool × Bool × Bool → Bool from the 8-bit table and prove it matches Wolfram number 110.",
+      "Transcribe Cook's periodic background and prove the invariance he claims.",
+      "Transcribe each glider as a finite word on that background.",
+      "Discharge each collision lemma by blocked kernel reduction of the pure step function.",
+      "Record #print axioms output and reject the module if any axiom other than propext, Classical.choice or Quot.sound appears."
+     ],
+     "decisive_result": "A Lean module, with no sorry, whose lemmas are exactly Cook's background, glider catalog and collision table, each proved by reduction of the cellular-automaton step.",
+     "failure_signature": "Any transcribed collision evolves to a word different from Cook's table, or a collision is too long for blocked kernel reduction and no alternative proof is found. A mismatched collision is also evidence against the published table.",
+     "tools": [
+      "lean4",
+      "cellular-automaton-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Nothing external. The obstacle is proof size: Cook's table is a long finite case analysis, and Lean's kernel may force very small blocks."
+    },
+    {
+     "id": "rule110-universality-machine-checked--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Formalize cyclic-tag universality before any glider",
+     "kind": "formalization",
+     "method": "Separate the computability half of Cook's argument from the cellular-automaton half, so a bug in a glider collision cannot hide inside a tag-system lemma. Define a cyclic tag system as a finite list of appendants, a binary work string, and the rotation that appends the next word and deletes the front bit. Formalize the Cocke–Minsky simulation of a binary Turing machine by a 2-tag system, then Cook's simulation of a 2-tag system by a cyclic tag system. The main theorem is: for every Turing machine and input there is a cyclic tag system and an encoding of the input such that the tag system halts if and only if the machine does, with an explicit bound on the number of tag steps per machine step. Do not mention Rule 110 in this module. Hypotheses that Cook leaves informal (the precise halting convention, the treatment of the empty appendant) stay as named hypotheses rather than as sorry.",
+     "steps": [
+      "Define Turing machines, 2-tag systems and cyclic tag systems with explicit halting.",
+      "Formalize the Cocke–Minsky encoding and prove one-step correspondence.",
+      "Formalize Cook's tag-to-cyclic-tag encoding and prove one-step correspondence.",
+      "Compose the two simulations and extract the overhead bound.",
+      "Audit axioms. Leave Rule 110 out of the imports."
+     ],
+     "decisive_result": "A no-sorry theorem that cyclic tag systems simulate every Turing machine, with the step overhead as a proved bound.",
+     "failure_signature": "A one-step correspondence fails on a finite witness (a tag system whose encoded run disagrees with the machine), or the halting convention cannot be stated without an extra axiom.",
+     "tools": [
+      "lean4"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "rule110-universality-machine-checked--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Compose glider lemmas into the emulation theorem",
+     "kind": "proof",
+     "method": "Assuming the collision lemmas and the cyclic-tag theorem as already checked modules, formalize Cook's compiler: a function from a cyclic tag system and a finite input to a finite set of gliders on the background. The theorem is a lockstep bisimulation. Each tag step is a fixed finite sequence of the checked collisions, and the encoding of the work string is an invariant of that sequence. Prefer the Neary–Woods polynomial-overhead presentation where it cites the same gliders, and prove the polynomial bound as a separate lemma rather than hiding it in the invariant. This module is forbidden to re-verify collisions by simulation; it may only apply the lemmas from the catalog. That split is what makes a failure here different from a failure in the table.",
+     "steps": [
+      "Define the compiler from cyclic tag systems to Rule 110 configurations using only named gliders.",
+      "State the representation invariant (work string, phase, and head glider).",
+      "Prove that each tag operation is a composition of catalogued collisions.",
+      "Prove the overhead bound, polynomial if the Neary–Woods schedule is the one formalized.",
+      "Compose with cyclic-tag universality to obtain the Rule 110 universality theorem and audit axioms."
+     ],
+     "decisive_result": "A no-sorry theorem: for every cyclic tag system and input there is a Rule 110 configuration whose evolution encodes the computation, with gliders, collisions and background used only as prior lemmas.",
+     "failure_signature": "The invariant fails on some tag operation even though every individual collision lemma is true, which means the compiler, not the table, is wrong. Partial gates with no bisimulation do not count.",
+     "tools": [
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A month of agent time is unlikely to finish the bisimulation even after the collision lemmas exist. The missing piece is proof effort on the compiler invariant, not data or a new algorithm."
+    }
+   ]
+  },
+  {
+   "id": "smallest-universal-turing-machine-2-3",
+   "title": "Settle whether the (2,3) Turing machine is universal under a conventional definition",
+   "field": "mathematics",
+   "tier": "A",
+   "question": "Is Wolfram's 2-state 3-color Turing machine universal when the initial tape is required to be finite-support or eventually periodic, rather than the non-periodic infinite background used in Smith's prize proof?",
+   "known_state": "Smith's 2007 proof (published 2020) uses an infinite, non-periodic but computable initial tape, which several authors argue smuggles computation into the input. Standard small-universal-machine results (Neary and Woods) use blank or periodic backgrounds. Whether the (2,3) machine is universal under those definitions is open.",
+   "acceptance_criteria": [
+    "Either a construction with a finite-support or eventually periodic initial tape that emulates a universal system, formalized in Lean 4, or a proof that no such construction exists (for example by showing the machine's behaviour on all eventually periodic tapes is decidable)."
+   ],
+   "falsifiers": [
+    "A decidability proof for eventually periodic inputs would refute universality under that definition."
+   ],
+   "required_capabilities": [
+    "lean4",
+    "turing-machine-enumeration",
+    "computability-theory"
+   ],
+   "data_access": "None needed; the machine is a 6-entry table.",
+   "related_claims": [
+    {
+     "id": "wolfram2002-ch11-27",
+     "label": "A 2-state 5-color Turing machine is universal via rule 110",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.9,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-27/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch11-28",
+     "label": "No 2-state 2-color Turing machine can be universal",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.75,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-28/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch12-23",
+     "label": "Exhaustive search of 2-state 2-color Turing machines finds three growth rates",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "refutes",
+     "data_test": {
+      "verdict": "refutes",
+      "confidence": 0.4,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch12-23/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "smallest-universal-turing-machine-2-3--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Decidability route: regular invariants for the (2,3) machine on periodic backgrounds",
+     "kind": "computation",
+     "method": "Fix the decision problem first, since the (2,3) machine has no halt state: say 'does the head ever reach cell n' or 'does the tape ever contain word v within distance n of the origin', which is how Smith's emulation reads off computation. Restrict to eventually periodic tapes u^ω · w · v^ω. Use the bbchallenge decider family, adapted to non-halting machines: closed tape languages, finite-automata reduction (FAR) and translated-cycler detection. They search for a regular language L of configurations that contains the initial configuration, is closed under the step relation, and implies the property or its negation. Enumerate background pairs (u, v) with |u|, |v| ≤ 8 and windows |w| ≤ 12. If a uniform regular invariant family appears (for example, the machine reduces on every periodic background to a counter or pushdown system whose reachability is decidable), state and prove it in Lean as a decidability theorem. Systematic non-existence of small invariants, together with growth patterns resembling Smith's system 0, is evidence in the other direction and identifies the hardest background classes.",
+     "steps": [
+      "Write the (2,3) rule table and a reference simulator; fix the observable (head-position or word-occurrence predicate) as the decision problem.",
+      "Port FAR and closed-tape-language deciders to non-halting predicates; validate on machines whose behaviour is known.",
+      "Run the enumeration over (u, w, v) and record which configurations admit regular invariants and with how many states.",
+      "If invariants follow a pattern, generalize by hand and formalize the decidability proof in Lean 4; otherwise publish the census of undecided cases."
+     ],
+     "decisive_result": "A Lean-checked theorem that the chosen predicate is decidable for all eventually periodic initial tapes, which refutes universality under that definition. Short of that, a census giving, for each background up to the bound, either a verified regular invariant or an explicit undecided configuration.",
+     "failure_signature": "Many small backgrounds, including the blank one, resist all regular invariants up to large state counts, while showing irregular, nested head motion; the decidability route then probably cannot succeed.",
+     "tools": [
+      "turing-machine-enumeration",
+      "automata-theory",
+      "lean4",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Mathematics beyond current automation if the machine is in fact universal on periodic backgrounds; adapting halting-oriented deciders to observables is new work."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Construction route: replace Smith's non-periodic tape with a periodic refuel gadget",
+     "kind": "mixed",
+     "method": "Smith's proof is a chain: the (2,3) machine emulates system 0, which emulates a sequence of intermediate systems ending in a cyclic tag system, and the infinite non-periodic tape supplies the structures the chain consumes. Implement each layer as an executable specification and instrument the emulation to find exactly which layer consumes non-periodic structure, and what that structure is (for example, blocks whose lengths grow with the number of emulated steps). Then search for a replacement: a finite gadget on a periodic background that regenerates the consumed structure on demand. Neary and Woods' weakly universal small machines show this kind of periodic-background refuelling can work. The search runs over short periodic background words and finite gadgets (SAT or bounded model checking on the layer's step relation), with the requirement that the composed system still emulates the CTS.",
+     "steps": [
+      "Implement Smith's systems 0 through 5 and the CTS layer as executable specs, with cross-checking simulation from a common CTS input.",
+      "Instrument the emulation to log the background symbols consumed per emulated CTS step and fit their growth law.",
+      "Formulate a SAT or bounded-model-checking search for a periodic background plus finite gadget that produces the consumed structure; run for background periods up to 40.",
+      "If a candidate is found, verify by long simulation and then formalize the composed emulation in Lean."
+     ],
+     "decisive_result": "An explicit eventually periodic initial tape for which the (2,3) machine emulates a universal CTS, verified by simulation for at least 10^6 emulated steps and then proved in Lean. Even without success, the instrumented chain is a precise statement of what the non-periodic tape contributes, which the current literature lacks.",
+     "failure_signature": "The consumed structure grows superlinearly in a way no finite gadget on a periodic background can produce (for example, its growth law implies the background must encode an unbounded counter), or the search exhausts all gadgets up to the size bound.",
+     "tools": [
+      "turing-machine-enumeration",
+      "sat-solver",
+      "lean4",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Possibly a genuinely new idea; the search space for gadgets may be far too large."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Formalize Smith's proof and bound the computational power of its initial tape",
+     "kind": "formalization",
+     "method": "Machine-check what is currently claimed, with the definitional issue stated exactly. Formalize in Lean 4 Smith's theorem: for every CTS there is a computable initial tape on which the (2,3) machine emulates it. Then prove a theorem about the tape's complexity, which is what the dispute is about. Candidate statements: the tape is generated by a fixed finite-state transducer from the CTS description and a fixed infinite word; it is a fixed morphic or automatic sequence modified by a finite prefix; or it is computable in linear time by a non-universal device. Each turns 'the encoding smuggles in computation' into a checkable claim. If the tape is automatic or morphic, the result places the (2,3) machine in a precisely named universality class between weak universality (periodic background) and Smith's notion.",
+     "steps": [
+      "Formalize the (2,3) machine, CTS and Smith's intermediate systems in Lean; prove each emulation step.",
+      "Extract the explicit initial-tape generator from the proof and formalize it as a function.",
+      "Prove the generator lies in a named weak class (finite transducer over a fixed sequence, automatic sequence, or linear-time and non-universal), or show it cannot, by exhibiting an encoding step that requires unbounded computation.",
+      "Write a short mapping of the critics' objections onto the formal statements."
+     ],
+     "decisive_result": "A Lean module proving Smith's theorem together with a proved upper bound on the complexity of the required tape (for example 'the tape is k-automatic'). That settles the definitional dispute in the form 'universal under definition D', even though it leaves the periodic-background case open.",
+     "failure_signature": "Formalization uncovers a gap in Smith's chain that cannot be closed, or the tape generator turns out to need unbounded computation in a way that makes every weak-class statement false.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "computability-theory"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Smith's chain is long (about 40 pages of construction); the full formalization is likely beyond a month, though the tape-complexity analysis can be done on the informal proof first."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Search for periodic-background tag-system compilers",
+     "kind": "computation",
+     "method": "Treat an eventually periodic tape as left period, finite defect and right period. Enumerate periods up to 12 and defects up to 40 cells, then use symbolic execution and counterexample-guided synthesis to seek macro-configurations representing tag symbols and clock phases. Require compositional transitions, not isolated long transients, and certify candidates by exact simulation.",
+     "steps": [
+      "Implement the six-entry machine and symmetry-reduced eventually periodic configurations.",
+      "Mine recurring spacetime motifs and infer finite-state macro-boundaries.",
+      "Synthesize encodings of a cyclic tag system with bounded phase jitter.",
+      "For any candidate, prove finite transition certificates and formulate an induction invariant in Lean."
+     ],
+     "decisive_result": "A periodic-background compiler with exact certificates for both tag productions, erasure, appending and clock restoration, followed by a Lean simulation theorem.",
+     "failure_signature": "No closed macro-transition set survives adversarial compositions of 10,000 random tag steps despite exhaustive periods and defect bounds; this falsifies the searched compiler family, not universality.",
+     "tools": [
+      "turing-machine-enumeration",
+      "large-scale-computation",
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "No completeness theorem says universality must use a short periodic background or local tag encoding."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Decidability via bounded crossing sequences",
+     "kind": "proof",
+     "method": "Seek a negative result for eventually periodic tapes. Define crossing sequences at cell boundaries and prove that the 2-state control plus periodic tails forces either bounded crossing complexity or a pumpable translation cycle. A finite quotient of boundary state, tape color and tail phase would then decide halting and exclude conventional universality.",
+     "steps": [
+      "Enumerate local boundary-return types for each left and right tail period up to symbolic period p.",
+      "Conjecture a monotone measure or pumping lemma from exhaustive runs up to 10^9 steps.",
+      "Formalize crossing sequences and the tail-phase quotient in Lean.",
+      "Derive a halting decider if the bounded-crossing lemma is proved."
+     ],
+     "decisive_result": "A Lean theorem that every eventually periodic input either enters a computably detected cycle or halts, with an explicit computable bound from the finite defect and periods.",
+     "failure_signature": "A generated family has unbounded nonrepeating crossing sequences or simulates an unbounded counter, directly refuting the proposed bounded-crossing lemma.",
+     "tools": [
+      "lean4",
+      "turing-machine-enumeration",
+      "computability-theory"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A viable global invariant; finite experiments cannot establish decidability."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Prove Smith's tape is not eventually periodic",
+     "kind": "formalization",
+     "method": "Encode Wolfram machine 596440 exactly as published: state 1 on colors 0, 1, 2 writes (1, right, state 2), (2, left, state 1), (1, left, state 1); state 2 writes (2, left, state 1), (2, right, state 2), (0, right, state 1). Define eventually periodic as the existence of a center bound N and periods p, q such that the tape repeats with period p to the right of N and period q to the left. Define finite support as the case where both periodic parts are the blank symbol. Formalize Smith's doubling recurrence for the infinite initial condition, as described in his prize proof and in the public development at the Wolfram Institute Lean notes, and prove that this particular tape is not eventually periodic. Separately audit that public development against this repo's rules: no sorry, no extra axioms. The audit's job is to isolate the infinite-tape hypothesis, not to re-prove universality under a periodic background.",
+     "steps": [
+      "Define machine 596440 and the two tape restrictions as Lean predicates.",
+      "Transcribe Smith's doubling construction of the infinite initial tape.",
+      "Prove that tape is not eventually periodic.",
+      "Audit the public Lean development and list every hypothesis it still assumes, in particular the non-periodic background.",
+      "Reject the module if universality is stated without that hypothesis."
+     ],
+     "decisive_result": "A no-sorry lemma that Smith's infinite initial condition is not eventually periodic, plus an axiom audit showing his universality theorem uses that tape.",
+     "failure_signature": "The doubling recurrence in fact produces an eventually periodic tape, or the public development's universality theorem does not depend on a non-periodic background. Either outcome would change the status of the objection rather than confirm it.",
+     "tools": [
+      "lean4"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "The public Lean notes list open items. Closing those items under a no-sorry rule may exceed a month even though the non-periodicity lemma itself is the smaller target."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Decide the machine on eventually periodic tapes",
+     "kind": "proof",
+     "method": "Try to refute conventional universality by a regularity theorem. Fix an eventually periodic initial tape with left period q, right period p and a finite center of length L. The head will destroy periodicity, so the configuration space is not the finite set of phases. The attack is to find an invariant of machine 596440 that restores finiteness: a bound on the number of non-periodic cells, or a vector of local statistics (for example counts of 1s and 2s modulo a small integer) that determines the future and takes values in a finite monoid. If every space-time diagram from an eventually periodic tape is generated by a finite automaton whose state is that invariant, then halting and reachability of any finite target pattern are decidable, which refutes universality under the conventional restriction. The invariant has to be proved for all p, q and L, not checked up to a bound. A bound-only result belongs to the search approach and is not this theorem.",
+     "steps": [
+      "Define the configuration graph of machine 596440 on eventually periodic tapes.",
+      "Search symbolically for a finite invariant by enumerating small moduli and local window statistics.",
+      "If a candidate invariant closes, prove it is preserved by all six transitions.",
+      "Prove that the invariant's state, plus the head state, determines the next window.",
+      "Conclude decidability of reachability, which is the anti-universality theorem."
+     ],
+     "decisive_result": "A no-sorry theorem that reachability for machine 596440 on every eventually periodic tape is decidable.",
+     "failure_signature": "Every candidate finite invariant fails on an explicit tape: the non-periodic region grows without a periodic residue. That kills this proof route and leaves conventional universality open.",
+     "tools": [
+      "lean4",
+      "turing-machine-enumeration"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "No known finite invariant for this machine. Finding one is open mathematics, not a missing dataset."
+    },
+    {
+     "id": "smallest-universal-turing-machine-2-3--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Search a bounded periodic-background encoding family",
+     "kind": "computation",
+     "method": "Search for a positive construction inside an explicit family, so exhaustion is a real partial result. The family is: a right-infinite periodic background of period at most 32 over the alphabet {0,1,2}, a finite program region of length at most 10^4, and a block encoding that uses only the block sizes already appearing in Smith's system-0 to system-3 schedule. For each candidate, simulate machine 596440 and test whether the successive visits of the head to the left end reproduce one full step of a fixed universal cyclic tag system (two appendants, the smallest Cook system that is already universal once cyclic-tag universality is granted) for at least 100 tag steps, with the background period unchanged outside the program. The search is exhaustive over periods and over program regions drawn from that block grammar, not over all strings of length 10^4. Publish the grammar, the seed, and the list of simulated candidates.",
+     "steps": [
+      "Fix the target cyclic tag system and the block grammar before any simulation.",
+      "Enumerate background periods from 1 to 32 and program blocks within the grammar up to length 10^4.",
+      "Simulate machine 596440 from each candidate for enough steps to cover 100 tag steps or until the background is corrupted.",
+      "Accept a candidate only if the decoded tag step matches and the background period is intact.",
+      "If the grammar is exhausted with no accept, report the bound as a negative partial result."
+     ],
+     "decisive_result": "Either an explicit periodic-background initial tape, of period at most 32 and program length at most 10^4, that emulates 100 steps of the chosen cyclic tag system, or a machine-readable exhaustion certificate for that grammar.",
+     "failure_signature": "Exhaustion of this grammar does not refute conventional universality. The approach has failed to settle the question if the grammar is exhausted, and it has failed as a search if a candidate is accepted by one simulator and rejected by an independent reimplementation.",
+     "tools": [
+      "turing-machine-enumeration"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "rule54-universality",
+   "title": "Is Rule 54 computationally universal?",
+   "field": "mathematics",
+   "tier": "A",
+   "question": "Is elementary cellular automaton Rule 54 capable of universal computation, as Wolfram conjectures, or can a bound on its information transmission rule it out?",
+   "known_state": "Open since 2002. Martínez, Adamatzky and McIntosh catalogued Rule 54's gliders and collisions and built logic gates in 2006, but no complete emulation of a universal system exists. Wolfram's search of 100 million initial conditions (wolfram2002-ch11-21) found only repetitive and nested structures.",
+   "acceptance_criteria": [
+    "A construction (glider-based or otherwise) emulating a known universal system, with the collision table verified by exhaustive simulation and formalized in Lean 4, or",
+    "A proof that Rule 54 cannot be universal (for example a regularity or transmission bound on all configurations)."
+   ],
+   "falsifiers": [
+    "Partial results only (new gates without a complete emulation) leave the problem open."
+   ],
+   "required_capabilities": [
+    "cellular-automaton-simulation",
+    "glider-collision-search",
+    "lean4"
+   ],
+   "data_access": "None needed.",
+   "related_claims": [
+    {
+     "id": "wolfram2002-ch11-21",
+     "label": "Rule 54 shows only repetitive or nested forms in 100 million initial conditions",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.6,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-21/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch11-19",
+     "label": "Class 1 and 2 cellular automata cannot be universal",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "mixed",
+     "data_test": {
+      "verdict": "mixed",
+      "confidence": 0.7,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-19/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch11-20",
+     "label": "Nested-pattern and additive cellular automata cannot be universal",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.6,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch11-20/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "rule54-universality--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Automated synthesis of a cyclic-tag emulation from the complete collision graph",
+     "kind": "computation",
+     "method": "Treat universality search as program synthesis over glider collisions. First compute the complete set of Rule 54 gliders on the standard ether up to period 120 and width 80 (de Bruijn diagrams), and the full binary collision table over all phases and gaps (outgoing gliders, phase shifts, and whether the outcome depends on the gap). Then search the collision graph for the four functional components of a Cook-style CTS emulation: stationary or slow 'tape' gliders encoding 0 and 1; a periodic left-moving 'program' stream encoding appendants; an annihilation or conversion reaction that reads the leading tape symbol; and a reaction that appends or deletes appendant material conditionally. Encode timing and spacing constraints as an SMT problem (z3, integer gaps modulo the ether period) and search for satisfying assignments that emulate a 2-appendant CTS. A solution is validated by direct simulation and then formalized as in the Rule 110 approach.",
+     "steps": [
+      "Compute and publish the glider catalogue with periods, velocities and phases; compare with Martínez, Adamatzky and McIntosh 2006.",
+      "Compute the complete binary collision table and identify collisions that are gap-sensitive, the raw material for conditional behaviour.",
+      "Encode CTS-emulation components as SMT constraints over glider choices and gaps; search with increasing component sizes.",
+      "Validate any candidate by simulating a small universal CTS for 10^7 generations and decoding."
+     ],
+     "decisive_result": "An explicit initial configuration (ether, finite seed, periodic stream) on which Rule 54 emulates arbitrary CTS, validated by simulation and then proved in Lean. Short of that, a proof that the collision graph restricted to gliders up to the bound lacks a conditional-append reaction, which pins down what a universal construction would need.",
+     "failure_signature": "The SMT search finds no conditional reaction among gliders up to the bound; every collision outcome is independent of the data it would need to read. That is evidence that the bound is too small or that the second (impossibility) approach is the right one.",
+     "tools": [
+      "cellular-automaton-simulation",
+      "glider-collision-search",
+      "smt-solver",
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Conditional (data-reading) reactions may not exist among small gliders; the search may need structures no one has catalogued."
+    },
+    {
+     "id": "rule54-universality--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Impossibility route: a potential function on glider dynamics forcing ballistic decay",
+     "kind": "proof",
+     "method": "Try to prove that Rule 54 cannot be universal in a precise sense, for example that on every finite perturbation of the ether the long-run behaviour is decidable. Strategy: (a) prove a decomposition theorem that every configuration differing from the ether on a finite set evolves, after a transient bounded in terms of the perturbation's width, into a superposition of catalogued gliders separated by ether, using a de Bruijn-diagram argument that any non-ether, non-glider region shrinks; (b) compute the full collision algebra and look for a potential Φ (a weighted glider count, or a count weighted by velocity class) that never increases in any collision and strictly decreases in some. If Φ exists and the number of gliders produced by a collision is bounded, every finite perturbation reaches, in finitely many collisions, a state of non-interacting outgoing gliders. Then 'eventual configuration' is computable, which rules out universality for the standard definition with finite seeds. The integrable reversible RCA54 of Bobenko et al., a different automaton whose name and local rule are related, has solitons that only phase-shift on collision; checking whether ECA 54's ether-restricted dynamics inherit such a conservation law is a concrete sub-question.",
+     "steps": [
+      "Compute the collision algebra (outcome multiset for each glider pair, phase and gap) from the approach-1 catalogue.",
+      "Solve an integer linear program for weights making Φ non-increasing over all catalogued collisions; record strict decreases.",
+      "Attempt the decomposition theorem: prove by exhaustive de Bruijn analysis that non-glider defects shrink, giving a bound on transient length.",
+      "If both hold, formalize: decomposition plus potential implies decidability of the eventual glider content; state precisely what this excludes (universality with finite seeds on ether)."
+     ],
+     "decisive_result": "A proof, ideally Lean-checked, that for every finite perturbation of the ether the multiset of eventual outgoing gliders is computable. This rules out universality from finite seeds on ether, and the result states exactly which universality notions remain open (for example, infinite periodic program streams).",
+     "failure_signature": "The ILP is infeasible, meaning some collision cycle increases every candidate potential (glider multiplication), or an exhaustive search finds a finite perturbation that produces unboundedly many gliders (a 'gun' or breeder). Both suggest universality is plausible and point back to approach 1.",
+     "tools": [
+      "proof",
+      "integer-linear-programming",
+      "cellular-automaton-simulation",
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Infinite periodic program streams (as in Cook's Rule 110 proof) escape a finite-seed impossibility argument, so even success settles only one universality notion."
+    },
+    {
+     "id": "rule54-universality--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean-certified completeness of the Rule 54 glider catalogue up to explicit bounds",
+     "kind": "formalization",
+     "method": "Both other approaches depend on knowing all gliders, and current catalogues are lists of what has been seen, not completeness theorems. Prove in Lean 4: every pattern that is spacetime-periodic on the ether, with period p ≤ P and width w ≤ W, is one of the listed gliders up to phase and translation. The method is de Bruijn-diagram enumeration. Periodic patterns of period p correspond to cycles in a finite graph whose vertices are width-2p words, so completeness reduces to enumerating cycles in finite graphs. Extract the enumeration as a certificate (cycle list plus a proof that no other cycle passes the ether boundary conditions) and check it in Lean by kernel reduction. Pick P and W so the kernel check stays feasible (P = 24 first, then extend).",
+     "steps": [
+      "Define the de Bruijn graph for period-p spacetime patterns in Lean and prove the correspondence theorem (periodic pattern ⇔ graph cycle).",
+      "Generate the cycle enumeration externally for each p ≤ P with ether boundary conditions.",
+      "Check the certificate in Lean; derive the completeness theorem for the glider list.",
+      "Repeat for the binary collision table: prove that outcomes for all pairs from the complete list are as tabulated."
+     ],
+     "decisive_result": "A Lean theorem 'the gliders of Rule 54 on ether with period ≤ P and width ≤ W are exactly G_1 … G_k' plus a verified collision table. This does not settle universality, but turns the search space of approaches 1 and 2 from an observation into a proved object.",
+     "failure_signature": "The de Bruijn graphs for useful P are too large for kernel checking (they grow as 2^(2p) vertices), capping the theorem at a P too small to include the gliders Martínez et al. used for gates.",
+     "tools": [
+      "lean4",
+      "de-bruijn-diagrams",
+      "cellular-automaton-simulation"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "rule54-universality--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Collision-circuit synthesis for Rule 54",
+     "kind": "computation",
+     "method": "Build a complete phase-resolved catalog of Rule 54 gliders and collisions, then use SAT-based spacetime synthesis to implement a universal cyclic tag system. Each gate must restore a common ether phase and tolerate every symbol context; exact traces become Lean certificates.",
+     "steps": [
+      "Enumerate periodic-domain defects of width at most 60 and classify velocity and phase.",
+      "Enumerate binary and ternary collisions over all relative phases.",
+      "Synthesize fanout, delay, annihilation and conditional production modules.",
+      "Compose modules into tag steps and test at least 100,000 adversarial random steps before Lean certification."
+     ],
+     "decisive_result": "A finite library of phase-restoring modules that exactly emulates a known universal cyclic tag system, plus checked traces and a compositional simulation invariant.",
+     "failure_signature": "The exhaustive glider basis lacks either reliable fanout or conditional production under all contexts, closing this glider-circuit architecture within the declared bounds.",
+     "tools": [
+      "cellular-automaton-simulation",
+      "sat-solving",
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Failure of one glider architecture would not prove Rule 54 nonuniversal."
+    },
+    {
+     "id": "rule54-universality--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Finite-factor obstruction to universality",
+     "kind": "proof",
+     "method": "Search for a symbolic-dynamics obstruction: a finite-state transducer or invariant cone showing every finite perturbation of each Rule 54 periodic domain decomposes into ballistic particles with ultimately periodic interactions. Infer candidate invariants from de Bruijn graphs, then prove closure and an upper bound on crossing-sequence complexity in Lean.",
+     "steps": [
+      "Construct order-k de Bruijn graphs for k through 24 and minimize future-equivalence classes.",
+      "Infer conserved additive charges and particle interaction normal forms.",
+      "Attempt a finite-defect decomposition and confluence theorem.",
+      "If obtained, prove finite-defect prediction decidable and state the exact restricted nonuniversality result."
+     ],
+     "decisive_result": "A machine-checked theorem that finite perturbations of specified periodic backgrounds have decidable long-term behavior via a finite particle quotient.",
+     "failure_signature": "Future-equivalence class counts grow without stabilization and collision products generate unbounded novel defects, defeating the finite-factor premise.",
+     "tools": [
+      "symbolic-dynamics",
+      "large-scale-computation",
+      "lean4"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Even a finite-defect theorem may not cover arbitrary computable initial configurations."
+    },
+    {
+     "id": "rule54-universality--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Exhaustive collision census of the 2006 glider catalog",
+     "kind": "computation",
+     "method": "Take every glider and compound glider named by Martínez, Adamatzky and McIntosh 2006, on the periodic ether they use, and collide every ordered pair at every separation from 1 to 256 cells. Evolve each collision for 10^5 steps or until the configuration is a disjoint union of catalogued gliders on the ether. Two independent simulators must agree. From the resulting table, search for a finite gate set that simulates one append of a cyclic tag system: a memory-carrying glider that survives a round trip, a fan-out, and a collision sequence whose net effect is that append. New logic gates that do not compose into that append are recorded and then counted as failure, matching the problem's falsifier that partial gates leave the question open.",
+     "steps": [
+      "Transcribe the 2006 glider words and ether; do not invent new names.",
+      "Collide all pairs at separations 1 through 256, cutoff 10^5 steps, with two simulators.",
+      "Classify products as ether, catalogued gliders, or a new persistent object.",
+      "Search the table for a cyclic-tag append realized as a finite collision sequence.",
+      "If found, emit the sequence as a witness; if not, emit the census and stop."
+     ],
+     "decisive_result": "A collision sequence, reproduced by both simulators, whose net glider content is one step of a cyclic tag system, or a complete census up to separation 256 with no such sequence.",
+     "failure_signature": "The census finds gates, oscillators or a new glider but no composition that implements a tag append. That is the partial-result failure the problem already names. Disagreement between the two simulators invalidates the census.",
+     "tools": [
+      "cellular-automaton-simulation",
+      "glider-collision-search"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "rule54-universality--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Prove a defect invariant that blocks unbounded memory",
+     "kind": "proof",
+     "method": "Attempt a negative theorem that applies to every finite perturbation of the ether, not only to the 2006 gliders. Rule 54's ether is periodic. Treat gliders as defects. Search for a conserved quantity taking values in a finite monoid: a sum of local window weights modulo m, or a pairing between left-going and right-going defects, that every space-time diagram must preserve. The universality-refuting conclusion is that the set of defects reachable from a finite perturbation is a regular language, so the diagram cannot encode an arbitrary binary work string. The conservation law has to be proved from the 8-bit table for every configuration, then specialized to finite ether perturbations. Compatibility of the invariant with a glider that stores an arbitrary string is an immediate failure of this route.",
+     "steps": [
+      "Define the ether and the defect of a finite window relative to it.",
+      "Enumerate small modular weightings and test them against the 8-bit table.",
+      "Prove any surviving weighting is invariant for every configuration.",
+      "Prove that finite perturbations stay inside a regular defect language.",
+      "Conclude that no such perturbation simulates a cyclic tag system on arbitrary inputs."
+     ],
+     "decisive_result": "A proof that every finite perturbation of the Rule 54 ether has space-time defect language regular, hence cannot emulate a cyclic tag system on all inputs.",
+     "failure_signature": "The invariant, if it exists, still permits a defect whose internal tape is an arbitrary finite word. The route has then failed even if the invariant is true.",
+     "tools": [
+      "lean4",
+      "cellular-automaton-simulation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "No published conservation law of this strength. The swarm lacks a theorem, not a dataset."
+    },
+    {
+     "id": "rule54-universality--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Lean-check the published gates and their generated monoid",
+     "kind": "formalization",
+     "method": "Formalize only the collisions Martínez, Adamatzky and McIntosh actually used to build gates, as kernel-checked lemmas of the same kind as the Rule 110 table, then stop at the algebra those gates generate. Represent each gate as a relation on a finite set of glider occupancy vectors. Compute the monoid generated by composition up to a stated vector length. Prove either that the monoid contains a copy of a cyclic-tag append, or that every element is a function of a finite set of counters that cannot store an arbitrary work string. This can succeed as a non-universality proof for this gate set while the wider Rule 54 question stays open, and it fails differently from the census: the census can find a new glider that this monoid never sees.",
+     "steps": [
+      "Transcribe the published gate collisions and check them by kernel reduction.",
+      "Encode each gate as a relation on occupancy vectors.",
+      "Close the monoid under composition up to the stated length.",
+      "Test whether a cyclic-tag append embeds in that monoid.",
+      "If it does not, prove the monoid's memory is bounded by the counters found in the closure."
+     ],
+     "decisive_result": "Either a checked embedding of one cyclic-tag step in the monoid of the 2006 gates, or a proof that this monoid cannot store an arbitrary work string.",
+     "failure_signature": "The monoid is too large to close and no embedding is found. That is an inconclusive stop, not a non-universality proof. A simulator mismatch on a published gate also fails the approach.",
+     "tools": [
+      "lean4",
+      "cellular-automaton-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "rule30-center-column",
+   "title": "The Rule 30 center column",
+   "field": "mathematics",
+   "tier": "A",
+   "question": "Is the center column of Rule 30 from a single black cell non-periodic, does it have asymptotic density 1/2, and does computing its n-th cell require effort growing at least linearly in n?",
+   "known_state": "The three Wolfram Rule 30 Prize problems (2019), all unsolved. Non-periodicity has been verified computationally far beyond a million steps (wolfram2002-ch02-05 tests the statistical claim). Partial results exist for related sequences (surjectivity of Rule 30 on bi-infinite configurations, left-permutivity), none settles the column.",
+   "acceptance_criteria": [
+    "A proof of any of the three statements, machine-checked in Lean 4.",
+    "A weaker but new result: a proven lower bound on the period (if periodic) that exceeds all computational checks, or a proof that the column is not eventually periodic under an added hypothesis made explicit."
+   ],
+   "falsifiers": [
+    "Discovery of a period (would refute problem 1) or a proven density different from 1/2."
+   ],
+   "required_capabilities": [
+    "lean4",
+    "symbolic-dynamics",
+    "large-scale-simulation"
+   ],
+   "data_access": "None needed.",
+   "related_claims": [
+    {
+     "id": "wolfram2002-ch02-05",
+     "label": "Rule 30's center column shows no deviation from randomness over a million steps",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.85,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch02-05/result.json"
+     }
+    },
+    {
+     "id": "wolfram2002-ch12-27",
+     "label": "Inverse problems for rule 30 are likely NP-complete",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "wolfram2002-ch06-14",
+     "label": "Class 3 randomness can arise without randomness in initial conditions",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.9,
+      "data_kind": "computational",
+      "preregistered": true,
+      "path": "test-data/claim-tests/wolfram-nks/wolfram2002-ch06-14/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "rule30-center-column--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean: left-permutivity, Jen's two-column theorem and conditional extensions",
+     "kind": "formalization",
+     "method": "Formalize the only rigorous progress on Prize problem 1 and push it as far as it goes. Rule 30 is x_i^{t+1} = x_{i−1}^t XOR (x_i^t OR x_{i+1}^t). It is left-permutive: x_{i−1}^t = x_i^{t+1} XOR (x_i^t OR x_{i+1}^t), so two adjacent columns determine everything to their left. Jen (1990, announced 1986) proved that no two columns of the single-seed pattern can both be eventually periodic. Prove in Lean: (a) the reconstruction lemma; (b) if columns i and i+1 are eventually periodic with period p, every column to the left is eventually periodic with period p; (c) Jen's theorem, from the fact that the left boundary of the light cone moves left one cell per step, contradicting periodicity of the reconstructed region. Then attempt new conditional theorems with explicit hypotheses, for example: if the center column is eventually periodic with period p from time t₀, then column +1 is not eventually periodic and its subword complexity grows at least linearly; or, the periodic-diagonal region on the left (Wolfram's observation) cannot reach the center column before time f(p).",
+     "steps": [
+      "Define Rule 30 and the single-seed evolution on ℤ × ℕ; prove the light-cone and left-permutivity lemmas.",
+      "Prove the reconstruction and periodicity-propagation lemmas; derive Jen's two-column theorem.",
+      "Formulate and attempt the conditional single-column statements; record which hypotheses each needs.",
+      "Report as in the Thompson Lean reports, with axioms checked."
+     ],
+     "decisive_result": "A Lean module proving Jen's theorem (no two columns both eventually periodic) with only standard axioms, plus at least one new conditional theorem about the center column whose hypothesis is stated explicitly. A proof of non-periodicity itself would settle Prize problem 1.",
+     "failure_signature": "All conditional extensions reduce back to assuming information about a second column; the left-permutivity method then provably cannot reach a single column without new input.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "symbolic-dynamics"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Jen's theorem is tractable; a genuinely new single-column result needs a mathematical idea no one has yet found."
+    },
+    {
+     "id": "rule30-center-column--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Extend the column to 10^10–10^11 bits with a pre-registered density and period test",
+     "kind": "computation",
+     "method": "Extend the known prefix beyond the published billion bits and pre-register what the extension can and cannot show. Computing n center bits needs about n²/2 cell updates, but the light cone can be trimmed: cells at distance d from the center at time t only matter if d ≤ n − t. With bit-sliced 64-wide words on GPUs this gives roughly 10^19 to 10^20 word operations for n = 10^10, which is feasible on a modest cluster. Pre-register: (a) exclusion of every eventual period p ≤ n/3 with transient ≤ n/3, using a suffix-array or Z-function scan; (b) a density test, the running deviation D(n) = #1s − n/2 compared with the law-of-iterated-logarithm envelope √(2n log log n)/2 expected for an i.i.d. fair sequence, with pass and fail bands fixed in advance; (c) block-frequency and linear-complexity profiles (Berlekamp–Massey) at block lengths 1 to 20. The result is computational evidence, recorded as data_kind 'computational', not a proof.",
+     "steps": [
+      "Validate the simulator against the published billion-bit dataset (SHA-256 match).",
+      "Write result.json with hypotheses, bands and planned outputs before running beyond 10^9.",
+      "Run to n = 10^10 (stretch 10^11) with checkpointing; publish the prefix checksum and a fetch script, not the data.",
+      "Run the period-exclusion scan, the LIL density test and Berlekamp–Massey linear complexity; record verdicts."
+     ],
+     "decisive_result": "A certified statement that no eventual period with transient and period each ≤ n/3 exists in the first n = 10^10 bits, and density deviations inside or outside the pre-registered LIL band. A detected period would refute problem 1 outright.",
+     "failure_signature": "Compute or memory limits stop the run below 10^10, so it adds little beyond the published billion bits; or the trimming is shown to be wrong because the result disagrees with the reference prefix.",
+     "tools": [
+      "large-scale-computation",
+      "gpu",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "GPU time on the order of 10^4 GPU-hours for 10^10 bits; less if a better light-cone trimming is found."
+    },
+    {
+     "id": "rule30-center-column--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Restricted-model lower bounds: the column is not generated by small automata",
+     "kind": "mixed",
+     "method": "Attack weak forms of problems 1 and 3 that are provable. Problem 3 asks for a lower bound on the effort to compute bit n, and unrestricted lower bounds are out of reach, but lower bounds against restricted models are finite questions. (a) For each base k in {2, 3, 4} and state count s ≤ 12, prove that no deterministic finite automaton with output (DFAO) reading n in base k reproduces the first N center bits. Encode as SAT (variables for transition and output tables; constraints from each prefix bit) and extract unsatisfiability certificates, which are DRAT proofs checkable by a verified checker. (b) Use Walnut to test whether the prefix is consistent with low-complexity morphic generation. (c) Prove in Lean, from (a) and the definitions, the theorem 'the center column is not k-automatic with ≤ s states'. That theorem implies, for example, that no constant-memory streaming algorithm over base-k digits of n computes the column with that much memory.",
+     "steps": [
+      "Generate SAT instances for (k, s) pairs over a prefix of N = 10^6 bits (smaller if unsatisfiability is reached earlier).",
+      "Solve with a DRAT-producing solver; check proofs with a verified checker.",
+      "Formalize the DFAO definition in Lean and state the non-automaticity theorems; import the certificate check by kernel-verified decoding of the minimal refuting prefix.",
+      "Record the largest (k, s) reached and the shortest refuting prefix for each."
+     ],
+     "decisive_result": "Lean-checked theorems 'the Rule 30 center column is not generated by any base-k DFAO with at most s states' for stated (k, s). These are new and weak; their value is a precise, citable lower bound in a restricted model, and any satisfiable instance that extends to 10^9 bits would be a striking structural discovery.",
+     "failure_signature": "SAT instances become intractable at small s (for example s ≤ 6), giving results too weak to matter; or proofs need native_decide-level computation that Lean cannot do in kernel.",
+     "tools": [
+      "sat-solver",
+      "lean4",
+      "automata-theory",
+      "walnut"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "rule30-center-column--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "SAT-certified lower bounds on center-column periods",
+     "kind": "computation",
+     "method": "Encode the triangular Rule 30 light cone and the assertion that the center column is eventually p-periodic after preperiod q as SAT. Use incremental solving for all p up to a declared P and q up to Q, produce DRAT certificates for unsatisfiable cases, and verify certificates independently; formalize the reduction from a certificate to the excluded finite period claim.",
+     "steps": [
+      "Generate bit-blasted Rule 30 constraints with shared subformulas.",
+      "Exclude every pair p <= 100000 and q <= 100000 using incremental SAT and symmetry reductions.",
+      "Check all UNSAT certificates with an independent verifier.",
+      "Formalize the constraint semantics and certificate implication in Lean."
+     ],
+     "decisive_result": "A Lean-checked theorem excluding every eventual period and preperiod in the stated rectangle, exceeding previous certified bounds.",
+     "failure_signature": "A satisfying assignment reproduces from the single-cell seed and yields a genuine period; otherwise solver scaling before a novel bound defeats this approach.",
+     "tools": [
+      "sat-solving",
+      "large-scale-computation",
+      "lean4"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Finite lower bounds do not prove nonperiodicity."
+    },
+    {
+     "id": "rule30-center-column--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Algebraic dependency and entropy bounds",
+     "kind": "proof",
+     "method": "Exploit left-permutivity to express center bits as Boolean polynomials of boundary variables, then seek a lemma that any eventual center period imposes repeated polynomial identities of increasing degree. Compute algebraic normal forms to identify a monotone leading monomial and formalize the resulting degree or influence lower bound.",
+     "steps": [
+      "Compute exact algebraic normal forms for center bits through n = 4096.",
+      "Conjecture and prove a recurrence for a distinguished monomial or discrete derivative.",
+      "Show an eventual period would force equality of incompatible derivatives.",
+      "Formalize the recurrence and contradiction in Lean."
+     ],
+     "decisive_result": "A Lean theorem proving non-eventual-periodicity, or a new theorem that center-bit algebraic degree or influence grows unboundedly.",
+     "failure_signature": "The proposed distinguished monomial cancels infinitely often or the derivative recurrence admits periodic center sequences, invalidating the invariant.",
+     "tools": [
+      "lean4",
+      "symbolic-computation",
+      "cellular-automaton-simulation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A currently unknown invariant connecting global left-permutivity to the single seeded center column."
+    },
+    {
+     "id": "rule30-center-column--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Certify a period lower bound past the published checks",
+     "kind": "mixed",
+     "method": "Prove the elementary step in Lean: the Rule 30 cell is left XOR (center OR right). Then certify a long center-column prefix by blocked replay. An external bit-packed simulator emits a row hash every K steps; Lean replays each block from the certified start row and checks the hash and the center bit. The theorem is that if the center column is periodic with period p, then p exceeds N, where N is the length of the certified prefix with no period. N must be strictly larger than the longest prefix the Rule 30 prize page reports as already computed on the day the run starts. Read that horizon from the prize page first and write it into the pre-registration. A certified prefix that does not beat the published horizon is not a result under the acceptance criteria.",
+     "steps": [
+      "Record the computational horizon stated on the prize page before running.",
+      "Prove the Rule 30 step function in Lean.",
+      "Emit block hashes from a bit-packed simulator for a prefix longer than that horizon.",
+      "Check every block in Lean.",
+      "Prove that absence of a repeat in the certified prefix rules out every period at most N."
+     ],
+     "decisive_result": "A no-sorry theorem that any period of the center column exceeds the published computational horizon recorded at the start of the run.",
+     "failure_signature": "A repeat is found, which refutes non-periodicity if it is a true period, or the certified N does not exceed the published horizon, in which case the approach has not met its own bar.",
+     "tools": [
+      "lean4",
+      "large-scale-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Lean kernel time. If the published horizon is far beyond what blocked replay can certify in a month, this approach cannot finish as stated."
+    },
+    {
+     "id": "rule30-center-column--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Prove density one half from left permutivity",
+     "kind": "proof",
+     "method": "The local rule f(l, c, r) = l XOR (c OR r) is left-permutive: for every fixed center and right, the two choices of the left neighbor give opposite outputs. Prove that permutivity, then the standard consequences that can be formalized: the global map on bi-infinite configurations is surjective, and the fair Bernoulli product measure is invariant. The prize question is not about almost every configuration. It is about the single orbit of the configuration with one black cell. The remaining lemma is equidistribution of that orbit's center cell: the visit frequency of black at the center tends to 1/2. State equidistribution as a separate theorem whose hypotheses, if any extra ergodicity assumption is used, are written explicitly. An extra assumption means the prize problem is not solved.",
+     "steps": [
+      "Prove left permutivity from the XOR-OR formula.",
+      "Prove surjectivity on bi-infinite configurations.",
+      "Prove invariance of the fair Bernoulli measure.",
+      "Attempt equidistribution of the single-seed center cell with no added assumption.",
+      "If an ergodicity hypothesis is required, stop and label the prize statement unproved."
+     ],
+     "decisive_result": "A no-sorry proof that the center-cell frequency along the single-seed orbit tends to 1/2, with no hypothesis beyond the rule and the initial cell.",
+     "failure_signature": "The measure lemmas go through but equidistribution of this orbit needs an assumption that is itself open. The approach has then failed on the prize statement even if the lemmas are worth keeping.",
+     "tools": [
+      "lean4",
+      "symbolic-dynamics"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A proof idea that upgrades invariance of Bernoulli measure to equidistribution of one explicit orbit. That is the open step."
+    },
+    {
+     "id": "rule30-center-column--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Show the center column is not 2-automatic",
+     "kind": "proof",
+     "method": "Attack the linear-effort prize by way of automatic sequences. A shortcut that computed the n-th center cell from the binary digits of n in o(n) time, uniformly, would make the sequence 2-automatic or at least would give a finite 2-kernel. Compute the 2-kernel of the center column: the subsequences u(2^k n + r) for residues r. Prove in Lean that the step function commutes with the kernel construction in the usual way for a cellular automaton. Then exhibit more distinct kernel sequences than any finite automaton of a given size can hold, using a certified prefix from the first approach as the witness for the small kernels, and a theorem that a new distinct subsequence appears at arbitrarily large scales. Refuting all linear recurrences over GF(2) up to a fixed order is a weaker lemma and should be stated separately; it does not by itself give an Ω(n) lower bound.",
+     "steps": [
+      "Define the 2-kernel of the center column.",
+      "Prove the Rule 30 step constrains kernel sequences.",
+      "Certify, from a checked prefix, that the kernel already has more than M distinct sequences.",
+      "Prove distinctness persists at arbitrary scale, or isolate the missing lemma.",
+      "Separately refute linear recurrences up to an order fixed by the certified prefix, and do not call that the prize theorem."
+     ],
+     "decisive_result": "A proof that the center column is not 2-automatic, together with a reduction showing that any uniform o(n) digit-based algorithm would imply automaticity. That is a form of the linear-effort lower bound, not yet a general Ω(n) time lower bound against all algorithms.",
+     "failure_signature": "The kernel collapses to a finite set, or a new distinct subsequence cannot be forced past the certified prefix. Recurrence-refutation alone is a failure to reach the prize statement.",
+     "tools": [
+      "lean4",
+      "large-scale-simulation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A general time lower bound against arbitrary algorithms is beyond a kernel argument. This approach only targets digit-based and automatic shortcuts."
+    }
+   ]
+  },
+  {
+   "id": "turing-capable-network-topologies",
+   "title": "Classify the network topologies that admit diffusion-driven instability",
+   "field": "both",
+   "tier": "A",
+   "question": "For reaction networks of n species with m diffusing, which interaction sign-patterns (topologies) admit a Turing instability for some parameters, and is it true that for n >= 3 almost all topologies with at least one feedback loop do?",
+   "known_state": "Turing (1952) settled n = 2 (activator-inhibitor or substrate-depletion sign patterns, with the inhibitor diffusing faster). Marcon et al. (2016) and Scholes et al. (2019) enumerated 2- and 3-node topologies numerically and found many that pattern without differential diffusivity, but there is no proof characterizing the Turing-capable set for general n, and the genericity conjecture is numerical only. turing-ddi has formal status partial in the repo.",
+   "acceptance_criteria": [
+    "A theorem, machine-checked in Lean 4 or at least rigorously proved, giving necessary and sufficient sign-pattern conditions for the existence of parameters producing a Turing instability for n = 3, and",
+    "An exhaustive, reproducible enumeration for n = 3 and n = 4 against which the theorem is checked."
+   ],
+   "falsifiers": [
+    "A 3-node topology that the enumeration finds Turing-capable but the theorem excludes, or vice versa."
+   ],
+   "required_capabilities": [
+    "linear-algebra",
+    "sign-pattern-matrices",
+    "enumeration",
+    "lean4"
+   ],
+   "data_access": "None needed; verification against published topology atlases (Marcon 2016, Scholes 2019) which are open access.",
+   "related_claims": [
+    {
+     "id": "turing-ddi",
+     "label": "Turing diffusion-driven instability",
+     "status": "partial",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "turing-wavelength",
+     "label": "Turing wavelength selection",
+     "status": "proved",
+     "proof": "literature",
+     "theorem": true,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "turing-morphogen-hypothesis",
+     "label": "Reaction-diffusion of morphogens accounts for biological pattern",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "turing-capable-network-topologies--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Sign-pattern theorem via additive D-stability and sign stability",
+     "kind": "proof",
+     "method": "Reformulate. With linearization J at a stable steady state and diagonal diffusion D ≥ 0, a Turing instability is J stable with J − k²D unstable for some k > 0. Absorbing k² into D, the pattern P is Turing-capable (all species may diffuse) iff some realization J of P is stable but not additively D-stable, that is, J − D is unstable for some nonnegative diagonal D (Cross 1978). Lemma A: sign-stable patterns, characterized combinatorially by Quirk–Ruppert and Jeffries–Klee–van den Driessche (nonpositive diagonal, no positive 2-cycles, no cycles of length ≥ 3, nonzero determinant, a colour test), stay sign-stable when negative diagonal is added, hence are Turing-incapable. Conjecture B for n = 3: P is Turing-capable iff P is potentially stable and not sign-stable. Prove B by case analysis over which Jeffries condition fails (a 3-cycle, a positive self-loop, a mutualistic 2-cycle, or the colour test). For each case give an explicit parametric family (J(ε), D) that is stable, satisfying the 3×3 Routh–Hurwitz conditions a₁ > 0, a₃ > 0, a₁a₂ > a₃, with det(J − D) of the wrong sign or Routh–Hurwitz violated for J − D. For m < n diffusing species, D is supported on the diffusing set S, and the analogous criterion involves principal submatrices of J off S (Satnoianu et al. 2000).",
+     "steps": [
+      "Prove in Lean: for 3×3 real matrices, define stability by the Routh–Hurwitz inequalities on the characteristic polynomial coefficients, and prove that the Turing condition is equivalent to 'not additively D-stable'.",
+      "Prove Lemma A (sign-stable implies Turing-incapable) from the Jeffries conditions.",
+      "For each failure mode of sign stability, construct witness families and prove the inequalities with nlinarith or polyrith.",
+      "Extend to restricted diffusion sets S ⊂ {1,2,3} and state the theorem for each m.",
+      "Check the theorem against approach 2's enumeration (any disagreement is a counterexample to B)."
+     ],
+     "decisive_result": "A Lean-checked theorem: for n = 3 and each diffusing set S, the Turing-capable sign patterns are exactly those satisfying an explicit combinatorial condition (conjecturally 'potentially stable and not S-restricted sign-stable'), with zero disagreements against the exhaustive enumeration.",
+     "failure_signature": "The enumeration finds a potentially stable, non-sign-stable pattern that is Turing-incapable (every stable realization is additively D-stable without being sign-stable), so Conjecture B is false and the characterization needs a finer invariant.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "sign-pattern-matrices",
+      "linear-algebra"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Mathlib lacks a ready Routh–Hurwitz theorem connecting coefficient inequalities to root location; for n = 3 it must be proved, or stability defined by the coefficient conditions with that equivalence proved separately."
+    },
+    {
+     "id": "turing-capable-network-topologies--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Exact exhaustive enumeration for n = 3 and n = 4 with certificates",
+     "kind": "computation",
+     "method": "Decide Turing-capability for every sign pattern exactly, not by sampling. For n = 3 there are 3^9 = 19,683 patterns, about 3,400 up to relabelling. For each pattern and diffusing set S, the question ∃J consistent with P, ∃D ≥ 0 supported on S, ∃k: J stable and J − k²D unstable is a sentence in the existential theory of the reals, decidable by cylindrical algebraic decomposition or nlsat. Pipeline: (1) random-search for a numerical witness (log-uniform entries, D spanning six orders of magnitude); (2) if found, rationalize and verify exactly (rational arithmetic, Routh–Hurwitz), and emit the witness as a Lean `norm_num` lemma; (3) otherwise run Redlog CAD or z3 nlsat on the exact sentence and keep the 'unsat' result, or prove incapability from sign stability (approach 1, Lemma A). For n = 4, 3^16 ≈ 4.3 × 10^7 patterns, about 1.8 × 10^6 up to relabelling. Numerical witnesses should settle most capable patterns; the unresolved remainder goes to nlsat with a time cap, and capped cases are reported as open. Compare with the Marcon et al. 2016 and Scholes et al. 2019 atlases pattern by pattern.",
+     "steps": [
+      "Canonicalize patterns under node relabelling (respecting S) and generate the work list.",
+      "Run witness search with exact rational verification; export capable witnesses as Lean lemmas.",
+      "Run CAD or nlsat on unresolved patterns; record certificates or timeouts.",
+      "Cross-check with the published atlases; publish the classification table with SHA-256 and reproduction scripts."
+     ],
+     "decisive_result": "A complete n = 3 table (every pattern × S labelled capable with an exact rational witness, or incapable with a CAD/nlsat certificate or sign-stability proof), and an n = 4 table with the fraction left undecided stated. Any capable pattern that a published atlas lists as non-Turing, or the reverse, is reported.",
+     "failure_signature": "CAD or nlsat times out on a substantial set of n = 3 patterns, so incapability cannot be certified and the table is incomplete even at n = 3.",
+     "tools": [
+      "enumeration",
+      "computer-algebra",
+      "smt-solver",
+      "lean4"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "turing-capable-network-topologies--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Genericity for n ≥ 3 via counting non-sign-stable patterns and a 3-node embedding lemma",
+     "kind": "proof",
+     "method": "Prove the genericity conjecture without first characterizing every n. Embedding lemma: if a principal subpattern on 3 nodes is Turing-capable (with a stable realization), and the remaining nodes have negative self-loops, then the full pattern is Turing-capable. Proof sketch: realize the 3-node block with a witness, give other nodes strong self-damping −M, and scale off-block couplings by ε. For small ε and large M, the eigenvalues of J and of J − k²D are perturbations of the block eigenvalues plus values near −M, so stability and the instability persist by continuity of eigenvalues (Gershgorin plus a Rouché-type argument). Counting lemma: among n-node patterns with all diagonal entries negative, the fraction with no 3-node principal subpattern from the n = 3 capable list tends to 0 as n → ∞. This holds because the n = 3 list is nonempty and the C(n,3) triples are only weakly dependent, so a second-moment (Janson) bound applies. Together these give: almost all n-node patterns with negative self-loops are Turing-capable. Weaker hypotheses on the diagonal (for example, at least one self-loop) need a refined embedding.",
+     "steps": [
+      "State and prove the embedding lemma (eigenvalue continuity under block-diagonal dominance) in Lean, or rigorously on paper if Mathlib's spectral continuity is insufficient.",
+      "Take the n = 3 capable list from approach 2 and prove the counting lemma via Janson's inequality.",
+      "Combine into the genericity theorem; state precisely the class of patterns (diagonal sign assumptions) it covers.",
+      "Check numerically against approach 2's n = 4 table: predicted capable fraction versus measured."
+     ],
+     "decisive_result": "A theorem: the fraction of n-node sign patterns (in the stated class) that are Turing-capable tends to 1 as n → ∞, with an explicit rate, checked against the n = 4 enumeration.",
+     "failure_signature": "The embedding lemma fails because coupling to the other nodes destroys stability or instability in ways small ε cannot control for some sign configurations, or the n = 4 enumeration shows a capable fraction inconsistent with the bound.",
+     "tools": [
+      "proof",
+      "lean4",
+      "combinatorics",
+      "enumeration"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Eigenvalue-perturbation results in Mathlib are thin; the Lean version may need to be replaced by a rigorous paper proof."
+    },
+    {
+     "id": "turing-capable-network-topologies--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Quantifier-eliminate all three-node sign patterns",
+     "kind": "mixed",
+     "method": "Represent a three-species Jacobian with prescribed zero/sign entries and diagonal diffusion with one to three positive diffusivities. Turing capability is an existential semialgebraic formula: stability at wave number zero plus instability for some q > 0. Use cylindrical algebraic decomposition per sign pattern, then translate compact certificates into determinant, trace and Routh-Hurwitz lemmas checked in Lean.",
+     "steps": [
+      "Canonicalize all 3-node signed directed graphs under permutation and global rescaling.",
+      "Write exact Routh-Hurwitz and diffusion-shift inequalities.",
+      "Run exact quantifier elimination and extract parameter witnesses or infeasibility certificates.",
+      "Prove the classification theorem and check every graph against numerical witnesses."
+     ],
+     "decisive_result": "Necessary and sufficient conditions for every canonical 3-node sign pattern, with exact rational witnesses for capable classes and checked algebraic contradictions for incapable classes.",
+     "failure_signature": "Quantifier elimination cannot finish after decomposition, or numerical capability disagrees with an exact certificate, exposing an encoding error.",
+     "tools": [
+      "symbolic-computation",
+      "enumeration",
+      "lean4",
+      "linear-algebra"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Efficient proof-certificate translation from quantifier elimination into Lean."
+    },
+    {
+     "id": "turing-capable-network-topologies--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Asymptotic capability fraction for random sign graphs",
+     "kind": "computation",
+     "method": "Define an explicit random topology ensemble with independent directed edges, signs and m diffusers. For n = 3 through 8, estimate existence of Turing parameters by global optimization followed by interval verification, stratified by feedback-cycle signatures. Fit finite-size scaling and seek constructive sufficient conditions based on an embedded capable motif plus weak couplings.",
+     "steps": [
+      "Pre-register graph ensemble, parameter box and interval verification criterion.",
+      "Enumerate n <= 5 exactly and sample at least 100000 graphs for each larger n and m.",
+      "Verify candidate instabilities with interval eigenvalue bounds.",
+      "Prove an embedding lemma that preserves instability under sufficiently small added couplings."
+     ],
+     "decisive_result": "A verified lower bound on the capable fraction with 99% binomial intervals and a theorem showing a stated motif family remains capable for all n.",
+     "failure_signature": "Capability fraction remains bounded away from one after conditioning on feedback, or supposed motif extensions lose instability under every admissible coupling.",
+     "tools": [
+      "large-scale-computation",
+      "interval-arithmetic",
+      "lean4"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Sampling cannot by itself settle the almost-all conjecture."
+    },
+    {
+     "id": "turing-capable-network-topologies--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Formalize equal-diffusion impossibility and the n=2 list",
+     "kind": "formalization",
+     "method": "Two theorems, both classical, both absent as checked lemmas. First, for every dimension n, if the diffusion matrix is a scalar multiple of the identity, every eigenvalue of J minus q squared D is an eigenvalue of J shifted by a non-positive real, so Hurwitz stability of J implies stability at every wave number. Equal diffusion cannot create a Turing instability. This does not contradict Marcon et al., who found patterning by mechanisms other than that linear instability; the theorem's statement must say diffusion-driven linear instability, not patterning. Second, for n = 2, derive the necessary and sufficient sign patterns: the inhibitor diffuses faster, and the Jacobian signs are the activator-inhibitor pattern or the substrate-depletion pattern. Use the Routh–Hurwitz criteria on the quadratic characteristic polynomial. Hypotheses are the signs and which species diffuse.",
+     "steps": [
+      "Define the Jacobian, the diagonal diffusion matrix and the dispersion relation.",
+      "Prove the equal-diffusion theorem for general n.",
+      "Specialize to n = 2 and compute the Hurwitz inequalities.",
+      "Case-split the sign patterns and prove the two classical patterns are exactly the Turing-capable ones.",
+      "Audit axioms."
+     ],
+     "decisive_result": "No-sorry theorems: equal diffusivities forbid a Turing instability in every dimension, and for two species the Turing-capable sign patterns are exactly the two classical ones.",
+     "failure_signature": "A concrete 2-by-2 sign pattern outside those two classes, with numerical rates, that is stable without diffusion and unstable at some wave number. That would falsify the classification.",
+     "tools": [
+      "lean4",
+      "linear-algebra"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "turing-capable-network-topologies--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Exact n=3 sign-pattern census by interval bounds",
+     "kind": "computation",
+     "method": "Enumerate all 3^9 = 19683 sign patterns in {-1, 0, +1}^{3×3}. Quotient by simultaneous permutation of the three species only after the raw census, so the quotient cannot hide a disagreement. A pattern is Turing-capable if there exist positive rate magnitudes and a non-negative diffusion vector, not a scalar multiple of the identity, such that J is Hurwitz and J minus q squared D is not Hurwitz for some q > 0. Hurwitz for 3×3 is the three Routh–Hurwitz inequalities on the characteristic polynomial. Search by log-uniform samples of the nonzero magnitudes in [10^{-2}, 10^{2}], 200 draws per pattern, and a log grid of q. Every pattern not decided by a sample goes to interval branch-and-bound on the log-magnitudes. Capable means a concrete witness box. Incapable means the parameter domain is covered by boxes that violate the conditions. A pattern still unresolved below a minimum box width is a failure of the census, not a silent negative. Compare witnesses with the Turing-instability labels in Marcon et al. 2016 and Scholes et al. 2019, not with their broader patterning labels.",
+     "steps": [
+      "Enumerate the 19683 sign patterns and the diffusion supports.",
+      "Apply the Routh–Hurwitz test to samples and to the q grid.",
+      "Branch-and-bound every undecided pattern with interval arithmetic.",
+      "Emit a witness or a covering certificate for each pattern.",
+      "Match the capable set against the Turing labels in the two atlases and list every disagreement."
+     ],
+     "decisive_result": "A complete partition of the 19683 patterns into capable and incapable, with a witness or a covering certificate for each, and an empty disagreement list against the published Turing labels or an explicit list of disagreements.",
+     "failure_signature": "More than 1 percent of patterns remain unresolved, or a published Turing-capable network is certified incapable, or the converse. Either is a failed census or a failed atlas entry, and the approach must say which.",
+     "tools": [
+      "enumeration",
+      "sign-pattern-matrices",
+      "linear-algebra"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "turing-capable-network-topologies--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Monte Carlo the n=4 genericity conjecture",
+     "kind": "computation",
+     "method": "The genericity claim is that for n at least 3, almost all topologies with a feedback loop are Turing-capable. For n = 4 an exact census of 3^16 patterns is not the target. Draw 2000 sign patterns uniformly among those whose interaction digraph contains at least one directed cycle, assign diffusion to a non-empty random subset of species, and test 100 log-uniform rate draws with the same Routh–Hurwitz and wave-number sweep as the n = 3 census. Estimate the capable fraction and a Clopper–Pearson 95 percent interval. Almost-all is pre-registered as a fraction above 0.9. A cycle is required in the sample by construction, so the estimate is conditional on that event. This sample can refute the conjecture and cannot prove it.",
+     "steps": [
+      "Sample 2000 four-species sign patterns conditioned on having a directed cycle.",
+      "Sample diffusion supports that are not scalar.",
+      "Test 100 rate draws per pattern with the Hurwitz criteria.",
+      "Compute the capable fraction and the Clopper–Pearson interval.",
+      "Declare the conjecture refuted for n = 4 if the interval lies below 0.9, and unrefuted otherwise."
+     ],
+     "decisive_result": "A Clopper–Pearson 95 percent interval for the Turing-capable fraction among 4-node cyclic sign patterns. The conjecture is refuted for this n if the interval lies entirely below 0.9.",
+     "failure_signature": "The interval covers both sides of 0.9, so the sample does not decide the conjecture. That is a failed test, not evidence for the conjecture. Patterns found capable only because diffusion was accidentally scalar are a bug, not a result.",
+     "tools": [
+      "enumeration",
+      "sign-pattern-matrices"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "hamiltons-rule-exact-scope",
+   "title": "The exact scope of Hamilton's rule",
+   "field": "both",
+   "tier": "A",
+   "question": "Under precisely which population-genetic models is Hamilton's rule rb > c (i) a theorem with predictive content, (ii) an identity with no content beyond the Price equation, and (iii) false?",
+   "known_state": "Nowak, Tarnita and Wilson (2010) argued the rule is almost never a theorem and when general is tautological; Gardner, West and Wild (2011) replied that the regression form is exact and general. Birch and Okasha (2015) separate the readings. The dispute is partly about theorem statements, which makes it formalizable; no formalization exists. The repo records hamilton-rule as proved in the regression form and hamilton-haplodiploidy as refuted.",
+   "acceptance_criteria": [
+    "A Lean 4 development stating the general regression form, the additive-fitness form and a frequency-dependent counterexample as separate theorems, each proved or refuted, with the model assumptions as explicit hypotheses.",
+    "A short statement of which disputed claims in the 2010-2011 exchange correspond to which formal theorem."
+   ],
+   "falsifiers": [
+    "A formal model in which the regression form fails to predict the direction of allele-frequency change would refute Gardner et al.'s generality claim."
+   ],
+   "required_capabilities": [
+    "lean4",
+    "population-genetics",
+    "price-equation"
+   ],
+   "data_access": "None needed for the formal part; empirical follow-up can use pedigreed cooperative-breeder datasets.",
+   "related_claims": [
+    {
+     "id": "hamilton-rule",
+     "label": "Hamilton's rule",
+     "status": "proved",
+     "proof": "literature",
+     "theorem": true,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "hamilton-haplodiploidy",
+     "label": "Haplodiploidy hypothesis for eusociality",
+     "status": "refuted",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "hamilton-lmc",
+     "label": "Local mate competition sex ratio",
+     "status": "proved",
+     "proof": "literature",
+     "theorem": true,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "hamiltons-rule-exact-scope--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean: Price equation and the regression Hamilton's rule as an exact finite identity",
+     "kind": "formalization",
+     "method": "Formalize the finite-population statements both sides of the 2010–2011 dispute rely on. Population: a Finset of individuals with breeding value g_i, social partners' breeding value g'_i and fitness w_i (real, mean w̄ > 0). Theorem 1 (Price, no transmission bias): w̄ Δḡ = Cov(w, g). Theorem 2 (least-squares decomposition): with c := −β_{wg·g'} and b := β_{wg'·g} the partial regression coefficients from the 2×2 normal equations (assuming the regressors' covariance matrix is nonsingular), Cov(w, g) = Var(g)(r b − c) with r := Cov(g', g)/Var(g). Corollary (regression HR): if Var(g) > 0, then Δḡ > 0 ⇔ r b > c. Theorem 3 (content condition): if fitness is exactly additive, w_i = α − c₀ g_i + b₀ g'_i, then the regression b, c equal b₀, c₀ in every population state, so the rule predicts change from parameters fixed in advance. Theorem 4: if fitness has an interaction term d g_i g'_i, the regression b and c depend on the population state, so b and c measured in one generation do not predict the next. These separate reading (ii), an identity, from reading (i), a theorem with content.",
+     "steps": [
+      "Define finite-population mean, covariance and partial regression coefficients over Finset sums in Lean.",
+      "Prove Theorems 1 and 2 and the corollary with field_simp, ring and positivity.",
+      "Prove Theorem 3 (parameter recovery under additivity) and Theorem 4 (state dependence under synergy), giving explicit rational states for the latter.",
+      "Write the mapping document: each disputed sentence from Nowak et al. 2010, Gardner et al. 2011 and Birch and Okasha 2015 assigned to Theorems 1–4 or to approach 2's counterexamples."
+     ],
+     "decisive_result": "A Lean module with Theorems 1–4 compiled with only standard axioms, and a mapping table assigning each disputed claim to a formal statement. This settles which claims are identities and which have content under which hypotheses.",
+     "failure_signature": "None expected for Theorems 1–3, which are classical. The approach fails as a resolution if the mapping shows the disputants mean incompatible definitions of 'Hamilton's rule' that no single formal statement captures; the mapping would then document the equivocation instead.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "population-genetics",
+      "price-equation"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Formal counterexamples: synergistic games where parameter-based rb > c mispredicts",
+     "kind": "proof",
+     "method": "Settle reading (iii), when the rule is false, by explicit, Lean-checked counterexamples in standard population-genetic models. Model: a two-player game with payoffs to a focal individual: cooperate against cooperate R = b − c + d, cooperate against defect −c, defect against cooperate b, defect against defect 0. Here d is the synergy term, and assortment is given by relatedness r through the probability that partners share type. Under weak selection, with linear fitness and the probability of a cooperator partner given focal type p_C = r + (1 − r)p, the expected change in cooperator frequency has sign (r b − c) + d·φ(r, p), with φ an explicit polynomial. Choose rational (b, c, d, r, p) with r b > c but Δp < 0, and the reverse, and prove both in Lean by norm_num. Also prove the general form, the generalized Hamilton's rule with the synergy correction (Queller's form), as a theorem, so the counterexample marks where the simple rule's scope ends. Second family: a frequency-dependent threshold game where the sign of Δp flips with p at fixed (b, c, r), showing that no fixed parameter pair predicts the direction everywhere.",
+     "steps": [
+      "Define the game, assortment and expected allele-frequency change in Lean.",
+      "Derive the closed form for Δp and prove the synergy-corrected rule.",
+      "Prove two explicit counterexample instances and the frequency-flip instance with norm_num.",
+      "Add these as the (iii) entries of the approach-1 mapping table."
+     ],
+     "decisive_result": "Lean theorems exhibiting model states in which the parameter-based rule r b > c and the actual direction of selection disagree, alongside a theorem stating the corrected rule. This is the formal refutation the problem's falsifier asks about for the parameter reading, while approach 1 shows the regression reading is never refuted.",
+     "failure_signature": "None for the mathematics. The approach fails as a contribution if reviewers judge the model class non-standard; mitigate by using the exact models of van Veelen et al. 2017 and Lehmann and Keller 2006.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "evolutionary-game-theory"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Computational phase map of when parameter-based Hamilton's rule predicts selection",
+     "kind": "computation",
+     "method": "Map the boundary between readings (i) and (iii) across model space, not just at isolated counterexamples. Model classes: Wright–Fisher island model (n demes ∈ {2, 5, 20}, migration m ∈ [0.001, 0.5]); Moran process on cycles, regular graphs (degree 3–10) and random graphs with N ∈ {20, 50, 200}; two-player games with synergy d ∈ [−b, b]; and multiplicative versus additive fitness, at selection strengths δ from 10^-4 to 1. In each cell compute exactly (small N, linear algebra on the Markov chain) or by simulation with 10^6 replicates (larger N) the fixation probability of a single cooperator relative to neutral 1/N. Compare three predictors: parameter HR with model b, c and pedigree or identity-by-descent r; the weak-selection inclusive-fitness condition (Taylor–Frank); and regression HR, which holds by approach 1. Output the fraction of model space where parameter HR gives the right sign, as a function of δ and d.",
+     "steps": [
+      "Implement exact Markov-chain fixation for small graphs and validated Monte Carlo for larger ones.",
+      "Pre-register the predictors and the agreement metric (sign agreement and, where nonzero, rank correlation of effect sizes).",
+      "Sweep the grid; publish the phase maps with code and seeds.",
+      "Identify the analytic boundary (for example agreement whenever d = 0 and δ → 0) and feed it back to approach 1 as a theorem to prove."
+     ],
+     "decisive_result": "Phase maps showing, for each model class, the region where parameter-based r b > c correctly predicts the direction of selection. The pre-stated expectation is 100% agreement at d = 0, δ → 0, with measured degradation as |d| and δ grow; a region of disagreement at d = 0 under weak selection would itself be notable.",
+     "failure_signature": "Monte Carlo noise at small fixation-probability differences makes signs undecidable in large parts of the grid (Wilson intervals overlapping 1/N), so the map is mostly 'unresolved'.",
+     "tools": [
+      "large-scale-computation",
+      "markov-chains",
+      "population-genetics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Lean taxonomy of Hamilton-rule statements",
+     "kind": "formalization",
+     "method": "Formalize finite populations as weighted probability spaces and allele-frequency change as a covariance identity. Separate three statements: the Price-equation regression identity, an additive causal fitness theorem with exogenous coefficients, and a frequency-dependent predictive rule. Prove the first two under explicit hypotheses and encode a minimal counterexample to the third.",
+     "steps": [
+      "Define reproductive value, fitness, genotype and social-partner genotype on a finite probability space.",
+      "Prove the Price covariance identity and least-squares decomposition including zero-variance cases.",
+      "Derive rb > c iff positive allele-frequency change under additive linear fitness and transmission assumptions.",
+      "Exhaustively search two- and three-player games for a rational frequency-dependent counterexample and check it in Lean."
+     ],
+     "decisive_result": "A no-sorry Lean module whose theorem boundaries exactly identify when rb > c is an identity, a predictive theorem, or false, including a checked finite countermodel.",
+     "failure_signature": "The proposed countermodel disappears when relatedness and costs are defined consistently, or the predictive theorem needs assumptions equivalent to its conclusion.",
+     "tools": [
+      "lean4",
+      "population-genetics",
+      "finite-enumeration"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Exhaustive finite-population boundary map",
+     "kind": "computation",
+     "method": "Enumerate finite haploid models with population size 2 through 8, binary action, mutation, assortment and all rational payoff tables on a coarse grid. Compute exact one-generation allele change, regression r, b and c, and causal intervention effects. Classify disagreements among identity, additive and causal readings and mine minimal assumption sets with decision trees.",
+     "steps": [
+      "Predefine each Hamilton-rule estimator and degeneracy handling.",
+      "Enumerate transition kernels using exact rational arithmetic.",
+      "Record minimal models where each reading predicts the wrong sign.",
+      "Generalize recurring boundaries into conjectured lemmas for Lean."
+     ],
+     "decisive_result": "A complete exact atlas for the declared model class, with minimal counterexamples and zero unexplained disagreements between implementation and formal definitions.",
+     "failure_signature": "Classification depends primarily on arbitrary regression conventions rather than model structure, preventing a stable scope taxonomy.",
+     "tools": [
+      "large-scale-computation",
+      "population-genetics",
+      "lean4"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Three Lean theorems for the three readings of rb > c",
+     "kind": "formalization",
+     "method": "Formalize the Birch–Okasha separation as three theorems with disjoint hypotheses. Price's identity first: the change in mean breeding value equals the covariance of fitness and breeding value divided by mean fitness, plus the expected fitness-weighted transmission term. Under fair meiosis the transmission term is zero, so the sign of allele-frequency change is the sign of that covariance. Regression form: define r as the least-squares regression of partner genotype on actor genotype, and b, c as the partial regressions of fitness on partner and actor genotype. Prove that r b - c equals the covariance ratio by the normal equations, so the regression form predicts the sign of frequency change whenever the transmission term vanishes. This is an identity, and the theorem should say so. Additive form: fitness is exactly 1 - c x + b y with b, c constant and y the partner phenotype. Prove the same sign prediction with genealogical relatedness in place of the regression. Counterexample theorem: with fitness 1 - c x + b x y, b and c frozen at one frequency do not preserve the sign at another frequency. State the 2010–2011 correspondence in the module docstring: Nowak, Tarnita and Wilson attack dynamic sufficiency of inclusive-fitness maximization; Gardner, West and Wild defend the regression identity; those are different theorems.",
+     "steps": [
+      "Prove Price's identity and the fair-meiosis corollary.",
+      "Prove the regression form from the normal equations, labeled as an identity.",
+      "Prove the additive constant-b, constant-c form with genealogical relatedness.",
+      "Prove a frequency-dependent counterexample to the frozen additive predictor.",
+      "Map each theorem onto the 2010 and 2011 claims in the module documentation."
+     ],
+     "decisive_result": "Three no-sorry theorems with explicit hypotheses, plus a short map from those theorems onto the 2010–2011 dispute.",
+     "failure_signature": "A model inside the regression theorem's hypotheses where the regression form has the wrong sign of allele-frequency change. That would refute the identity and the formalization together.",
+     "tools": [
+      "lean4",
+      "population-genetics",
+      "price-equation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Exact Moran chain where frozen rb > c has the wrong sign",
+     "kind": "computation",
+     "method": "Give a finite witness that does not rely on Monte Carlo error. Population of N = 6 haploid individuals, reproduction a Moran birth-death update, interaction in three fixed pairs so genealogical relatedness inside a pair is 1 and between pairs is 0. Phenotype x in {0,1}. Fitness w = 1 - c x + b x y with b = 5 and c = 1, where y is the partner phenotype. The state is the integer count of cooperators, 0 through 6, and the chain is written in closed form. The additive predictor freezes b and c at frequency 1/2 by an ordinary least-squares regression on the exact stationary-conditional fitnesses at states with three cooperators, then is applied at every other state. The regression predictor is refit at each state. Compare signs with the exact expected frequency change. Pre-register success as: the refit regression matches the sign of expected change at every non-absorbing state where the absolute expected change exceeds 0, and the frozen predictor disagrees at least at one endpoint state.",
+     "steps": [
+      "Write the 7-state Moran transition matrix for the paired population and the synergistic payoff.",
+      "Compute exact expected frequency change at each state.",
+      "Fit the frozen additive regression at the three-cooperator states.",
+      "Refit the regression at every state.",
+      "Compare signs and emit the disagreement table."
+     ],
+     "decisive_result": "An exact table, with rational arithmetic, where the refit regression matches every nonzero expected frequency change and the additive coefficients frozen at frequency 1/2 disagree in sign at least once.",
+     "failure_signature": "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees. The second outcome would contradict the regression identity and fail the formalization too.",
+     "tools": [
+      "population-genetics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "hamiltons-rule-exact-scope--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Separate the regression identity from ESS maximization",
+     "kind": "computation",
+     "method": "Nowak, Tarnita and Wilson's target is dynamic sufficiency of inclusive-fitness maximization, not the regression identity. Use the same Moran chain as the sign witness. Compute its exact stationary distribution by solving the linear balance equations on the transient states with mutation probability u = 0.01 each birth, so the chain is irreducible. Define the inclusive-fitness ESS as the strategy that maximizes r b_marg - c with genealogical r from the pair structure and b_marg the marginal benefit at that frequency. Pre-register the comparison: the stationary mean frequency is not within 0.05 of the ESS frequency, while the one-step regression identity still holds at every state. That package shows an identity with predictive content for one-step change and no content for the long-run optimum. It fails differently from the sign witness, which never looks at the stationary distribution.",
+     "steps": [
+      "Add mutation u = 0.01 and solve the stationary distribution exactly.",
+      "Compute the inclusive-fitness ESS frequency from the marginal benefit.",
+      "Check the one-step regression identity at each state.",
+      "Compare stationary mean frequency to the ESS with tolerance 0.05.",
+      "Report the pair of outcomes as the scope statement for this model."
+     ],
+     "decisive_result": "Exact stationary mean at least 0.05 away from the inclusive-fitness ESS, together with the regression identity holding at every state of the same chain.",
+     "failure_signature": "The stationary mean sits within 0.05 of the ESS. This model then does not witness the gap Nowak et al. claim, and another payoff would be a new approach rather than a rescue of this one.",
+     "tools": [
+      "population-genetics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "phyllotaxis-attractor-classification",
+   "title": "Rigorous classification of attractors in dynamical phyllotaxis",
+   "field": "both",
+   "tier": "A",
+   "question": "In the Douady-Couder class of models (new primordium placed at the point of least repulsion from existing ones on a growing cylinder or disc), what is the complete set of attractors and their basins as the growth parameter varies, and does the golden-angle Fibonacci branch have full-measure basin for small growth parameter?",
+   "known_state": "Douady and Couder (1992) showed numerically and experimentally that the Fibonacci branch is selected; Levitov (1991) explained the energetics; Atela, Golé and Hotton (2002) proved convergence to Fibonacci lattices for a cylindrical model under restrictions. Pennybacker, Shipman and Newell (2015) review the gap: no rigorous classification covering Lucas and bijugate branches, basin boundaries, or the disc geometry. Thompson's phyllotaxis claims (ch14) sit on this.",
+   "acceptance_criteria": [
+    "A theorem characterizing the attractors for the cylindrical Douady-Couder map over a stated parameter range, including the Lucas branch, with proof (Lean 4 or rigorous computer-assisted interval proof).",
+    "Numerical basin maps matching the theorem."
+   ],
+   "falsifiers": [
+    "Numerical discovery of an attractor outside the classified set."
+   ],
+   "required_capabilities": [
+    "dynamical-systems",
+    "interval-arithmetic",
+    "lean4",
+    "simulation"
+   ],
+   "data_access": "None needed; sunflower and cone parastichy counts in the repo (thompson1917-ch14-05/06 tests) can check predictions.",
+   "related_claims": [
+    {
+     "id": "thompson1917-ch14-01",
+     "label": "Spirals of sunflower, thistle and cone are deformations of helices on a stem",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "thompson1917-ch14-05",
+     "label": "Parastichy numbers change when the structure varies greatly in size",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.9,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch14-05/result.json"
+     }
+    },
+    {
+     "id": "thompson1917-ch14-06",
+     "label": "Right- and left-handed parastichy directions occur about equally often",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.85,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch14-06/result.json"
+     }
+    },
+    {
+     "id": "thompson1917-ch14-09",
+     "label": "Which parastichies are conspicuous depends on leaf proportions, not on divergence",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "thompson1917-ch14-02",
+     "label": "Sunflower spirals intersect isogonally, rarely orthogonally",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "phyllotaxis-attractor-classification--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Computer-assisted proof of attractors via interval Newton and Conley–Morse graphs",
+     "kind": "proof",
+     "method": "Use the Atela–Golé–Hotton reduction: in the cylindrical hard-disk version of the Douady–Couder model (each new primordium at the lowest available position at distance ≥ D from existing ones on a cylinder of circumference 1), the dynamics reduce to a finite-dimensional map on 'fronts', the chains of most recent primordia. Rhombic lattices (Fibonacci, Lucas, bijugate and other parastichy pairs) are fixed points of this map up to translation. For the smooth-repulsion version (energy Σ exp(−|x − x_j|/λ) or a power law), the step map is piecewise smooth. Plan: (a) for each candidate branch (m, n), enclose the fixed point over parameter boxes in D (or Γ) with the interval Newton or Krawczyk operator in Arb/FLINT or CAPD, and enclose the Jacobian spectrum inside the unit disk to certify local attraction; (b) for global classification, build a Conley–Morse graph over a box grid of the reduced state space for each parameter box (the Arai et al. 2009 database method), certifying that every recurrent set is one of the enclosed fixed points; (c) the Lucas and bijugate branches enter as additional Morse sets with their own parameter ranges.",
+     "steps": [
+      "Implement the front map exactly (hard-disk model) and the smooth-repulsion map; reproduce Douady–Couder bifurcation diagrams numerically.",
+      "Certify fixed points and stability with interval Newton or Krawczyk across D ∈ [D_min, 0.5] in boxes, adaptively refined.",
+      "Compute Conley–Morse graphs per parameter box; check that the Morse sets match the certified fixed points.",
+      "Publish the certified bifurcation diagram and code; describe precisely the parameter range covered."
+     ],
+     "decisive_result": "A computer-assisted theorem: for all D in a stated range, the only attractors of the cylindrical front map are the certified lattice fixed points, which include the Fibonacci and Lucas branches with explicit ranges, and every other initial front converges to one of them. Basin boundaries are bounded by the Morse decomposition.",
+     "failure_signature": "Conley–Morse graphs at feasible resolutions contain Morse sets that are not single fixed points (unresolved recurrent sets) in significant parameter ranges, or the discontinuities of the hard-disk map break the interval Newton enclosures near bifurcations.",
+     "tools": [
+      "interval-arithmetic",
+      "dynamical-systems",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "The disc geometry (non-cylindrical, radially varying spacing) is out of scope for this reduction; the result would cover only the cylinder."
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean: lattice parastichy theorems from continued fractions",
+     "kind": "formalization",
+     "method": "Formalize the static half of the theory, which every dynamical claim refers to and which is classical. For the lattice of points (kα mod 1, k·h), k ∈ ℤ, on a cylinder, with divergence α and rise h, prove: (a) the visible opposed parastichy pairs, the two shortest lattice vectors forming a basis and pointing in opposite directions, have numbers (q_j, q_{j+1}) given by consecutive denominators of convergents or intermediate fractions of α; (b) as h decreases, the visible pair changes exactly at the h-values where three vectors have equal length (triangular lattice points), and the sequence of pairs is the convergent sequence; (c) for α = the golden angle fraction (3 − √5)/2, all visible pairs are consecutive Fibonacci numbers, for α = 1/(3 + 1/φ) (the Lucas angle) consecutive Lucas numbers, and bijugate lattices give 2× Fibonacci pairs. Mathlib has generalized continued fractions (GenContFract) and Fibonacci (Nat.fib), so most groundwork exists.",
+     "steps": [
+      "Define the cylindrical lattice, visible parastichy pairs and the shortest-vector basis in Lean.",
+      "Prove the convergent characterization using Mathlib's continued-fraction API and best-approximation lemmas.",
+      "Specialize to golden, Lucas and bijugate cases; prove the Fibonacci and Lucas statements.",
+      "Write a report linking each theorem to Thompson's ch14 claims in the repo."
+     ],
+     "decisive_result": "A Lean module proving that the visible opposed parastichy numbers of the golden-angle lattice are consecutive Fibonacci numbers for every rise h, with the Lucas and bijugate analogues. It does not classify dynamical attractors, but certifies the lattice side that approach 1's fixed points are identified by.",
+     "failure_signature": "Mathlib's best-approximation lemmas for continued fractions are not in the form needed, and proving them from scratch exceeds the time budget.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "number-theory"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Simulated basin measures tested against citizen-science sunflower counts",
+     "kind": "data-test",
+     "method": "Turn the model into a quantitative prediction about real plants. Simulate the Douady–Couder disc model and the cylindrical model over a slowly decreasing growth parameter Γ (the ontogenetic path from seedling to capitulum), starting from initial fronts sampled from a stated distribution (cotyledon arrangement: decussate or two-fold at stated rates, plus Gaussian positional noise σ ∈ {0.01, 0.03, 0.1}). Record the terminal parastichy pair class (Fibonacci, Lucas, double Fibonacci, other) and the basin measures with Wilson intervals from 10^5 runs per setting. Pre-register predicted class frequencies at each σ and compare with the Swinton et al. 2016 sunflower data and the repo's thompson1917-ch14-05/06 parastichy count tests, using a multinomial likelihood-ratio test. The pre-registered rule: the model supports the data if some σ in the grid gives p > 0.05 for the class distribution; it is refuted if all σ give p < 0.001 or if the model cannot produce the observed non-Fibonacci classes at all.",
+     "steps": [
+      "Implement disc and cylinder simulators with an inhibition-field placement rule; validate against Douady and Couder 1996 diagrams.",
+      "Write result.json with predictions per σ and the decision rule before downloading the Swinton data.",
+      "Run 10^5 simulations per setting; estimate class frequencies.",
+      "Fetch the sunflower data, classify heads by published parastichy counts, run the multinomial test."
+     ],
+     "decisive_result": "A pre-registered verdict on whether the Douady–Couder model, with one noise parameter, reproduces the observed frequencies of Fibonacci, Lucas and other classes in sunflowers. If it does, the basin measures are what the rigorous classification must explain.",
+     "failure_signature": "Model frequencies cannot match the observed share of non-Fibonacci heads for any σ, or the data lack enough class detail to distinguish Lucas from other non-Fibonacci heads (then inconclusive, underpowered).",
+     "tools": [
+      "simulation",
+      "data-test",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Interval-certified cylinder attractors",
+     "kind": "proof",
+     "method": "Fix a smooth finite-range repulsion kernel and reduce the cylindrical placement process to a finite-memory map after proving an exponential tail bound. Use interval Newton and cone conditions to certify fixed or periodic lattice branches, then cover the state space with boxes whose images enter certified basins or declared unresolved sets.",
+     "steps": [
+      "Specify kernel, growth parameter interval and finite-memory truncation error.",
+      "Continue Fibonacci, Lucas and bijugate branches with interval arithmetic.",
+      "Certify hyperbolicity and trapping neighborhoods.",
+      "Run a validated box-cover basin computation and formally check interval certificates."
+     ],
+     "decisive_result": "For a nontrivial growth interval, a rigorous list of all attractors and basin-volume bounds whose uncovered state-space measure is below 10^-6.",
+     "failure_signature": "Persistent positive-measure unresolved boxes or a certified additional attractor outside the proposed branches disproves completeness.",
+     "tools": [
+      "interval-arithmetic",
+      "dynamical-systems",
+      "lean4",
+      "simulation"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Validated numerics infrastructure for the model's discontinuous least-repulsion placement rule."
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Empirical basin frequencies from randomized primordia",
+     "kind": "simulation",
+     "method": "Pre-register a computational experiment over growth parameters and perturbation amplitudes. Sample 100000 initial states per stratum using a declared uniform phase measure, simulate until convergence diagnostics stabilize, classify parastichy pairs, and estimate basin probabilities with simultaneous multinomial confidence intervals. Compare cylinder and disc geometries.",
+     "steps": [
+      "Fix repulsion kernel, numerical precision, initial-state measure and attractor classifier.",
+      "Validate convergence classifications against high-precision reruns.",
+      "Estimate basin probabilities on an adaptive parameter grid.",
+      "Search rare trajectories for unknown attractors and hand them to interval certification."
+     ],
+     "decisive_result": "A reproducible basin atlas with 99% lower confidence bound above 0.999 for the Fibonacci basin in any claimed small-growth interval, or a measured non-Fibonacci mass exceeding 0.001.",
+     "failure_signature": "Classifier instability under precision doubling or discovery of persistent unclassified trajectories above 0.1% prevents the full-measure inference.",
+     "tools": [
+      "large-scale-computation",
+      "simulation",
+      "interval-arithmetic"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "Simulation cannot prove full measure."
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Interval-certify cylindrical Fibonacci and Lucas branches",
+     "kind": "computation",
+     "method": "Implement the discrete cylindrical map exactly as defined by Atela, Golé and Hotton 2003, whose fixed points are cylindrical lattices and whose bifurcation parameter is the growth parameter of their diagram. Do not substitute a different potential. On a uniform grid of that parameter across the interval their paper analyzes, certify attracting cycles by interval Newton on the return map: a cycle is certified when an interval box maps into itself and the interval derivative excludes magnitude 1 or greater. Classify certified limits by parastichy pair: consecutive Fibonacci numbers, consecutive Lucas numbers, or the bijugate doubles. A trajectory whose interval enclosure stays away from every classified cycle is an unclassified attractor. The golden-angle branch is the divergence 2π/φ^2 with φ = (1 + sqrt(5))/2. Full Lebesgue measure of its basin is not claimed by a grid; the grid certifies which cycles exist.",
+     "steps": [
+      "Encode the Atela–Golé–Hotton cylindrical map from the paper, not a proxy.",
+      "Sweep their growth parameter on a stated grid.",
+      "Certify attracting cycles by interval Newton.",
+      "Label each cycle as Fibonacci, Lucas, bijugate, or unclassified.",
+      "Emit the certified partition of the parameter interval."
+     ],
+     "decisive_result": "A certified partition of the paper's parameter interval into basins of Fibonacci, Lucas and bijugate cycles, with every grid point accounted for.",
+     "failure_signature": "An interval-certified attractor that is none of those families. That is the falsifier the problem states: an attractor outside the classified set.",
+     "tools": [
+      "interval-arithmetic",
+      "dynamical-systems",
+      "simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Formalize the Atela–Golé–Hotton fixed-point theorem",
+     "kind": "formalization",
+     "method": "Turn the 2003 existence-and-stability argument into Lean lemmas, restricted to the hypotheses printed in that paper. The first theorem is the characterization of fixed points as cylindrical lattices whose divergence angle is a noble number, with the Fibonacci and Lucas branches identified by their continued-fraction endings. The second is stability of those fixed points on the branches where the paper proves stability, with the same restrictions. Do not extend the theorem to the disc, to bijugate branches the paper does not cover, or to a full-measure basin. Those are different claims. A proof that uses an unformalized estimate must keep that estimate as a named hypothesis. The module is a success only if the named hypotheses are exactly the paper's.",
+     "steps": [
+      "Define the cylindrical lattice and the divergence angle.",
+      "Prove the fixed-point characterization and the continued-fraction labeling.",
+      "Formalize the stability estimates under the paper's restrictions.",
+      "Leave any unformalized estimate as a named hypothesis and list it.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry fixed-point theorem and a stability theorem whose hypotheses match Atela, Golé and Hotton 2003, including the Lucas branch where their proof includes it.",
+     "failure_signature": "A numerically certified attractor from the interval sweep lies outside the theorem's fixed-point list inside the theorem's parameter range. The formalization and the sweep then disagree.",
+     "tools": [
+      "lean4",
+      "dynamical-systems"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "The paper is a long real-analysis argument. A month is enough to formalize definitions and perhaps the fixed-point labeling, and unlikely to finish every stability estimate."
+    },
+    {
+     "id": "phyllotaxis-attractor-classification--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Monte Carlo basin volumes on the disc",
+     "kind": "simulation",
+     "method": "The disc geometry is the gap the cylindrical theorem does not close. Implement the Douady–Couder disc rule: each new primordium is placed at the angular minimum of the repulsive field of the existing primordia on a growing disc, with the growth parameter in the same role as in their 1992 simulations. Sweep 200 parameter values. At each, launch 500 random initial angles and place 300 primordia. Classify the last 50 divergence angles by distance to the golden angle, the Lucas angle, and the bijugate angles. Estimate basin volume as the fraction of seeds in each class, with a bootstrap percentile interval of 1000 resamples. An unclassified attractor has angular error above 10^{-3} radians from every listed noble angle over those 50 primordia and estimated measure above 0.01. This atlas can falsify a proposed complete list and cannot prove full measure.",
+     "steps": [
+      "Implement the disc placement rule from Douady and Couder 1992.",
+      "Sweep 200 growth parameters and 500 seeds, 300 primordia each.",
+      "Classify terminal divergence angles against the noble list.",
+      "Bootstrap the basin-volume estimates.",
+      "Flag any class with measure above 0.01 that is not on the list."
+     ],
+     "decisive_result": "A basin-volume table with bootstrap intervals. The classified list fails if any unclassified class has estimated measure above 0.01.",
+     "failure_signature": "Discovery of such an unclassified attractor. Failure of a different kind is a simulator bug: two implementations disagree on the terminal angle of a shared seed by more than 10^{-3} radians.",
+     "tools": [
+      "simulation",
+      "dynamical-systems"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "lewontins-paradox-of-variation",
+   "title": "Lewontin's paradox of variation",
+   "field": "biology",
+   "tier": "B",
+   "question": "Why does nucleotide diversity scale so weakly with census population size across species, and can linked selection plus demographic history account quantitatively for the gap predicted by neutral theory?",
+   "known_state": "Kimura's neutral theory predicts heterozygosity proportional to 4Nu; observed diversity spans about three orders of magnitude while census sizes span more than twelve (Lewontin 1974). Leffler et al. (2012) compiled diversity across 167 species; Corbett-Detig et al. (2015) argued linked selection explains part of it; Buffalo (2021) estimated the diversity-census slope with phylogenetic correction and found linked selection insufficient. The quantitative residual is unexplained.",
+   "acceptance_criteria": [
+    "A pre-registered test combining a current polymorphism compilation with census-size and range-size estimates (GBIF occurrence extents from the organisms layer) and recombination-rate or genome-size covariates, with explicit quantitative predictions from each hypothesis (neutral, linked selection, boom-bust demography) stated before analysis.",
+    "A verdict on whether linked selection models fitted to measured recombination landscapes close the gap."
+   ],
+   "falsifiers": [
+    "If linked-selection models with measured parameters predict the observed slope, the paradox is resolved; if the residual stays at orders of magnitude, demographic explanations are required."
+   ],
+   "required_capabilities": [
+    "population-genetics",
+    "phylogenetic-comparative-methods",
+    "gbif",
+    "data-test"
+   ],
+   "data_access": "Leffler 2012 and Buffalo 2021 supplementary tables (open); GBIF via the organisms layer; recombination maps per species where published.",
+   "related_claims": [
+    {
+     "id": "kimura-heterozygosity",
+     "label": "Neutral equilibrium heterozygosity (Kimura-Crow)",
+     "status": "proved",
+     "proof": "literature",
+     "theorem": true,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "kimura-neutral-theory",
+     "label": "Neutral theory: most molecular substitutions are neutral",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "kimura-substitution-rate",
+     "label": "Neutral substitution rate equals the mutation rate",
+     "status": "proved",
+     "proof": "literature",
+     "theorem": true,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "lewontins-paradox-of-variation--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered phylogenetic test of three quantitative predictions for the π–N slope",
+     "kind": "data-test",
+     "method": "Extend Buffalo's (2021) compilation with independent census proxies from the organisms layer and state, before analysis, the slope each hypothesis predicts. Response: log₁₀ π at synonymous or neutral sites. Census proxy: log₁₀(range area × density), where range area is the convex hull or alpha hull of cleaned GBIF occurrences and density is predicted from body mass by Damuth's allometry (D ∝ M^−0.75), as Buffalo did, but with GBIF-derived ranges to test robustness. Predictions: (H0, neutral) slope of log π on log N_c ≈ 1 if N_e ∝ N_c and μ is constant; (H1, linked selection) slope reduced by the factor predicted from each species' map length and coding density using a Corbett-Detig-style model of background selection plus sweeps, computed per species before looking at π; (H2, demographic) π tracks the harmonic mean of population size, so slope ≈ 1 against harmonic-mean N but much less against current N_c. Fit PGLS with Pagel's λ (phylolm) on an Open Tree of Life synthetic tree with time calibration. Decision rule: H1 closes the gap if the observed slope lies within the 95% interval of the H1-predicted slope; H0 is refuted if the slope interval excludes 0.5.",
+     "steps": [
+      "Write result.json with predicted slopes and intervals for H0, H1 and H2 before computing observed slopes.",
+      "Resolve species through the organisms layer; fetch GBIF occurrences with a cleaning pipeline (coordinate checks, outlier removal) and compute ranges.",
+      "Compute per-species predicted linked-selection reduction from published map lengths and genome annotations; record n for which inputs exist.",
+      "Fit PGLS; compare slopes; report residual orders of magnitude unexplained."
+     ],
+     "decisive_result": "Observed PGLS slope with 95% CI compared against the pre-registered H0 and H1 intervals: the gap is closed if the observed slope falls in the H1 interval, and the residual is quantified in orders of magnitude otherwise. The minimum sample is 100 species with π and range; Buffalo's set is larger, so recombination-map availability limits only the H1 subset.",
+     "failure_signature": "Census proxies from GBIF ranges and Damuth density have measurement error so large (or so correlated with body mass) that slope intervals overlap all three predictions: inconclusive, underpowered.",
+     "tools": [
+      "gbif",
+      "organisms-layer",
+      "phylogenetic-comparative-methods",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Recombination maps exist for a minority of species, so H1 can be tested only on a subset; census-size estimation remains crude."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Decompose π into N_e and μ using pedigree mutation rates",
+     "kind": "data-test",
+     "method": "Part of the paradox may sit in μ, not N_e: the drift-barrier hypothesis predicts that per-generation mutation rate falls as N_e rises, which flattens π = 4N_eμ against N_c. Pedigree-based germline mutation rates now exist for dozens of vertebrates (Bergeron et al. 2023). For every species with both a pedigree μ and a published π (Romiguier et al. 2014, Leffler et al. 2012, genome-scale estimates in NCBI-linked studies), compute N̂_e = π/(4μ) and fit log N̂_e on log N_c (PGLS). Pre-registered predictions: if the paradox is entirely in N_e, then log μ is uncorrelated with log N_c and the slope of log N̂_e equals the slope of log π; if drift-barrier compression matters, log μ declines with log N_c and the N̂_e slope is steeper than the π slope by the μ slope. The quantity of interest is the fraction of the gap between neutral slope 1 and the observed π slope that μ accounts for.",
+     "steps": [
+      "Pre-register the decomposition and predicted signs; list admissible μ estimates (trio-based, with stated callable-genome correction).",
+      "Assemble the matched set (species with both μ and π); resolve taxa via the organisms layer.",
+      "Fit PGLS for log π, log μ and log N̂_e on log N_c; propagate μ uncertainty by parametric bootstrap.",
+      "Report the share of the paradox attributable to μ with its 95% interval."
+     ],
+     "decisive_result": "The estimated slope of log μ on log N_c and the implied share of the π–N_c gap explained by mutation-rate variation, with 95% CI. If the share's interval excludes 0, μ is a quantified part of the answer; if it is centred near 0 with a tight interval, the paradox is entirely in N_e.",
+     "failure_signature": "Fewer than about 30 species with both pedigree μ and comparable π, giving intervals spanning 0 to 100%: inconclusive, underpowered.",
+     "tools": [
+      "phylogenetic-comparative-methods",
+      "organisms-layer",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "lewontins-paradox-of-variation--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Simulation bound on how much linked selection can flatten π across N",
+     "kind": "simulation",
+     "method": "Settle whether linked selection can close the gap by computing the most it could do under generous but empirically bounded parameters. Use SLiM forward simulation with tree-sequence recording plus msprime recapitation, and stdpopsim genome models and DFEs where available, across a ladder of census sizes N from 10^3 to 10^7 simulated directly. Extrapolate to 10^12 with the analytic background-selection and sweep formulas (B = exp(−Σ u/(s(1+r/s)²)) plus a recurrent-sweep coalescent rate), calibrated against the simulations in the overlap range. Upper-bound parameters: the deleterious mutation rate at the top of published estimates, a DFE fraction of strongly selected new mutations at the top of estimates, and adaptive substitution rate α from McDonald–Kreitman ranges. Output: the curve π(N) and the maximum achievable flattening (slope of log π on log N over 10^4–10^12). Compare with the observed slope from approach 1 or from Buffalo 2021.",
+     "steps": [
+      "Choose 3 representative genome architectures (vertebrate, insect, plant) from stdpopsim; fix parameter ranges from literature before simulating.",
+      "Run SLiM simulations over the N ladder with 20 replicates each; compute π at neutral sites.",
+      "Calibrate the analytic B and sweep model to simulations; extrapolate to large N.",
+      "Compute the maximum flattening and compare with the observed slope."
+     ],
+     "decisive_result": "The minimum π–N slope achievable by linked selection under upper-bound parameters. If that minimum exceeds the observed slope plus its CI, linked selection cannot explain the paradox, as Buffalo argued, and demography or μ must; if it falls below, the bound shows which parameter regime is needed.",
+     "failure_signature": "Extrapolation from 10^7 to 10^12 is unreliable: the analytic model misfits simulations at the top of the ladder, or sweep interference (genetic draft saturation) makes predictions model-dependent across plausible formulas.",
+     "tools": [
+      "simulation",
+      "population-genetics",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Direct simulation at N ≥ 10^8 is infeasible, so the bound rests on extrapolation."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Phylogenetic decomposition of diversity constraints",
+     "kind": "data-test",
+     "method": "Pre-register a phylogenetic hierarchical model for autosomal synonymous diversity across at least 150 animal species. Predict log diversity from log census proxy, recombination-map length, functional genomic density, body size, range area from GBIF, and generation time, with clade random slopes and measurement error. Compare neutral, linked-selection and boom-bust models by leave-one-clade-out expected log predictive density.",
+     "steps": [
+      "Freeze taxon inclusion, one diversity estimate per species and GBIF coverage rules before fitting.",
+      "Require at least 30 species with measured recombination maps and 150 total with range proxies.",
+      "Fit matched neutral, background-selection and recurrent-sweep models with a fixed phylogeny.",
+      "Report slope residuals, variance explained and held-out calibration."
+     ],
+     "decisive_result": "Linked selection closes the gap only if its model improves leave-one-clade-out ELPD by at least 10 and leaves an absolute census-diversity slope residual below 0.05; otherwise the residual is quantitatively unresolved.",
+     "failure_signature": "Fewer than 30 independent recombination landscapes or posterior predictions dominated by range-size measurement error make the mechanism comparison underpowered.",
+     "tools": [
+      "gbif",
+      "phylogenetic-comparative-methods",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Comparable recombination maps and defensible census sizes are sparse outside model organisms."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Genome-window test of linked-selection predictions",
+     "kind": "data-test",
+     "method": "Within species, use genome windows to avoid uncertain census sizes. For at least 20 species with polymorphism, recombination and annotation data, preregister the reduction in neutral diversity near conserved or selected sites predicted by background-selection maps, then aggregate the measured maximum genome-wide reduction into a cross-species upper bound on how much linked selection can compress diversity.",
+     "steps": [
+      "Select species and neutral-site filters without inspecting diversity-recombination associations.",
+      "Fit a common monotone recombination-diversity model with species-specific intercepts.",
+      "Cross-validate chromosome-held-out predictions and estimate diversity absent linked selection.",
+      "Regress corrected diversity on GBIF range and life-history proxies."
+     ],
+     "decisive_result": "If linked selection explains at least 80% of within-genome neutral-diversity variance and corrected cross-species diversity spans under two orders of magnitude, it is sufficient for the tested taxa; a corrected span above three orders refutes sufficiency.",
+     "failure_signature": "Neutral-site definitions or recombination maps are incomparable enough that chromosome-held-out prediction R2 is below 0.1 in more than half the species.",
+     "tools": [
+      "large-scale-computation",
+      "gbif",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Harmonized population-genomic callsets and recombination maps."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Pre-register the diversity-census slope with a range covariate",
+     "kind": "data-test",
+     "method": "Pre-register before downloading tables. Response is log10 of nucleotide diversity π from the Leffler et al. 2012 compilation, with the Buffalo 2021 estimates used only as a second, separately reported column where the species overlap. Predictor is log10 of census size as published in those supplements. Covariate is log10 of GBIF range area: occurrences for the species with coordinate uncertainty below 10 km, reduced to presence on a 0.1 degree grid, range area the axis-aligned bounding box, species with fewer than 20 occupied cells dropped. Primary estimator is a nested taxonomic random-effects model, species within genus within family within order, fit by REML, not a single time-calibrated tree of all life. Neutral prediction is slope 1 of log10 π on log10 N. Secondary estimator, mammals only, is PGLS with Pagel's lambda on 100 trees from the Upham, Esselstyn and Jetz credible set. Linked selection is not fit in this approach. The verdict is about the slope: if the 95 percent profile interval includes 1, neutral scaling of diversity with census size is not rejected and the paradox sits in the intercept.",
+     "steps": [
+      "Write the model, the GBIF filter and the drop rule before opening the supplements.",
+      "Join Leffler diversity and census size to GBIF bounding-box area.",
+      "Fit the nested random-effects model by REML and record the profile interval for the slope.",
+      "Repeat PGLS on the mammal overlap across 100 Upham trees.",
+      "Call the estimators mixed if one interval contains 1 and the other excludes it."
+     ],
+     "decisive_result": "A 95 percent interval for the slope of log10 π on log10 census N. Neutral scaling is rejected only if that interval excludes 1 in the primary model.",
+     "failure_signature": "Fewer than 30 species survive the GBIF cell filter, in which case the verdict is inconclusive and underpowered. A slope interval that includes both 0 and 1 is also indecisive and is reported as such.",
+     "tools": [
+      "gbif",
+      "phylogenetic-comparative-methods",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Census sizes are only as good as the supplements. GBIF bounding boxes are a range proxy, not a census, and the model treats them as a covariate rather than as N."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Test whether published recombination maps close the residual",
+     "kind": "data-test",
+     "method": "Pre-register a second test aimed at linked selection, using only species that have both a diversity estimate in the Leffler or Buffalo tables and a public genetic map with at least 10^3 markers in centimorgans. Homo sapiens enters through the 1000 Genomes resource; every other species enters only with a map meeting the same marker floor. For each such species compute map length per megabase. Fit log10 π = a + b log10 N + c (map length per megabase) in the same nested taxonomic model as the slope test. Linked selection closes the gap only if, after this covariate, the residual slope on log10 N has a 95 percent interval containing 0 and the root-mean-square residual of log10 π is below 0.5. Both conditions are required. If fewer than 8 species qualify, the verdict is inconclusive, underpowered, and is not filled in by dropping the marker floor.",
+     "steps": [
+      "Freeze the marker floor and the two numerical conditions before listing species.",
+      "Admit a species only when both a diversity row and a qualifying public map exist.",
+      "Fit the nested model with map length per megabase as covariate.",
+      "Record the residual slope interval and the residual RMSE.",
+      "Stop as underpowered if fewer than 8 species qualify."
+     ],
+     "decisive_result": "Residual slope interval containing 0 and residual RMSE of log10 π below 0.5, on at least 8 species with real maps. Otherwise linked selection, as measured here, does not close the gap.",
+     "failure_signature": "The residual slope interval excludes 0, or the RMSE stays at or above 0.5. Dropping the marker floor after seeing the fit is a failed pre-registration, not a result.",
+     "tools": [
+      "data-test",
+      "population-genetics"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Public genetic maps for most of the Leffler species. The test is designed to return underpowered rather than to invent maps."
+    },
+    {
+     "id": "lewontins-paradox-of-variation--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Forward simulations of sweeps, background selection and bottlenecks",
+     "kind": "computation",
+     "method": "Ask whether a pre-specified demographic-plus-selection process can reproduce the empirical slope, using the slope from the first approach as a fixed target and not refitting it. Three regimes, parameters frozen first: neutral Wright–Fisher with N_e equal to census N; recurrent hitchhiking plus background selection with a stated deleterious mutation rate and a beneficial rate scaled per megabase; and a bottleneck regime with a contraction of factor 100 lasting a stated fraction of each run. For each regime, simulate a grid of census sizes spanning the empirical range, 20 replicates per size, and estimate the slope of mean log10 π on log10 N. A regime accounts for the paradox only if its slope's simulation interval covers the empirical slope and its diversity range covers the empirical diversity range within a factor of two at both ends. Code and seeds are part of the result.",
+     "steps": [
+      "Freeze mutation rates, selection coefficients and the bottleneck schedule before fitting.",
+      "Simulate the three regimes across the census-size grid, 20 replicates.",
+      "Estimate each regime's slope of log10 π on log10 N.",
+      "Compare slope and endpoint diversity with the empirical target.",
+      "Reject a regime that misses either the slope or the endpoint range."
+     ],
+     "decisive_result": "A regime whose simulated slope interval covers the empirical slope and whose diversity range matches both empirical endpoints within a factor of two. If none does, demography-plus-linked-selection of this form does not resolve the paradox.",
+     "failure_signature": "All three regimes miss the slope or the endpoint range. Tuning the rates after seeing the empirical slope is a failed pre-registration.",
+     "tools": [
+      "population-genetics"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Species-specific recombination maps are not used here; the regimes are deliberately generic. A species-matched map is the other approach."
+    }
+   ]
+  },
+  {
+   "id": "metabolic-scaling-exponent",
+   "title": "Is there a universal metabolic scaling exponent?",
+   "field": "biology",
+   "tier": "B",
+   "question": "Does basal metabolic rate scale with body mass with a single exponent across taxa, and if so is it 3/4 (fractal supply networks) or 2/3 (surface-to-volume), or does the exponent vary systematically with taxon, temperature and body size?",
+   "known_state": "Kleiber (1932) reported 3/4; West, Brown and Enquist (1997) derived 3/4 from space-filling branching networks; White and Seymour (2003) found 2/3 for mammals once body temperature and digestive state are controlled; Kozlowski and Konarzewski (2004) disputed the WBE derivation. Current syntheses find curvature and taxon dependence. Thompson's surface-volume claims (ch02-01, ch03-07) encode the 2/3 alternative.",
+   "acceptance_criteria": [
+    "A pre-registered phylogenetically controlled analysis across the organism taxa with AnAge/PanTHERIA body mass and metabolic data, with stated predictions: a single exponent with 95% interval excluding one of 2/3 and 3/4, or a model-comparison verdict that a curved or taxon-specific model beats any single power law.",
+    "A Lean 4 formalization of the WBE derivation stating its assumptions as hypotheses, so the disputed step is explicit."
+   ],
+   "falsifiers": [
+    "If the pooled exponent interval contains both 2/3 and 3/4 after controls, the universality question is empirically underdetermined with present data."
+   ],
+   "required_capabilities": [
+    "phylogenetic-comparative-methods",
+    "allometry",
+    "data-test",
+    "lean4"
+   ],
+   "data_access": "AnAge (open), PanTHERIA (open), White and Seymour 2003 compilation; taxon resolution via test-data/organisms.",
+   "related_claims": [
+    {
+     "id": "thompson1917-ch03-07",
+     "label": "Weight tends to vary as the cube of linear dimensions during growth",
+     "status": "proved",
+     "proof": "lean",
+     "theorem": true,
+     "evidence": "mixed",
+     "data_test": {
+      "verdict": "mixed",
+      "confidence": 0.75,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json"
+     }
+    },
+    {
+     "id": "thompson1917-ch02-01",
+     "label": "Changes in the length-weight constant k reveal changes of form during growth",
+     "status": "proved",
+     "proof": "lean",
+     "theorem": true,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.55,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch02-01/result.json"
+     }
+    },
+    {
+     "id": "thompson1917-ch03-10",
+     "label": "Cold-blooded animals approach a maximal size only asymptotically",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "mixed",
+     "data_test": {
+      "verdict": "mixed",
+      "confidence": 0.6,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-10/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "metabolic-scaling-exponent--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered PGLS model comparison: single power law vs curvature vs clade slopes",
+     "kind": "data-test",
+     "method": "Assemble mammal BMR and mass from AnAge (metabolic rate, body mass, body temperature fields) and PanTHERIA (BasalMetRate, AdultBodyMass), deduplicated by species via the organisms layer. Exclude records not meeting basal criteria where flagged, and require n ≥ 300 species with temperature for the temperature-corrected analysis. Phylogeny: Upham et al. 2019 node-dated mammal trees, with analyses integrated over 100 posterior trees. Models: (M1) log B = a + b log M; (M2) M1 + Boltzmann temperature term −E/(kT_b) (Gillooly form) or T_b as covariate; (M3) quadratic in log M (Kolokotrones curvature); (M4) order-level random slopes. Fit by PGLS with Pagel's λ, compare by AICc and by leave-one-order-out predictive log-likelihood. Pre-registered decision: 'single exponent' if M1 or M2 wins and the 95% CI of b excludes one of 2/3 or 3/4 (reported as such); 'no universal exponent' if M3 or M4 improves predictive log-likelihood by > 10 units summed over orders; 'underdetermined' if the CI contains both.",
+     "steps": [
+      "Write result.json with models, decision rule and minimum n before downloading.",
+      "Download AnAge (dataset.zip) and PanTHERIA; record SHA-256; merge and resolve taxa.",
+      "Prune Upham trees to the matched species; fit M1–M4 over 100 trees.",
+      "Report b with CI, curvature coefficient, order-slope variance and the verdict."
+     ],
+     "decisive_result": "A verdict among 'exponent b with CI excluding 2/3 (or 3/4)', 'curved or clade-specific model wins by > 10 log-likelihood units out of sample', or 'underdetermined', with effect sizes. Mammals alone give n of several hundred species, enough to separate 2/3 from 3/4 if the relation is linear (White and Seymour's CI was about ±0.03).",
+     "failure_signature": "Strong dependence of b on inclusion criteria (basal versus resting, captive versus wild) that the pre-registered criteria cannot resolve; the verdict then rests on data curation rather than biology.",
+     "tools": [
+      "anage",
+      "phylogenetic-comparative-methods",
+      "organisms-layer",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "metabolic-scaling-exponent--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean formalization of the WBE network derivation with the finite-size exponent",
+     "kind": "formalization",
+     "method": "Make the disputed step explicit. Model: a branching network with N levels, branching ratio n, radius ratio β and length ratio γ per level, invariant terminal units (capillaries) and total blood volume V_b ∝ M. Define V_b(N) = Σ_{k=0}^{N} n^k π r_k² l_k with r_k = β^k r₀, l_k = γ^k l₀, so V_b = π r₀² l₀ Σ (nβ²γ)^k. Theorem 1 (exact finite form): with terminal size fixed, N_cap = n^N and V_b = V_cap · ((nβ²γ)^{−(N+1)} − 1)/((nβ²γ)^{−1} − 1) for nβ²γ < 1. Theorem 2 (asymptotic exponent): under area preservation β = n^{−1/2} and space filling γ = n^{−1/3}, and V_b ∝ M, the ratio log N_cap / log M → 3/4 as N → ∞, but for finite N the effective exponent is strictly less than 3/4 with an explicit correction term, matching Savage et al. 2008's finite-size analysis. Theorem 3: if area-preserving branching holds only below a transition level and Poiseuille scaling (β = n^{−1/3}) above it, the limiting exponent is different (explicit formula). The hypotheses V_b ∝ M and invariant terminal units are exactly where Kozłowski and Konarzewski object, and they appear as named hypotheses.",
+     "steps": [
+      "Define the network sums in Lean (Finset.sum over levels, geometric series).",
+      "Prove Theorem 1 by geometric-series lemmas, and Theorem 2 by limits (Filter.Tendsto) on logarithms.",
+      "Prove Theorem 3 for the two-regime network.",
+      "Write a report with each hypothesis named and linked to Thompson's ch03-07 and ch02-01 claims; state which are empirical."
+     ],
+     "decisive_result": "A Lean module proving that WBE's 3/4 is the N → ∞ limit under four named hypotheses, with the exact finite-N exponent, compiled with only standard axioms. Each published objection then corresponds to dropping a named hypothesis.",
+     "failure_signature": "The formalization shows that the published derivation needs a hypothesis not listed (for example a specific relation between N and M) to get 3/4, which is a substantive finding about WBE rather than a failure, or the limit proofs in Mathlib take longer than budgeted.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "allometry"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "metabolic-scaling-exponent--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Cross-domain heterogeneity test: one exponent across prokaryotes, protists and animals?",
+     "kind": "data-test",
+     "method": "Universality claims cover all life, but approach 1 tests mammals. DeLong et al. 2010 compiled metabolic rates for prokaryotes, protists and metazoans and reported superlinear, approximately linear and sublinear exponents respectively. Re-analyse with a pre-registered hierarchical model: log B = a_g + b_g log M + temperature correction, with group g ∈ {prokaryotes, protists, ectothermic metazoans, endotherms}, b_g ~ Normal(b̄, τ²). Pre-registered decision: universality is refuted if τ's 95% posterior interval excludes 0.05 and at least two b_g intervals are disjoint; supported if τ < 0.03 and b̄'s interval contains 3/4 or 2/3. Add AnAge ectotherm entries with temperature to test whether temperature correction collapses ectotherm and endotherm slopes, as metabolic theory predicts.",
+     "steps": [
+      "Pre-register the model, priors and decision thresholds.",
+      "Retrieve DeLong et al. 2010 supplementary data; add AnAge ectotherm records with temperature.",
+      "Fit the hierarchical model (Stan or PyMC) with measurement-error terms on M where reported.",
+      "Report τ, group slopes and the verdict; check sensitivity to the temperature correction."
+     ],
+     "decisive_result": "The posterior for between-group slope heterogeneity τ, and whether group slopes overlap. Disjoint slopes across domains refute a single universal exponent regardless of the mammal result.",
+     "failure_signature": "Group samples (especially prokaryotes and protists) too small or too heterogeneous in measurement protocol for slopes to be compared, leaving τ's interval wide: inconclusive, underpowered.",
+     "tools": [
+      "anage",
+      "bayesian-hierarchical-models",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "metabolic-scaling-exponent--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Phylogenetic model comparison across endotherms",
+     "kind": "data-test",
+     "method": "Pre-register adult, postabsorptive, thermoneutral basal-metabolism inclusion rules and fit mammal and bird data with phylogenetic generalized least squares. Compare fixed slopes 2/3 and 3/4, an estimated common slope, clade-specific slopes and a quadratic log-mass model using leave-one-family-out prediction.",
+     "steps": [
+      "Resolve taxa against the organisms layer and deduplicate measurements by source.",
+      "Require at least 300 species and 20 families, recording temperature and measurement protocol.",
+      "Fit all five models with body-temperature and study random effects.",
+      "Use family-held-out ELPD and calibrated residuals for the preregistered verdict."
+     ],
+     "decisive_result": "Universality is supported only if one common-slope model beats every curved or clade-varying model by ELPD at least 10 and its 95% interval width is below 0.04; otherwise report the best heterogeneity structure.",
+     "failure_signature": "Protocol covariates are missing for over 30% of records or 2/3 and 3/4 remain inside the common-slope interval, yielding an inconclusive universal exponent.",
+     "tools": [
+      "phylogenetic-comparative-methods",
+      "anage",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "metabolic-scaling-exponent--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Formal audit of the WBE exponent derivation",
+     "kind": "formalization",
+     "method": "Encode an idealized branching network with branch ratio, length ratio, radius ratio, terminal-unit invariance and space-filling assumptions. Prove each exponent implication separately in Lean, including where area preservation or impedance minimization enters, and construct countermodels when assumptions are weakened.",
+     "steps": [
+      "Represent finite self-similar trees and derive total serviced volume and network volume.",
+      "Prove logarithmic exponent lemmas with positivity and nondegeneracy hypotheses.",
+      "Derive 3/4 only from a named minimal assumption set.",
+      "Use exact finite trees to exhibit assumption-compatible alternatives producing 2/3 or other exponents."
+     ],
+     "decisive_result": "A no-sorry theorem stating the minimal explicit hypotheses implying exponent 3/4, plus checked countermodels showing which omitted hypotheses destroy the conclusion.",
+     "failure_signature": "The biological assumptions cannot be stated without directly assuming the desired scaling relation, showing that the derivation has no independent formal content.",
+     "tools": [
+      "lean4",
+      "symbolic-computation",
+      "allometry"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Formalization settles logical validity, not whether organisms satisfy the assumptions."
+    },
+    {
+     "id": "metabolic-scaling-exponent--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "PGLS of PanTHERIA basal rate against body mass",
+     "kind": "data-test",
+     "method": "Use PanTHERIA 1.0, Wilson and Reeder 2005 file, columns 18-1_BasalMetRate_mLO2hr and the paired mass 5-2_BasalMetRateMass_g. The Ecological Archives metadata says metabolic rate was accepted only with a mass from the same individuals, measured resting, post-absorptive, in the thermoneutral zone. Drop the missing-value code -999. Primary regression is log10(BMR) on log10(paired mass), PGLS with Pagel's lambda, repeated on 100 trees from the Upham credible set. A species-typical mass sensitivity uses 5-1_AdultBodyMass_g and is reported separately. Model comparison, pre-registered: a single slope, order-specific slopes, and a quadratic term in log mass. The curved or order-specific model wins if its AIC beats the single power law by more than 10 on at least 95 of the 100 trees. The single-exponent claim is decided by the 95 percent interval of the single slope: it must exclude either 2/3 or 3/4. If the interval contains both, the question is underdetermined, which is the problem's own falsifier. Geographic mean temperature in PanTHERIA is not body temperature and is not used as a thermoregulatory control.",
+     "steps": [
+      "Pre-register the columns, the missing code, the AIC gap and the two target exponents.",
+      "Drop -999 and match species to the Upham trees.",
+      "Fit Pagel's lambda PGLS on 100 trees for the paired-mass regression.",
+      "Compare single-slope, order-specific and quadratic models by AIC.",
+      "Repeat with adult body mass as a labeled sensitivity and do not pool the two masses."
+     ],
+     "decisive_result": "On at least 95 of 100 trees, either a single-slope 95 percent interval that excludes 2/3 or excludes 3/4, or an order-specific or quadratic model that beats the power law by AIC of more than 10.",
+     "failure_signature": "The single-slope interval contains both 2/3 and 3/4 and no alternative model beats the power law by the AIC gap. The universality question is then underdetermined on PanTHERIA.",
+     "tools": [
+      "phylogenetic-comparative-methods",
+      "allometry",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "A species-level body-temperature table joined to this taxonomy. PanTHERIA's geographic temperature is not a substitute, so the White and Seymour control is not replicated here."
+    },
+    {
+     "id": "metabolic-scaling-exponent--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Lean statement of the West–Brown–Enquist exponent",
+     "kind": "formalization",
+     "method": "Formalize the scaling argument under explicit hypotheses, and make the step Kozlowski and Konarzewski dispute a separate lemma. Hypotheses: a self-similar branching network with fixed branching ratio; a space-filling condition relating the linear scale factor to that ratio; a terminal unit whose size does not depend on body mass; and a flow or impedance condition that fixes how cross-section scales across a branch. From those, prove that metabolic rate scales as mass to the 3/4. Then prove a second lemma that names the alternative service-volume assumption used in the critique and shows whether it is consistent with invariant terminal units. The module must not hide either assumption inside a definition. Empirical truth of the hypotheses is out of scope, as in the Thompson Lean standard.",
+     "steps": [
+      "Define branching ratio, scale factor, terminal-unit size and service volume.",
+      "Prove the 3/4 exponent from the stated hypotheses.",
+      "State the critiqued service-volume assumption as a second definition.",
+      "Prove consistency or inconsistency with invariant terminal units.",
+      "Audit axioms and write the scope note that the hypotheses are not data."
+     ],
+     "decisive_result": "A no-sorry derivation of the 3/4 exponent under named hypotheses, and a second lemma that settles consistency of the critiqued alternative with invariant capillaries.",
+     "failure_signature": "The 3/4 exponent is obtained only by assuming the conclusion, or the two lemmas use incompatible definitions of service volume without saying so.",
+     "tools": [
+      "lean4",
+      "allometry"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "metabolic-scaling-exponent--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Finite-generation networks and the approach to 3/4",
+     "kind": "computation",
+     "method": "The Lean theorem is an infinite-generation statement. Build the finite network the hypotheses describe: branching ratio 2, generations G from 2 to 24, area-preserving branch radii, terminal units of fixed size, service volume the sum of the terminal service volumes. Define metabolic rate as total terminal flow. Regress log rate on log service volume across the generation sequence and report the local exponent between successive generations. The numerical claim matching the theorem is that the local exponent is within 0.01 of 3/4 by some G at most 24. Also build the alternative network from the critique's service-volume assumption and report its exponent. This checks the algebra of both lemmas and says nothing about real mammals.",
+     "steps": [
+      "Implement both finite networks from the Lean hypotheses.",
+      "Compute total flow and service volume at each generation from 2 to 24.",
+      "Estimate the local log-log exponent between successive generations.",
+      "Test whether the primary network is within 0.01 of 3/4 by generation 24.",
+      "Report the alternative network's exponent beside it."
+     ],
+     "decisive_result": "The primary network's local exponent lies within 0.01 of 3/4 at some generation at most 24, and the alternative network's exponent is reported from the same code.",
+     "failure_signature": "The primary exponent stays more than 0.01 away from 3/4 through generation 24. The finite network then does not realize the theorem, and one of the two must be wrong.",
+     "tools": [
+      "allometry"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    }
+   ]
+  }
+ ]
+}

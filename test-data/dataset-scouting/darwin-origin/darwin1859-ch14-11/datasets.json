@@ -1,0 +1,222 @@
+{
+  "claim_id": "darwin1859-ch14-11",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "per-taxon fossil occurrence counts and ages by time bin (first and last appearance)",
+    "geographic range of each taxon (occurrence coordinates)",
+    "abundance proxy (collection-level counts) where recorded",
+    "clade size and persistence of descendant lineages at genus level (species-level ancestry is not recorded)"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mammalia&rank=genus&limit=1&rowcount&show=app",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:24Z",
+        "method": "GET taxa/list and occs/list with rowcount and show=app/coords/abund (2026-11-01T08:04:52-54Z)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Mammalia: 9,031 genus and 21,222 species records, each with first/last appearance fields (fea, lea, fla, lla, tei)",
+        "Mammalia Miocene occurrences: 34,237, with lng/lat and abundance value/unit fields (abv, abu)",
+        "Mammalia Miocene occurrences with abundance counts: 5,045"
+      ],
+      "variables_missing": [
+        "species-level ancestor-descendant links",
+        "sampling-corrected survival estimates"
+      ],
+      "scope": "All fossil taxa; Mammalia queried as example",
+      "evidence": "taxa/list rowcount: genus 9031, species 21222; occs/list Miocene Mammalia 34237; abundance=count filter 5045; sample record has lng -118.848335, lat 35.492779, abv 14, abu \"specimens\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "neotoma",
+      "name": "Neotoma Paleoecology Database (API v2.0)",
+      "landing_url": "https://www.neotomadb.org/",
+      "access_url": "https://api.neotomadb.org/v2.0/data/datasets?limit=1&offset=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:47Z",
+        "method": "GET landing (200); GET API datasets limit=1 (200 at 08:04:55Z)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "site-level Quaternary datasets with coordinates and DOIs (sample record returned)"
+      ],
+      "variables_missing": [
+        "counts of datasets not extracted",
+        "pre-Quaternary coverage"
+      ],
+      "scope": "Late Quaternary/Holocene mostly",
+      "evidence": "API returned status \"success\" with a site record (siteid 1, coordinates -75.25, 55.09167, altitude 244).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF (occurrence API)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:04:58Z",
+        "method": "GET occurrence/search limit=0 (API 200); web landing returned 403 (Cloudflare) at 05:10:46Z",
+        "http_status": 200,
+        "note": "web landing 403; API fine"
+      },
+      "variables_present": [
+        "modern occurrences (3,887,469,368 records)"
+      ],
+      "variables_missing": [
+        "fossil survivorship"
+      ],
+      "scope": null,
+      "evidence": "occurrence/search count 3887469368.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree, v3 API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:03:24Z",
+        "method": "POST tree_of_life/about (landing page tree.opentreeoflife.org: timeout at 05:10:24Z, HTTP 503 at 08:03:07Z)",
+        "http_status": 200,
+        "note": "API answered 200; the web landing page returned 503 when checked"
+      },
+      "variables_present": [
+        "clade sizes (tips per node) for living clades"
+      ],
+      "variables_missing": [
+        "fossil taxa",
+        "survival information"
+      ],
+      "scope": "Synthetic tree opentree16.1, taxonomy 3.7draft3: 2,385,875 tips, built from 2,064 source trees in 1,931 studies",
+      "evidence": "tree_of_life/about response: synth_id opentree16.1, root \"cellular organisms\" num_tips 2385875, num_source_trees 2064, num_source_studies 1931.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-8330-gastropod-abundance-extinction",
+      "name": "Data from: Local and global abundance associated with extinction risk in late Paleozoic and early Mesozoic gastropods",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.8330",
+      "access_url": null,
+      "doi": "10.5061/dryad.8330",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:05:13Z",
+        "method": "GET Dryad datasets API (found via DataCite/Zenodo search)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "global database of gastropod occurrences and collection-level abundances, Early Permian to Early Jurassic, with extinction outcomes"
+      ],
+      "variables_missing": [
+        "gastropods only",
+        "file sizes not checked"
+      ],
+      "scope": "Late Paleozoic-early Mesozoic gastropods",
+      "evidence": "API abstract: \"we compiled a global database of gastropod occurrences and collection-level abundances spanning the Early Permian throug...\"",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-0mq69-forms-of-rarity",
+      "name": "Data from: Long-term differences in extinction risk among the seven forms of rarity",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0mq69",
+      "access_url": null,
+      "doi": "10.5061/dryad.0mq69",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:51Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 69966860
+      },
+      "variables_present": [
+        "fossil-record dataset used to relate range, abundance and habitat breadth to extinction risk (per abstract)"
+      ],
+      "variables_missing": [
+        "taxonomic scope not read from abstract excerpt"
+      ],
+      "scope": null,
+      "evidence": "API title as given; abstract says the fossil record is used to determine impacts of forms of rarity on extinction; storage 69966860 B.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB",
+      "query": "Mammalia genera and species with appearance fields",
+      "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mammalia&rank=genus&limit=1&rowcount&show=app",
+      "hits": 9031
+    },
+    {
+      "source": "PBDB",
+      "query": "Mammalia Miocene occurrences with coords and abundance",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mammalia&interval=Miocene&limit=1&rowcount&show=coords,abund",
+      "hits": 34237
+    },
+    {
+      "source": "Dryad",
+      "query": "fossil species survivorship geographic range extinction PyRate occurrence",
+      "url": "https://datadryad.org/api/v2/search?q=fossil+species+survivorship+geographic+range+extinction+PyRate+occurrence&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "fossil genera survivorship geographic range abundance extinction selectivity Paleobiology Database",
+      "url": "https://zenodo.org/api/records?q=fossil+genera+survivorship+geographic+range+abundance+extinction+selectivity+Paleobiology+Database&size=8",
+      "hits": 616814,
+      "note": "hits include dryad.8330, dryad.0mq69, dryad.rj28ck8g, dryad.76082 and the divDyn package"
+    },
+    {
+      "source": "DataCite",
+      "query": "extinction selectivity geographic range fossil genera survival",
+      "url": "https://api.datacite.org/dois?query=extinction+selectivity+geographic+range+fossil+genera+survival&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 2
+    }
+  ],
+  "status": "partial",
+  "summary": "PBDB provides what a retrospective test needs at genus level (first/last appearances, occurrence coordinates, some abundance counts, clade size) and several Dryad deposits pair range or abundance with extinction in single groups; species-level descendants and sampling-corrected survival are not in any open table.",
+  "next_step": "Use PBDB genus-level occurrences for one or two well-sampled groups (e.g. marine bivalves, mammals), with explicit sampling-bias controls, and pre-register the persistence definition.",
+  "obstacles_confirmed": [
+    "Widespread taxa are more likely to be sampled again.",
+    "True ancestor-descendant links are not recorded; only genus persistence is available."
+  ]
+}

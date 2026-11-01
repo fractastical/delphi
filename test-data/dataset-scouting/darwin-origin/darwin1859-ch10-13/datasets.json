@@ -1,0 +1,167 @@
+{
+  "claim_id": "darwin1859-ch10-13",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "geological age of each fossil taxon",
+    "morphological (or taxonomic) distance from each fossil to its nearest living relatives",
+    "extant/extinct status per genus or family",
+    "character matrices containing both fossil and living taxa"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "curl -sL https://morphobank.org/ and https://www.morphobank.org/ (also with a browser User-Agent)",
+        "http_status": 403,
+        "note": "CloudFront 403 to non-browser clients; portal content (project/matrix counts) not verified."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "fossil+extant character matrices (portal not reachable)"
+      ],
+      "scope": "Not inspected: the site refused every request from this client.",
+      "evidence": "Both URLs returned HTTP 403 with a 919-byte CloudFront error page (server: CloudFront, x-cache: Error from cloudfront); no project list or matrix could be fetched.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service v1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET PBDB taxa/list.json with rowcount&limit=0 and show=app",
+        "http_status": 200,
+        "note": "Landing page HTTP 200; API calls below also HTTP 200."
+      },
+      "variables_present": [
+        "fossil taxon first/last appearance ages (fea, fla, lea, lla in Ma)",
+        "extant flag per taxon",
+        "occurrence age bounds"
+      ],
+      "variables_missing": [
+        "morphological distance to living relatives"
+      ],
+      "scope": "Vertebrata: 52,391 species-rank taxa with first/last appearance in Ma; 4,866 genera and 8,546 species flagged extant; 20,156 genera flagged non-extant",
+      "evidence": "taxa/list.json?base_name=Vertebrata&rank=species&show=app -> records_found 52391 with fields fea, fla, lea, lla, tei, ext; rank=genus&extant=yes -> 4866; extant=no -> 20156; rank=species&extant=yes -> 8546.",
+      "verdict": "partial"
+    },
+    {
+      "id": "lloyd-2018-coelurosaur-phylomorphospace",
+      "name": "Data from: Journeys through discrete-character morphospace (Lloyd 2018) - code and data zip",
+      "landing_url": "https://doi.org/10.5061/dryad.1j5h875",
+      "access_url": null,
+      "doi": "10.5061/dryad.1j5h875",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.1j5h875 and its /files listing; GET https://doi.org/10.5061/dryad.1j5h875 (final HTTP 200 at datadryad.org)",
+        "http_status": 200,
+        "bytes": 5269998
+      },
+      "variables_present": [
+        "discrete morphological character-taxon matrix including fossil non-avian theropods and birds (152 coelurosaurian taxa, 853 characters, per abstract)"
+      ],
+      "variables_missing": [
+        "other class boundaries (mammal-reptile, tetrapod-fish)",
+        "crown-group-only matrix for comparison with and without fossils"
+      ],
+      "scope": "Coelurosaurian theropods only (the dinosaur-bird transition); one clade, not whole vertebrate classes",
+      "evidence": "Dryad metadata: CC0 licence, storageSize 5,270,665, published 2019-06-14; files CodeAndData.zip (5,269,998 bytes) and README_for_CodeAndData.txt (667 bytes). Zip contents not opened (over 1 MB).",
+      "verdict": "partial"
+    },
+    {
+      "id": "fossil-penguin-bill-disparity",
+      "name": "Bill disparity and feeding strategies amongst fossil and modern penguins",
+      "landing_url": "https://doi.org/10.5061/dryad.08kprr4zf",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "Dryad search result only (title returned by /api/v2/search?q=living fossils morphological disparity); dataset record not opened",
+        "http_status": null,
+        "note": "Not individually fetched; HTTP status unknown."
+      },
+      "variables_present": [
+        "fossil and modern morphological measurements (per title)"
+      ],
+      "variables_missing": [
+        "verified variable list",
+        "scope beyond penguins"
+      ],
+      "scope": "One clade (penguins); contents not inspected",
+      "evidence": "Title seen in the Dryad search response; no metadata, file list or DOI resolution was fetched.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB data1.2",
+      "query": "taxa/list Vertebrata species with show=app; extant yes/no for genera and species",
+      "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Vertebrata&rank=species&rowcount&limit=1&show=app",
+      "hits": 52391,
+      "note": "genera extant 4866, non-extant 20156; extant species 8546"
+    },
+    {
+      "source": "PBDB data1.2",
+      "query": "occs/diversity Vertebrata count=genera reso=stage",
+      "url": "https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Vertebrata&count=genera&reso=stage&limit=2",
+      "hits": null,
+      "note": "returns per-stage richness fields (xft, xbl, xfl, xbt, dsb, dib, noc); row count not read"
+    },
+    {
+      "source": "Dryad",
+      "query": "living fossils morphological disparity",
+      "url": "https://datadryad.org/api/v2/search?q=living%20fossils%20morphological%20disparity",
+      "hits": 15,
+      "note": "titles include fossil/modern penguin bills, crocodylomorph innovation, fossilisation and disparity"
+    },
+    {
+      "source": "Dryad",
+      "query": "morphological disparity morphospace fossil stem",
+      "url": "https://datadryad.org/api/v2/search?q=morphological%20disparity%20morphospace%20fossil%20stem",
+      "hits": 2,
+      "note": "Lloyd 2018"
+    },
+    {
+      "source": "DataCite",
+      "query": "morphological character matrix fossil extant vertebrate disparity",
+      "url": "https://api.datacite.org/dois?query=morphological%20character%20matrix%20fossil%20extant%20vertebrate%20disparity",
+      "hits": 0,
+      "note": null
+    }
+  ],
+  "status": "partial",
+  "summary": "Fossil ages and extant/extinct status are openly queryable in PBDB (taxa with first and last appearance in Ma), which supports a taxonomic version of the question (proportion of fossil genera that still have living members, by age). A morphological distance needs character matrices containing fossils and living taxa; MorphoBank was unreachable and the only matrix confirmed here (Lloyd 2018) covers coelurosaurian theropods.",
+  "next_step": "For a taxonomic test, pull PBDB genera with ages and extant flag; for a morphological test choose clades with open matrices (Dryad/MorphoBank supplements) and pre-register the age-distance regression.",
+  "obstacles_confirmed": [
+    "Matrices are clade-specific; no all-life fossil+extant character matrix was found.",
+    "MorphoBank returned HTTP 403."
+  ]
+}

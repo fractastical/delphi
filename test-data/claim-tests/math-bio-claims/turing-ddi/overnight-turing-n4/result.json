@@ -1,0 +1,50 @@
+{
+  "claim_id": "turing-ddi",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/turing-ddi",
+  "project": "math-bio-claims",
+  "status": "complete",
+  "hypothesis": "Among uniformly sampled four-species interaction sign patterns whose directed interaction graph contains at least one feedback cycle, more than 90% are detected as admitting a diffusion-driven linear instability for at least one of 100 sampled parameter realizations and one non-empty diffusion support.",
+  "pass_criterion": "A detected Turing-capable fraction greater than 0.9 supports the operational 'almost all' claim; because this is a finite Monte Carlo parameter search, it cannot prove the existential topological claim.",
+  "fail_criterion": "A two-sided exact Clopper-Pearson 95% interval for the detected Turing-capable fraction lying entirely below 0.9 refutes the pre-registered n=4 operational claim.",
+  "planned_datasets": [],
+  "test_contract": {
+    "expected_observation": "More than 90% of sampled cyclic n=4 sign patterns are detected as Turing-capable by the fixed finite parameter and wave-number search.",
+    "disconfirming_observation": "The exact 95% binomial interval for the detected-capable fraction lies entirely below 0.9.",
+    "admissible_datasets": "No external dataset; only seeded computational output from the enumerated n=3 and sampled n=4 sign-pattern ensembles.",
+    "inference_method": "Count a topology once any sampled stable Jacobian becomes non-Hurwitz after diagonal diffusion at a tested positive wave number; apply a two-sided 95% Clopper-Pearson interval to the n=4 detected-capable count."
+  },
+  "interpretation": "This operationalizes topology capability as detection within fixed bounded rate, diffusion, and wave-number searches. It directly tests the stated Monte Carlo approach, but non-detection is not a proof that no parameters exist.",
+  "datasets": [],
+  "data_kind": "computational",
+  "method": "Seed 470003 was fixed before execution. Because no n=3 census existed in the repository, all 3^9 sign patterns and all seven non-empty diffusion supports were first searched with 200 draws per pattern-support pair. Nonzero reaction magnitudes and positive diffusion coefficients were sampled log-uniformly on [0.01, 100], and 121 wave numbers were swept logarithmically on [0.001, 1000]. Then 2,000 distinct n=4 sign patterns were sampled uniformly conditional on a directed cycle, one non-empty support was sampled uniformly for each, and 100 parameter draws were tested. Strict cubic and quartic Routh-Hurwitz inequalities defined stability; capability required stable J and non-Hurwitz J-k^2D at some tested k > 0.",
+  "measured": {
+    "value": 0.196,
+    "unit": "detected-capable fraction",
+    "n": 2000,
+    "uncertainty": "exact two-sided Clopper-Pearson 95% interval [0.1788079205547995, 0.21408794619692778]",
+    "extra": {
+      "detected_capable_patterns_n4": 392,
+      "stable_parameter_draws_n4": 7044,
+      "n3_patterns": 19683,
+      "n3_detected_capable_patterns": 3782,
+      "n3_detected_capable_fraction": 0.19214550627445004,
+      "n3_cyclic_patterns": 19574,
+      "n3_detected_capable_fraction_cyclic": 0.1932154899356289,
+      "seed": 470003
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.95,
+  "caveats": [
+    "The exact interval lies far below 0.9 and therefore refutes the pre-registered operational n=4 detection claim.",
+    "A finite random parameter search has false negatives for existential capability; consequently this result does not settle or rigorously refute the mathematical conjecture that parameters exist for almost all cyclic topologies.",
+    "The sample can refute the threshold under this fixed procedure but cannot prove 'almost all'; even a detected fraction above 0.9 would only support, not prove, the claim.",
+    "The n=3 baseline exhausts sign patterns and diffusion supports but not the continuous parameter domain, so it is not the interval-certified exact census proposed in the approach file."
+  ],
+  "agent": {
+    "kind": "cursor-agent",
+    "model": "gpt-5.6-sol",
+    "run": "turing-capable-network-topologies--grok-4-7--3",
+    "date": "2026-11-01"
+  }
+}

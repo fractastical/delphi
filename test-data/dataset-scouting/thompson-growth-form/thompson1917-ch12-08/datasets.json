@@ -1,0 +1,279 @@
+{
+  "claim_id": "thompson1917-ch12-08",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "life habit per species or genus (attached benthic, free benthic, planktonic)",
+    "coiling mode per species or genus (planispiral, trochospiral/helicoid) and spire height or flattening of the attached side",
+    "taxonomy sufficient for phylogenetic control",
+    "ideally 3D or multi-view shell images"
+  ],
+  "datasets": [
+    {
+      "id": "world-foraminifera",
+      "name": "World Foraminifera Database / WoRMS Foraminifera",
+      "landing_url": "https://www.marinespecies.org/foraminifera/",
+      "access_url": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/1410",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "HEAD landing page (200); GET WoRMS REST AphiaIDByName and AphiaAttributesByAphiaID for Foraminifera",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxonomic backbone (Foraminifera AphiaID 1410)",
+        "a high-level 'Functional group: benthos' attribute and a qualitative body-size range at the class level"
+      ],
+      "variables_missing": [
+        "no per-genus attached/free habit",
+        "no coiling mode or spire-flattening field in the attributes returned"
+      ],
+      "scope": "All marine Foraminifera taxonomy; ecological attributes only at high rank",
+      "evidence": "AphiaIDByName?name=Foraminifera returned 1410; AphiaAttributesByAphiaID/1410 returned measurementType 'Functional group' value 'benthos' (source Brusca & Brusca 1990, unreviewed) and 'Body size (qualitative)' '0.2 - 2.0 mm'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "world-register-of-marine-species-worms",
+      "name": "World Register of Marine Species (WoRMS)",
+      "landing_url": "https://www.marinespecies.org/",
+      "access_url": "https://www.marinespecies.org/rest/AphiaIDByName/Foraminifera?marine_only=true",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET WoRMS REST API (same calls as above)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxonomic classification and functional-group attributes at high rank"
+      ],
+      "variables_missing": [
+        "genus- or species-level benthic/planktonic annotation not seen"
+      ],
+      "scope": "Marine taxa",
+      "evidence": "REST response for AphiaID 1410 as described under the World Foraminifera Database entry.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bforams-mikrotax",
+      "name": "bforams@mikrotax",
+      "landing_url": "https://www.mikrotax.org/bforams/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [
+        "catalogue of Mesozoic and Cenozoic deep-sea benthic foraminifera taxa"
+      ],
+      "variables_missing": [
+        "initial focus is common deep-sea benthic taxa, not attached forms",
+        "coiling and habit fields not enumerated"
+      ],
+      "scope": "Deep-sea benthic foraminifera",
+      "evidence": "Page text: 'a companion site to pforams@mikrotax dealing with benthic foraminifera. The immediate objective is to document Mesozoic and Cenozoic deep-sea benthic foraminifera'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "foraminifera-eu-project",
+      "name": "Foraminifera.eu Database (illustrated catalogue)",
+      "landing_url": "https://www.foraminifera.eu/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET landing page (200, redirects to foraminifera.eu)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "25,635 illustrations of 2,072 genera, searchable on taxonomy, morphology, geological time and geography (site text dated 1 November 2026)"
+      ],
+      "variables_missing": [
+        "no bulk download seen",
+        "attached vs free habit and flattening not confirmed as fields"
+      ],
+      "scope": "Benthic and planktonic foraminifera images",
+      "evidence": "Landing text: 'Foraminifera Database - illustrated catalog. 25.000 images searchable on taxonomy, morphology, geological time and geography ... 25.635 illustrations of foraminifera (2.072 genera)'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "forcens",
+      "name": "ForCenS planktonic foraminifera census counts (PANGAEA)",
+      "landing_url": "https://doi.org/10.1594/PANGAEA.873570",
+      "access_url": "https://doi.pangaea.de/10.1594/PANGAEA.873570?format=metadata_jsonld",
+      "doi": "10.1594/PANGAEA.873570",
+      "license": "CC BY-NC-SA 3.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "HEAD doi.org (200, redirects to doi.pangaea.de); GET metadata_jsonld",
+        "http_status": 200
+      },
+      "variables_present": [
+        "census counts of planktonic species in surface sediments, the floating end of the contrast"
+      ],
+      "variables_missing": [
+        "planktonic only",
+        "no coiling or attachment fields; counts per species"
+      ],
+      "scope": "Global marine surface sediments",
+      "evidence": "JSON-LD: name 'Compilation of planktonic foraminifera census counts in marine surface sediment samples (ForCenS)', licence CC BY-NC-SA 3.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Foraminifera",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET media API q=Foraminifera",
+        "http_status": 200
+      },
+      "variables_present": [
+        "75 media records matching 'Foraminifera' (8 pages of 10)"
+      ],
+      "variables_missing": [
+        "species coverage and attached-side flattening not assessed",
+        "no habit labels"
+      ],
+      "scope": "3D shell scans",
+      "evidence": "pages.total_count 75 for q=Foraminifera.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pangaea",
+      "name": "PANGAEA",
+      "landing_url": "https://www.pangaea.de/",
+      "access_url": "https://pangaea.de/advanced/search.php?q=foraminifera+coiling",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET pangaea.de/advanced/search.php?q=foraminifera+coiling",
+        "http_status": 200
+      },
+      "variables_present": [
+        "2,568 datasets matched the query text, e.g. doi:10.1594/PANGAEA.672519 'The Fohsella chronocline in middle Miocene sediments'"
+      ],
+      "variables_missing": [
+        "hits are mostly planktonic assemblage or morphometric studies of specific lineages; no cross-genus habit-by-coiling table seen"
+      ],
+      "scope": "Marine and palaeoceanographic datasets",
+      "evidence": "totalCount 2568 for q='foraminifera coiling'; first three URIs doi:10.1594/PANGAEA.672519, .678283, .771325.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-foraminifera-shape-sets",
+      "name": "Dryad: planktonic foraminifera size, shape and micro-CT records",
+      "landing_url": "https://datadryad.org/api/v2/search?q=foraminifera%20morphology",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3bk3j9kqh",
+      "doi": "10.5061/dryad.3bk3j9kqh",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET Dryad search 'foraminifera morphology' (17 hits) and dataset records 3bk3j9kqh, 41ns1rnrd",
+        "http_status": 200
+      },
+      "variables_present": [
+        "10.5061/dryad.3bk3j9kqh size and shape data of Globigerinoidesella fistulosa, Trilobatus sacculifer and intermediates (ODP 1115, CC0, 59,127 bytes)",
+        "10.5061/dryad.41ns1rnrd Pulleniatina micro-CT volumes of 7 specimens (CC0, 18,661 bytes)"
+      ],
+      "variables_missing": [
+        "planktonic taxa only; no attached benthic forms"
+      ],
+      "scope": "Single planktonic lineages",
+      "evidence": "Dataset API titles, licences (CC0-1.0) and storageSize as listed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "foraminifera morphology",
+      "url": "https://datadryad.org/api/v2/search?q=foraminifera%20morphology&per_page=5",
+      "hits": 17
+    },
+    {
+      "source": "BioImage Archive",
+      "query": "foraminifera",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=foraminifera&pageSize=5",
+      "hits": 2,
+      "note": "two Tara protist image collections (S-BIAD598, S-BIAD595)"
+    },
+    {
+      "source": "DataCite",
+      "query": "foraminifera coiling planispiral trochospiral life habit database",
+      "url": "https://api.datacite.org/dois?query=foraminifera%20coiling%20planispiral%20trochospiral%20life%20habit%20database&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "benthic foraminifera attached epiphytic test shape",
+      "url": "https://api.datacite.org/dois?query=benthic%20foraminifera%20attached%20epiphytic%20test%20shape&page[size]=5",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "foraminifera test morphology coiling mode ecology trait database",
+      "url": "https://zenodo.org/api/records?q=foraminifera%20test%20morphology%20coiling%20mode%20ecology%20trait%20database&size=5",
+      "hits": 639612,
+      "note": "unranked broad match; relevant hits are Dryad lineage studies"
+    },
+    {
+      "source": "PANGAEA",
+      "query": "foraminifera coiling",
+      "url": "https://pangaea.de/advanced/search.php?q=foraminifera+coiling",
+      "hits": 2568
+    }
+  ],
+  "status": "partial",
+  "summary": "No open table links foraminiferan genera to attached/free/planktonic habit and coiling mode: WoRMS gives only a class-level 'benthos' attribute, bforams and Foraminifera.eu are image catalogues (25,635 images of 2,072 genera on the latter), MorphoSource has 75 foraminifer media, and PANGAEA/Dryad hold lineage-specific planktonic sets. Habit and coiling would have to be compiled from monographs and joined to WoRMS taxonomy.",
+  "next_step": "Compile a genus-level habit and coiling table from monographs (Loeblich & Tappan style), join it to WoRMS AphiaIDs, and use Foraminifera.eu or MorphoSource images to score flattening on the attached side.",
+  "obstacles_confirmed": [
+    "Attached versus free habit and the flattened face are not fields in the census databases and must be compiled from monographs.",
+    "Many species lack public 3D scans."
+  ]
+}

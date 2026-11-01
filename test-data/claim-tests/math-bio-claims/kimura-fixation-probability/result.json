@@ -1,0 +1,67 @@
+{
+  "claim_id": "kimura-fixation-probability",
+  "data_kind": "biological",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/kimura-fixation-probability",
+  "project": "math-bio-theorems",
+  "status": "complete",
+  "hypothesis": "If a neutral allele's probability of eventual fixation equals its initial frequency, then in Buri's (1956) 107 replicate Drosophila populations, each started with the bw75 allele at frequency 0.5 in 16 flies, the lines that have reached fixation or loss by the last recorded generation should be split evenly between fixation of bw75 and loss of bw75.",
+  "pass_criterion": "Pre-registered. Data: the 'fly' matrix in the CRAN package popgenr 0.2 (CC0; Laruson and Reed 2021), a 19 x 107 matrix of the number of bw75 allele copies (out of 32) in each replicate at each generation, transcribed from Buri (1956). At the last recorded generation, a line is 'fixed' if the count is 32 and 'lost' if the count is 0; m = fixed + lost, k = fixed. SUPPORTS if m >= 20 AND the two-sided exact binomial test of k against Binomial(m, 0.5) gives p > 0.05 AND |k/m - 0.5| < 0.15. Reported but not decisive: the mean bw75 frequency across all 107 lines at the last generation (predicted 0.5 under neutrality, since the expected frequency is constant under drift) and the number of fixed-or-lost lines.",
+  "fail_criterion": "Pre-registered. REFUTES if the exact binomial test gives p < 0.01 (fixation significantly favours one allele) OR |k/m - 0.5| >= 0.25. MIXED otherwise (0.01 <= p <= 0.05, or 0.15 <= |k/m - 0.5| < 0.25). INCONCLUSIVE (underpowered) if m < 20; INCONCLUSIVE (data-unavailable) if the package source cannot be downloaded.",
+  "planned_datasets": [
+    "buri1956-drosophila-bw75-popgenr-fly"
+  ],
+  "interpretation": "The claim's neutral limit u(p) = p is tested at p = 0.5 with 32 gene copies per line. The selection-dependent form u(p) = (1 - exp(-4*Ne*s*p)) / (1 - exp(-4*Ne*s)) is not tested, because the selection coefficient of bw75 is not measured independently of these data (Buri himself reported a small heterozygote advantage in the series). A balanced split among fixed lines is the prediction of neutrality; a strong imbalance would show selection acting, which the claim's selective form would then describe but which this test could not quantify. Lines not yet fixed at the last generation are censored and do not enter k or m.",
+  "datasets": [
+    {
+      "id": "buri1956-drosophila-bw75-popgenr-fly",
+      "name": "Buri (1956) 'Gene frequency in small populations of mutant Drosophila': allele-count distribution of bw75 in 107 replicate populations of 16 flies over 19 generations, as transcribed in the CRAN package popgenr 0.2 (object 'fly')",
+      "landing_url": "https://cran.r-project.org/package=popgenr",
+      "doi": "10.2307/2406998",
+      "version": "popgenr 0.2 (CRAN, 2021-02-25)",
+      "license": "CC0",
+      "files": [
+        {
+          "download_url": "https://cran.r-project.org/src/contrib/popgenr_0.2.tar.gz",
+          "retrieved_at": "2026-10-31T05:57:50Z",
+          "byte_size": 35230,
+          "sha256": "50aa99f0ba37e5a35fcc0fe06a4ce27642708b7613cb05e36fca03357f848d98"
+        },
+        {
+          "member_of_tarball": "popgenr/data/fly.RData",
+          "byte_size": 689,
+          "sha256": "229423c3953a1d90a2d3a27b04dd83e7d2c1b7bdf68c0786dd8751b7bdcd148d"
+        }
+      ],
+      "role": "generation x allele-count table (rows = generations, columns = number of bw75 copies 0..32, cells = number of populations)"
+    }
+  ],
+  "method": "fetch.py downloads the CRAN tarball, extracts data/fly.RData and converts it with Rscript to derived/buri1956_fly.csv (committed, 1.7 KB). The object turned out to be a 20 x 33 generation-by-allele-count table (each row sums to 107 populations), not a 19 x 107 per-replicate matrix as the pre-registration assumed; the pre-registered quantities (number of populations fixed for bw75, k = 32 copies, and lost, k = 0, at the last recorded generation) are read directly from it. analysis.py applies the exact two-sided binomial test of fixed against Binomial(fixed + lost, 0.5) and reports the mean bw75 frequency and heterozygosity by generation, from whose decay an effective size is estimated for context.",
+  "measured": {
+    "value": 0.4827586206896552,
+    "unit": "fraction of fixed-or-lost populations fixed for bw75 at the last recorded generation (neutral prediction 0.5)",
+    "n": "58 fixed-or-lost populations of 107 (28 fixed, 30 lost) after 19 generations",
+    "uncertainty": "exact binomial two-sided p = 0.90",
+    "extra": {
+      "mean_bw75_frequency_first_gen": 0.5,
+      "mean_bw75_frequency_last_gen": 0.47167056074766356,
+      "heterozygosity_first_last": [
+        0.5,
+        0.16159827686915884
+      ],
+      "ne_from_heterozygosity_decay": 8.240195577974482
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Only the neutral limit u(p) = p at p = 0.5 is tested; the selection-dependent formula is untested because s for bw75 is not independently known. The mean bw75 frequency drifted from 0.500 to 0.472 over 19 generations, a slight deficit that Buri attributed to weak selection; it is within what drift alone produces in 107 lines and does not change the fixed/lost balance.",
+    "The popgenr object is a transcription of Buri's published table; transcription accuracy was not checked against the 1956 paper (not open access).",
+    "Censoring: 49 of 107 lines were still segregating at the last generation; the test uses only lines that had resolved. Effective size from heterozygosity decay is about 8 (census 16), consistent with Buri's own estimate, so most fixations occurred before 4Ne generations had elapsed."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "claim_id": "levin-2022-tame-27",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "per-animal voltage maps (dye-reported Vmem) of tadpoles after ion-channel mRNA injection",
+    "ectopic eye incidence and anatomical location (gut, tail, spinal cord) per injected animal",
+    "eye marker or histology scoring for completeness of eyes",
+    "matched Pax6-misexpression scoring at the same sites"
+  ],
+  "datasets": [
+    {
+      "id": "biostudies-portal",
+      "name": "BioStudies",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; search API for \"Xenopus eye voltage\"",
+        "http_status": 200,
+        "bytes": 20454
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "per-animal voltage maps (dye-reported Vmem) of tadpoles after ion-channel mRNA injection",
+        "ectopic eye incidence and anatomical location (gut, tail, spinal cord) per injected animal",
+        "eye marker or histology scoring for completeness of eyes",
+        "matched Pax6-misexpression scoring at the same sites"
+      ],
+      "scope": "portal over all submitters",
+      "evidence": "Landing HTTP 200 (20,454 bytes). Search API returned 63,418 hits for the query, top 5 being S-EPMC article mirrors (e.g. S-EPMC6667200 Jmjd6a, S-EPMC556406 Wnt-4), none a voltage or ion-channel eye-induction record.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "geo-portal-xenopus-eye",
+      "name": "NCBI Gene Expression Omnibus",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; eutils esearch db=gds \"Xenopus laevis ectopic eye\"",
+        "http_status": 200,
+        "bytes": 21425
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "per-animal voltage maps (dye-reported Vmem) of tadpoles after ion-channel mRNA injection",
+        "ectopic eye incidence and anatomical location (gut, tail, spinal cord) per injected animal",
+        "eye marker or histology scoring for completeness of eyes",
+        "matched Pax6-misexpression scoring at the same sites"
+      ],
+      "scope": "expression archive",
+      "evidence": "Landing HTTP 200 (21,425 bytes). The esearch returned 3 series (GSE32452, GSE32331, GSE12613), all multiciliated-cell or FoxJ1 work, none on ion-channel eye induction.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "pmc-portal",
+      "name": "PubMed Central",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; Europe PMC search for Xenopus ectopic-eye papers",
+        "http_status": 200,
+        "bytes": 67222
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "per-animal voltage maps (dye-reported Vmem) of tadpoles after ion-channel mRNA injection",
+        "ectopic eye incidence and anatomical location (gut, tail, spinal cord) per injected animal",
+        "eye marker or histology scoring for completeness of eyes",
+        "matched Pax6-misexpression scoring at the same sites"
+      ],
+      "scope": "full-text article archive",
+      "evidence": "Landing HTTP 200 (67,222 bytes). It is a literature portal; Europe PMC search \"ectopic eye\" Xenopus voltage potassium channel Levin returned 23 articles (reviews and PMC3243095 / PMC3258185 for Pai et al. 2012), no deposited image or animal-level dataset.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Europe PMC",
+      "query": "\"ectopic eye\" Xenopus voltage potassium channel Levin",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=%22ectopic%20eye%22%20Xenopus%20voltage%20potassium%20channel%20Levin",
+      "hits": 23,
+      "note": "reviews and the 2012 Pai et al. eye-patterning paper (PMC3243095, PMC3258185 in the title search); no dataset records"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "TITLE:\"Transmembrane voltage potential controls embryonic eye patterning in Xenopus laevis\"",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=TITLE%3A%22Transmembrane%20voltage%20potential%20controls%20embryonic%20eye%20patterning%20in%20Xenopus%20laevis%22",
+      "hits": 2,
+      "note": "PMC3258185 and PMC3243095 (doi 10.1242/dev.077917 and 10.1242/dev.073759); Europe PMC full text of PMC3258185 returned HTTP 500"
+    },
+    {
+      "source": "Dryad",
+      "query": "Xenopus bioelectric",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Xenopus%20bioelectric",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "Xenopus ectopic eye",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Xenopus%20ectopic%20eye",
+      "hits": 1,
+      "note": "Celf1 / lens dataset (doi 10.5061/dryad.k3r485h), not voltage or ion-channel induction"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Xenopus ectopic eye ion channel",
+      "url": "https://zenodo.org/api/records?size=5&q=Xenopus%20ectopic%20eye%20ion%20channel",
+      "hits": 143123,
+      "note": "free-text query; top 5 unrelated (includes the same Celf1 Dryad mirror)"
+    },
+    {
+      "source": "NCBI GEO (eutils db=gds)",
+      "query": "Xenopus laevis ectopic eye",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&retmode=json&retmax=5&term=Xenopus%20laevis%20ectopic%20eye",
+      "hits": 3,
+      "note": "GSE32452, GSE32331, GSE12613 are multiciliated-cell series, not eye induction"
+    },
+    {
+      "source": "BioStudies",
+      "query": "Xenopus eye voltage",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=Xenopus%20eye%20voltage",
+      "hits": 63418,
+      "note": "generic; top 5 are article mirrors, none a Levin eye-induction record"
+    },
+    {
+      "source": "DataCite",
+      "query": "Xenopus bioelectric eye induction",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Xenopus%20bioelectric%20eye%20induction",
+      "hits": 0
+    }
+  ],
+  "status": "gap",
+  "summary": "The claim rests on published Xenopus eye-induction experiments; no deposited images, voltage maps or per-animal tables were found in Dryad, Zenodo, GEO, BioStudies or DataCite. The Pax6 comparison comes from separate studies, so no single dataset covers both manipulations.",
+  "next_step": "Extract incidence, site and n for the ion-channel and Pax6 experiments from the primary papers into one table, or request images from the authors.",
+  "obstacles_confirmed": [
+    "Histology and induction rates are in papers, not a public image archive.",
+    "Pax6 and ion-channel experiments are in different studies."
+  ]
+}

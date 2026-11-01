@@ -12,6 +12,10 @@ import morphogenesis as M  # noqa: E402
 
 SEEDS = range(20)
 INIT = {"code_randn_over_8": 1 / 8, "paper_log_precision_minus4": float(np.exp(2.0))}
+# Primary runs are deterministic, as pre-registered. Sensitivity runs add the SPM generative
+# process's sensory noise (precision exp(16)), omitted from the pre-registered re-implementation.
+CONDITIONS = [(k, sd, False) for k, sd in INIT.items()] + \
+    [(k + "+process_noise", sd, True) for k, sd in INIT.items()]
 
 
 def first(traj, cond):
@@ -22,10 +26,11 @@ def main():
     records, demo, _, _ = M.load_source_info()
     tg = M.Target(demo["T"])
     rows, summary = [], {}
-    for name, sd in INIT.items():
+    for name, sd, noisy in CONDITIONS:
         for seed in SEEDS:
             v, ax, as_ = M.initial_state(tg, np.random.default_rng(seed), sd)
-            traj, _ = M.run(tg, v, ax, as_)
+            nrng = np.random.default_rng(10_000 + seed) if noisy else None
+            traj, _ = M.run(tg, v, ax, as_, noise_rng=nrng)
             d0 = traj[0]["mean_dist"]
             t_m = first(traj, lambda t: t["mean_dist"] < 0.5 * d0)
             t_d = first(traj, lambda t: t["correct_types"] >= 6 and t["mean_max_p"] > 0.5)

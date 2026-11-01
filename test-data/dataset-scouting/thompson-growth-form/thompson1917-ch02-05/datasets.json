@@ -1,0 +1,107 @@
+{
+  "claim_id": "thompson1917-ch02-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T03:35:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-2/thompson-ch01-05" },
+  "variables_needed": [
+    "burst (fast-start / sprint) speed per individual with body length, within related species",
+    "time to fatigue or endurance at fixed speed per individual with body length",
+    "annual (or long-term) distance travelled per individual with body length, from telemetry",
+    "covariates: water temperature, swimming mode, body shape"
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-speed",
+      "name": "FishBase Speed table (swimming speeds by species, mode and length)",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://www.fishbase.se/physiology/SpeedList.php?ID=239&GenusName=Oncorhynchus&SpeciesName=mykiss",
+      "doi": null,
+      "license": "CC BY-NC 3.0",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T03:22:00Z", "method": "GET SpeedList.php HTML for Oncorhynchus mykiss and Gadus morhua", "http_status": 200, "bytes": null },
+      "variables_present": ["swimming speed (m/s and body lengths/s) with length and mode ('burst', 'sustained') per record"],
+      "variables_missing": ["time to fatigue", "annual distance", "individual-level size series within a test"],
+      "scope": "Species-level literature records; O. mykiss page has 38 speed rows (12 tagged burst, 64 'sustained' tokens), G. morhua 2 rows; the SwimSpeedList.php URL returned 404",
+      "evidence": "Speed List page columns: 'Speed (m/s)', 'Speed (Length type/s)', 'Mode'; rows link to SpeedSummary.php. Counts from the HTML of the two species pages.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "fishbase-2026-10"
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": "https://www.movebank.org/movebank/service/direct-read?entity_type=study&i_have_download_access=true",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T03:22:00Z", "method": "HEAD landing; GET direct-read study list without credentials", "http_status": 401, "bytes": null, "note": "Landing 302→200; the REST API returns HTTP 401 Unauthorized without a Movebank account." },
+      "variables_present": [],
+      "variables_missing": ["cannot enumerate fish tracking studies or their body-length attributes without login"],
+      "scope": "Unknown from this session",
+      "evidence": "direct-read?entity_type=study returned 'HTTP Status 401 – Unauthorized'.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-21216275-ucrit-global-synthesis",
+      "name": "Life history stage, body size and morphology dominate fish critical swimming speed: a global synthesis (Zenodo, TableS1)",
+      "landing_url": "https://zenodo.org/records/21216275",
+      "access_url": "https://zenodo.org/api/records/21216275",
+      "doi": "10.5281/zenodo.21216275",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T03:30:00Z", "method": "GET Zenodo API record (21216274 redirects to 21216275)", "http_status": 200, "bytes": 2673106 },
+      "variables_present": ["absolute and relative critical swimming speed (Ucrit) with body length, life-history stage and morphology; 1,345 experimental cases across 361 species"],
+      "variables_missing": ["burst speed", "time to fatigue", "annual distance"],
+      "scope": "Global prolonged-swimming compilation, published 2026-07-06; one file TableS1.xlsx (2,673,106 bytes)",
+      "evidence": "Record metadata: Dataset, CC BY 4.0, description 'compiled a global dataset of experimentally measured absolute and relative Ucrit ... from 1,345 experimental cases across 361 sp[ecies]'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-gxd2547n6-great-basin-burst-prolonged",
+      "name": "Size matters, but species do not: burst (c-start) and prolonged (Ucrit) swimming in co-occurring Great Basin stream fishes (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.gxd2547n6",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.gxd2547n6",
+      "doi": "10.5061/dryad.gxd2547n6",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T03:25:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 5246 },
+      "variables_present": ["burst speed (c-start velocity) and prolonged speed (Ucrit) per individual with body size, several co-occurring species"],
+      "variables_missing": ["time to fatigue as such", "annual distance", "large size range"],
+      "scope": "Small table (5,246 bytes), Great Basin stream fishes",
+      "evidence": "API abstract: 'we characterize both burst (c-start velocity) and prolonged speed (critical swim speed) across a poorly documented, co-occurring group of stream fishes'; CC0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-b8nh1x-burst-tunnel",
+      "name": "Data from: A laser-equipped tunnel for the assessment of multiple burst swimming traits in fishes (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.25338/B8NH1X",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.25338%2FB8NH1X",
+      "doi": "10.25338/B8NH1X",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T03:30:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 536619 },
+      "variables_present": ["multiple burst-swimming traits (acceleration, short-distance speed, duration) per trial"],
+      "variables_missing": ["fatigue time", "annual distance", "size series not confirmed"],
+      "scope": "Methods dataset, 536,619 bytes",
+      "evidence": "API record: title, CC0, storageSize 536619, abstract on fast acceleration over short distance and limited duration.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "fish burst swimming", "url": "https://datadryad.org/api/v2/search?q=fish%20burst%20swimming&per_page=8", "hits": 20, "note": "dryad.gxd2547n6 (burst + Ucrit vs size) and 10.25338/B8NH1X (burst traits) relevant; others single-species ecology." },
+    { "source": "Dryad", "query": "critical swimming speed", "url": "https://datadryad.org/api/v2/search?q=critical%20swimming%20speed&per_page=8", "hits": 19, "note": "Mostly single-species Ucrit; dryad.vk820 (cyprinid morphology vs swimming performance) is interspecific." },
+    { "source": "DataCite", "query": "fish \"swimming speed\" \"body length\" dataset", "url": "https://api.datacite.org/dois?query=fish%20%22swimming%20speed%22%20%22body%20length%22%20dataset&page%5Bsize%5D=6", "hits": 15, "note": "Surfaced the global Ucrit synthesis (10.5281/zenodo.21216274/5)." },
+    { "source": "Zenodo", "query": "fish acoustic telemetry \"body length\" distance", "url": "https://zenodo.org/api/records?q=fish%20acoustic%20telemetry%20%22body%20length%22%20distance&size=5", "hits": 226280, "note": "Loose match; no open per-individual annual-distance table with body length surfaced; Movebank API needs credentials." }
+  ],
+  "status": "partial",
+  "summary": "Burst speed with body size exists in small Dryad tables (Great Basin stream fishes; burst-tunnel trials) and as species-level literature rows in FishBase's Speed table; prolonged (Ucrit) performance with body length is compiled for 1,345 cases / 361 species in a CC BY 4.0 Zenodo synthesis. No open dataset pairs these with time-to-fatigue curves or annual distance travelled for the same size series; Movebank's API requires an account.",
+  "next_step": "Use the Zenodo Ucrit synthesis plus FishBase burst rows for the speed-vs-length exponents, obtain fatigue-curve data (Brett-style endurance at fixed speed) from primary papers, and request fish studies from Movebank with an account for annual distance; then pre-register the three exponent comparisons.",
+  "obstacles_confirmed": [
+    "Sprint tests, fatigue curves, and annual tracks are rarely available for the same size series.",
+    "Movebank requires credentials for study listing and download."
+  ]
+}

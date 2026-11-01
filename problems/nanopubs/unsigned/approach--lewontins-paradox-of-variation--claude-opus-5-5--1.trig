@@ -1,0 +1,93 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered phylogenetic test of three quantitative predictions for the π–N slope" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Extend Buffalo's (2021) compilation with independent census proxies from the organisms layer and state, before analysis, the slope each hypothesis predicts. Response: log₁₀ π at synonymous or neutral sites. Census proxy: log₁₀(range area × density), where range area is the convex hull or alpha hull of cleaned GBIF occurrences and density is predicted from body mass by Damuth's allometry (D ∝ M^−0.75), as Buffalo did, but with GBIF-derived ranges to test robustness. Predictions: (H0, neutral) slope of log π on log N_c ≈ 1 if N_e ∝ N_c and μ is constant; (H1, linked selection) slope reduced by the factor predicted from each species' map length and coding density using a Corbett-Detig-style model of background selection plus sweeps, computed per species before looking at π; (H2, demographic) π tracks the harmonic mean of population size, so slope ≈ 1 against harmonic-mean N but much less against current N_c. Fit PGLS with Pagel's λ (phylolm) on an Open Tree of Life synthetic tree with time calibration. Decision rule: H1 closes the gap if the observed slope lies within the 95% interval of the H1-predicted slope; H0 is refuted if the slope interval excludes 0.5." ;
+
+    delphi:proposedTest "Observed PGLS slope with 95% CI compared against the pre-registered H0 and H1 intervals: the gap is closed if the observed slope falls in the H1 interval, and the residual is quantified in orders of magnitude otherwise. The minimum sample is 100 species with π and range; Buffalo's set is larger, so recombination-map availability limits only the H1 subset." ;
+    delphi:context "Fails if: Census proxies from GBIF ranges and Damuth density have measurement error so large (or so correlated with body mass) that slope intervals overlap all three predictions: inconclusive, underpowered." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with predicted slopes and intervals for H0, H1 and H2 before computing observed slopes. 2. Resolve species through the organisms layer; fetch GBIF occurrences with a cleaning pipeline (coordinate checks, outlier removal) and compute ranges. 3. Compute per-species predicted linked-selection reduction from published map lengths and genome annotations; record n for which inputs exist. 4. Fit PGLS; compare slopes; report residual orders of magnitude unexplained." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Recombination maps exist for a minority of species, so H1 can be tested only on a subset; census-size estimation remains crude." ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+    rdfs:seeAlso <https://github.com/vsbuffalo/paradox_variation> ;
+    rdfs:seeAlso <https://api.gbif.org/v1/occurrence/search?limit=1> ;
+    rdfs:seeAlso <https://opentreeoflife.github.io/> ;
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.67509> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.1002112> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.1001388> ;
+    rdfs:seeAlso <https://doi.org/10.1038/290699a0> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+
+  <https://github.com/vsbuffalo/paradox_variation> dct:title "Buffalo 2021 data and code" ;
+    dct:description "Species diversity estimates, census proxies and the analysis code to extend" .
+  <https://api.gbif.org/v1/occurrence/search?limit=1> dct:title "GBIF occurrence API" ;
+    dct:description "Occurrence coordinates for range estimation" .
+  <https://opentreeoflife.github.io/> dct:title "Open Tree of Life" ;
+    dct:description "Synthetic phylogeny for PGLS" .
+  <https://doi.org/10.7554/eLife.67509> dct:title "Quantifying the relationship between genetic diversity and population size suggests natural selection cannot explain Lewontin’s Paradox" ;
+    dct:bibliographicCitation "Buffalo 2021, Quantifying the relationship between genetic diversity and population size" .
+  <https://doi.org/10.1371/journal.pbio.1002112> dct:title "Natural Selection Constrains Neutral Diversity across A Wide Range of Species" ;
+    dct:bibliographicCitation "Corbett-Detig, Hartl and Sackton 2015, linked selection across 40 species" .
+  <https://doi.org/10.1371/journal.pbio.1001388> dct:title "Revisiting an Old Riddle: What Determines Genetic Diversity Levels within Species?" ;
+    dct:bibliographicCitation "Leffler et al. 2012, diversity across 167 species" .
+  <https://doi.org/10.1038/290699a0> dct:title "Population density and body size in mammals" ;
+    dct:bibliographicCitation "Damuth 1981, Population density and body size in mammals" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.299Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Pre-registered phylogenetic test of three quantitative predictions for the π–N slope" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

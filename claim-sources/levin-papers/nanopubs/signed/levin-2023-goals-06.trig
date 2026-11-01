@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAcup-fnkWFKosqbFkkl8iQqnQhXzuJ3GJ1qRin7Getas>.
+@prefix sub: <https://w3id.org/np/RAcup-fnkWFKosqbFkkl8iQqnQhXzuJ3GJ1qRin7Getas/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2023-goals-06> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In an evolved neural cellular automaton tissue that uses stress as an instructive signal, forcing stress to zero throughout life (a simulated anxiolytic) lowered pattern accuracy (82.8% vs 95.1% at step 90) and killed the red-stripe cells, so anatomical homeostasis was neither reached nor maintained.";
+    dc:type "simulation-result";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Blocking stress signalling prevents anatomical homeostasis in a stress-using tissue";
+    <https://w3id.org/delphi/ontology/context> "Pio-Lopez L, Bischof J, LaPalme JV, Levin M, “The scaling of goals from cellular to anatomical homeostasis: an evolutionary simulation, experiment and analysis”, Interface focus (2023), doi:10.1098/rsfs.2022.0072; section “Computational results › Evolution exploits stress as an instructive signal to reach the target morphology”. Scope: One evolved tissue in the 2D neural cellular automaton model that uses stress instructively"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1098/rsfs.2022.0072>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-goals.txt#line=147,148>;
+    prov:wasQuotedFrom <https://doi.org/10.1098/rsfs.2022.0072>;
+    <https://schema.org/text> "These experiments reveal that, in the absence of stress, anatomical homeostasis is not reached nor maintained during the lifetime of the cells.".
+<https://doi.org/10.1098/rsfs.2022.0072> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Pio-Lopez L, Bischof J, LaPalme JV, Levin M. The scaling of goals from cellular to anatomical homeostasis: an evolutionary simulation, experiment and analysis. Interface focus (2023). doi:10.1098/rsfs.2022.0072";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2023"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "The scaling of goals from cellular to anatomical homeostasis: an evolutionary simulation, experiment and analysis";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10102734>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-goals.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-goals.txt#line=147,148> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-goals.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-goals.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10102734/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1098/rsfs.2022.0072>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "0fc61cfca3c9a35234c862ccd2bcc482f672e1eaff3e6d9e289fac0e1d95eb90"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2023 claim: Blocking stress signalling prevents anatomical homeostasis in a stress-using tissue";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2023-goals-06>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "UcGHuYntPuIXMA38VSv2J2/SGuwexGvWnNXnA/md5aTkQP8K9risyEqmiD6+KZFg70/VhJjjDZiiIcbScEbRRYDIK6+BNug0kocnyp/w+r5+EAOCI18WKsbSdwQ+oTO8vCa6hxy/ZAG6ERLCYxyHBVkOj+8dGzF1XHDY2UnfmmFg5i+NxVEAfcwDyT1ZOymH2hwzulvVNaLUE0rALXYi7XYRY3WHchmhZlduWAVQZhbDY9IlOmsqPbXHudY23PkfDRr83NWJfIgfMsHjf2E3kotqezJj5hdxd8kdg6rIn17l/+ZOt+9Co1gGAoXMdXWVtbdtoFLtpYzB+4Q5unC2+w=="
+}

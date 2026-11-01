@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> a delphi:Concept, schema:Question ;
+    rdfs:label "The exact scope of Hamilton's rule" ;
+    dct:description "Under precisely which population-genetic models is Hamilton's rule rb > c (i) a theorem with predictive content, (ii) an identity with no content beyond the Price equation, and (iii) false?" ;
+
+    skos:historyNote "Known state: Nowak, Tarnita and Wilson (2010) argued the rule is almost never a theorem and when general is tautological; Gardner, West and Wild (2011) replied that the regression form is exact and general. Birch and Okasha (2015) separate the readings. The dispute is partly about theorem statements, which makes it formalizable; no formalization exists. The repo records hamilton-rule as proved in the regression form and hamilton-haplodiploidy as refuted." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: A Lean 4 development stating the general regression form, the additive-fitness form and a frequency-dependent counterexample as separate theorems, each proved or refuted, with the model assumptions as explicit hypotheses." ;
+    skos:scopeNote "Resolved when: A short statement of which disputed claims in the 2010-2011 exchange correspond to which formal theorem." ;
+    skos:scopeNote "Refuted if: A formal model in which the regression form fails to predict the direction of allele-frequency change would refute Gardner et al.'s generality claim." ;
+    skos:note "Data access: None needed for the formal part; empirical follow-up can use pedigreed cooperative-breeder datasets." ;
+    skos:note "Requires: lean4" ;
+    skos:note "Requires: population-genetics" ;
+    skos:note "Requires: price-equation" ;
+    skos:note "Scale: evolutionary" ;
+    skos:note "Scale: collective" ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-rule> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-haplodiploidy> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-lmc> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0022-5193(64)90038-4> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature09205> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1420-9101.2011.02236.x> ;
+    rdfs:seeAlso <https://doi.org/10.1093/biosci/biu196> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1016/0022-5193(64)90038-4> dct:title "The genetical evolution of social behaviour. I" ;
+    dct:bibliographicCitation "Hamilton 1964, The genetical evolution of social behaviour I" .
+  <https://doi.org/10.1038/nature09205> dct:title "The evolution of eusociality" ;
+    dct:bibliographicCitation "Nowak, Tarnita and Wilson 2010, The evolution of eusociality" .
+  <https://doi.org/10.1111/j.1420-9101.2011.02236.x> dct:title "The genetical theory of kin selection" ;
+    dct:bibliographicCitation "Gardner, West and Wild 2011, The genetical theory of kin selection" .
+  <https://doi.org/10.1093/biosci/biu196> dct:title "Kin Selection and Its Critics" ;
+    dct:bibliographicCitation "Birch and Okasha 2015, Kin selection and its critics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.290Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: The exact scope of Hamilton's rule" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

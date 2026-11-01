@@ -1,0 +1,91 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Computer-assisted proof of attractors via interval Newton and Conley–Morse graphs" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "Use the Atela–Golé–Hotton reduction: in the cylindrical hard-disk version of the Douady–Couder model (each new primordium at the lowest available position at distance ≥ D from existing ones on a cylinder of circumference 1), the dynamics reduce to a finite-dimensional map on 'fronts', the chains of most recent primordia. Rhombic lattices (Fibonacci, Lucas, bijugate and other parastichy pairs) are fixed points of this map up to translation. For the smooth-repulsion version (energy Σ exp(−|x − x_j|/λ) or a power law), the step map is piecewise smooth. Plan: (a) for each candidate branch (m, n), enclose the fixed point over parameter boxes in D (or Γ) with the interval Newton or Krawczyk operator in Arb/FLINT or CAPD, and enclose the Jacobian spectrum inside the unit disk to certify local attraction; (b) for global classification, build a Conley–Morse graph over a box grid of the reduced state space for each parameter box (the Arai et al. 2009 database method), certifying that every recurrent set is one of the enclosed fixed points; (c) the Lucas and bijugate branches enter as additional Morse sets with their own parameter ranges." ;
+
+    delphi:proposedTest "A computer-assisted theorem: for all D in a stated range, the only attractors of the cylindrical front map are the certified lattice fixed points, which include the Fibonacci and Lucas branches with explicit ranges, and every other initial front converges to one of them. Basin boundaries are bounded by the Morse decomposition." ;
+    delphi:context "Fails if: Conley–Morse graphs at feasible resolutions contain Morse sets that are not single fixed points (unresolved recurrent sets) in significant parameter ranges, or the discontinuities of the hard-disk map break the interval Newton enclosures near bifurcations." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Implement the front map exactly (hard-disk model) and the smooth-repulsion map; reproduce Douady–Couder bifurcation diagrams numerically. 2. Certify fixed points and stability with interval Newton or Krawczyk across D ∈ [D_min, 0.5] in boxes, adaptively refined. 3. Compute Conley–Morse graphs per parameter box; check that the Morse sets match the certified fixed points. 4. Publish the certified bifurcation diagram and code; describe precisely the parameter range covered." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: The disc geometry (non-cylindrical, radially varying spacing) is out of scope for this reduction; the result would cover only the cylinder." ;
+    skos:note "Tool: interval-arithmetic" ;
+    skos:note "Tool: dynamical-systems" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+    rdfs:seeAlso <https://doi.org/10.1007/s00332-002-0513-1> ;
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevLett.68.2098> ;
+    rdfs:seeAlso <https://doi.org/10.1006/jtbi.1996.0024> ;
+    rdfs:seeAlso <https://doi.org/10.1137/080734935> ;
+    rdfs:seeAlso <https://arblib.org/> ;
+    rdfs:seeAlso <http://capd.ii.uj.edu.pl/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+  <https://doi.org/10.1007/s00332-002-0513-1> dct:title "A Dynamical System for Plant Pattern Formation: A Rigorous Analysis" ;
+    dct:bibliographicCitation "Atela, Golé and Hotton 2002, A dynamical system for plant pattern formation: a rigorous analysis (J Nonlinear Sci)" .
+  <https://doi.org/10.1103/PhysRevLett.68.2098> dct:title "Phyllotaxis as a physical self-organized growth process" ;
+    dct:bibliographicCitation "Douady and Couder 1992, Phyllotaxis as a physical self-organized growth process" .
+  <https://doi.org/10.1006/jtbi.1996.0024> dct:title "Phyllotaxis as a Dynamical Self Organizing Process Part I: The Spiral Modes Resulting from Time-Periodic Iterations" ;
+    dct:bibliographicCitation "Douady and Couder 1996, Phyllotaxis as a dynamical self organizing process, Part I" .
+  <https://doi.org/10.1137/080734935> dct:title "A Database Schema for the Analysis of Global Dynamics of Multiparameter Systems" ;
+    dct:bibliographicCitation "Arai et al. 2009, A database schema for the analysis of global dynamics of multiparameter systems" .
+  <https://arblib.org/> dct:bibliographicCitation "Arb (now part of FLINT), ball arithmetic for interval enclosures" .
+  <http://capd.ii.uj.edu.pl/> dct:bibliographicCitation "CAPD library for computer-assisted proofs in dynamics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.298Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Computer-assisted proof of attractors via interval Newton and Conley–Morse graphs" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,114 @@
+{
+  "claim_id": "thompson1917-ch17-15",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:05:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "cranial shape (3D landmarks or surface scans) of Hyracotherium/Eohippus, Parahippus and Equus",
+    "an independently coded phylogeny or character matrix for Equidae that includes Parahippus, to place it on or off the Equus stem",
+    "stratigraphic age and occurrence context of Parahippus relative to other equids"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-equidae-taxa-and-occurrences",
+      "name": "Paleobiology Database: Equidae genera and occurrence counts (Parahippus, Mesohippus, Hyracotherium, Eohippus, Equus)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Equidae&rank=genus&limit=200&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:00:52Z", "method": "GET taxa/list.json for Equidae genera (81 genus records, 51 not synonymised) and taxa/single.json for Parahippus (txn:43016, 74 occurrences, parent Anchitheriinae), Hyracotherium (203), Eohippus (6), Equus (1679)", "http_status": 200 },
+      "variables_present": [
+        "taxonomy and parent-child placement of Parahippus (Anchitheriinae) in PBDB's classification",
+        "occurrence counts per genus (Parahippus 74, Hyracotherium 203, Equus 1679)"
+      ],
+      "variables_missing": [
+        "no cranial shape data",
+        "PBDB taxonomy is a classification, not a character-based tree testing direct ancestry"
+      ],
+      "scope": "51 non-synonymised equid genera in PBDB, 5,833 occurrences summed over them",
+      "evidence": "taxa/single.json?name=Parahippus returned oid txn:43016, par txn:53170, prl Anchitheriinae, noc 74; taxa list returned 81 records of which 51 lack an 'acc' (accepted-name) field",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pbdb-occurrences-equidae-2026-10-31"
+    },
+    {
+      "id": "morphosource-parahippus-physical-objects",
+      "name": "MorphoSource: Parahippus specimens and media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/physical-objects?q=Parahippus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T04:59:58Z", "method": "GET /api/physical-objects?q=Parahippus (6 records) and /api/media?q=Parahippus (0 records); also q=Mesohippus (5 objects, 3 media), q=Hyracotherium (1 object, 1 media)", "http_status": 200 },
+      "variables_present": [
+        "six catalogued Parahippus specimens (first: UF 43653, Parahippus leonensis, FLMNH Vertebrate Paleontology)"
+      ],
+      "variables_missing": [
+        "zero public media (scans) attached to Parahippus",
+        "Hyracotherium's single media record is a metacarpal CT image, not a skull; for q=Equus the publication-status facet shows 55 Open Download and 62 Restricted Download media, mostly laser-scan meshes"
+      ],
+      "scope": "MorphoSource catalogue; media availability varies per specimen",
+      "evidence": "physical-objects?q=Parahippus pages.total_count=6; media?q=Parahippus pages.total_count=0 and empty media array; Hyracotherium media title 'Metacarpal 3 [Image] [CT]'",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-media-2026-10-31"
+    },
+    {
+      "id": "dryad-equid-skull-shape-wisniewski-slater",
+      "name": "Data for: Phylogenetic analyses reveal that horses deviate from a pervasive pattern of skull shape evolution (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.crjdfn3g3",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.crjdfn3g3",
+      "doi": "10.5061/dryad.crjdfn3g3",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:00:24Z", "method": "GET Dryad dataset, versions and files metadata (zip 285,853,459 bytes, README.md 14,073 bytes); doi.org resolves 200; file download itself returned 401 without a token and was not fetched", "http_status": 200 },
+      "variables_present": [
+        "3D geometric morphometrics and linear skull measurements for the equid skull (abstract)",
+        "a meta-analytic species-level phylogeny of Equidae (abstract: 'first formally inferred species-level phylogeny for family Equidae')"
+      ],
+      "variables_missing": [
+        "whether Parahippus, Mesohippus or Hyracotherium skulls are in the landmark set is not confirmed (zip not opened)",
+        "phylogeny is species-level and built by meta-analysis, not a character matrix for the stem"
+      ],
+      "scope": "Equidae; published 2026-03-26; linked article doi 10.1017/pab.2026.10096; scripts on Zenodo 10.5281/zenodo.18635760 (209,950,545 bytes)",
+      "evidence": "Dryad API: storageSize 285867532, license https://spdx.org/licenses/CC0-1.0.html, keywords Paleobiology/Phylogenetics/allometry, relatedWorks primary_article 10.1017/pab.2026.10096",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphobank-perissodactyla-matrices",
+      "name": "MorphoBank projects on Perissodactyla (found via DataCite; no Equidae-specific project)",
+      "landing_url": "https://morphobank.org/",
+      "access_url": "https://api.datacite.org/dois?query=prefix:10.7934%20AND%20(Perissodactyla%20OR%20horse%20OR%20Equidae%20OR%20equid)",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:00:41Z", "method": "GET DataCite query on MorphoBank prefix 10.7934 (18 Perissodactyla/horse/Equidae/equid hits; 0 for Equidae/Equus/Equinae/Hipparion/Anchitheriinae/Mesohippus/Hyracotherium); morphobank.org and doi.org/10.7934/x29445 returned 403 to scripted requests", "http_status": 200 },
+      "variables_present": [
+        "Perissodactyla character matrices, e.g. 10.7934/x29445 'Comparative osteology of early Tertiary tapiromorphs (Mammalia, Perissodactyla)' (2023), 10.7934/x29763 Brontotheriidae (2024)"
+      ],
+      "variables_missing": [
+        "no project returned for Equidae, Parahippus or anchitheres; MorphoBank portal itself blocked scripted access (403) so matrix contents were not inspected"
+      ],
+      "scope": "Perissodactyla broadly",
+      "evidence": "DataCite meta.total 18 for the Perissodactyla/horse/Equidae/equid query and 0 for the equid-genus query",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB taxa API", "query": "Equidae genera; Parahippus, Mesohippus, Protohippus, Hyracotherium, Eohippus, Equus single-taxon records", "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Equidae&rank=genus&limit=200&show=attr", "hits": 81, "note": "51 accepted genera; Parahippus 74 occurrences" },
+    { "source": "MorphoSource API", "query": "physical-objects q=Parahippus", "url": "https://www.morphosource.org/api/physical-objects?q=Parahippus&per_page=3", "hits": 6, "note": "6 objects; media q=Parahippus gave 0" },
+    { "source": "DataCite", "query": "equid skull geometric morphometrics Hyracotherium", "url": "https://api.datacite.org/dois?query=equid%20skull%20geometric%20morphometrics%20Hyracotherium&page[size]=6", "hits": 1, "note": "Dryad 10.5061/dryad.crjdfn3g3" },
+    { "source": "Dryad", "query": "Equidae skull", "url": "https://datadryad.org/api/v2/search?q=Equidae%20skull&per_page=6", "hits": 1, "note": "same dataset; query 'equid phylogeny morphological matrix' gave 0" },
+    { "source": "Zenodo", "query": "Equidae morphological character matrix", "url": "https://zenodo.org/api/records?q=Equidae%20morphological%20character%20matrix&size=6", "hits": 236580, "note": "unfiltered full-text noise; no equid matrix among top 6" },
+    { "source": "DataCite (MorphoBank prefix)", "query": "prefix:10.7934 AND (Perissodactyla OR horse OR Equidae OR equid)", "url": "https://api.datacite.org/dois?query=prefix%3A10.7934%20AND%20%28Perissodactyla%20OR%20horse%20OR%20Equidae%20OR%20equid%29&page[size]=6", "hits": 18, "note": "perissodactyl matrices, none equid-specific" }
+  ],
+  "status": "partial",
+  "summary": "Taxonomy and occurrence context for Parahippus is open in PBDB (74 occurrences), and a CC0 Dryad dataset provides 3D skull morphometrics plus a species-level Equidae phylogeny, but it was not possible to confirm that Parahippus is among its specimens. MorphoSource lists six Parahippus specimens with no public scans, and no equid-specific MorphoBank matrix was found, so no single open source combines skull geometry and an independent character-based placement of Parahippus.",
+  "next_step": "Obtain the Dryad zip (285 MB, needs a Dryad token or browser download) and list its specimens; if Parahippus is absent, compile a cladistic matrix from the primary equid literature.",
+  "obstacles_confirmed": [
+    "MorphoSource has no media for Parahippus.",
+    "MorphoBank portal returned 403 to scripted requests, so matrices could not be inspected.",
+    "Dryad file downloads require an authentication token (HTTP 401)."
+  ]
+}

@@ -1,0 +1,91 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2023-competency-07--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2023-competency-07: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "In a re-implementation of the Shreesha & Levin (2023) evolvable-competency experiment (competency gene in [1, 500] initialised in [1, 15], 1000 generations), the best individual's competency gene rises rapidly and plateaus around 470, above the competency needed to sort its genome." ;
+    delphi:passCriterion "Pre-registered design: 30 repeats x 1000 generations, 100 embryos. 'Best individual' (primary) = the individual with the highest genotypic fitness, first in population order on ties, as in the authors' Exp3 code; secondary = the individual ranked first on phenotypic fitness. 'Needed competency' = number of inversions of the best individual's structural genome (the swaps restricted bubble sort needs to reach fitness 1.0). Using the mean over repeats per generation: pass if all of (R) the mean best-individual competency first reaches 300 by generation 50; (L) its mean over generations 801-1000 is in [440, 500]; (N) that plateau mean exceeds the mean needed competency over generations 801-1000; (S) |mean over 901-1000 minus mean over 801-900| <= 20." ;
+    delphi:failCriterion "Pre-registered: refutes if the plateau mean (generations 801-1000) is < 400, or is not above the mean needed competency, or the mean best-individual competency never reaches 300. Any other failure of R/L/N/S -> mixed. Reported but not entering the verdict: the population maximum competency, the secondary best-individual definition, and the fraction of plateau generations in which >= 10% of the population has phenotypic fitness 1.0 (the tie condition the authors invoke for drift)." ;
+    delphi:expectedObservation "Best-individual competency climbing from <= 15 to a stable plateau near 470 within the first tens of generations, above the inversion count of its genome." ;
+    delphi:disconfirmingObservation "A plateau well below 470 (< 400), at or below the needed competency, or no rise." ;
+    delphi:admissibleDatasets "Runs of the evolvable-competency model as described in the paper (competency gene range [1, 500], initial [1, 15], 1000 generations, top-10% phenotypic selection, crossover, mutation probability 0.6), with unspecified details from the authors' public code." ;
+    delphi:inferenceMethod "Mean over 30 repeats of the per-generation best-individual competency; plateau as the generation 801-1000 mean compared with the [440, 500] band and with the mean inversion count; rise time as first generation >= 300." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py runs 30 independent 1000-generation evolutions with an evolvable competency gene and records, each generation, the competency gene and inversion count of the highest-genotypic-fitness individual and of the top phenotypic individual, the population range of the gene, and how many embryos reach phenotypic fitness 1.0. The repeat-mean curve gives the rise time (first generation >= 300) and the plateau (mean over generations 801-1000), compared with the mean needed swaps." ;
+    rdfs:comment "Measured: 484.86 mean competency gene of the best (highest-genotypic-fitness) individual over generations 801-1000, averaged over repeats (n = 30, SD across repeats of the per-run generation-801-1000 mean: 11.70; fixed seed). Interpretation: Simulation-result claim, tested by replication of the evolvable-competency experiment: a competency gene in [1, 500] initialised in [1, 15] (the paper's inclusive ranges; the authors' code draws [1, 14] and [1, 499]), 100 embryos, top-10% phenotypic selection, crossover with the gene in the right segment, point mutation over 51 positions with probability 0.6, 1000 generations. 'Best individual' follows the authors' Exp3 code (highest genotypic fitness); the phenotypically top-ranked individual is reported as a secondary definition. 'Needed competency' is the inversion count of the best individual's genome, the number of swaps restricted bubble sort needs to reach fitness 1.0. The drift attribution is the authors' explanation; the test reports whether its precondition (ties at phenotypic fitness 1.0 among more than 10% of the population) holds, but does not test drift directly." ;
+    delphi:evidenceAgainst "This is a replication of a simulation, not an empirical test: it shows what follows from the stated model, not what real cellular competency does." ;
+    delphi:evidenceAgainst "The best individual's competency rose from about 9 to 309 by generation 5 and 443 by generation 10, then plateaued at 484.9 (generations 801-1000; per-run means 451-498), against a mean of 354.9 swaps needed (paper: ~364). Its genotypic fitness settled at 0.53 (paper: 52%)." ;
+    delphi:evidenceAgainst "The plateau is somewhat above the claim's ~470 and creeps up slowly (about 450-465 over generations 50-500, 485 after 800); it is inside the pre-registered 440-500 band. The paper's figure averages 10 runs in 10-generation bins, which may explain the difference." ;
+    delphi:evidenceAgainst "In every plateau generation of every run at least 10% of embryos reached phenotypic fitness 1.0, so selection picks the first 10% among ties, the precondition of the authors' drift explanation. Values between the needed level and 500 are selectively neutral here. The test does not exclude other mechanisms that would push the gene higher, for example a buffer against mutations that lower structural fitness." ;
+    delphi:evidenceAgainst "The repository was restructured while this test ran (claim-tests/ moved to test-data/claim-tests/, books/ to claim-sources/); the pre-registered planned_datasets keep the old paths." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-07/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Evolvable-competency runs of the Shreesha & Levin (2023) model, 30 repeats x 1000 generations (generated by analysis.py)" ;
+    dct:description "per-generation competency gene of the best individual, population range, needed swaps and fitness; mean curves in derived/mean_curves.json" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Shreesha L, Levin M (2023) Cellular Competency during Development Alters Evolutionary Dynamics in an Artificial Embryogeny Model. Entropy 25(1):131" ;
+    dct:description "model specification (Sections 2-3, Discussion); full text vendored in claim-sources/levin-papers/inputs/2023-competency.txt" ;
+    prov:wasDerivedFrom <https://doi.org/10.3390/e25010131> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-07--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Authors' simulation code for Shreesha & Levin (2023), CellularCompetency" ;
+    dct:description "unspecified evolvable-competency details (gene position, mutation, tracked best individual); not imported" ;
+    delphi:hasChecksum "sha256:8357fe689efe9ab76efd8c5f39bbf474a5b15ff4381be856b17a6dbc7c080c46" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/hyperparameters.json> ;
+    delphi:hasChecksum "sha256:55ad59da900e896f2b59b153c8dcdfe9371d0c3f01a8fc5ba3638a430badc1d6" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/core_functions.py> ;
+    delphi:hasChecksum "sha256:b172cf3b2d5858636156156730ba710e5972eba0c38f5a5460021d7717890ec9" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/Exp3-EvolvableCompetency.py> ;
+    prov:wasDerivedFrom <https://github.com/Niwhskal/CellularCompetency> ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/levin-2023-competency-07> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2023-competency-07--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-07/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.961Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2023-competency-07: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2023-competency-07--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

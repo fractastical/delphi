@@ -1,0 +1,65 @@
+{
+  "claim_id": "fisher-sex-ratio",
+  "data_kind": "biological",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/fisher-sex-ratio",
+  "project": "math-bio-theorems",
+  "status": "complete",
+  "hypothesis": "If parents are selected to invest equally in sons and daughters and a son costs the same as a daughter, then the primary (birth) sex ratio of human populations should be close to one male per female and should not vary widely between populations.",
+  "pass_criterion": "Pre-registered. Data: United Nations World Population Prospects 2024, Demographic Indicators, medium variant CSV (WPP2024_Demographic_Indicators_Medium.csv.gz), variable SRB (sex ratio at birth, males per 100 female births), rows with LocTypeName == 'Country/Area', years 1950 to 1979 inclusive (before prenatal sex determination was widely available, so the ratio reflects biology rather than sex-selective abortion), country-years with total mid-year population >= 1 million. Criterion A (equality): the median SRB across qualifying country-years lies in [95, 105] (within 5% of equal numbers). Criterion B (uniform near-equality): at least 95% of qualifying country-years lie in [90, 110]. SUPPORTS if A and B both hold.",
+  "fail_criterion": "Pre-registered. REFUTES if the median SRB lies outside [90, 110] OR fewer than 80% of qualifying country-years lie in [90, 110]. MIXED otherwise (for example a consistent small excess of one sex between 5% and 10%, with B holding). INCONCLUSIVE (data-unavailable) if the file cannot be downloaded or has no SRB column.",
+  "planned_datasets": [
+    "un-wpp-2024-demographic-indicators-medium"
+  ],
+  "interpretation": "Fisher's principle concerns investment up to the end of parental care, not numbers at birth; the birth sex ratio is the only primary-allocation quantity available for a large set of human populations, and the test treats sons and daughters as equally costly, which is the case the claim's statement singles out ('1:1 when the two cost the same'). WPP 1950-1979 values are UN estimates reconstructed from censuses and vital registration, not raw counts, and are not independent across years within a country. This is a weak test of a strong claim: it can detect gross departures from equality and strong between-population variation, not fine deviations.",
+  "datasets": [
+    {
+      "id": "un-wpp-2024-demographic-indicators-medium",
+      "name": "United Nations World Population Prospects 2024, Demographic Indicators, medium variant (CSV)",
+      "landing_url": "https://population.un.org/wpp/",
+      "doi": null,
+      "version": "WPP 2024 (July 2024 release)",
+      "license": "CC BY 3.0 IGO",
+      "files": [
+        {
+          "download_url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz",
+          "retrieved_at": "2026-10-31T05:57:47Z",
+          "byte_size": 16557272,
+          "sha256": "286ac36bb1415e2e1ade03acfef0a29f0e4c087e2f78e38c48f50c5df89082bc"
+        }
+      ],
+      "role": "sex ratio at birth (SRB, males per 100 female births) and mid-year population by country and year"
+    }
+  ],
+  "method": "fetch.py downloads the gzipped CSV (16.6 MB). analysis.py keeps rows of type Country/Area for 1950-1979 with mid-year population >= 1 million and a non-missing SRB, and computes the median, mean, SD, 5th and 95th percentiles of SRB over country-years, the fractions inside [95,105] and [90,110], and per-country means; the pre-registered rule is applied.",
+  "measured": {
+    "value": 105.2,
+    "unit": "median sex ratio at birth, males per 100 females, country-years 1950-1979 (equal numbers = 100)",
+    "n": "4222 country-years from 146 countries",
+    "uncertainty": "5th-95th percentile 102.5-107.0; SD 1.41; range 100.5-109.8",
+    "extra": {
+      "fraction_in_90_110": 1.0,
+      "fraction_in_95_105": 0.4689720511605874,
+      "criterion_A": false,
+      "criterion_B": true,
+      "country_means_range": [
+        101.03666666666666,
+        108.0
+      ],
+      "mean_srb": 105.02482235907152
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.85,
+  "caveats": [
+    "Verdict is 'mixed' by the pre-registered rule: every one of 4222 country-years lies within 10% of equality (criterion B, the strong-constraint prediction, holds with no exceptions), but the median is 105.2, just outside the 5% band of criterion A, and the excess of male births is systematic (minimum country mean 101.0).",
+    "The standard Fisherian reading of the 5% male excess is that boys die more often before the end of parental investment, so investment is nearer equality than births are; this test did not measure sex-specific child mortality and so cannot confirm that reconciliation.",
+    "WPP values are UN estimates reconstructed from censuses and registration systems, smoothed and not independent across years within a country; the effective sample size is far below 4222.",
+    "Only humans were tested, and only the 'equal cost' case; Fisher's principle predicts equal investment, which the birth ratio measures only approximately."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "claim_id": "darwin1859-ch05-16",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "whole-genome or multi-locus sequences for horse, ass, hemione, quagga and zebra species (with ancient material where available)",
+    "a resolved, dated Equus phylogeny",
+    "coat-pattern state coded per species (striped, partly striped, unstriped), including dun/primitive markings and stripes in horses, asses and hybrids",
+    "sequences of the TBX3 dun/striping regulatory region across equids"
+  ],
+  "datasets": [
+    {
+      "id": "ncbi-datasets-equus-genome-assemblies",
+      "name": "NCBI Datasets genome assemblies for Equus (taxid 9789)",
+      "landing_url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/9789/dataset_report",
+      "access_url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/9789/dataset_report?page_size=100",
+      "doi": null,
+      "license": "NCBI data are public domain (US Government work); individual submitters may add notices",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:11:30Z", "method": "GET dataset_report page_size=100 (read total_count and organism names)", "http_status": 200 },
+      "variables_present": [
+        "genome assemblies for horse (E. caballus), ass (E. asinus), Przewalski's horse, plains zebra/quagga (E. quagga), Grevy's zebra, mountain zebra (E. zebra hartmannae), kiang (E. kiang)"
+      ],
+      "variables_missing": ["no assembly record for E. hemionus in the 53 returned reports", "ancient quagga/extinct-equid genomes are not assemblies (reads sit in SRA/ENA)", "coat phenotype"],
+      "scope": "total_count 53 assemblies: E. caballus 26, E. asinus 9 (+1 asinus asinus), E. przewalskii 6, E. quagga 4 (+1 quagga burchellii), E. kiang 2, E. grevyi 2, E. zebra hartmannae 1, one mule-type hybrid record",
+      "evidence": "dataset_report JSON returned total_count 53; counted organism_name over all 53 reports (page_size 100).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "ncbi-genomes-equus-2026-10-31"
+    },
+    {
+      "id": "ncbi-sra-equus-reads",
+      "name": "NCBI SRA / GenBank records for Equus (incl. TBX3)",
+      "landing_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Equus[Organism]&retmax=0&retmode=json",
+      "access_url": null,
+      "doi": null,
+      "license": "NCBI public domain; per-record submitter terms",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:11:27Z", "method": "Entrez esearch counts: db=sra Equus[Organism]; db=nuccore TBX3[Gene] AND Equus[Organism]; db=bioproject Equus AND (ancient OR quagga OR zebra)", "http_status": 200 },
+      "variables_present": [
+        "sequencing runs for Equus (SRA)",
+        "nucleotide records for TBX3 in Equus (nuccore)"
+      ],
+      "variables_missing": ["records were counted, not inspected; which are ancient or quagga samples not determined"],
+      "scope": "SRA Equus[Organism]: 57,487 records; nuccore TBX3[Gene] AND Equus: 15 records; bioproject Equus AND (ancient OR quagga OR zebra): 80 records",
+      "evidence": "esearchresult.count values 57487, 15 and 80 for the three queries.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-equus",
+      "name": "Open Tree of Life synthetic tree (API) for Equus species",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:12:00Z", "method": "POST tnrs/match_names for 7 names, then POST tree_of_life/induced_subtree for 6 ott ids", "http_status": 200, "note": "https://tree.opentreeoflife.org/ landing page HEAD timed out; the API answered 200" },
+      "variables_present": ["taxon name resolution (ott ids: caballus 1068218, asinus 1068202, hemionus 918649, quagga 124776, grevyi 1068209, zebra 1068212)", "synthetic-tree topology"],
+      "variables_missing": ["the induced subtree is an unresolved polytomy at genus level with empty supporting_studies; no branch lengths", "no character data"],
+      "scope": "taxonomic and topology scaffold only",
+      "evidence": "induced_subtree returned newick '(((Equus_burchellii_quagga_ott124776)Equus_burchellii_ott1068214,Equus_zebra_ott1068212)Hippotigris_ott615440,(Equus_asinus_ott1068202)Asinus_ott615436,(Equus_caballus_ott1068218)...)Equus_ott541951;' with supporting_studies [].",
+      "verdict": "partial"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:40Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": ["divergence-time lookup portal (not queried for Equus pairs)"],
+      "variables_missing": ["no coat data; per-pair queries not made"],
+      "scope": "portal; a divergence-time source, not a character dataset",
+      "evidence": "HEAD returned 200 text/html; no API call made.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology-database-equus",
+      "name": "Paleobiology Database fossil Equus occurrences",
+      "landing_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Equus&rowcount&limit=0",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Equus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:11:27Z", "method": "GET occs/list.json base_name=Equus rowcount limit=0", "http_status": 200 },
+      "variables_present": ["fossil Equus occurrences and taxonomy"],
+      "variables_missing": ["coat pattern (stripes are rarely preserved)", "stem-equid fossil coat state"],
+      "scope": "records_found 1,679 occurrences for base_name Equus",
+      "evidence": "records_found 1679 in response.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pbdb-occurrences-equus-2026-10-31"
+    },
+    {
+      "id": "dryad-zebra-phenotypes-larison-2015",
+      "name": "Data from: How the zebra got its stripes: a problem with too many solutions (zebra_phenotypes.xlsx)",
+      "landing_url": "https://datadryad.org/api/v2/search?q=zebra+stripes+Equus&per_page=6",
+      "access_url": null,
+      "doi": "10.5061/dryad.s13rt",
+      "license": "CC0 (Dryad SPDX CC0-1.0)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:11:37Z", "method": "Dryad search API and Zenodo mirror search (file list)", "http_status": 200 },
+      "variables_present": ["zebra stripe phenotypes (file zebra_phenotypes.xlsx, 61,470 B; column names not read)"],
+      "variables_missing": ["horse, ass, hemione, quagga phenotypes", "phylogeny"],
+      "scope": "zebras only, per file name; Zenodo record also lists environmental_data.xlsx and a README",
+      "evidence": "Zenodo mirror listed files README_for_environmental_data.docx (137,075 B), zebra_phenotypes.xlsx (61,470 B), environmental_data.xlsx (46,550 B).",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://www.morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:12:10Z", "method": "GET landing page and HEAD morphobank.org", "http_status": 403 },
+      "variables_present": [],
+      "variables_missing": ["could not check for equid matrices"],
+      "scope": "unknown",
+      "evidence": "Both requests returned 403 (error page); no equid project verified.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "dryad-digital-repository",
+      "name": "Dryad Digital Repository",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=zebra+stripes+Equus&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T05:11:42Z", "method": "HEAD landing page; GET search API for 'zebra stripes Equus'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["a cross-Equus coat-pattern coding with phylogeny"],
+      "scope": "repository; search 'zebra stripes Equus' gave 3 datasets (zebra phenotype/environment, two on biting flies)",
+      "evidence": "search total 3: dryad.gb5mkkwtd, dryad.s13rt, 10.15146/R3201J; none is a cross-equid ancestral-state matrix.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "zebra stripes Equus", "url": "https://datadryad.org/api/v2/search?q=zebra+stripes+Equus&per_page=6", "hits": 3, "note": "only dryad.s13rt holds phenotype data (zebras only)" },
+    { "source": "Zenodo", "query": "Equus TBX3 dun striping", "url": "https://zenodo.org/api/records?q=Equus+TBX3+dun+striping&size=5", "hits": 11122, "note": "mostly irrelevant; surfaced dryad.s13rt mirror" },
+    { "source": "DataCite", "query": "equid coat pattern stripes phylogeny", "url": "https://api.datacite.org/dois?query=equid+coat+pattern+stripes+phylogeny&page%5Bsize%5D=5", "hits": 0, "note": "none" },
+    { "source": "DataCite", "query": "Equus genome ancient DNA", "url": "https://api.datacite.org/dois?query=Equus+genome+ancient+DNA&page%5Bsize%5D=6", "hits": 3, "note": "none specific to equid genomes" },
+    { "source": "NCBI Datasets", "query": "genome assemblies taxid 9789", "url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/9789/dataset_report?page_size=100", "hits": 53, "note": "total_count" },
+    { "source": "NCBI Entrez", "query": "sra Equus[Organism]", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Equus[Organism]&retmax=0&retmode=json", "hits": 57487, "note": "count" },
+    { "source": "NCBI Entrez", "query": "nuccore TBX3[Gene] AND Equus[Organism]", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=TBX3[Gene]+AND+Equus[Organism]&retmax=0&retmode=json", "hits": 15, "note": "count" },
+    { "source": "NCBI Entrez", "query": "bioproject Equus AND (ancient OR quagga OR zebra)", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=bioproject&term=Equus+AND+(ancient+OR+quagga+OR+zebra)&retmax=15&retmode=json", "hits": 80, "note": "count; ids not resolved" },
+    { "source": "PBDB", "query": "base_name=Equus", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Equus&rowcount&limit=0", "hits": 1679, "note": "records_found" }
+  ],
+  "status": "partial",
+  "summary": "Genome sequence for the horse, ass, plains/Grevy's/mountain zebras and kiang is public (53 NCBI assemblies; 57,487 SRA records for Equus) and Open Tree provides names and a topology scaffold. No open dataset codes coat/stripe state per equid species or pairs it with the tree; the only phenotype table found covers zebras and its columns were not read. Ancient quagga reads and a TBX3 allele alignment were not located as ready tables.",
+  "next_step": "Compile a species-by-coat-state table (striped, partly striped, unstriped, dun markings) from the literature and align it to a genome-based tree built from the NCBI assemblies; identify the ancient quagga and TBX3 (Imsland et al.) accessions in SRA/ENA.",
+  "obstacles_confirmed": [
+    "No repository dataset with equid coat-pattern coding was found.",
+    "MorphoBank returned 403 to automated requests, so fossil character matrices could not be checked."
+  ]
+}

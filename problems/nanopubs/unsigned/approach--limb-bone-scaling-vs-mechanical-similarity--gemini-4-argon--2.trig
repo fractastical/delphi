@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 unification of posture-compensated stress similarity and safety-factor bounds" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "Extend `ThompsonLaws/Magnitude.lean` (which already proves `strengthToWeight_size_bound` for `thompson1917-ch02-03`) to formalize the exact mathematical relationship between bone allometry (d prop M^alpha, L prop M^beta), Biewener's (1989) effective mechanical advantage (EMA = r / R prop M^gamma), and peak bending-plus-axial bone stress sigma_peak. In a limb segment of length L and diameter d subjected to ground reaction force F prop M at moment arm R = L cos(theta) / EMA, peak stress is dominated by bending: sigma_peak prop (M * L / EMA) / d^3.\n\nProve in Lean 4 the exact scaling exponent identity: safety factor S = sigma_yield / sigma_peak is invariant with body mass M (exponent 0) if and only if 3 * alpha - beta + gamma = 1. Show as machine-checked corollaries that: (1) under geometric similarity (alpha = 1/3, beta = 1/3), constant safety factor requires EMA scaling exponent gamma = 1/3 (strictly faster than Biewener's measured gamma = 0.26); (2) combining Biewener's measured posture exponent gamma in [0.24, 0.28] with Campione and Evans's diameter exponent alpha in [0.35, 0.36] yields a nearly flat safety factor up to the posture ceiling EMA_max = 1 (columnar elephant/sauropod limb), above which gamma = 0 and alpha must jump to >= 4/9 to prevent S from falling below 1." ;
+
+    delphi:proposedTest "A zero-`sorry` Lean 4 proof of the posture-allometry conservation law and the columnar-saturation kink theorem, paired with a data check on the 40 individuals showing that observed bone allometry plus posture scaling satisfies `3 * alpha - beta + gamma = 1` within +/- 0.04." ;
+    delphi:context "Fails if: Empirical combinations of (alpha, beta, gamma) in terrestrial mammals deviate from the conservation plane `3 * alpha - beta + gamma = 1` by more than 0.10, implying that bone safety factor is not conserved across body mass." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the combined axial and bending stress functional sigma(M, d, L, EMA) for a cylindrical tubular diaphysis in `ThompsonLaws/Magnitude.lean`. 2. Prove the scaling-exponent conservation theorem `safetyFactor_flat_iff : (3 * alpha - beta + gamma = 1) <-> ConstantSafetyFactor` with zero `sorry`. 3. Formalize the posture saturation bound `EMA <= 1` and prove the kink theorem: once `EMA = 1` is reached at critical mass `M_columnar`, keeping `S >= S_min` at isometric length scaling (`beta = 1/3`) forces `alpha >= 4/9`. 4. Evaluate the proved piecewise scaling law against published EMA and bone dimensions across 40 individuals from Biewener (1989, 2005) spanning 0.03 kg to 2,500 kg." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: allometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.868mr> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01520> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb05668.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+
+  <https://datadryad.org/dataset/doi:10.5061/dryad.868mr> dct:title "Campione and Evans 2012 Dryad stylopodial dataset" ;
+    dct:description "Femoral and humeral lengths and circumferences across body sizes to test the columnar kink" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+  <https://doi.org/10.1242/jeb.01520> dct:title "Biomechanical consequences of scaling" ;
+    dct:bibliographicCitation "Biewener 2005, Biomechanical consequences of scaling" .
+  <https://doi.org/10.1111/j.1469-7998.1985.tb05668.x> dct:title "Linear relations in biomechanics: the statistics of scaling functions" ;
+    dct:bibliographicCitation "Rayner 1985, Linear relations in biomechanics: the statistics of scaling functions" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.315Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Lean 4 unification of posture-compensated stress similarity and safety-factor bounds" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

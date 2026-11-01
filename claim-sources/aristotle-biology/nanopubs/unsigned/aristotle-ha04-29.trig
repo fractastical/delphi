@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/aristotle-ha04-29> a delphi:Claim ;
+    rdfs:label "The psetta, erythrinus and channe are always found with eggs" ;
+    dct:description "Among fishes, the psetta, the erythrinus and the channe are always found bearing eggs, having what bears and engenders but nothing that impregnates." ;
+    delphi:context "Aristotle, The History of Animals (Historia Animalium), Book IV, Part 11; translated by D'Arcy Wentworth Thompson, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910). Scope: psetta, erythrinus, channe (channe is plausibly the comber, Serranus cabrilla)" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.html> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "so is it, among fishes, with the psetta, the erythrinus, and the channe; for these fish are in all cases found furnished with eggs." ;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/history_anim.html> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=656,657> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=656,657> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt> .
+
+  <http://classics.mit.edu/Aristotle/history_anim.html> a schema:Book ;
+    dct:title "The History of Animals, translated by D'Arcy Wentworth Thompson" ;
+    dct:creator <http://www.wikidata.org/entity/Q868> ;
+    schema:translator "D'Arcy Wentworth Thompson" ;
+    dct:bibliographicCitation "Aristotle. The History of Animals (Historia Animalium). Translated by D'Arcy Wentworth Thompson. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910)." ;
+    dct:date "1910"^^xsd:gYear ;
+    schema:translationOfWork <http://www.wikidata.org/entity/Q1620799> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt> schema:about <http://classics.mit.edu/Aristotle/history_anim.html> ;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.mb.txt> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "6d79cdc7d0d2a655136a2e6469c90c021b4c82e05c345cc74ddcbd728cbfc113" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Aristotle biology claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Aristotle, History of Animals IV: The psetta, erythrinus and channe are always found with eggs" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ha04-29> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/aristotle-biology> .
+  <https://w3id.org/delphi/resource/domain/aristotle-biology> rdfs:label "aristotle-biology" .
+}

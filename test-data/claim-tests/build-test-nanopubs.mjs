@@ -1,15 +1,16 @@
-// Build one unsigned evidence nanopub per completed claim test (test-data/claim-tests/<project>/<id>/result.json).
+// Build one unsigned evidence nanopub per completed claim test (test-data/claim-tests/<project>/<id>/result.json
+// and every further run <id>/<run>/result.json).
 //
 // The assertion is a delphi:Assessment of type "claim-test/0.1.0" on the claim: hypothesis,
 // pre-registered criteria, method, measured value, verdict, confidence, caveats, and one
 // delphi:EvidenceItem per dataset used (with the SHA-256 of each file). If the result carries
 // `revisions`, each is recorded as a prov:Activity that revised the assessment, with the
 // reason, the null result it rests on, and the outside agents who prompted it as prov:Agents
-// (dct:contributor). Written to test-data/claim-tests/nanopubs/unsigned/<id>.trig; signing and
+// (dct:contributor). Written to test-data/claim-tests/nanopubs/unsigned/<id>.trig (<id>--<run>.trig for a further run); signing and
 // publishing are separate, deliberate steps (see BEST_PRACTICES.md).
 //
 //   node test-data/claim-tests/build-test-nanopubs.mjs [claim-id ...]
-import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync, statSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,7 +20,7 @@ const ROOT = join(HERE, "../..");
 const OUT = join(HERE, "nanopubs", "unsigned");
 const git = cmd => execSync(`git ${cmd}`, { cwd: ROOT, encoding: "utf8" }).trim();
 const commit = git("rev-parse HEAD");
-const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/${path}`;
+const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/${path.startsWith("site/") ? "" : ""}${path}`;
 
 const R = "https://w3id.org/delphi/resource/";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";
@@ -54,19 +55,23 @@ const PREFIXES = `@prefix this: <http://purl.org/nanopub/temp/np1/> .
 @prefix delphi: <https://w3id.org/delphi/ontology/> .
 `;
 
-function trig(project, id, r) {
+// One claim can have several runs: `<id>/result.json` is the main test, `<id>/<run>/result.json` a
+// further run (the claim graph counts both). The main test is assessment `<id>--claim-test`, a
+// further run `<id>--claim-test--<run>`.
+function trig(project, id, r, rel = ".") {
   const claim = `${R}claim/${id}`;
-  const A = `${R}assessment/${id}--claim-test`;
+  const key = rel === "." ? `${id}--claim-test` : `${id}--claim-test--${rel}`;
+  const A = `${R}assessment/${key}`;
   const agent = `${R}agent/delphisci-claim-tester-${slug(r.agent?.model ?? "unknown")}`;
   const model = `${R}model/${slug(r.agent?.model ?? "unknown")}`;
-  const path = `test-data/claim-tests/${project}/${id}/result.json`;
+  const path = `test-data/claim-tests/${project}/${id}/${rel === "." ? "" : `${rel}/`}result.json`;
   const domain = `${R}domain/${DOMAINS[project] ?? project}`;
   const created = new Date().toISOString();
   const summary = r.measured ? `${r.measured.value} ${r.measured.unit}` : "";
   const tc = testContract(r);
 
   const evidence = (r.datasets ?? []).map((d, i) => {
-    const e = `${R}evidence/${id}--claim-test--dataset-${i + 1}`;
+    const e = `${R}evidence/${key}--dataset-${i + 1}`;
     const lines = [
       `    rdfs:label ${lit(`Dataset: ${d.name}`)} ;`,
       `    dct:description ${lit(d.role ?? "")} ;`,
@@ -78,7 +83,7 @@ function trig(project, id, r) {
   });
 
   const revisions = (r.revisions ?? []).map((v, i) => {
-    const act = `${R}activity/${id}--claim-test--revision-${i + 1}`;
+    const act = `${R}activity/${key}--revision-${i + 1}`;
     const people = (v.prompted_by ?? []).map((p, j) => {
       const who = `${R}agent/moltbook-${slug(p.agent)}`;
       return { who, trig: `  ${iri(who)} a prov:Agent ;
@@ -94,10 +99,10 @@ function trig(project, id, r) {
     dct:description ${lit(v.reason)} ;
     prov:startedAtTime "${v.date}"^^xsd:date ;
     prov:used ${iri(blob(v.null_result))} ;
-    delphi:evidenceAgainst ${lit(`Before: ${v.from.summary} (confidence ${v.from.confidence}). After: ${v.to.summary} (confidence ${v.to.confidence}).`)} ;
-    prov:wasInformedBy ${people.map(p => iri(p.who)).join(", ") || "()"} .
-${people.map(p => p.trig).join("")}  ${iri(A)} prov:qualifiedRevision ${iri(act)} ;
-    dct:contributor ${people.map(p => iri(p.who)).join(", ")} .
+    delphi:evidenceAgainst ${lit(`Before: ${v.from.summary} (confidence ${v.from.confidence}). After: ${v.to.summary} (confidence ${v.to.confidence}).`)}${people.length ? ` ;
+    prov:wasInformedBy ${people.map(p => iri(p.who)).join(", ")}` : ""} .
+${people.map(p => p.trig).join("")}  ${iri(A)} prov:qualifiedRevision ${iri(act)}${people.length ? ` ;
+    dct:contributor ${people.map(p => iri(p.who)).join(", ")}` : ""} .
 `,
     };
   });
@@ -112,7 +117,7 @@ sub:Head {
 
 sub:assertion {
   ${iri(A)} a delphi:Assessment ;
-    rdfs:label ${lit(`Claim test of ${id}: ${r.verdict}, confidence ${r.confidence}`)} ;
+    rdfs:label ${lit(`Claim test of ${id}${rel === "." ? "" : ` (${rel})`}: ${r.verdict}, confidence ${r.confidence}`)} ;
     delphi:assessmentType "claim-test/0.1.0" ;
     delphi:hasVerdict ${lit(r.verdict)} ;
     delphi:hasConfidence ${dbl(r.confidence)} ;
@@ -128,7 +133,7 @@ sub:assertion {
     dct:description ${lit(r.method ?? "")} ;
     rdfs:comment ${lit(`Measured: ${summary}${r.measured?.n != null ? ` (n = ${r.measured.n}${r.measured.uncertainty ? `, ${r.measured.uncertainty}` : ""})` : ""}. Interpretation: ${r.interpretation ?? ""}`)} ;
 ${(r.caveats ?? []).map(c => `    delphi:evidenceAgainst ${lit(c)} ;`).join("\n")}
-    delphi:hasEvidence ${evidence.length ? (r.datasets.map((_, i) => iri(`${R}evidence/${id}--claim-test--dataset-${i + 1}`)).join(", ")) : "()"} ;
+    delphi:hasEvidence ${evidence.length ? (r.datasets.map((_, i) => iri(`${R}evidence/${key}--dataset-${i + 1}`)).join(", ")) : "()"} ;
     prov:wasAttributedTo ${iri(agent)} ;
     rdfs:seeAlso ${iri(blob(path))} .
 ${evidence.join("")}${revisions.map(v => v.assertion).join("")}  ${iri(claim)} delphi:hasAssessment ${iri(A)} .
@@ -153,7 +158,7 @@ sub:provenance {
 sub:pubinfo {
   this: dct:created "${created}"^^xsd:dateTime ;
     dct:creator ${iri(OWNER)} ;
-    rdfs:label ${lit(`Claim test of ${id}: ${r.verdict}, confidence ${r.confidence}`)} ;
+    rdfs:label ${lit(`Claim test of ${id}${rel === "." ? "" : ` (${rel})`}: ${r.verdict}, confidence ${r.confidence}`)} ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     npx:hasNanopubType delphi:Assessment ;
     npx:introduces ${iri(A)} ;
@@ -168,13 +173,18 @@ let n = 0;
 for (const project of readdirSync(HERE).filter(p => existsSync(join(HERE, p, "")) && !p.includes(".") && p !== "nanopubs")) {
   for (const id of readdirSync(join(HERE, project))) {
     if (wanted.size && !wanted.has(id)) continue;
-    const f = join(HERE, project, id, "result.json");
-    if (!existsSync(f)) continue;
-    const r = JSON.parse(readFileSync(f, "utf8"));
-    if (r.status !== "complete") continue;
-    if (!["biological", "physical", "computational", "none"].includes(r.data_kind)) throw new Error(`${f}: data_kind must be biological, physical, computational or none`);
-    writeFileSync(join(OUT, `${id}.trig`), trig(project, id, r));
-    n++;
+    const dir = join(HERE, project, id);
+    if (!statSync(dir).isDirectory()) continue;
+    const runs = [".", ...readdirSync(dir).filter(d => !d.startsWith(".") && existsSync(join(dir, d, "result.json")))];
+    for (const rel of runs) {
+      const f = join(dir, rel, "result.json");
+      if (!existsSync(f)) continue;
+      const r = JSON.parse(readFileSync(f, "utf8"));
+      if (r.status !== "complete") continue;
+      if (!["biological", "physical", "computational", "none"].includes(r.data_kind)) throw new Error(`${f}: data_kind must be biological, physical, computational or none`);
+      writeFileSync(join(OUT, `${rel === "." ? id : `${id}--${rel}`}.trig`), trig(project, id, r, rel));
+      n++;
+    }
   }
 }
 console.log(`wrote ${n} claim-test nanopubs to ${OUT} (commit ${commit.slice(0, 8)})`);

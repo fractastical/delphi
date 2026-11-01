@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Leave-one-family regression of toughness on architecture" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Build a provenanced table of published fracture records for mineralised composites, aimed at the problem's bar of at least 40 records and five families (nacre, bone, dentin, antler, and one of enamel, sea-urchin stereom or stomatopod cuticle). Each row records the family, the toughness quantity and the method name, mineral volume fraction, mineral Young's modulus, mineral strength, platelet or fibril aspect ratio, an interface-compliance proxy defined as organic-layer thickness divided by platelet thickness, and the number of hierarchical levels counted by a written rule (a level counts only if the paper names a distinct structural element at that scale). Work of fracture is not pooled with K_Ic. The constituent-only null, fixed first, is log10(K_Ic) = a + b φ + c log10(E_mineral) + d log10(σ_mineral) + error. The architecture model adds log10(aspect ratio), log10(interface compliance) and the level count N. Pass requires a likelihood-ratio test of those three terms at p < 0.01, and a leave-one-family-out check in which the architecture model cuts mean absolute error on log10(K_Ic) by at least 0.10 relative to the null in at least four of five held-out families. Compounding is a separate coefficient: N has a positive coefficient whose 95 percent interval excludes zero in the model that already contains φ. Rows missing a required field are dropped, not imputed." ;
+
+    delphi:proposedTest "At least 40 K_Ic records, five families, a likelihood-ratio p < 0.01 for the architecture block, a leave-one-family-out error drop of at least 0.10 log10 units in at least four families, and a 95 percent interval for the level-count coefficient that lies entirely above zero. Anything short of the coverage bar is a failed test, not a fit on a smaller table." ;
+    delphi:context "Fails if: Fewer than 40 complete K_Ic records or fewer than five families remain after the method filter; the likelihood-ratio test is above 0.01; or the level-count interval includes zero or is negative, which refutes compounding even if the joint architecture test passes." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write the extraction rules, the level-counting rule and both model formulas before reading tables for the purpose of fitting. 2. Extract records from open papers and from supplements, keeping the page or table for each number. 3. Drop rows that mix toughness definitions or lack a required field. 4. Fit the null and the architecture model; run the likelihood-ratio test and leave-one-family-out. 5. Report the coefficient on N after controlling for mineral volume fraction." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: There is no open database that already joins toughness with aspect ratio, interface compliance and level count. Several source papers are paywalled, and interface thickness is often unreported, so the table may miss the coverage bar." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: literature-extraction" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nmat4089> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2006.07.007> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.2010.1093> ;
+    rdfs:seeAlso <https://doi.org/10.1002/adma.200803322> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1038/nmat4089> dct:title "Bioinspired structural materials" ;
+    dct:bibliographicCitation "Wegst, Bai, Saiz, Tomsia and Ritchie 2015, Bioinspired structural materials" .
+  <https://doi.org/10.1016/j.jmps.2006.07.007> dct:title "On the mechanics of mother-of-pearl: A key feature in the material hierarchical structure" ;
+    dct:bibliographicCitation "Barthelat, Tang, Zavattieri, Li and Espinosa 2007, On the mechanics of mother-of-pearl" .
+  <https://doi.org/10.1098/rspb.2010.1093> dct:title "On optimal hierarchy of load-bearing biological materials" ;
+    dct:bibliographicCitation "Zhang, Zhang and Gao 2011, On optimal hierarchy of load-bearing biological materials" .
+  <https://doi.org/10.1002/adma.200803322> dct:title "On the Fracture Toughness of Advanced Materials" ;
+    dct:bibliographicCitation "Launey and Ritchie 2009, On the fracture toughness of advanced materials" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.346Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Leave-one-family regression of toughness on architecture" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

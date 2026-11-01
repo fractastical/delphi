@@ -1,0 +1,201 @@
+{
+  "claim_id": "darwin1859-ch13-02",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "traditional (pre-molecular or morphology-based) classification of taxa",
+    "independent molecular phylogeny covering the same taxa",
+    "overall phenotypic or ecological similarity matrix",
+    "current classification for comparison"
+  ],
+  "datasets": [
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about and /v3/taxonomy/about; GET landing",
+        "http_status": null,
+        "note": "Landing 000; API 200"
+      },
+      "variables_present": [
+        "synthetic tree built from published phylogenies (opentree16.1, 2,385,875 tips, 1,931 source studies, 2,064 source trees)",
+        "taxonomy OTT 3.7"
+      ],
+      "variables_missing": [
+        "pre-molecular classification",
+        "phenotypic similarity matrix"
+      ],
+      "scope": "All life; the OTT taxonomy backbone partly draws on current classifications (circularity risk)",
+      "evidence": "tree_of_life/about returned 200 with synth_id opentree16.1, 2,385,875 tips, 1,931 source studies. taxonomy/about returned 200: ott3.7draft3. Landing https://tree.opentreeoflife.org/ did not respond (000); https://opentreeoflife.github.io/ returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "catalogue-of-life",
+      "name": "Catalogue of Life (COL26.10)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": "https://api.checklistbank.org/dataset/3LR",
+      "doi": "10.48580/dgzh4",
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET api.checklistbank.org/dataset/3LR and nameusage/search; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "current accepted classification (2,193,940 accepted species)"
+      ],
+      "variables_missing": [
+        "historical classification",
+        "molecular evidence"
+      ],
+      "scope": "Current classification; already revised with phylogenetic data",
+      "evidence": "ChecklistBank API dataset/3LR returned 200: title 'Catalogue of Life', alias COL26.10, DOI 10.48580/dgzh4. nameusage/search with rank=SPECIES and status=accepted returned total 2,193,940. Landing returned 200 (24,475 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "genbank",
+      "name": "NCBI GenBank / nuccore",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "Entrez einfo db=nuccore; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "molecular sequences (nuccore 744,629,387 records, build 261029-1250m.1)"
+      ],
+      "variables_missing": [
+        "trees",
+        "classification"
+      ],
+      "scope": "Raw sequences",
+      "evidence": "Entrez einfo returned 200 with nuccore count 744,629,387. Landing returned 200 (37,829 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-taxonomy",
+      "name": "NCBI Taxonomy",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/taxonomy",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "Entrez esearch db=taxonomy term species[Rank]; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "classification hierarchy (2,497,528 species-rank nodes)"
+      ],
+      "variables_missing": [
+        "historical classification",
+        "tree"
+      ],
+      "scope": "Current taxonomy tied to sequence data",
+      "evidence": "Entrez esearch returned 200 with count 2,497,528 for species[Rank]. Landing redirected to https://www.ncbi.nlm.nih.gov/datasets/taxonomy/ (200, 21,464 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "actinopterygii-phylogenetic-classification-8352027",
+      "name": "Phylogenetic classification of living and fossil ray-finned fishes",
+      "landing_url": "https://zenodo.org/records/8352027",
+      "access_url": null,
+      "doi": "10.5281/zenodo.8352027",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "Zenodo API search result",
+        "http_status": 200
+      },
+      "variables_present": [
+        "a classification of Actinopterygii derived from phylogenies"
+      ],
+      "variables_missing": [
+        "pre-molecular classification",
+        "other clades"
+      ],
+      "scope": "Ray-finned fishes only; the classification is itself phylogenetic",
+      "evidence": "Zenodo search returned record 10.5281/zenodo.8352027 (file 6,210,194 bytes, cc-by-4.0) and Dryad 10.5061/dryad.80gb5mkwp (files 266 and 14,832 bytes); contents not read.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Open Tree of Life API",
+      "query": "about",
+      "url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "hits": 1
+    },
+    {
+      "source": "ChecklistBank API",
+      "query": "COL dataset 3LR accepted species",
+      "url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?limit=0&rank=SPECIES&status=accepted",
+      "hits": 2193940
+    },
+    {
+      "source": "NCBI Entrez",
+      "query": "taxonomy species[Rank]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=species[Rank]&retmode=json&retmax=0",
+      "hits": 2497528
+    },
+    {
+      "source": "DataCite",
+      "query": "phylogenetic classification congruence Linnaean taxonomy molecular tree",
+      "url": "https://api.datacite.org/dois?query=phylogenetic+classification+congruence+Linnaean+taxonomy+molecular+tree&page%5Bsize%5D=5",
+      "hits": 2,
+      "note": "irrelevant taxonomic treatments"
+    },
+    {
+      "source": "DataCite",
+      "query": "taxonomy phylogeny concordance classification",
+      "url": "https://api.datacite.org/dois?query=taxonomy+phylogeny+concordance+classification&page%5Bsize%5D=5",
+      "hits": 22,
+      "note": "single-clade datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "congruence taxonomic classification molecular phylogeny",
+      "url": "https://zenodo.org/api/records?q=congruence+taxonomic+classification+molecular+phylogeny&size=5",
+      "hits": 549890,
+      "note": "found ray-finned fish classification; no machine-readable historical classification surfaced"
+    }
+  ],
+  "status": "partial",
+  "summary": "Current classifications (Catalogue of Life, 2,193,940 accepted species; NCBI Taxonomy) and a synthetic molecular tree (Open Tree of Life, 2,385,875 tips) are open via APIs. None of the searches surfaced a machine-readable pre-molecular classification, so the circularity the assessors raise remains unresolved.",
+  "next_step": "Find or transcribe a historical classification (e.g. a 19th-century systematic work) mapped to modern names, then compare it with the Open Tree synthetic tree for shared taxa.",
+  "obstacles_confirmed": [
+    "Modern classifications already incorporate phylogenetic data.",
+    "No machine-readable historical classification found in these searches.",
+    "Open Tree web landing did not respond; API did."
+  ]
+}

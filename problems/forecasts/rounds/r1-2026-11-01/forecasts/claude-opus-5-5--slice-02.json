@@ -1,0 +1,162 @@
+{
+  "round": "r1-2026-11-01",
+  "slice": "slice-02",
+  "model": "claude-opus-5-5",
+  "provider": "Anthropic",
+  "generated": "2026-11-01T05:40:00Z",
+  "problems": [
+    {
+      "problem": "species-area-exponent",
+      "p_solved_30d": 0.25,
+      "p_solved_365d": 0.55,
+      "rationale": "The acceptance bar is a pre-registered model comparison on open GBIF/GIFT island data, which the swarm has already done in simpler form for Darwin's ch12-04 and ch12-05 claims, so a run is plausible within a month. The main blocker is sampling quality: GBIF coverage on small islands and METE's need for abundances can turn any run into the 'inconclusive, data quality' signature rather than a verdict. Approaches share that failure mode, so the problem probability is close to the best single data test, not their union; a logged GIFT-plant run with a clean decision would move this up sharply. The 30-day figure sits below the logseries null's product on purpose: that null settles only whether sampling explains z and does not meet the pre-registered multi-model acceptance test.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "species-area-exponent--claude-opus-5-5--1", "p_complete": 0.35, "p_settle": 0.5, "note": "Six archipelagos by three taxa is a lot of GBIF polygon work and coverage rarefaction, and snail sampling is likely to push several sets to inconclusive." },
+        { "approach": "species-area-exponent--claude-opus-5-5--2", "p_complete": 0.6, "p_settle": 0.45, "note": "Coleman-formula nulls are pure computation, but the proposer's own failure signature (any z fittable by some SAD) is a real risk to discriminating power." },
+        { "approach": "species-area-exponent--claude-opus-5-5--3", "p_complete": 0.2, "p_settle": 0.4, "note": "Reconstructing per-dataset z standard errors from the Triantis and Drakare compilations is laborious and partly impossible, and few datasets carry abundances for the METE collapse." },
+        { "approach": "species-area-exponent--gpt-5-6-sol--1", "p_complete": 0.25, "p_settle": 0.5, "note": "Thirty well-sampled oceanic archipelagos with 1000+ occurrences and usable polygons is a stretch, and the coverage failure threshold will likely bite." },
+        { "approach": "species-area-exponent--gpt-5-6-sol--2", "p_complete": 0.1, "p_settle": 0.4, "note": "No harmonized public collection of 50 genuinely nested surveys is known to exist, so assembly dominates and probably stalls." },
+        { "approach": "species-area-exponent--grok-4-7--1", "p_complete": 0.4, "p_settle": 0.6, "note": "GIFT checklists sidestep GBIF sampling bias and the rules are crisp, though group identifiers and METE fitting on presence data are possible snags." },
+        { "approach": "species-area-exponent--grok-4-7--2", "p_complete": 0.55, "p_settle": 0.7, "note": "A frozen logseries placement null is cheap to compute and yields a binary inside/outside answer, conditional on the GIFT data being in hand." },
+        { "approach": "species-area-exponent--grok-4-7--3", "p_complete": 0.15, "p_settle": 0.7, "note": "Non-constancy and the limit involve infinite sums over a MaxEnt distribution, which is real analysis that current Lean provers handle slowly." }
+      ]
+    },
+    {
+      "problem": "clade-trajectory-universality",
+      "p_solved_30d": 0.35,
+      "p_solved_365d": 0.65,
+      "rationale": "PBDB is already wired into the organisms layer and SQS with a birth-death or MBL null is a standard, finite pipeline, so a pre-registered census with an effect size is the most tractable problem in this slice's paleo/ecology group. The blockers are the subtle null (conditioned random walks are themselves hat-shaped) and the impossibility of guaranteeing monophyly from PBDB names, which could leave the verdict hedged. Several proposers converge on nearly the same test, which raises the chance one gets run but adds little independent probability.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "clade-trajectory-universality--claude-opus-5-5--1", "p_complete": 0.5, "p_settle": 0.55, "note": "Straightforward divDyn/SQS pipeline on hundreds of families, but conditioning the null on duration may wash out power as the proposer warns." },
+        { "approach": "clade-trajectory-universality--claude-opus-5-5--2", "p_complete": 0.15, "p_settle": 0.35, "note": "Hundreds of PyRate runs taking hours to days each, with rate trends often unidentifiable in small clades." },
+        { "approach": "clade-trajectory-universality--claude-opus-5-5--3", "p_complete": 0.45, "p_settle": 0.4, "note": "Simulation is easy but the arbitrary Linnaean divergence threshold makes the artifact size hard to pin to a fixed reference." },
+        { "approach": "clade-trajectory-universality--gpt-5-6-sol--1", "p_complete": 0.45, "p_settle": 0.6, "note": "A clear census with explicit thresholds and a quorum-robustness check; the 75% universality bar makes a definite 'not universal' answer likely." },
+        { "approach": "clade-trajectory-universality--gpt-5-6-sol--2", "p_complete": 0.1, "p_settle": 0.4, "note": "Per-clade state-space birth-death inference with simulation-based calibration is heavy and likely confuses hats with sampling heterogeneity." },
+        { "approach": "clade-trajectory-universality--grok-4-7--1", "p_complete": 0.5, "p_settle": 0.6, "note": "Well-specified SQS test with a pull-of-the-recent robustness check that agents can run directly against the PBDB API." },
+        { "approach": "clade-trajectory-universality--grok-4-7--2", "p_complete": 0.45, "p_settle": 0.6, "note": "Using empirical collection counts as time-varying sampling is a simple, decisive add-on once the census pipeline exists." },
+        { "approach": "clade-trajectory-universality--grok-4-7--3", "p_complete": 0.35, "p_settle": 0.6, "note": "Poisson fits of two birth-death models per curve are cheap, but this depends on the census running first and on hats surviving the nulls." }
+      ]
+    },
+    {
+      "problem": "empty-shell-morphospace",
+      "p_solved_30d": 0.04,
+      "p_solved_365d": 0.2,
+      "rationale": "The acceptance criteria need a new dataset of Raup parameters measured from museum scans and three fitted occupancy models compared on held-out taxa; open, consistently oriented mollusc meshes are scarce and spiral fitting needs curation, so this will not finish in 30 days. The geometric half (self-intersection boundary in Lean, functional landscapes by simulation) is quite doable and will likely be logged, but it only supplies one of the three models. A year allows a modest 2D-image dataset, though passing the phylogenetic-random-walk falsifier on held-out families remains doubtful. The 30-day figure is deliberately below the Lean boundary proof's product because that proof settles only the geometric piece, not the occupancy-model comparison.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "empty-shell-morphospace--claude-opus-5-5--1", "p_complete": 0.07, "p_settle": 0.45, "note": "Building a 200+ species Raup dataset from uneven MorphoSource and iDigBio material is the bottleneck for the whole problem." },
+        { "approach": "empty-shell-morphospace--claude-opus-5-5--2", "p_complete": 0.35, "p_settle": 0.3, "note": "Generative grids and simple mechanics are feasible, but the arbitrary load case makes a decisive functional boundary unlikely on its own." },
+        { "approach": "empty-shell-morphospace--claude-opus-5-5--3", "p_complete": 0.3, "p_settle": 0.45, "note": "The circular planispiral boundary is provable, but the elliptical and helicospiral generalizations plus a reachability map are much more work." },
+        { "approach": "empty-shell-morphospace--gpt-5-6-sol--1", "p_complete": 0.05, "p_settle": 0.5, "note": "Needs 1000 shells across 100 genera with ICC above 0.9, which open data are unlikely to supply." },
+        { "approach": "empty-shell-morphospace--gpt-5-6-sol--2", "p_complete": 0.25, "p_settle": 0.35, "note": "Self-intersection and stability are computable, but finite-element failure across material ranges is underdetermined without species-specific properties." },
+        { "approach": "empty-shell-morphospace--grok-4-7--1", "p_complete": 0.4, "p_settle": 0.8, "note": "A narrow, well-posed geometric equivalence for circular planispiral shells is within reach of current Lean tooling and would be definite." },
+        { "approach": "empty-shell-morphospace--grok-4-7--2", "p_complete": 0.1, "p_settle": 0.45, "note": "The 30-species floor is modest but measurable open meshes and MorphoEval measurements are not yet shown to exist." },
+        { "approach": "empty-shell-morphospace--grok-4-7--3", "p_complete": 0.3, "p_settle": 0.45, "note": "The grid is easy, but the overlay depends on empirical mesh measurements that the other approaches have not produced." }
+      ]
+    },
+    {
+      "problem": "somite-number-control",
+      "p_solved_30d": 0.15,
+      "p_solved_365d": 0.4,
+      "rationale": "The comparative test is formally easy but data-starved: clock period and elongation duration are measured independently in only about four to eight species, so a run will probably be underpowered or tautological unless PSM dynamics are measured separately from counts. The ranked list of species to measure next is a tractable deliverable and could be logged soon. A falsifier hit needs several clear misses, which the scant data make unlikely, so the main path to 'solved' is a modest-n pre-registered test plus the ranking. The 30-day figure is below the ranking and held-out-oscillator products on purpose, since each settles only a piece and neither alone is the comparative test.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "somite-number-control--claude-opus-5-5--1", "p_complete": 0.3, "p_settle": 0.3, "note": "Avoiding the tautology is right, but independent PSM measurements exist for too few species to give a definite verdict." },
+        { "approach": "somite-number-control--claude-opus-5-5--2", "p_complete": 0.2, "p_settle": 0.35, "note": "Digitizing PSM time courses from figures and fitting a balance model across species is laborious and noisy." },
+        { "approach": "somite-number-control--claude-opus-5-5--3", "p_complete": 0.15, "p_settle": 0.25, "note": "Matched clock-temperature and meristic-temperature data for the same species are rare, so the comparison will likely cross species." },
+        { "approach": "somite-number-control--gpt-5-6-sol--1", "p_complete": 0.3, "p_settle": 0.25, "note": "The 10-species floor almost certainly fails, so completion most likely lands on the underpowered branch." },
+        { "approach": "somite-number-control--gpt-5-6-sol--2", "p_complete": 0.45, "p_settle": 0.35, "note": "A sensitivity analysis is pure simulation, but it only proposes wet-lab perturbations and structural nonidentifiability is plausible." },
+        { "approach": "somite-number-control--grok-4-7--1", "p_complete": 0.45, "p_settle": 0.3, "note": "Simple to run from Gomez et al. 2008 plus a few more species, but the 6-species bar will probably return underpowered." },
+        { "approach": "somite-number-control--grok-4-7--2", "p_complete": 0.45, "p_settle": 0.5, "note": "FishBase counts and an Open Tree subtree make the ranking computable, and it directly delivers the second acceptance criterion." },
+        { "approach": "somite-number-control--grok-4-7--3", "p_complete": 0.35, "p_settle": 0.55, "note": "Fitting an oscillator to zebrafish and predicting three species is a contained simulation with a binary outcome, though parameter sourcing is fiddly." }
+      ]
+    },
+    {
+      "problem": "murrays-law-vascular-optimality",
+      "p_solved_30d": 0.25,
+      "p_solved_365d": 0.6,
+      "rationale": "Retinal segmentations (DRIVE, HRF) and published morphometry are open, and exponent estimation at bifurcations is a finite computation, so a multi-tissue pre-registered test is realistic. The blockers are radius measurement error at a few pixels, which can make 3 and 7/3 indistinguishable, and the xylem arm, which depends on transcribing 2003 tables that may not hold branch-point radii. The Lean derivations are likely to be logged but do not by themselves meet the data-based acceptance criteria, which is why the 30-day figure is deliberately below their high products.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "murrays-law-vascular-optimality--claude-opus-5-5--1", "p_complete": 0.3, "p_settle": 0.55, "note": "Four tissue types including VesSAP and Kassab tables is ambitious within 30 days, but errors-in-variables modelling makes any finished result interpretable." },
+        { "approach": "murrays-law-vascular-optimality--claude-opus-5-5--2", "p_complete": 0.65, "p_settle": 0.85, "note": "One-variable calculus optimizations are well within Mathlib reach, with the load-bearing variant the only uncertain part." },
+        { "approach": "murrays-law-vascular-optimality--claude-opus-5-5--3", "p_complete": 0.55, "p_settle": 0.6, "note": "Synthetic-tree power calibration is cheap and directly answers whether retinal resolution can separate the hypotheses." },
+        { "approach": "murrays-law-vascular-optimality--gpt-5-6-sol--1", "p_complete": 0.25, "p_settle": 0.5, "note": "Requires calibrated 3D trees and xylem in addition to retina, and the 0.2 band in every modality is strict." },
+        { "approach": "murrays-law-vascular-optimality--gpt-5-6-sol--2", "p_complete": 0.65, "p_settle": 0.8, "note": "Convexity and the cubic law are routine to formalize; the generalized envelope adds work but is still elementary analysis." },
+        { "approach": "murrays-law-vascular-optimality--grok-4-7--1", "p_complete": 0.7, "p_settle": 0.85, "note": "The narrowest formal statement in the group, an exponent formula (b + 2)/a, is highly likely to compile." },
+        { "approach": "murrays-law-vascular-optimality--grok-4-7--2", "p_complete": 0.5, "p_settle": 0.5, "note": "DRIVE, HRF and the Vascular Model Repository are accessible, but thin retinal vessels may leave intervals containing both 3 and 7/3." },
+        { "approach": "murrays-law-vascular-optimality--grok-4-7--3", "p_complete": 0.3, "p_settle": 0.45, "note": "The xylem arm stops if the McCulloh tables lack branch-point radii, which I cannot verify from the slice." }
+      ]
+    },
+    {
+      "problem": "morphogenesis-cognition-gene-overlap",
+      "p_solved_30d": 0.55,
+      "p_solved_365d": 0.8,
+      "rationale": "This is a finite gene-set enrichment test on open GO/HPO annotations with INDRA CoGEx already available, and several approaches specify near-identical, runnable designs, so it is the most likely problem in the slice to be closed within a month. The risk is that matching on pleiotropy and annotation count leaves strata too thin or collinear, producing an unstable p-value rather than a verdict. The ion-channel and gap-junction subsets are small, so the second acceptance criterion may come out underpowered even when the main test is clean.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--1", "p_complete": 0.65, "p_settle": 0.65, "note": "A matched permutation over GO/HPO sets is standard; collinearity of study bias and pleiotropy is the main threat to a clean answer." },
+        { "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--2", "p_complete": 0.45, "p_settle": 0.5, "note": "IMPC data are open and avoid curation bias, but its behavioural screens may not measure learning as such." },
+        { "approach": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--3", "p_complete": 0.45, "p_settle": 0.4, "note": "Network separation on INDRA is computable, but separation likely tracks publication count even after degree matching." },
+        { "approach": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--1", "p_complete": 0.55, "p_settle": 0.65, "note": "Well-specified thresholds and a human-mouse replication requirement; joint matching on four covariates may struggle with balance." },
+        { "approach": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--2", "p_complete": 0.3, "p_settle": 0.35, "note": "Evidence-weighted subnetworks with statement-level provenance are heavy, and hub or review-paper dominance is likely." },
+        { "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--1", "p_complete": 0.7, "p_settle": 0.7, "note": "The simplest complete design, with explicit odds-ratio and p thresholds for both the full sets and the bioelectric subsets." },
+        { "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--2", "p_complete": 0.55, "p_settle": 0.5, "note": "Counting cross-set INDRA statements against a degree-preserving null is quick via Cypher, but literature density confounds interpretation." },
+        { "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--3", "p_complete": 0.35, "p_settle": 0.55, "note": "GO annotation dates exist in some downloads but historical sets are incomplete, so the run may stop at the stated data gap." }
+      ]
+    },
+    {
+      "problem": "bioelectric-prepattern-predicts-anatomy",
+      "p_solved_30d": 0.05,
+      "p_solved_365d": 0.18,
+      "rationale": "The acceptance criterion needs a decoder that predicts phenotype from Vmem images on held-out data, but specimen-level Vmem images with outcome labels are rarely published, and figure panels are a small, curated, biased sample; the swarm cannot image anything new. Simulation routes depend on BETSE calibration with conductance data that papers do not report, and frontier_simulate is only a preview. Likely logged outputs within a year are partial: a dose-response meta-analysis, a Lean identifiability lemma, or a small figure-based decoder that returns underpowered. The 30-day figure is deliberately below the Lean lemma's product because that lemma only rules out one decoder class and does not meet the held-out prediction criterion.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--1", "p_complete": 0.12, "p_settle": 0.35, "note": "Curating a multi-study corpus from figures is slow and leave-one-study-out with few studies will have wide intervals." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--2", "p_complete": 0.07, "p_settle": 0.35, "note": "Full BETSE calibration needs channel densities that published papers lack, and the slice says frontier_simulate is only bounded." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--3", "p_complete": 0.3, "p_settle": 0.35, "note": "Coding published perturbation experiments is doable, but Vmem shift magnitudes are often unreported and publication bias is severe." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--1", "p_complete": 0.08, "p_settle": 0.4, "note": "Requires specimen-linked raw Vmem maps at adequate sample size from one system, which are probably not public." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--2", "p_complete": 0.02, "p_settle": 0.4, "note": "Needs quantitative conductance and longitudinal imaging of the same specimens, which the swarm cannot obtain." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--1", "p_complete": 0.15, "p_settle": 0.25, "note": "Three papers' figures will likely fall short of 20 independent experiments, giving an underpowered rather than definite result." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--2", "p_complete": 0.12, "p_settle": 0.5, "note": "Running BETSE locally at published defaults is possible, but turning output into a phenotype class by a frozen threshold is fragile." },
+        { "approach": "bioelectric-prepattern-predicts-anatomy--grok-4-7--3", "p_complete": 0.35, "p_settle": 0.4, "note": "The lemma is trivial to prove, but the empirical half depends on figure measurements that may be too coarse for the tolerance." }
+      ]
+    },
+    {
+      "problem": "grn-memory-generic-or-biological",
+      "p_solved_30d": 0.35,
+      "p_solved_365d": 0.7,
+      "rationale": "The question is entirely computational: BioModels and the Biswas et al. 2021 paper are open, and running a memory protocol on 35 models plus 350 matched random ODE networks is ordinary simulation work. The blocker is reproducing the original protocol and model list faithfully (stimulus and response node choices, memory scoring) and designing a matched null that survives critique of what 'matched kinetics' means. Once the protocol is reimplemented, the enrichment ratio is a definite number, so settle probabilities are high.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "grn-memory-generic-or-biological--claude-opus-5-5--1", "p_complete": 0.45, "p_settle": 0.65, "note": "Direct match to the acceptance criteria; reimplementing all memory types faithfully is the main effort." },
+        { "approach": "grn-memory-generic-or-biological--claude-opus-5-5--2", "p_complete": 0.35, "p_settle": 0.6, "note": "Surgery on the real models reuses the same harness and gives clean attribution, but follows the protocol reimplementation." },
+        { "approach": "grn-memory-generic-or-biological--claude-opus-5-5--3", "p_complete": 0.12, "p_settle": 0.4, "note": "CRNT covers mass-action only and a Lean proof about memory persistence in ODEs is far beyond current tooling." },
+        { "approach": "grn-memory-generic-or-biological--gpt-5-6-sol--1", "p_complete": 0.4, "p_settle": 0.6, "note": "Signed-degree and kinetic-family matching with two null generators is thorough and slightly more work than the minimal design." },
+        { "approach": "grn-memory-generic-or-biological--gpt-5-6-sol--2", "p_complete": 0.15, "p_settle": 0.45, "note": "Motif enumeration with Latin hypercube sweeps is expensive and context-dependence threatens the 80% deletion criterion." },
+        { "approach": "grn-memory-generic-or-biological--grok-4-7--1", "p_complete": 0.45, "p_settle": 0.7, "note": "Minimal matched design with a crisp 20-of-35 rule, likely the first version anyone runs." },
+        { "approach": "grn-memory-generic-or-biological--grok-4-7--2", "p_complete": 0.35, "p_settle": 0.65, "note": "The two-arm factorial is a small extension once the harness exists and gives a definite four-way call." },
+        { "approach": "grn-memory-generic-or-biological--grok-4-7--3", "p_complete": 0.2, "p_settle": 0.75, "note": "The linear impossibility half is tractable, but an existence proof for a forced nonlinear ODE needs solution bounds Mathlib barely supports." }
+      ]
+    },
+    {
+      "problem": "active-inference-morphogenesis-falsifiable",
+      "p_solved_30d": 0.07,
+      "p_solved_365d": 0.22,
+      "rationale": "The conceptual half (free-target accounts are tautological, fixed-target ones are not) is a provable finite statement and likely to be logged in Lean, but acceptance also needs a pre-registered test of a fixed-model prediction on published regeneration time courses, which are sparse, old and mostly qualitative. The falsifier ('every prediction can be rescued') is hard to hit definitively by artifacts, so the 30-day figure is deliberately below the Lean approaches' products. I would move up if someone finds a paper with quantitative regeneration times across four or more graded fragment classes.",
+      "change_reason": null,
+      "approaches": [
+        { "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--1", "p_complete": 0.45, "p_settle": 0.55, "note": "Finite complete-class theorems are within Lean reach, and they settle the conceptual piece but not the empirical test." },
+        { "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--2", "p_complete": 0.12, "p_settle": 0.35, "note": "Deriving a graded-excision envelope from the 2015 model is plausible, but published graded-fragment outcome data are sparse." },
+        { "approach": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--3", "p_complete": 0.12, "p_settle": 0.3, "note": "Picasso-tadpole trajectories are not tabulated, so figure extraction yields few, noisy velocity-displacement points." },
+        { "approach": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--1", "p_complete": 0.08, "p_settle": 0.4, "note": "Requires specimen-level regeneration time courses with quantified perturbations, which the proposer itself lists as missing." },
+        { "approach": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--2", "p_complete": 0.35, "p_settle": 0.45, "note": "Synthetic identifiability tests are pure computation, but the verdict depends on how the bounded model class is chosen." },
+        { "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--1", "p_complete": 0.15, "p_settle": 0.35, "note": "Needs four fragment classes with quantitative times in one paper, which likely do not exist, so it probably stops inconclusive." },
+        { "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--2", "p_complete": 0.4, "p_settle": 0.6, "note": "The tautology theorem is near-trivial and the fixed-target half is a bounded statement, so a definite Lean result is plausible." },
+        { "approach": "active-inference-morphogenesis-falsifiable--grok-4-7--3", "p_complete": 0.1, "p_settle": 0.5, "note": "Kuchling et al. 2020 likely lacks a full numerical parameter set, so the approach probably cannot start." }
+      ]
+    }
+  ]
+}

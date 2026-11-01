@@ -1,0 +1,89 @@
+{
+  "claim_id": "levin-2023-agential-15",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:22:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "RNA-seq (counts or FPKM) of Dugesia japonica heads regenerated in BaCl2 versus untreated controls",
+    "replicate structure for a differential-expression threshold",
+    "head loss / regeneration / barium-insensitivity counts over time",
+    "untreated and acute-stress control conditions"
+  ],
+  "datasets": [
+    {
+      "id": "geo-series-gse98084",
+      "name": "GEO GSE98084: Regenerative adaptation to electrochemical perturbation in planaria",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98084",
+      "access_url": "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98084/suppl/GSE98084_All_Data_BaCl2.xlsx",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:00Z", "method": "GET GEO accession page (text, brief) and eutils esummary; HEAD on supplementary xlsx", "http_status": 200, "bytes": 2562675 },
+      "variables_present": ["RNA-seq of D. japonica, BaCl2 versus WT samples", "FPKM tables per replicate (supplementary xlsx)", "raw reads via SRA SRP104988 / BioProject PRJNA383937"],
+      "variables_missing": ["head loss, regrowth and survival counts", "acute-stress control condition", "a time course"],
+      "scope": "Taxon Dugesia japonica, platform GPL16430, 4 samples listed (WT1, WT2, BaCl1, BaCl2), released 2017-08-31. Supplementary files: GSE98084_All_Data_BaCl2.xlsx (2,562,675 bytes), GSE98084_FPKM_Replicate_1.xlsx (2,533,594 bytes), GSE98084_FPKM_Replicate_2.xlsx. The series design text says worms were kept in BaCl2 for 35 days and heads amputated for RNA; it also mentions 'three biological replicates' with 25 worms each, while only 4 samples are listed, so the replicate structure should be checked before use.",
+      "evidence": "GEO text record: !Series_type = Expression profiling by high throughput sequencing; !Series_supplementary_file lines as above; esummary lists extrelation SRA SRP104988 and bioproject PRJNA383937. The xlsx files are over 1 MB and were not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "sra-srp104988",
+      "name": "SRA study SRP104988 (reads for GSE98084)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra?term=SRP104988",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=SRP104988&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:11:10Z", "method": "eutils esearch db=sra term=SRP104988", "http_status": 200 },
+      "variables_present": ["raw sequencing reads for the 4 GSE98084 samples"],
+      "variables_missing": ["phenotype counts"],
+      "scope": "esearch returned count 4 (SRA experiments 3973025 to 3973028).",
+      "evidence": "esearch JSON count '4' with idlist 3973028, 3973027, 3973026, 3973025. Read files not downloaded.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-gene-expression-omnibus",
+      "name": "NCBI Gene Expression Omnibus (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=planaria+barium&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:10:30Z", "method": "eutils esearch db=gds term='planaria barium'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal, not a dataset"],
+      "scope": "esearch for 'planaria barium' returned exactly 1 record, GSE98084.",
+      "evidence": "esearch count '1', idlist 200098084 (= GSE98084).",
+      "verdict": "rejected"
+    },
+    {
+      "id": "ncbi-sequence-read-archive",
+      "name": "NCBI Sequence Read Archive (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal, not a dataset; the relevant study is SRP104988 (listed separately)"],
+      "scope": "General archive.",
+      "evidence": "Landing page returned 200.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "GEO (eutils db=gds)", "query": "planaria barium", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=planaria+barium&retmode=json", "hits": 1, "note": "only GSE98084" },
+    { "source": "SRA (eutils db=sra)", "query": "SRP104988", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=SRP104988&retmode=json", "hits": 4, "note": "4 experiments" },
+    { "source": "Dryad", "query": "planaria barium", "url": "https://datadryad.org/api/v2/search?q=planaria%20barium", "hits": 0, "note": "nothing" },
+    { "source": "Zenodo", "query": "planarian barium regeneration", "url": "https://zenodo.org/api/records?q=planarian%20barium%20regeneration&size=3", "hits": 14750, "note": "loose match; top hits are other planarian studies (serotonin, transcriptomes), none about barium" },
+    { "source": "Europe PMC", "query": "title of the iScience paper", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Regenerative%20adaptation%20to%20electrochemical%20perturbation%20in%20planaria%22&format=json&resultType=lite", "hits": 1, "note": "Regenerative Adaptation to Electrochemical Perturbation in Planaria, iScience 2019, DOI 10.1016/j.isci.2019.11.014, PMID 31765995; DOI resolves (200) via linkinghub.elsevier.com" }
+  ],
+  "status": "partial",
+  "summary": "The RNA-seq (GSE98084: 4 D. japonica samples, supplementary FPKM tables, SRA SRP104988) is public and is the only barium-adaptation expression dataset found. Head loss, regrowth and survival counts, any time course and acute-stress controls are not deposited anywhere I could find.",
+  "next_step": "Pre-register the 'handful' threshold, confirm the replicate structure from the GEO sample records, and extract the phenotype tallies from the iScience paper text.",
+  "obstacles_confirmed": [
+    "Only 4 samples are listed for GSE98084, which limits how stable a differentially-expressed gene list can be.",
+    "Anatomical time course and survival tallies are not in the expression series."
+  ]
+}

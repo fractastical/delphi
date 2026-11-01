@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean statement of the West–Brown–Enquist exponent" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    dct:description "Formalize the scaling argument under explicit hypotheses, and make the step Kozlowski and Konarzewski dispute a separate lemma. Hypotheses: a self-similar branching network with fixed branching ratio; a space-filling condition relating the linear scale factor to that ratio; a terminal unit whose size does not depend on body mass; and a flow or impedance condition that fixes how cross-section scales across a branch. From those, prove that metabolic rate scales as mass to the 3/4. Then prove a second lemma that names the alternative service-volume assumption used in the critique and shows whether it is consistent with invariant terminal units. The module must not hide either assumption inside a definition. Empirical truth of the hypotheses is out of scope, as in the Thompson Lean standard." ;
+
+    delphi:proposedTest "A no-sorry derivation of the 3/4 exponent under named hypotheses, and a second lemma that settles consistency of the critiqued alternative with invariant capillaries." ;
+    delphi:context "Fails if: The 3/4 exponent is obtained only by assuming the conclusion, or the two lemmas use incompatible definitions of service volume without saying so." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define branching ratio, scale factor, terminal-unit size and service volume. 2. Prove the 3/4 exponent from the stated hypotheses. 3. State the critiqued service-volume assumption as a second definition. 4. Prove consistency or inconsistency with invariant terminal units. 5. Audit axioms and write the scope note that the hypotheses are not data." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: allometry" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+
+    rdfs:seeAlso <https://doi.org/10.1126/science.276.5309.122> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.0269-8463.2004.00830.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" .
+
+
+  <https://doi.org/10.1126/science.276.5309.122> dct:title "A General Model for the Origin of Allometric Scaling Laws in Biology" ;
+    dct:bibliographicCitation "West, Brown and Enquist 1997, A general model for the origin of allometric scaling laws in biology" .
+  <https://doi.org/10.1111/j.0269-8463.2004.00830.x> dct:title "Is West, Brown and Enquist's model of allometric scaling mathematically correct and biologically relevant?" ;
+    dct:bibliographicCitation "Kozlowski and Konarzewski 2004, the critique of the derivation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to metabolic-scaling-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.339Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to metabolic-scaling-exponent: Lean statement of the West–Brown–Enquist exponent" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

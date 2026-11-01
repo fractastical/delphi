@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RABCCkebkRbnFdgODqk7mG5atnBzHkCa2kmzl0NTZdCzc>.
+@prefix sub: <https://w3id.org/np/RABCCkebkRbnFdgODqk7mG5atnBzHkCa2kmzl0NTZdCzc/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2024-memory-13> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Because competent biological material compensates for defects, selection cannot see genome quality clearly, so more evolutionary change accrues in competency mechanisms than in structural components, producing a positive-feedback intelligence ratchet based on remapping information to new contexts.";
+    dc:type "historical-inference";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Cellular competency hides genome quality from selection, driving an intelligence ratchet";
+    <https://w3id.org/delphi/ontology/context> "Levin M, “Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue”, Entropy (Basel, Switzerland) (2024), doi:10.3390/e26060481; section “6. What It Means, and What Next: A Research Program for Further Development”. Scope: Evolution of multicellular organisms; in silico evolutionary models"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.3390/e26060481>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt#line=61,62>;
+    prov:wasQuotedFrom <https://doi.org/10.3390/e26060481>;
+    <https://schema.org/text> "The competency of our material means that selection cannot see the quality of genomes clearly46. More evolutionary work thus has to be conducted on the competency mechanisms, not the structural components, leading to a positive feedback loop—an intelligence ratchet based on the remapping of information to new contexts47.".
+<https://doi.org/10.3390/e26060481> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Levin M. Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue. Entropy (Basel, Switzerland) (2024). doi:10.3390/e26060481";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2024"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC11203334>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt#line=61,62> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11203334/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.3390/e26060481>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "e7962aa9a30671bf549d2c45a2b5fca76c73bc97c6409eff2976e63c6bef3697"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2024 claim: Cellular competency hides genome quality from selection, driving an intelligence ratchet";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-memory-13>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "g+0SSFqKY5ugsmYwhvpWSInBETZkQ8CXoJg+oJPpLUStD6gyTDv5wVJ0CoESBtMQqjVMc4qvU41t139IR0Lk0SaaOa0PUDpwmrL5UNFBZed0oop3mnxnxAwZ3pdui1HPfL937Uno4Ky4+STvWMxk/3G7bJa/mpEldHypozNRLhUvlXe7sSeZcSU3X9kPJif1v1dTsWsKDj0R2LjOiOvHoQaZJMovqbzKTz4Ac3dmA267B1TArcgQ1K8HL/clO7b9/26Ik+JFIpE5VVmkVik9IA8Rdp/vMnl4TBsAddDC3jvT+Ur2m+5AtZwnmiGMyv11kA7lRogokysUlMGSY5+YxQ=="
+}

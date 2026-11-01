@@ -1,0 +1,383 @@
+{
+ "schema": "frontier.voxel-actuation-summary/1",
+ "protocol": "artifacts/voxel-actuation/protocol.json",
+ "protocol_frozen_commit": "7b9bd5d",
+ "engine": {
+  "name": "Voxelyze",
+  "commit": "4287e365e11416dd108f2f361e9ec4c5a011a16c",
+  "lib_version_string": "voxelyze.0.9.92",
+  "licence_of_record": "LGPL-3.0-or-later (source headers; no LICENSE file at this commit)"
+ },
+ "host_build": {
+  "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "os": "Ubuntu 24.04, Linux 6.17.0-1012-aws",
+  "upstream_make_exit": 0,
+  "upstream_make_wall_s": 11.45,
+  "full_build_sh_exit": 0,
+  "full_build_sh_wall_s": 17.85,
+  "upstream_makefile_defect": "default FLAGS contain -DPARDISO_5=1, leaving undefined references to pardisoinit/pardiso in the archive; any program linking it fails without a commercial Pardiso 5 library. Build with FLAGS overridden to drop the define.",
+  "compiler_warnings": 16,
+  "gpu_required": false,
+  "peak_rss_bound": "ran inside MemoryMax=2G MemorySwapMax=0; no OOM kill observed"
+ },
+ "determinism": "no RNG in Voxelyze 0.9 or in this driver; repeat runs are identical and there are no stochastic replicates",
+ "arm_A_candidates": {
+  "uniform": {
+   "body_lengths": 2e-05,
+   "net_dx_m": 8.17e-07,
+   "net_dy_m": 2.81e-07,
+   "disp_per_cycle_m": 1.73e-07,
+   "path_len_m": 2.7679e-05,
+   "diverged": false
+  },
+  "longitudinal": {
+   "body_lengths": 0.15318,
+   "net_dx_m": -0.006127263,
+   "net_dy_m": -2.4037e-05,
+   "disp_per_cycle_m": 0.001225462,
+   "path_len_m": 0.012219948,
+   "diverged": false
+  },
+  "lateral": {
+   "body_lengths": 0.14125,
+   "net_dx_m": -4.5202e-05,
+   "net_dy_m": -0.005649723,
+   "disp_per_cycle_m": 0.001129981,
+   "path_len_m": 0.013795105,
+   "diverged": false
+  },
+  "dorsoventral": {
+   "body_lengths": 0.00308,
+   "net_dx_m": 0.000105323,
+   "net_dy_m": 6.378e-05,
+   "disp_per_cycle_m": 2.4626e-05,
+   "path_len_m": 0.003758029,
+   "diverged": false
+  },
+  "travelling": {
+   "body_lengths": 0.36443,
+   "net_dx_m": -0.01457605,
+   "net_dy_m": 0.000189432,
+   "disp_per_cycle_m": 0.002915456,
+   "path_len_m": 0.016124646,
+   "diverged": false
+  },
+  "checker": {
+   "body_lengths": 3e-05,
+   "net_dx_m": -9.68e-07,
+   "net_dy_m": -1.86e-07,
+   "disp_per_cycle_m": 1.97e-07,
+   "path_len_m": 8.663e-06,
+   "diverged": false
+  }
+ },
+ "arm_A_ranking": [
+  "travelling",
+  "longitudinal",
+  "lateral",
+  "dorsoventral",
+  "checker",
+  "uniform"
+ ],
+ "arm_A_verdict": {
+  "predeclared": "at least one pattern >= 0.05 body lengths and not all equal",
+  "observed": "best travelling at 0.364432 BL, worst uniform at 0.000022 BL; ratio 16565, which is 4.22 orders of magnitude (independent audit computed 4.23 from the same artifacts; the small difference is rounding of the smallest value). CORRECTION 2026-11-01: an earlier version of this field said 'spans ~5 orders of magnitude', which overstated it.",
+  "met": true
+ },
+ "controls": {
+  "B_passive_cte0": {
+   "body_lengths": 3e-06,
+   "bound": 0.01,
+   "met": true
+  },
+  "C_zero_amplitude": {
+   "body_lengths": 3e-06,
+   "bound": 0.01,
+   "met": true,
+   "note": "numerically identical to B, as it must be: both zero the same product cte*amplitude"
+  },
+  "D_frictionless": {
+   "body_lengths": 0.0,
+   "bound": 0.01,
+   "met": true,
+   "note": "net_dx and net_dy are exactly 0.0 and COM x,y are constant to 9 decimals across all 241 samples, while COM z ranges 0.009967-0.011017 m. The body is demonstrably active and its horizontal centre of mass does not move. This is the predicted conservation result, not a dead run."
+  },
+  "E_zero_gravity": {
+   "body_lengths": 0.017479,
+   "bound": 0.01,
+   "met": false,
+   "PREREGISTRATION_MISS": true,
+   "diagnosis": "the predeclared argument was wrong, not the threshold. It claimed removing gravity removes the normal force; it does not. With the floor still enabled, actuation itself drives voxels into the floor and generates transient normal force, so Coulomb friction still acts. Arm D, which removes the tangential coefficient, is the control that actually isolates friction, and it gives exactly zero. The threshold was not changed and this arm is recorded as missed.",
+   "magnitude": "0.0175 BL, which is 4.8% of the travelling arm and 11.4% of the longitudinal arm"
+  }
+ },
+ "analytic_controls": {
+  "P1-expansion-none": {
+   "mode": "expansion",
+   "mutate": "none",
+   "must_fail": false,
+   "ratio": 1.0,
+   "settled": true,
+   "passed": true,
+   "control_verdict_ok": true
+  },
+  "P2-cantilever-none": {
+   "mode": "cantilever",
+   "mutate": "none",
+   "must_fail": false,
+   "ratio": 1.0,
+   "settled": true,
+   "passed": true,
+   "control_verdict_ok": true
+  },
+  "M1-expansion-sign": {
+   "mode": "expansion",
+   "mutate": "sign",
+   "must_fail": true,
+   "ratio": 1.222222,
+   "settled": true,
+   "passed": false,
+   "control_verdict_ok": true
+  },
+  "M2-expansion-none_law": {
+   "mode": "expansion",
+   "mutate": "none_law",
+   "must_fail": true,
+   "ratio": 1.1,
+   "settled": true,
+   "passed": false,
+   "control_verdict_ok": true
+  },
+  "M3-cantilever-stiffness": {
+   "mode": "cantilever",
+   "mutate": "stiffness",
+   "must_fail": true,
+   "ratio": 10.000005,
+   "settled": true,
+   "passed": false,
+   "control_verdict_ok": true
+  }
+ },
+ "analytic_controls_verdict": "2 positive controls reproduce the closed form at ratio 1.0000 with settle drift <= 6.3e-07; 3 must-fail mutants are rejected at ratios 1.2222, 1.1000 and 10.0000, each while settled and not diverged",
+ "settling_sweep": {
+  "settling-n12": {
+   "n_voxels": 12,
+   "ratio": 0.266914,
+   "settle_drift_frac": 0.08119,
+   "settled": false
+  },
+  "settling-n2": {
+   "n_voxels": 2,
+   "ratio": 1.0,
+   "settle_drift_frac": 0,
+   "settled": true
+  },
+  "settling-n3": {
+   "n_voxels": 3,
+   "ratio": 1.0,
+   "settle_drift_frac": 0,
+   "settled": true
+  },
+  "settling-n4": {
+   "n_voxels": 4,
+   "ratio": 1.0,
+   "settle_drift_frac": 4.342e-13,
+   "settled": true
+  },
+  "settling-n6": {
+   "n_voxels": 6,
+   "ratio": 0.995396,
+   "settle_drift_frac": 0.00329,
+   "settled": false
+  },
+  "settling-n8": {
+   "n_voxels": 8,
+   "ratio": 0.798327,
+   "settle_drift_frac": 0.04345,
+   "settled": false
+  }
+ },
+ "settling_sweep_reading": "at 20 s simulated the cantilever reproduces Euler-Bernoulli at ratio 1.0000 for n=2,3,4 with drift <= 4.3e-13, and departs to 0.9954 / 0.7983 / 0.2669 at n=6,8,12 with drift rising to 0.081. The departure tracks the drift, so it is incomplete settling of a longer, lower-frequency beam, not a model error. Without the settle gate this would read as a 3.7x stiffness discrepancy.",
+ "arm_F_timestep": {
+  "F-dtScale-0.5": {
+   "dt_s": 5.06427969e-05,
+   "body_lengths": 0.15318
+  },
+  "F-dtScale-0.25": {
+   "dt_s": 2.53213984e-05,
+   "body_lengths": 0.15189
+  },
+  "F-dtScale-0.125": {
+   "dt_s": 1.26606992e-05,
+   "body_lengths": 0.1518
+  }
+ },
+ "arm_F_verdict": {
+  "predeclared": "dtScale 0.25 and 0.125 within 20% of 0.5",
+  "observed": "0.15318 / 0.15189 / 0.15180 BL at dtScale 0.5 / 0.25 / 0.125; coarsest-to-finest difference 0.00138 BL, which is 0.901% of the coarsest value and 0.909% of the finest; the successive differences fall 0.00129 then 0.00009, consistent with convergence. CORRECTION 2026-11-01: an earlier version of this field wrote '0.90%' without naming the denominator; both figures are now given.",
+  "met": true
+ },
+ "arm_G_spatial": {
+  "G-coarse": {
+   "nx": 5,
+   "voxel_m": 0.01,
+   "body_lengths": 0.15318
+  },
+  "G-fine": {
+   "nx": 10,
+   "voxel_m": 0.005,
+   "body_lengths": 0.01878
+  }
+ },
+ "arm_G_verdict": {
+  "predeclared": "no convergence predicted; reported as an open question",
+  "observed": "0.15318 BL coarse (5x3x3, s=10mm) versus 0.01878 BL fine (10x6x6, s=5mm), an 8.2x drop",
+  "resolved_post_hoc": true
+ },
+ "post_hoc_diagnostics": {
+  "status": "NOT preregistered. Run after arm G to explain its gap. Reported as diagnosis, not as confirmatory evidence.",
+  "hypothesis_1_global_damping": {
+   "statement": "VX_Material.h:94 gives translational global damping C = zeta*2*sqrt(m*k) with k=E*nomSize, so C ~ L^2 per voxel while voxel count ~ L^-3 and total drag ~ L^-1. Halving the voxel should double total ground drag and suppress motion.",
+   "test": "vary zeta_global at both resolutions",
+   "REFUTED": true,
+   "evidence": {
+    "coarse_zeta_0.1": 0.15318,
+    "coarse_zeta_0": 0.02365,
+    "fine_zeta_0.1": 0.01878,
+    "fine_zeta_0.05": 0.01039,
+    "fine_zeta_0.025": 0.00425,
+    "fine_zeta_0": 0.00466
+   },
+   "why_refuted": "displacement is HIGHER at the largest zeta than at zero at both resolutions (coarse 0.02365 -> 0.15318; fine 0.00466 -> 0.01878), so increasing global damping does not suppress this motion the way a purely parasitic drag would; and matching total drag by halving zeta on the fine lattice widens the coarse/fine gap to 15x rather than closing it.",
+   "CORRECTION_2026-11-01": "two overstatements removed, both raised by independent audit and both confirmed here from the stored artifacts. (1) An earlier version said displacement 'rises with zeta' at both resolutions. The fine series is NOT strictly monotone: zeta 0 -> 0.00466, 0.025 -> 0.00425 (a DECREASE), 0.05 -> 0.01039, 0.1 -> 0.01878. Only the endpoints are ordered. (2) An earlier version said global damping 'is not a parasitic drag here', which could be read as denying that it dissipates. It is a dissipative -C*v term (VX_Material.h:94). What these runs show is about RECTIFICATION of the actuation cycle, not about the sign of the term, and the mechanism is not identified.",
+   "monotonicity": {
+    "coarse_endpoints_only": {
+     "zeta_0": 0.02365,
+     "zeta_0.1": 0.15318
+    },
+    "fine_series": {
+     "zeta_0": 0.00466,
+     "zeta_0.025": 0.00425,
+     "zeta_0.05": 0.01039,
+     "zeta_0.1": 0.01878
+    },
+    "strictly_monotone": false,
+    "note": "a non-monotone series does not support a simple trend statement"
+   }
+  },
+  "hypothesis_2_parity_confound": {
+   "statement": "the longitudinal pattern splits at x < nx/2, so nx=5 gives an asymmetric 2|3 actuator layout and nx=10 a symmetric 5|5 one. Net translation needs a broken mirror symmetry, so the comparison confounded lattice resolution with actuator-layout parity.",
+   "test": "vary nx at FIXED voxel size 10 mm and fixed zeta 0.1",
+   "SUPPORTED": true,
+   "evidence_body_lengths": {
+    "nx=4 (2|2 symmetric)": 0.02003,
+    "nx=5 (2|3 asymmetric)": 0.15318,
+    "nx=6 (3|3 symmetric)": 0.0086,
+    "nx=7 (3|4 asymmetric)": 0.07959
+   },
+   "reading": "odd nx moves 7.6x to 17.8x further than its ADJACENT even neighbours at identical resolution, material, amplitude and duration (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25). Non-adjacent pairs are not part of this claim. Arm G was therefore not a clean resolution test; most of its 8.2x gap is my own encoding. CORRECTION 2026-11-01: an earlier version wrote '7.7x'; 0.15318/0.02003 = 7.6475, which rounds to 7.6.",
+   "adjacent_pair_ratios": {
+    "nx5_over_nx4": 7.6475,
+    "nx5_over_nx6": 17.8095,
+    "nx7_over_nx6": 9.2537
+   },
+   "CAVEAT_bodies_are_not_matched": "varying nx at fixed voxel size changes the voxel COUNT, the body LENGTH and the MASS together: nx=4 is 36 voxels / 30 mm centre span / 40 mm envelope / 36 g; nx=5 is 45 / 40 / 50 / 45 g; nx=6 is 54 / 50 / 60 / 54 g; nx=7 is 63 / 60 / 70 / 63 g. So this series is a DIAGNOSTIC that identifies parity as a large effect, NOT an isolated demonstration that parity is the single cause. Length and mass are not held constant and their separate contributions are unmeasured. Raised by independent audit."
+  },
+  "clean_refinement_test": {
+   "statement": "the travelling-wave pattern sets phase as a gradient 2*pi*x/nx and carries its own asymmetry at any nx, so it has no parity confound.",
+   "relative_difference": "15.5739% at a common denominator, NOT 2.74%",
+   "reading": "at a common denominator the travelling-wave pattern differs by 15.6% across a 2x lattice refinement. That is far smaller than the longitudinal pattern's 8.2x, and it is NOT agreement and NOT convergence. A single pattern on two grids cannot establish convergence under any denominator, and the parity diagnosis does not cure the remaining discretisation and normalisation issues.",
+   "CORRECTION_2026-11-01": "WITHDRAWN READING. The 2.74% figure compared two DIFFERENT denominators. The stored normalisation is body_len = (nx-1)*voxel, which is the centre-to-centre span, and that span is 40 mm for the coarse body (nx=5, s=10mm) but 45 mm for the fine body (nx=10, s=5mm). Dividing by two different lengths manufactured an agreement that is not in the data. Raised by independent review of e6f1033; all eight of its figures were recomputed here from the stored artifacts and all eight match. The frozen stored metric is unchanged below; the SI values and both denominators are added.",
+   "stored_centre_span_normalised": {
+    "coarse": 0.364432,
+    "fine": 0.374389,
+    "denominator_coarse_mm": 40.0,
+    "denominator_fine_mm": 45.0,
+    "relative_difference_pct": 2.7322,
+    "WARNING": "these two numbers use different denominators and MUST NOT be compared to each other"
+   },
+   "raw_SI": {
+    "coarse_net_disp_mm": 14.577281,
+    "fine_net_disp_mm": 16.847525,
+    "relative_difference_pct_vs_coarse": 15.5739
+   },
+   "common_denominator_outer_envelope": {
+    "denominator_mm": 50.0,
+    "note": "outer envelope nx*voxel is 50 mm for BOTH bodies, so it is the invariant length here",
+    "coarse": 0.291546,
+    "fine": 0.33695,
+    "relative_difference_pct": 15.5739
+   }
+  }
+ },
+ "extracted_relation": {
+  "statement": "In this configuration, net displacement per actuation cycle is produced by spatial asymmetry of the actuation phase field, not by actuation amplitude alone. A phase field mirror-symmetric about the mid-plane of the travel axis yields roughly an order of magnitude less net displacement than an asymmetric one at matched amplitude, frequency, material and duration.",
+  "conditions": [
+   "Voxelyze 4287e365 lattice, linear elastic E=1e5 Pa, nu=0.35, rho=1e3 kg/m3",
+   "Coulomb friction mu_s=1.0, mu_k=0.8 against a rigid floor at z=0",
+   "global damping zeta=0.1 to a stationary absolute frame; this is a numerical ground-drag term and NOT a fluid model, so no swimming interpretation is available",
+   "explicit Euler at dt = 0.5 * recommendedTimeStep",
+   "5 cycles at 4 Hz, peak linear strain 0.10 from cte 0.01/degC at amplitude 10 degC",
+   "bodies of 36 to 360 voxels at 5 mm or 10 mm lattice spacing"
+  ],
+  "validation_data": [
+   "arm A, 6 patterns",
+   "parity series nx=4,5,6,7 at fixed resolution",
+   "two-resolution refinement of the travelling pattern",
+   "controls B, C, D, E",
+   "timestep series F",
+   "analytic controls P1, P2 and mutants M1, M2, M3"
+  ],
+  "NOT_A_BIOLOGICAL_LAW": "This is a property of a particular numerical soft-body model under declared parameters. No organism, tissue or cell measurement enters it. It is not evidence about Xenopus, about any computationally designed organism, or about matter.",
+  "known_threat_to_validity": "the rectifying ground reaction here is part Coulomb friction and part global damping to an absolute frame; the zeta sweep shows displacement rises with zeta, so the mechanism is not purely frictional crawling and the split between the two has not been measured"
+ },
+ "resource_receipt": {
+  "all_runs_cpu_only": true,
+  "longest_single_run_wall_s": 8.555,
+  "total_simulation_runs": 23,
+  "total_analytic_runs": 11,
+  "caps_applied": "systemd-run --user --scope MemoryMax=2G MemorySwapMax=0 TasksMax=64 RuntimeMaxSec<=900, nice -n 19",
+  "apt_or_system_packages_installed": "none"
+ },
+ "animation_data": {
+  "path": "artifacts/voxel-actuation/trajectory/travelling-voxels.csv",
+  "rows": 10845,
+  "frames": 241,
+  "voxels": 45,
+  "columns": "step,t_s,vox,ix,iy,iz,x_m,y_m,z_m,temp_C",
+  "com_path": "artifacts/voxel-actuation/trajectory/travelling-com.csv",
+  "provenance": "produced by this run; it is NOT an upstream recording and no upstream video is reused anywhere in this artifact",
+  "what_the_csv_DOES_NOT_contain": [
+   "voxel orientations",
+   "deformed voxel meshes or surfaces",
+   "forces or tractions",
+   "any measured cellular state"
+  ],
+  "rendering_constraint": "travelling-voxels.csv stores voxel CENTRES and the imposed temperature only. A renderer may draw centre points, a link graph or nominal glyphs, and must label them as such. It must not invent cellular textures, traction arrows or deformed tissue boundaries. temp_C is an imposed numerical thermal actuation signal, not a measured cellular state. Use SI axes; if body lengths are shown, state which denominator.",
+  "endpoint_sampling_limitation": "the headline net displacement is computed from the centre of mass at the exact step boundaries inside the simulator (the first measurement step and the final step), whereas the CSV is written every record_every steps. The CSV endpoints therefore need not coincide with the metric's endpoints, so a value re-derived from the CSV can differ slightly from the stored net_disp_m. Use the stored metric for the number and the CSV for the shape. Raised by independent audit."
+ },
+ "model_scale_labelling": {
+  "what_this_object_is": "a numerical soft-voxel ground-contact mechanics benchmark, not tissue",
+  "baseline_body": "45 nominal 10 mm voxels; outer envelope 50 x 30 x 30 mm; centre-to-centre span 40 mm; nominal mass 45 g at the assumed density 1000 kg/m3",
+  "refined_body": "360 nominal 5 mm voxels; outer envelope 50 x 30 x 30 mm; centre-to-centre span 45 mm; same nominal mass 45 g",
+  "NOT": [
+   "a tissue-scale object",
+   "a Xenopus or microcarrier model",
+   "measured or material-calibrated"
+  ],
+  "no_fluid_interpretation": "global damping is a numerical absolute-frame term, not CFD and not fluid drag. No swimming interpretation is available."
+ },
+ "independent_audit_2026-11-01": {
+  "scope": "24 simulation runs and 11 analytic runs re-read; the 241 x 45 centre-of-mass and voxel data checked for consistency; 6 of the cheap controls independently rebuilt and reproduced",
+  "no_new_runs_requested": true,
+  "findings_accepted": [
+   "travelling-wave 2.74% withdrawn for 15.5739% at a common denominator",
+   "pattern spread is 4.2 orders, not ~5",
+   "parity series is a diagnostic, not an isolated cause",
+   "global damping is a dissipative -Cv term and the fine zeta series is not monotone",
+   "CSV endpoint sampling differs from the metric's endpoints"
+  ],
+  "findings_rejected": [],
+  "note": "every figure in the audit was recomputed here from the stored artifacts before acceptance"
+ }
+}

@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--4> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Meta-analysis of load-reorientation experiments for the causal arm" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "The causal falsifier (failure to re-orient after altered loading) can be tested on published experiments without new animals. Extract every controlled in vivo experiment in which joint load orientation or magnitude was changed and trabecular orientation measured against a control limb or group (starting with Pontzer et al. 2006 and Barak et al. 2011, plus studies found by a pre-registered search string in Europe PMC). The effect size is the change in primary fabric orientation in degrees relative to control, with the imposed load rotation as moderator. Fit a random-effects meta-regression of observed re-orientation on imposed rotation; Wolff's law predicts a slope near 1 (fabric tracks load) and an intercept near 0. Include studies with null results and record risk of bias (blinding, sample size)." ;
+
+    delphi:proposedTest "Pooled slope of fabric re-orientation on imposed load rotation with 95% CI excluding 0 (causal tracking) and its distance from 1 (complete tracking), from at least five independent experiments." ;
+    delphi:context "Fails if: Fewer than five eligible experiments, or a CI including 0, which would leave the causal claim unsupported; if eligible studies overwhelmingly report positive results with small n and Egger asymmetry, the pooled estimate is not credible." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the search string, inclusion criteria (controlled design, quantitative fabric angle, stated load-change angle) and the model. 2. Search Europe PMC and screen with two independent agents; resolve disagreements by a third. 3. Extract angles, SDs and n with page-level provenance; contact-free only, so studies without dispersion are recorded but excluded from pooling. 4. Fit the random-effects meta-regression (metafor, REML) and report the slope with 95% CI, heterogeneity I^2, and an Egger test." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: The number of controlled re-orientation experiments with extractable angles and dispersion may be below five; no wet lab to add new ones." ;
+    skos:note "Tool: europe-pmc" ;
+    skos:note "Tool: r-metafor" ;
+    skos:note "Tool: literature-extraction" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01971> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2011.08.020> ;
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms5855> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1242/jeb.01971> dct:title "Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" ;
+    dct:bibliographicCitation "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" .
+  <https://doi.org/10.1016/j.bone.2011.08.020> dct:title "A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" ;
+    dct:bibliographicCitation "Barak et al. 2011, A Wolff in sheep's clothing" .
+  <https://doi.org/10.1038/ncomms5855> dct:title "Bone remodelling in humans is load-driven but not lazy" ;
+    dct:bibliographicCitation "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.307Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Meta-analysis of load-reorientation experiments for the causal arm" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--4> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

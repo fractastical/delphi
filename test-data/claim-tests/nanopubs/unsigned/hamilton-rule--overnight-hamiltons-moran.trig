@@ -1,0 +1,69 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/hamilton-rule--claim-test--overnight-hamiltons-moran> a delphi:Assessment ;
+    rdfs:label "Claim test of hamilton-rule (overnight-hamiltons-moran): inconclusive, confidence 0.99" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.99"^^xsd:double ;
+    delphi:hypothesis "In the specified exact N = 6 paired Moran model, a regression predictor refit at each non-absorbing state has the same sign as exact expected frequency change, while coefficients frozen from frequency 1/2 have the wrong sign in at least one endpoint state." ;
+    delphi:passCriterion "The refit regression matches the sign of exact expected frequency change at every non-absorbing state with nonzero expected change, and the frozen predictor disagrees in sign at least once at an endpoint state." ;
+    delphi:failCriterion "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees with any nonzero exact expected frequency change." ;
+    delphi:expectedObservation "The refit regression matches the sign of exact expected frequency change at every non-absorbing state with nonzero expected change, and the frozen predictor disagrees in sign at least once at an endpoint state." ;
+    delphi:disconfirmingObservation "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees with any nonzero exact expected frequency change." ;
+    delphi:admissibleDatasets "" ;
+    delphi:inferenceMethod "Enumerate all 64 labelled binary configurations of six haploids in three fixed pairs using fractions.Fraction. For each configuration, compute exact fitnesses and all Moran birth-death transitions, then uniformly average transitions conditional on cooperator count to emit the requested seven-row table. Fit exact ordinary least-squares coefficients to pooled individual records at each count, freeze the count-three coefficients for the additive predictor, and compare both predictor signs with the aggregated expected frequency change." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "Enumerate all 64 labelled binary configurations of six haploids in three fixed pairs using fractions.Fraction. For each configuration, compute exact fitnesses and all Moran birth-death transitions, then uniformly average transitions conditional on cooperator count to emit the requested seven-row table. Fit exact ordinary least-squares coefficients to pooled individual records at each count, freeze the count-three coefficients for the additive predictor, and compare both predictor signs with the aggregated expected frequency change." ;
+    rdfs:comment "Measured: 0 preregistered-pass indicator (n = 5, none; exact rational arithmetic). Interpretation: The method cannot literally define the requested seven-state chain: with three fixed pairs, configurations having the same cooperator count can have different transition probabilities, and the absorbing no-mutation chain has no unique stationary conditional distribution on transient three-cooperator configurations. To make the requested count table computable without adding data or stochastic error, the analysis enumerated all 64 labelled configurations and uniformly averaged configurations conditional on each count; this is an explicit closure convention, not a true lumping of the fixed-pair chain. Under that convention the pre-registered criterion fails because the refit predictor disagrees at counts 2 and 3, but this does not refute the regression identity or the target claim because the averaging mixes distinct population states and their fitness normalizations." ;
+    delphi:evidenceAgainst "Uniform conditional averaging was not specified by the approach and is not preserved by the fixed-pair Moran dynamics." ;
+    delphi:evidenceAgainst "The phrase stationary-conditional fitnesses is undefined without mutation or another conditioning construction because the stated chain is absorbing." ;
+    delphi:evidenceAgainst "The computation tests a finite closure convention, not whether organisms obey Hamilton's rule and not the full exact-scope problem." ;
+    delphi:hasEvidence () ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-gpt-5-6-sol> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/math-bio-claims/hamilton-rule/overnight-hamiltons-moran/result.json> .
+  <https://w3id.org/delphi/resource/claim/hamilton-rule> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/hamilton-rule--claim-test--overnight-hamiltons-moran> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/math-bio-claims/hamilton-rule/overnight-hamiltons-moran/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (gpt-5.6-sol; hamiltons-rule-exact-scope--grok-4-7--2)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    dct:identifier "gpt-5.6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.964Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of hamilton-rule (overnight-hamiltons-moran): inconclusive, confidence 0.99" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/hamilton-rule--claim-test--overnight-hamiltons-moran> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/math-bio-claims> .
+}

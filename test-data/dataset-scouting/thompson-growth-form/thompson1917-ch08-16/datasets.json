@@ -1,0 +1,186 @@
+{
+  "claim_id": "thompson1917-ch08-16",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "pre-division 3D shape of each dividing cell (length/width, hemispherical vs oblong)",
+    "orientation of the new wall (transverse, oblique, longitudinal) relative to the cell axis",
+    "growth rate and interdivision interval per cell (time-lapse or lineage)",
+    "apical cells of mosses, liverworts, ferns or algae (the claim's stated scope)"
+  ],
+  "datasets": [
+    {
+      "id": "arabidopsis-embryo-image-collection",
+      "name": "A collection of 3D images of Arabidopsis thaliana embryos (Recherche Data Gouv)",
+      "landing_url": "https://doi.org/10.15454/HIIBKW",
+      "access_url": "https://entrepot.recherche.data.gouv.fr/api/datasets/:persistentId/?persistentId=doi:10.15454/HIIBKW",
+      "doi": "10.15454/HIIBKW",
+      "license": "Etalab Open Licence 2.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.15454/HIIBKW (200, redirects to entrepot.recherche.data.gouv.fr); GET Dataverse API datasets/:persistentId (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "~100 3D confocal image stacks of wall-stained (mPS-PI) embryos, stages 1C to early heart (~256C), 0.17 x 0.17 x 0.35 um sampling, LSM/TIF",
+        "wall positions visible in each fixed embryo, so mother-cell shape and daughter walls can be read from successive stages"
+      ],
+      "variables_missing": [
+        "no time-lapse, so no growth rate or interdivision interval per cell",
+        "no segmentation or division-plane annotation in the record",
+        "Arabidopsis embryo cells, not moss/liverwort/fern/algal apical cells"
+      ],
+      "scope": "One species, fixed embryos; single file at-embryo-collection.tar, 3,184,394,240 bytes (not downloaded)",
+      "evidence": "Dataverse JSON: versionState RELEASED, releaseTime 2022-04-20, 1 file at-embryo-collection.tar filesize 3184394240, description as quoted; license etalab-2.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cambridge-apollo-sam-cell-size-growth-1810-262530",
+      "name": "Research data supporting 'Cell size and growth regulation in the Arabidopsis thaliana apical stem cell niche' (Apollo, Cambridge)",
+      "landing_url": "https://www.repository.cam.ac.uk/handle/1810/262530",
+      "access_url": "https://www.repository.cam.ac.uk/oai/request?verb=GetRecord&identifier=oai:www.repository.cam.ac.uk:1810/262530&metadataPrefix=oai_dc",
+      "doi": "10.17863/cam.7793",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET OAI-PMH GetRecord oai:www.repository.cam.ac.uk:1810/262530 (200); HEAD handle page (200, 751-byte JS shell); GET DataCite dois query (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "confocal membrane data, segmentation data and cell lineage information for shoot-apical-meristem cells (OAI description begins 'Confocal membrane data, segmentation data, and cell lineage information for cells in the shoot apical meristem of 6 NPA-treated Arabidops...')",
+        "segmented cells with lineage links permit shape just before division and daughter geometry"
+      ],
+      "variables_missing": [
+        "description was seen truncated; number of time points and file formats not confirmed",
+        "NPA-treated Arabidopsis meristems, not moss/liverwort/fern/algal apical cells",
+        "no explicit division-plane labels confirmed"
+      ],
+      "scope": "6 NPA-treated Arabidopsis shoot apical meristems (from OAI description)",
+      "evidence": "OAI dc:title 'Research data supporting Cell size and growth regulation in the Arabidopsis thaliana apical stem cell niche', creators Jonsson SH, Willis L, Refahi Y; DataCite lists DOI 10.17863/cam.7793, publisher Apollo - University of Cambridge Repository, rights CC BY 4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cell%20division%20plane%20orientation",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET BioImages search API: 'cell division plane orientation' (2160 hits), 'division plane meristem OR embryo Arabidopsis segmentation' (848), 'moss OR Physcomitrella OR fern OR liverwort OR Marchantia apical cell' (1833)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "top hits for division-plane queries are animal spindle-orientation studies (e.g. S-BIAD1801, S-JCBD-201002047) and Arabidopsis segmentation sets without division-plane labels (S-BIAD962 root segmentation masks, 37 files; S-BIAD1026 Go-Nuclear nuclei toolkit)",
+        "no moss, liverwort or fern apical-cell division series among top hits; S-BSST215 is 1 file of TEM images of Ectocarpus apical cells"
+      ],
+      "scope": "Archive-wide; a portal, not one dataset",
+      "evidence": "totalHits and accession/title lists from the three search responses",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=200",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET OMERO JSON API /api/v0/m/projects/?limit=200 (147 projects, meta totalCount 147), project names filtered for divi|plane|plant|arabid|meristem|embryo|mitosis|moss|alga|spindle",
+        "http_status": 200
+      },
+      "variables_present": [
+        "project names matching: idr0032-yang-meristem/experimentA (id 201), idr0045-reichmann-zygotespindle/experimentA (id 405)"
+      ],
+      "variables_missing": [
+        "contents of idr0032 not opened (name only); idr0045 name suggests mouse zygote spindle, not plant cells",
+        "no moss/liverwort/fern/algal project name"
+      ],
+      "scope": "147 public projects, mostly screens",
+      "evidence": "project names from API response; no further fetch",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "cell division plane orientation",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cell%20division%20plane%20orientation&pageSize=8",
+      "hits": 2160,
+      "note": "animal spindle-orientation studies dominate"
+    },
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "division plane meristem OR embryo Arabidopsis segmentation",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=division%20plane%20meristem%20OR%20embryo%20Arabidopsis%20segmentation&pageSize=8",
+      "hits": 848,
+      "note": "plant segmentation sets, none labelled with division planes"
+    },
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "moss OR Physcomitrella OR fern OR liverwort OR Marchantia apical cell",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=moss%20OR%20Physcomitrella%20OR%20fern%20OR%20liverwort%20OR%20Marchantia%20apical%20cell&pageSize=8",
+      "hits": 1833,
+      "note": "no relevant plant apical-cell series in top 8"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"division plane\" cell segmentation, type=dataset",
+      "url": "https://zenodo.org/api/records?q=%22division%20plane%22%20cell%20segmentation&type=dataset&size=8",
+      "hits": 23333,
+      "note": "loose matching; top hits are bioimage.io model uploads (plantseg_ovules, plantseg_root) and a 3D benchmark"
+    },
+    {
+      "source": "Dryad",
+      "query": "cell division plane orientation",
+      "url": "https://datadryad.org/api/v2/search?q=cell%20division%20plane%20orientation",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "Arabidopsis shoot apical meristem cell segmentation lineage",
+      "url": "https://api.datacite.org/dois?query=Arabidopsis%20shoot%20apical%20meristem%20cell%20segmentation%20lineage&resource-type-id=dataset",
+      "hits": 1,
+      "note": "the Apollo record 10.17863/cam.7793"
+    },
+    {
+      "source": "IDR OMERO API",
+      "query": "project list filtered by name",
+      "url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=200",
+      "hits": 2,
+      "note": "idr0032-yang-meristem, idr0045-reichmann-zygotespindle"
+    }
+  ],
+  "status": "partial",
+  "summary": "Arabidopsis 3D wall-stained embryo stacks (Recherche Data Gouv, ~100 embryos, stages 1C to ~256C) and Cambridge shoot-meristem confocal, segmentation and lineage data (6 meristems) hold fixed or lineage-linked cell geometry from which shape before division and daughter wall can be read. Neither is a moss, liverwort, fern or algal apical-cell series, and neither supplies growth rate and interdivision time per cell in the record metadata I saw.",
+  "next_step": "Open the Cambridge record's file list and the IDR idr0032 study to confirm time points and lineage fields; decide whether Arabidopsis cells are an acceptable proxy; compile a separate apical-cell series for a moss or fern from the literature for the stated scope.",
+  "obstacles_confirmed": [
+    "Suitable apical-cell series for mosses, liverworts, ferns, and algae are not in the repositories searched.",
+    "Open image sets do not carry per-cell growth rates and division intervals together with wall orientation."
+  ]
+}

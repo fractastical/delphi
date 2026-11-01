@@ -1,0 +1,253 @@
+{
+  "claim_id": "darwin1859-ch03-03",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:48:05Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "average local population density/abundance per species",
+    "fecundity per species (litter/clutch size, litters per year, seeds or eggs per individual)",
+    "early-life (juvenile) mortality or survival per species",
+    "adult body mass per species (to partial out size)"
+  ],
+  "datasets": [
+    {
+      "id": "pantheria-1-0",
+      "name": "PanTHERIA: species-level life-history database of mammals (Ecological Archives E090-184)",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "access_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+      "doi": "10.1890/08-1494.1",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET esapubs.org/archive/ecol/E090/184/; GET (range 0-1500) PanTHERIA_1-0_WR05_Aug2008.txt header",
+        "http_status": 200
+      },
+      "variables_present": [
+        "21-1_PopulationDensity_n/km2",
+        "15-1_LitterSize",
+        "16-1_LittersPerYear",
+        "5-1_AdultBodyMass_g",
+        "5-3_NeonateBodyMass_g",
+        "25-1_WeaningAge_d",
+        "phylogeny-ready taxonomy (MSW05)"
+      ],
+      "variables_missing": [
+        "juvenile mortality/survival"
+      ],
+      "scope": "Mammals; 5,416 species rows (per vendored organisms record)",
+      "evidence": "Header row of the TSV fetched; column names listed above appear verbatim. Landing page 200. Vendored record gives byte_size 2,359,096 and 5,416 species.",
+      "verdict": "holds",
+      "reuses_organism_dataset": "pantheria-1-0-wr05-aug2008"
+    },
+    {
+      "id": "tetradensity",
+      "name": "TetraDENSITY: population density dataset (figshare 5371633)",
+      "landing_url": "https://figshare.com/articles/dataset/TetraDENSITY_Population_Density_dataset/5371633",
+      "access_url": "https://ndownloader.figshare.com/files/20334360",
+      "doi": "10.6084/m9.figshare.5371633",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET api.figshare.com/v2/articles/5371633; GET (range 0-900) TetraDENSITY_v.1.csv",
+        "http_status": 200,
+        "bytes": 2969721
+      },
+      "variables_present": [
+        "population density per species and locality (Density, Density_unit)",
+        "taxonomy, coordinates, year, habitat, sampling method"
+      ],
+      "variables_missing": [
+        "fecundity",
+        "juvenile mortality",
+        "body mass"
+      ],
+      "scope": "Terrestrial vertebrates (rows begin with Amphibia)",
+      "evidence": "Figshare API 200: TetraDENSITY.xls 5,295,104 bytes and TetraDENSITY_v.1.csv 2,969,721 bytes; CC BY 4.0; DOI 10.6084/m9.figshare.5371633.v3. CSV header: Class, Order, Family, Genus, Species, Subspecies, Longitude, Latitude, Locality, Country, Year, Habitat, Sampling_Area, Density, Density_unit, Sampling_Method.",
+      "verdict": "partial"
+    },
+    {
+      "id": "amniote-life-history-database",
+      "name": "Amniote life-history database (Myhrvold et al. 2015)",
+      "landing_url": "https://esapubs.org/archive/ecol/E096/269/",
+      "access_url": null,
+      "doi": null,
+      "license": "Not stated in the distributed file (per vendored record)",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:48:15Z",
+        "method": "GET (range 0-700) Amniote_Database_Aug_2015.csv header; vendored record organisms/merged/datasets.json for row count",
+        "http_status": 206,
+        "bytes": 4728122
+      },
+      "variables_present": [
+        "litter_or_clutch_size_n",
+        "litters_or_clutches_per_y",
+        "adult_body_mass_g",
+        "birth_or_hatching_weight_g",
+        "female_maturity_d",
+        "longevity_y"
+      ],
+      "variables_missing": [
+        "population density",
+        "juvenile mortality"
+      ],
+      "scope": "21,322 amniote species rows",
+      "evidence": "CSV header fetched (HTTP 206) lists the columns named above; missing values coded -999. Vendored record: 4,728,122 bytes, 21,322 rows.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "amniote-life-history-database-2015-08"
+    },
+    {
+      "id": "comadre-compadre",
+      "name": "COMADRE and COMPADRE matrix databases",
+      "landing_url": "https://compadre-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET compadre-db.org; GET compadre-db.org/Data/Comadre",
+        "http_status": 200
+      },
+      "variables_present": [
+        "stage-specific survival and fecundity in projection matrices (per landing description)"
+      ],
+      "variables_missing": [
+        "field abundance/density",
+        "body mass in most entries"
+      ],
+      "scope": "Animals (COMADRE) and plants (COMPADRE)",
+      "evidence": "Both pages 200; nav shows Download Compadre/Comadre and a Data User Agreement. File contents not inspected.",
+      "verdict": "partial"
+    },
+    {
+      "id": "living-planet-index",
+      "name": "Living Planet Index / Database",
+      "landing_url": "https://www.livingplanetindex.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET www.livingplanetindex.org; GET /data_portal",
+        "http_status": 200
+      },
+      "variables_present": [
+        "population time series (relative abundance)"
+      ],
+      "variables_missing": [
+        "fecundity per species",
+        "absolute abundance"
+      ],
+      "scope": "Vertebrate populations",
+      "evidence": "Pages 200: data portal with search/download of the Living Planet Database.",
+      "verdict": "partial"
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET www.fishbase.se (meta refresh to search.php); GET fishbase.ropensci.org/species?limit=1",
+        "http_status": 200,
+        "note": "API endpoints 404"
+      },
+      "variables_present": [
+        "fish fecundity/length/resilience fields (per assessor; not verified)"
+      ],
+      "variables_missing": [
+        "verified machine-readable endpoint"
+      ],
+      "scope": "Fishes",
+      "evidence": "Landing 200; fishbase.ropensci.org API returned 404 on /species, /popqb and /fecundity (and a self-signed certificate), so no field list was seen.",
+      "verdict": "partial"
+    },
+    {
+      "id": "try-seed-traits",
+      "name": "TRY Plant Trait Database (seed number, seed mass)",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:48:05Z",
+        "method": "GET www.try-db.org (meta refresh); GET /TryWeb/Data.php",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant seed traits (per assessor)"
+      ],
+      "variables_missing": [
+        "plant abundance",
+        "early mortality"
+      ],
+      "scope": "Plants; registration needed",
+      "evidence": "Data page states download needs free registration.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "population density fecundity body mass across species abundance",
+      "url": "https://api.datacite.org/dois?query=%22population+density%22+fecundity+body+mass+across+species+abundance&page%5Bsize%5D=1",
+      "hits": 3,
+      "note": "none relevant at species-comparative scale"
+    },
+    {
+      "source": "Dryad",
+      "query": "fecundity population density juvenile mortality species comparative",
+      "url": "https://datadryad.org/api/v2/search?q=fecundity+population+density+juvenile+mortality+species+comparative&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Figshare",
+      "query": "population density life history fecundity species database",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": null,
+      "note": "one result returned, a defaunation traits paper, not inspected"
+    },
+    {
+      "source": "Figshare API",
+      "query": "TetraDENSITY article 5371633",
+      "url": "https://api.figshare.com/v2/articles/5371633",
+      "hits": 1,
+      "note": "two files"
+    }
+  ],
+  "status": "partial",
+  "summary": "For mammals, PanTHERIA holds density, litter size, litters per year and body mass for thousands of species in one open table, and TetraDENSITY adds locality-level density for tetrapods to join on species. Juvenile mortality is the missing variable (matrix databases hold survival but not field abundance), and non-mammal species lack fecundity+density in one place.",
+  "next_step": "Join PanTHERIA with COMADRE-derived early survival for mammals (registration needed) or restrict to the mammal slice; pre-register fecundity-excluding-mortality model.",
+  "obstacles_confirmed": [
+    "Absolute abundance missing for many species with fecundity data",
+    "Body size confounds both fecundity and density",
+    "Sample biased to well-studied vertebrates"
+  ]
+}

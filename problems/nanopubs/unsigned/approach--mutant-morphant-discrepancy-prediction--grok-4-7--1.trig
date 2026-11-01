@@ -1,0 +1,85 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Test the NMD-plus-paralog rule on all doubly assayed genes" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    dct:description "Labels come from ZFIN downloads: Morpholinos.txt, CRISPR.txt, and phenoGeneCleanData_fish.txt. A gene is labeled only if it has both a morpholino phenotype and at least one mutant or CRISPR allele. It is a discrepancy if the morpholino is abnormal for an anatomy term and no mutant or CRISPR allele of that gene is abnormal for that term. Genes with no mutant are unlabeled, not counted as concordant. The rule, frozen first: predict discrepancy if and only if a representative frameshift or nonsense lesion lies more than 50 nucleotides upstream of the last exon-exon junction, the vertebrate nonsense-mediated-decay position rule, and Ensembl reports a paralogue with at least 70 percent identity over at least half the length. Hold out entire paralogue families, not single genes. The rule supports predictability if, on the held-out families, precision is at least 0.6 and the bootstrap interval for precision minus the base rate excludes 0. Report recall and do not require it to match precision." ;
+
+    delphi:proposedTest "Held-out precision at least 0.6 with a bootstrap interval for precision minus the discrepancy base rate excluding 0." ;
+    delphi:context "Fails if: The interval for precision minus base rate contains 0. The rule then does not beat the base rate, which refutes predictability of this form." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Build labels from the three ZFIN files with the anatomy-term rule. 2. Annotate NMD position and Ensembl paralogue identity. 3. Hold out paralogue families. 4. Apply the Boolean rule. 5. Require held-out precision at least 0.6 and a bootstrap interval for precision minus base rate that excludes 0." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: The 50-nucleotide rule is the mammalian exon-junction convention. Zebrafish may differ, and a failure may mean the threshold is wrong rather than that compensation is unpredictable." ;
+    skos:note "Tool: zfin" ;
+    skos:note "Tool: indra-cogex" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://zfin.org/downloads> ;
+    rdfs:seeAlso <https://www.ensembl.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.devcel.2014.11.018> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14580> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1064-z> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" .
+
+  <https://zfin.org/downloads> dct:title "ZFIN downloads" ;
+    dct:description "Morpholinos.txt, CRISPR.txt and phenoGeneCleanData_fish.txt supply labels." .
+  <https://www.ensembl.org/> dct:title "Ensembl" ;
+    dct:description "Exon structure for the 50-nucleotide rule and Compara paralogue identity." .
+  <https://doi.org/10.1016/j.devcel.2014.11.018> dct:title "Reverse Genetic Screening Reveals Poor Correlation between Morpholino-Induced and Mutant Phenotypes in Zebrafish" ;
+    dct:bibliographicCitation "Kok et al. 2015, the discrepancy observation" .
+  <https://doi.org/10.1038/nature14580> dct:title "Genetic compensation induced by deleterious mutations but not gene knockdowns" ;
+    dct:bibliographicCitation "Rossi et al. 2015, Genetic compensation induced by deleterious mutations but not gene knockdowns" .
+  <https://doi.org/10.1038/s41586-019-1064-z> dct:title "Genetic compensation triggered by mutant mRNA degradation" ;
+    dct:bibliographicCitation "El-Brolosy et al. 2019, the NMD and sequence-similarity mechanism" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to mutant-morphant-discrepancy-prediction, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.345Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to mutant-morphant-discrepancy-prediction: Test the NMD-plus-paralog rule on all doubly assayed genes" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

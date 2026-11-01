@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RA9CBs1I9FW0vh8vRhbfebazuRPX59JLErdj2RDqp-V9g>.
+@prefix sub: <https://w3id.org/np/RA9CBs1I9FW0vh8vRhbfebazuRPX59JLErdj2RDqp-V9g/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2014-tumor-05> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The endogenous chloride intracellular channel 1 (CLIC1) is required for chloride-driven, long-range suppression of oncogene-induced tumor-like structures in Xenopus laevis, because non-local overexpression of wildtype CLIC1 increases suppression while a dominant-negative CLIC1C24S mutant blocks suppression even under high extracellular chloride.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Native CLIC1 mediates chloride-based long-range tumor suppression";
+    <https://w3id.org/delphi/ontology/context> "Chernet BT, Levin M, “Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range”, Oncotarget (2014), doi:10.18632/oncotarget.1935; section “RESULTS › Chloride-dependent hyperpolarization through endogenous chloride intracellular channel 1 (CLIC1)”. Scope: 16-cell-stage Xenopus laevis embryos injected with KRASG12D plus wildtype or dominant-negative CLIC1 in a separate blastomere, raised in 70 mM chloride"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.18632/oncotarget.1935>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt#line=40,41>;
+    prov:wasQuotedFrom <https://doi.org/10.18632/oncotarget.1935>;
+    <https://schema.org/text> "In contrast, overexpression of the mutant CLIC1 (N=336) effectively blocked ITLS suppression despite the presence of high Cl− (Fig 4C). Together, these data suggest a role for native CLIC1 in mediating hyperpolarization-induced long-range ITLS suppression.".
+<https://doi.org/10.18632/oncotarget.1935> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Chernet BT, Levin M. Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range. Oncotarget (2014). doi:10.18632/oncotarget.1935";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2014"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC4102810>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt#line=40,41> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4102810/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.18632/oncotarget.1935>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "0cb471523c612aad56f5f95e59d30924250a69abd9bddb491dc924107d31ac5a"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2014 claim: Native CLIC1 mediates chloride-based long-range tumor suppression";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2014-tumor-05>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "MfFoXRebWjpN4MiXuGNkdY7PqP7hs1B+OS3D8BE/4up1gesxw2SJipkn99AzHoEVVZnIP0kx8VW2XRZ+aRBmltNjpUzrgpCH5MZHBRN+WtLBHjyJS2XSikwyiz2UM6sXxG+fN5xTi3jazygB1J3WsDgXIn0RaZ9icRSClh1nM8+bcEPq9l0dT5mJ8/8KKuEfO1qZ0TPtMwMCLa0J8WvcgHO77cPhXZmgX978Vdt37H6hoKKei2k16lddWeHMnqMGkEKqMhkZMKEVN0qcegjK4jq5gV/jxOu60YQotfzZwVJ7nkH+7rsrhQOJxLDEDnI+puvRBljrOxqj5RLojW2v0w=="
+}

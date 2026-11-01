@@ -1,0 +1,27 @@
+{
+  "role": "A12 red team",
+  "subject": "https://github.com/BigBirdReturns/GSK-LeanBio",
+  "commit": "2d35f9fe64f01fa64be70af95bdf89a1bdd877d0",
+  "date": "2026-11-01",
+  "issue": "https://github.com/fractastical/delphi/issues/82",
+  "environment": {
+    "python": "3.14.7 (venv, pytest)",
+    "lean": "4.35.0 arm64-apple-darwin (repo pins v4.31.0; deviation recorded)",
+    "mathlib": "v4.35.0 from claim-sources/thompson-growth-form/lean, via `lake env lean`"
+  },
+  "checks": [
+    {"id": "pytest", "claim": "test suite passes", "verdict": "confirmed", "observed": "45 passed"},
+    {"id": "verify-examples", "claim": "bsl verify discharges all 5 shipped examples with Lean omega", "verdict": "confirmed", "observed": "5/5 VERIFIED"},
+    {"id": "flagship-compiles", "claim": "ReversibleTwoSpecies.lean compiles sorry-free against Mathlib", "verdict": "confirmed", "observed": "compiles under Mathlib v4.35.0; pinned v4.31.0 not rebuilt here (their CI run 27971146551 succeeded)"},
+    {"id": "generated-roundtrip", "claim": "bsl certify on example E reproduces the committed Generated/ReversibleAB.lean", "verdict": "confirmed", "observed": "byte-identical; compiles"},
+    {"id": "certify-fail-closed", "claim": "certify refuses models outside the certified subset", "verdict": "confirmed", "observed": "examples A and D refused with coded reasons"},
+    {"id": "mutation-flagship", "claim": "a false tightening (A <= 7) is rejected by Lean", "verdict": "confirmed", "observed": "exactly one error, at mutated_flagship (redteam/RedTeam.lean)"},
+    {"id": "certify-fractional", "claim": "a non-flagship certify instance produces a closing proof", "verdict": "confirmed", "observed": "rev_frac.bsl instance compiles; bounds equal M*kr/(kf+kr) at box corners"},
+    {"id": "refute-false-invariant", "claim": "a false invariant is refuted with a counterexample", "verdict": "confirmed", "observed": "FAILED, counterexample v_f >= 1"},
+    {"id": "refute-tight-band", "claim": "a too-tight flux band is refuted", "verdict": "confirmed", "observed": "FAILED, counterexample 10 <= v_efflux <= 11"},
+    {"id": "int-abstraction-soundness", "claim": "bsl verify only reports VERIFIED for bounds true of the real-valued model", "verdict": "differs", "observed": "int_gap.bsl: flux(efflux) in [0,0] reported VERIFIED; true efflux is 5.5. Over Int the hypotheses (2*v_step = 11) are unsatisfiable so omega closes the goal vacuously. Mathlib-checked witness in redteam/RedTeam.lean (int_gap_false_over_reals)."},
+    {"id": "pinned-mathlib-build", "claim": "lake build succeeds with the pinned v4.31.0 toolchain", "verdict": "could-not-check", "observed": "not rebuilt locally; relied on their CI log"}
+  ],
+  "biology_relevance": "none: every theorem is model-consistency under author-typed hypotheses; no organism, dataset or measured constant",
+  "registry_candidate": false
+}

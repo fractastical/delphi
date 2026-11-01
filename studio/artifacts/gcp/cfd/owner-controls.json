@@ -1,0 +1,95 @@
+{
+ "schema": "cfd3d-cpu-packet-controls-0.1",
+ "host": "this host (8 vCPU, shared, load 7-26), Julia 1.12.7, WaterLily 1.10.0, 2 threads; T_restart is a tiny NON-contract run (n_D 4, H 60, Re 100, t_end 30): no cylinder contract run has been made",
+ "restart_check_real": {
+  "code": "cyl2d.jl + cpu_entry.py restart_check (as committed with this file)",
+  "result": {
+   "rc_straight": 0,
+   "rc_first_segment": 75,
+   "rc_resumed": 0,
+   "first_segment_wrote_no_output": true,
+   "series_identical": true,
+   "segments": [
+    1,
+    2
+   ],
+   "steps": [
+    198,
+    198
+   ],
+   "cp_samples": [
+    14,
+    14
+   ],
+   "cp_after_split": 7,
+   "final_state_identical": true,
+   "foreign_checkpoint_refused": true
+  },
+  "gate_ok": true
+ },
+ "restart_check_mutant": {
+  "mutation": "a scratch copy of cyl2d.jl whose checkpoint omits the pressure (flow.p and Poisson level-1 x)",
+  "result": {
+   "rc_straight": 0,
+   "rc_first_segment": 75,
+   "rc_resumed": 0,
+   "first_segment_wrote_no_output": true,
+   "series_identical": false,
+   "segments": [
+    1,
+    2
+   ],
+   "steps": [
+    198,
+    198
+   ],
+   "cp_samples": [
+    14,
+    14
+   ],
+   "cp_after_split": 7,
+   "final_state_identical": false,
+   "foreign_checkpoint_refused": true
+  },
+  "gate_ok": false,
+  "cpu_entry_exit": 4,
+  "reading": "the check fails when the state is incomplete: it can detect a non-exact restart"
+ },
+ "export_resume_test": {
+  "setup": "cpu_entry 'cases' stage with T_restart in a scratch packet copy: 6 s segments, 20 s budget, export every segment; then a fresh WORK/OUT seeded with CFD3D_RESUME_FROM=<run 1 OUT/checkpoints>",
+  "run1": {
+   "state": "stopped at budget (checkpoint kept)",
+   "segments_rc": [
+    75
+   ],
+   "exports": [
+    {
+     "file": "T_restart-1.ckpt",
+     "run_id": "T_restart",
+     "bytes": 3138244,
+     "sha256": "51a3de190368710b7e35f42a3ba1ca97446f84354d8823dfe4d3c752ea2e46fb",
+     "why": "periodic",
+     "t_s": 35.4
+    },
+    {
+     "why": "stopped at budget",
+     "skipped": "unchanged since the last export"
+    }
+   ]
+  },
+  "run2": {
+   "state": "finished",
+   "seed": {
+    "resumed_from": "T_restart-1.ckpt",
+    "sha256": "51a3de190368710b7e35f42a3ba1ca97446f84354d8823dfe4d3c752ea2e46fb"
+   },
+   "segments_in_run": 2
+  },
+  "run2_series_identical_to_straight_run": true,
+  "note": "the stop-at-budget export was skipped as unchanged since the periodic one (this dedup was added after a first run of this test exported the same state twice)"
+ },
+ "not_measured_here": "thread scaling (host load made it unmeasurable); the worker's scaling stage measures it",
+ "cyl2d_jl_sha256": "ebc21ef0262e5c611b3969e9a4ad2ded43bec4d7cd6d34b50ccafa3d74745192",
+ "contract_sha256": "cea01ce89373a11b82b98cad1e53c6b3d7e0e23c5e0067274d2a8572b0d0a4c2",
+ "note_sha": "both runs record these hashes inside their outputs (script_sha256, contract_sha256)"
+}

@@ -1,0 +1,91 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2023-competency-05--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2023-competency-05: supports, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "In a re-run of the Shreesha & Levin (2023) Experiment 1 model (fixed competency 20/100/400 vs hardwired, 100 repeats x 250 generations), the best genotypic fitness of each competent population stops rising and stays below the hardwired population's, its spread across repeats grows with competency, while phenotypic fitness stays high." ;
+    delphi:passCriterion "Pre-registered, with 'best genotypic fitness' = the maximum genotypic (pre-development) fitness in the population each generation, as in the authors' code: (A) at generation 250 each competent population's mean best genotypic fitness is below hardwired, one-sided Welch t-test p < 0.001; (B) plateau: for each competency level, |mean of the mean curve over generations 226-250 minus mean over generations 126-150| < 0.03; (C) the across-repeat standard deviation of best genotypic fitness, averaged over generations 51-250, is strictly ordered competency 20 < 100 < 400; (D) mean best phenotypic fitness at generation 250 >= 0.95 for every competency level. All four -> supports." ;
+    delphi:failCriterion "Pre-registered: refutes if any competent level's mean best genotypic fitness at generation 250 is >= hardwired, or the generation-51-250 SD at competency 400 is below that at competency 20, or any competent level's genotypic mean curve still rises by more than 0.1 between the 126-150 and 226-250 windows. Any other failure of (A)-(D) -> mixed." ;
+    delphi:expectedObservation "Competent populations' best genotypic fitness rises for a few generations, then flattens below the hardwired curve, with across-repeat spread increasing with competency level and phenotypic fitness near maximal." ;
+    delphi:disconfirmingObservation "Competent genotypic fitness reaching or exceeding hardwired, continuing to climb, or showing less spread at higher competency." ;
+    delphi:admissibleDatasets "Runs of the model exactly as specified in the paper and its supplement (50-cell arrays, 100 embryos, top-10% phenotypic selection, crossover, mutation probability 0.6, competency 20/100/400); unspecified details from the authors' public code; fresh random seeds independent of the companion test levin-2023-competency-04." ;
+    delphi:inferenceMethod "Mean curves over 100 repeats; one-sided Welch t-test at generation 250 (alpha 0.001); plateau as window-mean difference < 0.03; spread as mean across-repeat SD over generations 51-250 compared across levels." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py imports run() from the levin-2023-competency-04 re-implementation and re-runs hardwired and competency 20, 100 and 400 populations, 100 repeats of 250 generations each, from a new master seed. It compares best genotypic fitness at generation 250 with hardwired by one-sided Welch t-tests, measures the change in the mean genotypic curve between generations 126-150 and 226-250, the across-repeat SD of best genotypic fitness over generations 51-250 per level, and best phenotypic fitness at generation 250." ;
+    rdfs:comment "Measured: 0.583921 mean best genotypic fitness at generation 250, competency 400 (hardwired: see extra) (n = 100, Monte Carlo; fixed seed, deterministic for a given numpy version). Interpretation: Simulation-result claim, tested by replication. 'Genotypic fitness of the best individual' is taken, as in the authors' Exp1 code, as the maximum pre-development fitness in the population each generation. 'Plateaued' is operationalised as < 0.03 change in the repeat-mean curve between generations 126-150 and 226-250; 'wider variance' as the across-repeat SD of best genotypic fitness averaged over generations 51-250; 'high phenotypic fitness' as mean best phenotypic fitness >= 0.95 at generation 250. 'Reduced selective pressure on structural genes' is the authors' interpretation of the lower plateau and is not measured separately." ;
+    delphi:evidenceAgainst "This is a replication of a simulation, not an empirical test: it shows what follows from the stated model, not what real cellular competency does." ;
+    delphi:evidenceAgainst "All pre-registered criteria hold: genotypic fitness at generation 250 is 0.973, 0.872 and 0.584 at competency 20, 100 and 400 vs 1.000 hardwired (all p < 1e-80); the curves change by < 0.003 between the two windows; across-repeat SD rises 0.0040 < 0.0094 < 0.0211; phenotypic fitness is 1.0 at every level." ;
+    delphi:evidenceAgainst "How long genotypic fitness tracks hardwired before plateauing depends strongly on competency: the competent mean first falls 0.02 below hardwired at generation 85, 33 and 6 for competency 20, 100 and 400. 'Rose briefly' fits competency 400 best; at competency 20 the genotypic curve follows hardwired for most of the climb." ;
+    delphi:evidenceAgainst "The companion test levin-2023-competency-04 had already reported generation-250 genotypic means (0.97, 0.87, 0.59) before this test was pre-registered, so the direction of criterion A was known; this run uses independent seeds." ;
+    delphi:evidenceAgainst "The repository was restructured while this test ran (claim-tests/ moved to test-data/claim-tests/, books/ to claim-sources/); the pre-registered planned_datasets keep the old paths." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-05/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Re-run of the Shreesha & Levin (2023) Experiment 1 re-implementation, 100 repeats x 250 generations x 4 populations (generated by analysis.py)" ;
+    dct:description "per-generation best genotypic and phenotypic fitness; mean and SD curves in derived/genotypic_curves.json" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Shreesha L, Levin M (2023) Cellular Competency during Development Alters Evolutionary Dynamics in an Artificial Embryogeny Model. Entropy 25(1):131" ;
+    dct:description "model specification (Sections 2-3, Discussion); full text vendored in claim-sources/levin-papers/inputs/2023-competency.txt" ;
+    prov:wasDerivedFrom <https://doi.org/10.3390/e25010131> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-05--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Authors' simulation code for Shreesha & Levin (2023), CellularCompetency" ;
+    dct:description "definition of the tracked 'best genotypic fitness' (population maximum) and unspecified model details; not imported" ;
+    delphi:hasChecksum "sha256:8357fe689efe9ab76efd8c5f39bbf474a5b15ff4381be856b17a6dbc7c080c46" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/hyperparameters.json> ;
+    delphi:hasChecksum "sha256:55ad59da900e896f2b59b153c8dcdfe9371d0c3f01a8fc5ba3638a430badc1d6" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/core_functions.py> ;
+    delphi:hasChecksum "sha256:907b43e5e5a37f3680af1064302ca77e1dde91f882150881c9c0f0486e2f7846" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/Exp1-CompetentVsHw.py> ;
+    prov:wasDerivedFrom <https://github.com/Niwhskal/CellularCompetency> ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/levin-2023-competency-05> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2023-competency-05--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2023-competency-05/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.959Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2023-competency-05: supports, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2023-competency-05--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

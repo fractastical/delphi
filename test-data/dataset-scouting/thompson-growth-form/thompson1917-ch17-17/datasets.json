@@ -1,0 +1,102 @@
+{
+  "claim_id": "thompson1917-ch17-17",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T07:25:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "3D cranial shape data (landmarks or scans) for Mesopithecus, Homo erectus ('Pithecanthropus'), Neanderthals, modern humans and living apes",
+    "fossil specimen identifiers and geological ages, to order any proposed series",
+    "a phylogeny or tree topology of the same taxa, as an independent branching reference",
+    "enough specimens per taxon to fit competing models (single transformation series vs. branching)"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media search (keyword)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Pan%20troglodytes&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T07:22:43Z", "method": "GET /api/media?q=<name>&per_page=1, reading pages.total_count, for Homo erectus, Neanderthal, Mesopithecus, Hominidae and Pan troglodytes", "http_status": 200 },
+      "variables_present": ["34 media for the keyword 'Pan troglodytes' (living ape side of the comparison)"],
+      "variables_missing": [
+        "total_count 0 for 'Homo erectus', 'Neanderthal', 'Mesopithecus' and 'Hominidae'",
+        "keyword search may miss records filed under other names (e.g. 'Homo sapiens neanderthalensis'), not tried",
+        "fossil hominin scans are often access-restricted"
+      ],
+      "scope": "MorphoSource keyword search",
+      "evidence": "pages.total_count: Homo erectus 0, Neanderthal 0, Mesopithecus 0, Hominidae 0, Pan troglodytes 34",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life-synthesis",
+      "name": "Open Tree of Life: taxonomic name resolution and synthetic tree (API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:24:07Z", "method": "POST /v3/tnrs/match_names for Hominidae, Homo erectus, Mesopithecus, Homo neanderthalensis; POST /v3/tree_of_life/about; HEAD tree.opentreeoflife.org returned 503", "http_status": 200, "note": "web front end tree.opentreeoflife.org answered 503 at the time; the API answered 200" },
+      "variables_present": [
+        "all four names match in the taxonomy: Hominidae ott 770311 (family), Homo erectus ott 3607671, Mesopithecus ott 3607643, Homo neanderthalensis ott 83926 (as Homo sapiens neanderthalensis)",
+        "synthetic tree summary: 1,931 source studies and 2,064 source trees; root 'cellular organisms' with 2,385,875 tips"
+      ],
+      "variables_missing": [
+        "a synthesis tree of living and fossil taxa built mostly from molecular and taxonomy sources; whether the fossil tips have a placement in the synthetic tree was not queried",
+        "no morphology of skulls"
+      ],
+      "scope": "Synthetic tree and taxonomy",
+      "evidence": "TNRS response lists matches with ott_ids above and unmatched_names empty; about response gives num_source_studies 1931, num_source_trees 2064, num_tips 2385875",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank / Taxonomy (Entrez)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Hominidae%5BOrganism%5D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:24:04Z", "method": "Entrez esearch db=taxonomy term=Hominidae (1 hit, taxid 9604) and db=nuccore term=Hominidae[Organism] (count 31116492)", "http_status": 200 },
+      "variables_present": ["31,116,492 nucleotide records under Hominidae (count returned); Hominidae is NCBI taxid 9604"],
+      "variables_missing": ["sequences only from living species plus a few ancient-DNA records; no Mesopithecus or Pithecanthropus skulls; no morphology"],
+      "scope": "Molecular, mostly Homo sapiens",
+      "evidence": "esearch JSON: taxonomy count 1, idlist [9604]; nuccore esearch count 31116492",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "digimorph",
+      "name": "DigiMorph (UT Austin digital morphology library)",
+      "landing_url": "https://digimorph.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T07:24:07Z", "method": "HEAD landing page (Content-Length 161, a stub or redirect page)", "http_status": 200, "note": "landing page returned 161 bytes; no search interface queried" },
+      "variables_present": [],
+      "variables_missing": ["primate cranial CT holdings not confirmed"],
+      "scope": null,
+      "evidence": "HTTP 200 with Content-Length 161",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource", "query": "media q=Homo erectus / Neanderthal / Mesopithecus / Hominidae / Pan troglodytes", "url": "https://www.morphosource.org/api/media?q=Homo%20erectus&per_page=1", "hits": 0, "note": "0 for all but Pan troglodytes (34)" },
+    { "source": "Zenodo", "query": "hominin cranium 3D landmarks geometric morphometrics", "url": "https://zenodo.org/api/records?q=hominin%20cranium%203D%20landmarks%20geometric%20morphometrics&size=6", "hits": 157062, "note": "count inflated; relevant top hits are papers' supplements (Cannstatt cranium 19498446, Homo naledi ilium 5520040) rather than a skull-landmark table" },
+    { "source": "Dryad", "query": "hominin cranial landmarks", "url": "https://datadryad.org/api/v2/search?q=hominin%20cranial%20landmarks", "hits": 0, "note": "no hits" },
+    { "source": "NCBI Entrez", "query": "taxonomy Hominidae; nuccore Hominidae[Organism]", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Hominidae%5BOrganism%5D&retmode=json&rettype=count", "hits": 31116492, "note": "sequence records; not skull data" },
+    { "source": "Open Tree of Life", "query": "tnrs match_names for four names", "url": "https://api.opentreeoflife.org/v3/tnrs/match_names", "hits": 4, "note": "all four matched" }
+  ],
+  "status": "partial",
+  "summary": "No open skull-shape dataset for the claim's taxa was found: MorphoSource keyword counts are 0 for Homo erectus, Neanderthal, Mesopithecus and Hominidae (34 for Pan troglodytes), Dryad has no hominin landmark set, and Zenodo yields only paper supplements. Independent branching information is available as phylogenetic infrastructure (Open Tree of Life resolves all four names; GenBank holds molecular records for living Hominidae), but neither carries skull morphology, and the claim's test needs cranial transformation data for fossils.",
+  "next_step": "Compile a landmark table for Mesopithecus, H. erectus, Neanderthal, modern human and ape skulls from published supplements or from a fossil-hominin repository with access terms, and pre-register the series-vs-branching error comparison; use Open Tree of Life only as the reference topology.",
+  "obstacles_confirmed": [
+    "Key fossils are few and not found as open downloads in MorphoSource (zero keyword hits).",
+    "Which specimens count as successive stages is an analyst choice that drives the result."
+  ]
+}

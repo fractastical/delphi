@@ -1,0 +1,299 @@
+{
+  "claim_id": "thompson1917-ch03-07",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-07",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If weight varies as the cube of a linear dimension during growth, then across childhood and adolescence the population mean body weight scales with the population mean stature with a log-log exponent near 3, so the weight-for-age curve is approximately the cube of the stature-for-age curve.",
+  "pass_criterion": "Pre-registered. Data: US NHANES examination data, cycles 2013-2014, 2015-2016 and 2017-2018 (Body Measures BMX_H/I/J and Demographics DEMO_H/I/J XPT files), examined participants aged 2 to 19 years with measured standing height (BMXHT, cm) and weight (BMXWT, kg). For each sex, compute MEC-exam-weighted (WTMEC2YR) mean height and mean weight in 1-year age bins (18 bins), regress log(mean weight) on log(mean height) by ordinary least squares, and also fit the constrained model weight = k * height^3 with k estimated by least squares on the log scale. SUPPORTS if, for both sexes, the free exponent b lies in [2.5, 3.5] AND the cubic model reproduces the age-bin mean weights with R^2 >= 0.90 on the original scale.",
+  "fail_criterion": "Pre-registered. REFUTES if, for either sex, b lies outside [2.5, 3.5] OR the cubic model's R^2 on the age-bin weight curve is < 0.90. MIXED is not possible under this rule except as follows: if the two sexes disagree (one passes, the other fails) the verdict is MIXED. INCONCLUSIVE (data-unavailable) if the files cannot be downloaded.",
+  "planned_datasets": [
+    "nhanes-2013-2018-body-measures-demographics"
+  ],
+  "interpretation": "Thompson's 'linear dimension' is measured standing stature and 'weight' is measured body mass, taken as proportional to volume at near-constant density. 'Tend to vary as the cube' is read as an ontogenetic allometric exponent near 3 with a tolerance band of 2.5 to 3.5 because he wrote 'mainly (though not wholly)'. The claim is tested on age-binned population means, which is how he compared the human weight and stature curves, using a modern cross-sectional survey in place of his Quetelet-era tables; survey weights make the means representative of the US population. This follows the swarm thread's draft plan with the cycles fixed in advance.",
+  "datasets": [
+    {
+      "id": "nhanes-2013-2018-body-measures-demographics",
+      "name": "US National Health and Nutrition Examination Survey (NHANES) 2013-2014, 2015-2016 and 2017-2018: Body Measures (BMX) and Demographics (DEMO) files",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "public release XPT files as served 2026-10-31",
+      "license": "public domain (US federal government data)",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 2045520,
+          "sha256": "fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 3833200,
+          "sha256": "f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 1989600,
+          "sha256": "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 3756480,
+          "sha256": "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+          "retrieved_at": "2026-10-31T06:14:10Z",
+          "byte_size": 1466000,
+          "sha256": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-10-31T06:14:10Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "measured standing height and weight with age, sex and MEC exam weights"
+    }
+  ],
+  "method": "fetch.py downloads six XPT files (16.5 MB). analysis.py merges body measures with demographics per cycle, keeps examined participants aged 2-19 with both measurements, computes MEC-weighted mean height and weight per completed year of age and sex, regresses log mean weight on log mean height (free exponent with 95% CI), fits weight = k * height^3 by least squares on the log scale, and scores the cubic model's R^2 on the original scale.",
+  "measured": {
+    "value": 2.7420799020169984,
+    "unit": "log-log exponent of mean weight on mean height across ages 2-19, males (pre-registered band 2.5-3.5); females given in extra",
+    "n": "4905 males and 4810 females in 18 age bins each",
+    "uncertainty": "males 95% CI [2.59, 2.89]; females b = 2.86, CI [2.66, 3.06]",
+    "extra": {
+      "male_cubic_model_r2": 0.9905578803477098,
+      "female_cubic_model_r2": 0.97918410786246,
+      "female_free_exponent_b": 2.8606369468483357,
+      "male_height_range_cm": [
+        91.6548428956483,
+        175.2816641779385
+      ],
+      "female_height_range_cm": [
+        90.10482142878853,
+        162.94861252958128
+      ],
+      "cubic_k_kg_per_cm3": {
+        "male": 1.4492782056210137e-05,
+        "female": 1.5046459489477242e-05
+      },
+      "post_hoc_perturbation": {
+        "n_simulations_per_exponent": 2000,
+        "sexes": {
+          "male": {
+            "observed": {
+              "free_exponent_b": 2.7420799020169984,
+              "cubic_model_r2": 0.9905578803477098,
+              "passes": true,
+              "n_age_bins": 18,
+              "residual_sd_log_weight": 0.061401843299767125
+            },
+            "simulated": {
+              "3.0": {
+                "true_exponent": 3.0,
+                "pass_fraction": 1.0,
+                "mean_fitted_exponent": 3.0003139039424087,
+                "mean_cubic_r2": 0.982854958911395
+              },
+              "2.0": {
+                "true_exponent": 2.0,
+                "pass_fraction": 0.0,
+                "mean_fitted_exponent": 1.997920427163882,
+                "mean_cubic_r2": 0.6287244961398625
+              },
+              "2.5": {
+                "true_exponent": 2.5,
+                "pass_fraction": 0.49,
+                "mean_fitted_exponent": 2.500082955432895,
+                "mean_cubic_r2": 0.9202604912729514
+              },
+              "3.5": {
+                "true_exponent": 3.5,
+                "pass_fraction": 0.4945,
+                "mean_fitted_exponent": 3.500277739901454,
+                "mean_cubic_r2": 0.9515844795341976
+              },
+              "4.0": {
+                "true_exponent": 4.0,
+                "pass_fraction": 0.0,
+                "mean_fitted_exponent": 3.9976656315573234,
+                "mean_cubic_r2": 0.8783782613478972
+              }
+            }
+          },
+          "female": {
+            "observed": {
+              "free_exponent_b": 2.8606369468483357,
+              "cubic_model_r2": 0.97918410786246,
+              "passes": true,
+              "n_age_bins": 18,
+              "residual_sd_log_weight": 0.07671684266439144
+            },
+            "simulated": {
+              "3.0": {
+                "true_exponent": 3.0,
+                "pass_fraction": 0.9995,
+                "mean_fitted_exponent": 2.997924457828407,
+                "mean_cubic_r2": 0.9671462441663621
+              },
+              "2.0": {
+                "true_exponent": 2.0,
+                "pass_fraction": 0.0,
+                "mean_fitted_exponent": 2.0013906355602886,
+                "mean_cubic_r2": 0.6732374305880456
+              },
+              "2.5": {
+                "true_exponent": 2.5,
+                "pass_fraction": 0.466,
+                "mean_fitted_exponent": 2.5002502967139146,
+                "mean_cubic_r2": 0.9125358530569535
+              },
+              "3.5": {
+                "true_exponent": 3.5,
+                "pass_fraction": 0.4935,
+                "mean_fitted_exponent": 3.4997766138568487,
+                "mean_cubic_r2": 0.9441403543487251
+              },
+              "4.0": {
+                "true_exponent": 4.0,
+                "pass_fraction": 0.0,
+                "mean_fitted_exponent": 4.0003796719354066,
+                "mean_cubic_r2": 0.8836855223775872
+              }
+            }
+          }
+        },
+        "reading": "The rule passes under the cube law and under exponents inside the pre-registered band, and fails under an exponent of 2 (surface scaling) or 4 at the fractions shown, with the observed heights and the observed bin scatter. The band was pre-registered as a tolerance for Thompson's 'mainly (though not wholly)'; this check shows what it can and cannot reject."
+      },
+      "cross_check": {
+        "ours_individual_level": {
+          "ages": "2-19 completed years, standing stature, NHANES 2013-2018 (this test's sample)",
+          "pooled": {
+            "n_individuals": 9715,
+            "ols_exponent": 2.755198077482473,
+            "ci95": [
+              2.7355684426476894,
+              2.7748277123172564
+            ],
+            "r2": 0.8862795709963611,
+            "survey_weighted_exponent": 2.7611926881801017
+          },
+          "male": {
+            "n_individuals": 4905,
+            "ols_exponent": 2.716250868644738,
+            "ci95": [
+              2.6903049937293924,
+              2.7421967435600836
+            ],
+            "r2": 0.8957373344791765,
+            "survey_weighted_exponent": 2.7241728155211202
+          },
+          "female": {
+            "n_individuals": 4810,
+            "ols_exponent": 2.812436935724894,
+            "ci95": [
+              2.7827959018252395,
+              2.8420779696245484
+            ],
+            "r2": 0.8779986711816458,
+            "survey_weighted_exponent": 2.8191082022830547
+          }
+        },
+        "theirs": {
+          "source": "origin/main e6b25d4c6ab6 (c587bd47cb08dfc80be718c8d6c3583ede84c6ce 2026-10-31T04:35:02Z), claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json",
+          "run": "cursor/claim-tests-thompson-efb7",
+          "verdict": "mixed",
+          "scope": "NHANES 2007-2018, ages 0 to 19.99, recumbent length under 24 months, individuals pooled",
+          "pooled_0_19_individuals": {
+            "ols_slope": 2.4076916540629516,
+            "ols_slope_ci95": [
+              2.3992683428055552,
+              2.416114965320348
+            ],
+            "ols_intercept": -3.5677394844224724,
+            "r2": 0.9302385181166233,
+            "rma_slope": 2.496339842087518,
+            "n": 23540
+          },
+          "slope_by_age_window": {
+            "0-2yr": {
+              "ols_slope": 2.0975315252406825,
+              "ols_slope_ci95": [
+                2.0751295739850537,
+                2.1199334764963114
+              ],
+              "ols_intercept": -2.946923856081076,
+              "r2": 0.8980344554712152,
+              "rma_slope": 2.213410658558297,
+              "n": 3826
+            },
+            "2-10yr": {
+              "ols_slope": 2.358272557215868,
+              "ols_slope_ci95": [
+                2.337935784384827,
+                2.378609330046909
+              ],
+              "ols_intercept": -3.5069780992661475,
+              "r2": 0.8394619638082076,
+              "rma_slope": 2.5739107619546817,
+              "n": 9881
+            },
+            "10-20yr": {
+              "ols_slope": 3.095255052906955,
+              "ols_slope_ci95": [
+                3.0372676262217726,
+                3.1532424795921377
+              ],
+              "ols_intercept": -5.060208366167421,
+              "r2": 0.5268221709129836,
+              "rma_slope": 4.264463675157318,
+              "n": 9833
+            },
+            "2-20yr": {
+              "ols_slope": 2.7364582069270176,
+              "ols_slope_ci95": [
+                2.7231001959757397,
+                2.7498162178782954
+              ],
+              "ols_intercept": -4.276832970519582,
+              "r2": 0.8910501478218595,
+              "rma_slope": 2.8989301184879293,
+              "n": 19714
+            }
+          },
+          "age_median_curve_0_19": {
+            "ols_slope": 2.457611504717952,
+            "ols_slope_ci95": [
+              2.4094881450524954,
+              2.5057348643834083
+            ],
+            "ols_intercept": -3.683371097125789,
+            "r2": 0.9767964568604828,
+            "rma_slope": 2.4866301413746332,
+            "n": 240
+          }
+        },
+        "reading": "Binning versus individuals is not the cause of the difference: on this test's own sample the individual-level exponent (2.755) is within 0.03 of the age-bin exponents. The cause is the age range. The collaborator's 2-20 year window gives 2.736, which reproduces this test, while their 0-2 year window gives 2.098 and pulls their pooled 0-19 exponent to 2.408, below the 2.5 edge of the band both tests pre-registered. The verdict is therefore conditional on the pre-registered scope (ages 2-19): including infancy makes it 'mixed'."
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "The free exponent is below 3 in both sexes (2.74 and 2.86) and the male CI excludes 3, so weight grows a little slower than the cube of stature across childhood; Thompson's 'mainly (though not wholly)' is borne out literally: the cube reproduces the weight curve with R^2 of 0.98-0.99 but is not exact.",
+    "Cross-sectional population means from 2013-2018 US children, who are heavier at given height than Thompson's early-20th-century tables; the exponent, not the constant k, is what the claim concerns.",
+    "Binned means over 18 ages leave 16 degrees of freedom; the CI reflects bin-to-bin scatter, not individual variation.",
+    "Post-hoc discriminating-power check (perturbation.py, added 2026-10-31 after the result; simulation, not observation): with the observed mean heights and bin scatter, the pre-registered rule passes in 100% (males) and 99.95% (females) of 2000 simulations under the cube law, in 0% under an exponent of 2 or 4, and in about 47 to 49% at the band edges 2.5 and 3.5; so the rule rejects surface-law and fourth-power alternatives and is indifferent only at its own pre-registered boundaries.",
+    "Cross-check (cross_check.py, added 2026-10-31 after the result; verdict unchanged): the collaborator swarm's test of this claim (origin/main, run cursor/claim-tests-thompson-efb7, NHANES 2007-2018, ages 0 to 19.99 with recumbent length under 24 months) reports a pooled individual-level exponent of 2.408 (95% CI 2.399 to 2.416, n = 23540) and 'mixed'. On this test's own sample the individual-level exponent is 2.755 (CI 2.736 to 2.775, n = 9715; males 2.716, females 2.812), within 0.03 of the age-bin values, so the unit of analysis (bins versus individuals) is not the cause. The cause is the age range: the collaborator's own 2-20 year window gives 2.736 (CI 2.723 to 2.750, n = 19714), reproducing this test, while their 0-2 year window gives 2.098 and pulls the pooled exponent below the 2.5 edge of the band both tests pre-registered. The 'supports' verdict is therefore conditional on the scope fixed at pre-registration (ages 2 to 19, standing stature); including infancy in Thompson's 'during growth' makes it 'mixed'. Whether infancy is inside the claim is a reading of the claim, not a measurement."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted",
+    "date": "2026-10-31"
+  }
+}

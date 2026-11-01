@@ -15,7 +15,8 @@ is not a reason to skip the checks below. Publish to the test registry and promo
 
 1. **Build through the 12-step loop** wherever the work allows it.
 2. **Inspect for dummy data** before anything is signed.
-3. **Publish every batch to the test registry first.** Never go straight to production.
+3. **Publish every batch to the test registry first**, and commit and push the signed files
+   and manifest in the same step. Never go straight to production.
 4. **Promote to production only after review**, never during the hack by default.
 5. **Source every assertion** with a dataset identifier or the paper it was extracted from.
 6. **Give every dataset its own nanopub**, and have claims point at its IRI.
@@ -103,6 +104,14 @@ As soon as a batch is signed and passes section 2, publish all of it to the test
 - A [Nanopub Query](https://query.knowledgepixels.com/) count matches the number of files
   published.
 
+**Publish, commit and push together.** Publishing to test, committing the signed TriG files
+and the updated manifest (section 8), and pushing are one step. Do not leave published
+files uncommitted or unpushed, and do not commit signed files that have not been published.
+Commit only the batch, not unrelated work in the tree, and name the registry and file count
+in the commit message. If the publish fails partway, commit what reached the registry,
+record the failures in the manifest, and say so in the commit message. If the push fails,
+fix it before starting another batch. Promotion to production follows the same rule.
+
 Test is a staging area, not a record. Do not cite test URIs in demos, slides, papers, or
 other nanopubs' `prov:wasDerivedFrom`. They change when the batch is promoted.
 
@@ -172,7 +181,7 @@ The dataset nanopub and its assessment reach production before any claim that ci
 
 Record every published file in a manifest with its file path, trusty URI, registry (test or
 production), timestamp, and generator commit. A batch not in the test manifest cannot be
-promoted.
+promoted. The manifest is committed and pushed together with the publication (section 3).
 
 Never commit signing keys, nanopub profiles, or API tokens. Keys stay in `~/.nanopub/` or a
 CI secret store.

@@ -1,0 +1,96 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-10--claim-test--lewis-law-timelapse> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch07-10 (lewis-law-timelapse): mixed, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If close-packed cells of varying size are hexagonal on average, with the larger ones having more and the smaller ones fewer than six sides, then in expert-segmented epithelia the mean neighbour number of interior cells is 6 and neighbour number increases monotonically with cell area (Lewis 1928's relation, mean area linear in polygon class), in proliferating and in post-mitotic tissue alike." ;
+    delphi:passCriterion "Pre-registered. In each of the five wing-disc movies (Dye et al., every 10th frame) and the three pupal wings (Etournay et al. 2015, every 10th frame), for interior cells: mean neighbour number; Spearman rho between area and neighbour number; and, for polygon classes 4 to 8 with at least 50 cells, the mean area relative to the frame median per class. Supported if in at least seven of the eight tissues the mean neighbour number lies in [5.85, 6.15], rho(area, n) >= 0.3, and the class means increase strictly from 4 through 8 sides. Diagnostic (Lewis's law proper): the least-squares slope of mean relative area against n over classes 4-8 and the R^2 of the linear fit; Lewis's original form predicts area proportional to (n - 2), i.e. a positive intercept-free fit in (n - 2)." ;
+    delphi:failCriterion "Pre-registered. Refuted if in at least four tissues rho(area, n) < 0.1 or the class means are not monotone (larger cells do not have more sides), or if the mean neighbour number falls outside [5.7, 6.3] in four or more tissues. Otherwise 'mixed'. The mean-neighbour-number part is forced by Euler's formula for three-way-vertex tilings and is reported as a check, not as evidence; the informative part is the size-sides relation, which Euler does not force." ;
+    delphi:expectedObservation "Interior cells average six neighbours and neighbour number rises monotonically with cell area, the mean area of n-sided cells increasing from 4 through 8 sides." ;
+    delphi:disconfirmingObservation "Cell area is unrelated to neighbour number (rho < 0.1) or the relation is not monotone, so size variation is not what makes some cells have fewer and some more than six sides." ;
+    delphi:admissibleDatasets "Public expert-corrected segmentations of confluent epithelia with per-cell area and neighbour relations, >= 1,000 cells per frame, not segmented by a method shown in this repo to round junctions; the claim's own example (coral corallites) is not required since the claim is about close-packed cells of varying size in general." ;
+    delphi:inferenceMethod "Per tissue: mean neighbour number, Spearman rho(area, n), monotonicity of class mean areas for 4-8 sides, slope and R^2 of area against n; verdict by count of tissues meeting all conditions." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "For each of the eight TissueMiner databases, every 10th frame, interior cells (no bond with the margin cell) were listed with neighbour number n and area relative to the frame median. Per tissue: mean and SD of n, Spearman rho between relative area and n, mean relative area per polygon class for n = 4..8 (all classes had >= 276 cells), whether those class means increase strictly, the least-squares line of class mean area on n (slope, intercept, R^2), and Lewis's intercept-free form area = k (n - 2) with its R^2. Verdict by the pre-registered count of tissues meeting all three conditions." ;
+    rdfs:comment "Measured: 0.443 median over tissues of Spearman rho between relative cell area and neighbour number (n = 254970, discs 0.44-0.51, pupal wings 0.29-0.32; class means monotone 4..8 in 8 of 8 tissues). Interpretation: The first run of this claim (top-level result.json, Cellpose on five tissue images) confirmed the mean of six and noted that Euler forces it. Thompson's sentence has a second part, that where sizes vary irregularly 'some have fewer and some more than six sides', which he attributes to size: the bigger corallites take more neighbours. That is Lewis's law (F. T. Lewis 1928, Anat Rec 38:341, cucumber epidermis), and it is not forced by topology: a tiling can have varying areas with sides independent of area. This run tests that second part on 2.5 million expert-segmented cell-frames from two developmental states. Data are on disk from the ch07-09 runs; area-by-polygon-class statistics had not been computed before this pre-registration (the ch07-09 run reported only a pooled Spearman rho between relative area and n, 0.43-0.51 in the discs and 0.29-0.32 in the wings, which this run will re-derive per frame and extend to class means)." ;
+    delphi:evidenceAgainst "Pre-registered support criterion met in 6 of 8 tissues (7 required), refutation criterion in 0; verdict 'mixed' by the pre-registered rule. The substantive relation holds in every tissue: mean relative area rises strictly from 4- to 8-sided cells (about 0.65, 0.89, 1.1, 1.35, 1.65 in the discs; 0.63, 0.89, 1.04, 1.25, 1.57 in the pupal wings), linear in n with R^2 0.98-0.996 and a slope of 0.22-0.27 median-areas per side; Lewis's intercept-free form area = k (n - 2) fits with R^2 0.93-0.98. The two misses are the pupal wings WT_2 and WT_3 with rho 0.288 and 0.299 against the 0.3 threshold: rank correlation shrinks where area variance shrinks (area CV 0.34 post-mitotic against 0.5 proliferating), while the class means stay monotone and linear." ;
+    delphi:evidenceAgainst "Mean neighbour number is 5.90-5.93 in the discs and 5.98 in the pupal wings, inside the pre-registered band; this part is forced by Euler's formula for tilings with three-way vertices (1.2-1.6% four-way vertices in the discs account for the deficit) and is a check, not evidence. The size-sides relation is the informative part and is not forced by topology." ;
+    delphi:evidenceAgainst "This tests Thompson's 1917 sentence about close-packed cells of varying size and finds that its second clause is Lewis's law, stated by F. T. Lewis in 1928 from cucumber epidermis and here recovered in insect epithelia in two developmental states. Thompson's own example, coral corallites, is not tested; the first run of this claim (Cellpose on five tissue images) tested only the mean of six." ;
+    delphi:evidenceAgainst "Cells of the same tissue across sampled frames are not independent (every 10th frame, 15-20 frames per tissue), so the Spearman p-values are descriptive. Relative area uses the frame median to remove growth and projection scale. Historical claim; one cell type, one lab's segmentation conventions for both datasets. Data were on disk before pre-registration (commit fa08361f); the pooled rho had been reported in the ch07-09 runs, the class means and fits had not been computed." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-10--claim-test--lewis-law-timelapse--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-10--claim-test--lewis-law-timelapse--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-10/lewis-law-timelapse/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-10--claim-test--lewis-law-timelapse--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Timelapse imaging, boundary segmentation, and cell tracking data from cultured proliferating Drosophila wing disc epithelia (Dye et al.; MPI-CBG Dresden)" ;
+    dct:description "five proliferating wing disc pouches, every 10th frame" ;
+    delphi:hasChecksum "sha256:0eb41b1e0fbfb23b1af3950c14ad06834c40c6debf639ab572c2ecff006fb478" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20141010_P2.zip/content> ;
+    delphi:hasChecksum "sha256:07b74f7594a99bd3243e7fde4f1c23967f7256db7db91cccc4a4eb0dd0de4a0c" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150310_P2.zip/content> ;
+    delphi:hasChecksum "sha256:dcfc9f79b387b0657723731bcf79fab0d600600161f57577cb54748239a1ef69" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150418_P1.zip/content> ;
+    delphi:hasChecksum "sha256:79c52b04b414fc0f4dcb1a73053c2e96f5db02b39b9dff3e0eb25a54e2d25f2d" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20150608_P1.zip/content> ;
+    delphi:hasChecksum "sha256:8a3ee532c89950bc0f4880ff243593e0c7917f080e352bd41ac6f215ac9da6c0" ;
+    prov:atLocation <https://zenodo.org/api/records/22760592/files/Ecd_20161213_F0.zip/content> ;
+    prov:wasDerivedFrom <https://zenodo.org/records/22760592> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-10--claim-test--lewis-law-timelapse--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: TissueMiner example datasets WT_1, WT_2, WT_3: the three wild-type E-cadherin-GFP Drosophila pupal wing time-lapses of Etournay et al. 2015 (eLife 4:e07090), as TissueMiner SQLite databases with the authors' frame-200 region-of-interest polygons (Etournay et al. 2016, eLife 5:e14334)" ;
+    dct:description "three pupal wings, every 10th frame" ;
+    delphi:hasChecksum "sha256:994779314e39a906b9e171c7f2da0b12cacd94708bb09d6a70236ca62cec53ae" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_1.tar.gz> ;
+    delphi:hasChecksum "sha256:119d0facc43b480a7673ef4b8e0405368cccca28fc9456ed0a8767d77c4792dd" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_2.tar.gz> ;
+    delphi:hasChecksum "sha256:db5de2a3b6a1547eac5a19227c90cd7408de4b54db6a8992847963996faa8df8" ;
+    prov:atLocation <http://bds.mpi-cbg.de/tissue_miner/WT_3.tar.gz> ;
+    prov:wasDerivedFrom <https://github.com/mpicbg-scicomp/tissue_miner#datasets> ;
+    dct:license "not stated for the data files; TissueMiner repository BSD-licensed (MPI-CBG), archives offered for public download" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch07-10> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-10--claim-test--lewis-law-timelapse> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-10/lewis-law-timelapse/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor local session, hexagon follow-up)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.985Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch07-10 (lewis-law-timelapse): mixed, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-10--claim-test--lewis-law-timelapse> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

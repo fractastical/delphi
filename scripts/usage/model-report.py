@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TRANSCRIPTS = Path.home() / ".cursor/projects/Users-jdietz-Documents-GitHub-dev-delphisci/agent-transcripts"
 OUT = Path(__file__).resolve().parent / "model-report.json"
-PROJECTS = ["darwin-origin", "thompson-growth-form", "wolfram-nks", "levin-papers"]
+PROJECTS = sorted(p.parent.parent.name for p in (ROOT / "claim-sources").glob("*/assessment/assessments.json"))
 ASSESSOR_MODEL = {"gpt": "gpt-5.6-sol-medium", "grok": "grok-4.7-high-fast",
                   "gemini": "gemini-4-argon-medium", "claude": "claude-opus-5.5"}
 LABEL_MODEL = {"GPT-5.6 Sol": "gpt-5.6-sol-medium", "Grok 4.7": "grok-4.7-high-fast",
@@ -241,7 +241,7 @@ def pearson(x, y):
 
 
 def truth():
-    claims = json.loads((ROOT / "docs/claims.json").read_text())["claims"]
+    claims = json.loads((ROOT.parent / "docs/claims.json").read_text())["claims"]
     checks = {
         "data tests (supports=1, refutes=0)": lambda c: {"supports": 1, "refutes": 0}.get((c.get("data_test") or {}).get("verdict")),
         "proof status (proved=1, refuted=0)": lambda c: {"proved": 1, "refuted": 0}.get(c.get("status")),
@@ -278,7 +278,9 @@ def data_tests():
         for r in json.loads(f.read_text())["results"]:
             key = (r["kind"], r["claim_id"])
             if r["status"] != "skipped" or key not in status:
-                status[key] = r["status"]
+                v = r.get("verdict") or {}
+                flipped = r["status"] == "drifted" and v.get("now") and v.get("now") != v.get("committed")
+                status[key] = "drifted, verdict changed" if flipped else r["status"]
     by = defaultdict(lambda: {"tests": 0, "verdicts": Counter(), "exec": Counter(), "pass_fail_criteria": 0})
     for f in sorted((ROOT / "test-data/claim-tests").glob("*/*/result.json")):
         r = json.loads(f.read_text())

@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAll6YS13i3JY68aHcdz-G7451i_Y5ICoCRgsc4bDXpPM>.
+@prefix sub: <https://w3id.org/np/RAll6YS13i3JY68aHcdz-G7451i_Y5ICoCRgsc4bDXpPM/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-ga01-28> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The female is, as it were, an impotent male: she is female through an incapacity to concoct the final nutriment into semen.";
+    dc:type "conceptual";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The female is a kind of impotent male, unable to concoct semen";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, On the Generation of Animals (De Generatione Animalium), Book I, Part 20; translated by Arthur Platt, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: Females of all animals with two sexes, especially women"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=148,149>;
+    prov:wasQuotedFrom <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>;
+    <https://schema.org/text> "the woman is as it were an impotent male, for it is through a certain incapacity that the female is female, being incapable of concocting the nutriment in its last stage into semen".
+<https://en.wikisource.org/wiki/On_the_Generation_of_Animals> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. On the Generation of Animals (De Generatione Animalium). Translated by Arthur Platt. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1912"^^xsd:gYear;
+    dc:title "On the Generation of Animals, translated by Arthur Platt";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1180637>;
+    <https://schema.org/translator> "Arthur Platt".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=148,149> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt> prov:wasDerivedFrom <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_I&oldid=3450790&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_II&oldid=3450789&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_III&oldid=3450788&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_IV&oldid=3450787&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_V&oldid=3450786&action=raw>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "23349787bbc025417e5a55b00000cc260f158f4579a9dd1213740da2bc670338"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, Generation of Animals I: The female is a kind of impotent male, unable to concoct semen";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ga01-28>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "KZ2ZCLkN4NSKC/3lb/y8zIJ1tz5S6e8akG4F/zy57XTKgNvrG9J466kTebAWN++NfIbDV04L1SF2MlYUA68CHz0d6o2ksAr3fT3yUYY1SJFiD4g5gWo2pa7uf1aNh95vDyadgRdXWAGfJRgbRm9/X3/0JA53qFLKWXZPXHsH0f3P92ELzYfa9fEp8M90NkMrhyk65X8oQjbUtD2XjGBQC6laqF4w8UNT4UkXb9dMSc+Q1IjXd9R7j/kU7ITWi+TW/gHgtDIQfU6CGc8vVs9fSIss1VUh00IiRMA6MGHyVUXdeO0RgFt/7Td+ABJNbNrXJoAdvd4L9GoSiWQupY6nkw=="
+}

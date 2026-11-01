@@ -1,0 +1,93 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered phylogenetic GLS and quadratic-curvature test across 300 species" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "Run a pre-registered phylogenetically controlled comparative analysis on the open Campione and Evans (2012) Dryad dataset (`10.5061/dryad.868mr`) joined to the repo's vendored organisms layer (`test-data/organisms/merged/`), PanTHERIA (`10.1890/08-1494.1`), and PHYLACINE 1.2 (`10.5061/dryad.bp26v20`), covering at least 300 species of quadrupedal terrestrial tetrapods across Mammalia and Reptilia. Resolve all binomials to GBIF backbone keys and Open Tree of Life identifiers to build a dated consensus phylogeny.\n\nFit Phylogenetic Generalized Least Squares (PGLS under Pagel's lambda and Ornstein-Uhlenbeck correlation structures) of log10(humeral circumference C_H), log10(femoral circumference C_F), and derived cross-sectional area A prop C^2 against log10(body mass M). Test four pre-registered hypotheses on the area-mass slope beta_A (= 2 * beta_C): geometric similarity (beta_A = 2/3 = 0.667, beta_C = 1/3 = 0.333), McMahon's elastic similarity (beta_A = 3/4 = 0.750, beta_C = 3/8 = 0.375), static stress similarity without posture change (beta_A = 1.0, beta_C = 0.500), and differential-allometry quadratic curvature (log C = a + b_1 log M + b_2 (log M)^2) reflecting the shift from crouched small-mammal to graviportal large-mammal posture (Biewener 1989)." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--1#n_species> ;
+    delphi:proposedTest "Across the 300 species, a PGLS 95% confidence interval for beta_C of width <= 0.02 that excludes at least two of {0.333, 0.375, 0.500}, together with a decisive Delta AICc verdict on whether a single universal power law beats a clade-split or quadratic-posture-shift model." ;
+    delphi:context "Fails if: PGLS confidence intervals after phylogenetic correction are wide enough to contain both 1/3 (0.333) and 3/8 (0.375) simultaneously, leaving geometric and elastic similarity empirically unseparated." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Download and checksum `10.5061/dryad.868mr`, join with independent body mass records from PanTHERIA and PHYLACINE across at least 300 species, and prune the Open Tree / TimeTree phylogeny to matched tips. 2. Pre-register equivalence bands of +/- 0.015 around beta_C in {0.333, 0.375, 0.500} and the AICc threshold (Delta AICc > 4) for preferring clade-specific slopes or quadratic curvature. 3. Fit global and clade-stratified (Mammalia vs non-avian Reptilia; ungulates vs carnivorans vs rodents) PGLS models for humerus, femur, and total stylopodial circumference. 4. Compute bootstrap 95% confidence intervals on beta_C and beta_A and test whether the quadratic mass term b_2 is significantly positive in mammals above 20 kg." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: gbif-taxon-resolution" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.868mr> ;
+    rdfs:seeAlso <https://esapubs.org/archive/ecol/E090/184/> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.bp26v20> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:seeAlso <https://doi.org/10.1890/08-1494.1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--1#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 300 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://datadryad.org/dataset/doi:10.5061/dryad.868mr> dct:title "Campione and Evans 2012 Dryad dataset: Extrapolating body masses in large terrestrial vertebrates" ;
+    dct:description "Humeral and femoral midshaft circumferences paired with body mass across terrestrial tetrapods" .
+  <https://esapubs.org/archive/ecol/E090/184/> dct:title "PanTHERIA 1.0 mammal life-history database" ;
+    dct:description "Independent adult body mass compilation for cross-checking and expanding mammal coverage" .
+  <https://datadryad.org/dataset/doi:10.5061/dryad.bp26v20> dct:title "PHYLACINE 1.2 Phylogenetic Atlas of Mammal Macroecology" ;
+    dct:description "Mammal phylogenies and body masses for phylogenetic GLS covariance matrices" .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" ;
+    dct:bibliographicCitation "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" .
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+  <https://doi.org/10.1890/08-1494.1> dct:title "PanTHERIA: a species‐level database of life history, ecology, and geography of extant and recently extinct mammals" ;
+    dct:bibliographicCitation "Jones et al. 2009, PanTHERIA: a species-level database of life history, ecology, and geography of extant and recently extinct mammals" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.314Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Pre-registered phylogenetic GLS and quadratic-curvature test across 300 species" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}
