@@ -374,7 +374,7 @@ def measurement(protocol, draws, seed):
         "ratio_selected_over_baseline_variance_reduction": best_at_budget["variance_reduction"] / baseline["variance_reduction"],
         "zero_sensitivity_control": {"variance_reduction": zm["expected_target_variance_reduction"], "ok": zm["expected_target_variance_reduction"] == 0.0},
         "sensitivity": {"scenarios": total, "plans_ranked_first_at_budget": dict(sorted(first.items(), key=lambda kv: -kv[1])),
-                        "selected_matches_or_beats_baseline_in": total and wins_vs_base, "baseline_dominated_fraction_note": "share of scenarios in which the best affordable plan is at most the baseline (i.e. baseline is not beaten)"},
+                        "scenarios_where_baseline_is_not_beaten": wins_vs_base, "note": "count of scenarios in which no affordable plan reduces margin variance more than the baseline"},
         "misclassification_probability_of_sign_of_margin": {**mis, "note": "no_measurement guesses 'inside regime'; selected/baseline use the Gaussian posterior mean; model-based, not empirical"},
         "target_prior_sd": float(np.sqrt(target @ prior @ target)),
     }
@@ -463,8 +463,9 @@ def run(protocol_path: Path = PROTOCOL, out: Path = OUT):
     (out / "result.json").write_text(_canon(result))
     (out / "interface-map.json").write_text(_canon(interface_map()))
     _plot(rows, meas, out / "selection.png")
+    (out / "instrument-flow.svg").write_text(_flow_svg())
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.strip()
-    names = ("protocol.json", "candidates.json", "result.json", "interface-map.json", "selection.png")
+    names = ("protocol.json", "candidates.json", "result.json", "interface-map.json", "selection.png", "instrument-flow.svg")
     manifest = {"schema": "frontier.crossscale-doe.manifest/1", "code_commit": commit,
                 "code_sha256": {f: _sha256_file(ROOT / f) for f in CODE_FILES},
                 "input_sha256": {"artifacts/assurance-experiments/all-simulations.json": SIMS_SHA256,
@@ -497,6 +498,30 @@ def _plot(rows, meas, path):
     fig.tight_layout()
     fig.savefig(path, dpi=110, metadata={"Software": None})
     plt.close(fig)
+
+
+def _flow_svg() -> str:
+    """Instrument/validation flow: each box is one instrument contract, coloured by evidence status."""
+    fill = {"simulation_derived": "#cfe8dc", "proposal_needs_calibration": "#f6e3b4", "proposed_uncalibrated": "#e9c3c3"}
+    lanes = [("simulation_derived", "Saved simulation field -> virtual instrument -> analytic reference (numerical agreement only)"),
+             ("proposal_needs_calibration", "Physical measurement PROPOSALS (assumed noise, no data)"),
+             ("proposed_uncalibrated", "Sequence / growth PROPOSALS (no calibrated mapping)")]
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 420" font-family="sans-serif" font-size="12">',
+           '<rect width="900" height="420" fill="#ffffff"/>']
+    y = 20
+    for status, title in lanes:
+        out.append(f'<text x="10" y="{y}" font-weight="bold" fill="#222">{title}</text>')
+        x = 10
+        for inst in [i for i in INSTRUMENTS if i["status"] == status]:
+            out.append(f'<rect x="{x}" y="{y + 10}" width="205" height="90" rx="6" fill="{fill[status]}" stroke="#555"/>')
+            out.append(f'<text x="{x + 8}" y="{y + 30}" font-weight="bold" fill="#222">{inst["id"]}</text>')
+            out.append(f'<text x="{x + 8}" y="{y + 48}" fill="#222">unit: {inst["unit"][:26]}</text>')
+            out.append(f'<text x="{x + 8}" y="{y + 66}" fill="#222">ref: {inst["reference_control"][:28]}</text>')
+            out.append(f'<text x="{x + 8}" y="{y + 84}" fill="#222">accept: {inst["acceptance"][:26]}</text>')
+            x += 215
+        y += 130
+    out.append('<text x="10" y="410" fill="#444">No response rows exist. Green = numerical agreement of two solutions, not empirical validation.</text></svg>')
+    return "\n".join(out) + "\n"
 
 
 def main(argv=None):
