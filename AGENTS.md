@@ -155,7 +155,7 @@ directory runs them.
   - `claim-graph.html`, `theorems.html`, `claims-query.html`, `problems.html`, `team.html`: built
     from `scripts/site/templates/*.template.html` by the builders in `scripts/site/`
     and `problems/build/build-site.mjs`. Edit the template, not the output. The same goes for the
-    project-overview slide deck `assets/deck/overview-deck.html`, built by
+    project-overview slide deck `docs/deck/index.html` (https://delphibio.org/deck/, the header's About link), built by
     `scripts/site/build-overview-deck.mjs` with every count computed from `docs/claims.json`,
     the organism inventory and the Lean registry.
   - `claims.json`, `problems.json`, `export/`, `thumbs/`, `team/`: built data the pages and the MCP

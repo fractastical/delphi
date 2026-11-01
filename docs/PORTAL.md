@@ -16,8 +16,9 @@ homepage `index.html` is `Delphi_Product_Platform.html` from
 `platform.html` remains the earlier Lean for Biology page, also at `/platform/`. The
 mission-control dashboard stays on its Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
-  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, plus `claims.json`,
-  `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.
+  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, `deck/index.html` (the project
+  overview deck, the header's About link), plus `claims.json`, `problems.json`, `export/`, `thumbs/`,
+  `team/`. Don't edit these by hand; rebuild them.
 
 ## Shared look
 
@@ -40,6 +41,7 @@ cd engine
 node scripts/site/build-claim-graph.mjs     # claim-graph, claims-query, theorems, claims.json, export
 node problems/build/build-site.mjs          # problems.html, problems.json
 python3 scripts/site/build-team-page.py     # team.html
+node scripts/site/build-overview-deck.mjs   # deck/index.html (after build-claim-graph; reads claims.json)
 ```
 
 ## Refresh the portal

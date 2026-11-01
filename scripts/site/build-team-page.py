@@ -22,7 +22,7 @@ from urllib.parse import quote
 from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
-DOCS = REPO.parent / "site"  # REPO is ; the built site sits beside it
+DOCS = REPO / "docs"  # the built site (GitHub Pages)
 TEMPLATES = REPO / "scripts/site/templates"
 OUT = DOCS / "team"
 ORG_IMAGES = REPO / "test-data/organisms/images"
