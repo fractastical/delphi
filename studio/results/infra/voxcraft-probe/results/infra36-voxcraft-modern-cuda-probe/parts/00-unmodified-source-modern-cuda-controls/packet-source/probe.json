@@ -1,0 +1,141 @@
+{
+ "schema": "frontier.voxcraft-gpu-probe/1",
+ "id": "voxcraft-h100-compat-r1",
+ "frozen": true,
+ "NOTE": "operational subset. The full frozen protocol, including the source-review narrative and the predicted-failure derivation, is artifacts/voxcraft-gpu-probe/probe.json in delphi-frontier. This copy is trimmed to stay inside the ~48 KiB injection budget.",
+ "one_arm_only": "modern CUDA toolkit on one H100. This is not a sweep and not a fleet. The old-CUDA-10 arm is deliberately NOT included: whether it is scientifically useful depends on this arm's result.",
+ "question": "Does voxcraft-sim, at its pinned commit and unmodified, compile and run on a current CUDA toolkit targeting sm_90, and does it then produce a structurally complete history that distinguishes actuation from no actuation?",
+ "no_claim_yet": "Nothing in this packet asserts an answer. The answer is whatever the run records.",
+ "source": {
+  "repo": "https://github.com/voxcraft/voxcraft-sim",
+  "commit": "dd8668f99ff74fb2fc2ee60deb91287a3b519d8f",
+  "archive_url": "https://codeload.github.com/voxcraft/voxcraft-sim/tar.gz/dd8668f99ff74fb2fc2ee60deb91287a3b519d8f",
+  "archive_bytes": 1247489,
+  "archive_sha256": "0a0f4fd105a8df21df8b62a7d00e5178096d28415f2fb9f1679f6c78fd2c6546",
+  "archive_measured": "fetched twice from this host on 2026-11-01, byte-identical both times",
+  "archive_verified_against_git": "all 403 git-tracked files extracted from this archive hash-match a manifest computed from a clone at the same commit: 0 missing, 0 mismatched",
+  "license": "CC0-1.0 per the LICENSE file at this commit; the project website cdorgs.github.io/code states CC BY-NC 4.0 instead. Both recorded, neither picked.",
+  "bytes_changed_by_us": "ZERO. No upstream source byte is modified. See adapter_action."
+ },
+ "adapter_action": {
+  "kind": "configuration only",
+  "flags": [
+   "-DCMAKE_BUILD_TYPE=Release",
+   "-DCMAKE_CUDA_ARCHITECTURES=90",
+   "-DCUDA_ARCH=arch=compute_90,code=sm_90"
+  ],
+  "why_CUDA_ARCH_survives": "VERIFIED IN THE SOURCE, NOT ASSUMED. CMakeLists.txt:47 reads `if (NOT DEFINED CUDA_ARCH)`, so defining it on the command line skips the whole autodetection block, lines 48-56, including the `message(FATAL_ERROR \"Nvidia GPU not found. Abort.\")` at line 54 and the `CUDA_SELECT_NVCC_ARCH_FLAGS` call at line 48 that the removed-in-CMake-4 FindCUDA module provides. The runner re-greps these exact lines in the FETCHED bytes before configuring, and stops if the guard is absent.",
+  "not_done": "no source patch, no sed, no vendored replacement file, no flag shuffling on failure"
+ },
+ "predicted_first_failure": {
+  "status": "A PREDICTION TO BE CONFIRMED OR REFUTED BY THE RUN. It is not a result and must not be reported as one.",
+  "what": "compilation failure from legacy CUDA Dynamic Parallelism in device code",
+  "evidence_from_source": "src/VX3/VX3_VoxelyzeKernel.cu contains EIGHT device-side kernel launches and EIGHT device-side cudaDeviceSynchronize() calls inside __device__ member functions of VX3_VoxelyzeKernel: launches at lines 230, 267, 301, 310, 426, 434, 443, 454 and 471, each followed by VcudaDeviceSynchronize() (the macro at src/Utils/VX3.cuh:70 expands to cudaDeviceSynchronize()) at lines 232, 269, 303, 312, 428, 437, 446 and 473. The enclosing functions are __device__ void updateTemperature() at line 219, __device__ bool doTimeStep() at 237, __device__ void updateAttach() at 401 and __device__ void updateDetach() at 461.",
+  "why_that_should_fail": "device-side cudaDeviceSynchronize() was deprecated in CUDA 11.6 and removed in CUDA 12.0, where CDP2 replaced the legacy interface and dropped device-side synchronisation entirely.",
+  "first_site_expected": "src/VX3/VX3_VoxelyzeKernel.cu:232",
+  "if_it_fails_this_way": "record it and STOP. Do not patch the synchronisation out: removing a device-side sync is a SEMANTIC change to the integration order, not an adapter action, and a build repaired that way would answer a different question than the one asked.",
+  "if_it_does_NOT_fail_this_way": "that is the more interesting outcome and the run should continue to the history checks. Report what actually happened."
+ },
+ "image": {
+  "preferred": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+  "provenance": "digest supplied by infra as an existing cached image",
+  "suitability": "NOT ASSUMED. The runner's preflight records nvcc --version, the CUDA build string, /usr/local/cuda, cmake and g++ versions, and whether Boost is present, and stops with NO_CUDA_TOOLKIT or NO_CMAKE rather than guessing.",
+  "do_not_assume": "this image's toolkit is not assumed to support device-side synchronisation. The compiler's actual output is the evidence."
+ },
+ "budgets": {
+  "gpus": 1,
+  "HARD_OUTER_BOUND_S": 900,
+  "outer_bound_covers": "preflight, fetch, dependency install, configure, build, both runs, validation and packaging. Every stage cap is min(its own cap, time left minus a 25 s packing reserve), so no stage can push the total past 900 s.",
+  "build_cap_s": 600,
+  "run_cap_s_per_case": 120,
+  "pack_reserve_s": 25,
+  "build_threads": 2,
+  "memory_gib": 12,
+  "return_compressed_max_bytes": 16777216,
+  "timeout_semantics": "three distinct outcomes, never merged. BUILD_TIMEOUT means the build hit its OWN 600 s cap with time still left in the outer bound. DEADLINE_EXCEEDED means the outer 900 s bound was reached, including when it shortened a stage cap, and is also what a TERM or INT signal records. COMPILE_FAIL means the compiler rejected the code. A deadline is never reported as a compiler failure, and the deadline path still writes a receipt and packs partial logs.",
+  "signal_handling": "TERM and INT are trapped; the handler records the stage, writes the receipt and packs the partial logs before exiting, so an external kill still returns evidence."
+ },
+ "cases": {
+  "actuated": "adapter/cases/actuated/base.vxa",
+  "passive": "adapter/cases/passive/base.vxa",
+  "difference": "ONE line: <VaryTempEnabled>1</VaryTempEnabled> versus 0. Everything else is byte-identical, verified by diff.",
+  "body": "4 x 4 x 2 = 32 voxels at Lattice_Dim 0.01 m; all 32 are surface voxels, so all 32 appear in the history",
+  "parameters_and_their_source_lines": {
+   "VXA.Simulator.RecordHistory.*": "src/VX3/VX3_SimulationManager.cu:344-346",
+   "VXA.Simulator.EnableExpansion": "src/VX3/VX3_SimulationManager.cu:367, default 0",
+   "VXA.GPU.PrintfFIFOSize": "src/VX3/VX3_SimulationManager.cu:376, default multiplier 50; set to 200 here",
+   "VXA.Environment.Thermal.*": "src/old/VX_Environment.cpp ReadXML",
+   "VXA.Environment.Gravity.*": "src/old/VX_Environment.cpp ReadXML",
+   "Mechanical CTE / uStatic / uDynamic": "src/VXA/VX_Object.cpp:1445-1447"
+  },
+  "actuation_law_read_from_source": "src/VX3/VX3_VoxelyzeKernel.cu:636-646 computes T(t) = TempAmplitude * sin(2*pi*(t/TempPeriod + phaseOffset)), and because EnableExpansion is 0 it CLIPS T at zero, so voxels only contract. TempBase is NOT used on the CUDA path, only in the legacy src/old CPU path. With CTE 0.01 and amplitude 10 the zero-stress extent should run 10.0 mm down to 9.0 mm.",
+  "material_baseline_provenance": "Elastic_Mod 1e5, Density 1e3, Poissons_Ratio 0.35, uStatic 1, uDynamic 0.8 are taken from demos/basic/base.vxa at this same commit. CTE 0.01, TempAmplitude 10 and TempPeriod 0.25 are OUR assumed values with no measured referent."
+ },
+ "acceptance": {
+  "structural": [
+   "history non-empty",
+   "a finite positive <voxel_size> setting line",
+   "a 'real_stepsize: N' line with N >= 1",
+   "at least 3 recorded frames",
+   "step indices strictly increasing AND spaced exactly at the program's own reported real_stepsize",
+   "Time finite, non-negative and non-decreasing",
+   "every voxel block splits into exactly 15 values plus one trailing empty, all finite",
+   "voxel count constant across frames and equal to 32",
+   "no 'Diverged' in the output"
+  ],
+  "why_contiguity_not_just_non_emptiness": "the history is written by printf from INSIDE a __global__ kernel, so it passes through the CUDA device printf FIFO ring buffer. On overflow, lines are dropped SILENTLY. A non-emptiness check passes on truncated output; a stride check does not.",
+  "discriminator": {
+   "quantity": "per-frame mean voxel x-extent, computed as field[10] - field[7], the PPP minus NNN corner offsets, which carry both the thermal factor and the elastic strain (src/VX3/VX3_Voxel.cu:147-158)",
+   "A1_actuated_moves": "actuated peak-to-peak >= 0.5 history units (mm). Predicted ~1.0.",
+   "A2_passive_quiet": "passive peak-to-peak * 3 <= actuated peak-to-peak",
+   "A3_actuated_contracts": "actuated mean extent < passive mean extent, because EnableExpansion 0 clips temperature at zero",
+   "A1_fail": "DISCRIMINATOR_FAIL: the program ran but the actuation path did not take effect. Not a working build.",
+   "A2_fail": "INCONCLUSIVE: the control is not quiet, so the contrast does not separate actuation from settling.",
+   "A3_fail": "INCONCLUSIVE: extent changed but did not contract, so the case or the clip does not behave as the source says."
+  }
+ },
+ "statuses_the_runner_can_return": [
+  "PASS",
+  "NO_GPU",
+  "NO_CUDA_TOOLKIT",
+  "NO_CMAKE",
+  "SOURCE_HASH_MISMATCH",
+  "SOURCE_EXTRACT_FAIL",
+  "SOURCE_FILE_HASH_MISMATCH",
+  "CMAKE_GUARD_ABSENT",
+  "DEP_MISSING_BOOST",
+  "DEP_INSTALL_FAILED",
+  "CONFIGURE_FAIL",
+  "BUILD_TIMEOUT",
+  "DEADLINE_EXCEEDED",
+  "COMPILE_FAIL",
+  "RUN_TIMEOUT",
+  "RUNTIME_FAIL",
+  "HISTORY_STRUCTURAL_FAIL",
+  "ACTUATION_DISCRIMINATOR_FAIL",
+  "INCONCLUSIVE"
+ ],
+ "runner_selftest": {
+  "script": "artifacts/voxcraft-gpu-probe/selftest.sh",
+  "sha256": "5f04095986494acda9c9ecbf5e542d9b303849d438c3d958767d52a35d098377",
+  "not_injected": "it is a HOST-SIDE control that was already run here; leaving it out keeps the injected set inside the ~48 KiB budget. It is committed in delphi-frontier at the hash above if infra wants to re-run it.",
+  "fixtures": 20,
+  "result_on_the_fixed_runner": "20 passed, 0 failed",
+  "result_on_the_reviewed_runner_624065f5": "6 passed, 9 failed, on exactly the four defects",
+  "result_on_a_deliberate_mutant_with_the_truncation_re_inserted": "17 passed, 3 failed: 'NATIVE HISTORY WAS MUTATED (300000 -> 1024 bytes)', 'expected RETURN_TOO_LARGE*, got OK', and 'no originals-intact message'"
+ },
+ "runner_defects_fixed_since_review_624065f5": [
+  "first-failure excerpt was always blank (export order); now passed to python as a path argument",
+  "return archive embedded itself and its tar error was hidden; now written outside the tree, exclusions before operands, exit reported, 16 MiB cap enforced",
+  "environment dump matched a prefix and did leak a planted token in test; now an exact-name allow-list",
+  "outer time bound was not enforced; now a hard 900 s deadline with per-stage remaining-time caps, a TERM/INT trap and a distinct DEADLINE_EXCEEDED status",
+  "history truncation fallback destroyed the only copy of the science output while claiming it had not; removed entirely, out/ is now immutable, transport failure is explicit and exits non-zero"
+ ],
+ "scope": {
+  "no_biological_fidelity_claim": "this is a compiler and runtime compatibility probe on a numerical soft-voxel engine. Nothing here is calibrated to any organism and no biological fidelity is claimed or implied.",
+  "no_convergence_claim": "this probe does not test convergence of anything.",
+  "cpu_arms_untouched": "the existing CPU preregistration stands unchanged, including the arm E miss at 0.0175 against a 0.01 bound and the arm G spatial non-convergence at 8.2x, and including the withdrawal of the 2.74% travelling-wave figure in favour of 15.5739% at a common denominator.",
+  "no_fleet": "no fleet, no sweep and no second arm before this one returns.",
+  "no_science_edits_in_this_revision": "the VXA cases, the actuation law, the acceptance criteria and the validator's thresholds are byte-identical to the reviewed packet. Only the runner's failure handling, resource bounding and environment capture changed."
+ }
+}

@@ -155,3 +155,7 @@ At11:05pm PDT on October31, the45-arm aeroelastic packet was complete and VM04 h
 - [x] Admit epithelial8CPU worker02 at11:41:51pm PDT,5400s whole-tree bound; frozen interval/finite completeness criteria preserved.
 - [x] Start bounded automatic collection services for both Google prefixes.
 - [ ] Independently verify returned files and hand native science to their owners; retain compiler failures, incomplete families and unresolved brackets.
+
+- [x] Collect all372 extended VLM solves; native extended collocation diagnostic supported, core unknown retained. Independent science audit pending.
+- [x] Preserve Voxcraft native COMPILE_FAIL:39.1s runtime,12files/92,682bytes;40device samples all0%GPU. First Boost.Asio error plus actual device-sync CUDA incompatibilities. No simulation cases, source edits or blind retry.
+- [x] Repair local collector overhead with30-second in-memory token reuse;16focused tests passed. No scientific packet changed.
