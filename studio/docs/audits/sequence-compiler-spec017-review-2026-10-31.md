@@ -1,0 +1,81 @@
+# Sequence/compiler and SPEC-017 independent review
+
+Review status: initial findings delivered; awaiting owner02's fixed committed
+compiler for the final integration check. This report concerns bookkeeping,
+identity and validator rules, not measured biological function.
+
+SPEC-017 was read at root `cd0290f`; this worktree is based on root `c7b6f9e`.
+The actual ledger is `7d51169`, SHA256
+`5ecebe0d8f123457cceb2630fa2597542f8885f3052023504e96db80d32d3b87`.
+No compiler owner files, source records, scientific runs or acceptance criteria
+were changed by this reviewer.
+
+## Executed draft checks
+
+A frozen-in-memory copy of the owner working-tree compiler, file SHA256
+`ac385331f7e98faa13214beb8623e0fdb947562ce7e3d78b6471aa6e193abb88`, was
+loaded by `artifacts/audits/sequence-compiler/check.py`. The actual ledger's four
+natural FASTA references parsed. All 32 existing model-output JSON artifacts were
+refused as sequence text. All 44 entries were consumed, but the nested source-native
+LEN context became null normalized fields. These are integration refusals/context
+loss, not false function predictions. Raw output is `draft-check.json` beside the
+check script. Initial launch lacked PYTHONPATH and failed before the probes; the
+corrected bounded launch executed them.
+
+The same draft's `evaluate_validation` reported `all_required_pass=true` for:
+
+- A purported plan and result both pinned to unrelated plaintext, with caller
+  `status=pass` and boolean positive/negative counts. File identity was checked;
+  plan/result meaning and counts were not bound to file contents.
+- A plan whose entire check set consisted of nonendpoint `not_applicable` checks.
+  No endpoint had executed.
+
+The owner was sent exact findings and the reproducer through
+`messages/sequence-compiler-independent-review.md` and authorized tmux messages.
+The owner is fixing the source; draft outputs remain historical findings.
+
+## Source findings requiring final recheck
+
+1. Bind normalized nucleotide hash/length to the selected actual artifact record;
+   preserve file digest separately. JSON outputs require an exact unique row
+   selection. Preserve the source-native nested context alongside any explicit
+   normalized map, with unknown fields left unknown. Preserve `direction`,
+   `functional_validation`, source references and desired versus demonstrated
+   readouts. Natural references are not experimental alleles.
+2. Bind versioned plan/result content, candidate/check/endpoint identities,
+   required checks, status/counts and execution/dependence metadata to pinned
+   bytes. A source pin does not authenticate arbitrary caller metadata. Boolean,
+   NaN, negative and noninteger case counts must not count as evaluated cases.
+3. A calibrated DNA-to-expression transfer must depend on the exact candidate
+   nucleotide/input identity, not only matching allele/construct context strings.
+   Per-candidate forward checks currently check sequence integrity but the source
+   measurement interface does not require the corresponding sequence dependency.
+   Other interfaces require their own relevant upstream input/transfer pins.
+   A changed DNA reference cannot inherit a transfer merely by reusing labels.
+
+## Specification review
+
+SPEC-017 explicitly distinguishes numerical/formal verification from biology,
+forbids a model validating its optimized sequence, names evidence dependence,
+requires meaningful negative cases and forbids empty collections passing. Those
+are appropriate boundaries. Two operational requirements should be made explicit
+when implementing its acceptance:
+
+- A passing validation plan must include at least one actual required endpoint
+  that executed. Nonendpoint `not_applicable` checks cannot collectively produce
+  a pass or remove the endpoint by omitting its row. Required-check identifiers
+  and result counts must be typed, unique and bound to frozen source records.
+- A purportedly independent functional check needs a declared, inspected data and
+  model dependency chain, not only a different agent/validator name or file hash.
+  Optimization readouts, copied predictions and deterministic transforms of them
+  remain dependent; a forward/inverse round trip remains model consistency.
+  Record overlap, calibration/fitting usage, reused-source groups and missing
+  independent observations. Do not make missing independence into a new model
+  score.
+
+These clarify enforcement of the existing specification, not permission to claim
+functional DNA or a genome-to-organism model. The actual ledger still leaves LEN
+GRCz11 sequence identity, context-matched candidate function and all biological
+expression-to-material/flight transfer unknown or blocked. The LEN deletion
+result specifically preserves the distinction between induced expression and
+required fin regeneration.
