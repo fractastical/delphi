@@ -117,10 +117,11 @@
         <h3 class="sr">Interactive 3D candidate</h3>
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p><p class="small"><a href="${DF.href("/history")}">How these candidates relate: the fish design history</a> (revisions, sibling variants and display props kept apart).</p>
         <div id="home-model-downloads" class="small">
+          ${snap.print_laws && snap.print_laws.data ? html`<p><a href="${DF.href("/print-laws")}"><b>Why the print fails its mass budget · laws, checks & lineage</b></a></p>` : ""}
           ${v3a ? html`<p><a href="${v3a.href}" download>Download v3a fish with scales · STL</a> <span class="faint">Display model, not the slingshot prototype.</span></p>` : ""}
           ${launchBundle ? html`<p><a href="${launchBundle.href}" download>Download corrected slingshot test-print set · ZIP</a> <span class="faint">Six parts and assembly notes. Fit/balance only: overweight, with a catch-wall concern unresolved. Not cleared for launch.</span></p>` : ""}
           <details><summary><b>All model downloads</b> · print revisions, stands and 3D candidates</summary>
-            ${downloads.map((g) => html`<details><summary>${g.title} · ${g.files.length} files</summary><p class="faint">${g.scope} <a href="${g.manifest_href}">Manifest and checks</a></p>${g.warning ? html`<p class="note warn">${g.warning}</p>` : ""}<ul>${g.files.map((f) => html`<li>${f.withdrawn ? html`<span>${f.name} — withdrawn. ${f.withdrawn}</span>` : html`<a href="${f.href}" download title="SHA-256 ${f.sha256}">${f.name}</a>`} <span class="faint">${(f.bytes / 1048576).toFixed(2)} MB</span></li>`)}</ul></details>`)}
+            ${downloads.map((g) => html`<details><summary>${g.title} · ${g.files.length} files</summary><p class="faint">${g.scope} <a href="${g.manifest_href}">Manifest and checks</a></p>${g.warning ? html`<p class="note warn">${g.warning}</p>` : ""}<ul>${g.files.map((f) => html`<li>${f.withdrawn ? html`<span>${f.name} — withdrawn. ${f.withdrawn}</span>` : html`<a href="${f.href}" download title="SHA-256 ${f.sha256}">${f.name}</a>`} <span class="faint">${(f.bytes / 1048576).toFixed(2)} MB</span> ${snap.print_laws && snap.print_laws.data && snap.print_laws.data.files.some((p) => p.path === f.href) ? html` · <a href="${DF.href("/print-laws", { file: f.href })}">Laws & checks</a>` : ""}</li>`)}</ul></details>`)}
             <details><summary>Candidate meshes · GLB</summary><p class="faint">Visualisation meshes; use the print revisions above for printing.</p><ul>${snap.fish3d_viewer.candidates.map((c) => html`<li>${c.label}: ${["fish.glb", ...(c.variants || []).map((v) => v.glb)].filter((f) => copied.has(c.id + "/" + f)).map((f) => html`<a href="${c.base + f}" download>${f}</a> `)}</li>`)}</ul></details>
           </details>
         </div>
@@ -289,4 +290,30 @@
     if (!a.unavailable && a.report && a.report.view) return { n: a.report.view.n_problems ?? (a.report.view.rows || []).length, source: "attention layer" };
     const r = await DF.api.catalog({ kind: "Problem", limit: 50 }); return { n: r.records.length + (r.next_cursor ? "+" : ""), source: "catalog first page" };
   };
+
+  /* Shared table behaviour, so no view needs its own markup: cells take their label from the header (the phone layout stacks them), wide tables get a sticky
+   * first column, and a table that scrolls sideways says so above it. Idempotent; runs as the page changes and when the window resizes. */
+  (function () {
+    const main = () => document.getElementById("main"); let queued = false;
+    const enhance = () => {
+      queued = false; const root = main(); if (!root) return;
+      root.querySelectorAll(".tablewrap table").forEach((t) => {
+        if (!t.dataset.enh) {
+          t.dataset.enh = "1"; const hr = t.tHead && t.tHead.rows[t.tHead.rows.length - 1]; const heads = hr ? [...hr.cells].map((h) => h.textContent.trim()) : [];
+          if (heads.length) t.querySelectorAll("tbody tr").forEach((tr) => [...tr.cells].forEach((c, i) => { if (c.tagName === "TD" && !c.hasAttribute("data-label") && heads[i]) c.setAttribute("data-label", heads[i]); }));
+          if (heads.length >= 7 || t.classList.contains("matrix") || t.classList.contains("ctable")) t.classList.add("widetable");
+          else if (heads.length && !t.classList.contains("qtable") && !t.querySelector("[colspan]")) t.classList.add("stackable");
+        }
+      });
+      root.querySelectorAll(".tablewrap").forEach((w) => {
+        const t = w.querySelector("table"); const stacked = t && getComputedStyle(t.querySelector("td, th") || t).display === "block"; const prev = w.previousElementSibling; const has = prev && prev.classList.contains("tablehint");
+        const over = !stacked && w.scrollWidth > w.clientWidth + 1;
+        if (over && !has) { const h = document.createElement("p"); h.className = "tablehint small faint"; h.textContent = "This table is wider than the screen: scroll sideways for the other columns."; w.parentNode.insertBefore(h, w); }
+        else if (!over && has) prev.remove();
+      });
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(enhance); } };
+    window.addEventListener("resize", queue);
+    new MutationObserver(queue).observe(document.documentElement, { childList: true, subtree: true });
+  })();
 })();

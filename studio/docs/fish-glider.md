@@ -13,8 +13,10 @@ sling. Root chose the rest as provisional engineering defaults; none of them is 
 
 Fin and hook sections follow claude-07's print requirements R1–R4 (`glider-dynamics-to-fish-glider-print-reqs.md`).
 
+**Per-file laws and checks.** `docs/print-law-index.md`, generated from `artifacts/print-law-index.json`, lists every downloadable print file: its sha256, its mass calculated from the mesh, each law's relation to it, every check's outcome, and the open findings. It covers glider r1–r4 and the display props.
+
 ## Revisions (lineage; a later revision never overwrites an earlier one)
-| revision | parent | body shell | dry mass (measured from the meshes) | ballasted to CG x 52 mm | V_trim at C_L 0.5 (hand) |
+| revision | parent | body shell | dry mass (calculated from the meshes) | ballasted to CG x 52 mm | V_trim at C_L 0.5 (hand) |
 |---|---|---|---|---|---|
 | `r1-strong` | none | 0.8 mm | 19.95 g, CG x 69.3 mm | 28.9 g | 13.2 m/s |
 | `r1-light` | r1-strong | 0.5 mm | 17.14 g, CG x 68.2 mm | 24.0 g | 12.1 m/s |
@@ -70,9 +72,18 @@ pelvics at 0.48 SL.
   `download.json`, beside the ZIP and outside it, pins the ZIP's path, size and sha256. The ZIP is deterministic:
   the same files give the same bytes.
 
+**Open finding: thin body wall at the forward catch slot (unresolved).** Reviewer claude-13's wall sampling found two
+readings of 0.115 mm at about (19.4, ±5.9, 8.8) mm on the r3 body, against the 0.45 mm rule. The r4 body is the same
+mesh.
+- **The builder's gate missed it.** Its sampler logged an edge-limited 0.31 mm reading at (18.38, 6.39, 8.15), and
+  edge-limited readings are reported but do not gate.
+- **Consequence.** r4 is a fit and balance print only, with no launch clearance.
+- **Record.** The finding is in `artifacts/glider/REVIEW_FINDINGS.json`, outside the frozen revisions and the ZIP.
+  It will be fixed in a new revision, never by editing r4.
+
 **All five revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
 V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with that failure stated.
-- **Measured split** (`r1-light`): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.
+- **Calculated split** (`r1-light`, mesh volume × 1220 kg/m³, not weighed): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.
 - **Why the ballast is large.** The hollow body's CG sits at about x 69 mm, against claude-07's CG window of
   44–60 mm, so nose ballast does the rest.
 - **Levers for r2,** with the mass each saves taken from these meshes:

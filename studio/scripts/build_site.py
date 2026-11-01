@@ -15,6 +15,7 @@ import argparse
 import collections
 import copy
 import datetime
+import importlib.util
 import json
 import re
 import shutil
@@ -310,11 +311,12 @@ def build_timeline(ins: Inputs) -> dict | None:
     add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
     dated_only = []
     for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
-        path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
+        path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", []); note = ch if isinstance(ch, str) else None   # a receipt may state its checks as prose
+        ch = [c for c in ch if isinstance(c, dict)] if isinstance(ch, list) else []
         npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
         if "checked_at" not in d:                         # a receipt with no time of day is listed apart, never given a made-up time
             dated_only.append({"title": f.stem.replace("-", " ") + (" (release " + str(d["sha"])[:12] + ")" if d.get("sha") else ""), "outcome": "; ".join(f"{c.get('name', 'check')}: {c.get('result') or ('passed' if c.get('passed') is True else 'not passed')} (exit {c.get('exit', 'not recorded')})" for c in ch) or "no checks listed", "ok": all(c.get("exit", 1) == 0 for c in ch) if ch else None, "path": path, "sha256": sha(path), "date": "no time recorded"}); continue
-        add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
+        add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", (note if note and not ch else f"{npass} of {len(ch)} checks passed"), path, (None if note and not ch else npass == len(ch)), d.get("scope", ""))
     for k, u in (U or R)["model_usage"].items():
         if isinstance(u, dict) and u.get("window_utc"):
             out = ", ".join(f"{n.replace('_', ' ')} {u[n]}" for n in ("documents_embedded", "embedding_requests", "failed_requests", "calls", "input_tokens", "output_tokens_including_thinking") if n in u)
@@ -380,7 +382,20 @@ def build_timeline(ins: Inputs) -> dict | None:
         usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": job_kind(j).upper(), "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
             "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
             "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
-    return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+    audits = {}
+    for key, path in (("contributors", "results/resources/agent-contributors.json"),
+                      ("models", "results/resources/bio-model-usage.json")):
+        if (ROOT / path).is_file():
+            audits[key] = {"data": ins.json(path), "path": path, "sha256": sha(path)}
+    if "contributors" in audits:
+        a = audits["contributors"]; c = a["data"]["counts"]
+        observed = datetime.datetime.fromisoformat(a["data"]["window"]["observed_utc"].replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
+        counters = [c for c in counters if c["quantity"] != "Agents"]
+        counters[:0] = [
+            {"quantity": "Contributing harnesses", "value": f"At least {c['distinct_contributing_harness_ids_supported_minimum']} distinct harness identities", "status": "partial", "note": f"Authored handoffs or reviewed identity mappings with checked artifacts, observed {observed}. A supported minimum, not a census or concurrent-worker count.", "source": a["path"]},
+            {"quantity": "Native collaborators", "value": str(c['native_contributors_supported_minimum']), "status": "partial", "note": "Separate native collaboration identities; work artifacts checked and attribution attested by the coordinator. Root is not counted again. No collective speedup is inferred.", "source": a["path"]},
+            {"quantity": "Live harness processes", "value": str(c['live_harness_processes_now']), "status": "partial", "note": f"Process snapshot at {observed}. Includes idle and authentication-blocked sessions; this is not a count of agents working.", "source": a["path"]}]
+    return {"observed_at": R["observed_at"], "usage": usage, "audits": audits, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
 
@@ -688,9 +703,45 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
     return {"groups": groups, "refused": refused}
 
 
+def print_laws(ins: Inputs, out: dict, downloads: dict) -> dict | None:
+    """Only show grounding when its exact file pins match the published catalog."""
+    path = "artifacts/print-law-index.json"
+    if not (ROOT / path).is_file():
+        return None
+    raw = ins.read(path)
+    index = json.loads(raw)
+    catalog = {f["href"]: f for g in downloads["groups"] for f in g["files"]}
+    rows = index.get("files", [])
+    refused = [r.get("path", "missing path") for r in rows
+               if r.get("path") not in catalog or r.get("sha256") != catalog[r["path"]]["sha256"]]
+    indexed = {r.get("path") for r in rows}
+    refused.extend(p for p, f in catalog.items() if f["format"] == "STL" and p not in indexed)
+    if index.get("schema") != "frontier.print-law-index/1" or not rows or len(indexed) != len(rows):
+        refused.append("index schema or cardinality")
+    if refused:
+        return {"data": None, "refused": sorted(set(refused))}
+    out["@" + path] = raw
+    return {"data": index, "href": path, "sha256": digest_bytes(raw), "refused": []}
+
+
 def demo_videos(ins: Inputs, out: dict) -> dict | None:
+    """Preserve earlier cuts while admitting an additive, completely pinned edit."""
+    result = {"cuts": [], "refused": [], "limits": []}
+    present = False
+    for directory, expected in (("artifacts/demo-video", {"frontier-60s": 60, "frontier-120s": 120}),
+                                ("artifacts/demo-video-90", {"frontier-90s": 90})):
+        manifest = _demo_manifest(ins, out, directory, expected)
+        if manifest is None:
+            continue
+        present = True
+        result["cuts"].extend(manifest["cuts"])
+        result["refused"].extend(manifest["refused"])
+        result["limits"].extend(x for x in manifest["limits"] if x not in result["limits"])
+    return result if present else None
+
+
+def _demo_manifest(ins: Inputs, out: dict, directory: str, expected_cuts: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
-    directory = "artifacts/demo-video"
     manifest_path = f"{directory}/manifest.json"
     if not (ROOT / manifest_path).is_file():
         return None
@@ -700,7 +751,7 @@ def demo_videos(ins: Inputs, out: dict) -> dict | None:
         return result
     required = {"video": {".mp4"}, "poster": {".png", ".jpg"}, "captions": {".vtt"}, "transcript": {".txt"}}
     for cut in manifest.get("cuts", []):
-        expected = {"frontier-60s": 60, "frontier-120s": 120}.get(cut.get("id"))
+        expected = expected_cuts.get(cut.get("id"))
         if expected is None or not isinstance(cut.get("duration_s"), (int, float)) or abs(cut["duration_s"] - expected) > 0.25:
             result["refused"].append({"id": cut.get("id"), "reason": "unexpected cut or duration"})
             continue
@@ -996,6 +1047,14 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     """Wind-tunnel, behavior controller and scale-growth manifests as gallery cards, with equations, sources and limitations.
     Every number is copied from the worker's own receipt; verdicts and misses are carried, never softened."""
     cards = []
+    if (ROOT / "artifacts/fin-ray/artifact-manifest.json").is_file():
+        module_path = "engineering/fin_ray/site.py"
+        ins.read(module_path)
+        spec = importlib.util.spec_from_file_location("frontier_fin_ray_card", ROOT / module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        cards.append(module.build_card(ins.read, lambda name, sha: _vid(
+            ins, out, "fin-ray-bilaminar", "artifacts/fin-ray", name, sha)))
     d = "artifacts/windtunnel"
     if (ROOT / d / "render-manifest.json").exists() and (ROOT / d / "summary.json").exists():
         rm = json.loads(ins.read(f"{d}/render-manifest.json")); sm = json.loads(ins.read(f"{d}/summary.json")); o = rm["outputs"]
@@ -1190,6 +1249,76 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "equations": [{"label": "Erk activity", "tex": "\\dot E=\\alpha_1\\tfrac{A^2}{\\beta^2+A^2}(1-E)-E(\\gamma_1 I+\\gamma_e)", "source": "Hayden 2021, doi 10.1016/j.bpj.2021.05.004"}, {"label": "Activator with diffusion", "tex": "\\dot A=\\alpha_2[\\text{source}]+\\alpha_3E-\\gamma_2A+D\\nabla^2A", "source": "Hayden 2021"}, {"label": "Inhibitor", "tex": "\\dot I=\\gamma_3(\\alpha_4E-I)", "source": "Hayden 2021"}, {"label": "Growth coupling (ASSUMED exponential form)", "tex": "\\frac{d\\ln a}{dt}=0.006\\ \\mathrm{h^{-1}}\\ \\text{for}\\ t-t_{\\text{peak}}\\le 24\\ \\mathrm{h}", "source": "assumption; measured form is linear, De Simone 2021 Ext. Data Fig. 7b"}],
             "sources": [{"label": s_["citation"], "locator": f"doi {s_['doi']}; read level {s_['read_level']}; {s_.get('used_for', '')}"} for s_ in r["sources"] if not s_.get("used_for", "").startswith("NOT YET")],
             "limitations": r["not_claimed"], "couplings": [], "manifest": f"{d}/receipt.json", "native": True})
+    return cards
+
+
+def aeroelastic_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Static aeroelastic coupling card from the native model card and its production audit. Wording follows the independent review (B1, B2): a
+    bending-only, torsion-rigid scaffold; a fixed-alpha assumed-release descent proxy; ledger gates are bookkeeping; the absolute mesh gate does not
+    resolve small paired effects; small differences are not validated improvements. The 36-arm production arms are used, not the earlier coarse slice."""
+    d = "artifacts/aeroelastic"
+    if not (ROOT / d / "index.json").exists():
+        return []
+    ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; P = ix.get("production")
+    if not P:
+        return []
+    sub = lambda k: art[k]["path"].split(d + "/", 1)[1]
+    st, href = _vid(ins, out, "aeroelastic-coupling", d, sub("video"), art["video"]["sha256"])
+    _, ph = _vid(ins, out, "aeroelastic-coupling", d, sub("poster"), art["poster"]["sha256"])
+    _, prov = _vid(ins, out, "aeroelastic-coupling", d, sub("render_provenance"), art["render_provenance"]["sha256"])
+    au = json.loads(ins.read(f"{d}/production-audit.json")); dg = json.loads(ins.read(f"{d}/production-diagnostics.json"))
+    gates = dg["native_lattice_gates"]; npass = sum(1 for g in gates if g.get("lattice_gate_passed"))
+    nom = next(e for e in dg["paired_effects"] if e["compliance"] == 0.2 and e["speed_m_s"] == 20.0 and e["comparison"] == "two_way_minus_one_way")["meshes"]["fine"]
+    rv = dg.get("review", {})
+    (r_cl, o_cl, t_cl), (r_rg, o_rg, t_rg) = P["nominal_fine"]["CL"], P["nominal_fine"]["descent_range_m"]
+    return [{"id": "aeroelastic-coupling", "title": f"Static aeroelastic coupling of the fins: {P['arms']} arms, bending-only torsion-rigid scaffold", "scales": ["organ", "organism"], "evidence_kind": ix["evidence_kind"] + " (video: render of saved states)",
+        "model": {"name": "equivalent constant-EI bending scaffold + steady thin-surface VLM", "context": ix["question"] + " " + ix["status"] + "."},
+        "time": {"units": "static iterations, not physical seconds", "note": "The video holds terminal states explicitly; deflection is unscaled. The descent paths are a separate rigidized-shape point-mass proxy."},
+        "video": {"file": "coupled-states.mp4", "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph, "provenance_href": prov,
+        "numerical_checks": [
+            {"name": "production run", "result": f"{P['native_execution_status']}: {P['arms']} arms over {P['contexts']} compliance and speed contexts, two lattices; empirical accuracy {P['empirical_accuracy']}"},
+            {"name": "nominal (compliance 0.2, 20 m/s, fine lattice)", "result": f"CL rigid {r_cl:.6f}, one-way {o_cl:.6f}, two-way {t_cl:.6f}; assumed-release descent range {r_rg:.3f}, {o_rg:.3f}, {t_rg:.3f} m"},
+            {"name": "two-way minus one-way", "result": f"dCL {t_cl - o_cl:.2e}, range {1000 * (t_rg - o_rg):+.2f} mm; about {nom['abs_delta_CL_over_fixed_point_tolerance']:.1f} times the frozen fixed-point tolerance. A small effect, not a demonstrated useful flight improvement"},
+            {"name": "independent audit of the returned files", "result": f"{au['collection_files_checked']} files, {au['actual_static_frames_checked']} static frames and {au['actual_glide_states_checked']} descent states reproduced exactly; same-model integrity, not validation"},
+            {"name": "mesh gate", "result": f"the absolute 3% CL gate between the two lattices passed for {npass} of {len(gates)} comparisons; it cannot resolve smaller paired effects or establish a convergence rate"},
+            {"name": "ledger gates", "result": "the force, moment and virtual-work residuals hold by construction and only detect an overridden normal vector; they are bookkeeping, not an independent transfer validation"}],
+        "parameter_unknowns": [ix["inputs"]["material"] + ".", "Mass, drag coefficients, release height and fixed alpha in the descent proxy are assumed engineering values.", "Paired differences and their mesh ratios are descriptive posthoc diagnostics; no acceptance criterion was changed or added."],
+        "open_questions": ix["open_questions"],
+        "equations": [], "sources": [{"label": "Static aeroelastic method (aircraft model, not a fish)", "locator": "Ting, Nguyen, Trinh 2014, NASA NTRS 20140008648, Eq 63-66, 74-75 and Section VIII"}, {"label": "Beam deflection reference", "locator": "MIT 1.050 beam deflection notes"}, {"label": "Independent review (claude-07), kept byte-exact, with the author's response", "locator": f"{d}/independent-review-claude07.md sha256 {rv.get('sha256', '')[:12]}…"}, {"label": "Protocol", "locator": f"{d}/protocol.json sha256 {art['protocol']['sha256'][:12]}…"}],
+        "limitations": ["Bending-only, torsion-rigid scaffold; the descent is a fixed-alpha, assumed-release proxy; neither is validated fin or glide performance.", "Independent review B1: the ledger identities cannot catch a wrong station, frame or scaling, so they are not independent transfer validation.", "Independent review B2: the 3% absolute mesh gate cannot establish paired effects smaller than itself; the deltas, mesh ratios and tolerance multiples shown are descriptive and added after the fact, with no new gate.", "Torsion, axial, hinge stiffness, trimmed flight, unsteady fluid and structure, viscosity and separation are not modelled.", "Computed engineering result; empirical validation: " + str(ix["empirical_validation"]) + ". No biological calibration of the equivalent stiffness exists."],
+        "couplings": [], "manifest": f"{d}/index.json", "native": True}]
+
+
+def nca_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Neural cellular automaton fin-pattern cards: the original run and the one-factor seed-placement intervention, side by side. Both fit one 64x64 design
+    raster on reused evaluation cases; neither is tissue regeneration, a sequence implementation or a generalisation."""
+    cards = []
+    kinds = {}
+    sp = ROOT / "artifacts/nca-seed-placement/index.json"
+    if sp.exists():
+        kinds = {b["kind"]: b for b in json.loads(ins.read("artifacts/nca-seed-placement/index.json")).get("by_kind", [])}
+    for cid, d in (("nca-pattern", "artifacts/nca-pattern"), ("nca-seed-placement", "artifacts/nca-seed-placement")):
+        if not (ROOT / d / "index.json").exists() or not (ROOT / d / "returned-analysis").is_dir():
+            continue
+        ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; rel = lambda k: art[k]["path"].split(d + "/", 1)[1]
+        st, href = _vid(ins, out, cid, d, rel("video"), art["video"]["sha256"]); _, ph = _vid(ins, out, cid, d, rel("poster"), art["poster"]["sha256"])
+        _, plot = _vid(ins, out, cid, d, rel("training_plot"), art["training_plot"]["sha256"]); _, prov = _vid(ins, out, cid, d, rel("render_provenance"), art["render_provenance"]["sha256"])
+        c = ix["counts"]; seed = cid == "nca-seed-placement"; nfr = len(json.loads(ins.read(art["render_provenance"]["path"]))["frames"])
+        checks = [{"name": "declared design predicates", "result": f"{c['design_passed']} of {c['design_executed']} passed; negative controls {c['negative_passed']} of {c['negative_executed']}"}]
+        if seed:
+            checks += [{"name": b["kind"].replace("-", " "), "result": f"original {b['parent']['passed']} of {b['parent']['executed']} to corrected seed {b['variant']['passed']} of {b['variant']['executed']}"} for b in kinds.values()]
+            checks += [{"name": "regime " + r["regime"], "result": f"{r['passed']} of {r['tested']}"} for r in ix["regime_counts"]]
+        cards.append({"id": cid, "title": ("Neural cellular automaton fin pattern, corrected seed placement: 32 of 48 predicates, left-half recovery 0 of 12" if seed else "Neural cellular automaton fin pattern, original run: 0 of 48 predicates"),
+            "scales": ["tissue", "developmental"], "evidence_kind": "computed (trained model on a 64x64 design raster; video renders saved states, not tissue)",
+            "model": {"name": "neural cellular automaton, 8336 shared local-rule weights", "context": ("One factor changed from the original run: the seed cell " + str(ix["parent_seed_xy"]) + " -> " + str(ix["seed_xy"]) + ". Target, source, training budgets and evaluation cases are unchanged. " + ix["evaluation_status"] + "." if seed else "The original run, kept unchanged: " + ix["inverse_objective_status"] + ". Four models, two initialisations, a fin/ray design raster; not observed tissue.")},
+            "time": {"units": f"cellular-automaton update steps; {nfr} frames shown", "note": "Frames are saved model states drawn as a raster, not a microscope image."},
+            "video": {"file": rel("video"), "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph, "plot_href": plot, "provenance_href": prov,
+            "numerical_checks": checks,
+            "parameter_unknowns": ["The 12 hidden channels are computational state, not measured biochemical signals.", ("Evaluation cases are reused from the original run: not fresh held-out cases and not a new target." if seed else "Seeds and pools are declared inputs; repeated probes are not independent biological replicates.")],
+            "open_questions": ["Large left-half damage failed all 12 cases even with the corrected seed." if seed else "Would a different seed placement change the outcome? One factor was tested separately (see the corrected-seed card).", "No DNA, cell program, neural control or tissue regeneration is implemented or implied."],
+            "equations": [], "sources": [{"label": "Protocol", "locator": art["protocol"]["path"] + " sha256 " + art["protocol"]["sha256"][:12] + "…"}, {"label": "Audit", "locator": art["audit"]["path"] + " sha256 " + art["audit"]["sha256"][:12] + "…"}],
+            "limitations": list(ix.get("limits", [])) + ["Computed result; empirical validation: " + str(ix["empirical_validation"]) + ". Not generalisation and not a biological regeneration result."],
+            "couplings": [], "manifest": f"{d}/index.json", "native": True})
     return cards
 
 
@@ -1464,7 +1593,7 @@ def build() -> dict[str, bytes]:
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
@@ -1482,6 +1611,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
+    print_law_index = print_laws(ins, extra, downloads)
     demos = demo_videos(ins, extra)
     diffusion = diffusion_pilot(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
@@ -1528,6 +1658,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
+        "print_laws": print_law_index,
         "demo_videos": demos,
         "diffusion_pilot": diffusion,
         "recovery_inputs": recovery_in,

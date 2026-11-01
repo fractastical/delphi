@@ -1,0 +1,1 @@
+The primary source parameter set and Eq5.2 cancel the hyperbolic term exactly. Preserve the conflict with the published S-shaped Fig8b/text. This protocol reproduces the printed equations, not the figure or the biological experiments. G200 is nondimensional; its dimensional analogue is shear modulus times area, not200Pa. No SI fin stiffness is inferred.

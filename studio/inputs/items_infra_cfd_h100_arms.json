@@ -1,0 +1,37 @@
+{
+  "run_tag": "infra33",
+  "items": [
+    {
+      "id": "h100-frozen-cuda-control-arms",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+      "args": [
+        "inputs/warm_queue_infra_cfd_h100_arms.json"
+      ],
+      "files": [
+        "frontier_compute/__init__.py",
+        "frontier_compute/portable_entry.py",
+        "frontier_compute/checkpoint_entry.py",
+        "frontier_compute/resumable_upload.py",
+        "artifacts/cfd-h100-arms/source.tar.xz",
+        "artifacts/cfd-h100-arms/portable.json",
+        "inputs/warm_queue_infra_cfd_h100_arms.json",
+        "runtime/capabilities.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "CFD3D_WORK": "/work/cfd-h100-arms",
+        "CFD3D_OUTER_BUDGET_S": "7200",
+        "CFD3D_EXPORT_BYTES_MAX": "2800000000",
+        "CFD3D_PACKET_SHA256": "b8f9543bd94e305243a02f3ae9037632f775992b839c50faecf23d27cbbd28dd"
+      },
+      "timeout": "3h",
+      "inner_timeout_s": 7900,
+      "max_result_bytes": 1000000,
+      "priority": 1
+    }
+  ]
+}

@@ -15,12 +15,26 @@
     const B = snap.biodesign;
     if (!B || !B.report) return { html: html`<section class="pagehead"><h1>Biodesign assemblies</h1><p class="empty">The compiler's report is not in this snapshot${B && B.refused.length ? " (a file did not match its declared hash: " + B.refused.join(", ") + ")" : ""}, so no assembly is shown.</p></section>` };
     const R = B.report; const ids = R.compiled.map((c) => c.assembly); const ax = (c, k) => c.axes[k] || {};
-    const detail = (a) => { const { status, reading, ...rest } = a; return Object.keys(rest).length ? plain(rest) : ""; };
+    // One short line per axis; the full fields sit in a disclosure, as a readable tree, never as a block of prose.
+    const pct = (x) => (typeof x === "number" ? (x * 100).toFixed(2) + "%" : "not stated");
+    const cnt = (o) => Object.entries(o || {}).map(([k, v]) => v + " " + k.replace(/ \(.*\)/, "")).join(", ");
+    const SUM = {
+      structural_refs: (a) => `${(a.pinned_ok || []).length} pinned files match their hashes${(a.failures || []).length ? "; " + a.failures.length + " do not" : ""}`,
+      units_context: (a) => `${cnt(a.counts)}; the registry models are not these variants`,
+      model_domain: (a) => a.reading || "not stated",
+      numerical: (a) => `CL change on refinement ${pct(a.CL_rel_change_48x16_to_72x24)}; ${a.frozen_threshold === null ? "no frozen threshold" : "threshold " + a.frozen_threshold}`,
+      empirical: (a) => ((a.calibrations_registered || []).length ? a.calibrations_registered.length + " calibrations registered" : "no calibration registered"),
+      implementation: (a) => "proposals only; no genome implied",
+    };
+    const tree = (v) => (v === null || v === undefined ? html`<span class="faint">not stated</span>` : Array.isArray(v) ? (v.length ? html`<ul class="astree">${v.map((x) => html`<li>${tree(x)}</li>`)}</ul>` : html`<span class="faint">none</span>`)
+      : typeof v === "object" ? html`<dl class="astree">${Object.entries(v).map(([k, x]) => html`<dt>${k.replace(/_/g, " ")}</dt><dd>${tree(x)}</dd>`)}</dl>` : html`${String(v)}`);
+    const cell = (c, k) => { const a = ax(c, k); const { status, reading, ...rest } = a; const line = (SUM[k] ? SUM[k](a) : reading) || "not stated";
+      return html`<td data-label="${HOME[c.assembly] || c.assembly}">${U.pill(status || "not stated", cls(status || ""))}<p class="small asline">${line}</p>${(Object.keys(rest).length || (reading && SUM[k] && k !== "model_domain")) ? html`<details class="asinspect"><summary class="small">Inspect checks</summary>${reading && SUM[k] && k !== "model_domain" ? html`<p class="small">${reading}</p>` : ""}${Object.keys(rest).length ? tree(rest) : ""}</details>` : ""}</td>`; };
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio/flying-fish")}">Studio</a> / assemblies</p><h1>Biodesign assemblies</h1><p class="lede">Three fish variants, each a bundle of pinned files: genetic blueprint, regulatory map, tissue interface, geometry, aerodynamics and behavior. The compiler checks six things about each bundle and keeps them apart.</p></section>
         <section class="panel"><p class="note warn small"><b>${U.pill("pinned files, not a genome", "warn")} ${U.pill("no single score", "warn")}</b> ${R.compiled[0].no_single_badge} No whole genome is designed here and no variant is shown to be biologically valid. ${B.assemblies[ids[0]].scope}.</p></section>
         <section class="panel" aria-labelledby="as-axes"><h2 id="as-axes">Six axes, kept separate</h2><div class="tablewrap"><table class="qtable asmatrix"><caption class="sr">Compiler axes for each assembly</caption><thead><tr><th scope="col">Axis</th>${R.compiled.map((c) => html`<th scope="col">${HOME[c.assembly] || c.assembly}</th>`)}</tr></thead><tbody>
-          ${AXIS_ORDER.map((k) => html`<tr id="axis-${k}"><th scope="row">${AXIS_LABEL[k]}</th>${R.compiled.map((c) => { const a = ax(c, k); return html`<td data-label="${HOME[c.assembly] || c.assembly}">${U.pill(a.status || "not stated", cls(a.status || ""))}<br><span class="small">${a.reading || detail(a)}</span></td>`; })}</tr>`)}</tbody></table></div>
+          ${AXIS_ORDER.map((k) => html`<tr id="axis-${k}"><th scope="row">${AXIS_LABEL[k]}</th>${R.compiled.map((c) => cell(c, k))}</tr>`)}</tbody></table></div>
           ${R.retained_failures.length ? html`<p class="note warn small" id="as-retained"><b>Retained failure.</b> ${R.retained_failures.map((f) => HOME[f] || f).join(", ")} stays in the comparison with its failure visible: its aerodynamic refinement did not converge, so its lift is listed but unusable.</p>` : ""}</section>
         <section class="panel" aria-labelledby="as-cmp"><h2 id="as-cmp">Matched comparison</h2><p class="small">${R.comparison.matched_conditions}. ${R.comparison.note}.</p><div class="tablewrap"><table class="qtable"><caption class="sr">Matched aerodynamic comparison</caption><thead><tr><th scope="col">Assembly</th><th scope="col">CL (paired fins, alpha 4)</th><th scope="col">Change on refinement</th><th scope="col">Usable for comparison</th><th scope="col">Status</th></tr></thead><tbody>
           ${R.comparison.rows.map((r) => html`<tr><td data-label="Assembly"><b>${HOME[r.assembly] || r.assembly}</b></td><td data-label="CL">${num(r.CL_paired_fins_alpha4_S_lattice)}</td><td data-label="Refinement change">${num(r.refinement_CL_rel_change)}</td><td data-label="Usable">${r.usable_for_comparison ? "yes" : U.pill("no", "no")}</td><td data-label="Status" class="small">${r.aero_status}</td></tr>`)}</tbody></table></div></section>
