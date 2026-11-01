@@ -114,6 +114,7 @@ def update_demo(rows, cfg):
 
 
 def run(out):
+    out = out.resolve()
     if out.exists():
         raise ValueError("Fresh output directory required")
     start = time.monotonic()
