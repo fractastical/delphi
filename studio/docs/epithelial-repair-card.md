@@ -73,8 +73,8 @@ All four pass.
 cell–medium interface energy and no protrusion — the gap still shrinks by **22.0%**.
 
 That is arithmetic, not biology. After removing 4 cells, 61 survivors at a 625-node target
-claim 38 125 of 40 000 nodes, so 1 875 nodes of the hole are filled by cells relaxing into
-volume they were already short of. The geometric floor is 25.0%; measured 22.0% sits just
+claim 38 125 of 40 000 nodes, so 625 nodes of the 2 500-node hole are filled by cells relaxing
+into volume they were already short of, and 1 875 nodes remain as the residual gap. The geometric floor is 25.0%; measured 22.0% sits just
 below it because the surface constraint holds cells slightly under target.
 
 **Every closure figure at *k*=4 must be read against this 22% floor.** The first revision's
@@ -134,7 +134,7 @@ Phi = lambda_V * A_gap^2 / (N_cells * J_cell_medium * P_gap),   P_gap = 2*sqrt(p
 **Held-out test (G9, passes).** Φ is linear in λ_V and inverse in J, so doubling J must
 double the threshold. Revision 1 bracketed the *k*=4 threshold at λ_V ∈ (0.3, 1.0) with
 J=140, predicting (0.6, 2.0) at J=280. Measured at J=280: closes at 0.3, 0.6, 1; arrests at
-2, 4 — bracket (1, 2), threshold **1.414**, inside the predicted interval. **No J=280
+2, 4 — bracket (1, 2), whose geometric mean is **1.414** (not an observed point threshold), inside the predicted interval. **No J=280
 measurement entered the prediction.**
 
 **Where it breaks (G12, fails).**
