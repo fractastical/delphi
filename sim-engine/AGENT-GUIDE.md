@@ -16,14 +16,14 @@ existed when this guide was last checked.
 | | Hosted `delphisci` MCP | Local `sim-engine` |
 |---|---|---|
 | What it is | The project's knowledge: claims, their maths, assessments, the claim graph, and (being added) the Lean law tools | The design and simulation backend: organism documents, edits, perturbation scenarios, optimisation, specs, codesign sessions, and the numeric models |
-| Where | `https://delphisci-mcp.fly.dev/mcp` (Streamable HTTP, no auth, 120 req/min per IP) | Your clone: `node sim-engine/server.mjs` (stdio) or `node sim-engine/http.mjs` (HTTP on 127.0.0.1) |
+| Where | `https://mcp.delphibio.org/mcp` (Streamable HTTP, no auth, 120 req/min per IP) | Your clone: `node sim-engine/server.mjs` (stdio) or `node sim-engine/http.mjs` (HTTP on 127.0.0.1) |
 | Source | `mcp/` in the repo (its own README) | `sim-engine/` (this folder) |
 | Start here if | you want to read what DELPHI claims and which laws are proved | you want to design, perturb or optimise an organism |
 
 **Collaborators should start with the hosted server.** It needs nothing installed. The `lean_*` law
 tools are being added to it in a versioned change. **Honest caveat:** the hosted copy serves `main` as
 of its last deploy, so it gains the `lean_*` tools only after that change merges to `main` upstream and
-the deploy workflow runs. Until then, check `https://delphisci-mcp.fly.dev/healthz` and `tools/list`;
+the deploy workflow runs. Until then, check `https://mcp.delphibio.org/healthz` and `tools/list`;
 if `lean_*` is not there, use the local sim-engine copy (section 7) or the static mirror at
 `/api/lean/` on the dashboard site, if it has been published. All three surfaces read laws through
 one loader (`lib/lean-source.mjs`), so they agree on law ids, versions and statuses. The mirror is
@@ -40,7 +40,7 @@ its best verdict is `candidate`, and acceptance needs a recorded human approval.
 Hosted (one line):
 
 ```bash
-claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp
+claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp
 ```
 
 Local sim-engine, from a clone, as a project `.mcp.json` entry at the repository root:
@@ -77,14 +77,14 @@ or `claude mcp add delphi-sim-engine -- node "$PWD/sim-engine/server.mjs"`. Run 
 ```
 
 For the hosted server in Claude Desktop or claude.ai, add a custom connector with the URL
-`https://delphisci-mcp.fly.dev/mcp`.
+`https://mcp.delphibio.org/mcp`.
 
 ### Any other MCP client
 
 - stdio: spawn `node sim-engine/server.mjs`, speak JSON-RPC 2.0 MCP on stdin/stdout. Call
   `initialize`, then `tools/list`, then `tools/call` with `{name, arguments}`. The envelope comes back
   both as `structuredContent` and as JSON text in `content[0].text`.
-- Streamable HTTP (hosted): POST JSON-RPC to `https://delphisci-mcp.fly.dev/mcp`.
+- Streamable HTTP (hosted): POST JSON-RPC to `https://mcp.delphibio.org/mcp`.
 
 ### No MCP at all: the HTTP bridge
 
@@ -109,7 +109,7 @@ curl -s -X POST 127.0.0.1:7341/tool/morphogen_diffusion \
 - Browsers: only `localhost`/`127.0.0.1` origins get CORS, plus any listed in
   `DELPHI_STUDIO_ORIGINS` (comma-separated). Any other Origin is refused, because some tools write
   session state. To let the deployed dashboard drive your local bridge, start it with
-  `DELPHI_STUDIO_ORIGINS=https://delphi-mission-control.ashenoy000.workers.dev`; the bridge answers
+  `DELPHI_STUDIO_ORIGINS=https://delphibio.org`; the bridge answers
   Chrome's Private Network Access preflight for listed origins.
 - Tools marked `local_only` in the contract (`lean_propose`, which runs a Lean build on a submitted
   file) are served only while the bridge is bound to loopback.
@@ -291,6 +291,6 @@ At this check:
 
 ### Static law mirror
 
-`/api/lean/` on the dashboard site (https://delphi-mission-control.ashenoy000.workers.dev/api/lean/), built by `dashboard/build-lean-api.mjs` from the same loader (`lib/lean-source.mjs`). Present in this working tree: start at `/api/lean/index.json` (the directory itself has no index page); `current.json` is the current lawset.
+`/api/lean/` on the dashboard site (https://delphibio.org/api/lean/), built by `dashboard/build-lean-api.mjs` from the same loader (`lib/lean-source.mjs`). Present in this working tree: start at `/api/lean/index.json` (the directory itself has no index page); `current.json` is the current lawset.
 
 <!-- tool-table:end -->

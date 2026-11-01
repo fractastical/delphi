@@ -32,7 +32,7 @@ const R = 'https://w3id.org/delphi/resource/';
 const AGENT = `${R}agent/delphisci-genotype-thread-claude-fable-5-1`;
 const MODEL = `${R}model/claude-fable-5-1`;
 const DOMAIN = `${R}domain/genotype-phenotype-mapping`;
-const LIVE = 'https://delphi-mission-control.ashenoy000.workers.dev/t/genotype/';
+const LIVE = 'https://delphibio.org/t/genotype/';
 const MAP = 'genotype/map.vetted.json';
 const mapSha = shaOf(MAP), mapSize = sizeOf(MAP);
 const esc = s => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r?\n/g, ' ');

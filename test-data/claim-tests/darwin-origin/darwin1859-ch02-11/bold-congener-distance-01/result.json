@@ -1,0 +1,85 @@
+{
+  "claim_id": "darwin1859-ch02-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch02-11",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "problem": "genus-size-vs-congener-difference",
+  "hypothesis": "If Darwin's remark (after Fries and Westwood) holds for insects, the amount of difference between species within a genus is smaller in larger genera: across insect genera, the mean pairwise COI-5P distance among congeneric species decreases with genus size (log10 of the number of described species in the genus), after removing differences between families.",
+  "pass_criterion": "Pre-registered (claim supported). In the primary analysis (unit = genus; outcome D = mean pairwise uncorrected COI-5P p-distance among 8 randomly drawn barcoded congeneric species, averaged over 100 seeded draws; predictor = log10 of genus size S, the number of species-rank children of the genus in Open Tree taxonomy OTT 3.7), the family-fixed-effects OLS slope of D on log10(S) is negative, its 95 % stratified-bootstrap confidence interval (10,000 resamples of genera within families, seed 20261101) lies entirely below 0, and the family-adjusted Spearman correlation (ranks of D and of log10(S) taken over all genera, family means subtracted, Pearson correlation of the residuals) is at most -0.20.",
+  "fail_criterion": "Pre-registered (claim refuted for this reading). The family-fixed-effects slope of D on log10(S) has a point estimate of 0 or above (no tendency for larger genera to have smaller differences), or its 95 % bootstrap CI lies entirely above 0 (larger genera differ more). If the point estimate is negative but the 95 % CI includes 0, or the CI lies entirely below 0 but the family-adjusted Spearman correlation is above -0.20 (a negative but negligible association), the verdict is 'mixed'. The verdict is 'inconclusive' with reason 'underpowered' if fewer than 40 genera qualify (at least 8 named species with a COI-5P sequence of 500 or more unambiguous bases), if fewer than 5 families contribute at least 3 qualifying genera each, or if the largest S among qualifying genera is less than 10 times the smallest; with reason 'data-unavailable' if BOLD or Open Tree cannot be queried as planned, or if no aligner is available (see method note in test_contract.inference_method).",
+  "planned_datasets": [
+    "bold-systems",
+    "open-tree-of-life"
+  ],
+  "datasets": [
+    {
+      "id": "bold-systems",
+      "name": "BOLD Systems v5 public portal API (portal.boldsystems.org)",
+      "landing_url": "https://www.boldsystems.org/",
+      "doi": null,
+      "version": "unversioned live service; the retrieval timestamp and per-file SHA-256 are recorded at fetch time",
+      "license": null,
+      "license_note": "The scout record gives no licence for BOLD and none was verified for this registration; the BOLD data-use terms must be checked and recorded before the run. No BOLD data are redistributed in the repository.",
+      "files": [
+        {
+          "name": "per-genus specimen table (TSV) for each genus in the frozen genus list",
+          "download_url": "https://portal.boldsystems.org/api/query?query=tax:genus:<GENUS>&extent=full  ->  returns {query_id, extent_limit}; then https://portal.boldsystems.org/api/documents/<query_id>/download?format=tsv",
+          "note": "extent=full returned extent_limit null in a metadata request made before registration; without extent=full the scout saw extent_limit 1000. The TSV header (processid, bin_uri, genus, species, marker_code, nuc, ...) was confirmed by the scout on one genus (first 2.5 KB). Marker filtering is done client-side on marker_code == COI-5P because the query-string syntaxes tried for a combined taxon-and-marker query (';' and a space) returned an error and an empty object respectively. Files over 1 MB are not committed; the fetch script and SHA-256 are."
+        },
+        {
+          "name": "per-genus summary (JSON), used only to list named species and specimen counts",
+          "download_url": "https://portal.boldsystems.org/api/summary?query=tax:genus:<GENUS>&fields=species,bins,specimens",
+          "note": "Returned {counts:{species,specimens}, species:{name:count,...}} for the one genus tried before registration. fields=genus on a family query returned an empty object, so genera cannot be enumerated from BOLD's summary endpoint; Open Tree supplies the genus list."
+        }
+      ],
+      "role": "COI-5P barcode sequences per named species within genus, from which pairwise genetic distances among congeners are computed"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life taxonomy OTT 3.7 (ott3.7draft3), v3 API",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "doi": null,
+      "version": "ott3.7draft3 (taxonomy/about, verified by the scout on 2026-11-01); synthetic tree opentree16.1 is not used",
+      "license": null,
+      "license_note": "No licence is recorded in the scout record; to be checked before the run.",
+      "files": [
+        {
+          "name": "genus and species-rank children per family",
+          "download_url": "POST https://api.opentreeoflife.org/v3/taxonomy/taxon_info with {\"ott_id\": <family OTT id, resolved with POST /v3/tnrs/match_names>, \"include_children\": true}, then the same call per genus",
+          "note": "The taxonomy/about and tnrs/match_names endpoints were verified by the scout; taxon_info with include_children was NOT exercised before registration, so the exact response shape is unverified. If it fails, the deviation rule in caveats applies."
+        }
+      ],
+      "role": "genus membership and genus size S (count of species-rank children, excluding children flagged as extinct, incertae sedis, hybrid or environmental in OTT's own flags), independent of how many species have barcodes"
+    }
+  ],
+  "test_contract": {
+    "expected_observation": "Among insect genera that are barcoded for at least 8 named species, the mean pairwise COI-5P distance among 8 randomly chosen congeners falls as genus size rises, within families: a negative family-adjusted slope whose 95 % interval excludes 0 and a family-adjusted rank correlation of at most -0.20.",
+    "disconfirming_observation": "A family-adjusted slope of 0 or above, or an interval entirely above 0: species in large insect genera are no closer to one another, and possibly further apart, than species in small genera.",
+    "admissible_datasets": "Public records of homologous barcode sequences identified to named species within genera, with an independent species-count for each genus taken from a taxonomy that does not depend on those sequences (so that genus size is not the number of species a lab happened to barcode). Insect genera only for the primary analysis, because COI is not a usable plant barcode and TRY (plants) is not open without registration. Genus size and distances must come from different sources.",
+    "inference_method": "Genus list: families fixed now (Carabidae, Curculionidae, Chrysomelidae, Cerambycidae, Noctuidae, Geometridae, Tortricidae, Formicidae); every genus-rank child of each family in OTT 3.7 with a binomial-bearing, non-provisional name. For each genus keep records with marker_code COI-5P, 500 or more unambiguous bases, and a species name that is a clean binomial (two words, second word all lowercase letters, no 'sp.', 'cf.', 'aff.', digits or BOLD provisional codes). A genus qualifies if it has 8 or more such species. For each qualifying genus, 100 draws (numpy RandomState seed 20261101, advanced per genus in alphabetical order) of 8 species and one qualifying sequence per species; sequences aligned per draw with MAFFT v7 (--auto); p-distance = proportion of differing sites among sites with no gap or ambiguity in either sequence, requiring at least 400 compared sites per pair; D = mean over the 28 pairs, then over the 100 draws. Genus size S = number of species-rank children of the genus in OTT 3.7; predictor x = log10(S). Primary statistic: OLS of D on x with family fixed effects; 95 % CI from a bootstrap that resamples genera within each family (10,000 resamples, seed 20261101); plus the family-adjusted Spearman correlation defined in pass_criterion. Thresholds are exactly those in pass_criterion and fail_criterion: slope sign and CI against 0, rho against -0.20, minimum 40 genera. If MAFFT is not installed, the run is 'inconclusive' / 'data-unavailable' unless the TSV nuc strings are already aligned (contain '-' at consistent positions), in which case they are used as supplied and the deviation is recorded."
+  },
+  "secondary_analyses_descriptive": [
+    "The same model with the mean nearest-neighbour p-distance among the 8 drawn species instead of the mean pairwise distance, reported with the caveat that sampling 8 of S species mechanically lengthens nearest-neighbour distances in larger genera.",
+    "Darwin's contrast stated as two groups: genera in the top versus bottom tercile of S within each family, difference in median D with a family-stratified permutation test (10,000 permutations).",
+    "The same slope with S taken as the number of clean-binomial species in the BOLD summary instead of the OTT count, to show how much the result depends on where genus size comes from.",
+    "A genus-age control: the slope after adding the maximum within-genus pairwise distance as a rough age covariate is NOT planned because it is a function of the outcome; instead, if the Open Tree synthetic tree gives a crown age for at least 30 qualifying genera, the slope is reported with that age as a covariate. This is descriptive only and not used for the verdict.",
+    "Per-order slopes (Coleoptera, Lepidoptera, Hymenoptera) to check that no one order drives the pooled result."
+  ],
+  "interpretation": "Darwin's 'amount of difference between the species' meant morphological difference, judged by a naturalist; he tested it 'numerically by averages' on plants and (via Westwood) insects, with results he called imperfect. The test maps 'large genera' to genera with large S, a count of described species in a genus (a continuous predictor, not a binary split), and 'amount of difference between species' to the mean pairwise uncorrected COI-5P distance among 8 randomly drawn named species of the genus. This is a MODERN REINTERPRETATION: a mitochondrial barcode is not the characters Darwin compared, and genetic distance need not track morphological distance. The 'species resemble varieties more than do those of small genera' half of the claim (that the same differences are varietal) is not tested; nor is the plant half of the claim's scope, since COI is not a plant barcode and the plant trait route (TRY) requires registration. Fixing the number of species per genus at 8 removes the dependence of the mean pairwise distance on how many species are barcoded, but not the dependence of the dataset on which species are barcoded (barcoding is uneven by region and group). Genus size and genus delimitation are themselves taxonomic judgments: if taxonomists split or lump on the same kind of difference that Darwin observed, the association is partly built into the classification (Darwin's own caveat about 'doubtful forms'), and the test cannot remove this. It also cannot separate 'large genera contain close species' from 'large genera are younger'.",
+  "caveats": [
+    "What was inspected before registering (metadata only, 6 requests, nothing downloaded beyond JSON of at most a few KB): (1) BOLD summary for genus Carabus returned {counts:{species:890, specimens:4003}} plus a per-species specimen-count dictionary (names and counts for the whole genus were displayed in the response; these include provisional names and were not examined or counted by species); (2) BOLD summary with fields=genus on family Carabidae returned {}; (3) a combined taxon-and-marker query using ';' returned HTTP 500; (4) the same with a space returned {}; (5) /api/query with extent=summary was rejected (allowed: zero, limited, large, full); (6) /api/query?query=tax:genus:Carabus&extent=full returned a query_id and extent_limit null. No sequence, no distance, no genus size from OTT, and no statistic was computed or viewed. The scout record (earlier, read-only here) reported TSV headers and the first row of Drosophila.",
+    "Prior knowledge of the likely outcome: the author of this registration has no firm expectation. There is literature on taxonomic oversplitting and on genus age and diversification that bear on the sign, and a genus-age effect (older genera are both larger and more divergent) would push the slope positive, whereas oversplitting of large genera would push it negative. A pass, a mixed result and a refutation are all plausible, and the thresholds were fixed from the claim's own wording (a decrease of difference with size), conventional 95 % intervals and a conventional small-to-moderate rank-correlation cutoff (0.20), not from any data.",
+    "The families, the number of species per draw (8), the minimum sequence length (500 bases), the 400-site pair minimum, the number of draws (100), the minimum of 40 genera and the 0.20 cutoff are choices made now and not tuned. The family list was chosen for being large, well-barcoded insect families spanning three orders; BOLD coverage of each family was not checked.",
+    "Unverified plumbing: the Open Tree taxon_info endpoint with include_children, the species-rank filter and the flags used to exclude non-species children; MAFFT availability on the runner; whether BOLD's TSV includes sequences with gaps. A deviation, recorded in a 'deviations' field before any statistic is computed, is allowed for these only: if OTT cannot supply genus size, the primary predictor becomes the number of clean-binomial species in BOLD's summary for the genus (a sampling-affected count, noted as a weaker test); if a family cannot be enumerated, it is dropped and the family-count rule is re-applied unchanged.",
+    "Barcoded genera are a non-random sample of all insect genera (well-studied temperate groups are over-represented), and the requirement of 8 barcoded species excludes small genera by construction, so the contrast is between medium and very large genera, not 'small' genera in Darwin's sense. This weakens the test of the claim as stated; it is stated here because the minimum is needed for the distance estimate.",
+    "COI p-distance saturates at high divergence and is affected by mitochondrial introgression, Wolbachia sweeps and misidentification of specimens in BOLD, none of which is corrected here.",
+    "The test does not show that species in large genera resemble varieties more than those of small genera, does not cover plants, and says nothing about morphology."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "prereg-darwin-batch-1",
+    "date": "2026-11-01"
+  }
+}

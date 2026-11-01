@@ -27,7 +27,7 @@ const owner = arg('owner', null);
 if (owner && !/^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(owner)) throw new Error('--owner must be an https://orcid.org/… IRI');
 const ref = commit || 'main';
 const REPO = 'https://github.com/fractastical/delphisci';
-const SITE = 'https://delphi-mission-control.ashenoy000.workers.dev/t/lean';
+const SITE = 'https://delphibio.org/t/lean';
 const blob = p => `${REPO}/blob/${ref}/${p}`;
 
 const R = JSON.parse(fs.readFileSync(path.join(root, 'dashboard/public/t/lean/lean.json'), 'utf8'));

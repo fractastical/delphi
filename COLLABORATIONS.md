@@ -1,7 +1,7 @@
 # Collaboration log
 
 Who we have worked with or pointed at delphisci, when, and what came of it, plus what the hosted
-MCP server (`https://delphisci-mcp.fly.dev/mcp`) records about its use. Times are UTC, with
+MCP server (`https://mcp.delphibio.org/mcp`) records about its use. Times are UTC, with
 US Eastern (UTC-4) in brackets where the source showed local time. Add new entries at the bottom
 of each table.
 
@@ -19,6 +19,28 @@ of each table.
 | 2026-10-31 18:12 | PiXlRAM (human-pixlram) | SentiLab room; Discord 15:42 [11:42] | Posted a closed-loop CNC manufacturing project (milled-slot width) and asked for multi-agent collaborators. Not biology; no exchange with us. | Contact |
 | 2026-10-31 23:01 – 2026-11-01 07:42 | SentiLab team (aneta-claude, sentilab-host, pocket-forge), Carter-ChatGPT, ScienceClaw team | SentiLab room, tickets `897c7563` and `ba58c374` | Delfie answered both research tickets. 897c7563: reproduced TAP-2.5D's published 75.48 / 115.94 °C from SentiLab's `case.json` with HotSpot 6.0, showed HotSpot 7.0 gives 123.42 / 232.67 °C on identical inputs because its detailed-3D vertical link carries the sink's convection share, and posted a 9-line patch (78.77 / 125.52 °C after) plus a reproduction harness (v1 #57314, v2 with receipts #57872 after Carter-ChatGPT's review); ScienceClaw re-ran the patch independently (PASS, #57666/#57668, byte-identical outputs #57883) and Team Vortex on ARM (reply under #57881); Delfie then ran the SuperLU solver path (#58029, same fix applies) and guarded Variant 2 (#58035). Rows 1–3, 7, 11, 18 of the overnight re-run table (#58018). ba58c374: Kannan et al. MICRO 2015 gives the CPU–DRAM arrangement only, no coordinates or powers (#57597, re-derived by ScienceClaw #57820). SentiLab's slides credit "Delfie (delphisci team)". Both tickets closed as solved by the host (#57756). | Done |
 | 2026-10-31 19:00 [15:00] | Fittest MCP (Pavel-Tk) | Announcement shared with Joel; [issue #57](https://github.com/fractastical/delphi/issues/57) | ML-potential trust-or-DFT router. We ran a pilot against the hosted server and borrowed its routing design for assessor truth scores (`plugins/fittest/`). Feedback for them: sparse calibration buckets pass on the posterior mean (a 2× stretched C–O bond trusted at 0.67 on 3 labels). | Not contacted yet |
+
+## Agent networks (Moltbook, The Colony, Science Claw forum, Discord)
+
+Delfie's four Moltbook posts (`plugins/agent/moltbook-drafts.json`) drew replies from nine outside
+agents; participants re-read live on 2026-11-01 15:23 UTC (Delfie karma 20). What each objection
+changed is recorded in the file named in the last column.
+
+| Agent | Thread | What they contributed | What it changed |
+|---|---|---|---|
+| vina | `e06b5458` (intro) | Asked for a null: run the junction statistics on segmenter output for synthetic tilings with known non-hexagonal packing | Segmenter-bias null run (`claim-sources/cell-geometry/results/segmenter-bias/`); `thompson1917-ch07-04` confidence 0.60 → 0.35 (`revisions[0]` in its `result.json`), later re-based on expert-segmented Drosophila epithelia (`revisions[1]`) |
+| hivefound | `e06b5458` | Expected observation, disconfirming observation, admissible data and inference method as separate fields; keep revisions as new records | The test contract fields in `result.json`; revisions as `prov:Activity` in `test-data/claim-tests/build-test-nanopubs.mjs` |
+| nanoswarm | `9ff17185` (segmenter bias) | Blur alone curves wall ridges toward Y near a vertex; fit lines in an annulus and sweep its radius on synthetic tilings first | Planned ridge re-measurement in `ch07-04` `inference_method` |
+| doctor_memory | `e06b5458`, `9ff17185` | Fisher's theorem has no single reading; tag formalizations; 25-record assessment batch with unmarked seeds; synthetic CV sweep before clinical images | `formalization` tag on all 23 math claims (commit `912fbea9`); Hardy–Weinberg and Price added to `math-bio-claims`; batch `test-data/organisms/assessment/batches/doctor-memory-01.json` (scores not yet returned) |
+| grokbot_polymath | `1154e21c` (cornea pre-registration) | Annotation noise alone produces the negative slope the design called confirmation; rodrep.com spelling | Contract amended before any clinical image was opened (`amend-cornea-grokbot` in the drafts file) |
+| yuigui | `e9010612` (Darwin large genera) | Namer effort sits on both sides of the regression; registered a prediction (holds without control, shrinks with occurrences, mostly gone with authority count) | Three-model contract with namer-effort rates and per-source stratification (`amend-darwin-yuigui`); prediction to be recorded beside the result |
+| sheeshscout | `e06b5458` | Seed known records into each dataset-assessment batch | `test-data/organisms/assessment/seeds.json` |
+| nyna, anandanode | `e06b5458`, `e9010612` | Welcome; discussion of the attention confound | Nothing to change |
+
+Every agent whose objection changed a design is `dct:contributor` in the provenance of the resulting
+nanopub. The other networks so far: The Colony (`@delfie`, 2 posts, karma 4, 6 unread; nothing has
+changed a file), the Science Claw forum (20 posts, one registered agent, which is ours, 0 comments at
+`/healthz` on 2026-11-01) and Discord (two people said they would try the MCP; unconfirmed, see above).
 
 ## Agents
 

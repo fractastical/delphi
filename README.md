@@ -6,6 +6,8 @@
 
 **DELPHI**: **D**istributed **E**pistemic **L**ayer for **P**robabilistic **H**ypothesis **I**nference. Created for **Science Claw Hack @ MIT**.
 
+Public addresses: [delphibio.org](https://delphibio.org) (site), [`mcp.delphibio.org/mcp`](https://mcp.delphibio.org/mcp) (agents), [forum.delphibio.org](https://forum.delphibio.org) (forum).
+
 ## Goal
 
 Find the **fundamental theorems of biology**: general laws that hold across organisms, scales and systems, stated precisely enough to test. To get there we:
@@ -20,14 +22,14 @@ A machine-checked proof shows a theorem follows from its assumptions, not that l
 
 ## Connect via MCP
 
-The hosted `delphisci` MCP server (Streamable HTTP, no install or auth) searches claims, their math, assessment rankings and organisms: [`https://delphisci-mcp.fly.dev/mcp`](https://delphisci-mcp.fly.dev/mcp)
+The hosted `delphisci` MCP server (Streamable HTTP, no install or auth) searches claims, their math, assessment rankings and organisms: [`https://mcp.delphibio.org/mcp`](https://mcp.delphibio.org/mcp)
 
 ```json
-{ "mcpServers": { "delphisci": { "url": "https://delphisci-mcp.fly.dev/mcp" } } }
+{ "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }
 ```
 
 - **Cursor**: add the JSON to `~/.cursor/mcp.json`, or open this repo ([`.cursor/mcp.json`](.cursor/mcp.json)).
-- **Claude Code**: `claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp`
+- **Claude Code**: `claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp`
 - **claude.ai / ChatGPT**: add a custom connector with the URL.
 - **Self-host**: `npx -y github:fractastical/delphi`, or `npm install && node mcp/server.mjs` from a clone (also sees unpushed drafts).
 
@@ -36,10 +38,10 @@ The hosted server serves `main` as of the last deploy. Tools and ranking semanti
 ## Progress at a glance
 
 <p align="center">
-  <a href="https://delphisci-mcp.fly.dev/docs/team.html"><img src="docs/team/team.gif" alt="Animated tour of the team page" width="800"></a>
+  <a href="https://mcp.delphibio.org/docs/team.html"><img src="docs/team/team.gif" alt="Animated tour of the team page" width="800"></a>
 </p>
 
-The [team page](https://delphisci-mcp.fly.dev/docs/team.html) is the quick tour: hover a pattern for its claims and tested species, or the right-edge tab for its knowledge graph (thinkers, claims, AI assessors, Lean proofs, data tests, MorphoEval audits).
+The [team page](https://mcp.delphibio.org/docs/team.html) is the quick tour: hover a pattern for its claims and tested species, or the right-edge tab for its knowledge graph (thinkers, claims, AI assessors, Lean proofs, data tests, MorphoEval audits).
 
 ### Current numbers
 
@@ -62,12 +64,49 @@ Every tested claim with its verdict: [`test-data/claim-tests/SUMMARY.md`](test-d
 
 **Collective vs. single agent.** On 20 pre-registered Darwin and Thompson test plans, every multi-agent arm beat a single agent by at least 4 of 20 verified datasets in both experiments, with no fabricated identifiers; the arms are indistinguishable from each other at n=20, and the single agent costs a fifth to a tenth as much. Details: [`test-data/agent-comparison/SUMMARY.md`](test-data/agent-comparison/SUMMARY.md).
 
-### Snapshots
+### What we did, day by day
 
-- [Everything so far](assets/repo-snapshot.png) and the [animated commit history](assets/repo-history.gif) of the opening evening.
-- [Organisms overnight](assets/organisms-overnight.gif): 782 taxa, 3,340 mentions and 1,372 dataset records, merged in [`test-data/organisms/`](test-data/organisms/README.md).
-- [Overnight, Oct 31 → Nov 1](assets/overnight-nov1.gif): Aristotle's 566 claims, 21 data tests, the faithfulness gate, 1,496 nanopubs to the test registry, the four-arm comparison and the first open-problem run, hour by hour.
-- [Nebius](assets/nebius-snapshot.png): Cellpose-SAM segmented micrographs from seven species to test three cell-packing claims ([`cell-geometry`](claim-sources/cell-geometry/README.md)).
+The animations are the short version of each stretch. The same stretches, with the figures printed on the cards, are logged in [`DAY-BY-DAY.md`](DAY-BY-DAY.md). The design thread's decisions, failures and corrections are in [`DEVELOPMENT-RECORD.md`](DEVELOPMENT-RECORD.md).
+
+#### Friday, Oct 30 — opening evening
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#friday-oct-30"><img src="assets/repo-history.gif" alt="Commit-by-commit animation of Friday Oct 30, from 18:40 to midnight" width="800"></a>
+</p>
+
+The repo, the goal, Darwin, Thompson, Wolfram, the claim graph and the MCP server, in one evening. [Log](DAY-BY-DAY.md#friday-oct-30).
+
+#### Saturday, Oct 31 — organisms overnight, then the claim ladder
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#saturday-morning"><img src="assets/organisms-overnight.gif" alt="Sixteen cloud agents merging animal taxa from 00:30 to 01:40 on Oct 31" width="800"></a>
+</p>
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#saturday-midday"><img src="assets/claims-status.gif" alt="Claims, blind confidence, data tests and theorems as of Saturday midday" width="800"></a>
+</p>
+
+Sixteen cloud agents, one per chapter slice, merged by 01:40: 782 taxa, 3,340 mentions, 1,372 dataset records ([`test-data/organisms/`](test-data/organisms/README.md)). The midday card is the scoreboard after the claim-test swarm: 880 claims, 132 tested against public data, 16 proved as theorems. Stills from that morning: [everything so far](assets/repo-snapshot.png) and the [Nebius cell-geometry run](assets/nebius-snapshot.png) (Cellpose-SAM on seven species, [`cell-geometry`](claim-sources/cell-geometry/README.md)). [Organisms log](DAY-BY-DAY.md#saturday-morning), [claims log](DAY-BY-DAY.md#saturday-midday).
+
+#### Saturday, Oct 31, 13:09–15:50
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#saturday-afternoon"><img src="assets/since-1309.gif" alt="What changed between 13:09 and 15:50 on Oct 31: Levin, production nanopubs, theorems" width="800"></a>
+</p>
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#saturday-afternoon"><img src="assets/delphi-summary.gif" alt="Standing card at 15:50 on Oct 31: 1,190 claims, 880 live, 63 theorems, 133 tested" width="800"></a>
+</p>
+
+Levin's 16 papers (310 claims), Thompson and Wolfram onto production (372 → 880 live nanopubs), theorems 16 → 63 once the Lean-checked Thompson claims count. [Log](DAY-BY-DAY.md#saturday-afternoon).
+
+#### Saturday night into Sunday morning
+
+<p align="center">
+  <a href="DAY-BY-DAY.md#overnight"><img src="assets/overnight-nov1.gif" alt="Hour-by-hour animation from Oct 31 16:08 to Nov 1 09:54" width="800"></a>
+</p>
+
+16:08 on Oct 31 to 09:54 on Nov 1. Aristotle's 566 claims, 21 pre-registered tests, the faithfulness gate, 1,496 nanopubs to the test registry, theorems 63 → 91, and the first open-problem run. [Log](DAY-BY-DAY.md#overnight).
 
 ## The wings: a model next to the real thing
 
@@ -102,7 +141,20 @@ Two repos by Kris Ganjam ([@kganjam](https://github.com/kganjam)), built at the 
   - Five cases where review by a second session changed a decision (a retracted 0.50 misclassification claim, two compiler input holes, stale cache passes, a contributor count corrected from 4 to 11, a control that could not fail), with their caveat that all reviewers share one git identity and the counterfactual is unknown.
   - 1,252 commits across the four repositories in one day by their audit: delphi-frontier 1,102, this repo 136, delphi-portal 8, morpholib-delphi-branch 6.
 
+  **Their git history, beside ours.** `node swarm/frontier/git-history.mjs` clones their default branch and lines its `git log` up with ours hour by hour on the Boston clock the day-by-day cards use: every commit in [`swarm/frontier/git-history.json`](swarm/frontier/git-history.json), the reading per stretch (first and last commit, their pre-registration, correction, Lean and Delphi-import commits quoted and linked) in [`swarm/frontier/GIT-HISTORY.md`](swarm/frontier/GIT-HISTORY.md), and the hour table at the [end of `DAY-BY-DAY.md`](DAY-BY-DAY.md#frontier). Their repository opens at 10:49 on Saturday Oct 31, sixteen hours after ours; their `frontier_adapters` and bulk-import commits land in the same hour as the adapter sessions in our MCP log.
+
   **Reuse documented from both ends.** Their adapter's import is visible in our MCP log as the `frontier-adapters` client, 30 sessions on Oct 31 ([`COLLABORATIONS.md`](COLLABORATIONS.md)); their node is an MCP server in our `.cursor/mcp.json`. What does not exist yet, on either side, is a result that crosses the boundary: a Delphi claim test run through their simulators, or a Frontier record citing a Delphi verdict. The two records are complementary: this repo holds the claims, proofs, data verdicts and the measured four-arm swarm comparison; Frontier holds the live node, compute receipts and contributor audit.
+
+## Sponsor services: what we used
+
+One file per sponsor in [`sponsors/`](sponsors/README.md) states what the service was used for, where the record is, and what was not done. Every figure below is read from the file it names.
+
+| Sponsor | What we used it for | Record |
+|---|---|---|
+| **NVIDIA** | A Brev L40S instance served a self-hosted Qwen3-32B (vLLM) assessor that scored all 566 Aristotle claims for dataset resolvability, giving the pipeline an assessor provider no builder shares at zero per-token cost. The BioNeMo ESMFold NIM was called on bovine albumin and refused (HTTP 401, no `nvapi-` key); the refusal is recorded as a run and as unsigned nanopub drafts. ProteinMPNN, RFdiffusion, Evo2 and ESMFold NIMs are wired into the design studio but never exercised against a live key. | [`sponsors/NVIDIA.md`](sponsors/NVIDIA.md); `scripts/assess/`, `organism-design/esmfold/runs/P02769/` |
+| **OpenResearch** (alphaXiv `orx`) | Literature grounding, made a release requirement in `AGENTS.md` role A2. `orx discover` runs, logged with command, time and returned records, for six headline claim tests (5 of 6 already answered by prior work, so they are reported as reproductions), the 59-search prior-art report that found Phenoscape as the closest prior work and ruled out "first formal verification of biology", the flying-fish physics thread, and the open-problems catalogue. Citations come only from searches that returned them. | [`sponsors/OPENRESEARCH.md`](sponsors/OPENRESEARCH.md); `test-data/claim-tests/openresearch/`, `research/prior-art/` |
+| **Nebius** | The Scientific AI Platform ran Cellpose (CPSAM v2) in 19 operations on eight tissue micrographs and eleven synthetic tilings to test three Thompson cell-packing claims (`thompson1917-ch07-04/08/10`); every mask carries its Nebius operation ID, and the synthetic null cut the ch07-04 confidence from 0.60 to 0.35. ESMFold2 jobs (23 operations) were submitted for three pre-registered Levin tests, whose verdicts are not yet computed. | [`sponsors/NEBIUS.md`](sponsors/NEBIUS.md); `claim-sources/cell-geometry/`, `plugins/nebius/` |
+| **Formlabs** | Two 140 mm SLA prints of the same dragonfly hindwing, one with the real vein network and one with Hoffmann 2018 model venation ([#58](https://github.com/fractastical/delphi/issues/58), [photo above](#the-wings-a-model-next-to-the-real-thing)); no measured print-vs-design agreement yet. Several copies of the flying zebrafish (`fabrication/flying-zebrafish/out/`, 80 mm SL zebrafish body with Exocoetidae wings, built by a six-agent swarm to the Form 3/4 spec) were also printed; the project lead has them, and a photograph is still to be added to `assets/`. Designed to Formlabs SLA specifications and verified as geometry but not printed: the 71-file winged-zebrafish kit (Tough 2000, 0.5 mm walls) and a pre-registered printed test of a Lean-proved bilayer law. | [`sponsors/FORMLABS.md`](sponsors/FORMLABS.md); `anatomy-model/print/`, `fabrication/flying-zebrafish/` |
 
 ## Repository layout
 
@@ -110,6 +162,7 @@ Two repos by Kris Ganjam ([@kganjam](https://github.com/kganjam)), built at the 
 - [`test-data/`](test-data/): claim tests, organism reference datasets, model truth scores.
 - [`scripts/`](scripts/): executable claims, release status, site build.
 - [`plugins/`](plugins/): Nebius, Fittest and the Discord/Moltbook agent.
+- [`sponsors/`](sponsors/README.md): what each sponsor service (NVIDIA, OpenResearch, Nebius, Formlabs) was used for, with the file that records it.
 - [`mcp/`](mcp/README.md), [`forum/`](forum/README.md), [`docs/`](docs/): the MCP server, the agent forum (agents begin at `/skill.md`; `npm run forum`) and the built claim-graph site.
 
 Before building or publishing nanopubs, read [BEST_PRACTICES.md](BEST_PRACTICES.md) (adapted from the Project Delphi Ontology's publishing guide).
@@ -122,16 +175,16 @@ Team roles and deadlines are in [#53](https://github.com/fractastical/delphi/iss
 covers the genotype–phenotype, validation and MCP-testing work (Amit's row) and the agent threads that
 produce it. Everything below is built from repository files by scripts; no figure is typed by hand.
 
-**Start here:** https://delphi-mission-control.ashenoy000.workers.dev/start/ — one page that reads every
+**Start here:** https://delphibio.org/start/ — one page that reads every
 thread's status live.
 
 | Page | What it shows |
 | --- | --- |
-| [Knowledge graph](https://delphi-mission-control.ashenoy000.workers.dev/graph/) | Claims, data tests from both agent swarms, Lean theorems, datasets, taxa, the flying-fish blueprint, open problems and candidate answers, with provenance on every node. `?view=theorems` clusters open problems by the claims their theorems formalise. |
-| [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
-| [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
-| [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
-| [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
+| [Knowledge graph](https://delphibio.org/graph/) | Claims, data tests from both agent swarms, Lean theorems, datasets, taxa, the flying-fish blueprint, open problems and candidate answers, with provenance on every node. `?view=theorems` clusters open problems by the claims their theorems formalise. |
+| [Claim Book](https://delphibio.org/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
+| [Figures](https://delphibio.org/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
+| [Deck](https://delphibio.org/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
+| [Lean](https://delphibio.org/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
 
 **Where things live**
 
@@ -179,14 +232,14 @@ candidate with a new binding violation and says "no design meets the spec" when 
 
 Three ways in:
 
-- **In the browser:** [Open the Fish, Perturb & optimise mode](https://delphi-mission-control.ashenoy000.workers.dev/blueprint3d/explode.html?mode=perturb)
+- **In the browser:** [Open the Fish, Perturb & optimise mode](https://delphibio.org/blueprint3d/explode.html?mode=perturb)
   on the dashboard (standalone harness: `/blueprint3d/perturb`). It runs the same engine code as the server, copied by
   `dashboard/build-engine.mjs`.
 - **From your own agent or shell (local):** the `sim-engine` MCP server (`node sim-engine/server.mjs`, stdio), its CLI
   (`node sim-engine/cli.mjs`, `node sim-engine/lean-cli.mjs`) and its HTTP bridge (`node sim-engine/http.mjs`, localhost
   only). Start with [`sim-engine/AGENT-GUIDE.md`](sim-engine/AGENT-GUIDE.md); the contract is
-  [`sim-engine/CONTRACT.md`](sim-engine/CONTRACT.md) and the page [`/studio-api/`](https://delphi-mission-control.ashenoy000.workers.dev/studio-api/).
-- **Hosted:** the `delphisci` MCP server (`claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp`).
+  [`sim-engine/CONTRACT.md`](sim-engine/CONTRACT.md) and the page [`/studio-api/`](https://delphibio.org/studio-api/).
+- **Hosted:** the `delphisci` MCP server (`claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp`).
   Version 0.3.0 in [`mcp/`](mcp/README.md) adds the `lean_*` law tools (`lean_laws_list`, `lean_law_get`,
   `lean_lawset_get`, `lean_check`, `lean_verify`). The hosted copy serves `main` as of its last deploy, so check its
   `tools/list` before relying on them; a read-only mirror of the laws is at `/api/lean/` on the dashboard.
@@ -223,7 +276,7 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 
 ## Nanopublication resources
 
-To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server ([setup](#connect-via-mcp)) or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md). Live team dashboard: https://delphi-mission-control.ashenoy000.workers.dev/start/
+To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server ([setup](#connect-via-mcp)) or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md). Live team dashboard: https://delphibio.org/start/
 
 - [Nanodash](https://nanodash.knowledgepixels.com/): browse, search and publish in the browser.
 - [Nanopub Query](https://query.knowledgepixels.com/) ([docs](https://github.com/knowledgepixels/nanopub-query)): SPARQL endpoints over the network.

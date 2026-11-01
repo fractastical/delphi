@@ -1,5 +1,5 @@
 {
- "built": "2026-11-01 14:34",
+ "built": "2026-11-01 15:21",
  "claims": [
   {
    "id": "darwin1859-intro-01",
@@ -72208,18 +72208,18 @@
    ],
    "formalization": null,
    "evidence": "supports",
-   "evidence_kind": "computational",
+   "evidence_kind": "biological",
    "data_test": {
     "verdict": "supports",
-    "confidence": 0.95,
+    "confidence": 0.4,
     "preregistered": true,
-    "data_kind": "computational",
-    "path": "test-data/claim-tests/plant-hygromorph-mechanics/hygromorph-bilayer-curvature/marom-crosscheck-01/result.json",
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/plant-hygromorph-mechanics/hygromorph-bilayer-curvature/result.json",
     "test_contract": {
-     "expected_observation": "The published pipeline, the Lean closed form and the numerical equilibrium solution give the same curvature for random layer thicknesses, moduli, fibre angles and swelling strains.",
-     "disconfirming_observation": "At least one draw in an unmutated configuration where the published kappa differs from the Lean closed form by more than the rounding bound, or the equilibrium solve differs from the closed form by more than relative 1e-9.",
-     "admissible_datasets": "None: random draws from the stated grid; references are the published code at a pinned commit and a linear solve of the stated equations.",
-     "inference_method": "Exhaustive comparison over all draws against the rounding-aware bound; fault-injection controls must trip the same comparison.",
+     "expected_observation": "Published measurements on real Pinus cone scales (layer thicknesses h1 and h2, Young's moduli E1 and E2 of the sclerenchyma and sclereid layers, hygroscopic strain mismatch delta_eps between dry and wet, and the dry-to-wet change in scale curvature or opening angle) give a Timoshenko prediction kappa_pred that matches the measured curvature change within a factor of 1.5, with the scale bending towards the passive layer.",
+     "disconfirming_observation": "The Timoshenko prediction from the measured h1, h2, E1/E2 and delta_eps differs from the measured curvature change by more than a factor of 3, or predicts bending in the wrong direction; this would show that the scale is not adequately described as a well-bonded, uniform, linearly elastic two-layer strip (for instance because swelling is strongly non-uniform through the thickness, the layers slip, or the scale is too thick for Euler-Bernoulli kinematics).",
+     "admissible_datasets": "Peer-reviewed, open-access publications reporting measurements on real pine cone (Pinus) scales, not on biomimetic bilayers or simulations; the values must be tabulated or quoted in the text, or digitisable from figures whose axes are labelled with numeric values; thicknesses in the same cross-section as the curvature measurement; moduli measured along the scale axis (tensile or nanoindentation) on the dry and/or wet tissue; swelling strain along the scale axis between the same two hydration states as the curvature change. Model fits reported by the papers themselves are not admissible as measurements but may be quoted for comparison. Combining geometry and curvature from one paper with moduli and strain from another is admissible only as a secondary, lower-confidence analysis and must be stated.",
+     "inference_method": "For each specimen set compute kappa_pred from the Timoshenko formula with the measured inputs; propagate the stated uncertainties (or the plausible range of any input that is only bounded) by evaluating the formula at the extremes; compute r = log10(kappa_pred / kappa_meas), where kappa_meas is the measured curvature change or theta_meas / L for reported opening angles. Verdict thresholds: |r| <= 0.18 supports, 0.18 < |r| <= 0.48 mixed, |r| > 0.48 or wrong sign refutes; a secondary sensitivity statistic is the ratio under the m = 1, n = 1 simplification kappa = 1.5 delta_eps / h, reported but not used for the verdict.",
      "explicit": true
     },
     "revisions": [],

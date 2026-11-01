@@ -278,7 +278,7 @@ function build(D) {
       <li><b>A second assessor, from a different company.</b> One is not enough for a verdict to travel with a publication, and we will not let the model that wrote a proof grade it.</li>
       <li><b>A harder panel.</b> Our own check showed a benchmark can measure its own composition. Send pairs we did not pick.</li>
     </ul>
-    <p class="caption">Live dashboard, every number traceable to a file: <b>delphi-mission-control.ashenoy000.workers.dev/start/</b></p>`;
+    <p class="caption">Live dashboard, every number traceable to a file: <b>delphibio.org/start/</b></p>`;
 
   // ---------------- assemble ----------------
   const order = D.slides.map(s => s.id).filter(id => SL[id]);

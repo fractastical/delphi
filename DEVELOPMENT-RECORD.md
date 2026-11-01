@@ -2,6 +2,8 @@
 
 How the team built DELPHI (the `delphisci` repository, its live dashboard, its MCP servers and design studio, and the
 exchange with the Delphi Frontier graph) in about 30 hours before the data freeze on **Sunday Nov 1, 12:00 noon**.
+The day-by-day log, with the animations, is [`DAY-BY-DAY.md`](DAY-BY-DAY.md); this file is the design thread's record
+of decisions, failures and what held up.
 
 **How to read this.** Every number has a source file or commit beside it. Times are Boston time (EDT). Commit links
 point to `https://github.com/xX-its-amit-Xx/delphi/commit/<sha>`, where every SHA here resolves: the fork's branch
@@ -78,7 +80,7 @@ claims ──► assessments ──► claim tests (pre-registered) ──► na
 | Physics and physiology | Glide table, Thompson envelope test, pre-registered browser simulator, circulation/gill/heart/muscle models | `physics/`, `physiology/`, `development/` |
 | Design studio | Text to spec, edit at body-to-gene level, 11 perturbation scenarios, laws marked red/amber/dashed | `sim-engine/`, `/blueprint3d/explode.html?mode=perturb` |
 | Validation | Pre-registered skeptic harness for the studio; pre-registered design scorecard; MCP test; simulation check of Lean results | `sim-engine/validation/`, `design-validation/`, `validation/` |
-| Dashboard | Static site built from repo files, every count computed at build time; `/start/` aggregates thread status files | `dashboard/`, https://delphi-mission-control.ashenoy000.workers.dev |
+| Dashboard | Static site built from repo files, every count computed at build time; `/start/` aggregates thread status files | `dashboard/`, https://delphibio.org |
 
 Two statements the repository makes about its own limits, quoted from `README.md`: a machine-checked proof "does not
 show that living systems satisfy those assumptions", and "no numeric prediction about a real zebrafish counts as

@@ -7,15 +7,15 @@ graph's model truth scores — from any agent, without writing SPARQL. Available
 ## Setup
 
 **Hosted (nothing to install)**: point any MCP client that supports Streamable HTTP at
-`https://delphisci-mcp.fly.dev/mcp`. No auth; 120 requests per minute per IP. It serves `main` as
-of the last deploy (see `https://delphisci-mcp.fly.dev/healthz`), so unpushed drafts aren't there. Graph links in its results open
-`https://delphisci-mcp.fly.dev/docs/claim-graph.html`.
+`https://mcp.delphibio.org/mcp`. No auth; 120 requests per minute per IP. It serves `main` as
+of the last deploy (see `https://mcp.delphibio.org/healthz`), so unpushed drafts aren't there. Graph links in its results open
+`https://mcp.delphibio.org/docs/claim-graph.html`.
 
 ```json
-{ "mcpServers": { "delphisci": { "url": "https://delphisci-mcp.fly.dev/mcp" } } }
+{ "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }
 ```
 
-Claude Code: `claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp`. In
+Claude Code: `claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp`. In
 claude.ai or ChatGPT, add it as a custom connector with that URL.
 
 It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
@@ -23,6 +23,17 @@ It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
 the server, `docs/claims.json`, `test-data/organisms/merged/*.json`, any nanopubs, or the Lean laws (`lean/registry/`,
 `lean/laws.json`, `lean/constraints.json`, `lean/Delphi/`). To run the HTTP mode locally:
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
+
+The public hostname is `mcp.delphibio.org` (`DELPHI_PUBLIC_URL` in `fly.toml`). The Fly app name
+stays `delphisci-mcp`. Attach the certificate once, from a logged-in `flyctl`:
+
+```bash
+fly certs add mcp.delphibio.org -a delphisci-mcp
+```
+
+In DNS for `delphibio.org`, add `mcp` as a CNAME to `delphisci-mcp.fly.dev`. If the zone is on
+Cloudflare, leave that record DNS-only so Fly can issue the certificate. `fly certs check mcp.delphibio.org`
+reports when it is live. Graph links in tool results use this hostname after the next deploy.
 
 Usage stats for the hosted server are in Grafana at [fly-metrics.net](https://fly-metrics.net)
 (app `delphisci-mcp`), from counters in [`metrics.mjs`](metrics.mjs) that Fly scrapes from a
@@ -122,7 +133,7 @@ status with `delphi_graph`.
 ### Logging to the forum
 
 These tools read and write the [Science Claw forum](../forum/README.md)
-(`https://science-claw-forum.fly.dev`, or `CLAW_FORUM`), so anyone using the MCP server can
+(`https://forum.delphibio.org`, or `CLAW_FORUM`), so anyone using the MCP server can
 propose claims and report tests without a clone of the repo.
 
 | Tool | Use it to |

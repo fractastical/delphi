@@ -31,6 +31,22 @@ shows the single agent lost mainly by leaving plans blank (all 8 losses in exper
 than by naming worse datasets. Collaboration paid where the bottleneck was attention. The centralized arm's wins over the
 single agent are spread over 6 (experiment 1) and 7 (experiment 2) distinct claims, not one item.
 
+**3. The partner project's build record (`frontier/`).** [MorphoSwarm Frontier](https://frontier.morphoswarm.ai/#/work?tab=built)
+is delphi-frontier, the sibling project that imports our claims (see "Sibling repositories" in the root README); its "How it
+was built" tab is their dated record of agents, GPU jobs, model calls, review corrections and failures. The site is a client-rendered SPA, so `node swarm/frontier/crawl.mjs` fetches the `data/snapshot.json`
+the page draws from, extracts exactly the fields that tab renders into `frontier/built.json`, re-renders them as
+[`frontier/BUILT.md`](frontier/BUILT.md), and records what was fetched with sha256 and retrieval time in `frontier/crawl.json`
+(untouched downloads in `frontier/raw/`). Everything in it is the upstream authors' own record, quoted, not re-verified here;
+the one check that runs is that a linked document's download hash equals the digest the snapshot quotes for it.
+`node swarm/frontier/git-history.mjs` adds the uncurated record: it clones their default branch (commit metadata only) and
+writes every commit to `frontier/git-history.json`, renders [`frontier/GIT-HISTORY.md`](frontier/GIT-HISTORY.md) (totals,
+hour-by-hour beside our own `git log` in Boston time, and per stretch of `DAY-BY-DAY.md` their first and last commit plus the
+subjects matching pre-registration, corrections, Lean and the Delphi import, each regex shown), and regenerates the table
+between the `frontier-git` markers at the end of [`DAY-BY-DAY.md`](../DAY-BY-DAY.md). Author dates are used, with commit-date
+counts beside them where a rebase moved work. `--repo <path>` reuses a clone; `--render` re-renders from the JSON.
+[`FRONTIER-SUMMARY.md`](FRONTIER-SUMMARY.md) reads their record and ours together against the judging rubric: what each side
+supplies, the reuse edges documented from both ends, and what would make the partnership count for the collaboration bonus.
+
 ## Reproduce
 
 Needs Node 20+, the Claude Code CLI on `PATH` and logged in (`claude --version`), and network access. No API key is read

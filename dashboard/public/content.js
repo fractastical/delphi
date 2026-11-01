@@ -61,7 +61,7 @@ window.CONTENT = {
     { f: "Team roster and ideas", s: "Message from the team lead in this session", v: "anecdote" },
     { f: "Agent proposal and harness critique", s: "Issue #17 in github.com/fractastical/delphi", v: "read today" },
     { f: "BioNeMo model list", s: "Issue #14 in github.com/fractastical/delphi", v: "read today, not smoke-tested" },
-    { f: "MCP server availability", s: "https://delphisci-mcp.fly.dev/mcp", v: "probed today: initialize and tools/list answered" },
+    { f: "MCP server availability", s: "https://mcp.delphibio.org/mcp", v: "canonical hostname as of 2026-11-01; the previous Fly hostname answered initialize and tools/list the same day. This name is live only after its DNS CNAME and certificate are in place" },
     { f: "Pax6, CASP, Liquid Tensor, trial registration, Rule 110", s: "Background knowledge of the author", v: "not re-verified this session; check before citing externally" },
     { f: "Dataset sources for the holdout (ProteinGym, MaveDB, Open Tree of Life, TimeTree, GBIF)", s: "Background knowledge", v: "not downloaded or checked" }
   ]

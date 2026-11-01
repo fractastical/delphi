@@ -1,0 +1,82 @@
+{
+  "claim_id": "darwin1859-ch10-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-10",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "problem": "cenozoic-origination-extinction-balance",
+  "hypothesis": "If Darwin is right that, 'looking to later times', the production of new forms has caused the extinction of about the same number of old forms, then across the Cenozoic stages (Danian to Piacenzian, 66 to 2.58 Ma) the per-capita origination of animal genera in the Paleobiology Database is approximately cancelled by per-capita extinction: the duration-weighted net diversification, expressed as a fraction of total turnover, B = sum[(p_i - q_i) dt_i] / sum[(p_i + q_i) dt_i], is close to zero (|B| <= 0.10), so standing diversity has not grown without limit.",
+  "pass_criterion": "Pre-registered (claim supported, as a raw-count result). Primary analysis: PBDB occs/diversity, base_name Metazoa, count genera, time_reso stage, the 17 Cenozoic stages with min_ma >= 2.58 and max_ma <= 66 (Danian through Piacenzian). Foote boundary-crosser rates per stage i with N_b = X_bt + X_bL, N_t = X_bt + X_Ft, p_i = ln(N_t / X_bt) / dt_i, q_i = ln(N_b / X_bt) / dt_i, dt_i = max_ma - min_ma. B is computed on the pooled window as defined in the hypothesis. Pass requires BOTH |B| <= 0.10 AND the 95 % percentile-bootstrap confidence interval of B (10,000 resamples of stages with replacement, numpy default_rng seed 20261101) lies entirely within [-0.20, +0.20].",
+  "fail_criterion": "Pre-registered (claim refuted, as a raw-count result). |B| > 0.20 AND the 95 % bootstrap confidence interval of B lies entirely on one side of zero beyond +/-0.10 (lower bound > +0.10 for sustained net growth; upper bound < -0.10 for sustained net decline). Mixed: any outcome that is neither pass nor fail (for example |B| between 0.10 and 0.20, or a point estimate inside +/-0.10 whose interval extends beyond +/-0.20, or a point estimate beyond 0.20 whose interval reaches inside +/-0.10). Inconclusive (reason 'underpowered' or 'data-unavailable'): fewer than 12 of the 17 stages have X_bt > 0, N_b > 0 and N_t > 0; or the endpoint returns fewer than 17 rows in the window or lacks any of the columns X_Ft, X_bL, X_FL, X_bt, n_occs; or the endpoint is unreachable at run time. The thresholds are fixed now and are not to be tuned after the data are seen; a deviation must be recorded in a 'deviations' field.",
+  "planned_datasets": [
+    "paleobiology-database-occs-diversity-metazoa-genera-stage"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database-occs-diversity-metazoa-genera-stage",
+      "name": "Paleobiology Database (PBDB) data service 1.2, occs/diversity operation: Metazoa genera counted by stage, 0 to 66 Ma",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "data service 1.2 (live database, unversioned; the access time and the response hash are recorded at run time)",
+      "license": "Creative Commons CC0 (as stated in the response header of the data service on 2026-11-01, requested with the 'datainfo' parameter)",
+      "files": [
+        {
+          "name": "diversity-metazoa-genera-stage.csv",
+          "download_url": "https://paleobiodb.org/data1.2/occs/diversity.csv?base_name=Metazoa&count=genera&min_ma=0&max_ma=66&time_reso=stage",
+          "api_query": "GET occs/diversity.csv with base_name=Metazoa, count=genera, min_ma=0, max_ma=66, time_reso=stage; the run appends '&datainfo&rowcount' to record licence, access time and row count",
+          "expected_columns": ["interval_no", "interval_name", "max_ma", "min_ma", "X_Ft", "X_bL", "X_FL", "X_bt", "sampled_in_bin", "implied_in_bin", "n_occs"],
+          "expected_rows": 22,
+          "byte_size_observed_before_registration": 1847,
+          "retrieved_at": null,
+          "sha256": null
+        },
+        {
+          "name": "diversity-metazoa-genera-stage-marine.csv",
+          "download_url": "https://paleobiodb.org/data1.2/occs/diversity.csv?base_name=Metazoa&count=genera&min_ma=0&max_ma=66&time_reso=stage&envtype=marine",
+          "api_query": "Same as above with envtype=marine (secondary, descriptive analysis only)",
+          "expected_columns": ["interval_no", "interval_name", "max_ma", "min_ma", "X_Ft", "X_bL", "X_FL", "X_bt", "sampled_in_bin", "implied_in_bin", "n_occs"],
+          "expected_rows": 21,
+          "byte_size_observed_before_registration": 2629,
+          "retrieved_at": null,
+          "sha256": null
+        }
+      ],
+      "role": "per-stage counts of fossil genera by first and last appearance relative to the stage boundaries, from which boundary-crosser origination and extinction rates and standing diversity are computed",
+      "documentation_url": "https://paleobiodb.org/data1.2/occs/diversity_doc.html",
+      "column_definitions_verified": {
+        "X_Ft": "taxa whose first known occurrence lies in the interval and whose range crosses the top boundary",
+        "X_bL": "taxa whose last known occurrence lies in the interval and whose range crosses the bottom boundary",
+        "X_FL": "taxa found only in the interval (cross neither boundary)",
+        "X_bt": "taxa whose range crosses both boundaries (may or may not occur in the interval)",
+        "source": "the data service documentation (diversity_doc.html), read on 2026-11-01; the column names follow Foote 2000, Paleobiology 26(4), as cited there"
+      }
+    }
+  ],
+  "test_contract": {
+    "expected_observation": "Over the Cenozoic stages from the Danian to the Piacenzian, per-capita origination and extinction of fossil animal genera are approximately equal, so that net diversification is a small fraction (|B| <= 0.10) of total turnover and the boundary-crosser diversity at the top of the window is close to that at its bottom, with a bootstrap interval that excludes strong growth or decline (within +/-0.20).",
+    "disconfirming_observation": "Net diversification is a large fraction of turnover with the same sign across the window (|B| > 0.20 with a bootstrap interval beyond +/-0.10), i.e. origination exceeds extinction (or the reverse) persistently, so that standing diversity rises (or falls) steadily through the later periods rather than staying bounded.",
+    "admissible_datasets": "Open, licensed compilations of dated fossil occurrences or range data of animals, with per-interval counts of first appearances, last appearances and range-through taxa at a resolution of about 10 Myr or finer, compiled independently of Darwin's text, covering at least 12 consecutive Cenozoic intervals. Counts must be of taxa (genera or species), not of occurrences or collections. Counts not standardized for sampling are admissible for the raw-count test registered here, which must be labelled as such; the sampling-standardized version is a separate test.",
+    "inference_method": "Per stage, boundary-crosser per-capita rates (Foote 2000): N_b = X_bt + X_bL, N_t = X_bt + X_Ft, p = ln(N_t / X_bt) / dt, q = ln(N_b / X_bt) / dt, so that p - q = ln(N_t / N_b) / dt. Statistic B = sum[(p_i - q_i) dt_i] / sum[(p_i + q_i) dt_i] over the 17 stages of the window, with a 95 % percentile bootstrap interval from resampling stages with replacement (10,000 resamples, numpy default_rng seed 20261101). Thresholds: |B| <= 0.10 with interval within +/-0.20 passes; |B| > 0.20 with interval entirely beyond +/-0.10 on one side fails; everything else is mixed; fewer than 12 usable stages is underpowered."
+  },
+  "secondary_analyses_descriptive": [
+    "The same statistic B for the marine-only query (envtype=marine), reported beside the primary value and not used for the verdict.",
+    "B recomputed after dropping the Danian and Selandian (post-Cretaceous-Paleogene rebound), and after dropping the last three stages of the window (Messinian, Zanclean, Piacenzian; pull-of-the-Recent sensitivity).",
+    "Per-stage p_i, q_i and net rate p_i - q_i, the number of stages with positive and with negative net rate, and the sum of ln(N_t/N_b) over the window (the log change in boundary-crosser genus diversity from 66 Ma to 2.58 Ma).",
+    "The Spearman correlation across stages between the net rate and the change in ln(n_occs) from the preceding stage (a sampling-effort check), and between per-capita extinction and per-capita origination (the covariation Darwin's mechanism would predict); descriptive only, and correlation does not show that origination caused extinction.",
+    "The same statistic for the Quaternary stages (Gelasian to Meghalayan), reported separately and flagged as strongly affected by the pull of the Recent."
+  ],
+  "interpretation": "Darwin's sentence says that the number of species has not increased indefinitely 'at least in the later geological periods', so that new forms have displaced about as many old forms. Mapped here to: 'later geological periods' = the Cenozoic stages from the Danian to the Piacenzian (66 to 2.58 Ma; the Quaternary is excluded from the primary window because the pull of the Recent and the short stages make boundary-crosser rates unreliable there); 'number of species' = number of genera in the Paleobiology Database (modern reinterpretation: genus level, because species-level fossil counts are too incomplete); 'production of new forms' = first appearances and 'extinction of old forms' = last appearances, estimated by Foote's boundary-crosser per-capita rates; 'about the same number' / 'roughly balanced' = net diversification no more than 10 % of total turnover (|B| <= 0.10; a modern operationalization, not Darwin's). The fixed thresholds (0.10 and 0.20) are round conventional values chosen from the claim's wording before any count was viewed: 0.10 means origination and extinction rates differ by less than about 22 % of each other on average (rate ratio between about 0.82 and 1.22); 0.20 means a ratio beyond about 1.5. The test uses raw, unstandardized PBDB counts, because the endpoint serves no sampling-standardized rates, so it can be misled by changing sampling effort and by the pull of the Recent; the three assessors (grok, gpt, gemini) named this as the main obstacle, and gemini proposed shareholder quorum subsampling on occurrences, which is a separate and larger test not registered here. What this test does not cover: global species richness, which is not observed; terrestrial species, which fossilize sparsely; the causal part of Darwin's sentence (that new forms caused the extinctions: a balance of rates cannot show causation, and bounded diversity is also what random turnover or an external ceiling would give); any period before the Cenozoic; and sampling-corrected diversity. A pass supports only the weak numerical reading (balance of rates in the raw record); a fail refutes only that the raw PBDB record shows balance, not that real diversity was unbounded.",
+  "caveats": [
+    "Before this registration was written the following were inspected: the CSV header and the number of rows of the primary and the marine query; the interval names and ages (max_ma, min_ma) of the primary query; the data-service documentation for the column definitions; and the response header with the licence. No value in the columns X_Ft, X_bL, X_FL, X_bt, sampled_in_bin, implied_in_bin or n_occs was viewed by this agent, and no rate or statistic was computed. Two n_occs values (Late Pleistocene 40,842 and Piacenzian 20,263) appear in the scout's record, which this agent read; they were not used to set any threshold.",
+    "Four metadata requests were made: the primary CSV (1,847 bytes), the documentation page, the marine CSV with datainfo (2,629 bytes), and one exclusion query ('Metazoa^Chordata') that returned a taxonomy warning and is dropped from the plan. All responses were under 60 KB and none was retained in the repository.",
+    "The author of this registration knows from the literature that raw PBDB genus counts generally rise through the Cenozoic (for example the Alroy et al. 2008 Science paper on Phanerozoic marine diversity, in which sampling-standardized curves are flatter than raw ones, and whether the Cenozoic rise is real remains contested; cited from memory and not re-verified in this session). A fail or mixed result on raw counts is therefore plausible, and a sampling-standardized version might give a different answer. The thresholds were fixed from the claim's wording and round conventional values, not from any expected value.",
+    "PBDB is a live database that changes as occurrences are added: the run records the access time and the SHA-256 of the response, and a later re-run may differ slightly. The scout's record gave 22 rows for the primary query and the same 22 interval names were seen here.",
+    "Foote's boundary-crosser counts treat taxa that cross a boundary as present in the intermediate interval whether or not they were sampled there (range-through assumption); this is not corrected.",
+    "Counts are of genera, a coarser unit than species; a long-ranging genus can hide species turnover, so the test says nothing about species-level balance. Metazoa without an environment filter mixes marine and terrestrial animals; the marine-only variant is a descriptive check.",
+    "Bootstrap resampling of stages treats stages as exchangeable, which they are not (adjacent stages share boundary counts); the interval is therefore probably narrower than the true uncertainty. The thresholds are not widened to compensate, and this is stated in advance.",
+    "A balance of rates in the aggregate does not show that new forms caused the extinctions; the causal clause of Darwin's sentence is not tested.",
+    "If completed, the data kind is 'biological' (fossil occurrence counts), with no sampling standardization in the primary analysis."
+  ],
+  "created": "2026-11-01",
+  "created_utc": "2026-11-01T14:45:31Z",
+  "agent": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "prereg-darwin-batch-1", "date": "2026-11-01" }
+}

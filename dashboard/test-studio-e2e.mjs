@@ -3,7 +3,7 @@
 // End-to-end browser tests for the Design Studio's Perturb mode (blueprint3d/perturb.html + perturb.js, the engine
 // bundle in blueprint3d/engine/, partedit.js, lean-client.js + /api/lean/, spec-box.js). Drives the installed Edge
 // through playwright-core with SwiftShader WebGL. Serves dashboard/public from a local node http server (no files
-// written); --live targets https://delphi-mission-control.ashenoy000.workers.dev instead.
+// written); --live targets https://delphibio.org instead.
 //
 // Flows (each a named test; a failure saves a screenshot to C:/Temp/studio-e2e/ and the run exits 1):
 //   1 load        every organism in perturb.html's model menu loads with zero console errors, page errors, failed
@@ -35,7 +35,7 @@ const PUBLIC = path.join(here, 'public');
 const OUT = process.env.STUDIO_E2E_OUT || 'C:/Temp/studio-e2e';
 const PW = process.env.PW_CORE || 'C:/Temp/partedit-deps/node_modules/playwright-core';
 const EDGE = process.env.EDGE_PATH || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
-const LIVE = 'https://delphi-mission-control.ashenoy000.workers.dev';
+const LIVE = 'https://delphibio.org';
 fs.mkdirSync(OUT, { recursive: true });
 const { chromium } = createRequire(path.join(PW, 'package.json'))('playwright-core');
 

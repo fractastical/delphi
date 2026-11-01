@@ -6,7 +6,7 @@ This note records what reaches collaborators, and when.
 
 ## What collaborators get
 
-- **When:** after the hub merges to `main`. `deploy-mcp.yml` then redeploys `delphisci-mcp.fly.dev`, and it also
+- **When:** after the hub merges to `main`. `deploy-mcp.yml` then redeploys `mcp.delphibio.org`, and it also
   redeploys on any later change under `lean/registry/`, `lean/Delphi/`, `lean/laws.json`, `lean/constraints.json`,
   `lean/empirical.json` or `lean/eliminate/browser-check.mjs`.
 - **Hosted tools:** `lean_laws_list`, `lean_law_get`, `lean_lawset_get`, `lean_check`, `lean_verify`.

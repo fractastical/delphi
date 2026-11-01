@@ -11,7 +11,7 @@ the holdout thread's records as **unsigned drafts**. Nothing here is signed or p
 - The hub has asked Amit who signs. Until that answer arrives these files stay unsigned, their labels start
   with `Draft:` and their pubinfo carries a comment saying so.
 - Provenance points at two copies of `holdout/`: the live sub-dashboard data file
-  `https://delphi-mission-control.ashenoy000.workers.dev/t/holdout/data.json`, and the commit-pinned tree on
+  `https://delphibio.org/t/holdout/data.json`, and the commit-pinned tree on
   the pushed branch (PR #36 against fractastical/delphi; `manifest.json` names the commit). That commit holds
   the provisional freeze the exams ran against, which the exam records cite by SHA-256; the confirmed
   re-freeze of 2026-10-31 14:38 UTC (decision recorded, roster unchanged) reaches the pinned copy at the next

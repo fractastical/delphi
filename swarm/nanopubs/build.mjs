@@ -26,7 +26,7 @@ const read = p => JSON.parse(fs.readFileSync(path.join(root, p), 'utf8'));
 const R1 = read('swarm/compare/results.json');
 const R2 = read('swarm/compare/results2.json');
 
-const LIVE = 'https://delphi-mission-control.ashenoy000.workers.dev/t/swarm/';
+const LIVE = 'https://delphibio.org/t/swarm/';
 const REPO = 'https://github.com/fractastical/delphisci';
 const OWNER = process.env.NANOPUB_ORCID || null; // the human owner; null until the key owner approves (then a marked placeholder is emitted instead)
 const DELPHI = 'https://w3id.org/delphi/ontology/';

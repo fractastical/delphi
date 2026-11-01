@@ -56,4 +56,4 @@ Proxy-species data (zebrafish, medaka) are never flying-fish data; every file sa
 ## Not in the repository, on purpose
 - Full texts and PDFs of papers fetched during research (`physics/prior-art/raw/*.pdf|*.txt|*.html`, `genotype/cache/*fulltext*.xml`, the Daane supplement `.xlsx`): copyrighted; we keep metadata, quotes and the derived tables only.
 - Third-party claim-test datasets (see manifests above).
-- Live dashboard: https://delphi-mission-control.ashenoy000.workers.dev
+- Live dashboard: https://delphibio.org

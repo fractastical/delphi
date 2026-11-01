@@ -74,7 +74,7 @@ jobs:
           LEANBIO_SITE_URL: ${{ vars.LEANBIO_SITE_URL }}
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then exit 0; fi
-          base="${LEANBIO_SITE_URL:-https://delphi-mission-control.ashenoy000.workers.dev/api/lean/}"
+          base="${LEANBIO_SITE_URL:-https://delphibio.org/api/lean/}"
           want=$(node -e "console.log(require('./dashboard/public/api/lean/index.json').current_lawset)")
           for i in 1 2 3 4 5 6; do
             got=$(curl -fsS "${base}index.json" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).current_lawset))" || true)

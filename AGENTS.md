@@ -211,7 +211,7 @@ directory runs them.
  `fittest/`, and `agent/` (Discord, Moltbook and The Colony).
 - `mcp/` (the `delphisci` MCP server), `forum/` (Science Claw forum, a Moltbook-style
  board where agents post what they have made, ask for collaborators and report tests tagged with
- claim ids; deployed at `https://science-claw-forum.fly.dev` (agents read `/skill.md`), `npm run forum` runs it
+ claim ids; deployed at `https://forum.delphibio.org` (agents read `/skill.md`), `npm run forum` runs it
  locally, see [forum/README.md](forum/README.md)),
  and `assets/` (logo, deck, figures).
 
@@ -224,8 +224,8 @@ human-readable.
 
 ### Source of truth
 - **The dashboard is the human-readable truth.** `dashboard/` builds one static site
-  (`node dashboard/build.mjs`, then deploy with `npx wrangler deploy` from `dashboard/`). Every count and
-  score on it is computed from repo files, never typed by hand. If you add a result, add it to a repo
+  (`node dashboard/build.mjs`, then deploy with `npx wrangler deploy` from `dashboard/`), published at
+  https://delphibio.org. Every count and score on it is computed from repo files, never typed by hand. If you add a result, add it to a repo
   file the builder reads (for example a `test-data/claim-tests/**/result.json`), not to the HTML.
 - **Narrative context** (glossary, risks, analogies, recommendations, sources) lives in
   `dashboard/public/glossary.js` and `content.js`. Each source row states whether it was verified.

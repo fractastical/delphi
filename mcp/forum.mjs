@@ -19,7 +19,7 @@ const localCreds = () => {
   if (HOSTED) return {};
   try { return JSON.parse(readFileSync(CRED_FILE, "utf8")); } catch { return {}; }
 };
-export const FORUM_URL = (process.env.CLAW_FORUM ?? localCreds().forum ?? "https://science-claw-forum.fly.dev").replace(/\/$/, "");
+export const FORUM_URL = (process.env.CLAW_FORUM ?? localCreds().forum ?? "https://forum.delphibio.org").replace(/\/$/, "");
 
 export const PROPOSAL_TAG = "delphi:claim-proposal";
 export const RESULT_TAG = "delphi:test-result";

@@ -1,0 +1,90 @@
+{
+  "claim_id": "darwin1859-ch09-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch09-08",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "problem": "formation-duration-vs-species-duration",
+  "hypothesis": "If Darwin is right that a single geological formation 'perhaps is short compared with the period requisite to change one species into another', then the typical duration of a fossil-bearing formation is a small fraction of the typical duration of a fossil species: the ratio R = median(formation duration) / median(species duration) is at most 0.5, where formation durations come from Macrostrat (North America) and species durations from the Paleobiology Database (marine bivalves).",
+  "pass_criterion": "Pre-registered (claim supported). In the primary analysis (Macrostrat project 1 formations, fossil-bearing, duration per formation-in-column; PBDB Bivalvia extinct species with n_occs >= 3), the point estimate of R = median(D_f) / median(S) is <= 0.50 AND the upper bound of its 95 % bootstrap interval is <= 0.75. (The first condition says 'short compared with' means at most half; the second requires that the data exclude formations being three-quarters of a species lifetime.)",
+  "fail_criterion": "Pre-registered (claim refuted at this operationalization). The lower bound of the 95 % bootstrap interval of R is >= 1.0 (the typical formation lasts at least as long as the typical species, so a formation could hold a whole species lifetime, let alone a transformation). MIXED: any other outcome, i.e. the point estimate of R exceeds 0.50, or the upper bound exceeds 0.75, without the lower bound reaching 1.0; also mixed if the all-formations sensitivity analysis (below) falls on the other side of the 0.50 / 1.0 thresholds from the primary analysis. INCONCLUSIVE: fewer than 200 formations-in-column with D_f > 0 or fewer than 500 species with S > 0 after the stated filters (reason 'underpowered'), a fetch that cannot be completed within the stated size caps, or fetched files that do not match the checksums recorded at run time on a second fetch of the same query (reason 'data-unavailable').",
+  "planned_datasets": [
+    "macrostrat-units-project-1-north-america",
+    "pbdb-taxa-list-bivalvia-species"
+  ],
+  "datasets": [
+    {
+      "id": "macrostrat-units-project-1-north-america",
+      "name": "Macrostrat API v2, units endpoint, North America project (project_id = 1)",
+      "landing_url": "https://macrostrat.org/",
+      "doi": null,
+      "version": "API v2, retrieved live; no dataset version number is published (the retrieval time and SHA-256 are the version)",
+      "license": "CC-BY 4.0 (stated in the API response, per the scout record test-data/dataset-scouting/darwin-origin/darwin1859-ch09-08/datasets.json)",
+      "files": [
+        {
+          "name": "macrostrat-units-project1.csv",
+          "download_url": "https://macrostrat.org/api/v2/units?project_id=1&response=short&format=csv",
+          "byte_size": null,
+          "retrieved_at": null,
+          "sha256": null,
+          "note": "Not downloaded at registration. A header-only request returned HTTP 200 with content-type text/csv; its weak ETag begins with 266bdf, which if it encodes the body length in hex (an inference, not verified) is about 2.5 MB, against the 17.4 MB returned by the unfiltered units?all call recorded by the scout. The analysis must fetch with curl --max-filesize 5000000 so that it aborts instead of downloading more, must not use the 'all' parameter, and must not rely on 'limit', which the scout found Macrostrat ignores on this endpoint. The file is not committed (over 1 MB); byte size, retrieval time and SHA-256 go into result.json after the run, and a derived table of per-formation durations (< 200 KB, or a checksum if larger) goes under derived/."
+        }
+      ],
+      "role": "age bounds (t_age, b_age in Ma) of stratigraphic units, with Fm (formation) name, col_id (column) and pbdb_collections per unit; used to compute formation durations D_f. Fields expected, from the scout's parse of the JSON form of the same endpoint: Fm, Gp, Mbr, SGp, b_age, col_area, col_id, max_thick, min_thick, outcrop, pbdb_collections, pbdb_occurrences, project_id, section_id, strat_name_id, t_age, unit_id, unit_name."
+    },
+    {
+      "id": "pbdb-taxa-list-bivalvia-species",
+      "name": "Paleobiology Database data service 1.2, taxa/list, species of Bivalvia with first and last appearance ages",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "data service 1.2, retrieved live; the PBDB is continuously updated, so the retrieval time and SHA-256 are the version",
+      "license": null,
+      "license_note": "The scout record has license null for PBDB and this registration did not verify one. The analysis must record the licence stated by the data service response or the PBDB site at retrieval time, or write 'not verified'.",
+      "files": [
+        {
+          "name": "pbdb-bivalvia-species-page-<k>.csv",
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Bivalvia&rank=species&show=app&order=n_occs.desc&limit=5000&offset=<0, 5000, 10000, ...>",
+          "byte_size": null,
+          "retrieved_at": null,
+          "sha256": null,
+          "note": "Not downloaded at registration. A metadata-only request (limit=0&rowcount) returned 'Records Found' = 19194 species-rank records for base_name=Bivalvia, and the returned header row lists the fields orig_no, taxon_no, record_type, flags, taxon_rank, taxon_name, difference, accepted_no, accepted_rank, accepted_name, parent_no, reference_no, is_extant, n_occs, firstapp_max_ma, firstapp_min_ma, lastapp_max_ma, lastapp_min_ma, early_interval, late_interval. No row was read. The service rejects a min_occs parameter (HTTP 400), so n_occs >= 3 is applied client-side: pages of 5000 are fetched in order of decreasing n_occs and fetching stops at the first page whose last row has n_occs < 3 (at most 4 pages, about 19194 rows in total; the whole listing is estimated at a few MB, not verified). Each page's byte size and SHA-256 are recorded after the run."
+        }
+      ],
+      "role": "species-rank taxa with n_occs (occurrences), is_extant, and first/last appearance age bounds in Ma; used to compute observed species durations S"
+    }
+  ],
+  "test_contract": {
+    "expected_observation": "The median duration of fossil-bearing formations (formation-in-column) is at most half of the median observed duration of extinct fossil bivalve species, with the upper 95 % bootstrap bound of the ratio R at or below 0.75.",
+    "disconfirming_observation": "A ratio R whose 95 % bootstrap lower bound is at or above 1.0: the typical formation lasts as long as or longer than the typical species, so Darwin's premise that formations are short compared with the time to change a species fails at this operationalization. A ratio between the thresholds is the 'mixed' outcome.",
+    "admissible_datasets": "Openly accessible compilations independent of Darwin's text that give, for (a) stratigraphic units, base and top ages with a formation name, and for (b) fossil species, first and last appearance ages with an occurrence count. Marine animal fossils only (Darwin's argument concerns the marine formations that hold most of the record). Formation durations must be derived from the dataset's own age bounds, not typed in; species durations must not be taken from a source that used formation durations to make them. Extant species are excluded because their last appearance is right-censored.",
+    "inference_method": "R = median(D_f) / median(S). D_f = max(b_age) - min(t_age) in Myr over all Macrostrat units of one formation name (Fm non-empty) within one column (col_id); only formations with sum(pbdb_collections) >= 1 and D_f > 0 are kept. S = midpoint(firstapp_max_ma, firstapp_min_ma) - midpoint(lastapp_max_ma, lastapp_min_ma), in Myr, for species-rank taxa with is_extant empty, n_occs >= 3 and S > 0. 95 % interval for R by percentile bootstrap, 2000 resamples, numpy default_rng seed 1859: formations resampled by formation name (clusters, so that a formation present in many columns is not counted as independent), species resampled individually, medians and their ratio recomputed on each resample. Thresholds 0.50, 0.75 and 1.0 exactly as in pass_criterion and fail_criterion; minimum n as stated in the inconclusive rule."
+  },
+  "sensitivity_analyses_in_verdict": [
+    "All-formations variant: the same R without the pbdb_collections >= 1 filter. Used only in the 'mixed' rule: if it falls on the other side of the 0.50 or 1.0 threshold from the primary analysis, the verdict is mixed."
+  ],
+  "secondary_analyses_descriptive": [
+    "Fraction of formations-in-column with D_f < median(S), with a cluster bootstrap 95 % interval, and the full quantiles (5, 25, 50, 75, 95 %) of D_f and S.",
+    "R computed against the first quartile of S as well as the median, as a rough guard for the fact that a species' lifetime is longer than the time needed to transform it.",
+    "R with formation duration aggregated by formation name across all North American columns (a regional-formation reading, which includes time-transgression) in place of formation-in-column.",
+    "The same species-duration arm for Gastropoda (base_name=Gastropoda, same filters) and for the minimum n_occs threshold set to 1 and to 10; R for each.",
+    "The share of formation-in-column durations whose t_age and b_age are both identical to the bounds of a single international chronostratigraphic interval (a measure of how coarse the Macrostrat dating is), and R with those formations dropped."
+  ],
+  "interpretation": "Darwin's claim has two parts: that a formation is short compared with the time needed to change one species into another, and the consequence that one formation should rarely hold a full graded series between species. This test covers only the first part, and only through a proxy. 'Formation' is operationalized as Macrostrat's units sharing a formation name within one column, whose summed span gives the duration D_f in Myr (this includes any hiatuses inside the formation, so D_f is an upper bound on the time actually recorded, and its precision is limited by how finely each unit was dated). 'The period requisite to change one species into another' cannot be measured directly with any dataset found by the scout (the scout reports no independent speciation-duration dataset; TimeTree access was not examined). It is therefore replaced by the observed duration of a species in the Paleobiology Database, from first to last appearance, in Myr. That is a modern reinterpretation: a species' lifetime is not the time needed to turn an ancestor into a descendant, and the transformation time is plausibly a fraction of the lifetime, so R <= 0.5 against species lifetimes is a weaker condition than Darwin's against transformation times. Errors run in both directions: PBDB observed ranges are shorter than true ranges (sampling truncates them), which lowers S and works against a pass, and Macrostrat durations are inflated by coarse unit dating, which raises D_f and also works against a pass; the proxy for transformation time works the other way. The test does not cover: whether any formation actually contains a graded series of intermediates (no ancestor-descendant morphological series are examined, which is the second operationalization proposed by one assessor), the preservation of such series, regions outside North America for formations, clades other than Bivalvia for the primary arm, terrestrial formations' sampling, or Darwin's separate argument that the record is imperfect. Formations (North America) and species (global) are not matched geographically, so the comparison is between two distributions and not within any one basin. A supported verdict would show that, at the resolution of these compilations, typical formations are short relative to typical bivalve species lifetimes; it would not show that species do not change within a formation.",
+  "caveats": [
+    "What was inspected before this registration: the scout's record, the claim and the three assessors' operationalizations; for Macrostrat, the response headers of one filtered units request (project_id=1, CSV; headers only, body discarded, no field read) and the defs/projects table (project names, column and unit counts); for PBDB, the field names in the header row of taxa/list for Bivalvia species, and the record count (19194). No age, duration, occurrence count or taxon value was viewed and no statistic of any kind was computed. Five metadata requests were made in all (one returned HTTP 400 because the service has no min_occs parameter).",
+    "Prior knowledge of the likely outcome: from the literature the author recalls that the median duration of fossil marine invertebrate species is on the order of several million years, and that Macrostrat formations are often assigned spans of several to tens of millions of years because of coarse unit dating, but the distribution of either quantity in these two datasets was not seen. The author has no reliable expectation of whether R falls below 0.5, and thresholds were set from the claim's wording ('short compared with', 'probably') and the conventional choices of one half and one, not from any value in the data. A refuted or mixed result is a real possibility, and the Macrostrat dating-resolution issue makes a mixed result plausible.",
+    "Species duration is not transformation time (see interpretation); the claim is about the latter. A pass here is a weak, one-directional result.",
+    "Formations in Macrostrat are summed over all units with that name in the column, so one formation can span many unit records; units with a non-empty Fm are about 62 % of all units in the global listing according to the scout (22,102 of 35,481); the share for North America was not examined.",
+    "PBDB first and last appearances are interval-bound ages with their own uncertainty; midpoints are used. Singletons and doubletons are excluded by the n_occs >= 3 rule, which biases the species durations upward (a conservative choice for a pass) and is varied in the descriptive analyses.",
+    "Macrostrat's North American composite columns and the PBDB overlap in sources and people; they are not independent compilations of the same quantity, but they do measure different quantities (rock ages and fossil ranges).",
+    "The Macrostrat 'limit' parameter is ignored (scout) and no server-side filter beyond project_id was verified, so the 2.5 MB figure is an inference from an ETag. The cap --max-filesize 5000000 guarantees the analysis cannot repeat the 17 MB download, and if the real size exceeds the cap the run is inconclusive (data-unavailable) rather than silently re-scoped; any switch to a smaller filter (for example one column group or one interval) after seeing that failure must be written to a deviations field with the reason.",
+    "Macrostrat's 2.5 MB and PBDB's few MB responses exceed the 1 MB rule for files committed to the repo; only the fetch script, the byte sizes and checksums, and small derived tables (< 200 KB) will be committed."
+  ],
+  "created": "2026-11-01",
+  "created_utc": "2026-11-01T15:09:08Z",
+  "agent": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "prereg-darwin-batch-1",
+    "date": "2026-11-01"
+  }
+}

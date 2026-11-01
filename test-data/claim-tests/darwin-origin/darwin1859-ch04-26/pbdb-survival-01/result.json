@@ -1,0 +1,70 @@
+{
+  "claim_id": "darwin1859-ch04-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch04-26",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If Darwin is right that 'very few' of the species of long-past geological periods now have living (modified) descendants, and that 'many whole orders, families and genera have died out entirely', then in the Paleobiology Database's record of fossil animals (Metazoa) only a small minority of the accepted genera that first appeared in the Paleozoic are still extant today, and a large share of the accepted families and orders that first appeared before the Cenozoic have no extant member.",
+  "pass_criterion": "Pre-registered (claim supported). Using accepted PBDB Metazoa taxa with a fossil first appearance and a non-missing is_extant flag, ALL of the following hold. (P1) Paleozoic genera (firstapp_min_ma >= 251.9): the fraction with is_extant = extant has a Wilson 95 % upper bound <= 0.10. (P2) Pre-Cenozoic genera (firstapp_min_ma >= 66.0, Paleozoic plus Mesozoic pooled): the point estimate of the extant fraction is <= 0.10 and its Wilson 95 % upper bound is <= 0.15. (P3) Pre-Cenozoic families (firstapp_min_ma >= 66.0): at least 100 families and at least 25 % of them are extinct (is_extant = 0). (P4) Pre-Cenozoic orders (firstapp_min_ma >= 66.0): at least 20 orders and at least 25 % of them are extinct.",
+  "fail_criterion": "Pre-registered (claim refuted). ANY of: (F1) the Wilson 95 % LOWER bound of the extant fraction of Paleozoic genera is > 0.25 (a quarter or more survive, which is not 'very few'); (F2) the extinct share of pre-Cenozoic families is < 10 % (whole families have not died out in any large number); (F3) the extinct share of pre-Cenozoic orders is < 10 %. Mixed: neither all of P1-P4 nor any of F1-F3 holds (for example a Paleozoic genus survival fraction between 0.10 and 0.25, or genera satisfying P1 while P2 or P3 or P4 fails). Inconclusive (reason 'underpowered' or 'data-unavailable'): fewer than 200 Paleozoic genera, 200 Mesozoic genera or 50 pre-Cenozoic families have both a firstapp_min_ma value and a non-blank is_extant flag; or more than 30 % of the Paleozoic genera carry a blank is_extant flag (the survival fraction would then rest on a minority of the record); or the PBDB service cannot be queried. If the primary fraction passes with blanks excluded but would fail were every blank treated as extant, the sensitivity result is reported and the verdict is downgraded to 'mixed'. The thresholds are fixed here and are not to be adjusted after the data are opened.",
+  "planned_datasets": [
+    "paleobiology-database-taxa-list-1.2"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database-taxa-list-1.2",
+      "name": "Paleobiology Database (PBDB) data service 1.2, taxa/list",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "data service 1.2 (a live database with no release number; the retrieval time and the SHA-256 of each downloaded file identify the snapshot used)",
+      "license": "Creative Commons CC0 (read from the service's own datainfo block, https://creativecommons.org/publicdomain/zero/1.0/, on 2026-11-01)",
+      "files": [
+        {
+          "name": "pbdb-metazoa-genus-accepted.csv (paged by limit and offset)",
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Metazoa&rank=genus&taxon_status=accepted&show=attr,app&limit=20000&offset=0",
+          "note": "repeat with offset=20000, 40000, 60000 until all records are fetched; metadata query on 2026-11-01 reported 79,170 records for rank=genus with taxon_status=accepted and 91,047 without the status filter (the difference is synonyms and invalid names)"
+        },
+        {
+          "name": "pbdb-metazoa-family-accepted.csv",
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Metazoa&rank=family&taxon_status=accepted&show=attr,app",
+          "note": "metadata query on 2026-11-01 reported 13,465 records for rank=family without the status filter; the accepted-only count was not requested"
+        },
+        {
+          "name": "pbdb-metazoa-order-accepted.csv",
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Metazoa&rank=order&taxon_status=accepted&show=attr,app",
+          "note": "metadata query on 2026-11-01 reported 1,739 records for rank=order without the status filter"
+        }
+      ],
+      "fields_confirmed_by_header_only": "orig_no, taxon_no, record_type, flags, taxon_rank, taxon_name, taxon_attr, difference, accepted_no, accepted_rank, accepted_name, parent_no, reference_no, is_extant, n_occs, firstapp_max_ma, firstapp_min_ma, lastapp_max_ma, lastapp_min_ma, early_interval, late_interval (header line of the order-rank query with show=attr,app)",
+      "retrieved_at": null,
+      "byte_size": null,
+      "sha256": null,
+      "role": "per taxon: rank, extant flag, and first and last appearance ages (Ma) for fossil animals; the source of both the extinct share of higher taxa and the extant share of genera by age of first appearance"
+    }
+  ],
+  "test_contract": {
+    "expected_observation": "Of the animal genera whose fossil record begins in the Paleozoic, a small minority (at most about one in ten) are still extant, and a substantial share (a quarter or more) of the animal families and orders whose record begins before the Cenozoic have no living member.",
+    "disconfirming_observation": "A quarter or more of Paleozoic genera still extant (lower 95 % bound above 0.25), or fewer than one in ten pre-Cenozoic families or orders wholly extinct: that is, long-past taxa would mostly survive and few whole higher taxa would have died out.",
+    "admissible_datasets": "An openly licensed, taxon-level fossil record of animals with an explicit extant/extinct status and first-appearance ages, assembled independently of Darwin's text and not a model output; all Metazoa (marine and non-marine) with a fossil record; taxa as accepted names only (synonyms excluded to avoid double counting). Neontological-only checklists (e.g. Catalogue of Life) cannot give first-appearance ages and are not admissible as the primary source.",
+    "inference_method": "Per rank (genus, family, order), keep accepted taxa with a numeric firstapp_min_ma and a non-blank is_extant. Stratify by first-appearance age: Paleozoic (>= 251.9 Ma), Mesozoic (66.0 to < 251.9 Ma), pre-Cenozoic (>= 66.0 Ma). Compute the extant fraction (genera) and the extinct fraction (families, orders) with Wilson 95 % intervals, then apply the numeric thresholds in pass_criterion and fail_criterion. Sensitivity (reported, can only downgrade a pass to mixed): blanks counted as extant. Descriptive only, not used for the verdict: the same fractions by 50 Myr bins of first appearance, and the Mesozoic stratum alone."
+  },
+  "secondary_analyses_descriptive": [
+    "Extant fraction of genera by 50 Myr bin of first appearance (rising towards the present is expected from survival-time alone and is not evidence for or against the claim).",
+    "The Mesozoic genus stratum on its own, with Wilson interval.",
+    "Number of taxa excluded at each step (rank mismatch, missing firstapp_min_ma, blank is_extant), per rank.",
+    "Counts of taxa whose first appearance interval straddles a boundary (firstapp_max_ma >= boundary > firstapp_min_ma), to size the boundary-assignment ambiguity."
+  ],
+  "interpretation": "Darwin's 'species ... now have living and modified descendants' is a statement about lineages: of the species alive in a past period, how many have any descendant alive today. No source gives species-level ancestor-descendant links (all three assessors and the scout say so), so the test substitutes the survival of TAXA, which is what the second half of the claim ('many whole orders, families and genera have died out entirely') states directly. This is a modern reinterpretation in three respects. (1) The twigs of Darwin's tree are mapped to accepted PBDB genera, with 'living descendant' operationalised as the genus being flagged extant (is_extant, at least one living member). A genus can have living descendants without being extant itself (pseudoextinction: the ancestral genus is renamed or split), so genus survival under-counts lineage survival; conversely a surviving genus does not show that any particular ancient species left descendants. The test therefore measures the stated taxonomic half of the claim and gives only a rough proxy for the species half. (2) The extinct share of families and orders is the more robust measure, as pseudoextinction affects higher ranks less; it is used for P3, P4, F2 and F3. (3) 'Very few' and 'many' are given the numbers 10 % (about one in ten) and 25 % respectively, chosen from the claim's wording and conventional round fractions, not from data. 'Long-past geological periods' is taken as the Paleozoic (primary) and the Mesozoic (pooled). The scope is fossil-bearing Metazoa in PBDB, so soft-bodied and unfossilised animals, plants, fungi and microbes are absent. The test does not cover: species-level survival, the denominator of all species that ever lived (unknown), the correctness of PBDB's extant flags, the phylogenetic reality of the ranks, plants or other kingdoms, or Darwin's claim about the fewness of branches of the tree of life as a topological statement about phylogenies including fossils.",
+  "caveats": [
+    "Before this registration was written, only metadata were inspected: the scout record's findings; the CSV header line of one query (rank=order, show=attr,app); the service's datainfo licence block; and three record counts from the 'Records Found' line (Metazoa genera 91,047 unfiltered, 79,170 with taxon_status=accepted; families 13,465 unfiltered; orders 1,739 unfiltered; extant=1 genera 17,984 unfiltered, taxon_status not applied). The scout also recorded 8,065 extinct-flagged family-rank records and one first-row header-level look at Trilobita (extinct, 56,593 occurrences). No value of is_extant, firstapp_min_ma or any other field was viewed for the genera, families or orders to be analysed, and no fraction was computed. Note that the unfiltered counts imply 17,984 / 91,047 (about 20 %) of ALL Metazoa genera records, regardless of age, are extant; this is arithmetic on two record counts from before registration and is not the statistic tested (it mixes ages, includes synonyms and includes genera with no fossil record), but it was visible to the author.",
+    "Prior knowledge of the likely outcome: the author expects from the palaeontological literature (for example, that most Paleozoic marine genera are extinct and that several Paleozoic classes and orders have no living member) that the extinct share of pre-Cenozoic families and orders will pass, and that Paleozoic genus survival will be low. Whether it falls below the 10 % bound in P1 is not known to the author and is the main place where the result could be 'mixed'. The test is therefore partly a replication of a well-known pattern on an open dataset and is not expected to be surprising.",
+    "PBDB is a living database that changes daily. The numbers will move slightly between runs. The analysis records retrieval time, byte size and SHA-256 for each fetched file; a re-run on a later snapshot is a replicate, not new evidence.",
+    "PBDB flags: is_extant may be blank for taxa where status is unknown. The share of blanks is not known before analysis and is governed by the inconclusive rule and the blank-as-extant sensitivity above. The meaning of firstapp_min_ma and firstapp_max_ma (the youngest and oldest bound of the age of first appearance) was inferred from the field names and the PBDB convention and is to be confirmed against the service's documentation (https://paleobiodb.org/data1.2/taxa/list_doc.html) before analysis; if the convention is opposite, the stratum rule is applied to the field that bounds the first appearance from below in time and the swap is recorded in 'deviations'.",
+    "Assignment of the claim to taxa is sensitive to PBDB's taxonomy and sampling: fossil sampling is incomplete and biased towards shelly marine animals, so the sample is not a random sample of past species. Genera defined with a very short fossil range or a single occurrence may be both more often missing from the fossil record and more often extinct.",
+    "The genus counts include the fossil-only and the extant-with-fossil-record genera. Extant genera with no fossil record are not in the denominator by construction (no firstapp), which is the correct denominator for 'species of past periods' but can bias the survival fraction upward or downward relative to the true biota.",
+    "The pass thresholds (10 %, 15 %, 25 %, 100 and 20 taxa) are round numbers fixed from the wording of the claim; the Wilson interval treats genera as independent draws, although genera within a family share fate (the intervals are therefore narrower than they should be). A sensitivity that resamples at the family level is not pre-registered; if run it is reported as descriptive.",
+    "The Mesozoic genus stratum is used in P2 together with the Paleozoic; the Cenozoic genera, which have had less time to go extinct, are deliberately excluded from the primary test.",
+    "The Open Tree of Life and the Catalogue of Life were considered as additional sources and are not used: neither provides first-appearance dates, Open Tree's fossil coverage is unverified, and MorphoBank returned HTTP 403 to the scout. Sepkoski's Online Genus Database was considered as an independent second source of genus-level ranges for marine animals, but no bulk download was located; if one is found before analysis, it can be added as a descriptive replicate only."
+  ],
+  "created": "2026-11-01T14:45:37Z",
+  "agent": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "prereg-darwin-batch-1", "date": "2026-11-01" }
+}

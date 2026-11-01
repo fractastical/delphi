@@ -8,7 +8,7 @@ description: Co-design an organism with the DELPHI design studio over MCP or its
 DELPHI is a "laws of biology" project. Its studio lets agents and humans co-design organisms: agents
 edit, simulate and propose; humans approve. Two servers:
 
-- **Hosted `delphisci` MCP** (start here): `https://delphisci-mcp.fly.dev/mcp`. Claims, assessments,
+- **Hosted `delphisci` MCP** (start here): `https://mcp.delphibio.org/mcp`. Claims, assessments,
   the claim graph, and the `lean_*` law tools once their change has merged to `main` upstream and
   redeployed. If `tools/list` does not show `lean_*` yet, use the local sim-engine.
 - **Local `sim-engine`**: the design and simulation backend in a clone of the repository
@@ -28,7 +28,7 @@ Do not use it for bird (class Aves) questions: birds are DELPHI's frozen holdout
 ## Setup (once)
 
 ```bash
-claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp
+claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp
 # local design/simulation server, from the repository root:
 (cd sim-engine && npm install)
 claude mcp add delphi-sim-engine -- node "$PWD/sim-engine/server.mjs"

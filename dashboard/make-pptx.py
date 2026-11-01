@@ -452,7 +452,7 @@ for head, body in asks:
     tbox(s, M, y + Inches(0.38), W - 2 * M - Inches(1), Inches(0.7), body, 12, False, MUTE, spacing=1.12)
     y += Inches(1.28)
 tbox(s, M, H - Inches(1.1), W - 2 * M, Inches(0.5),
-     "delphi-mission-control.ashenoy000.workers.dev/start/", 14, True, ACCENT)
+     "delphibio.org/start/", 14, True, ACCENT)
 
 prs.save(OUT)
 print(f"{OUT.name}: {len(prs.slides.__iter__.__self__._sldIdLst)} slides, "

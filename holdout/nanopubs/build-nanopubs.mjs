@@ -56,7 +56,7 @@ const MODEL = `${R}model/claude-fable-5-1`;
 const CREATOR = CREATOR_OVERRIDE || ASSESSOR; // no human ORCID until the key holder approves and signs
 const DOMAIN_CLAIMS = `${R}domain/math-population-genetics-and-evolutionary-theory`; // the two examined claims' own domain
 const DOMAIN_METHOD = `${R}domain/held-out-clade-exam`;
-const LIVE = 'https://delphi-mission-control.ashenoy000.workers.dev/t/holdout/'; // the only resolvable copy of holdout/ today
+const LIVE = 'https://delphibio.org/t/holdout/'; // the only resolvable copy of holdout/ today
 const LIVE_DATA = `${LIVE}data.json`;
 // Commit-pinned copy of holdout/ on the pushed branch (PR #36 against fractastical/delphi, head of delphi-hack-2026-10-31 on
 // xX-its-amit-Xx/delphi, public). Pass --commit <sha> when a newer push lands; files changed after this commit (the confirmed

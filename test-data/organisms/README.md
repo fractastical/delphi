@@ -237,6 +237,29 @@ period-colour stripe). The per-taxon cards are gitignored (~110 MB); thumbnails,
 timeline data and the two summaries are committed. Image licences are CC/public domain as
 reported by Commons; check `manifest.json` before reusing a picture outside this repo.
 
+### Tree of life with claims
+
+```sh
+node test-data/organisms/tree.mjs             # -> merged/tree.json, images/tree.svg (reuses the cached Open Tree answer)
+node test-data/organisms/tree.mjs --refresh   # re-query Open Tree of Life
+```
+
+`tree.mjs` draws the inventory as one time-calibrated tree (`images/tree.svg`, ~1200×8200 px,
+open it in a browser: boxes have tooltips and link to the claim graph). Topology comes from the
+Open Tree of Life synthetic tree: every accepted name is matched with the TNRS (exact matches, the
+"Animals" context for metazoan phyla so homonyms in other kingdoms cannot win) and the matched OTT
+ids go to `induced_subtree`. A merged taxon that contains another (an order and one of its species)
+is an internal node and is labelled there; a taxon that is not monophyletic in the synthetic tree
+is attached to the MRCA node Open Tree reports for it (`broken` in `merged/tree.json`). Horizontal
+position is the PBDB first appearance from `merged/timeline.json`; an internal node sits at the
+oldest first appearance beneath it, which is a lower bound on the clade's age and not a divergence
+time. Lineages with no PBDB range are dashed at an arbitrary position. Beside each taxon is one box
+per claim that mentions it (`mentioned_in` plus `merged/mentions.json`), coloured from
+`docs/claims.json`: theorem, data verdict (supports / mixed / inconclusive / refutes) or untested.
+`merged/tree.json` keeps the TNRS matches, the Newick string, the unmatched names (mostly obsolete
+or fossil-only names Open Tree does not carry: Pachydermata, Ichthyosauria, Productus), the ids
+pruned from the synthetic tree, and each taxon's placement and claim list, with the retrieval time.
+
 `merge.mjs` unifies taxa across slices and projects by GBIF key (else Wikidata QID, else NCBI
 taxid), unions names, mentions and datasets, merges shared-database records by id, and lists
 identifier conflicts for a human to resolve. The merged files are the input for the

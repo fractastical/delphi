@@ -112,7 +112,7 @@ pushes. Note: Kris owns the FORM simulator (#54) and open-problem queries (#55);
 TWO JOBS, the first is due first.
 
 JOB 1 — MCP TEST REPORT, due before check-in 2 (Sat ~8 PM). This is Amit's #53 deliverable.
-The server is https://delphisci-mcp.fly.dev/mcp (Streamable HTTP, no auth, 120 requests/min per IP);
+The server is https://mcp.delphibio.org/mcp (Streamable HTTP, no auth, 120 requests/min per IP);
 the local CLI is node mcp/cli.mjs; tools are documented in mcp/README.md. For every tool: call it with
 normal inputs, edge cases (empty, unknown ids, very long strings, wrong types) and the source=local vs
 source=network split. Record request, response, latency and whether the answer matches the repo files.

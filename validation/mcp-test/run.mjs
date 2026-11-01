@@ -1,5 +1,5 @@
 // MCP test harness for the delphisci server. Calls every tool on the hosted server
-// (https://delphisci-mcp.fly.dev/mcp) and on a local stdio copy (node mcp/server.mjs), checks
+// (https://mcp.delphibio.org/mcp) and on a local stdio copy (node mcp/server.mjs), checks
 // answers against an independent parse of the repo files, and writes validation/mcp-test-results.json.
 //   node validation/mcp-test/run.mjs
 // Paced at >= 1.1 s between hosted requests (< 55/min, limit is 120/min).
@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { REPO, buildIndex, rankIndependent } from "./repo-index.mjs";
 
-const HOST = process.env.MCP_URL ?? "https://delphisci-mcp.fly.dev/mcp";
+const HOST = process.env.MCP_URL ?? "https://mcp.delphibio.org/mcp";
 const GAP_MS = 1100;
 const TRUNC = 700;
 const CLAIM = "https://w3id.org/delphi/resource/claim/";

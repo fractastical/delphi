@@ -38,7 +38,7 @@ typedef uint64_t u64;
 #define MAXK 8
 
 static long N;
-static int S = 1024, TILE = 2048, NT = 1, KF = 4, QUIET = 0;
+static int S = 1024, TILE = 2048, NT = 6, KF = 1, QUIET = 0;
 static u64 *bufA, *bufB;      /* two row buffers, with PAD words of zero padding each side   */
 static long PADW;
 static uint8_t *col;          /* col[t] = c[t] as bytes                                      */
@@ -58,17 +58,35 @@ static inline void step1(u64 *b, long T) {
  * the stage it emits the output word for the index of c[s].  Word 0 and the last word are
  * computed with zero neighbors outside the buffer: garbage, but only inside the halo.      */
 #define DEFINE_STEPK(K)                                                                     \
-static void stepK_##K(u64 *b, long T) {                                                     \
+static void stepK_##K(u64 *restrict b, long T) {                                            \
     u64 p[K], c[K];                                                                         \
     for (int s = 0; s < K; s++) { p[s] = 0; c[s] = 0; }                                     \
-    for (long j = 0; j < T + K; j++) {                                                      \
-        u64 in = (j < T) ? b[j] : 0;                                                        \
+    long j = 0;                                                                             \
+    for (; j < K; j++) {                      /* prologue: nothing to store yet */          \
+        u64 in = b[j];                                                                      \
+        _Pragma("clang loop unroll(full)")                                                  \
         for (int s = 0; s < K; s++) {                                                       \
             u64 out = ((c[s] << 1) | (p[s] >> 63)) ^ (c[s] | ((c[s] >> 1) | (in << 63)));   \
             p[s] = c[s]; c[s] = in; in = out;                                               \
         }                                                                                   \
-        long idx = j - K;                                                                   \
-        if (idx >= 0 && idx < T) b[idx] = in;                                               \
+    }                                                                                       \
+    for (; j < T; j++) {                      /* main loop: no conditionals */              \
+        u64 in = b[j];                                                                      \
+        _Pragma("clang loop unroll(full)")                                                  \
+        for (int s = 0; s < K; s++) {                                                       \
+            u64 out = ((c[s] << 1) | (p[s] >> 63)) ^ (c[s] | ((c[s] >> 1) | (in << 63)));   \
+            p[s] = c[s]; c[s] = in; in = out;                                               \
+        }                                                                                   \
+        b[j - K] = in;                                                                      \
+    }                                                                                       \
+    for (; j < T + K; j++) {                  /* epilogue: flush with zero input */         \
+        u64 in = 0;                                                                         \
+        _Pragma("clang loop unroll(full)")                                                  \
+        for (int s = 0; s < K; s++) {                                                       \
+            u64 out = ((c[s] << 1) | (p[s] >> 63)) ^ (c[s] | ((c[s] >> 1) | (in << 63)));   \
+            p[s] = c[s]; c[s] = in; in = out;                                               \
+        }                                                                                   \
+        if (j - K < T) b[j - K] = in;                                                       \
     }                                                                                       \
 }
 DEFINE_STEPK(1) DEFINE_STEPK(2) DEFINE_STEPK(3) DEFINE_STEPK(4)
@@ -215,14 +233,13 @@ int main(int argc, char **argv) {
             fprintf(stderr, "[%7.1fs] t=%ld (%.1f%% rows, %.1f%% work)  eta %.0fs\n", el, t0, 100 * frac, 100 * wf,
                     wf > 0 ? el * (1 - wf) / wf : 0.0);
             t_last = tn; (void)last_t0;
-            if (outp && tn - t_flush > 300.0) { write_packed(outp, t0); t_flush = tn; }
+            if (outp && tn - t_flush > 120.0) { write_packed(outp, t0); t_flush = tn; }
         }
     }
     atomic_store(&quit, 1);
     for (int i = 1; i < NT; i++) pthread_join(th[i], NULL);
     double el = now() - t_start;
     if (outp) write_packed(outp, N);
-    long ones = 0; for (long t = 0; t <= N; t++) ones += col[t];
-    fprintf(stderr, "done N=%ld in %.2fs (S=%d TILE=%d K=%d threads=%d)  ones=%ld\n", N, el, S, TILE, KF, NT, ones);
+    fprintf(stderr, "done N=%ld in %.2fs (S=%d TILE=%d K=%d threads=%d)\n", N, el, S, TILE, KF, NT);
     return 0;
 }

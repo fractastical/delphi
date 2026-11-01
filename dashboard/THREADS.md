@@ -46,7 +46,7 @@ area and one sub-dashboard, and talks to the others through files first and mess
    cd dashboard && npx wrangler deploy
    ```
    Run it after a meaningful update. Never deploy from a copy of the tree. The live site is
-   https://delphi-mission-control.ashenoy000.workers.dev and your page lives at `/t/<you>/`.
+   https://delphibio.org and your page lives at `/t/<you>/`.
 6. **Rules inherited from `AGENTS.md` and `BEST_PRACTICES.md`**, in short: nanopubs go to the test registry only and only
    with the key owner's approval; an assessor never scores what it built; never invent a DOI, accession, URL or number;
    pre-register a test before looking at data; never put API keys or the hackathon's credit links in the repo.

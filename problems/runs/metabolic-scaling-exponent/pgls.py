@@ -35,10 +35,6 @@ class Tree:
                 lst = [idx_of[i]] if i in idx_of else []
             else:
                 groups = [g for g in child_lists.pop(i, []) if g]
-                lst = []
-                for g in groups:
-                    for h in lst_groups_prev(lst, groups, g):
-                        pass
                 if len(groups) > 1:
                     for a in range(len(groups)):
                         for b in range(a + 1, len(groups)):
@@ -54,14 +50,9 @@ class Tree:
             raise ValueError("kept tips have no common ancestor")
         tipdepth = np.array([self.depth[self.leaf[k]] for k in keep])
         C[np.diag_indices(n)] = tipdepth
-        C -= base
-        C[np.diag_indices(n)] = tipdepth - base
+        C -= base  # every pair was set at its MRCA (depth >= base), so no zero entries are shifted
         scale = np.max(np.diag(C))
         return C / scale, base, scale
-
-
-def lst_groups_prev(a, b, c):  # placeholder kept trivial (no-op generator)
-    return ()
 
 
 def parse_newick(s, translate=None):
@@ -143,7 +134,8 @@ def fit_pgls(y, X, C, lam=None):
     """ML PGLS. lam=None: Pagel's lambda estimated in [0,1]. Returns dict."""
     y = np.asarray(y, float)
     X = np.asarray(X, float)
-    n, p = X.shape
+    n = X.shape[0]
+    p = int(np.linalg.matrix_rank(X))
     if lam is None:
         cand = [(_ml(y, X, C, 0.0), 0.0), (_ml(y, X, C, 1.0), 1.0)]
         res = optimize.minimize_scalar(lambda l: -_ml(y, X, C, l), bounds=(0.0, 1.0), method="bounded",
@@ -157,7 +149,7 @@ def fit_pgls(y, X, C, lam=None):
     ll, beta, rss, LX, r, L = _ml(y, X, C, lam, want_all=True)
     sig2_ml = rss / n
     sig2_u = rss / (n - p)
-    cov = sig2_u * np.linalg.inv(LX.T @ LX)
+    cov = sig2_u * np.linalg.pinv(LX.T @ LX)
     se = np.sqrt(np.diag(cov))
     aic = -2 * ll + 2 * k
     aicc = aic + 2 * k * (k + 1) / (n - k - 1)

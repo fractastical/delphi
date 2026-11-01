@@ -19,7 +19,7 @@ all of them follow the latest LeanBio statements without a manual step:
 | env | values | default |
 |---|---|---|
 | `LEANBIO_REMOTE` | `off` \| `mirror` \| `github` | `mirror` when hosted (`DELPHI_HTTP_PORT` set, i.e. Fly.io); `off` for local use (local files first) |
-| `LEANBIO_MIRROR_URL` | base of a static mirror | `https://delphi-mission-control.ashenoy000.workers.dev/api/lean/` |
+| `LEANBIO_MIRROR_URL` | base of a static mirror | `https://delphibio.org/api/lean/` |
 | `LEANBIO_REPO`, `LEANBIO_REF` | `owner/repo`, branch/tag/commit (github mode) | `fractastical/delphisci`, `main` |
 | `LEANBIO_GITHUB_URL` | base of raw `lean/registry/` files (overrides repo+ref) | from REPO+REF |
 | `LEANBIO_TTL_S` | seconds between checks | `600` |
@@ -148,15 +148,15 @@ The helper scripts live outside the repo in `C:/Temp/leanbio-demo/bin/`:
 
 ```
 cd delphisci
-DELPHI_HTTP_PORT=8791 LEANBIO_REMOTE=mirror LEANBIO_MIRROR_URL=https://delphi-mission-control.ashenoy000.workers.dev/api/lean/ LEANBIO_TTL_S=20 node mcp/server.mjs
+DELPHI_HTTP_PORT=8791 LEANBIO_REMOTE=mirror LEANBIO_MIRROR_URL=https://delphibio.org/api/lean/ LEANBIO_TTL_S=20 node mcp/server.mjs
 # log:
 delphisci MCP on :8791/mcp (2758 TriG files, claim graph 2026-10-31 03:41)
-lean laws: remote:mirror lawset 1.5.0 (https://delphi-mission-control.ashenoy000.workers.dev/api/lean/)
+lean laws: remote:mirror lawset 1.5.0 (https://delphibio.org/api/lean/)
 ```
 
 ```
 $ curl -s localhost:8791/healthz
-{"ok":true,"version":"0.4.0","files":2758,"built":"2026-10-31 03:41","lean":{"source":"remote:mirror","lawset_version":"1.5.0","fetched_at":"2026-11-01T04:03:48.617Z","checked_at":"2026-11-01T04:04:24.325Z","url":"https://delphi-mission-control.ashenoy000.workers.dev/api/lean/","integrity":"verified: 53 law files, 301 pins across 6 lawsets, all match content_hash"}}
+{"ok":true,"version":"0.4.0","files":2758,"built":"2026-10-31 03:41","lean":{"source":"remote:mirror","lawset_version":"1.5.0","fetched_at":"2026-11-01T04:03:48.617Z","checked_at":"2026-11-01T04:04:24.325Z","url":"https://delphibio.org/api/lean/","integrity":"verified: 53 law files, 301 pins across 6 lawsets, all match content_hash"}}
 $ node /c/Temp/leanbio-demo/bin/mcp-call.mjs 8791 lean_lawset_get '{}' source lawset_version fetched_at source_detail.integrity result.version result.previous result.is_current
 {
  "source": "remote:mirror",
@@ -176,7 +176,7 @@ $ node /c/Temp/leanbio-demo/bin/mcp-call.mjs 8791 lean_source_status '{}' source
  "result.mode": "mirror",
  "result.mode_reason": "LEANBIO_REMOTE=mirror",
  "result.ttl_s": 20,
- "result.remote.url": "https://delphi-mission-control.ashenoy000.workers.dev/api/lean/",
+ "result.remote.url": "https://delphibio.org/api/lean/",
  "result.remote.laws": 52,
  "result.remote.laws_verified": 53,
  "result.remote.pins_verified": 301,
@@ -230,8 +230,8 @@ The server keeps the mirror URL it started with, so phase b runs a second server
 copy of the live mirror. That server is never restarted.
 
 ```
-$ node bin/copy-live.mjs https://delphi-mission-control.ashenoy000.workers.dev/api/lean/ C:/Temp/leanbio-demo/mirror
-copied 61 files of lawset 1.5.0 from https://delphi-mission-control.ashenoy000.workers.dev/api/lean/ to C:/Temp/leanbio-demo/mirror
+$ node bin/copy-live.mjs https://delphibio.org/api/lean/ C:/Temp/leanbio-demo/mirror
+copied 61 files of lawset 1.5.0 from https://delphibio.org/api/lean/ to C:/Temp/leanbio-demo/mirror
 node C:/Temp/leanbio-demo/bin/serve.mjs C:/Temp/leanbio-demo/mirror 8792
 DELPHI_HTTP_PORT=8793 LEANBIO_REMOTE=mirror LEANBIO_MIRROR_URL=http://127.0.0.1:8792/api/lean/ LEANBIO_TTL_S=15 node mcp/server.mjs
 # log:

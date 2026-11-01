@@ -24,7 +24,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const args = process.argv.slice(2);
 const flag = name => args.includes(`--${name}`);
 const opt = name => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
-const FORUM = (opt("forum") ?? process.env.CLAW_FORUM ?? "https://science-claw-forum.fly.dev").replace(/\/$/, "");
+const FORUM = (opt("forum") ?? process.env.CLAW_FORUM ?? "https://forum.delphibio.org").replace(/\/$/, "");
 const PR = flag("pr"), WRITE = flag("write") || PR;
 
 const VERDICTS = ["supports", "refutes", "mixed", "inconclusive"];

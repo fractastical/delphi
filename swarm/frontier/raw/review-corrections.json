@@ -1,0 +1,175 @@
+{
+ "counterfactual": "For every entry it is unknown whether one agent re-reading its own work could have found the same issue; this ledger cannot answer that.",
+ "entries": [
+  {
+   "correction": {
+    "also_fixed": [
+     "sensitivity enumerated plans at nominal prices only",
+     "off-grid control was hard-coded True",
+     "baseline-not-beaten denominator mixed ineligible scenarios"
+    ],
+    "commit": "4d9628f",
+    "preserved_old_outputs": "artifacts/crossscale-doe/superseded/ (SUPERSEDED.json)",
+    "protocol_frozen_before_rerun": "c151433"
+   },
+   "decision_changed": "Retracted a claim that measurement halves a 0.50 misclassification rate; the stated benefit is now small because the finalist is already probably inside the regime.",
+   "id": "doe-centered-margin",
+   "information_used": "Root read the code and the arithmetic of the exercise; the author had only run it.",
+   "limits": [
+    "Old v1 outputs were overwritten before commit and are irrecoverable; only a labelled regeneration exists",
+    "The corrected figure is a model-based exercise, not an observed error rate"
+   ],
+   "recheck": {
+    "tests": "tests/test_crossscale_doe.py, 19 passed (author-run)",
+    "values": "no measurement 0.043, baseline 0.028, selected 0.023",
+    "what": "v3 run with the finalist offset m0=1.27",
+    "where": "artifacts/crossscale-doe/result.json measurement.decision_exercise"
+   },
+   "review": {
+    "class": "root_review",
+    "finding": "the exercise drew a zero-mean perturbation, so the no-measurement arm was 0.50 by construction; the finalist actually passes 63/64",
+    "locator": "findings 1-5",
+    "receipt": "/data/artifacts/delphi-evolve-rethink/messages/root-doe-review-findings.md",
+    "reviewer": "root session (same fleet, not an independent lab)"
+   },
+   "submitted": {
+    "artifact": "artifacts/crossscale-doe/result.json",
+    "author": "claude-14 (self)",
+    "claim_withdrawn": "sign-misclassification 0.50 (no measurement) / 0.13 (baseline) / 0.10 (selected)",
+    "version": "11b5c30"
+   },
+   "title": "DOE decision exercise used a centered margin; corrected to the finalist's actual margin"
+  },
+  {
+   "correction": {
+    "commit": "1a084328ae49ae2c065465d1c400cb8df3d6f78f",
+    "subject": "strict bool/digest validation, bound to typed instrument-contracts"
+   },
+   "decision_changed": "The compiler's string-flag and arbitrary-string-digest behaviour was treated as a blocking residual until fixed; the review kept the claim to bookkeeping, not biology.",
+   "id": "sequence-compiler-typed-inputs",
+   "information_used": "An independent reader built adversarial typed inputs the author's tests had not, and compared snapshots to Git objects.",
+   "limits": [
+    "Reviewer and author are agents of the same fleet",
+    "No general fuzzing or full-suite run was done"
+   ],
+   "recheck": {
+    "caution": "17/19 and 29/29 are DIFFERENT check sets (the later set adds conditions); they are not a before/after percentage and no improvement rate is claimed",
+    "commit": "b02b51a",
+    "receipt": "artifacts/audits/sequence-compiler/reconciled-receipt.json (sha256 112cd0900abcbf27b440d6a8bc45b4eed85116ba5b36d7b8f9b03020f18f2a28 per the reviewer's handoff)",
+    "what": "both prior failures now reject at the intended gates; 29 of 29 declared conditions pass"
+   },
+   "review": {
+    "class": "separate_harness_review",
+    "finding": "endpoint=\"false\" (a string) coerced truthy and could pass a bound plan; inputs.upstream=\"not-a-digest\" was accepted as a dependency",
+    "note": "17 of 19 scoped checks passed at that commit",
+    "receipt": "artifacts/audits/sequence-compiler/final-receipt.json at 7d5d06b; report docs/audits/sequence-compiler-spec017-review-2026-10-31.md",
+    "reviewer": "sequence/compiler review harness, branch work/sequence-compiler-review"
+   },
+   "submitted": {
+    "artifact": "engineering/biodesign_compiler/genotype.py",
+    "author": "claude-02 (compiler owner)",
+    "version": "3b2ca996e6095e3e4b20ed0255c687f31007e403"
+   },
+   "title": "Separate-harness review found two typed-input holes in the genotype compiler"
+  },
+  {
+   "correction": {
+    "commits": [
+     "f2f0c69",
+     "68117a9",
+     "189c0e5"
+    ],
+    "note": "each issue was reproduced on a temp tree before the fix, per the handoff"
+   },
+   "decision_changed": "Cache reuse was no longer trusted on the manifest alone; stale pins now produce typed blocked results, not passes.",
+   "id": "compiler-cache-and-pins",
+   "information_used": "The reviewers supplied the cases (pinned-byte change, repointed pin, missing file); the author supplied the reproduction.",
+   "limits": [
+    "Original pre-fix compiler bytes are available only through git history; no separate baseline run was fabricated"
+   ],
+   "recheck": {
+    "uncovered_recorded": "STAGE_FILES is hand-listed; modules imported by coupling.py are not hashed; blocked gating is conservative",
+    "what": "tests/test_biodesign_compiler.py 19 passed, run --check PASS at 189c0e5 (author-run)"
+   },
+   "review": {
+    "class": "native_review_then_root_review",
+    "finding": "a changed geometry_panels pin or aero path was served from cache and structural_refs still passed; later, changed pinned bytes with an unchanged manifest reused a pass, a repointed pin was ignored, and a missing file crashed",
+    "locator": "sections 'Cache-invalidation issue from native mechanobio review' and 'Update: second review'",
+    "receipt": "/data/artifacts/delphi-evolve-rethink/messages/compiler-to-root.md",
+    "reviewer": "native mechanobio read-only review, then root"
+   },
+   "submitted": {
+    "artifact": "engineering/biodesign_compiler/compile.py",
+    "author": "claude-14 (self)",
+    "version": "first handoff before f2f0c69"
+   },
+   "title": "Compiler cache keys and pin reads: reproduced stale-cache false passes in two review rounds"
+  },
+  {
+   "correction": {
+    "commit": "474fb8e",
+    "summary": "field renamed live_harness_processes_now; root-attested mappings added, each verified against a commit, branch or handoff"
+   },
+   "decision_changed": "A headline contributor number moved from 4 to an 11 floor, and 31 stopped being described as active.",
+   "id": "contributor-count-labels",
+   "information_used": "Root's out-of-band knowledge of which harness wrote which commit, which the ledger could not derive from the shared git identity.",
+   "limits": [
+    "The 11 rests partly on root's attestation of artifacts, not on independent authorship evidence",
+    "This is a counting correction, not evidence of a capability"
+   ],
+   "recheck": {
+    "tests": "tests/test_agent_contributors.py (author-run)",
+    "values": "supported minimum 4 at 1ff9f00, 11 at 474fb8e; 31 live processes kept as a separate, unlabelled-activity count",
+    "what": "count read back from the committed JSON"
+   },
+   "review": {
+    "class": "root_review",
+    "finding": "harness authors known to root were missing; idle or auth-blocked panes were labelled active_verified",
+    "receipt": "chat review message to the author session; the durable trace is the handoff /data/artifacts/delphi-evolve-rethink/messages/contributors-to-root.md and the diff 1ff9f00..474fb8e",
+    "reviewer": "root session"
+   },
+   "submitted": {
+    "artifact": "results/resources/agent-contributors.json",
+    "author": "claude-14 (self)",
+    "version": "1ff9f00"
+   },
+   "title": "Contributor ledger mislabelled 31 live processes as verified active and missed known authors"
+  },
+  {
+   "correction": {
+    "commit": "895487f"
+   },
+   "decision_changed": "The analytic screen's agreement with 192 recorded flags became meaningful evidence only after the control could fail.",
+   "id": "doe-mutant-control",
+   "information_used": "Only the author's own declared acceptance gate; no other agent was involved.",
+   "limits": [
+    "Code was edited after the v1 protocol freeze; the protocol did not pin code (disclosed in SUPERSEDED.json)"
+   ],
+   "recheck": {
+    "what": "the wrong-exponent mutant now changes 86 of 192 recorded flags",
+    "where": "artifacts/crossscale-doe/result.json controls.C3_mutant_changes_recorded_flags"
+   },
+   "review": {
+    "class": "author_self_correction",
+    "finding": "control C3's mutant was algebraically the true law, changed 0 recorded flags, and the run refused to select",
+    "receipt": "commit message of 895487f",
+    "reviewer": "none; the declared control failed"
+   },
+   "submitted": {
+    "artifact": "engineering/experimental_design/crossscale_screen.py",
+    "author": "claude-14 (self)",
+    "version": "ad18627"
+   },
+   "title": "A validator control that could not detect anything was caught by the run refusing"
+  }
+ ],
+ "independence": "All reviewers are agents or sessions of one fleet sharing one git identity; none is an independent lab. Classes: author_self_correction, root_review, separate_harness_review, native_review.",
+ "nature": "retrospective process trace of five corrections, not a controlled multi-agent benchmark",
+ "not_claimed": [
+  "that collective work outperforms a single agent",
+  "any agent-count based advantage",
+  "any scientific breakthrough count",
+  "a percentage improvement between differing check sets"
+ ],
+ "schema": "frontier.coordination.review-corrections/1"
+}
