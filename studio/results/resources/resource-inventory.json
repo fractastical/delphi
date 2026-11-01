@@ -2,8 +2,8 @@
   "$schema": "resource-inventory.schema.json",
   "schema_version": "frontier.resource-inventory/1",
   "observed_at": {
-    "utc": "2026-11-01T01:23:03.403639Z",
-    "seattle": "2026-10-31 18:23:03 PDT (UTC-07:00)"
+    "utc": "2026-11-01T01:25:57.458889Z",
+    "seattle": "2026-10-31 18:25:57 PDT (UTC-07:00)"
   },
   "scope": {
     "project": "delphi-frontier",
@@ -19,24 +19,39 @@
   "compute": {
     "nebius": {
       "project_id": "project-e00p797qpr0049snsqvf0k",
-      "observed_at_utc": "2026-11-01T01:23:03.403639Z",
-      "own_job_count": 39,
+      "observed_at_utc": "2026-11-01T01:25:57.458889Z",
+      "own_job_count": 40,
       "job_states": {
+        "STARTING": 1,
         "COMPLETED": 29,
         "FAILED": 7,
         "CANCELLED": 3
       },
       "active_allocations": {
-        "instances": 0,
+        "instances": 1,
         "running_instances": 0,
         "pulling_instances": 0,
-        "gpus": 0,
-        "vcpus": 0,
-        "memory_gb": 0,
+        "gpus": 1,
+        "vcpus": 16,
+        "memory_gb": 200,
         "jobs_with_unknown_capacity": 0,
         "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
       },
-      "active_jobs": [],
+      "active_jobs": [
+        {
+          "id": "aijob-e00rhs6hdan4n57kv8",
+          "name": "delphi-evolve-ops-infra27-nca-inverse-pattern-four-model-com",
+          "created_at": "2026-11-01T01:24:20.327698Z",
+          "state": "STARTING",
+          "platform": "gpu-h100-sxm",
+          "preset": "1gpu-16vcpu-200gb",
+          "requested_capacity": {
+            "gpu": 1,
+            "vcpu": 16,
+            "gb": 200
+          }
+        }
+      ],
       "cpu_worker_attempt": {
         "preset": "4vcpu-16gb",
         "timeout": "2h",
@@ -49,11 +64,12 @@
         "price": "unavailable"
       },
       "live_state_request_window_utc": [
-        "2026-11-01T01:23:01.360549+00:00",
-        "2026-11-01T01:23:03.403639+00:00"
+        "2026-11-01T01:25:55.865196+00:00",
+        "2026-11-01T01:25:57.458889+00:00"
       ],
       "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
       "shared_state_counts": {
+        "STARTING": 1,
         "COMPLETED": 61,
         "FAILED": 17,
         "CANCELLED": 5,
@@ -85,6 +101,19 @@
         "provider_spend": null
       },
       "own_jobs": [
+        {
+          "id": "aijob-e00rhs6hdan4n57kv8",
+          "name": "delphi-evolve-ops-infra27-nca-inverse-pattern-four-model-com",
+          "created_at": "2026-11-01T01:24:20.327698Z",
+          "state": "STARTING",
+          "platform": "gpu-h100-sxm",
+          "preset": "1gpu-16vcpu-200gb",
+          "requested_capacity": {
+            "gpu": 1,
+            "vcpu": 16,
+            "gb": 200
+          }
+        },
         {
           "id": "aijob-e00dw01t3zcsg4az55",
           "name": "delphi-evolve-ops-infra26-rd-ddpm-preregistered-secondary-a1",
@@ -587,9 +616,9 @@
           }
         }
       ],
-      "current_frontier_job_count": 39,
+      "current_frontier_job_count": 40,
       "historical_team_job_count": 15,
-      "team_job_count": 54,
+      "team_job_count": 55,
       "unattributed_job_count": 30,
       "team_count_scope": "Current Frontier prefix count remains separate from exact-ID historical attribution; no cancellation permissions are changed.",
       "measured_terminal_container_work": {
@@ -607,7 +636,7 @@
     },
     "google_compute": {
       "project": "scienceclaw26bos-3016",
-      "observed_at_utc": "2026-11-01T01:05:59.509116+00:00",
+      "observed_at_utc": "2026-11-01T01:27:40.060899+00:00",
       "global_cpu_limit": 32,
       "gpu_quota_granted": 1,
       "gpu_vm_created": true,
@@ -637,7 +666,7 @@
           "id": "946761909192569249",
           "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
           "name": "frontier-cpu-20261031-04",
-          "status": "RUNNING",
+          "status": "TERMINATED",
           "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
         },
         {
@@ -654,9 +683,9 @@
           "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
         }
       ],
-      "active_allocated_vcpus": 24,
+      "active_allocated_vcpus": 20,
       "instantaneous_cpu_utilization": null,
-      "state": "VM03 runs R1/R3/M1 cylinder controls; VM04 ecology dependency setup and same-job controls; GPU01 L4 startup driver recognized and frozen calibration pipeline started. VM01/02 stopped; genomics23/23 exported. Allocation is not measured utilization.",
+      "state": "VM03 runs R1/R3/M1 cylinder controls; L4 pinned environment and actual CUDA.functional passed, restart/platform controls pending. Ecology exported26computed scenario pairs plus2not-started statuses; VM04 stopped. Genomics23/23 exported; VM01/02 stopped.",
       "plan": [
         {
           "vm": "frontier-cpu-20261031-03",
@@ -689,7 +718,7 @@
         "results/resources/gcp/cfd-bootstrap-failure.json",
         "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
       ],
-      "status_update_utc": "2026-11-01T01:05:59.509116+00:00",
+      "status_update_utc": "2026-11-01T01:27:40.060899+00:00",
       "genomics_completed": "results/resources/gcp/genomics-completion.json",
       "automatic_collection": {
         "service": "frontier-cfd-collector",
@@ -700,8 +729,8 @@
         "completion_is_export_not_science": true
       },
       "next_ecology": {
-        "state": "admitted, initial export succeeded; same-job controls pending",
-        "receipt": "results/resources/gcp/ecology-admission.json"
+        "state": "Original26pairs complete,2not-started arms; missing-only packet being prepared with original gates",
+        "receipt": "results/resources/gcp/ecology-completion.json"
       },
       "l4_admission": {
         "id": "4266786588371661074",
@@ -712,6 +741,14 @@
           "us-central1-b"
         ],
         "receipt": "results/resources/gcp/cfd-r2-l4-verified.json"
+      },
+      "l4_environment_gate": {
+        "passed": true,
+        "seconds_after_start": 735.4,
+        "actual_device": "NVIDIA L4",
+        "canonical_pins_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
+        "scientific_platform_gate": null,
+        "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json"
       }
     },
     "launch_outcomes": {
