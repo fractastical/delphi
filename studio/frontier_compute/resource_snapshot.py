@@ -23,6 +23,36 @@ PREFIXES = ("delphi-evolve-ops-", "bioservices-")
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "CANCELED", "STOPPED", "DELETED", "ERROR", "SUCCEEDED"}
 
 
+def own_state_counts(jobs):
+    """Stable typed counts from provider presets; missing capacity stays unknown."""
+    counts = {kind: Counter() for kind in ("gpu", "cpu", "unknown")}
+    for job in jobs:
+        capacity = job.get("requested_capacity", {})
+        kind = "gpu" if capacity.get("gpu", 0) > 0 else "cpu" if capacity.get("vcpu", 0) > 0 else "unknown"
+        counts[kind][job["state"]] += 1
+    return {kind: dict(states) for kind, states in counts.items()}
+
+
+def refresh_usage(usage, snapshot, shared):
+    """Keep website counts and attribution on the exact same provider window."""
+    result = dict(usage)
+    result.update({
+        "observed_at_utc": snapshot["observed_at_utc"],
+        "observed_at_seattle": shared["observed_at_seattle"],
+        "provider_window_utc": snapshot["live_state_request_window_utc"],
+        "own_jobs": snapshot["own_jobs"],
+        "own_job_state_counts": own_state_counts(snapshot["own_jobs"]),
+        "own_job_state_counts_scope": "Current Frontier prefix jobs only; resource kind comes from the provider preset, with absent capacity kept unknown.",
+        "team_attribution": {
+            **shared,
+            "current_frontier_jobs": snapshot["current_frontier_job_count"],
+            "historical_team_jobs": snapshot["historical_team_job_count"],
+            "unattributed_jobs": snapshot["unattributed_job_count"],
+        },
+    })
+    return result
+
+
 def telemetry_summary(label: str, path: Path) -> dict:
     """Summarize actual device samples, retaining their original time window."""
     with path.open() as stream:
@@ -72,6 +102,37 @@ def ownership_class(job, historical=()):
                 raise ValueError("Historical ownership ID/name mismatch")
             return "historical_team"
     return "unattributed"
+
+
+def terminal_runtime_summary(directory, own_jobs):
+    """Deduplicate measured container durations, retaining each exact receipt."""
+    own = {row["id"]: row for row in own_jobs}
+    rows = {}
+    for path in sorted(Path(directory).rglob("manifest*.json")):
+        document = json.loads(path.read_text())
+        for run in document.get("owned", []):
+            jid = run.get("id")
+            result = run.get("result") or {}
+            seconds = result.get("wall_s")
+            if jid not in own or seconds is None:
+                continue
+            if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
+                raise ValueError("Invalid measured container duration")
+            if own[jid]["state"] not in TERMINAL:
+                continue
+            row = {"job_id": jid, "kind": "gpu" if "gpu" in own[jid]["preset"] else "cpu",
+                   "provider_state": own[jid]["state"], "container_seconds": seconds,
+                   "receipt": str(path), "receipt_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                   "truncated": result.get("truncated"), "timed_out": result.get("timed_out")}
+            if jid in rows and rows[jid]["container_seconds"] != seconds:
+                raise ValueError("Conflicting measured durations for one job")
+            rows[jid] = row
+    totals = {kind: {"jobs": sum(r["kind"] == kind for r in rows.values()),
+                     "seconds": round(sum(r["container_seconds"] for r in rows.values() if r["kind"] == kind), 6)}
+              for kind in ("gpu", "cpu")}
+    return {"schema": "frontier.measured-container-runtime/1", "totals": totals,
+            "rows": list(rows.values()),
+            "scope": "Subset of exact owned terminal controller receipts, including failures. Container duration includes setup and emission; it is not GPU kernel time or all historical usage. GCP VM time is excluded."}
 
 
 def summarize_shared(document, observed, historical=()):
@@ -169,6 +230,13 @@ def refresh(path: Path, cli: str) -> dict:
     inventory = json.loads(path.read_text())
     prior = inventory["compute"]["nebius"]
     inventory["compute"]["nebius"] = {**prior, **snapshot}
+    runtime_directory = path.parent.parent / "infra"
+    if runtime_directory.is_dir():
+        runtime = terminal_runtime_summary(runtime_directory, snapshot["own_jobs"])
+        runtime_path = path.parent / "terminal-runtime-receipts.json"
+        runtime_path.write_text(json.dumps(runtime, indent=2) + "\n")
+        inventory["compute"]["nebius"]["measured_terminal_container_work"] = {
+            **runtime["totals"], "scope": runtime["scope"], "receipt": str(runtime_path)}
     local = observed.astimezone(ZoneInfo("America/Los_Angeles"))
     offset = local.strftime("%z")
     inventory["observed_at"] = {
@@ -189,6 +257,12 @@ def refresh(path: Path, cli: str) -> dict:
     temporary = shared_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(shared, indent=2) + "\n")
     temporary.replace(shared_path)
+    usage_path = path.parent / "hackathon-usage.json"
+    if usage_path.exists():
+        usage = refresh_usage(json.loads(usage_path.read_text()), snapshot, shared)
+        temporary = usage_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(usage, indent=2) + "\n")
+        temporary.replace(usage_path)
     return snapshot
 
 

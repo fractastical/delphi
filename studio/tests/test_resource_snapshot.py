@@ -5,6 +5,29 @@ import pytest
 from frontier_compute.resource_snapshot import ownership_class, summarize, summarize_shared, telemetry_summary
 
 
+def test_usage_refresh_preserves_kind_and_same_window_attribution():
+    from frontier_compute.resource_snapshot import refresh_usage
+
+    snapshot = {
+        "observed_at_utc": "now", "live_state_request_window_utc": ["start", "now"],
+        "own_jobs": [
+            {"state": "RUNNING", "requested_capacity": {"gpu": 1, "vcpu": 16}},
+            {"state": "FAILED", "requested_capacity": {"vcpu": 4}},
+            {"state": "COMPLETED", "requested_capacity": {}},
+        ],
+        "current_frontier_job_count": 3, "historical_team_job_count": 2,
+        "unattributed_job_count": 4,
+    }
+    shared = {"observed_at_seattle": "local", "request_window_utc": ["start", "now"]}
+    result = refresh_usage({"model_usage": {"calls": 7}, "own_job_state_counts": {"RUNNING": 999}}, snapshot, shared)
+    assert result["own_job_state_counts"] == {"gpu": {"RUNNING": 1}, "cpu": {"FAILED": 1}, "unknown": {"COMPLETED": 1}}
+    assert result["team_attribution"]["current_frontier_jobs"] == 3
+    assert result["team_attribution"]["historical_team_jobs"] == 2
+    assert result["team_attribution"]["unattributed_jobs"] == 4
+    assert result["provider_window_utc"] == result["team_attribution"]["request_window_utc"]
+    assert result["model_usage"] == {"calls": 7}
+
+
 def test_allocation_counts_include_bioservices_without_leaking_specs():
     jobs = {"items": [
         {"metadata": {"id": "ours", "name": "bioservices-assay"},
@@ -101,3 +124,22 @@ def test_historical_attribution_is_exact_and_keeps_current_scope_separate():
 def test_historical_identity_mismatch_refuses_attribution():
     with pytest.raises(ValueError, match="ID/name mismatch"):
         ownership_class({"metadata": {"id": "old", "name": "changed"}}, [{"id": "old", "name": "original"}])
+
+
+def test_runtime_receipts_deduplicate_own_jobs_and_reject_conflicting_durations(tmp_path):
+    from frontier_compute.resource_snapshot import terminal_runtime_summary
+    import json
+    import pytest
+
+    own = [{"id": "ours", "preset": "1gpu-16vcpu", "state": "FAILED"}]
+    doc = {"owned": [{"id": "ours", "result": {"wall_s": 12.5}},
+                     {"id": "foreign", "result": {"wall_s": 999}}]}
+    (tmp_path / "manifest-a.json").write_text(json.dumps(doc))
+    (tmp_path / "manifest-b.json").write_text(json.dumps(doc))
+    result = terminal_runtime_summary(tmp_path, own)
+    assert result["totals"]["gpu"] == {"jobs": 1, "seconds": 12.5}
+    assert len(result["rows"]) == 1 and result["rows"][0]["provider_state"] == "FAILED"
+    doc["owned"][0]["result"]["wall_s"] = 13
+    (tmp_path / "manifest-b.json").write_text(json.dumps(doc))
+    with pytest.raises(ValueError, match="Conflicting"):
+        terminal_runtime_summary(tmp_path, own)
