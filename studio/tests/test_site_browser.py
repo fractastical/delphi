@@ -1532,3 +1532,19 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
     assert pg.locator(".subnav a:has-text('Genetic blueprints')").count() == 1
+
+
+def test_openresearch_exemplars_are_local_recorder_provenance_not_a_cloud_dispatcher(browser, base):
+    O = json.loads((ROOT / "site/data/snapshot.json").read_text())["openresearch"]
+    facts = json.loads((ROOT / "connectors/biomodels/orx/orx_facts.json").read_text())
+    assert len(O["exemplars"]) == 2 and O["exemplars"][0]["commit"] == facts["commit_sha"]
+    assert [x["sha256"] for x in O["exemplars"][0]["outputs"]] == [x["sha256"] for x in facts["outputs"]]
+    assert all(e["backend"] == "local_job" for e in O["exemplars"])
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built"); pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "Recorded OpenResearch runs (local exemplars)" in t and "not a cloud dispatcher" in t and "none of these runs used a remote backend" in t
+    assert "database exit code null" in t and "Collier 1996 replay v4" in t and "Neumann-mode Turing scan" in t
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/work?tab=built"); pg2.wait_for_selector("#bt-h")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
