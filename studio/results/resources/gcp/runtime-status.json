@@ -1,6 +1,6 @@
 {
   "project": "scienceclaw26bos-3016",
-  "observed_at_utc": "2026-11-01T01:38:47.734237+00:00",
+  "observed_at_utc": "2026-11-01T01:44:56.284787+00:00",
   "global_cpu_limit": 32,
   "gpu_quota_granted": 1,
   "gpu_vm_created": true,
@@ -30,7 +30,7 @@
       "id": "946761909192569249",
       "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
       "name": "frontier-cpu-20261031-04",
-      "status": "RUNNING",
+      "status": "TERMINATED",
       "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
     },
     {
@@ -45,11 +45,24 @@
       "name": "frontier-gpu-20261031-01",
       "status": "TERMINATED",
       "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
+    },
+    {
+      "guestAccelerators": [
+        {
+          "acceleratorCount": 1,
+          "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/acceleratorTypes/nvidia-l4"
+        }
+      ],
+      "id": "4290327145207244677",
+      "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/machineTypes/g2-standard-4",
+      "name": "frontier-gpu-20261031-02",
+      "status": "STOPPING",
+      "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a"
     }
   ],
-  "active_allocated_vcpus": 20,
+  "active_allocated_vcpus": 16,
   "instantaneous_cpu_utilization": null,
-  "state": "VM03 runs three CPU cylinder cases; VM04 restarted successfully for exactly two missing ecology pairs. L4 first run passed numerical controls then stopped at time-calibration NO-GO; subsequent restart failed central1-c stockout. Alternate eligible-region admission is being prepared.",
+  "state": "Only VM03 remains running scientific CPU cases. Ecology completed its two missing pairs and VM04 stopped. L4 retry and two alternate-zone admissions returned explicit capacity stockouts; no overnight R2 case started.",
   "plan": [
     {
       "vm": "frontier-cpu-20261031-03",
@@ -93,12 +106,9 @@
     "completion_is_export_not_science": true
   },
   "next_ecology": {
-    "state": "RUNNING after successful provider start operation",
-    "task": "ecology-missing-only-continuation",
-    "source_sha256": "b9f99c0c0bb7439e9635ed2c78d2ce84831dc26eca4df0ae84695f3da791ed53",
-    "original_receipt": "results/resources/gcp/ecology-completion.json",
-    "operation_receipt": "results/resources/gcp/ecology-missing-operation-result.json",
-    "result": "pending"
+    "state": "completed_missing_pairs",
+    "receipt": "results/resources/gcp/ecology-missing-completion.json",
+    "native_independent_check": "Reported by mechanobio_sim: four traces/364frames and18 endpoint/discrepancy metrics independently reproduced; final aggregation pending"
   },
   "l4_admission": {
     "id": "4266786588371661074",
@@ -121,5 +131,10 @@
   },
   "active_allocated_gpus": 0,
   "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
-  "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json"
+  "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json",
+  "l4_capacity_failures": [
+    "results/resources/gcp/l4-overnight-operation-result.json",
+    "results/resources/gcp/l4-east4-operation-result.json",
+    "results/resources/gcp/l4-east4a-operation-result.json"
+  ]
 }

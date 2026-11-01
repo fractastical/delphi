@@ -169,7 +169,7 @@
       "job_id": "aijob-e00rhs6hdan4n57kv8",
       "task": "Four-model inverse NCA comparison",
       "owner": "infra_director + mechanobio_sim",
-      "provider_state": "IMAGE_PULLING",
+      "provider_state": "RUNNING",
       "protocol": "artifacts/nca-pattern/packet/owner-manifest.json",
       "source_sha256": "27bba4e0f1a5dba9f869b05ff87ce20a0421921dea94d5137060e668eaa25262",
       "scope": "4models x2000steps,52heldouts declared; no result yet, no biological/genetic implementation claim"
@@ -180,23 +180,25 @@
       "task": "Collect four-model NCA comparison",
       "owner": "infra_director transport / mechanobio_sim science",
       "priority": 1,
-      "state": "admitted_image_pulling",
+      "state": "running_training_first_arm_zero_fields",
       "job_id": "aijob-e00rhs6hdan4n57kv8",
       "packet": "inputs/items_infra_nca.json",
       "budget": "One H100; 2400s science, 48MiB complete return cap",
       "next_acceptance": "Same-job CPU/CUDA gates; four exact final checkpoints and 52 declared heldouts, source/target/mask hashes and finite state checks; preserve missing models and deadline outcomes",
-      "stop_gate": "No extra seed jobs, no changed targets or thresholds, no training after heldout inspection"
+      "stop_gate": "No extra seed jobs, no changed targets or thresholds, no training after heldout inspection",
+      "progress": "results/resources/nca-live-progress.json"
     },
     {
       "task": "Complete two unstarted ecology scenario pairs",
       "owner": "mechanobio_sim freezes / infra_director dispatches",
       "priority": 1,
-      "state": "admitted_vm_running",
+      "state": "complete_original_partial_preserved",
       "prior_result": "results/resources/gcp/ecology-completion.json",
       "budget": "Reuse stopped 4-vCPU VM04 with existing exact dependencies; fresh task prefix and output directory",
       "next_acceptance": "Frozen two original scenario IDs, same original code/seed/settings and dt/actuator gates; rerun only missing two pairs, 4 simulations",
       "stop_gate": "Original 26 pairs and partial receipt immutable; no threshold relaxation or invented endpoints",
-      "packet": "inputs/gcp-ecology-missing.json"
+      "packet": "inputs/gcp-ecology-missing.json",
+      "result": "results/resources/gcp/ecology-missing-completion.json"
     },
     {
       "task": "L4 same-state parity and runtime calibration then conditional R2",
@@ -334,14 +336,14 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T01:38:47.734237+00:00",
+  "updated_at_utc": "2026-11-01T01:44:56.284787+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T01:38:47.734237+00:00",
+    "observed_at_utc": "2026-11-01T01:44:56.284787+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
     "gpu_vm_created": true,
@@ -371,7 +373,7 @@
         "id": "946761909192569249",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
         "name": "frontier-cpu-20261031-04",
-        "status": "RUNNING",
+        "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
@@ -386,11 +388,24 @@
         "name": "frontier-gpu-20261031-01",
         "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
+      },
+      {
+        "guestAccelerators": [
+          {
+            "acceleratorCount": 1,
+            "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/acceleratorTypes/nvidia-l4"
+          }
+        ],
+        "id": "4290327145207244677",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/machineTypes/g2-standard-4",
+        "name": "frontier-gpu-20261031-02",
+        "status": "STOPPING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a"
       }
     ],
-    "active_allocated_vcpus": 20,
+    "active_allocated_vcpus": 16,
     "instantaneous_cpu_utilization": null,
-    "state": "VM03 runs three CPU cylinder cases; VM04 restarted successfully for exactly two missing ecology pairs. L4 first run passed numerical controls then stopped at time-calibration NO-GO; subsequent restart failed central1-c stockout. Alternate eligible-region admission is being prepared.",
+    "state": "Only VM03 remains running scientific CPU cases. Ecology completed its two missing pairs and VM04 stopped. L4 retry and two alternate-zone admissions returned explicit capacity stockouts; no overnight R2 case started.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -434,12 +449,9 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "RUNNING after successful provider start operation",
-      "task": "ecology-missing-only-continuation",
-      "source_sha256": "b9f99c0c0bb7439e9635ed2c78d2ce84831dc26eca4df0ae84695f3da791ed53",
-      "original_receipt": "results/resources/gcp/ecology-completion.json",
-      "operation_receipt": "results/resources/gcp/ecology-missing-operation-result.json",
-      "result": "pending"
+      "state": "completed_missing_pairs",
+      "receipt": "results/resources/gcp/ecology-missing-completion.json",
+      "native_independent_check": "Reported by mechanobio_sim: four traces/364frames and18 endpoint/discrepancy metrics independently reproduced; final aggregation pending"
     },
     "l4_admission": {
       "id": "4266786588371661074",
@@ -462,7 +474,12 @@
     },
     "active_allocated_gpus": 0,
     "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
-    "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json"
+    "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json",
+    "l4_capacity_failures": [
+      "results/resources/gcp/l4-overnight-operation-result.json",
+      "results/resources/gcp/l4-east4-operation-result.json",
+      "results/resources/gcp/l4-east4a-operation-result.json"
+    ]
   },
-  "next_ready_dispatch": "NCA admitted; native owner preparing2missing ecology pairs without rerunning26completed pairs; CFD and L4 controlled runs active."
+  "next_ready_dispatch": "R2 source is frozen but three current capacity admissions failed; NCA actual training and CPU CFD continue. No further ecology work is needed."
 }
