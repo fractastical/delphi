@@ -18,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.request
 
 
 ROOT = Path("/work/frontier")
@@ -41,6 +42,11 @@ def validate(spec):
         raise ValueError("Task command must be an argv list")
     if not re.fullmatch(r"[a-f0-9]{64}", spec["source_sha256"]):
         raise ValueError("Source hash required")
+    if spec.get("source_url"):
+        if not re.fullmatch(r"https://raw\.githubusercontent\.com/kganjam/delphi-frontier/[a-f0-9]{40}/[A-Za-z0-9_./-]+", spec["source_url"]) or ".." in spec["source_url"].split("/"):
+            raise ValueError("Source URL must pin a public Frontier commit")
+        if type(spec.get("source_bytes")) is not int or not 1 <= spec["source_bytes"] <= 10_000_000:
+            raise ValueError("Source download size must be bounded")
     if not re.fullmatch(r"out(?:-[a-z0-9]+)*", spec.get("output_directory", "out")):
         raise ValueError("Invalid output directory")
     # Only declared, nonsensitive task parameters are permitted in metadata.
@@ -70,6 +76,10 @@ def build(spec, packet, exporter, destination):
         raise ValueError("Source packet hash mismatch")
     files = {"packet.tar": packet_bytes, "config.json": json.dumps(spec).encode(),
              "gcp_worker.py": Path(__file__).read_bytes(), "gcp_artifacts.py": Path(exporter).read_bytes()}
+    if spec.get("source_url"):
+        if len(packet_bytes) != spec["source_bytes"]:
+            raise ValueError("Source packet size mismatch")
+        del files["packet.tar"]
     text = "#!/bin/bash\nset -euo pipefail\nmkdir -p /work/frontier\ncd /work/frontier\n"
     # No shell interpolation of task content: all bytes are base64 encoded.
     for name, payload in files.items():
@@ -167,6 +177,15 @@ def prepare_source(spec, output):
     import tarfile
 
     packet = ROOT / "packet.tar"
+    if spec.get("source_url"):
+        validate(spec)
+        with urllib.request.urlopen(spec["source_url"], timeout=30) as response:
+            content = response.read(spec["source_bytes"] + 1)
+        if len(content) != spec["source_bytes"] or hashlib.sha256(content).hexdigest() != spec["source_sha256"]:
+            raise ValueError("Downloaded source size/hash mismatch")
+        temporary = ROOT / "packet.download"
+        temporary.write_bytes(content)
+        temporary.replace(packet)
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
     source = Path(tempfile.mkdtemp(prefix=f"source-{spec['task_id']}-", dir=ROOT))
