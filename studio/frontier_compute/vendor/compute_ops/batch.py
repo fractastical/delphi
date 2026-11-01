@@ -54,9 +54,19 @@ def parse_dur(s) -> int:
 # ------------------------------------------------------------------ bundle
 def build_bundle(item: dict, base: Path) -> bytes:
     """tar.gz of the item's script + extra files (paths relative to `base`), deterministic."""
+    files = [item["script"], *item.get("files", [])]
+    if Path(item["script"]).name == "warm_worker.py":
+        try:
+            from .warm_budget import queue_budget
+        except ImportError:  # direct script invocation
+            from warm_budget import queue_budget
+        queue_budget(json.loads((base / item["args"][0]).read_text()))
+        helper = str(Path(item["script"]).with_name("warm_budget.py"))
+        if helper not in files:
+            files.append(helper)
     buf = io.BytesIO()
     with gzip.GzipFile(fileobj=buf, mode="wb", mtime=0) as gz, tarfile.open(fileobj=gz, mode="w") as tf:
-        for rel in [item["script"], *item.get("files", [])]:
+        for rel in files:
             p = (base / rel)
             if p.is_dir():
                 for q in sorted(p.rglob("*")):

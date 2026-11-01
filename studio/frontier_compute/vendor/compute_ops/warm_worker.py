@@ -3,7 +3,7 @@
 Shipped as the item script by compute_ops.batch; the queue file is part of the bundle, so every workload is frozen (and hashable) before submission.
 
   python3 compute_ops/warm_worker.py warm_queue.json
-queue.json = {"queue_id": str, "max_wall_s": <= 7200, "margin_s": 60, "env": {...shared env, e.g. HF_HOME}, "max_part_bytes": 3000000,
+queue.json = {"queue_id": str, "max_wall_s": <= 14400, "margin_s": 60, "env": {...shared env, e.g. HF_HOME}, "max_part_bytes": 3000000,
               "workloads": [{"id": str, "argv": [...], "timeout_s": int, "env": {...}, "max_part_bytes": optional, "setup": false}]}
 For each workload, in order: run argv in the bundle directory with COPS_OUT=<fresh dir>, inner timeout; then pack that dir as tar.gz and emit it to the job log between
 COPS_PART_BEGIN {meta} / COPS_B64 ... / COPS_PART_END (flushed BEFORE the next workload starts, so a later crash or timeout keeps earlier outputs); append a receipt row.
@@ -12,12 +12,13 @@ Per-workload output over its cap is NOT emitted, and the part says so loudly wit
 cache directory named in env (HF_HOME etc.); nothing is persisted outside the container. The final COPS_OUT (queue_receipts.json, telemetry) is returned by cops_run as usual."""
 import base64, hashlib, io, json, os, shutil, subprocess, sys, tarfile, time
 
+from warm_budget import queue_budget
+
 T0 = time.time()
 Q = json.load(open(sys.argv[1]))
 OUT = os.environ.get("COPS_OUT", "/work/out"); os.makedirs(OUT, exist_ok=True)
 PARTS = os.environ.get("WARM_PARTS_DIR", "/work/parts")
-MAX_WALL = min(float(Q.get("max_wall_s", 7200)), 7200.0)
-MARGIN = float(Q.get("margin_s", 60))
+MAX_WALL, MARGIN = queue_budget(Q)
 utc = lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 sha = lambda b: hashlib.sha256(b).hexdigest()
 receipts = []
