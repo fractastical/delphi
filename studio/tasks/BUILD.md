@@ -1,11 +1,38 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 7:42pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 7:58pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 7:42pm PDT
+## Current checkpoint — October 31, 2026, 7:58pm PDT
+
+- [x] Shared table formatting is live at `fb52a75`: labelled cards for the build
+  report on small screens, readable wrapping elsewhere, and an ecology CSS
+  collision removed from all evidence badges. Root ran 7 focused page tests,
+  3 ecology interaction tests and 20 desktop/phone checks (340 short badges),
+  then 8 deployed web and 39 MCP public checks. Receipt:
+  `deploy/receipts/shared-table-live.json`.
+- [x] Compiler corrections and NCA seed-placement results are integrated. The
+  compiler's 19 checks pass; NCA design probes improved from 0/48 to 32/48,
+  with reused evaluation cases and left-half erasure still 0/12. These are
+  computational results, not biological regeneration or held-out generalization.
+- [ ] User STL review: r4 dry mesh-derived mass 20.33 g, nominal ballasted mass
+  26.07 g, versus 13.545 g under its own fin-area/8 m/s/CL=0.5 scenario. The
+  frozen 10.5 g legacy threshold also fails. Print author and independent reviewer
+  are creating exact-file law/check lineage; root owns the public viewer and links.
+  Display props are separate; no flight or measured printed mass is established.
+- [ ] Agent-contributor and bio-model usage ledgers are in progress. Count distinct
+  contributing harnesses, current active processes and completed worker runs
+  separately; enumerate actual provider receipts rather than available models.
+- [ ] Infra reports a new H100 CFD job admitted at 7:52:53pm PDT, image-pulling
+  at 7:55:16pm PDT. Google CFD/BETSE workers have 20 vCPU allocated; measured
+  7:52pm utilization was about 9.36 and 0.88 busy CPUs respectively. Allocation
+  is not utilization. Fresh telemetry and the next frozen NCA packet are pending.
+- [ ] Full aeroelastic production output and simulation cards await integration.
+  Broader scientific, observed-experiment and independent site-audit gaps remain.
+
+## Previous checkpoint — October 31, 2026, 7:42pm PDT
 
 - [x] Both public demo MP4 links returned HTTP 200 with the expected byte sizes;
   the deployed app includes the Demo videos menu entry. The preceding user-facing
