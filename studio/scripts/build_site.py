@@ -506,6 +506,40 @@ def ecology_block(ins: Inputs, out: dict) -> dict | None:
             "history": index.get("history"), "geometry": {k: geo.get(k) for k in ("source", "source_component_units", "mesh_to_body", "cg_from_nose_m")}, **state}
 
 
+BIO = "artifacts/biodesign-compiler"
+
+
+def biodesign_block(ins: Inputs, out: dict) -> dict | None:
+    """Biodesign assembly compiler output: the pinned assemblies, six separate axes, diffs and unresolved bridges, copied as the compiler wrote them.
+    Files are published only when equal to the hash the compiler's own manifest declares. No single badge is computed here."""
+    mp = ROOT / BIO / "manifest.json"
+    if not mp.exists() or not (ROOT / BIO / "report.json").exists():
+        return None
+    man = json.loads(ins.read(f"{BIO}/manifest.json")); want = {f["path"]: f["sha256"] for f in man["files"]}
+    state = {"copied": [], "refused": []}
+    def put(rel):
+        f = ROOT / rel
+        b = ins.read(rel) if f.is_file() else None
+        if b is None or digest_bytes(b) != want.get(rel):
+            state["refused"].append(rel); return None
+        out["@" + rel] = b; state["copied"].append(rel); return rel
+    report_path = put(f"{BIO}/report.json")
+    assemblies = {}
+    for rel in sorted(want):
+        if rel.startswith(f"{BIO}/assemblies/"):
+            path = put(rel)
+            if path:
+                a = json.loads(ins.read(rel))
+                assemblies[a["id"]] = {"path": path, "sha256": want[rel], "components": a["components"], "shared_pins": a.get("shared_pins"), "shared_pins_note": a.get("shared_pins_note"),
+                                       "siblings": a.get("siblings"), "scope": a.get("scope"), "unresolved_interfaces": a.get("unresolved_interfaces"), "parent": a.get("parent")}
+    out["@" + f"{BIO}/manifest.json"] = ins.read(f"{BIO}/manifest.json")
+    if (ROOT / BIO / "README.md").exists():
+        out["@" + f"{BIO}/README.md"] = ins.read(f"{BIO}/README.md")
+    report = json.loads(ins.read(f"{BIO}/report.json")) if report_path else None
+    return {"report": report, "report_path": report_path, "report_sha256": want.get(f"{BIO}/report.json"), "manifest": f"{BIO}/manifest.json", "readme": f"{BIO}/README.md" if (ROOT / BIO / "README.md").exists() else None,
+            "assemblies": assemblies, **state}
+
+
 def ecology_uncertainty(ins: Inputs, put) -> dict | None:
     """Assumed-parameter sensitivity of the neighbour cue (28 scenarios). Figures and files are published only when equal to the hash the native
     uncertainty manifest declares; the table is copied from the aggregate summary. Shared-model scenarios, not biological confidence."""
@@ -1444,6 +1478,7 @@ def build() -> dict[str, bytes]:
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
     ecology = ecology_block(ins, extra)
+    biodesign = biodesign_block(ins, extra)
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
@@ -1489,6 +1524,7 @@ def build() -> dict[str, bytes]:
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
         "ecology": ecology,
+        "biodesign": biodesign,
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
