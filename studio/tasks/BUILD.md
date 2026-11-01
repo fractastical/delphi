@@ -7,6 +7,22 @@ Every status distinguishes implementation, integration, publication and biologic
 
 ## Current checkpoint — October 31, 2026, 8:23pm PDT
 
+- [x] Publication follow-up: print/FAQ/usage release 9d5a3d0 passed 8 public
+  web, 39 public MCP and 6 live route/viewport checks. Subsequent release 7d72793
+  adds About → MCP for agents with endpoint/config copy controls and the fin-ray
+  calculation card; 8 web and 39 MCP checks passed. Receipts are under
+  deploy/receipts/{print-audit,mcp-menu}-live.json.
+- [ ] New user backup requirement: native infra owns a private off-host recovery
+  snapshot and reusable restore tooling. Existing AWS private backup bucket is
+  accessible using the instance identity; public-access/key handling and content
+  selection are being checked. No completed off-host Frontier backup or restore
+  is claimed yet. Google lab storage must not be the sole durable copy.
+- [ ] New 90-second film remains unexported at this checkpoint. Original narration
+  exceeded the scene budget; an explicit editorial timing revision applies
+  pitch-preserving atempo 1.30 and retimes scenes while preserving spoken text.
+  Old 60/120 cuts remain byte-identical. Publish only after actual export checks.
+
+
 - [x] Exact-file law and check index covers 123 STLs, 19 GLBs and one ZIP.
   Root independently recomputed r4 dry mass 20.334592 g, ballasted 26.071823 g,
   both failing the 13.545088 g own-area scenario. The new viewer separates

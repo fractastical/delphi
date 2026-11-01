@@ -1,5 +1,5 @@
 /* Demo videos: the narrated cuts published with this snapshot. A cut is listed only when root's snapshot.demo_videos names it (complete, hash-checked
- * outputs only); with none, the page says so. The videos describe the site; they add no evidence. The compact cut plays by default. */
+ * outputs only); with none, the page says so. The videos describe the site; they add no evidence. The newest 90-second cut plays by default when published; earlier cuts remain available. */
 (function () {
   const DF = window.DF; const { html } = DF; const U = DF.ui;
   const mmss = (s) => (typeof s === "number" ? Math.floor(s / 60) + ":" + String(Math.round(s % 60)).padStart(2, "0") : "length not stated");
@@ -8,17 +8,18 @@
 
   DF.views.demo = function (snap, route) {
     const D = snap.demo_videos; const cuts = ((D && D.cuts) || []).slice().sort((a, b) => (a.duration_s || 0) - (b.duration_s || 0));
-    const head = html`<section class="pagehead demohead"><p class="eyebrow">Demo film · one minute or two</p><h1 class="demotitle">A design studio for<br><span class="accent">biology's next frontier.</span></h1><p class="lede">Start with a flying fish. Connect claims, equations and simulations from molecules to behavior. Every missing link becomes a question agents can work on together.</p></section>`;
+    const latest = cuts.find((c) => c.id === "frontier-90s");
+    const head = html`<section class="pagehead demohead"><p class="eyebrow">${latest ? "Demo films · new 90-second tour" : "Demo films · one minute or two"}</p><h1 class="demotitle">A design studio for<br><span class="accent">biology's next frontier.</span></h1><p class="lede">Start with a flying fish. Connect claims, equations and simulations from molecules to behavior. Every missing link becomes a question agents can work on together.</p></section>`;
     if (!cuts.length) return { html: html`${head}<section class="panel"><p class="empty">No demo video is published in this snapshot yet. A cut appears here only once its file and hashes are verified; nothing is shown in its place.</p></section>` };
-    const cur = cuts.find((c) => c.id === (route.params || {}).cut) || cuts[0]; const other = cuts.find((c) => c.id !== cur.id);
-    const label = (c) => (c.duration_s <= 90 ? "1 minute" : "2 minutes");
+    const cur = cuts.find((c) => c.id === (route.params || {}).cut) || latest || cuts[0]; const other = cuts.find((c) => c.id !== cur.id && c.duration_s === 120) || cuts.find((c) => c.id !== cur.id);
+    const label = (c) => (c.duration_s === 90 ? "90 seconds" : c.duration_s === 60 ? "1 minute" : c.duration_s === 120 ? "2 minutes" : mmss(c.duration_s));
     return {
       html: html`${head}
         <section class="demolayout" aria-labelledby="demo-h"><h2 id="demo-h" class="sr">Player</h2>
           <figure class="demofig"><div class="demostage" id="demo-stage"><video id="demo-video" controls preload="metadata" playsinline ${cur.poster_href ? html`poster="${cur.poster_href}"` : ""} aria-label="${cur.title}"><source src="${cur.href}" type="video/mp4">${cur.subtitles_href ? html`<track kind="captions" srclang="en" label="English" src="${cur.subtitles_href}">` : ""}Your browser cannot play this video; use the download link.</video></div>
             <figcaption class="small">${cur.title}, ${mmss(cur.duration_s)}. Captions are burned into the video. ${cur.subtitles_href ? "An optional English caption track can also be turned on in the player controls." : "No separate caption track is published for this cut."}</figcaption></figure>
           <aside class="demoside" aria-label="Watch your way"><h2>Watch your way.</h2>
-            <p class="small">Start with the one-minute tour, or take the full two minutes. Both are narrated, with captions burned in.</p>
+            <p class="small">${latest ? "Watch the new 90-second tour with faster British female narration, or revisit either earlier cut. All include captions." : "Start with the one-minute tour, or take the full two minutes. Both are narrated, with captions burned in."}</p>
             <nav class="demotabs" aria-label="Choose a cut">${cuts.map((c) => html`<a class="democut" href="${DF.href("/demo", { cut: c.id })}" aria-current="${c.id === cur.id ? "page" : "false"}"><b>${label(c)}</b><span class="small">${c.title} · ${mmss(c.duration_s)}</span></a>`)}</nav>
             <p class="small faint demometa">Runtime ${mmss(cur.duration_s)} · 16:9</p>
             <p class="demoactions"><button type="button" class="btn ghost" id="demo-fs" hidden aria-label="Fullscreen: ${cur.title}">Fullscreen</button>

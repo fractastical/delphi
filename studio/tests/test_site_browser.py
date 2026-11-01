@@ -682,12 +682,24 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
 
 
 def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
-    pg = page(browser)
-    pg.goto(base + "#/work?tab=connect")
+    pg = page(browser, 390, 900)
+    pg.add_init_script("Object.defineProperty(navigator, 'clipboard', {value: {writeText: async (text) => {window.copiedMcp = text;}}});")
+    pg.goto(base + "#/home")
+    pg.locator('.aboutmenu summary').click()
+    pg.get_by_role('link', name='MCP for agents', exact=True).click()
     pg.wait_for_selector("#cn-h")
     txt = pg.locator("#main").inner_text().lower()
     assert "is not tested" in txt and "official mcp sdk client" in txt and "never put a credential" in txt
     assert pg.input_value("#sharelink").startswith("http")
+    endpoint = 'https://frontier.morphoswarm.ai/mcp'
+    assert pg.locator('#mcp-endpoint').get_attribute('href') == endpoint
+    pg.locator('#copy-mcp').click()
+    pg.wait_for_function("window.copiedMcp === 'https://frontier.morphoswarm.ai/mcp'")
+    pg.get_by_text('Client configuration', exact=True).click()
+    pg.locator('#copy-mcp-config').click()
+    pg.wait_for_selector('#mcp-config-copied:has-text("Copied.")')
+    assert json.loads(pg.evaluate('window.copiedMcp'))['mcpServers']['frontier'] == {'type': 'http', 'url': endpoint}
+    assert _overflow(pg) <= 0 and not pg.errors
 
 
 def test_gallery_has_every_verified_video_with_a_player(browser, base):
@@ -975,7 +987,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq"]
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/work?tab=connect"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
@@ -1855,14 +1867,15 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
         pg.close()
 
 
-def test_demo_page_with_the_published_snapshot_defaults_to_the_one_minute_cut(browser, base):
+def test_demo_page_defaults_to_latest_published_cut_and_preserves_old_downloads(browser, base):
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     cuts = {c["id"]: c for c in (snap.get("demo_videos") or {}).get("cuts", [])}
     if "frontier-60s" not in cuts:
         return
     pg = page(browser, 1280, 900)
     pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-    assert pg.locator("#demo-video source").get_attribute("src") == cuts["frontier-60s"]["href"]
+    expected = cuts.get("frontier-90s") or cuts["frontier-60s"]
+    assert pg.locator("#demo-video source").get_attribute("src") == expected["href"]
     assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
 
 
@@ -2127,3 +2140,38 @@ def test_tables_keep_badges_on_one_line_stack_on_phones_and_say_when_they_scroll
             pg.goto(base + "#/frontier"); pg.wait_for_selector("#main table")
             assert pg.evaluate("[...document.querySelectorAll('#main .tablewrap')].every(w => w.scrollWidth <= w.clientWidth + 1)"), "no Frontier table hides a column on desktop"
         pg.close()
+
+
+def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(browser, base):
+    snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
+    old = snap['demo_videos']['cuts']
+    assert {c['id'] for c in old} >= {'frontier-60s', 'frontier-120s'}
+    latest = dict(old[0], id='frontier-90s', title='New narrated tour', duration_s=90)
+    snap['demo_videos']['cuts'] = [c for c in old if c['id'] != 'frontier-90s'] + [latest]
+    for width in (1440, 390):
+        pg = page(browser, width, 900)
+        pg.route('**/data/snapshot.json', lambda r: r.fulfill(json=snap))
+        pg.goto(base + '#/demo')
+        pg.wait_for_selector('.democut[aria-current=page]')
+        assert pg.locator('.democut[aria-current=page] b').inner_text() == '90 seconds'
+        assert 'new 90-second tour' in pg.locator('.demohead').inner_text().lower()
+        assert pg.locator('.demodl li').count() == 3
+        pg.locator('.democut[href$="frontier-60s"]').click()
+        pg.wait_for_selector('.democut[aria-current=page]:has-text("1 minute")')
+        assert pg.locator('#demo-video source').get_attribute('src') == next(c['href'] for c in old if c['id'] == 'frontier-60s')
+        assert _overflow(pg) <= 0 and not pg.errors
+
+
+def test_single_ray_card_preserves_same_equation_scope_and_source_discrepancy(browser, base):
+    pg = page(browser)
+    pg.goto(base + '#/simulations')
+    pg.wait_for_selector('#sim-fin-ray-bilaminar')
+    card = pg.locator('#sim-fin-ray-bilaminar')
+    assert card.locator('video').count() == 0
+    text = card.text_content()
+    for phrase in ('24/24', 'same-equation', 'UNRESOLVED', 'G=200 is not 200 Pa', 'no measured flying-fish material or whole-fin validation'):
+        assert phrase in text
+    assert card.locator('.tex-fallback').count() == 0 and card.locator('.katex').count() == 3
+    image = card.locator('img').first
+    assert pg.request.get(base + image.get_attribute('src')).ok
+    assert not pg.errors

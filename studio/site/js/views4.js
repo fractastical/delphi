@@ -220,15 +220,29 @@
 
   /* Connect and share: what a person or agent can actually use, with what is and is not verified. Nothing is claimed beyond the repository's own documents. */
   function connect(snap, S, live) {
-    const origin = location.origin;
+    const origin = "https://frontier.morphoswarm.ai";
+    const endpoint = origin + "/mcp";
+    const config = JSON.stringify({ mcpServers: { frontier: { type: "http", url: endpoint } } }, null, 2);
     const apis = [["GET /api/health", "service status"], ["GET /api/catalog, /api/record, /api/events", "records, with exact pins"], ["GET /api/discovery?q=", "search (the response says which engine ran)"], ["GET /api/graph", "neighbourhood of one exact record"], ["GET /api/artifacts, /api/media?sha256=", "declared artifacts; node-verified local copies"], ["GET /api/attention, /api/system, /api/counts", "open work, system report, corpus counts"], ["POST /api/engineering/solve, /api/beliefs/solve, /api/simulations/run", "bounded calculations; they store nothing"]];
     return { html: html`<section class="panel" aria-labelledby="cn-h"><h2 id="cn-h">Connect an agent (MCP)</h2>
+      <p>Give your agent access to the shared frontier: find claims, inspect projects and artifacts, explore open questions, and run bounded calculations.</p>
+      <p><b>Streamable HTTP endpoint:</b> <a id="mcp-endpoint" href="${endpoint}">${endpoint}</a> <button class="btn small" type="button" id="copy-mcp">Copy endpoint</button> <span id="mcp-copied" class="small" role="status"></span></p>
+      <p class="small">Public reads need no token. Use this URL in your MCP client's remote-server settings; it is a protocol endpoint, not a web page.</p>
+      <details><summary>Client configuration</summary><p class="small">For clients that accept an <code>mcpServers</code> JSON configuration. Other clients ask for the URL directly.</p><pre class="json" id="mcp-config" tabindex="0">${config}</pre><button class="btn small" type="button" id="copy-mcp-config">Copy configuration</button> <span id="mcp-config-copied" class="small" role="status"></span></details>
       <p class="note small"><b>What is verified.</b> The public endpoint <code>${origin}/mcp</code> passed ${snap.mcp_check ? snap.mcp_check.passed + " of " + snap.mcp_check.total : "recorded"} checks with the official MCP SDK client (Streamable HTTP): initialisation, tool discovery, anonymous public identity, schema resources, a public fish search, anonymous writes denied before validation, an invalid token rejected, and public system metadata${snap.mcp_check ? ", at " + snap.mcp_check.checked_at : ""}. ${snap.mcp_check ? "Records written by that check: " + snap.mcp_check.scientific_records_written + "." : ""} <b>A specific product client (for example a desktop or IDE assistant) is not tested.</b> Report what yours actually does. <span class="faint">${snap.mcp_check ? snap.mcp_check.scope : ""}</span></p>
       <ul><li><b>Reading</b> public records, artifacts and schemas needs no credential on a public-read node.</li><li><b>Writing</b> (propose, lease, change state) needs the calling operator's own bearer credential; it is checked per request and an invalid one is refused, never treated as anonymous. Proposals stay <i>proposed</i> until an independent operator reviews them.</li><li>Never put a credential in a prompt, a URL or a shared link.</li></ul>
       <p class="small">Tools declared in <code>docs/mcp.md</code>: ${snap.capabilities.map((t) => html`<code>${t.name}</code> (${t.mode}) `)}. ${U.src("doc:mcp", "Read the MCP document")}</p></section>
       <section class="panel"><h2>Use the node directly (HTTP, read-only unless noted)</h2><div class="tablewrap"><table><thead><tr><th>Endpoint</th><th>What it gives</th></tr></thead><tbody>${apis.map(([e, w]) => html`<tr><td><code>${e}</code></td><td>${w}</td></tr>`)}</tbody></table></div><p class="small faint">Calculation endpoints need a session token from <code>GET /api/session</code> and send it as <code>X-CSRF-Token</code>.</p></section>
       <section class="panel"><h2>Share this view</h2><p class="small">The address bar carries the exact view, record pin or filter. Links to records include their version, so a shared link names the same record version for everyone.</p><p><input id="sharelink" type="text" readonly value="${location.href}" size="60" aria-label="Link to this view"> <button class="btn small" type="button" id="copylink">Copy link</button> <span id="copied" class="small" role="status"></span></p></section>`,
-      after(root) { const inp = root.querySelector("#sharelink"); root.querySelector("#copylink").addEventListener("click", async () => { inp.select(); try { await navigator.clipboard.writeText(inp.value); root.querySelector("#copied").textContent = "Copied."; } catch (e) { root.querySelector("#copied").textContent = "Select the text and copy it; this browser blocked clipboard access."; } }); } };
+      after(root) {
+        const copy = (button, text, status) => root.querySelector(button).addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText(text()); root.querySelector(status).textContent = "Copied."; }
+          catch (e) { root.querySelector(status).textContent = "Select the text and copy it; this browser blocked clipboard access."; }
+        });
+        copy("#copy-mcp", () => endpoint, "#mcp-copied");
+        copy("#copy-mcp-config", () => config, "#mcp-config-copied");
+        copy("#copylink", () => root.querySelector("#sharelink").value, "#copied");
+      } };
   }
 
   function runtime(snap, S, live) {
