@@ -1,0 +1,89 @@
+{
+  "schema": "frontier.ecology.cpu-job-packet/1",
+  "code_commit": "37fee2f6ccf458ea957e9584ddbb36f1a3ca35ac",
+  "archive_path": "artifacts/ecology/cpu-uncertainty-packet.tar.gz",
+  "archive_sha256": "755a23a592f3f07b87512d476a7560105bc203d3b2f5af8e85029a1db702c796",
+  "archive_bytes": 18720,
+  "input_manifest": "artifacts/ecology/source-downloads.json",
+  "public_http_preflight": "artifacts/ecology/public-input-preflight.json",
+  "input_total_bytes": 7144796,
+  "python_requirement": ">=3.12; local3.13.12, proposed VM3.12.3 must pass same-job controls",
+  "install": "python -m pip install -r artifacts/ecology/requirements.txt",
+  "preflight": "MUJOCO_GL=disable OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m engineering.ecology.remote --preflight",
+  "run": "MUJOCO_GL=disable OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m engineering.ecology.remote --out output --workers4",
+  "resources": {
+    "device": "CPU; no GPU requested",
+    "vCPU": 4,
+    "memory_tree_max_GiB": 12,
+    "tasks_max": 128,
+    "hard_runtime_s": 1200,
+    "soft_no_new_work_after_s": 900,
+    "output_cap_bytes": 104857600
+  },
+  "workload": "28 declared scenarios,56 actual main/half-step simulations if complete;7 axial parameter settings\u00d72 seeds\u00d72 neighbor ablations",
+  "expected_runtime_basis": "Local9-trajectory baseline/control/replay run used276.7CPU s; majority was four8-fish trajectories. Approximately14-20min at4CPU; preserve incomplete if deadline reached. No occupancy inflation.",
+  "local_controls": "All8 analytic/frame/control checks and4 refined dt/20actuator gates passed; source in run-refined/",
+  "outputs": [
+    "output/controls.json",
+    "output/progress.json",
+    "output/summary.json",
+    "output/<scenario>/result.json",
+    "output/<scenario>/main.json.gz",
+    "output/<scenario>/half-dt.json.gz",
+    "output/<scenario>/*.xml",
+    "output/source-download-receipt.json"
+  ],
+  "partial_policy": "Each completed main trace is durable before half-step starts; retain errors/domain exits/not-started cases. Complete does not mean numerical or biological success.",
+  "files": [
+    {
+      "path": "engineering/ecology/__init__.py",
+      "sha256": "a8b43e64268aff063e54761bb2cb82c3a87ddf41e633287e586ed160794abd77",
+      "bytes": 83
+    },
+    {
+      "path": "engineering/ecology/model.py",
+      "sha256": "d012a7b068c39514c89c5d400aa0cd65b0748cca877c1eb609b2672c921f6d3e",
+      "bytes": 24885
+    },
+    {
+      "path": "engineering/ecology/run.py",
+      "sha256": "145014dfecb0fe8d7c8c3cddaa74db689cf99253dc03dbc0c1364ac546d27bc3",
+      "bytes": 10067
+    },
+    {
+      "path": "engineering/ecology/batch.py",
+      "sha256": "ffd79c82062d317f95c14650b7cfea5d42bb7bf13d825c23e0a9f53370009eae",
+      "bytes": 11490
+    },
+    {
+      "path": "engineering/ecology/remote.py",
+      "sha256": "f09a9d6898fa5b395d2353fea27182bc7b2c768015282aaac6af1467cffd6522",
+      "bytes": 3271
+    },
+    {
+      "path": "artifacts/ecology/protocol.json",
+      "sha256": "0839a7892a72e1a61f1cf96d9c6fd955806e821d3cfc2eca79ff11747ace53a5",
+      "bytes": 9309
+    },
+    {
+      "path": "artifacts/ecology/protocol-refinement.json",
+      "sha256": "fbe93cca576bf13b7171e6134e5f70220a016e6bd40ac11091dc930aa3f82fa0",
+      "bytes": 10093
+    },
+    {
+      "path": "artifacts/ecology/uncertainty-protocol.json",
+      "sha256": "ae732d613339e0fdf62c4118f926cb59ac043c358807a8afa91903c8cc9e9804",
+      "bytes": 2965
+    },
+    {
+      "path": "artifacts/ecology/source-downloads.json",
+      "sha256": "e7509d99c564d398680b3aeb9c416e57580c46e9ff73ab7c28d51dd87a8e9262",
+      "bytes": 5909
+    },
+    {
+      "path": "artifacts/ecology/requirements.txt",
+      "sha256": "a25f66028ae052ca5bb2565fc0da2971c78b88f255271972dc1cd5b1d418cd2d",
+      "bytes": 159
+    }
+  ]
+}
