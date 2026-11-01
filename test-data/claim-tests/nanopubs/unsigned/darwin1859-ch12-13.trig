@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-13--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-13: mixed, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "For endemic vascular plants of oceanic archipelagos, the nearest relative on an independent synthetic phylogeny is, far more often than chance and in most cases, another species native to the same archipelago rather than a species from anywhere else." ;
+    delphi:passCriterion "Pre-registered: endemics of archipelago A = WCVP accepted non-hybrid species whose non-doubtful native records (introduced = 0) all lie in A. For every genus containing such an endemic, all WCVP accepted species of the genus are matched exactly to the Open Tree taxonomy (TNRS, context 'Land plants', no approximate matching) and the induced subtree of the Open Tree synthetic tree is fetched; tips are labelled A-native or non-A. A focal endemic qualifies if its genus tree has >= 1 other A-native tip and >= 1 non-A tip. Walking up from the focal tip to the first ancestor whose clade holds other tips, the outcome is 'inside' if those tips are all A-native, 'outside' if all non-A, 'tie' if mixed. f_in = inside / (inside + outside). Null per focal tip: the same clade size k drawn at random from the other tips of its genus tree (hypergeometric P_in, P_out); the null distribution of f_in is simulated (10,000 draws, seed 1). Archipelagos with < 10 resolved (inside + outside) endemics are dropped. SUPPORTS if pooled f_in >= 0.67 AND at least 75% of remaining archipelagos have f_in > 0.5 with simulated one-sided p < 0.05." ;
+    delphi:failCriterion "Pre-registered: REFUTES if pooled f_in <= 0.5, or if in a majority of remaining archipelagos f_in does not exceed its null expectation. Any other outcome is MIXED. Fewer than 5 remaining archipelagos: inconclusive (underpowered). WCVP or Open Tree API unreachable: inconclusive (data-unavailable). The tie fraction (unresolved polytomies, often taxonomy-only placements) is reported." ;
+    delphi:expectedObservation "Most archipelago endemics have as nearest phylogenetic relative another native of the same archipelago, well above a random-relabelling null." ;
+    delphi:disconfirmingObservation "Nearest relatives of archipelago endemics lie outside the archipelago at least as often as inside, or no more often inside than random labelling predicts." ;
+    delphi:admissibleDatasets "An expert checklist coding native ranges on a fixed regional scheme, and a phylogeny estimated independently of Darwin's argument covering the relevant genera; open access." ;
+    delphi:inferenceMethod "Nearest-clade composition for each endemic on the genus subtree of the Open Tree synthetic tree; f_in = inside/(inside+outside) compared with a hypergeometric clade-relabelling null simulated per archipelago; thresholds f_in >= 0.67 pooled and p < 0.05 in >= 75% of archipelagos." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Archipelago endemics were WCVP accepted species whose native records all fall in one of the 15 pre-registered archipelagos (4,746 species in 915 genera). All accepted species of those genera were matched exactly to Open Tree and the induced subtree of the synthetic tree was fetched for each genus (821 trees). For each endemic with at least one other archipelago native and one outside species in its genus tree (2,667 endemics), the first ancestral clade holding other tips was classified as inside (all same-archipelago natives), outside (none) or tie (mixed). The share inside among resolved outcomes was compared per archipelago with a null in which that clade's tips are drawn at random from the genus tree (10,000 simulations, seed 1); archipelagos with fewer than 10 resolved endemics were dropped." ;
+    rdfs:comment "Measured: 0.6888 pooled fraction of archipelago endemics whose nearest clade on the Open Tree genus subtree is entirely native to the same archipelago (among resolved inside/outside outcomes) (n = 8, archipelagos with f_in > 0.5 and simulated p < 0.05: 5/8; with f_in <= null: 0/8). Interpretation: Darwin's 'inhabitants of each separate island ... related in an incomparably closer degree to each other than to the inhabitants of any other part of the world' is read for endemic vascular plants: the nearest relative of an endemic should lie in the same archipelago. WCVP level-3 units are whole archipelagos, so 'separate islands' cannot be resolved except for the Mascarenes, which WCVP splits into Mauritius, Réunion and Rodrigues and which are pooled here as one archipelago (MAU+REU+ROD); for the others the test asks whether archipelago endemics cluster with archipelago natives. Relatives are searched within the genus only (genus trees from Open Tree), so endemics whose whole genus is confined to the archipelago contribute nothing. Archipelagos (WCVP level-3 codes): HAW, GAL, CNY, MDR, AZO, CVI, JNF, SCI, MRQ, FIJ, SAM, TUB, VAN, SEY, Mascarenes (MAU+REU+ROD); codes absent from WCVP are dropped. Plants only; Darwin's examples include birds and insects." ;
+    delphi:evidenceAgainst "Where the tree resolves an endemic's nearest relatives, they lie in the same archipelago 69% of the time pooled (301 inside, 136 outside), against 14% expected from random clade membership, and every one of the 8 scored archipelagos is above its null (Hawaii 0.79, Samoa 0.87, Canaries 0.76, Mascarenes 0.62, Madeira 0.52). The pooled criterion (>= 0.67) is met, but only 5 of 8 archipelagos have f_in > 0.5 with p < 0.05 against the required 6: Fiji (0.50), the Society Islands (0.31) and the Marquesas (0.33) are significantly above null yet below one half, so the verdict is MIXED. Darwin's 'incomparably closer' holds strongly relative to chance, not as a near-universal rule." ;
+    delphi:evidenceAgainst "84% of scored endemics (2,230 of 2,667) are ties: they sit in polytomies that mix archipelago and outside species, mostly because Open Tree places species that are in no input phylogeny as unresolved members of their genus. Results rest on the 437 resolved cases, which over-represent well-studied radiations." ;
+    delphi:evidenceAgainst "Seven archipelagos had fewer than 10 resolved endemics and were dropped (Azores 7, Cape Verde 6, Galápagos 8, Juan Fernández 5, Seychelles 5, Tubuai 7, Vanuatu 3); Juan Fernández, Cape Verde and the Azores leaned outside." ;
+    delphi:evidenceAgainst "WCVP level-3 units are whole archipelagos (except the Mascarenes, pooled from Mauritius, Réunion and Rodrigues), so the test asks whether endemics cluster with natives of the same archipelago, not whether species on separate islands are each other's relatives as Darwin's Galápagos examples did." ;
+    delphi:evidenceAgainst "Relatives are searched within the genus only; endemics of island-endemic genera or of genera without other archipelago natives (about 2,000 species) could not be scored. Plants only; Darwin's evidence was mainly birds, insects and plants of the Galápagos." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-13--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-13--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-13/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-13--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv" ;
+    dct:description "accepted species of each genus and their native TDWG level-3 ranges, defining archipelago endemics and archipelago natives" ;
+    delphi:hasChecksum "sha256:d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa" ;
+    prov:atLocation <https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip> ;
+    prov:wasDerivedFrom <https://sftp.kew.org/pub/data-repositories/WCVP/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-13--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Open Tree of Life synthetic tree opentree16.1 via the v3 API: tnrs/match_names (context Land plants, exact) and tree_of_life/induced_subtree" ;
+    dct:description "genus subtrees of the synthetic tree for 821 genera containing archipelago endemics (109,911 species matched)" ;
+    delphi:hasChecksum "sha256:06f9604d279a566dc2a841f328478a9ababbddbf7cd675cd267803d1db2426bd" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tnrs/match_names> ;
+    delphi:hasChecksum "sha256:ea1cbd57255f12e334924696aceae00e0e179d947c71571cc7f8d47079ef580d" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree> ;
+    prov:wasDerivedFrom <https://tree.opentreeoflife.org/> ;
+    dct:license "CC0 (Open Tree synthesis products)" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-13> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-13--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-13/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.394Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-13: mixed, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-13--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

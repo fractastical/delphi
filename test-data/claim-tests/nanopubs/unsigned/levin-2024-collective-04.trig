@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2024-collective-04--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2024-collective-04: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "In published measurements of fish keratocytes in a direct-current electric field, intact cells move toward the cathode (positive directedness, cos theta > 0 with the cathode at 0 degrees) and cell fragments in the same field conditions move toward the anode (negative directedness)." ;
+    delphi:passCriterion "Pre-registered: in the published primary measurements (Sun et al. 2013, Current Biology, doi:10.1016/j.cub.2013.02.026, or other published measurements of fish keratocytes and their fragments), at the same field strength (a) the mean directedness of intact cells is >= +0.5 and (b) the mean directedness of fragments is <= -0.3, with each mean differing from 0 at p < 0.01 (one-sample test from the reported mean, dispersion and n; if only a mean and n are reported, a sign test on n is not possible and (a)/(b) must instead be supported by a reported test of the authors)." ;
+    delphi:failCriterion "Pre-registered: fragments have mean directedness >= 0 (no anodal migration) or intact cells have mean directedness <= 0 in the published measurements. Means in the right direction but below the magnitude thresholds or without p < 0.01 are pre-registered as 'mixed'. If no published numbers for both cells and fragments can be retrieved, the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:expectedObservation "Published mean directedness >= +0.5 for intact keratocytes and <= -0.3 for keratocyte fragments under the same field, each significantly different from zero." ;
+    delphi:disconfirmingObservation "Fragments with mean directedness >= 0 or intact cells with mean directedness <= 0." ;
+    delphi:admissibleDatasets "Published quantitative measurements (text, tables, figure legends or supplementary data) of migration direction of fish epidermal keratocytes and their fragments in applied DC fields; the review the claim comes from is excluded as it reports no data." ;
+    delphi:inferenceMethod "Read the reported mean directedness, dispersion and n for cells and fragments at matched field strength; one-sample z/t test against 0 where dispersion is reported; apply the pass/fail thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py downloads the Sun et al. 2013 supplement, checks its SHA-256, extracts the text of its compressed PDF streams with the standard library and confirms that all 20 transcribed 'mean ± SE' directedness values of Table S1 (field-strength series 0-6 V/cm plus the 4 V/cm DMSO and pH 7.4 controls) occur in it. For each field strength it computes a one-sample z = mean/SE for cells and fragments and applies the pre-registered thresholds (cells >= +0.5, fragments <= -0.3, both p < 0.01), with the fail rule checked at 4 and 6 V/cm, the strengths of the paper's main experiments (Figure 1 is at 6 V/cm)." ;
+    rdfs:comment "Measured: 0.77,-0.59 mean directedness (cos angle to field, + = cathode) of keratocytes and fragments at 6 V/cm (Figure 1 conditions) (n = 190, SE 0.05 each; z = 15.4 (cells), -11.8 (fragments)). Interpretation: Taxis direction is measured as directedness, the mean cosine of the angle between each cell's net displacement and the field vector pointing to the cathode (+1 = straight to cathode, -1 = straight to anode), as is standard in electrotaxis studies. 'Fragments' are anucleate lamellipodial fragments of the same keratocytes. The claim's source is Levin's 2024 review, which cites the primary experiment rather than reporting data, so the primary publication by a different group (Zhao and Mogilner labs) is an admissible published measurement; it is the same experiment the claim rests on, not an independent replication. The claim's interpretive part (the collective has the opposite taxis to its parts, illustrating hard-to-predict collective behaviour) is not tested beyond the sign reversal." ;
+    delphi:evidenceAgainst "The sign reversal is large and clean at the paper's working field strengths: at 6 V/cm cells average +0.77 (n = 39) and fragments -0.59 (n = 151), at 4 V/cm +0.81 and -0.65, all |z| > 5; the vehicle and pH 7.4 controls at 4 V/cm repeat it. Cells are positive and fragments negative at every field from 0.5 V/cm up." ;
+    delphi:evidenceAgainst "Not an independent replication: this is the primary experiment the review cites (a different lab from Levin's, so independent of the claim's author, but the same data). Table S1 is labelled 'data from a representative experiment', so n counts cells within one experiment, not independent experiments." ;
+    delphi:evidenceAgainst "The pre-registration said 'at the same field strength' without naming one; the rule was applied to every strength and is met at 4 and 6 V/cm, the strengths of the main figures. Below 2 V/cm cell directedness is weak (<= 0.2), so 'whole keratocytes migrate to the cathode' holds for fields of a few V/cm, not for every field." ;
+    delphi:evidenceAgainst "Without a field, fragments show a slight anodal bias (-0.13 ± 0.05, z = -2.6), which is small compared with -0.59 at 6 V/cm." ;
+    delphi:evidenceAgainst "z tests use the reported SE and treat cells as independent; raw trajectories are not deposited, so the summary statistics could not be recomputed from tracks." ;
+    delphi:evidenceAgainst "Only the directional claim is tested; the interpretation that this illustrates hard-to-predict collective behaviour is not a measurable quantity here." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2024-collective-04--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2024-collective-04/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2024-collective-04--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Sun et al. 2013, Current Biology 23:569-574, Supplemental Information (Table S1: directedness and speed of keratocytes and fragments under various EF conditions)" ;
+    dct:description "per-condition n, mean directedness and SE of intact keratocytes and fragments (Table S1), transcribed into analysis.py and verified against the PDF text" ;
+    delphi:hasChecksum "sha256:86efb46b6a50bcb821cc45b49688e9c2b467c3e52d5b5c86c33de384807af3e1" ;
+    prov:atLocation <https://ars.els-cdn.com/content/image/1-s2.0-S0960982213001978-mmc1.pdf> ;
+    prov:wasDerivedFrom <https://doi.org/10.1016/j.cub.2013.02.026> ;
+    dct:license "Elsevier open-archive user license (https://www.elsevier.com/open-access/userlicense/1.0/)" .
+  <https://w3id.org/delphi/resource/claim/levin-2024-collective-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2024-collective-04--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2024-collective-04/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.400Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2024-collective-04: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2024-collective-04--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

@@ -94,10 +94,10 @@ function trig(project, id, r) {
     dct:description ${lit(v.reason)} ;
     prov:startedAtTime "${v.date}"^^xsd:date ;
     prov:used ${iri(blob(v.null_result))} ;
-    delphi:evidenceAgainst ${lit(`Before: ${v.from.summary} (confidence ${v.from.confidence}). After: ${v.to.summary} (confidence ${v.to.confidence}).`)} ;
-    prov:wasInformedBy ${people.map(p => iri(p.who)).join(", ") || "()"} .
-${people.map(p => p.trig).join("")}  ${iri(A)} prov:qualifiedRevision ${iri(act)} ;
-    dct:contributor ${people.map(p => iri(p.who)).join(", ")} .
+    delphi:evidenceAgainst ${lit(`Before: ${v.from.summary} (confidence ${v.from.confidence}). After: ${v.to.summary} (confidence ${v.to.confidence}).`)}${people.length ? ` ;
+    prov:wasInformedBy ${people.map(p => iri(p.who)).join(", ")}` : ""} .
+${people.map(p => p.trig).join("")}  ${iri(A)} prov:qualifiedRevision ${iri(act)}${people.length ? ` ;
+    dct:contributor ${people.map(p => iri(p.who)).join(", ")}` : ""} .
 `,
     };
   });

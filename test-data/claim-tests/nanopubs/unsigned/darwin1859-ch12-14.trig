@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-14--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-14: refutes, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "In well-documented regional floras, vascular plant species naturalised in a region belong to genera that have no native species there more often than do the species that have naturalised elsewhere in the world but not in that region (the pool of proven colonists that could have joined it)." ;
+    delphi:passCriterion "Pre-registered: using WCVP (World Checklist of Vascular Plants, Kew) accepted non-hybrid species and their non-doubtful TDWG level-3 distribution records, for each of 24 fixed regions R: native genera G_R = genera with >= 1 species recorded native (introduced = 0, extinct = 0) in R; naturalised set N_R = species recorded introduced in R and not native in R; pool P_R = species recorded introduced in >= 1 other level-3 region and with no record (native or introduced) in R. 'Novel' = genus not in G_R. Odds ratio OR_R = odds(novel | N_R) / odds(novel | P_R), Fisher exact test one-sided in each direction. Regions with |N_R| < 50 are dropped. SUPPORTS if, among the remaining regions, at least two thirds have OR_R > 1 with one-sided p < 0.05 (naturalised species over-represented in genera absent from the native flora)." ;
+    delphi:failCriterion "Pre-registered: REFUTES if at least two thirds of the remaining regions have OR_R < 1 with one-sided p < 0.05 (naturalised species significantly more likely than the colonist pool to have native congeners). Any other outcome is MIXED. If fewer than 12 regions remain the result is inconclusive (underpowered); if WCVP cannot be downloaded, inconclusive (data-unavailable). The fraction of naturalised species in novel genera (Darwin's and de Candolle's 'large proportion ... distinct genera') is recorded per region as a descriptive statistic and does not enter the verdict." ;
+    delphi:expectedObservation "Species naturalised in a region are more often in genera absent from its native flora than proven colonists that did not naturalise there." ;
+    delphi:disconfirmingObservation "Naturalised species are as likely or significantly more likely than the colonist pool to belong to genera already native to the region." ;
+    delphi:admissibleDatasets "A global, expert-curated vascular plant checklist that codes native versus introduced status per region on a fixed geographic scheme, compiled independently of Darwin and de Candolle; open licence; regions with at least 50 naturalised species." ;
+    delphi:inferenceMethod "Per region, Fisher exact test of genus novelty (genus without native species in the region) for naturalised species versus the pool of species naturalised elsewhere but absent from the region; verdict from the share of regions significant (p < 0.05) in each direction, two-thirds threshold." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "WCVP accepted non-hybrid species and their non-doubtful level-3 distribution records were loaded. For each of the 24 pre-registered regions (all present, all with >= 457 naturalised species), the native genera were those with a native, non-extinct species in the region; the naturalised set was the species recorded as introduced and not native there; the pool was every species recorded as introduced in at least one other region and with no record in the region. The share of each set in genera without native species was compared by odds ratio and one-sided Fisher exact tests in both directions, and regions significant in each direction were counted against the two-thirds threshold." ;
+    rdfs:comment "Measured: 0.9583 fraction of regions where naturalised plants are significantly MORE likely than the colonist pool to belong to genera already native (OR < 1, one-sided p < 0.05) (n = 24, regions significant in Darwin's direction: 0/24; opposite direction: 23/24). Interpretation: Darwin's 'not closely allied to the aboriginal inhabitants ... belonging in a large proportion of cases ... to distinct genera' is read at the genus level (the level de Candolle used): a naturalised species is 'closely allied' to the natives if its genus has a native species in the region. The claim is comparative in substance (closely allied species 'tend to keep separate'), so the test compares naturalised species with a colonist pool rather than with zero; the pool is all species proven able to naturalise somewhere, which controls for the fact that only some plants become weeds at all. WCVP 'introduced' records are taken as naturalised occurrences. Restricted to vascular plants, the group de Candolle and Darwin discussed; animals are out of scope of this test. The 24 regions are TDWG level-3 units with well-documented floras on every continent and oceanic islands: NZN, NZS, HAW, GRB, IRE, FRA, GER, SPA, ITA, CAL, TEX, FLA, NSW, VIC, WAU, TAS, CPP, CLC, AGE, JAP, MAU, REU, CNY, AZO; codes absent from WCVP are dropped and reported." ;
+    delphi:evidenceAgainst "The comparative part of the claim is refuted: in 23 of 24 regions (all but north-eastern Argentina, which is not significant) naturalised species are significantly more likely than the pool of proven colonists to belong to a genus already native to the region (median odds ratio 0.60; in Great Britain 48% of naturalised species are in novel genera against 70% of the pool, in Germany 42% against 71%). No region shows Darwin's direction. This agrees with the modern literature on 'Darwin's naturalisation hypothesis', which usually finds naturalised plants closer to natives than expected." ;
+    delphi:evidenceAgainst "The descriptive part that Darwin attributes to de Candolle holds: a median 56% of naturalised species per region belong to genera with no native species (40% in Japan to 77% on Hawaii), which is 'a large proportion of cases'. The verdict rests on the pre-registered comparative criterion, because only it tests 'not closely allied ... whereas closely allied species ... tend to keep separate'." ;
+    delphi:evidenceAgainst "The colonist pool is not climate-matched: many pool species come from climates where a region's native genera are absent and could not naturalise there for climatic reasons, which inflates the pool's novelty and biases the test against Darwin. Humans also preferentially introduce plants from floras similar to the recipient region (e.g. European weeds to other temperate regions), which creates congener overlap independent of establishment success." ;
+    delphi:evidenceAgainst "WCVP 'introduced' covers naturalised occurrences without separating casual from established populations; genus is a coarse measure of being 'closely allied' and genus concepts vary across families." ;
+    delphi:evidenceAgainst "Plants only; Darwin's statement also covers animals." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-14--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-14/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-14--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv" ;
+    dct:description "native and introduced status of accepted vascular plant species in TDWG level-3 regions; genus membership" ;
+    delphi:hasChecksum "sha256:d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa" ;
+    prov:atLocation <https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip> ;
+    prov:wasDerivedFrom <https://sftp.kew.org/pub/data-repositories/WCVP/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-14> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-14--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-14/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.395Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-14: refutes, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-14--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}
