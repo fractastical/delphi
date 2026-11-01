@@ -138,3 +138,8 @@ The first receipt lists two missing selected files. Both were tracked deletions 
 and deletion state remains in the binary patch. This is explicitly distinguished from missing
 untracked evidence; subsequent tooling fails publication for an unexplained missing selection.
 The final corrected film remains deferred until its publication manifest is ready.
+
+The parent reviewer also independently read the actual sb03-restored sanitized dump and
+matched its23,236,752 bytes and SHA256 to the dump used in its18-table/application replay.
+That ties the off-host recovered bytes directly to the database check. The complete-file
+rehash was performed by the restore tool; the parent did not manually rehash every file.
