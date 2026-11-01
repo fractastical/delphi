@@ -105,7 +105,33 @@ def main() -> None:
         Js = sorted({key[2] for key in sel})
         lam_lo = min(v["lambda_star"] for key, v in sel.items() if key[2] == min(Js))
         lam_hi = max(v["lambda_star"] for key, v in sel.items() if key[2] == max(Js))
+        # Minimum FEASIBLE cross-cell spread: pick one ratio from each interval to make them as
+        # close as possible. If the intervals share a point the spread can be 1; otherwise the
+        # cell with the largest lower bound forces r >= LO and the cell with the smallest upper
+        # bound forces r <= HI, so no choice does better than LO/HI. This tests the frozen
+        # tolerance directly instead of only rejecting exact equality.
+        min_feasible_spread = 1.0 if LO <= HI else LO / HI
+        # Exponent bounds from the interval ENDPOINTS, not from the summaries. The fitted value
+        # above is a regression of geometric bracket summaries and is not a measured exponent.
+        lo_at_min = min(brackets[key]["lo"] for key in sel if key[2] == min(Js))
+        hi_at_min = max(brackets[key]["hi"] for key in sel if key[2] == min(Js))
+        lo_at_max = min(brackets[key]["lo"] for key in sel if key[2] == max(Js))
+        hi_at_max = max(brackets[key]["hi"] for key in sel if key[2] == max(Js))
+        ratio_lo, ratio_hi = lo_at_max / hi_at_min, hi_at_max / lo_at_min
+        lj = math.log(max(Js) / min(Js))
+        exp_bounds = [math.log(ratio_lo) / lj, math.log(ratio_hi) / lj]
+
         per_gap[k] = dict(
+            min_feasible_spread=min_feasible_spread,
+            frozen_tolerance=2.0,
+            min_feasible_spread_exceeds_tolerance=min_feasible_spread > 2.0,
+            lambda_star_interval_at_min_J=[lo_at_min, hi_at_min],
+            lambda_star_interval_at_max_J=[lo_at_max, hi_at_max],
+            lambda_star_factor_feasible_range=[ratio_lo, ratio_hi],
+            exponent_feasible_bounds=exp_bounds,
+            exponent_note="bounds derived from bracket ENDPOINTS. The fitted value below is a "
+                          "regression of geometric bracket SUMMARIES, not a measured threshold "
+                          "exponent.",
             cells=n, j_range=[min(Js), max(Js)], j_factor=max(Js) / min(Js),
             ratio_interval_intersection=([LO, HI] if LO <= HI else None),
             intervals_consistent_with_a_constant_ratio=(LO <= HI),

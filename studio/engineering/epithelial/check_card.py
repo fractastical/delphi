@@ -130,7 +130,15 @@ def sweep_claims(S: dict) -> list[tuple[str, object, object]]:
             (f"sweep k={k}: intervals disjoint", False, v["intervals_consistent_with_a_constant_ratio"]),
             (f"sweep k={k}: J factor", 16.0, round(v["j_factor"], 1)),
             (f"sweep k={k}: lambda* factor", 2.00, round(v["lambda_star_factor"], 2)),
-            (f"sweep k={k}: fitted exponent", exp_exp, round(v["fitted_exponent_lambda_star_vs_J"], 3)),
+            (f"sweep k={k}: summary-regression exponent (NOT a measured exponent)", exp_exp,
+             round(v["fitted_exponent_lambda_star_vs_J"], 3)),
+            (f"sweep k={k}: min feasible spread", {"4": 4.0, "7": 8.0}[k], v["min_feasible_spread"]),
+            (f"sweep k={k}: min feasible spread exceeds frozen tolerance 2",
+             True, v["min_feasible_spread_exceeds_tolerance"]),
+            (f"sweep k={k}: feasible exponent bounds", {"4": [0.0, 0.5], "7": [-0.25, 0.5]}[k],
+             [round(x, 3) for x in v["exponent_feasible_bounds"]]),
+            (f"sweep k={k}: predicted exponent 1.0 outside feasible bounds", True,
+             not (v["exponent_feasible_bounds"][0] <= 1.0 <= v["exponent_feasible_bounds"][1])),
         ]
     need = H["highest_J_arms_proportionality_requires_to_close"]["4"]
     rows.append(("sweep k=4 J=560: no arm proportionality needs is still closing", 0,
