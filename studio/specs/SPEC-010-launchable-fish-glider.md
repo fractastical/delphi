@@ -37,6 +37,21 @@ mass and launch requirements are separate from living-organism feasibility.
    Form Studio 1's sourced build envelope is 200 × 125 × 235 mm before support
    and orientation allowance. Multiple printed parts are allowed. A bounding-box
    check is not slicing, curing, assembly, structural or flight validation.
+8. **Strong fins are required.** Size root joints, ribs/rays and membrane together
+   for the declared launch and airborne loads. Report both stiffness/strength and
+   added mass; uniformly thickening a fin is not evidence of a viable tradeoff.
+   Printed joints and orientation-dependent strength need their own tests.
+9. **Release a first printable prototype promptly and preserve revisions.** Each
+   revision must identify its parent geometry, changed parameters, material/cure
+   assumption, source hashes, actual manufacturing mass estimate, failed checks
+   and remaining tests. Distinguish sibling variants from later revisions. A
+   printable prototype may be published before flight acceptance, with that state
+   explicit. Keep all earlier files available.
+
+The coordinator selected printed fins at 1:1 scale and Alpha Grey V1 as
+provisional engineering defaults. These were not direct user answers about
+available hardware, material or dimensions. A release must preserve that origin
+and permit a revised material/scale without overwriting the earlier candidate.
 
 ## Analysis contract
 
@@ -64,6 +79,10 @@ mass and launch requirements are separate from living-organism feasibility.
 
 - [ ] At least one distinct new printable assembly and an assembled GLB, with
   retained fish morphology, part identifiers and a source-candidate hash.
+- [ ] Fin root/ray/membrane strength and stiffness calculations with launch-load
+  assumptions, joint limitations and the resulting mass penalty visible.
+- [ ] Downloadable, immutable revisions and a navigable design history with
+  explicit parentage, changes and separate manufacturing/flight statuses.
 - [ ] Machine-readable material cards: resin/version, solid density, stiffness,
   test/cure conditions, printer/tank compatibility, source URL and read status.
 - [ ] Computed volume, mass, center of mass and inertia for every part and the

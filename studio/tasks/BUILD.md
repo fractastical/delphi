@@ -266,8 +266,35 @@ are touched. Exact release and live-check receipts are under `deploy/receipts/`.
   acceptance. Existing display props remain distinct.
 - [ ] Build the lightweight fish-derived assembly (claude-05) and integrate
   stability, launch-load and trajectory sweeps (claude-07, aero controls04).
-- [ ] Bind sourced Form Studio material properties and exact manufacturing
-  conditions to the model; printer/resin availability remains an optional user
+- [x] Record sourced Form Studio material cards and exact manufacturing
+  conditions; geometry/dynamics binding remains in progress and printer/resin availability remains an optional user
   clarification while provisional scenarios proceed.
 - [ ] Publish linked launchable-model files, simulation artifacts and assembly/
   physical-test instructions. No flight demonstration has occurred.
+
+## Integration checkpoint — October 31, 5:11pm PDT
+
+- [x] Integrated two actual exact-Claim computations and the separate reviewer
+  findings. Root checked 56 artifact hashes/sizes, eight frozen code hashes and
+  both saved read→input-binding→solver→Evidence sequences; six focused tests
+  passed. Receipt: `deploy/receipts/claim-reuse-root-check.json`. This is input
+  reuse, not evidence of collective advantage or biological validity. Reviewer
+  reported both Evidence records disputed despite correct scoped mathematics;
+  empirical relevance and independent non-computational replication are absent.
+- [x] Add strong-fin and revision-history acceptance to SPEC-010. Printed fins,
+  1:1 scale and Alpha Grey are coordinator defaults, not confirmed user choices.
+- [ ] Geometry05: first reinforced lightweight print assembly; dynamics07:
+  quantify launch loads, trim and mass feasibility. Preliminary analytic wing
+  loading indicates 15–20 g may require more than the provisional 4–8 m/s launch
+  speeds. Retain this constraint rather than promising flight from appearance.
+- [ ] Site02: contribute through transient bearer credentials and show design
+  lineage. Root is reviewing the integration; deployed release remains 52cda98.
+- [ ] Separate browser critic06 replaces the previous critic's revoked-login
+  blocker. Review each route and major interaction against the exact release.
+- [ ] Research worker: map primary Evo2 cell-specific regulatory results and
+  zebrafish fin cell/epigenetic datasets to explicit missing biological bridges.
+  This literature/data work does not resume provider-stopped sequence work.
+- [ ] Infrastructure reports GCP one-GPU quota approved; no VM allocation implied.
+  CPU packet admission and durable collection remain in progress. Nebius recovery
+  job `aijob-e00fb6jhvdt12fgsje` was image-pulling at the last report; no new
+  evaluation result is claimed. Export GCP artifacts before account deletion.
