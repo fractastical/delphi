@@ -657,7 +657,7 @@ def render_scene(scene: dict, scene_spec: dict, cut_dir: Path, *, extra_hold_s: 
     if len(shot_files) == 1:
         return shot_files[0]
     list_path = cut_dir / f"{scene['id']}-shots.txt"
-    list_path.write_text("".join(f"file '{path.as_posix()}'\n" for path in shot_files), encoding="utf-8")
+    list_path.write_text("".join(f"file '{path.resolve().as_posix()}'\n" for path in shot_files), encoding="utf-8")
     subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-filter_complex_threads", "1", "-threads", "2", "-f", "concat", "-safe", "0", "-i", str(list_path),
                     "-c", "copy", "-movflags", "+faststart", str(scene_path)],
                    check=True, timeout=120, capture_output=True, text=True)
