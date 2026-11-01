@@ -1087,6 +1087,15 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "parameter_unknowns": ["Not calibrated to any fish cell, fin or channel (Kir2.1 is not modelled).", "Concentrations and permeabilities are BETSE defaults and the worker's scale factors."],
             "open_questions": ["Which measured cell-type voltage and permeability data would calibrate this patch?", "How would tissue voltage map to a fin growth law? No such bridge exists."],
             "limitations": ["Simulated numerical output, not observed, not calibrated, not a fish fin.", "Single-reader work: not independently reviewed."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
+    sensitivity = "artifacts/bioelectric-tissue/sensitivity-v1/index.json"
+    if (ROOT / sensitivity).is_file():
+        module_path = "engineering/bioelectric_tissue/sensitivity_site.py"
+        ins.read(module_path)
+        spec = importlib.util.spec_from_file_location("frontier_betse_sensitivity_card", ROOT / module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        cards.append(module.build_card(ins.read, lambda name, sha: _vid(
+            ins, out, "betse-k-sensitivity-v1", "artifacts/bioelectric-tissue/sensitivity-v1/reconstructed", name, sha)))
     d = "artifacts/multicell"
     if (ROOT / d / "summary.json").exists():
         sm = json.loads(ins.read(f"{d}/summary.json")); arms = sm["arms"]; shas = {l.split()[1].split("/")[-1]: l.split()[0] for l in ins.text(f"{d}/mp4.sha256").splitlines() if l.strip()}
