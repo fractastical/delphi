@@ -1,0 +1,106 @@
+{
+  "claim_id": "levin-2014-tumor-03",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:30:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-01"
+  },
+  "variables_needed": [
+    "per-embryo tumor-like-structure (ITLS) scores for Xrel3 and Gli1 with and without Kv1.5 in a distant blastomere",
+    "group sizes and incidence per condition",
+    "oncogene-only and Kv1.5-only controls"
+  ],
+  "datasets": [
+    {
+      "id": "long-range-vmem-control-of-tumorigenesis",
+      "name": "Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range (Oncotarget 2014), article and supplement",
+      "landing_url": "https://doi.org/10.18632/oncotarget.1935",
+      "access_url": null,
+      "doi": "10.18632/oncotarget.1935",
+      "license": "cc by (Europe PMC licence field)",
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:27:00Z",
+        "method": "HEAD doi.org (403 from oncotarget.com) and Europe PMC REST core record by DOI (200)",
+        "http_status": 403,
+        "note": "oncotarget.com returned 403 to curl; Europe PMC record: PMID 24830454, PMC4102810, hasSuppl Y, hasData Y, licence cc by"
+      },
+      "variables_present": [
+        "published summary statistics (assessors cite N=225 and N=292 and t-test results; I did not read the paper)"
+      ],
+      "variables_missing": [
+        "per-embryo scores",
+        "full contingency tables not located in any repository"
+      ],
+      "scope": "Open-access paper with a supplement flag; contents were not opened by me.",
+      "evidence": "Europe PMC metadata only.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "long-range-vmem-tumorigenesis-article-and-supplementary-materials",
+      "name": "Same article and supplementary materials (second assessor listing)",
+      "landing_url": "https://doi.org/10.18632/oncotarget.1935",
+      "access_url": null,
+      "doi": "10.18632/oncotarget.1935",
+      "license": "cc by (Europe PMC licence field)",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:27:00Z",
+        "method": "same HEAD and Europe PMC lookup as above",
+        "http_status": 403,
+        "note": "duplicate of the record above; doi.org target returned 403 to curl"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "duplicate of the first record"
+      ],
+      "scope": "Same paper.",
+      "evidence": "Same Europe PMC record (PMC4102810).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Europe PMC",
+      "query": "DOI:10.18632/oncotarget.1935",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.18632/oncotarget.1935&format=json&resultType=core",
+      "hits": 1,
+      "note": "PMC4102810, CC BY, hasSuppl Y"
+    },
+    {
+      "source": "Dryad",
+      "query": "Kv1.5 tumor-like structures Xenopus oncogene",
+      "url": "https://datadryad.org/api/v2/search?q=Kv1.5%20tumor-like%20structures%20Xenopus%20oncogene",
+      "hits": 0,
+      "note": "none"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Xenopus tumor membrane potential oncogene",
+      "url": "https://zenodo.org/api/records?q=%22Xenopus%22%20%22tumor%22%20%22membrane%20potential%22%20oncogene&size=4",
+      "hits": 25038,
+      "note": "loose; top 4 unrelated"
+    },
+    {
+      "source": "DataCite",
+      "query": "Xenopus Kv1.5 hyperpolarization tumorigenesis oncogene",
+      "url": "https://api.datacite.org/dois?query=Xenopus%20Kv1.5%20hyperpolarization%20tumorigenesis%20oncogene&page%5Bsize%5D=4",
+      "hits": 0,
+      "note": "none"
+    }
+  ],
+  "status": "gap",
+  "summary": "No repository dataset with per-embryo or contingency-table data for the Xrel3/Gli1 plus Kv1.5 experiments was found (Dryad 0, DataCite 0, Zenodo top hits unrelated). Only the open-access paper (with a supplement flag) exists; its summary percentages and sample sizes are the usable evidence.",
+  "next_step": "Open PMC4102810 and its supplement, tabulate the per-condition counts for the two oncogenes, and pre-register the incidence comparison against that summary.",
+  "obstacles_confirmed": [
+    "Per-embryo scores are not deposited.",
+    "Only two oncogenes are tested in this contrast."
+  ]
+}

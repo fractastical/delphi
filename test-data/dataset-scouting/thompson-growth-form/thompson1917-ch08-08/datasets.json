@@ -1,0 +1,128 @@
+{
+  "claim_id": "thompson1917-ch08-08",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:16:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "many individual eight-cell embryos of one species (the claim names the frog) with the cell-contact pattern recoverable",
+    "3D or multi-view imaging so that partition topology is not confused by 2D projection",
+    "per-embryo identifiers so that frequencies of each arrangement can be counted"
+  ],
+  "datasets": [
+    {
+      "id": "figshare-phallusia-mammillata-embryonic-development",
+      "name": "Phallusia mammillata embryonic development (Guignard et al. 2020; light-sheet, ASTEC segmentation and tracking)",
+      "landing_url": "https://figshare.com/projects/Phallusiamammillata_embryonic_development/64301",
+      "access_url": "https://api.figshare.com/v2/projects/64301/articles?page_size=100",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:50Z", "method": "GET figshare API project 64301 and its articles list", "http_status": 200 },
+      "variables_present": [
+        "19 articles, each a separately imaged and segmented ascidian embryo (including wild-type Phmamm-7 and Phmamm-16); membrane-labelled light-sheet movies with every cell segmented and tracked (project description)"
+      ],
+      "variables_missing": [
+        "ascidian, not frog; the claim is about within-species variability, which could be asked in a different species but is not the claim's frog example",
+        "eight-cell timepoints not opened"
+      ],
+      "scope": "One species, about 19 embryos including U0126-treated ones",
+      "evidence": "articles list length 19; project description quoted in ch07-05 record",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-13961381-mastodon-10-phallusia-embryos",
+      "name": "Mastodon example data set - 10 tracked Phallusia mammillata embryos",
+      "landing_url": "https://zenodo.org/records/13961381",
+      "access_url": "https://zenodo.org/api/records/13961381",
+      "doi": "10.5281/zenodo.13961381",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:43Z", "method": "GET Zenodo records API (metadata only)", "http_status": 200 },
+      "variables_present": ["10 .mastodon tracking files, one per embryo (Pm01 9,025,690 bytes; Pm02 3,486,142; ... Pm10 9,225,383), derived from the figshare Phallusia dataset"],
+      "variables_missing": ["tracking projects of nuclei/cells, not surface partition geometry; 1.5-9.2 MB each so not opened"],
+      "scope": "10 embryos of one ascidian species",
+      "evidence": "files array of 10 entries with sizes as listed; license id cc-by-4.0; description links to the figshare project and Guignard et al.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-13903500-mouse-4-to-26-cells",
+      "name": "Membrane staining and segmentation of a developing mouse embryo from 4 to 26 cells",
+      "landing_url": "https://zenodo.org/records/13903500",
+      "access_url": "https://zenodo.org/api/records/13903500",
+      "doi": "10.5281/zenodo.13903500",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:38Z", "method": "GET Zenodo records API (metadata only)", "http_status": 200, "bytes": 261559496 },
+      "variables_present": ["membrane-stained and segmented series from 4 cells to 26 cells (covers the 8-cell stage by the description)"],
+      "variables_missing": ["a single embryo, so no within-species variation; mouse, not frog"],
+      "scope": "One mouse embryo",
+      "evidence": "Zenodo record metadata as in ch07-05 record",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies search API)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Xenopus%20cleavage&pageSize=4",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:12:27Z", "method": "GET BioImages search 'Xenopus cleavage' (62 hits); also 'four-cell embryo' (134 hits)", "http_status": 200 },
+      "variables_present": ["multi-embryo mouse compaction sets (S-BIAD1057, 391 files; S-BIAD915 human embryos, 107 files)"],
+      "variables_missing": ["no frog eight-cell set among the top Xenopus hits (egg-extract cryo-ET entries EMPIAR-11263, -10691, -10742, -10744)"],
+      "scope": "Archive-wide search",
+      "evidence": "totalHits 62 and 134; accessions and titles as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:02Z", "method": "HEAD landing page (429 on /, 429 on /xenbase/, 5 s apart)", "http_status": 429, "note": "rate-limited for this client; content not inspected" },
+      "variables_present": [],
+      "variables_missing": ["not inspected"],
+      "scope": null,
+      "evidence": "HTTP 429 on both attempts",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ssbd",
+      "name": "SSBD (Systems Science of Biological Dynamics database, RIKEN)",
+      "landing_url": "https://ssbd.riken.jp/database/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:12:50Z", "method": "GET database landing page (no search API called)", "http_status": 200, "note": "reachability only" },
+      "variables_present": [],
+      "variables_missing": ["frog eight-cell content not established"],
+      "scope": null,
+      "evidence": "HTTP 200, HTML page, 35,194 bytes",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "Xenopus cleavage", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Xenopus%20cleavage&pageSize=4", "hits": 62, "note": "only egg-extract cryo-ET among top hits" },
+    { "source": "Zenodo", "query": "Xenopus cleavage embryo cell shape timelapse", "url": "https://zenodo.org/api/records?q=Xenopus%20cleavage%20embryo%20cell%20shape%20timelapse&size=5", "hits": 257027, "note": "inflated count; top hits are 13624 'High-Magnification In Vivo Imaging of Xenopus Embryos...' and 8353538 'Trained models for Xenopus segmentation and tracking workflow' (not opened)" },
+    { "source": "Dryad", "query": "cleavage blastomere geometry embryo", "url": "https://datadryad.org/api/v2/search?q=cleavage%20blastomere%20geometry%20embryo", "hits": 0, "note": "no hits" },
+    { "source": "figshare", "query": "project 64301 (Phallusia)", "url": "https://api.figshare.com/v2/projects/64301/articles?page_size=100", "hits": 19, "note": "one article per embryo" },
+    { "source": "Zenodo", "query": "Phallusia mammillata embryo segmentation cell contacts", "url": "https://zenodo.org/api/records?q=Phallusia%20mammillata%20embryo%20segmentation%20cell%20contacts&size=4", "hits": 159915, "note": "inflated count; 13961381 lists 10 embryos" }
+  ],
+  "status": "partial",
+  "summary": "No open set of individual frog eight-cell eggs was found: Xenbase answered HTTP 429, the BioImage Archive 'Xenopus cleavage' hits are egg-extract cryo-ET, and Zenodo/Dryad searches gave only unopened candidates. Multi-embryo cleavage-stage volumes with per-cell segmentation exist for the ascidian Phallusia (about 19 embryos on figshare, 10 in a Zenodo Mastodon mirror) and one mouse embryo, which could test whether eight-cell arrangements vary within a species but not the frog case.",
+  "next_step": "Retry Xenbase, then open Zenodo 13624 and 8353538 (Xenopus imaging and segmentation) to check for eight-cell data; otherwise pre-register the test on the Phallusia embryos at the eight-cell timepoint and state that the species differs from the claim's example.",
+  "obstacles_confirmed": [
+    "No frequency table of eight-cell arrangements per species exists in the sources checked.",
+    "Per-species embryo counts in open 3D data are about 19 (ascidian) and 1 (mouse)."
+  ]
+}

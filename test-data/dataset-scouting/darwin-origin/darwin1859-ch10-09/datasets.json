@@ -1,0 +1,117 @@
+{
+  "claim_id": "darwin1859-ch10-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "per-genus or per-species occurrence counts and geographic occupancy in successive time bins, with the last-appearance bin identified",
+    "extinct vs. surviving flag for the same taxa and bins (control group)",
+    "sampling covariates per bin (lithology, environment, number of collections) to separate Signor-Lipps truncation from true decline",
+    "documented population-size or range trends before extinction for modern, human-exterminated species"
+  ],
+  "datasets": [
+    {
+      "id": "harnik-phanerozoic-rarity-data",
+      "name": "Harnik, Simpson & Payne: Phanerozoic genus occurrence, occupancy and extinction table (Dryad/Zenodo mirror)",
+      "landing_url": "https://zenodo.org/api/records/4969866",
+      "access_url": "https://zenodo.org/api/records/4969866/files/Harnik-et-al-Phanerozoic-rarity-data.csv/content",
+      "doi": "10.5061/dryad.0mq69",
+      "license": "CC0 (Zenodo licence id cc-zero)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:10:31Z", "method": "HEAD access_url; GET README file from the same Zenodo record", "http_status": 200, "bytes": 5077949 },
+      "variables_present": [
+        "occurrences per genus per time bin (occs.raw)",
+        "grid-cell occupancy per genus per time bin (raw.cell.occupancy)",
+        "victim flag: genus extinct at end of that interval vs. survives (victim)",
+        "singleton flag",
+        "lithology, shallow/deep environment and tropical/extratropical occurrence counts per bin (sampling covariates)",
+        "mean proportional abundance in collections (abundance.mean.prop)"
+      ],
+      "variables_missing": [
+        "species-level resolution (rows are genera)",
+        "modern human-exterminated species"
+      ],
+      "scope": "Genus-by-time-bin table built from a Paleobiology Database download of 25 Sept 2010, Phanerozoic marine animals (per the data README: columns class, genus, bin, occs.raw, raw.cell.occupancy, occs.clast/carb/mix, occs.shallow/deep, occs.tr/etr, victim, singleton, abundance.mean.prop); a second 64,883,394-byte file in the same record holds the raw occurrence download",
+      "evidence": "Zenodo record 4969866 lists three files: README (5,517 B), Harnik-et-al-Phanerozoic-rarity-data.csv (5,077,949 B per HEAD content-length) and the raw PaleoDB occurrence CSV (64,883,394 B). The README defines the columns listed above, including victim (1 = no occurrences in subsequent intervals, 0 = survives). Table not downloaded (over 1 MB).",
+      "verdict": "partial"
+    },
+    {
+      "id": "finnegan-fossil-occupancy-trajectories-raw-data",
+      "name": "Data from: Adding fossil occupancy trajectories to the assessment of modern extinction risk",
+      "landing_url": "https://zenodo.org/api/records/4997399",
+      "access_url": "https://zenodo.org/api/records/4997399/files/Raw_data.xlsx/content",
+      "doi": "10.5061/dryad.h5b45",
+      "license": "CC0 (Zenodo licence id cc-zero)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:10:32Z", "method": "HEAD access_url; GET Zenodo record metadata (description)", "http_status": 200, "bytes": 4728165 },
+      "variables_present": ["Cenozoic marine species occupancy trajectories (per the record description)"],
+      "variables_missing": ["column list not inspected (xlsx over 1 MB)", "terrestrial taxa"],
+      "scope": "Cenozoic marine fossil species; description says occupancy and its temporal trajectory are modelled as determinants of extinction risk for extinct species and used to predict extant species",
+      "evidence": "Zenodo record 4997399 description: 'based on the Cenozoic fossil record of marine species, that both occupancy and its temporal trajectory are significant determinants of risk'; files Raw_data.xlsx (4,728,165 B) and README_for_Raw_data.docx (14,486 B). Column names not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mammalia&interval=Cenozoic&rowcount&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T02:59:38Z", "method": "GET occs/list.json with rowcount, limit=0 (Mammalia, Cenozoic) and limit=1 (Mammalia, Pleistocene, show=coords,loc,time)", "http_status": 200 },
+      "variables_present": [
+        "georeferenced, dated occurrences (lng/lat, early/late age bounds, stratum, collection id) per taxon",
+        "taxon rank and name per occurrence"
+      ],
+      "variables_missing": ["abundance counts are not returned by default fields", "sampling-effort covariates need joins to collection records"],
+      "scope": "records_found: 125,000 Mammalia occurrences in Cenozoic and 32,844 in Pleistocene at query time; all fossil groups available",
+      "evidence": "occs/list.json returned records_found 125000 for base_name=Mammalia&interval=Cenozoic and one sample record with fields oid, cid, idn, tna, oei, eag, lag, lng, lat, cc2, stp. Open API, no key.",
+      "verdict": "partial"
+    },
+    {
+      "id": "neotoma-paleoecology-database",
+      "name": "Neotoma Paleoecology Database API",
+      "landing_url": "https://www.neotomadb.org/",
+      "access_url": "https://api.neotomadb.org/v2.0/data/datasets?datasettype=vertebrate%20fauna&limit=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T03:00:36Z", "method": "GET api v2.0 data/datasets (limit=1, datasettype=vertebrate fauna)", "http_status": 200 },
+      "variables_present": ["site-level late Quaternary vertebrate fauna and pollen datasets with age ranges and DOIs (e.g. FAUNMAP dataset 5746, Bechan Cave, 14,000-11,000 14C yr BP)"],
+      "variables_missing": ["not checked whether per-taxon counts exist for species that later went extinct, in enough sites and time bins to form trajectories"],
+      "scope": "Late Quaternary sites, mainly North America (sample record); abundance/count tables obtained from separate per-dataset endpoints not queried",
+      "evidence": "Open JSON API returned status success with site, datasettype, database (FAUNMAP) and agerange fields. Dataset-type counts could not be verified (the dstypemonth summary endpoint appears to be monthly counts).",
+      "verdict": "partial"
+    },
+    {
+      "id": "iucn-red-list",
+      "name": "IUCN Red List of Threatened Species",
+      "landing_url": "https://www.iucnredlist.org/",
+      "access_url": "https://api.iucnredlist.org/api/v4/taxa/scientific_name?genus_name=Mammuthus&species_name=primigenius",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T02:59:53Z", "method": "HEAD landing page; GET API v4 without token; GET GBIF iucnRedListCategory for a test species", "http_status": 403, "note": "Landing page returned 200; API v4 returned 403 {\"error\":\"Forbidden\"} without a token; downloads require a registered account" },
+      "variables_present": ["category and population-trend assessments for assessed modern species (via account/token)"],
+      "variables_missing": ["pre-extinction time series of abundance", "extinct species have only a final assessment, not trajectories"],
+      "scope": "Modern assessed species only; GBIF's iucnRedListCategory for Mammuthus primigenius returned NOT_EVALUATED",
+      "evidence": "API v4 needs a bearer token (403 without). Not an openly downloadable time series; assessment histories exist per species but were not fetched.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "extinction rarity fossil occupancy last appearance", "url": "https://zenodo.org/api/records?q=extinction+rarity+fossil+occupancy+last+appearance&size=5", "hits": 198373, "note": "top hits relevant: Harnik et al. rarity data (dryad.0mq69), fossil occupancy trajectories (dryad.h5b45), Zimmt et al. clusters of last occurrences (10.6078/D1098D), microplankton occupancy-history code (zenodo.15174296)" },
+    { "source": "Dryad", "query": "extinction rarity fossil", "url": "https://datadryad.org/api/v2/search?q=extinction+rarity+fossil&per_page=5", "hits": 2, "note": "one relevant: dryad.0mq69" },
+    { "source": "Dryad", "query": "pre-extinction decline fossil occupancy", "url": "https://datadryad.org/api/v2/search?q=pre-extinction+decline+fossil+occupancy&per_page=3", "hits": 0, "note": "no results" },
+    { "source": "DataCite", "query": "fossil occupancy extinction rarity before extinction", "url": "https://api.datacite.org/dois?query=fossil+occupancy+extinction+rarity+before+extinction&page%5Bsize%5D=5", "hits": 0, "note": "no results (an earlier DataCite call timed out)" },
+    { "source": "PBDB", "query": "base_name=Mammalia interval=Pleistocene", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mammalia&interval=Pleistocene&show=coords,loc,time&limit=1&rowcount", "hits": 32844, "note": "records_found" }
+  ],
+  "status": "partial",
+  "summary": "The pre-extinction fossil half is well supported by public data: the Harnik et al. 2012 genus-by-bin table (occurrences, grid-cell occupancy, extinct/survivor flag, lithology and environment covariates; CC0) and the Paleobiology Database API. Species-level, modern human-exterminated cases have no open trajectory dataset: IUCN needs a token and holds final assessments, and Neotoma coverage of extinct late Quaternary species was not confirmed.",
+  "next_step": "Download the Harnik CSV (5.1 MB) and cross-check column names against the README; for the human-exterminated clause, compile a species list (e.g. from IUCN extinct species plus historical abundance series) as a separate small table.",
+  "obstacles_confirmed": [
+    "Occurrence counts are abundance proxies; the Harnik table records genera, not species.",
+    "No open repository of pre-extinction abundance series for human-exterminated species was found.",
+    "IUCN API requires a token (HTTP 403 without)."
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "claim_id": "levin-2020-xenobots-02",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:24:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "in vivo position tracks over time for upright and inverted organisms of the deciliated cardiac design",
+    "in silico design and simulator able to produce upright and inverted displacement under random perturbation",
+    "mapping of track IDs to designs",
+    "reported summary statistics for the inversion contrast"
+  ],
+  "datasets": [
+    {
+      "id": "reconfigurable-organisms",
+      "name": "skriegman/reconfigurable_organisms (code and in vivo tracks, Kriegman et al. 2020)",
+      "landing_url": "https://github.com/skriegman/reconfigurable_organisms",
+      "access_url": "https://raw.githubusercontent.com/skriegman/reconfigurable_organisms/master/data_analysis/vivo_data.csv",
+      "doi": null,
+      "license": "CC0-1.0 (GitHub API license field)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:16:00Z", "method": "GitHub API metadata and contents listings; HEAD and ranged GET (first 1,000,000 bytes) on vivo_data.csv", "http_status": 200, "bytes": 1215040 },
+      "variables_present": [
+        "in vivo tracks: data_analysis/vivo_data.csv, columns X, Y, Robot, Run, Upright, Start_X, Start_Y, Time",
+        "simulator and evolution code (exp/Locomotion_pass1.py, Locomotion_pass2.py, _voxcad, softbot.py)",
+        "analysis scripts including data_analysis/Transferal_from_silico_to_vivo.py and Statistical_Analysis.py",
+        "microscopy images data_analysis/imaging/4x1.tif to 4x4.tif (5,760,154 bytes each) and design.npy"
+      ],
+      "variables_missing": [
+        "an explicit table naming which Robot id is the deciliated cardiac design (a script comment refers to 'additional cardiacBot'; mapping not confirmed)",
+        "data_analysis/results is empty (.keep only), so simulated outputs are not stored and must be regenerated (Python 2.7, Voxelyze build)"
+      ],
+      "scope": "vivo_data.csv is 1,215,040 bytes. Within the first 1,000,000 bytes (22,384 complete rows) Robot ids 1 to 6 appear, with Upright values 0 and 1; per Robot/Upright there are 1 to 5 Run values; Time runs 0 to 567. Rows beyond that slice were not read. Repository last pushed 2020-02-19.",
+      "evidence": "GitHub API: license cc0-1.0, size field 28496 (KB); raw file header 'X,Y,Robot,Run,Upright,Start_X,Start_Y,Time'; Range GET returned HTTP 206 with 1,000,000 bytes. Script lines load vivo_data.csv and subset Upright==0 and Upright==1.",
+      "verdict": "holds"
+    },
+    {
+      "id": "a-scalable-pipeline-for-designing-reconfigurable-organisms-article-and-supplementary-information",
+      "name": "A scalable pipeline for designing reconfigurable organisms (PNAS 2020), article and SI",
+      "landing_url": "https://doi.org/10.1073/pnas.1910837117",
+      "access_url": null,
+      "doi": "10.1073/pnas.1910837117",
+      "license": "cc by (Europe PMC licence field)",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:15:00Z", "method": "HEAD doi.org (403 from pnas.org) and Europe PMC REST search by DOI (200)", "http_status": 403, "note": "pnas.org returned 403 to curl; Europe PMC REST returned a record: PMID 31932426, PMC6994979, isOpenAccess Y, licence cc by" },
+      "variables_present": [],
+      "variables_missing": ["paper, not a repository dataset; SI not inspected"],
+      "scope": "Open-access paper; source of the published statistics for the in vivo contrast.",
+      "evidence": "Europe PMC metadata only.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "GitHub API", "query": "repo skriegman/reconfigurable_organisms and contents of /, exp, data_analysis, tools, data_analysis/results, data_analysis/imaging", "url": "https://api.github.com/repos/skriegman/reconfigurable_organisms/contents/data_analysis", "hits": 20, "note": "20 entries under data_analysis including vivo_data.csv" },
+    { "source": "Europe PMC", "query": "DOI:10.1073/pnas.1910837117", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1073/pnas.1910837117&format=json&resultType=core", "hits": 1, "note": "PMC6994979, CC BY" },
+    { "source": "Zenodo", "query": "xenobot", "url": "https://zenodo.org/api/records?q=xenobot&size=5", "hits": 5, "note": "none are the Kriegman/Levin 2020 deposit; top hits are unrelated or later theory preprints" },
+    { "source": "Dryad", "query": "xenobot", "url": "https://datadryad.org/api/v2/search?q=xenobot", "hits": 0, "note": "response had no datasets key; treated as no hits" }
+  ],
+  "status": "data-ready",
+  "summary": "The authors' GitHub repository (CC0) holds in vivo position tracks for upright and inverted organisms (vivo_data.csv, 1,215,040 bytes, Robots 1 to 6, Upright 0/1) together with the simulator and analysis scripts. This contradicts the assessors' obstacle that in vivo tracks are not deposited. Which Robot id is the deciliated cardiac design is not stated in a table I could read.",
+  "next_step": "Read Transferal_from_silico_to_vivo.py and the paper SI to map Robot ids to designs, then pre-register the heading and displacement tests; regenerate the in silico runs with the Python 2.7 / Voxelyze build.",
+  "obstacles_confirmed": [
+    "Simulated outputs are not stored (results/ is empty); in silico numbers need the legacy Python 2.7 and Voxelyze toolchain.",
+    "Design-to-Robot-id mapping must be taken from the code or paper."
+  ]
+}

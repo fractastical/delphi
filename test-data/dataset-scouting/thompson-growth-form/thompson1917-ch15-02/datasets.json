@@ -1,0 +1,145 @@
+{
+  "claim_id": "thompson1917-ch15-02",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "egg asymmetry and elongation (posterior taper) per bird species",
+    "egg size (volume, mass, or length and breadth) per species",
+    "adult female body mass per species",
+    "oviduct or pelvic dimensions per species (for the stated mechanism)"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-evolution-of-egg-shape-in-birds",
+      "name": "Data from: The evolution of egg shape in birds: Evolutionary constraints and adaptations (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.sj3tx9648",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.sj3tx9648",
+      "doi": "10.5061/dryad.sj3tx9648",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:02:06Z", "method": "GET Dryad dataset metadata and version-157600 file list (DATAeggshape.csv 215,008 bytes; DATAoviducts.csv 4,541; DATAovilengths.csv 2,198; DATApelvis.csv 58,337; DATAraweggs.csv 791,148; Ericson1000.nex 37,455,205; PELVIStree.nex 590,037; README.txt 9,136); file downloads need a token (401 seen on another Dryad dataset) and were not fetched", "http_status": 200 },
+      "variables_present": [
+        "egg size and shape (elongation and asymmetry) for 955 extant species, 39 of 40 orders, 78% of 249 families (abstract)",
+        "oviduct data and pelvis data files (DATAoviducts.csv, DATAovilengths.csv, DATApelvis.csv)",
+        "an avian phylogeny file (Ericson1000.nex, 1000-tree sample by name) for phylogenetic control",
+        "article's stated finding that elongation relates to egg size relative to oviduct size is in the abstract; not evaluated here"
+      ],
+      "variables_missing": [
+        "column headers not read (README not downloadable without a token), so whether adult body mass is a column is unconfirmed",
+        "oviduct files are small (4.5 KB and 2.2 KB) so oviduct coverage is probably a subset of the 955 species; not verified",
+        "no in vivo pressure measurements"
+      ],
+      "scope": "955 bird species; published 2022-01-06; article doi 10.1086/716928; supplementary statistics PDF at Zenodo 10.5281/zenodo.5079342 (CC BY 4.0, StatSupplement.pdf 1,802,299 bytes)",
+      "evidence": "Dryad API: title, abstract text, license CC0-1.0, storageSize 39125610, relatedWorks primary_article 10.1086/716928; files endpoint listed the eight files above",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "amniote-life-history-database-aug-2015",
+      "name": "Amniote life-history database (Myhrvold et al. 2015)",
+      "landing_url": "https://esapubs.org/archive/ecol/E096/269/",
+      "access_url": "https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv",
+      "doi": "10.1890/15-0846.1",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:02:15Z", "method": "HEAD access_url (200, content-length 4,728,122) and GET of the first 1.5 KB for the column header", "http_status": 200, "bytes": 4728122 },
+      "variables_present": [
+        "adult_body_mass_g, female_body_mass_g, egg_mass_g, egg_length_mm, egg_width_mm per species (header line of the file), with -999 as the missing marker; first row is Aves, Accipitriformes"
+      ],
+      "variables_missing": [
+        "no egg asymmetry or posterior-taper measure",
+        "no oviduct or pelvic dimensions"
+      ],
+      "scope": "amniotes (mammals, birds, reptiles); birds are a subset",
+      "evidence": "header: class,order,family,genus,species,...,adult_body_mass_g,...,egg_mass_g,...,female_body_mass_g,...,egg_width_mm,egg_length_mm,...; first data row: Aves,Accipitriformes,Accipitridae,Accipiter,albogularis",
+      "verdict": "partial",
+      "reuses_organism_dataset": "amniote-life-history-database-2015"
+    },
+    {
+      "id": "esapubs-e090-184-pantheria",
+      "name": "Ecological Archives E090-184 (named by an assessor as the Amniote database)",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:02:06Z", "method": "GET landing page; citation line reads 'Kate E. Jones ... Andy Purvis. 2009. PanTHERIA: a species-level database of ...'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["the page is PanTHERIA (Jones et al. 2009), not the Amniote archive E096/269; the page text read does not list its taxon coverage"],
+      "scope": "PanTHERIA; coverage not read from the page",
+      "evidence": "page text: 'Kate E. Jones, Jon Bielby, ... Andy Purvis. 2009. PanTHERIA: a species-level database of'; the Amniote page E096/269 cites 'Ecology 96:3109' and doi 10.1890/15-0846.1",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-bird-egg-records",
+      "name": "iDigBio: bird egg collection records",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/summary/count/records?rq={\"class\":\"aves\",\"collectioncode\":\"eggs\"}",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:02:41Z", "method": "GET search.idigbio.org count and top endpoints: class aves 6,632,725 records; collectioncode 'eggs' 234,075 (wfvz 210,594, anwc 23,481); collectioncode eggs with hasImage true 0; class aves hasImage true 426,089", "http_status": 200 },
+      "variables_present": [
+        "taxonomic metadata for 234,075 egg-collection bird records"
+      ],
+      "variables_missing": [
+        "no egg images attached to the 'eggs' collections (hasImage count 0)",
+        "no shape, asymmetry or size measurements"
+      ],
+      "scope": "specimen records, mostly Western Foundation of Vertebrate Zoology",
+      "evidence": "summary/count itemCount values as listed; top_fields institutioncode returned wfvz and anwc",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "natural-history-museum-data-portal",
+      "name": "Natural History Museum Data Portal (CKAN API)",
+      "landing_url": "https://data.nhm.ac.uk/",
+      "access_url": "https://data.nhm.ac.uk/api/3/action/package_search?q=bird%20eggs",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:02:42Z", "method": "GET package_search q='bird eggs' (0 results) and q=egg (3 results, none on bird eggs: CHROMREP, Lepidosaur bite-force data, BioAcoustica talks); landing page returned 403 to scripted HEAD", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no digitised bird-egg dataset surfaced by the portal search"],
+      "scope": "NHM portal datasets",
+      "evidence": "package_search q='bird eggs' count 0",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "stoddard-et-al-2017-egg-shape-supplement",
+      "name": "Stoddard et al. 2017, Avian egg shape: form, function and evolution (Science supplement)",
+      "landing_url": "https://doi.org/10.1126/science.aaj1945",
+      "access_url": null,
+      "doi": "10.1126/science.aaj1945",
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:01:52Z", "method": "HEAD doi.org link (blocked); supplement not located in Dryad or DataCite searches", "http_status": 403 },
+      "variables_present": [],
+      "variables_missing": ["contents not verified: publisher returned 403 to scripted requests"],
+      "scope": "described by the assessor as about 1,400 species; not confirmed",
+      "evidence": "HTTP 403 from the DOI target; Dryad search 'Stoddard egg shape birds' returned 0 and DataCite 'avian egg shape asymmetry ellipticity species' returned 3 unrelated surrogate-egg records",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "Stoddard egg shape birds", "url": "https://datadryad.org/api/v2/search?q=Stoddard%20egg%20shape%20birds&per_page=6", "hits": 0, "note": "query 'avian egg shape asymmetry ellipticity' also 0" },
+    { "source": "DataCite", "query": "avian egg shape asymmetry ellipticity species", "url": "https://api.datacite.org/dois?query=avian%20egg%20shape%20asymmetry%20ellipticity%20species&page[size]=6", "hits": 3, "note": "three versions of a 3D-printable surrogate egg record on Zenodo; not relevant" },
+    { "source": "iDigBio", "query": "class aves collectioncode eggs", "url": "https://search.idigbio.org/v2/summary/count/records?rq={\"class\":\"aves\",\"collectioncode\":\"eggs\"}", "hits": 234075, "note": "no images" },
+    { "source": "GBIF occurrence API", "query": "classKey=212 (Aves), q=egg, mediaType=StillImage", "url": "https://api.gbif.org/v1/occurrence/search?classKey=212&q=egg&mediaType=StillImage&limit=0", "hits": 113426, "note": "free-text match on 'egg' over all fields; not verified to be egg specimens" },
+    { "source": "NHM Data Portal CKAN", "query": "bird eggs", "url": "https://data.nhm.ac.uk/api/3/action/package_search?q=bird%20eggs&rows=5", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "doi 10.5281/zenodo.5079342", "url": "https://zenodo.org/api/records?q=doi:%2210.5281/zenodo.5079342%22", "hits": 1, "note": "StatSupplement.pdf, CC BY 4.0" }
+  ],
+  "status": "data-ready",
+  "summary": "A CC0 Dryad dataset covers 955 bird species with egg size, elongation and asymmetry plus oviduct and pelvis files and a phylogeny; the Amniote database adds adult and female body mass and egg dimensions for many birds. Column-level contents of the Dryad CSVs were not read because file downloads require a token, so body mass and the overlap of oviduct data with the 955 species remain to be confirmed.",
+  "next_step": "Download the Dryad files in a browser, confirm columns for egg volume, asymmetry, female body mass and oviduct, join to the Amniote database by binomial, and pre-register the relative-egg-size versus asymmetry test.",
+  "obstacles_confirmed": [
+    "Oviduct dimension files are small (4.5 KB and 2.2 KB) and no oviduct pressure data were found.",
+    "Dryad file downloads need an API token; metadata and file names were readable.",
+    "The assessor URL esapubs E090/184 is PanTHERIA, not the Amniote database."
+  ]
+}

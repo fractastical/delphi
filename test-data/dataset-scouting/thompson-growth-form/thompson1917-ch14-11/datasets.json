@@ -1,0 +1,128 @@
+{
+  "claim_id": "thompson1917-ch14-11",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:28:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "phyllotactic ratio or divergence fraction (1/2, 2/3, 3/5, 5/8, 8/13, 13/21, 34/55 and higher) per species or per organ",
+    "a sampling frame across plants (leaves, cones, capitula) rather than only large reproductive structures",
+    "taxonomic identity of each record, so frequencies can be stratified"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-novel-fibonacci-sunflower-citizen-science",
+      "name": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Dryad, 'Turing's Sunflowers')",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "access_url": "https://api.datacite.org/dois/10.5061/dryad.f9k77",
+      "doi": "10.5061/dryad.f9k77",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:17:15Z", "method": "GET Dryad dataset metadata (storageSize 314,851,153 bytes) and DataCite file descriptions; Zenodo listing shows MSF007_SunflowerData_20151020_anonymised.xlsx 108,344 bytes and MOSIpaperPE.Rnw 98,016", "http_status": 200 },
+      "variables_present": [
+        "parastichy counts for 657 sunflower (Helianthus annuus) seedheads; in the most reliable subset 768 clockwise or anticlockwise parastichy numbers of which 565 were Fibonacci numbers and 67 more had a predefined Fibonacci structure (abstract)",
+        "annotated seedhead images (Powerpoint files) and a count summary spreadsheet"
+      ],
+      "variables_missing": [
+        "one species, one organ type (capitulum), which is the high-order case the claim excludes",
+        "no leaves, cones or other species"
+      ],
+      "scope": "657 Helianthus annuus heads",
+      "evidence": "Dryad API abstract text with the counts above; DataCite descriptions list the annotated images, MSF007_CountdataSummary and MSF007_SunflowerData files; license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-lateral-veins-vs-leaf-phyllotaxis",
+      "name": "Data from: The arrangement of lateral veins along the midvein of leaves is not related to leaf phyllotaxis (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p6g8048",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.p6g8048",
+      "doi": "10.5061/dryad.p6g8048",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:16:59Z", "method": "GET Dryad dataset metadata (storageSize 7,218,296,892 bytes); Zenodo listing: Scanned images.zip 1,917,287,203 bytes, Coordinates.zip 5,657,217", "http_status": 200 },
+      "variables_present": [
+        "leaf venation for 30 temperate dicot species (18 woody, 12 herbaceous), each with a stem-level phyllotaxis category of alternate or opposite (abstract)"
+      ],
+      "variables_missing": [
+        "phyllotaxis recorded only as alternate versus opposite, not as a fractional divergence or parastichy pair"
+      ],
+      "scope": "30 species",
+      "evidence": "Dryad API abstract text",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": "https://www.try-db.org/TryWeb/Data.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:17:09Z", "method": "GET https://www.try-db.org/TryWeb/Data.php (489,266 bytes of HTML) and searched its text for 'phyllotax' and 'leaf arrangement': no match", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["the data-request page text contains no mention of phyllotaxis or leaf arrangement; data are released by request under terms, not as an open table"],
+      "scope": "plant trait portal",
+      "evidence": "page text search, 0 matches",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-plant-images",
+      "name": "GBIF occurrence images of plants (candidate source for scoring phyllotaxis from images)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?kingdomKey=6&mediaType=StillImage&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:17:10Z", "method": "GET GBIF occurrence search, kingdomKey 6 (Plantae), mediaType StillImage, limit 0: count 142,329,595; GBIF dataset search 'phyllotaxis' returned 10 datasets, none about phyllotaxis in its top five titles", "http_status": 200 },
+      "variables_present": [
+        "142,329,595 occurrence records with still images, taxonomically broad"
+      ],
+      "variables_missing": [
+        "no phyllotactic ratios; they would have to be scored by hand or by a model from images",
+        "images overrepresent conspicuous organs, as the assessors noted"
+      ],
+      "scope": "Plantae with images",
+      "evidence": "count field in the response",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-plant-images",
+      "name": "iDigBio plant specimen images",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/summary/count/records?rq={\"kingdom\":\"plantae\",\"hasImage\":true}",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:17:10Z", "method": "GET summary/count: kingdom plantae with hasImage true = 39,870,613 records", "http_status": 200 },
+      "variables_present": [
+        "39,870,613 imaged plant specimen records (herbarium sheets, from which stem arrangement may sometimes be visible)"
+      ],
+      "variables_missing": [
+        "no scored phyllotaxis"
+      ],
+      "scope": "museum and herbarium specimen records",
+      "evidence": "itemCount 39870613",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "phyllotaxis", "url": "https://datadryad.org/api/v2/search?q=phyllotaxis&per_page=6", "hits": 13, "note": "relevant: sunflower citizen science (f9k77), lateral veins vs phyllotaxis (p6g8048); others unrelated; 'phyllotaxy divergence angle species' 0, 'parastichy Fibonacci' 1" },
+    { "source": "DataCite", "query": "phyllotaxis leaf arrangement species dataset", "url": "https://api.datacite.org/dois?query=phyllotaxis%20leaf%20arrangement%20species%20dataset&page[size]=6", "hits": 1, "note": "a Mimosa taxonomy Dryad record, not a phyllotaxis dataset; 'phyllotaxy trait database plants spiral distichous' 0" },
+    { "source": "Zenodo", "query": "phyllotaxis parastichy numbers species survey", "url": "https://zenodo.org/api/records?q=phyllotaxis%20parastichy%20numbers%20species%20survey&size=6", "hits": 1409232, "note": "noise plus the sunflower set; a theory paper on phyllotactic reversal fractions (10.5281/zenodo.23696384)" },
+    { "source": "GBIF dataset search", "query": "phyllotaxis", "url": "https://api.gbif.org/v1/dataset/search?q=phyllotaxis&limit=5", "hits": 10, "note": "top five are taxonomic checklists unrelated to phyllotactic ratios" },
+    { "source": "GBIF occurrence API", "query": "kingdomKey=6, mediaType=StillImage", "url": "https://api.gbif.org/v1/occurrence/search?kingdomKey=6&mediaType=StillImage&limit=0", "hits": 142329595, "note": "" },
+    { "source": "iDigBio", "query": "kingdom plantae hasImage", "url": "https://search.idigbio.org/v2/summary/count/records?rq={\"kingdom\":\"plantae\",\"hasImage\":true}", "hits": 39870613, "note": "" }
+  ],
+  "status": "gap",
+  "summary": "No repository holds phyllotactic fractions across species. The only open phyllotaxis counts found are 657 sunflower heads (a high-order case); other resources are image collections (GBIF, iDigBio) from which ratios would have to be scored, and a trait database whose request page does not mention phyllotaxis.",
+  "next_step": "Compile 1/2, 2/3, 3/5, 5/8 and higher fractions per genus from botanical floras and phyllotaxis reviews, adding cones and rosettes from the literature; alternatively score a stratified image sample from GBIF with a pre-registered protocol.",
+  "obstacles_confirmed": [
+    "Phyllotactic ratios are not routinely encoded in trait tables.",
+    "The only open ratio counts are for sunflower capitula.",
+    "Leaf-arrangement surveys remain in botanical compilations."
+  ]
+}

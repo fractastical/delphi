@@ -1,0 +1,162 @@
+{
+  "claim_id": "thompson1917-ch07-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "3D (or time-resolved) membrane-labelled volumes of four-cell embryos",
+    "per-cell segmentation labels so that cell-cell contacts and any four-way junction can be read off",
+    "a flag or measure for 'full fluid contact' (blastomeres apposed without adhesion-limited gaps)",
+    "several species (frog, sea urchin, mollusc, annelid, ascidian, mouse) to cover 'segmenting egg' in general"
+  ],
+  "datasets": [
+    {
+      "id": "zenodo-13903500-mouse-4-to-26-cells",
+      "name": "Membrane staining and segmentation of a developing mouse embryo from 4 to 26 cells",
+      "landing_url": "https://zenodo.org/records/13903500",
+      "access_url": "https://zenodo.org/api/records/13903500",
+      "doi": "10.5281/zenodo.13903500",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:38Z", "method": "GET Zenodo records API (metadata only, files not downloaded)", "http_status": 200, "bytes": 261559496 },
+      "variables_present": [
+        "membrane-stained time series starting at the 4-cell stage (imaging.zip, 258,283,055 bytes)",
+        "Cellpose segmentation of the same series (segmentation.zip, 3,276,441 bytes)"
+      ],
+      "variables_missing": [
+        "one embryo only (embryo 'C1' of Science 10.1126/science.adh1145)",
+        "mouse blastomeres adhere and compact, so 'full fluid contact' is not guaranteed; contacts must be derived from the label image"
+      ],
+      "scope": "One mouse embryo, 4 to 26 cells, 3D time series",
+      "evidence": "record title and description: 'mouse embryo developing from the 4-cell stage', 26 cells at the last timepoint; files and sizes as listed; license id cc-by-4.0; isSupplementTo doi 10.1126/science.adh1145",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "figshare-phallusia-mammillata-embryonic-development",
+      "name": "Phallusia mammillata embryonic development (Guignard et al. 2020; light-sheet, ASTEC segmentation and tracking)",
+      "landing_url": "https://figshare.com/projects/Phallusiamammillata_embryonic_development/64301",
+      "access_url": "https://api.figshare.com/v2/projects/64301/articles?page_size=100",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:50Z", "method": "GET figshare API project 64301 and its articles list (19 articles)", "http_status": 200 },
+      "variables_present": [
+        "multi-view light-sheet imaging of membrane-labelled ascidian embryos, with every cell segmented and tracked from early cleavage (project description)",
+        "19 articles (wild-type embryos Phmamm-7, Phmamm-16 and U0126-treated embryos among them)"
+      ],
+      "variables_missing": [
+        "early-cleavage timepoints were not checked in the files; licence not read from the API output",
+        "ascidian (Phallusia) only"
+      ],
+      "scope": "Ascidian Phallusia mammillata, wild-type and U0126-treated embryos",
+      "evidence": "project published_date 2020-06-26; description: 'Each cell was then automatically segmented and tracked in time using the ASTEC pipeline'; articles list length 19",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-5794683-ascidian-fused-lightsheet",
+      "name": "Four angle fused dataset for Ascidian embryo imaged via light sheet (Zenodo mirror of figshare 10.6084/m9.figshare.8235473.v1)",
+      "landing_url": "https://zenodo.org/records/5794683",
+      "access_url": "https://zenodo.org/api/records/5794683",
+      "doi": "10.5281/zenodo.5794683",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:12:44Z", "method": "GET Zenodo records API (metadata only)", "http_status": 200 },
+      "variables_present": ["55 fused 3D timepoint volumes (each file about 0.88-0.95 GB, e.g. Astec-pm1_fuse_t082.inr.tif 883,536,118 bytes); binary masks and labels provided separately per the description"],
+      "variables_missing": ["files are very large; only a deep-learning training set from one lineage"],
+      "scope": "Ascidian embryo, raw fused volumes",
+      "evidence": "record description 'Raw dataset for training deep neural networks for segmentation tasks'; 55 files; license id cc-by-4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies search API)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=four-cell%20embryo&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:12:14Z", "method": "GET BioImages search 'four-cell embryo' (134 hits), 'cleavage stage embryo blastomere segmentation' (786), 'Xenopus cleavage' (62), 'sea urchin embryo cleavage' (182), 'C. elegans 4-cell embryo' (1889)", "http_status": 200 },
+      "variables_present": [
+        "S-BIAD1057 'Mechanical strengthening of cell-cell adhesion during mouse embryo compaction' (391 files)",
+        "S-BIAD915 'Mechanics of human embryo compaction' (107 files)",
+        "S-BIAD842 'Apical PAR protein caps orient the mitotic spindle in C. elegans early embryos' (21 files)"
+      ],
+      "variables_missing": [
+        "no Xenopus or sea-urchin cleavage-stage volume found among the top hits (Xenopus hits were egg-extract cryo-ET; sea-urchin hits were sperm flagella and a skeletogenic gene study)",
+        "none of the hits was opened to confirm 4-cell volumes or contact data"
+      ],
+      "scope": "Archive-wide keyword search; hits are not curated for cleavage geometry",
+      "evidence": "totalHits as listed per query; accession, title and file count taken from each hits array",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ssbd",
+      "name": "SSBD (Systems Science of Biological Dynamics database, RIKEN)",
+      "landing_url": "https://ssbd.riken.jp/database/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:12:50Z", "method": "GET database landing page (35,194 bytes of HTML, no search API called)", "http_status": 200, "note": "reachability only; dataset contents not enumerated by this scout" },
+      "variables_present": [],
+      "variables_missing": ["whether any four-cell dataset is held was not established"],
+      "scope": null,
+      "evidence": "HTTP 200, HTML page",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:02Z", "method": "HEAD landing page (twice, 5 s apart)", "http_status": 429, "note": "rate-limited for this client; content not inspected" },
+      "variables_present": [],
+      "variables_missing": ["not inspected"],
+      "scope": null,
+      "evidence": "HTTP 429 on both attempts",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "echinobase",
+      "name": "Echinobase",
+      "landing_url": "https://www.echinobase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:12:45Z", "method": "HEAD landing page and /entry/", "http_status": 429, "note": "rate-limited for this client; content not inspected" },
+      "variables_present": [],
+      "variables_missing": ["not inspected"],
+      "scope": null,
+      "evidence": "HTTP 429 on both URLs",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "four-cell embryo", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=four-cell%20embryo&pageSize=5", "hits": 134, "note": "mouse/human compaction and chick studies; no frog/urchin cleavage set" },
+    { "source": "BioImage Archive", "query": "Xenopus cleavage", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Xenopus%20cleavage&pageSize=4", "hits": 62, "note": "top hits are egg-extract cryo-ET" },
+    { "source": "BioImage Archive", "query": "sea urchin embryo cleavage", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=sea%20urchin%20embryo%20cleavage&pageSize=4", "hits": 182, "note": "no cleavage-stage geometry set in the first four" },
+    { "source": "BioImage Archive", "query": "C. elegans 4-cell embryo", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=C.%20elegans%204-cell%20embryo&pageSize=4", "hits": 1889, "note": "noisy; S-BIAD842 is relevant to early C. elegans embryos" },
+    { "source": "Zenodo", "query": "\"4-cell\" embryo membrane segmentation", "url": "https://zenodo.org/api/records?q=%224-cell%22%20embryo%20membrane%20segmentation&size=6", "hits": 67936, "note": "top hit is the mouse 4-to-26-cell record 13903500; count is inflated by non-phrase matching" },
+    { "source": "Zenodo", "query": "Phallusia mammillata embryo segmentation cell contacts", "url": "https://zenodo.org/api/records?q=Phallusia%20mammillata%20embryo%20segmentation%20cell%20contacts&size=4", "hits": 159915, "note": "top hits 5794683 and 13961381 (Mastodon, 10 tracked embryos, 10 .mastodon files 1.5-9.2 MB); count inflated" },
+    { "source": "figshare", "query": "project 64301", "url": "https://api.figshare.com/v2/projects/64301", "hits": 1, "note": "Phallusia embryonic development project, 19 articles" },
+    { "source": "DataCite", "query": "\"four-cell stage\" embryo 3D cell contacts", "url": "https://api.datacite.org/dois?query=%22four-cell%20stage%22%20embryo%203D%20cell%20contacts&page%5Bsize%5D=6&disable-facets=true", "hits": 0, "note": "no hits" }
+  ],
+  "status": "partial",
+  "summary": "Open 3D membrane-segmented time series that begin at or before the four-cell stage exist for the mouse (Zenodo 13903500, CC BY, one embryo) and the ascidian Phallusia (figshare project 64301 and Zenodo mirrors, ASTEC segmentation of 19 articles), so contacts and any four-way junction can in principle be read from label images. No frog, sea-urchin, mollusc or annelid volume was found, Xenbase and Echinobase returned HTTP 429, and none of the sets flags 'full fluid contact', which is the claim's condition.",
+  "next_step": "Open the Phallusia and mouse label images at the four-cell timepoint to confirm they are present, and define the contact criterion (minimum shared area) and a 'fluid contact' proxy before scoring; retry Xenbase/Echinobase later for frog and urchin images.",
+  "obstacles_confirmed": [
+    "Mouse and ascidian embryos are the only species with open segmented volumes found; classical frog, urchin, mollusc and annelid material was not located.",
+    "Full-fluid-contact condition is not annotated in any dataset."
+  ]
+}

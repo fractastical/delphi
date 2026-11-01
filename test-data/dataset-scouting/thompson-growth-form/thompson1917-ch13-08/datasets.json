@@ -1,0 +1,148 @@
+{
+  "claim_id": "thompson1917-ch13-08",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:14:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "horn basal cross-section thickness (diameter or circumference) per specimen or species",
+    "horn spiral curvature (centerline curvature, torsion or spiral angle) per specimen or species",
+    "body size, sex and age covariates",
+    "a species phylogeny for bovids"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource-bovid-horn-media",
+      "name": "MorphoSource: bovid horn and cranium 3D media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=horn",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:10:39Z", "method": "GET /api/media with q=horn (45 media), q='horn core' (12: 7 restricted, 5 open download), Capra (28: 25 restricted, 3 open), Ovis (1 open cranium mesh), Tragelaphus (2 open volumetric series), Bovidae (6 restricted meshes)", "http_status": 200 },
+      "variables_present": [
+        "3D meshes of horn cores and crania, e.g. 'Left Horn Core [Mesh] [StrLight]' (open, file_size 142,985,207 bytes), 'Horn Core [Mesh] [Photogram]' (restricted, ~19 MB)"
+      ],
+      "variables_missing": [
+        "no precomputed thickness or curvature; measurements would have to be extracted from each mesh",
+        "few bovid taxa: the query hits are dominated by Capra and a handful of other genera; a sample across antelopes is not evident from the counts",
+        "most horn media are restricted download"
+      ],
+      "scope": "full-text hits on the media API; counts may include non-taxonomic matches",
+      "evidence": "pages.total_count values listed above; publication_status facet per query; individual item titles and visibility as returned",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-media-2026-10-31"
+    },
+    {
+      "id": "dryad-bovid-horn-ontogenetic-allometry-tidiere",
+      "name": "Variation in the ontogenetic allometry of horn length in bovids along a body mass continuum (Dryad / Zenodo copy)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.qz612jmb4",
+      "access_url": "https://zenodo.org/api/records/3964738/files/dataset_Tidiereetal2020.txt/content",
+      "doi": "10.5061/dryad.qz612jmb4",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:10:51Z", "method": "GET Dryad dataset metadata; GET first 700 bytes and line count of the Zenodo copy (record 3964738, 130,031 bytes, 1,887 lines)", "http_status": 200, "bytes": 130031 },
+      "variables_present": [
+        "horn_length_cm and body_mass_kg by sex and age class for 19 bovid species (column header: species, population, original_study, sex, body_mass_kg, horn_length_cm, N_BM, N_HL)"
+      ],
+      "variables_missing": [
+        "no horn thickness, no curvature or spiral measure",
+        "horn length only, per body-mass class rather than per specimen"
+      ],
+      "scope": "19 bovid species (unique values in the species column of 1,886 data rows)",
+      "evidence": "header line and first rows of the file (Aepyceros_melampus, Bison_bonasus, ...); Zenodo license cc-zero",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-female-bovid-horn-investment",
+      "name": "Territoriality, sociality and male weaponry shape horn investment in female bovids (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.fxpnvx16w",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.fxpnvx16w",
+      "doi": "10.5061/dryad.fxpnvx16w",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:10:52Z", "method": "GET Dryad dataset metadata (storageSize 1,683,089 bytes; abstract: family-level comparative analyses with N = 115)", "http_status": 200 },
+      "variables_present": [
+        "horn presence and relative weapon investment in female and male bovids for about 115 species (abstract), with body size and socio-ecological covariates"
+      ],
+      "variables_missing": [
+        "horn length based (weapon quotient), no thickness or curvature data stated in the abstract; file contents not read"
+      ],
+      "scope": "Bovidae, N = 115 species per the abstract",
+      "evidence": "Dryad API abstract text and license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-bovidae",
+      "name": "iDigBio: Bovidae specimen records",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/summary/count/records?rq={\"family\":\"bovidae\",\"hasImage\":true}",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:11:25Z", "method": "GET summary/count: family bovidae with hasImage true = 8,960 records", "http_status": 200 },
+      "variables_present": [
+        "specimen metadata and 8,960 imaged Bovidae records (photographs of specimens)"
+      ],
+      "variables_missing": [
+        "no horn thickness or curvature measurements; images are not 3D"
+      ],
+      "scope": "museum specimen records",
+      "evidence": "itemCount 8960",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life-bovidae",
+      "name": "Open Tree of Life (TNRS and synthetic tree API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:11:01Z", "method": "POST api.opentreeoflife.org/v3/tnrs/match_names for 'Bovidae' (exact match, ott_id 768677, family); the tree.opentreeoflife.org web page returned 503 on the same minute", "http_status": 200 },
+      "variables_present": [
+        "taxon resolution (ott_id 768677 for Bovidae) from which a synthetic subtree can be requested"
+      ],
+      "variables_missing": [
+        "the subtree itself was not requested; no morphology"
+      ],
+      "scope": "phylogenetic control only",
+      "evidence": "match_names response: matched_name Bovidae, score 1.0, rank family",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "animal-diversity-web",
+      "name": "Animal Diversity Web (ADW)",
+      "landing_url": "https://animaldiversity.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T05:11:01Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["species accounts and photographs, not a table of horn thickness or curvature; no downloadable measurement set was found"],
+      "scope": "web portal of species accounts",
+      "evidence": "HEAD returned 200; no data endpoint identified",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "media q=horn / horn core / Capra / Ovis / Tragelaphus / Bovidae", "url": "https://www.morphosource.org/api/media?q=horn%20core&per_page=3", "hits": 12, "note": "q=horn 45; most restricted" },
+    { "source": "Dryad", "query": "horn shape bovid", "url": "https://datadryad.org/api/v2/search?q=horn%20shape%20bovid&per_page=6", "hits": 1, "note": "female horn investment; 'horn curvature' returned 0 and 'horn spiral' 2 (Pseudoryx morphology dataset 10.5061/dryad.575; African antelope allometry 10.5061/dryad.9ghx3ffks), neither opened" },
+    { "source": "DataCite", "query": "bovid horn 3D morphometrics curvature", "url": "https://api.datacite.org/dois?query=bovid%20horn%203D%20morphometrics%20curvature&page[size]=6", "hits": 0, "note": "query 'horn core shape Bovidae' gave 13, mostly Zenodo taxon treatments" },
+    { "source": "Zenodo", "query": "bovid horn curvature 3D", "url": "https://zenodo.org/api/records?q=bovid%20horn%20curvature%203D&size=6", "hits": 114265, "note": "unfiltered noise; surfaced the Tidiere 2020 allometry file" },
+    { "source": "iDigBio", "query": "family bovidae hasImage", "url": "https://search.idigbio.org/v2/summary/count/records?rq={\"family\":\"bovidae\",\"hasImage\":true}", "hits": 8960, "note": "" }
+  ],
+  "status": "partial",
+  "summary": "Open 3D horn-core meshes exist on MorphoSource (45 media match 'horn', 5 of 12 'horn core' items open) from which thickness and curvature could be measured, but no repository was found that already tabulates horn thickness together with a curvature or spiral measure; the open tabular bovid horn data are horn length and body mass only.",
+  "next_step": "Query MorphoSource per bovid genus restricted to open-download horn-core or skull media, list taxa and sexes, and decide whether a basal-diameter plus centerline-curvature extraction on those meshes gives enough species.",
+  "obstacles_confirmed": [
+    "No open table of horn curvature or spiral angle across bovids was found.",
+    "Most MorphoSource horn media are restricted download.",
+    "Sheath versus core thickness is not distinguished in the horn-core scans."
+  ]
+}

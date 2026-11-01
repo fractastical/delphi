@@ -1,0 +1,104 @@
+{
+  "claim_id": "levin-2023-agential-11",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:27:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "protein sequence and structure of the yeast proton pump used and of Xenopus V-ATPase subunits (homology clause)",
+    "tail-regeneration frequency after V-ATPase loss of function with and without the yeast pump",
+    "membrane voltage measurements in the regenerating tail under the same conditions",
+    "controls (inactive pump, voltage-mismatched)"
+  ],
+  "datasets": [
+    {
+      "id": "uniprot",
+      "name": "UniProt (PMA1_YEAST P05030 and Xenopus V-ATPase entries)",
+      "landing_url": "https://www.uniprot.org/",
+      "access_url": "https://rest.uniprot.org/uniprotkb/P05030.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:22:30Z", "method": "GET P05030.json; search Xenopus laevis (taxon 8355) gene atp6v1a, read X-Total-Results and TSV fields", "http_status": 200 },
+      "variables_present": ["P05030 PMA1_YEAST, S. cerevisiae plasma membrane ATPase 1, 918 aa", "Xenopus laevis atp6v1a entries (3, e.g. Q4KLX0, 617 aa)"],
+      "variables_missing": ["confirmation that P05030 is the exact yeast pump used in the tail-regeneration experiment (the Europe PMC abstract of Adams et al. 2007 does not name it)", "regeneration and voltage data"],
+      "scope": "Sequences are sufficient for a pairwise homology comparison; other Xenopus V-ATPase subunits were not enumerated.",
+      "evidence": "P05030.json returned primaryAccession P05030, uniProtkbId PMA1_YEAST, length 918. Search organism_id:8355 AND gene:atp6v1a returned 3 entries.",
+      "verdict": "partial"
+    },
+    {
+      "id": "rcsb-protein-data-bank",
+      "name": "RCSB / PDBe structures for yeast Pma1 (P05030)",
+      "landing_url": "https://www.rcsb.org/",
+      "access_url": "https://www.ebi.ac.uk/pdbe/graph-api/uniprot/best_structures/P05030",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:23:00Z", "method": "GET PDBe best_structures API for P05030; HEAD RCSB landing", "http_status": 200 },
+      "variables_present": ["experimental structures of the yeast pump, e.g. 7vh5, 7vh6, 9ugb, 9ugc (16 chain-level entries, 4 distinct PDB IDs listed)"],
+      "variables_missing": ["structure of the Xenopus V-ATPase subunits was not queried", "regeneration and voltage data"],
+      "scope": "PDBe returned 16 entries for P05030 with 4 distinct PDB IDs: 7vh5, 7vh6, 9ugb, 9ugc (9ugb at 3.25 A electron microscopy; the others not read).",
+      "evidence": "PDBe API JSON. RCSB landing returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "adams-2007-tail-regeneration-paper",
+      "name": "H+ pump-dependent changes in membrane voltage ... Xenopus tail regeneration (Development 2007)",
+      "landing_url": "https://doi.org/10.1242/dev.02812",
+      "access_url": null,
+      "doi": "10.1242/dev.02812",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:23:30Z", "method": "HEAD doi.org (403 from journals.biologists.com); Europe PMC REST core record (200)", "http_status": 403, "note": "journal page returned 403 to curl; Europe PMC record: PMID 17329365, hasSuppl N, hasData Y, abstract fetched" },
+      "variables_present": [],
+      "variables_missing": ["paper, not a dataset; no deposited regeneration counts or voltage data found"],
+      "scope": "Abstract describes V-ATPase requirement for regeneration, depolarization on loss of function and H+ flux rescue; the yeast pump is not named in the abstract.",
+      "evidence": "Europe PMC abstractText.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (portal)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal; no matching study identified"],
+      "scope": "Portal.",
+      "evidence": "Landing page returned 200.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "ncbi-gene-expression-omnibus",
+      "name": "NCBI Gene Expression Omnibus (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Xenopus+tail+regeneration&retmode=json&retmax=10",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:24:30Z", "method": "eutils esearch db=gds term='Xenopus tail regeneration'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["expression data do not hold voltage or rescue counts"],
+      "scope": "115 GEO records match 'Xenopus tail regeneration'; titles not inspected.",
+      "evidence": "esearch count '115'.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "UniProt REST", "query": "organism_id:8355 AND gene:atp6v1a", "url": "https://rest.uniprot.org/uniprotkb/search?query=organism_id:8355+AND+gene:atp6v1a&size=3&fields=accession,gene_names,protein_name,length&format=tsv", "hits": 3, "note": "Xenopus laevis atp6v1a entries" },
+    { "source": "PDBe graph API", "query": "best_structures P05030", "url": "https://www.ebi.ac.uk/pdbe/graph-api/uniprot/best_structures/P05030", "hits": 16, "note": "4 distinct PDB IDs" },
+    { "source": "Europe PMC", "query": "H+ pump-dependent changes in membrane voltage", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1242/dev.02812&format=json&resultType=core", "hits": 1, "note": "abstract does not name the yeast pump" },
+    { "source": "GEO (eutils db=gds)", "query": "Xenopus tail regeneration", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Xenopus+tail+regeneration&retmode=json&retmax=10", "hits": 115, "note": "titles not inspected" },
+    { "source": "Dryad", "query": "Xenopus tail regeneration bioelectric", "url": "https://datadryad.org/api/v2/search?q=Xenopus%20tail%20regeneration%20bioelectric", "hits": 0, "note": "none" },
+    { "source": "Zenodo", "query": "\"tail regeneration\" Xenopus voltage", "url": "https://zenodo.org/api/records?q=%22tail%20regeneration%22%20Xenopus%20voltage&size=5", "hits": 19639, "note": "loose; top hits unrelated to V-ATPase or voltage" }
+  ],
+  "status": "partial",
+  "summary": "The homology clause can be tested from public sequence and structure records (UniProt P05030 PMA1_YEAST, 918 aa; Xenopus atp6v1a entries; PDBe structures 7vh5/7vh6/9ugb/9ugc), but the identity of the yeast pump used in the tail experiment is unconfirmed in what I fetched. The tail-regeneration rescue counts and voltage measurements are not deposited anywhere I found.",
+  "next_step": "Read the Adams et al. 2007 methods to name the yeast pump construct, then fetch matching Xenopus V-ATPase subunit sequences; the rescue data would have to be extracted from the paper figures.",
+  "obstacles_confirmed": [
+    "Regeneration counts and voltage measurements for the yeast-pump rescue are not in any repository found.",
+    "The paper page returned 403 to curl, so methods were not read."
+  ]
+}

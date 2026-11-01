@@ -1,0 +1,156 @@
+{
+  "claim_id": "darwin1859-ch10-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "first-appearance age (with age bounds) per genus or species",
+    "marine vs terrestrial environment of each occurrence",
+    "sampling intensity per time interval (collections / occurrences)"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount; show=env",
+        "http_status": 200
+      },
+      "variables_present": [
+        "first/last appearance ages per genus with age-bound intervals",
+        "environment field per collection (e.g. 'coastal indet.', 'offshore')",
+        "collection and occurrence counts for sampling control"
+      ],
+      "variables_missing": [
+        "sub-stage temporal resolution for most records"
+      ],
+      "scope": "Animals worldwide; Aves 15225 and Insecta 53530 occurrence records returned with show=env; 91,043 animal genus records",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s). occs/list.json?base_name=Aves&show=env returned env 'coastal indet.' for the first record; Insecta returned env 'offshore'. The parameter envtype=terr was rejected ('bad value'); a marine-filtered count query timed out. Age bounds are reported to stage level in the examples seen (e.g. oei Ediacaran, Lutetian).",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "neotoma-paleoecology",
+      "name": "Neotoma Paleoecology Database (API v2.0)",
+      "landing_url": "https://www.neotomadb.org/",
+      "access_url": "https://api.neotomadb.org/v2.0/data/datasets?limit=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET landing; GET api.neotomadb.org/v2.0/data/datasets?limit=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated late Cenozoic terrestrial and aquatic fossil assemblages"
+      ],
+      "variables_missing": [
+        "Phanerozoic-wide first appearances"
+      ],
+      "scope": "Late Cenozoic",
+      "evidence": "Landing HTTP 200. datasets?limit=1 returned status 'success', site 1 ('15/1', Lake) with dataset DOIs. No counts retrieved.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-land-vertebrate-radiation-280gb5mmv",
+      "name": "Data: The apparent exponential radiation of Phanerozoic land vertebrates is an artefact of spatial sampling biases (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.280gb5mmv",
+      "access_url": null,
+      "doi": "10.5061/dryad.280gb5mmv",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.280gb5mmv and its version files list",
+        "http_status": 200,
+        "bytes": 340846011
+      },
+      "variables_present": [
+        "terrestrial tetrapod fossil occurrences (abstract: database of 38,711 occurrences)"
+      ],
+      "variables_missing": [
+        "marine taxa",
+        "genus-level first appearance table (not seen)"
+      ],
+      "scope": "Phanerozoic terrestrial tetrapods; one 341 MB zip not opened",
+      "evidence": "Dryad API HTTP 200; publicationDate 2020-03-24; abstract reports a database of 38,711 fossil occurrences. The only listed file is a code zip (340,846,011 B). Files listed by the API: code-for-close-et-al-...-spatial-sampling-biases.zip (340846011 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-global-phanerozoic-biodiversity-2280gb621",
+      "name": "Data and R code from: Global Phanerozoic biodiversity, can variation be explained by spatial sampling intensity (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.2280gb621",
+      "access_url": null,
+      "doi": "10.5061/dryad.2280gb621",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.2280gb621 and its version files list",
+        "http_status": 200,
+        "bytes": 1172515963
+      },
+      "variables_present": [
+        "PBDB and OBIS occurrence extracts",
+        "a Phanerozoic time series (phanerozoic_ts.csv)"
+      ],
+      "variables_missing": [
+        "terrestrial vs marine split (not seen)"
+      ],
+      "scope": "Marine and other occurrences; files over 1 MB not opened",
+      "evidence": "Dryad API HTTP 200; publicationDate 2024-07-27. Files listed by the API: obis_subset_no_decapoda.csv (575014981 B), PBDB_Dataset1_edited_v2_forR.csv (597483313 B), phanerozoic_ts.csv (8280 B), README.md (9389 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "origination rates terrestrial marine fossil first appearance",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=origination%20rates%20terrestrial%20marine%20fossil%20first%20appearance",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "origination first appearance marine terrestrial fossil record Phanerozoic dataset",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=origination%20first%20appearance%20marine%20terrestrial%20fossil%20record%20Phanerozoic%20dataset",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "terrestrial marine first appearance origination Phanerozoic fossil occurrences",
+      "url": "https://zenodo.org/api/records?size=5&q=terrestrial%20marine%20first%20appearance%20origination%20Phanerozoic%20fossil%20occurrences",
+      "hits": 983140,
+      "note": "full-text noise; relevant: 10.5061/dryad.280gb5mmv, 10.5061/dryad.vhhmgqnxt (bedrock map predictions), 10.5061/dryad.2280gb621"
+    }
+  ],
+  "status": "data-ready",
+  "summary": "PBDB holds first and last appearance ages per genus, an environment field per collection to separate marine from terrestrial settings, and collection and occurrence counts for sampling standardization. Its ages are stage-level in the records seen, so 'one after another' can only be resolved at that grain. Neotoma covers only the late Cenozoic; two Dryad deposits give terrestrial-tetrapod and PBDB/OBIS occurrence extracts.",
+  "next_step": "Pre-register marine and terrestrial genus first-appearance extractions from PBDB (environment mapping, stage bins, sampling-standardized counts) and a clustering criterion for 'simultaneous batches' at that resolution.",
+  "obstacles_confirmed": [
+    "Stage-level binning limits resolution of simultaneity.",
+    "PBDB envtype=terr is not a valid filter value; environment must be mapped from the env field.",
+    "Terrestrial record is much thinner than marine in the counts I could obtain (not quantified)."
+  ]
+}

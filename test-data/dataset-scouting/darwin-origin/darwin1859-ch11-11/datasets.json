@@ -1,0 +1,107 @@
+{
+  "claim_id": "darwin1859-ch11-11",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T06:00:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "present-day occurrence records of arctic-alpine species on separated mountains and in the Arctic",
+    "dated last-glacial (c. 21,000 to 11,000 cal yr BP) fossil, pollen or macrofossil occurrences in the intervening lowlands, identified to the species or genus involved",
+    "population-genetic sequence data (chloroplast, nuclear) for summit and arctic populations of the same species",
+    "divergence-time estimates among summit populations"
+  ],
+  "datasets": [
+    {
+      "id": "neotoma-occurrences-api",
+      "name": "Neotoma Paleoecology Database API (occurrences, taxa)",
+      "landing_url": "https://api.neotomadb.org/v2.0/data/occurrences?taxonid=444&ageold=21000&ageyoung=11000&limit=2",
+      "access_url": "https://api.neotomadb.org/v2.0/data/occurrences",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:29Z", "method": "GET data/taxa?taxonname=Dryas*; GET data/occurrences with taxonid=444 (Dryas) and 82 (Dryas-type), ageold=21000, ageyoung=11000, limit=2", "http_status": 200 },
+      "variables_present": [
+        "dated (cal yr BP) pollen occurrences per site for Dryas (taxonid 444) and Dryas-type (82), with site coordinates, altitude, dataset type and database",
+        "age-window filtering on the API"
+      ],
+      "variables_missing": ["identification mostly to genus or pollen type (Dryas, Dryas-type), not to species", "taxonname filter was not applied by the occurrences endpoint (taxonid is); counts per region not tallied"],
+      "scope": "returned example records: Dryas 12,214 yr at Nichols Brook Site (North American Pollen Database), Dryas-type 13,524 yr at Tom Swamp; Siberian pollen database also present in the unfiltered response",
+      "evidence": "occurrences?taxonid=444&ageold=21000&ageyoung=11000 returned success with taxonname 'Dryas', age 12214, site Nichols Brook Site, database North American Pollen Database.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-occurrences-arctic-alpine-species",
+      "name": "GBIF occurrence records for Dryas octopetala and Saxifraga oppositifolia",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=4889932&limit=0",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=4889932",
+      "doi": null,
+      "license": "per-record CC0 / CC BY / CC BY-NC (GBIF)",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:10Z", "method": "GET species/match (strict) and occurrence/search limit=0 with taxonKey, hasCoordinate, basisOfRecord=FOSSIL_SPECIMEN, facet=country", "http_status": 200 },
+      "variables_present": ["georeferenced present-day occurrences with country", "a few fossil-specimen records"],
+      "variables_missing": ["no dating of lowland fossils comparable to Neotoma", "no genetic variables"],
+      "scope": "Dryas octopetala (taxonKey 4889932): 129,225 occurrences, 119,817 georeferenced (FR 33,154, NO 17,326, CH 15,165), 167 FOSSIL_SPECIMEN records. Saxifraga oppositifolia (8353146): 91,299 occurrences, 81,240 georeferenced (FR 23,289, NO 15,639, GB 9,872), 20 FOSSIL_SPECIMEN records",
+      "evidence": "count fields 129225, 119817, 167 and 91299, 81240, 20 with country facet counts as listed.",
+      "verdict": "holds"
+    },
+    {
+      "id": "ncbi-genbank-sra-arctic-alpine-species",
+      "name": "NCBI nuccore and SRA records for Dryas octopetala and Saxifraga oppositifolia",
+      "landing_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&retmax=0&retmode=json&term=%22Dryas+octopetala%22[Organism]",
+      "access_url": null,
+      "doi": null,
+      "license": "NCBI public domain; per-record submitter terms",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:15Z", "method": "Entrez esearch counts (db=nuccore and db=sra, Organism filter)", "http_status": 200 },
+      "variables_present": ["nucleotide and sequencing-read records tagged to each species"],
+      "variables_missing": ["population/locality and haplotype assignment not inspected, so which records are summit versus arctic samples is unknown"],
+      "scope": "Dryas octopetala: nuccore 35,299, SRA 178. Saxifraga oppositifolia: nuccore 451, SRA 115",
+      "evidence": "esearchresult.count values 35299, 178, 451, 115.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-polar-urals-sedadna",
+      "name": "Data from: Persistence of arctic-alpine flora during 24,000 years of environmental change in the Polar Urals",
+      "landing_url": "https://zenodo.org/api/records?q=arctic-alpine+disjunct+plants+phylogeography+Last+Glacial+Maximum&size=5",
+      "access_url": null,
+      "doi": "10.5061/dryad.jdfn2z378",
+      "license": "CC0 (Zenodo licence id cc-zero)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:18:40Z", "method": "Zenodo search API (metadata and file list)", "http_status": 200 },
+      "variables_present": ["lake-sediment ancient DNA reads and a taxon table (GZO24.tsv, 34,456 B; fastq files up to 577 MB) spanning 24,000 years in one region"],
+      "variables_missing": ["only one region (Polar Urals); no intervening-lowland coverage"],
+      "scope": "single site, Polar Urals",
+      "evidence": "Zenodo mirror lists GZO24.tsv (34,456 B), fastq.gz files (326,498,087 and 577,232,213 B); title as above, published 2019-12-17.",
+      "verdict": "partial"
+    },
+    {
+      "id": "skrede-2006-dryas-octopetala-refugia",
+      "name": "Refugia, differentiation and postglacial migration in arctic-alpine Eurasia, exemplified by the mountain avens (Dryas octopetala L.)",
+      "landing_url": "https://zenodo.org/api/records?q=arctic-alpine+disjunct+plants+phylogeography+Last+Glacial+Maximum&size=5",
+      "access_url": null,
+      "doi": "10.1111/j.1365-294X.2006.02908.x",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:18:40Z", "method": "Zenodo search API (metadata only)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["a paper record with no data files listed"],
+      "scope": "paper on the Eurasian phylogeography of Dryas octopetala",
+      "evidence": "Search hit with no files; the underlying sequences would be in GenBank, not located.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "arctic-alpine disjunct plants phylogeography Last Glacial Maximum", "url": "https://zenodo.org/api/records?q=arctic-alpine+disjunct+plants+phylogeography+Last+Glacial+Maximum&size=5", "hits": 344503, "note": "relevant: Polar Urals sedaDNA (dryad.jdfn2z378), Dryas octopetala phylogeography paper" },
+    { "source": "Dryad", "query": "arctic-alpine phylogeography glacial relict", "url": "https://datadryad.org/api/v2/search?q=arctic-alpine+phylogeography+glacial+relict&per_page=5", "hits": 0, "note": "none" },
+    { "source": "GBIF", "query": "occurrence counts Dryas octopetala, Saxifraga oppositifolia", "url": "https://api.gbif.org/v1/occurrence/search?taxonKey=4889932&limit=0", "hits": 129225, "note": "Dryas octopetala occurrences" },
+    { "source": "Neotoma", "query": "taxa Dryas*", "url": "https://api.neotomadb.org/v2.0/data/taxa?taxonname=Dryas*&limit=3", "hits": null, "note": "Dryas-type (82) and Dryas (444) found" },
+    { "source": "NCBI Entrez", "query": "nuccore/sra Organism counts", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&retmax=0&retmode=json&term=%22Dryas+octopetala%22[Organism]", "hits": 178, "note": "SRA runs for Dryas octopetala" }
+  ],
+  "status": "partial",
+  "summary": "Present-day occurrences (GBIF) and sequences (NCBI) exist for the standard example species, and Neotoma serves dated glacial-age Dryas pollen by taxon id. Missing is a combined, species-level table: Neotoma pollen is mostly genus or type, genetic records are not labelled by summit versus arctic population, and divergence-time estimates would need to be derived.",
+  "next_step": "Choose 5-10 species with published range-wide phylogeography, pull their GenBank haplotype accessions with locality fields, and pair them with Neotoma LGM-window records for intervening lowland sites.",
+  "obstacles_confirmed": [
+    "Pollen is identified to genus or pollen type (e.g. 'Dryas-type'), not species.",
+    "The Dryas octopetala phylogeography paper surfaced in search is a paper record with no data files; its sequences were not located as a labelled table.",
+    "Neotoma's occurrences endpoint did not filter by taxonname in testing; taxonid works."
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "claim_id": "thompson1917-ch11-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:18:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "shell outline or 3D coiling geometry along ontogeny (per half-whorl or continuous) for the named genera Oekotraustes, Scaphites, Ancyloceras, Lituites",
+    "whorl breadth / expansion and spiral angle (derivable from outlines or CT) at successive growth stages",
+    "specimen-level identification so that the named taxa can be located",
+    "more than one specimen per genus"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database: occurrences of Ammonoidea and the named genera",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/list.json?name=Scaphites,Ancyloceras,Lituites,Oekotraustes&show=attr,size&rank=genus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:57Z", "method": "GET PBDB data1.2 occs/list (rowcount) for Ammonoidea and taxa/list for the four genera", "http_status": 200 },
+      "variables_present": [
+        "94,568 occurrence records under Ammonoidea (records_found)",
+        "genus-level occurrence counts: Scaphites 395, Lituites 46, Ancyloceras 54, Oekotraustes 9 (noc field)"
+      ],
+      "variables_missing": ["occurrence and taxonomy only: no shell geometry, no ontogenetic measurements"],
+      "scope": "Global fossil occurrence compilation",
+      "evidence": "occs/list rowcount 94568; taxa/list records [Ancyloceras 54, Scaphites 395, Oekotraustes 9, Lituites 46] in the noc field",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media search (keyword)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Ammonoidea&per_page=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:15:06Z", "method": "GET /api/media?q=<name> for Ammonoidea, Ammonitida, Scaphites, Ancyloceras, Lituites, Oekotraustes (pages.total_count)", "http_status": 200 },
+      "variables_present": ["one media record for keyword 'Ammonoidea': a micro-CT mesh ('Element Unspecified [Mesh] [Etc]', modality MicroNanoXRayComputedTomography)"],
+      "variables_missing": [
+        "total_count 0 for Scaphites, Ancyloceras, Lituites, Oekotraustes and Ammonitida",
+        "the single Ammonoidea hit's taxon and specimen were not examined"
+      ],
+      "scope": "MorphoSource keyword search",
+      "evidence": "pages.total_count 1 for Ammonoidea; 0 for each of the other five names; media list empty",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-133nq-kosmoceras-2d-3d",
+      "name": "Data from: Integrating 2D and 3D shell morphology to disentangle the palaeobiology of ammonoids: a virtual approach",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.133nq",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.133nq",
+      "doi": "10.5061/dryad.133nq",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:15:16Z", "method": "GET Dryad API dataset record (files not listed or downloaded)", "http_status": 200, "bytes": 36119654 },
+      "variables_present": ["ontogenetic 2D and 3D shell morphology data from nano-CT of a juvenile Kosmoceras (Jurassic, Callovian), collected in half-whorl steps per the abstract"],
+      "variables_missing": ["one specimen of a genus not named in the claim (Kosmoceras is a coiled ammonite); not a heteromorph"],
+      "scope": "A single juvenile Kosmoceras specimen",
+      "evidence": "API: title as given, license https://spdx.org/licenses/CC0-1.0.html, storageSize 36119654, publicationDate 2018-08-29, abstract text on ontogenetic data",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-k9b14-early-ammonoids-ontogeny",
+      "name": "Data from: Intraspecific variability through ontogeny in early ammonoids",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.k9b14",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.k9b14",
+      "doi": "10.5061/dryad.k9b14",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:15:15Z", "method": "GET Dryad API dataset record (one version, files endpoint /api/v2/versions/26935/files listed but not fetched)", "http_status": 200, "bytes": 8722161 },
+      "variables_present": ["ontogenetic shell measurements across many specimens of Early Devonian ammonoids (abstract)"],
+      "variables_missing": ["Early Devonian coiled forms; none of the four named heteromorph genera"],
+      "scope": "Early Devonian ammonoids",
+      "evidence": "API: storageSize 8722161, publicationDate 2012-06-28, license CC0-1.0, abstract on intraspecific variability through ontogeny",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-scaphites-images",
+      "name": "GBIF occurrence records of Scaphites with still images",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Scaphites&mediaType=StillImage&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:15:06Z", "method": "GET occurrence/search with scientificName=Scaphites, mediaType=StillImage, limit=0; iDigBio records search with genus=scaphites and hasImage (itemCount 2804)", "http_status": 200 },
+      "variables_present": ["3,195 GBIF occurrences with still images and 2,804 iDigBio records with images for Scaphites (counts)"],
+      "variables_missing": ["image content not inspected: views may be single side photographs rather than ontogenetic profiles; counts are for Scaphites only, not Oekotraustes, Ancyloceras or Lituites"],
+      "scope": "Museum record images for one genus",
+      "evidence": "GBIF count 3195; iDigBio itemCount 2804",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "digital-atlas-of-ancient-life",
+      "name": "Digital Atlas of Ancient Life",
+      "landing_url": "https://www.digitalatlasofancientlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:15:07Z", "method": "HEAD landing page", "http_status": 200, "note": "reachability only; no machine-readable listing queried" },
+      "variables_present": [],
+      "variables_missing": ["educational atlas of illustrated fossils; no downloadable measurement table identified"],
+      "scope": null,
+      "evidence": "HTTP 200",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB", "query": "occs/list base_name=Ammonoidea", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Ammonoidea&limit=1&rowcount", "hits": 94568, "note": "occurrence count" },
+    { "source": "PBDB", "query": "taxa/list four named genera", "url": "https://paleobiodb.org/data1.2/taxa/list.json?name=Scaphites,Ancyloceras,Lituites,Oekotraustes&show=attr,size&rank=genus", "hits": 4, "note": "all four genera resolve" },
+    { "source": "MorphoSource", "query": "Ammonoidea / Scaphites / Ancyloceras / Lituites / Oekotraustes / Ammonitida", "url": "https://www.morphosource.org/api/media?q=Ammonoidea&per_page=3", "hits": 1, "note": "one Ammonoidea media hit; zero for each genus name" },
+    { "source": "Dryad", "query": "ammonoid ontogeny shell", "url": "https://datadryad.org/api/v2/search?q=ammonoid%20ontogeny%20shell", "hits": 2, "note": "k9b14 (early ammonoids) and 133nq (Kosmoceras 2D/3D)" },
+    { "source": "Zenodo", "query": "ammonoid ontogeny whorl expansion coiling measurements", "url": "https://zenodo.org/api/records?q=ammonoid%20ontogeny%20whorl%20expansion%20coiling%20measurements&size=6", "hits": 178602, "note": "count inflated by non-phrase matching; top hits are figure/table extracts from papers on Viséan ammonoid ontogeny and 'Piggyback whorls'" },
+    { "source": "iDigBio", "query": "genus scaphites with image", "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22genus%22:%22scaphites%22,%22hasImage%22:true%7D&limit=1", "hits": 2804, "note": "image records" }
+  ],
+  "status": "partial",
+  "summary": "The named genera exist as fossil occurrences in PBDB (Scaphites 395, Ancyloceras 54, Lituites 46, Oekotraustes 9) and Scaphites has thousands of museum photographs on GBIF and iDigBio, but MorphoSource holds no scan under any of the four genus names. Open ontogenetic shell-measurement datasets exist only for other ammonoids (Dryad: early Devonian forms, one Kosmoceras CT), so the uncoiling and narrowing trajectories of the claim's taxa have no tabulated data.",
+  "next_step": "Decide whether to test on photographed Scaphites specimens (outline extraction from GBIF/iDigBio images) or compile ontogenetic outline measurements from the heteromorph literature; pre-register how the local spiral angle is estimated from an outline.",
+  "obstacles_confirmed": [
+    "No 3D scans of the named heteromorph genera in MorphoSource (zero hits per name).",
+    "Occurrence databases hold no shell geometry."
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "claim_id": "darwin1859-ch09-11",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "current first-appearance age per genus and family",
+    "first-appearance ages as recorded in earlier compilations or database releases",
+    "date each occurrence or range was entered or published",
+    "sampling intensity in the intervals below each first appearance"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount; show=crmod; show=ref (the two parameter probes created_after/created_before returned HTTP 400)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "current first/last appearance ages per genus and family",
+        "per-occurrence entry and modification timestamps (dcr, dmd)",
+        "per-occurrence reference citation text, which includes publication year",
+        "collection counts per interval"
+      ],
+      "variables_missing": [
+        "earlier-release snapshots or Sepkoski-era compilations",
+        "a documented filter by entry date (created_after/created_before were rejected as unknown parameters)"
+      ],
+      "scope": "Animals worldwide; 91,043 genus records and 13,465 family records; Trilobita 56,590 occurrences",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s). occs/list.json?base_name=Trilobita&show=crmod returned dcr '1998-11-20 07:59:51' and dmd '2018-02-02 16:22:36' for occurrence occ:1; show=ref returned the citation text 'D. K. Brezinski. 1998. ...'. Parameters created_after and created_before returned HTTP 400 'unknown parameter'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "macrostrat",
+      "name": "Macrostrat API v2",
+      "landing_url": "https://macrostrat.org/",
+      "access_url": "https://macrostrat.org/api/v2/fossils?interval_name=Cambrian&format=json",
+      "doi": null,
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:40Z",
+        "method": "GET landing; GET api/v2/stats?all; GET api/v2/fossils?interval_name=Cambrian; GET api/v2/sections?col_id=2",
+        "http_status": 200
+      },
+      "variables_present": [
+        "rock-package ages and thickness (rock availability) per column",
+        "PBDB collections matched to Macrostrat units"
+      ],
+      "variables_missing": [
+        "first-appearance histories",
+        "taxon-level data"
+      ],
+      "scope": "Rock record; densest in North America (1076 columns, 8208 packages, 49266 PBDB collections)",
+      "evidence": "/stats?all returned per-project columns/packages/units/pbdb_collections (North America 1076/8208/27034/49266); /fossils?interval_name=Cambrian returned collections such as 'Sekwi Formation - collection 73056' with t_age 515.6334, b_age 520.2666 and pbdb_occs 2; /meta states CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "first appearance datum range extension fossil genera database history",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=first%20appearance%20datum%20range%20extension%20fossil%20genera%20database%20history",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "ghost lineage duration stratigraphic first appearance phylogeny",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=ghost%20lineage%20duration%20stratigraphic%20first%20appearance%20phylogeny",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "first appearance datum fossil record range extension",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=first%20appearance%20datum%20fossil%20record%20range%20extension",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "fossil first appearance datum ghost lineage stratigraphic range extension dataset",
+      "url": "https://zenodo.org/api/records?size=5&q=fossil%20first%20appearance%20datum%20ghost%20lineage%20stratigraphic%20range%20extension%20dataset",
+      "hits": 1033494,
+      "note": "full-text noise; no compilation of historic first-appearance datums"
+    }
+  ],
+  "status": "partial",
+  "summary": "PBDB supplies today's first-appearance ages per genus and family, entry and modification dates for every occurrence, and the reference text (with year) for each, so range changes can be examined against when records were entered or published. What it does not provide is a dated series of earlier compilations or database releases, and no deposit of historic first-appearance datums was found in DataCite, Dryad or Zenodo.",
+  "next_step": "Either use PBDB record-creation dates and reference years as a proxy for discovery order, or locate and digitize earlier compilations (e.g. Sepkoski-era lists) and pre-register how entry date substitutes for discovery date; sampling intensity below each first appearance would come from PBDB/Macrostrat collections.",
+  "obstacles_confirmed": [
+    "No dated snapshots of earlier compilations were found.",
+    "PBDB entry dates reflect database curation, not discovery dates.",
+    "Absence below a first appearance cannot be separated from non-preservation by data alone."
+  ]
+}

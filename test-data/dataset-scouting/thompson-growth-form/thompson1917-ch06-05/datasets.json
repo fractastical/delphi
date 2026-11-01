@@ -1,0 +1,125 @@
+{
+  "claim_id": "thompson1917-ch06-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:14:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "protein-level inventory of mitochondria (a characteristic proteome, double-membrane components, specific functions)",
+    "subcellular localisation images showing mitochondria as bounded organelles or networks in many cell types",
+    "3D / volume imaging of mitochondrial shape and position relative to the cell axis",
+    "any measurement of surface-tension or osmotic-flow forces acting on cytoplasmic granules (not expected in archives)"
+  ],
+  "datasets": [
+    {
+      "id": "human-protein-atlas",
+      "name": "Human Protein Atlas (subcellular section), search download API",
+      "landing_url": "https://www.proteinatlas.org/",
+      "access_url": "https://www.proteinatlas.org/api/search_download.php?search=subcell_location%3AMitochondria&format=json&columns=g,scl&compress=no",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:11:19Z", "method": "GET search_download API with subcell_location:Mitochondria (returned JSON array); first test with MFN2 returned 'Mitochondria'", "http_status": 200 },
+      "variables_present": [
+        "1,132 genes whose protein is annotated to the Mitochondria location, with the location label per gene",
+        "immunofluorescence images for each gene (HPA subcellular section; per-gene image pages not fetched)"
+      ],
+      "variables_missing": [
+        "human cultured cell lines only: no germ cells or invertebrate tissue",
+        "no measurements of surface tension, osmotic currents or cell-axis polarity",
+        "non-mitochondrial fibrils and granules in the wording are covered only by other location labels"
+      ],
+      "scope": "Human cell lines; protein-level annotation",
+      "evidence": "API returned a JSON list of length 1132 for subcell_location:Mitochondria, items of the form {Gene: 'A4GALT', 'Subcellular location': ['Mitochondria']}",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "mitocarta3-0",
+      "name": "MitoCarta3.0 (Broad Institute): inventory of mammalian mitochondrial proteins",
+      "landing_url": "https://personal.broadinstitute.org/scalvo/MitoCarta3.0/",
+      "access_url": "https://personal.broadinstitute.org/scalvo/MitoCarta3.0/Human.MitoCarta3.0.xls",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:14Z", "method": "GET directory index (200, lists Human.MitoCarta3.0.xls 9.7M, .fasta 905K, .bed 328K, .gmx); HEAD the .xls (Content-Length 10179584, not downloaded); GET .fasta (926,840 bytes) and counted headers", "http_status": 200, "bytes": 10179584 },
+      "variables_present": [
+        "curated list of mitochondrial proteins with sub-compartment and pathway annotation (xls, 10,179,584 bytes; MitoPathways gmx file listed)",
+        "FASTA of the human set: 2,254 records (header lines counted, e.g. 'YP_003024037 GeneID:4541 MT-ND6')"
+      ],
+      "variables_missing": [
+        "no images, no cell-axis or force data; sheets inside the xls were not opened (over 1 MB)",
+        "licence not stated on the index page"
+      ],
+      "scope": "Human (a mouse file is also expected but not fetched); proteome-level only",
+      "evidence": "Directory listing sizes and dates (2020-10-30 / 2023-03-21), Content-Length 10179584 for the .xls, 2254 '>' lines in the .fasta",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "allen-cell-explorer",
+      "name": "Allen Cell Explorer (Allen Institute for Cell Science)",
+      "landing_url": "https://www.allencell.org/",
+      "access_url": "https://www.allencell.org/data-downloading.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:11:34Z", "method": "HEAD landing page and data-downloading page", "http_status": 200, "note": "only reachability checked; no API or file listing queried, so dataset content for mitochondria is not confirmed by this scout" },
+      "variables_present": [],
+      "variables_missing": ["content of the mitochondria 3D image set not verified"],
+      "scope": null,
+      "evidence": "Both pages answered HTTP 200; no further queries made",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR), search engine and API",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/searchvalues/?value=mitochondria",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:11:33Z", "method": "GET /api/v0/m/projects/?limit=1 (totalCount 147); GET searchvalues?value=mitochondria", "http_status": 200 },
+      "variables_present": [
+        "147 projects in the IDR; annotation values 'mitochondria' occur as Class (1,296 images), Phenotype 1 (380 images), Compound Selectivity (192), Phenotype 2 (70), Phenotype 3 (5)"
+      ],
+      "variables_missing": ["these are screen annotations (mostly cultured mammalian cells); no ready link to cell-axis position or force"],
+      "scope": "Screening and reference image sets",
+      "evidence": "searchvalues JSON: {'Key': 'Class', 'Number of images': 1296, 'Value': 'mitochondria'}, {'Key': 'Phenotype 1', 'Number of images': 380, ...}; projects totalCount 147",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-mitochondria-volume-em",
+      "name": "BioImage Archive / EMPIAR: volume electron microscopy of mitochondria",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD3408",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=mitochondria%20network%20live%20cell&pageSize=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:11:43Z", "method": "GET BioImages search 'mitochondria live cell network' (top 3 hits) and 'mitochondria live cell network' count (2,108 hits)", "http_status": 200 },
+      "variables_present": [
+        "2,108 hits for 'mitochondria live cell network'; top hits include S-BIAD3408 (electron tomography of mitochondrial network and cristae remodelling during cell differentiation, 5 files), EMPIAR-13004 (electron tomography of mitochondria from adult and aged mouse hearts), S-BIAD2413 (volume EM, 657 files)"
+      ],
+      "variables_missing": ["no study selected or inspected for axial distribution or non-mammalian material"],
+      "scope": "Mixed organisms; search hits only",
+      "evidence": "hits array accession/title/file-count as listed; totalHits 2108 for the query 'mitochondria live cell network'; the three-hit listing came from the query 'mitochondria network live cell' (same words, reordered)",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Human Protein Atlas", "query": "subcell_location:Mitochondria", "url": "https://www.proteinatlas.org/api/search_download.php?search=subcell_location%3AMitochondria&format=json&columns=g,scl&compress=no", "hits": 1132, "note": "genes annotated to Mitochondria" },
+    { "source": "IDR", "query": "searchvalues mitochondria", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/searchvalues/?value=mitochondria", "hits": 1296, "note": "largest annotation key 'Class' with 1,296 images; the keys are screen labels" },
+    { "source": "BioImage Archive", "query": "mitochondria network live cell", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=mitochondria%20live%20cell%20network&pageSize=1", "hits": 2108, "note": "volume EM and tomography studies among the hits" },
+    { "source": "DataCite", "query": "mitochondria live-cell imaging dataset", "url": "https://api.datacite.org/dois?query=mitochondria%20live-cell%20imaging%20dataset&page%5Bsize%5D=1", "hits": 36, "note": "count only; individual records not reviewed" },
+    { "source": "Zenodo", "query": "mitochondria segmentation images", "url": "https://zenodo.org/api/records?q=mitochondria%20segmentation%20images&size=1", "hits": 132737, "note": "hit count is not specific (query terms matched independently); not used" }
+  ],
+  "status": "partial",
+  "summary": "Open data cover the identity half of the claim (HPA annotates 1,132 genes to the mitochondrion; MitoCarta3.0 lists the mitochondrial proteome and its sub-compartments) and there are many volume-EM and live-cell image sets in BioImage Archive and IDR. No archive holds force, osmotic-current or cell-axis polarity measurements, and the image sets are overwhelmingly mammalian cell lines, so the surface-tension-clump mechanism itself has no direct data.",
+  "next_step": "Pick one proteome source (MitoCarta3.0) and one volume-EM/tomography set, and pre-register what molecular and morphological observations would count as 'specific entity' versus 'clump'; flag the mechanism clause as not measurable with these archives.",
+  "obstacles_confirmed": [
+    "Surface tension and osmotic currents are not recorded in any of the checked archives.",
+    "Image sets are dominated by mammalian cultured cells; germ cells and invertebrate tissue were not found in these searches."
+  ]
+}

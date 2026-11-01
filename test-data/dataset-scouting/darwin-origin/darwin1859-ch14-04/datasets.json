@@ -1,0 +1,141 @@
+{
+  "claim_id": "darwin1859-ch14-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:50:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "sequences of universally conserved proteins and RNAs (ribosomal proteins, aminoacyl-tRNA synthetases, polymerases) sampled across Bacteria, Archaea and Eukarya",
+    "alignments or trees of those families, to compare one common-ancestry model against independent-origin models",
+    "genomes across cellular life to ask which gene cores are shared",
+    "standardised bacterial and archaeal phylogenies and a global synthesis tree"
+  ],
+  "datasets": [
+    {
+      "id": "uniprotkb-swiss-prot",
+      "name": "UniProtKB (REST API)",
+      "landing_url": "https://rest.uniprot.org/uniprotkb/search?query=reviewed:true&size=1&fields=accession",
+      "access_url": "https://rest.uniprot.org/uniprotkb/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:17:00Z", "method": "GET uniprotkb/search with reviewed:true and gene_exact/taxonomy_id filters, size=1, reading the X-Total-Results header", "http_status": 200 },
+      "variables_present": [
+        "curated protein sequences with gene names and taxonomy filters across all domains",
+        "ortholog-family retrieval by gene symbol and taxon"
+      ],
+      "variables_missing": ["pre-aligned universal-protein sets (alignments must be built)", "gene symbols differ between domains, so one symbol does not retrieve a family everywhere"],
+      "scope": "reviewed:true total 575,748 entries; gene_exact:rpsC in taxonomy 2 (Bacteria) 762 reviewed entries; gene_exact:RPS3 in taxonomy 2759 (Eukaryota) 149 reviewed entries",
+      "evidence": "X-Total-Results header values 575748, 762 and 149 for the three queries (HTTP 200). Counts are of entries, not of a validated orthologous family.",
+      "verdict": "holds"
+    },
+    {
+      "id": "dryad-testing-for-universal-common-ancestry",
+      "name": "Data from: Testing for universal common ancestry (Dryad, Zenodo mirror)",
+      "landing_url": "https://zenodo.org/api/records/5025603",
+      "access_url": "https://zenodo.org/api/records/5025603/files/SupplementaryData_20140512.tbz/content",
+      "doi": "10.5061/dryad.gn376",
+      "license": "CC0 (Zenodo licence id cc-zero)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:17:20Z", "method": "GET Zenodo record metadata (description, file list); search hit from Zenodo query 'universal common ancestry test Theobald likelihood'", "http_status": 200, "bytes": 14744201 },
+      "variables_present": ["supplementary data of a study that tests universal common ancestry against independent-origin models using model selection (per the record description)"],
+      "variables_missing": ["archive contents not opened (14.7 MB tbz is over the 1 MB limit); alignments and taxon sampling not confirmed"],
+      "scope": "record describes the likelihood/AIC/Bayes-factor UCA test originally proposed by Theobald 2010 and a re-analysis of it; SupplementaryData_20140512.tbz 14,744,201 B and SupplementaryText_20140512.pdf 2,045,450 B",
+      "evidence": "Zenodo record 5025603 title 'Data from: Testing for universal common ancestry', description quoted: 'A phylogenetic model selection test to quantify the evidence for the Universal Common Ancestry (UCA) of life forms was proposed recently (Theobald 2010a) ...'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gtdb-release-latest",
+      "name": "Genome Taxonomy Database (GTDB) release data, latest (v232)",
+      "landing_url": "https://data.gtdb.ecogenomic.org/releases/latest/",
+      "access_url": "https://data.gtdb.ecogenomic.org/releases/latest/bac120.tree.gz",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T05:17:32Z", "method": "GET directory index and VERSION.txt; HEAD bac120.tree.gz, ar53.tree.gz, bac120_metadata.tsv.gz", "http_status": 200, "bytes": 2462421 },
+      "variables_present": [
+        "bacterial (bac120) and archaeal (ar53) reference trees and taxonomy tables",
+        "per-genome metadata tables",
+        "MSA mask files for the marker alignments (bac120_msa_mask.txt, ar53_msa_mask.txt)"
+      ],
+      "variables_missing": ["Eukarya (GTDB covers Bacteria and Archaea only)", "the marker-protein alignments themselves were not seen in the directory index"],
+      "scope": "VERSION.txt reads 'v232 Released Apr 15, 2026'; bac120.tree.gz 2,462,421 B; ar53.tree.gz 156,360 B; bac120_metadata.tsv.gz 289,043,801 B",
+      "evidence": "Directory index lists ar53.tree, bac120.tree, *_taxonomy.tsv, *_metadata.tsv.gz, *_msa_mask.txt, genomic_files_reps/, genomic_files_all/ with HTTP 200 on HEAD for the files named.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-datasets-genomes-by-domain",
+      "name": "NCBI Datasets genome assemblies (GenBank/RefSeq) by domain",
+      "landing_url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/2/dataset_report",
+      "access_url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/2/dataset_report?filters.reference_only=true",
+      "doi": null,
+      "license": "NCBI public domain; per-record submitter terms",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:17:00Z", "method": "GET genome/taxon/{2,2157,2759}/dataset_report?page_size=1&filters.reference_only=true, read total_count", "http_status": 200 },
+      "variables_present": ["reference genome assemblies for Bacteria (taxid 2), Archaea (2157) and Eukaryota (2759)"],
+      "variables_missing": ["orthology assignments across domains"],
+      "scope": "total_count with reference_only=true: Bacteria 22,866; Archaea 834; Eukaryota 25,685",
+      "evidence": "total_count fields of the three JSON responses (HTTP 200).",
+      "verdict": "holds"
+    },
+    {
+      "id": "rcsb-pdb",
+      "name": "RCSB Protein Data Bank (Search API)",
+      "landing_url": "https://search.rcsb.org/rcsbsearch/v2/query",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T05:17:05Z", "method": "POST search v2 full_text 'ribosomal protein uS3', return_type entry, return_counts", "http_status": 200 },
+      "variables_present": ["3D structures of universally conserved proteins such as the ribosomal protein uS3 family"],
+      "variables_missing": ["not a sequence-phylogeny dataset; structure-based comparison would need its own pipeline"],
+      "scope": "total_count 2,003 entries matching the full-text phrase",
+      "evidence": "Response: result_type entry, total_count 2003.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-synthetic-tree",
+      "name": "Open Tree of Life synthetic tree (API tree_of_life/about)",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:17:10Z", "method": "POST tree_of_life/about", "http_status": 200 },
+      "variables_present": ["a synthetic tree rooted at 'cellular organisms' with taxonomic and source-study provenance"],
+      "variables_missing": ["not a molecular test of single origin; the tree is built from curated published trees plus a taxonomy"],
+      "scope": "root cellular organisms (ott93302), 2,385,875 tips, 1,931 source studies, 2,064 source trees, created 2025-12-20",
+      "evidence": "JSON fields num_tips 2385875, num_source_studies 1931, num_source_trees 2064, root.taxon.name 'cellular organisms'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "genbank",
+      "name": "GenBank (landing page)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:17:33Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal page; the genome counts are recorded under NCBI Datasets above"],
+      "scope": "portal",
+      "evidence": "HEAD 200 text/html.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "universal common ancestry test Theobald likelihood", "url": "https://zenodo.org/api/records?q=universal+common+ancestry+test+Theobald+likelihood&size=4", "hits": 454622, "note": "one relevant: dryad.gn376 'Testing for universal common ancestry'" },
+    { "source": "Dryad", "query": "universal common ancestor LUCA protein alignment", "url": "https://datadryad.org/api/v2/search?q=universal+common+ancestor+LUCA+protein+alignment&per_page=4", "hits": 0, "note": "none" },
+    { "source": "UniProt", "query": "reviewed:true", "url": "https://rest.uniprot.org/uniprotkb/search?query=reviewed:true&size=1&fields=accession", "hits": 575748, "note": "X-Total-Results" },
+    { "source": "NCBI Datasets", "query": "genome reference_only by taxon 2, 2157, 2759", "url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/2/dataset_report?page_size=1&filters.reference_only=true", "hits": 22866, "note": "Bacteria; Archaea 834, Eukaryota 25685 in sibling requests" },
+    { "source": "RCSB PDB", "query": "full text 'ribosomal protein uS3'", "url": "https://search.rcsb.org/rcsbsearch/v2/query", "hits": 2003, "note": "POST total_count" }
+  ],
+  "status": "partial",
+  "summary": "For extant cellular life the inputs are public and open: UniProt sequences, NCBI reference genomes for all three domains (22,866 bacterial, 834 archaeal, 25,685 eukaryotic), GTDB bacterial and archaeal trees, and a CC0 supplementary-data record from a published universal-common-ancestry test. What is missing is a ready alignment of universally conserved families across all three domains, and by definition any lineage that left no descendants.",
+  "next_step": "Open the Dryad gn376 archive (14.7 MB) to see whether its alignments can be reused; otherwise assemble a universal ribosomal-protein/aaRS set from UniProt with domain-specific gene symbols, and align it.",
+  "obstacles_confirmed": [
+    "Organisms that left no descendants cannot appear in any sequence database.",
+    "Gene symbols and nomenclature differ between Bacteria, Archaea and Eukarya, so ortholog sets must be curated.",
+    "GTDB covers only Bacteria and Archaea."
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "claim_id": "darwin1859-ch09-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "formation or unit thickness and areal extent",
+    "depositional environment per unit (shallow marine vs. other)",
+    "fossil richness per unit (collections or occurrences)",
+    "independent subsidence history per basin (tectonic subsidence rate, sediment accumulation rate)"
+  ],
+  "datasets": [
+    {
+      "id": "macrostrat-api",
+      "name": "Macrostrat API v2 (units, columns, environments, stats)",
+      "landing_url": "https://macrostrat.org/api/v2/stats?all",
+      "access_url": "https://macrostrat.org/api/v2/units?project_id=1&response=long&limit=1",
+      "doi": null,
+      "license": "CC-BY 4.0 (reported in every API response)",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:16:14Z", "method": "GET stats?all; units (response=long and short); columns; defs/environments", "http_status": 200 },
+      "variables_present": [
+        "max_thick and min_thick per unit",
+        "col_area per column and column lat/lng",
+        "lithology classes and proportions, environ (environment) list per unit",
+        "t_age/b_age per unit",
+        "pbdb_collections and pbdb_occurrences per unit (link to fossil richness)"
+      ],
+      "variables_missing": [
+        "subsidence or accommodation history per column",
+        "many units carry empty environ lists (sample unit notes 'environ- no data located')",
+        "thickness is present thickness after compaction and erosion"
+      ],
+      "scope": "stats?all reports project 1 (North America): 1,076 columns, 8,208 packages, 27,034 units, 49,266 PBDB collections; other projects (eODP 92,451 units, Deep Sea 7,356, New Zealand 587 columns) have no linked PBDB collections in the stats table",
+      "evidence": "units response=long lists fields max_thick, min_thick, pbdb_collections, pbdb_occurrences, lith[], environ[], t_age, b_age; defs/environments lists classes such as peritidal, shallow subtidal, open shallow subtidal (class marine). A query using min_thick and lith_class filters returned units not restricted by them, so server-side filtering was not confirmed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology-database-collections",
+      "name": "Paleobiology Database collections (colls/list)",
+      "landing_url": "https://paleobiodb.org/data1.2/colls/list.json?interval=Cenozoic&envtype=marine&rowcount&limit=1&show=env,loc",
+      "access_url": "https://paleobiodb.org/data1.2/colls/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:16:14Z", "method": "GET colls/list.json with envtype=marine, interval=Cenozoic, show=env,loc, limit=1, rowcount", "http_status": 200 },
+      "variables_present": ["collection-level environment (env), formation (sfm), location, age bounds and occurrence count per collection (noc)"],
+      "variables_missing": ["unit thickness", "subsidence"],
+      "scope": "records_found 66,942 marine collections for the Cenozoic; one sample record: Modelo Formation, env 'marine indet.', noc 3",
+      "evidence": "Response fields oid, sfm, lng, lat, nam, noc, oei, eag, lag, rid, env, cc2, stp, cny.",
+      "verdict": "partial"
+    },
+    {
+      "id": "pybacktrack",
+      "name": "pyBacktrack 1.5.0 (backstripping software)",
+      "landing_url": "https://zenodo.org/api/records?q=backstripping+tectonic+subsidence+curves+basins+dataset&size=5",
+      "access_url": null,
+      "doi": "10.5281/zenodo.20809733",
+      "license": "GPL-2.0 (Zenodo licence id gpl-2.0)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:16:20Z", "method": "Zenodo search API (record metadata and file list)", "http_status": 200, "bytes": 138991411 },
+      "variables_present": ["a tool that computes tectonic subsidence from stratigraphic well/section data"],
+      "variables_missing": ["a global table of subsidence histories; this is software, not a dataset"],
+      "scope": "software package (pyBacktrack-1.5.0.zip, 138,991,411 B); input wells must be supplied separately",
+      "evidence": "Zenodo hit titled 'PyBacktrack 1.5.0', published 2026-06-23.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "vitagliano-backstripping-po-plain",
+      "name": "Dataset for Error analysis in back-stripping procedure for modeling natural subsidence: application in the Po Plain",
+      "landing_url": "https://zenodo.org/api/records?q=backstripping+tectonic+subsidence+curves+basins+dataset&size=5",
+      "access_url": null,
+      "doi": "10.5281/zenodo.16751032",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:16:20Z", "method": "Zenodo search API (record metadata and file list)", "http_status": 200, "bytes": 572910 },
+      "variables_present": ["backstripping inputs/outputs for one basin (file Vitagliano_etalii_dataset.xlsx; columns not read)"],
+      "variables_missing": ["multi-basin coverage", "fossil richness"],
+      "scope": "Po Plain only",
+      "evidence": "Zenodo record dated 2025-08-06, one xlsx of 572,910 B.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "backstripping tectonic subsidence curves basins dataset", "url": "https://zenodo.org/api/records?q=backstripping+tectonic+subsidence+curves+basins+dataset&size=5", "hits": 344646, "note": "basin-specific datasets and pyBacktrack software; no global table" },
+    { "source": "Dryad", "query": "tectonic subsidence sedimentary basin backstripped", "url": "https://datadryad.org/api/v2/search?q=tectonic+subsidence+sedimentary+basin+backstripped&per_page=5", "hits": 0, "note": "none" },
+    { "source": "DataCite", "query": "tectonic subsidence history sedimentary basin database", "url": "https://api.datacite.org/dois?query=tectonic+subsidence+history+sedimentary+basin+database&page%5Bsize%5D=5", "hits": 2, "note": "both irrelevant (monsoon cloud composition)" },
+    { "source": "Macrostrat", "query": "stats?all", "url": "https://macrostrat.org/api/v2/stats?all", "hits": 27034, "note": "units in project 1" },
+    { "source": "PBDB", "query": "colls Cenozoic envtype=marine", "url": "https://paleobiodb.org/data1.2/colls/list.json?interval=Cenozoic&envtype=marine&rowcount&limit=1&show=env,loc", "hits": 66942, "note": "records_found" }
+  ],
+  "status": "partial",
+  "summary": "Thickness, environment, age and a link to fossil richness are available per unit in Macrostrat (27,034 North American units with 49,266 linked PBDB collections) and PBDB collections carry environment and occurrence counts. The independent subsidence variable is the gap: only the backstripping software pyBacktrack and a few single-basin datasets were found, no open table of subsidence histories matched to units.",
+  "next_step": "Pick basins with published subsidence curves (or run pyBacktrack on public well data), then join basin-level subsidence to Macrostrat columns and PBDB collection counts; verify server-side filters on Macrostrat before bulk queries.",
+  "obstacles_confirmed": [
+    "No open global dataset of independent tectonic subsidence histories matched to formations.",
+    "At least some Macrostrat units lack environment data (a sampled unit had an empty environ list with the note 'environ- no data located')."
+  ]
+}

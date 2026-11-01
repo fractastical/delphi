@@ -1,0 +1,112 @@
+{
+  "claim_id": "thompson1917-ch15-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:17:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "arterial tree geometry as centerlines or SWC-type graphs with a radius at each node",
+    "parent and daughter vessel radii at each bifurcation (relative branch calibre)",
+    "branch angle at each bifurcation (or 3D coordinates from which it can be computed)",
+    "trees that include the smallest side branches (the claim cites 70-90 degrees for those) and more than one organ or species"
+  ],
+  "datasets": [
+    {
+      "id": "brava",
+      "name": "BraVa: Brain Vasculature database (GMU, Ascoli lab), version 1.1",
+      "landing_url": "http://cng.gmu.edu/brava/home.php",
+      "access_url": "http://cng.gmu.edu/brava/home.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:57Z", "method": "GET home.php and help.php (text read); HEAD home.php", "http_status": 200 },
+      "variables_present": [
+        "digital reconstructions (SWC) of the human brain arterial trees from 61 healthy adult subjects, six trees per subject (left/right ACA, MCA, PCA)",
+        "extracted morphological measurements, searchable by subject, gender, age and reconstruction morphometrics",
+        "de-identified MRA image stacks available for bulk download (help page)"
+      ],
+      "variables_missing": [
+        "cerebral arteries of healthy adults only; not other organs or species",
+        "which morphometrics (bifurcation angle, radius ratio) are included was not confirmed from the pages read",
+        "licence / terms of use not read (a 'Terms of use' tab exists)"
+      ],
+      "scope": "61 human adults, circle-of-Willis trees",
+      "evidence": "home page: 'digital reconstructions of the human brain arterial arborizations from 61 healthy adult subjects along with extracted morphological measurements ... six major trees'; help page: each record gives the SWC file",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "vascular-model-repository",
+      "name": "Vascular Model Repository (VMR, Stanford / SimVascular)",
+      "landing_url": "https://www.vascularmodel.com/",
+      "access_url": "https://www.vascularmodel.com/dataset.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:13:59Z", "method": "GET landing page and dataset.html (text read)", "http_status": 200 },
+      "variables_present": [
+        "library of computational cardiovascular models; the dataset page offers filters for age, sex, species, anatomy, disease, procedure, modality and for items containing images, paths, segmentations, models, meshes or simulations"
+      ],
+      "variables_missing": [
+        "model counts are filled by JavaScript, so the number of arterial models, species and the data format of vessel paths were not confirmed",
+        "angles/radii are not tabulated; they would be derived from paths and models"
+      ],
+      "scope": "Patient-specific and healthy cardiovascular models; mostly human per the filter set",
+      "evidence": "page text lists the filter fields above; 'VMR in numbers' shows placeholders 0 Users / 0 Downloads / 0 Models in static HTML",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-23243094-awakening-imagecas-centerlines",
+      "name": "Awakening ImageCAS: Coronary Ostium and Centerline annotations for the ImageCAS CCTA Dataset",
+      "landing_url": "https://zenodo.org/records/23243094",
+      "access_url": "https://zenodo.org/api/records/23243094",
+      "doi": "10.5281/zenodo.23243094",
+      "license": "CC-BY-NC-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:14:26Z", "method": "GET Zenodo records API (metadata only; Centerlines.zip not downloaded)", "http_status": 200, "bytes": 514029039 },
+      "variables_present": [
+        "coronary centerlines with lumen radius, as GML graphs, for 999 of the 1000 ImageCAS coronary CT angiography scans (left and right trees grown from annotated ostia)",
+        "coronary ostia annotations for all 1000 scans (Ostia.zip, 1,551,631 bytes)"
+      ],
+      "variables_missing": [
+        "branch angles are not stored (graph geometry only); resolution limited to CCTA, so the smallest side branches are probably absent",
+        "coronary arteries of one patient population, not a range of organs or vertebrates",
+        "non-commercial licence"
+      ],
+      "scope": "999 human coronary trees from CCTA",
+      "evidence": "record description: 'Coronary centerlines ... (official set, 999 of 1000 scans) ... with lumen radius, as GML graphs'; files Ostia.zip 1551631, README.md 3513, Centerlines.zip 514029039; license id cc-by-nc-4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "the-cancer-imaging-archive",
+      "name": "The Cancer Imaging Archive (NBIA collection list)",
+      "landing_url": "https://www.cancerimagingarchive.net/",
+      "access_url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getCollectionValues",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:15Z", "method": "GET NBIA getCollectionValues (156 collections) and filtered names for 'ang', 'vess', 'aort'; HEAD landing page 200", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [
+        "no collection whose name indicates vessel or angiography; images are oncology CT/MR/PET and segmented vessel trees are not provided"
+      ],
+      "scope": "156 collections returned by the NBIA API",
+      "evidence": "API returned 156 collection names; none matched the filter terms",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "\"bifurcation angle\" artery centerline", "url": "https://zenodo.org/api/records?q=%22bifurcation%20angle%22%20artery%20centerline&size=6", "hits": 10164, "note": "inflated count; relevant top hits: ImageCAS-X (23562647), Awakening ImageCAS (23243094), carotid CTA reconstructions (4400035, a PDF only)" },
+    { "source": "DataCite", "query": "\"vessel tree\" centerline radius bifurcation dataset", "url": "https://api.datacite.org/dois?query=%22vessel%20tree%22%20centerline%20radius%20bifurcation%20dataset&page%5Bsize%5D=6&disable-facets=true", "hits": 0, "note": "no hits" },
+    { "source": "TCIA / NBIA", "query": "getCollectionValues filtered for angio/vessel/aorta", "url": "https://services.cancerimagingarchive.net/nbia-api/services/v1/getCollectionValues", "hits": 0, "note": "156 collections, none matched" }
+  ],
+  "status": "partial",
+  "summary": "Open arterial-tree geometry exists but only for humans and mostly for large vessels: BraVa (61 subjects, SWC trees of cerebral arteries with morphometrics) and the Awakening ImageCAS centerline graphs with lumen radius (999 coronary trees, CC BY-NC). VMR hosts patient-specific cardiovascular models but its contents could not be counted from static HTML. None tabulates bifurcation angles, none samples the smallest side branches the claim describes, and no non-human arteries were found; TCIA has no vessel collection by name.",
+  "next_step": "Confirm which morphometrics BraVa exposes (bifurcation angle, radius) by fetching one SWC record, and have VMR's model list enumerated through its site or repository; then pre-register the angle-versus-relative-radius regression restricted to trees with radii at each node.",
+  "obstacles_confirmed": [
+    "Clinical imaging resolves large vessels; smallest-branch angles (70-90 degrees in the claim) are not sampled.",
+    "Open trees are human only; no non-human vertebrate arterial tree was found."
+  ]
+}

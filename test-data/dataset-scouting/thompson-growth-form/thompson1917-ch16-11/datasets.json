@@ -1,0 +1,96 @@
+{
+  "claim_id": "thompson1917-ch16-11",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:25:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "vertical ground-reaction force (or load) under the fore-feet and hind-feet during quiet standing, per animal",
+    "body weight of the same animals",
+    "coverage of horses, elephants, camels and llamas (the claim's named species)"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-external-mechanical-work-galloping-racehorse",
+      "name": "Data from: External mechanical work in the galloping racehorse (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.db543",
+      "access_url": "https://api.datacite.org/dois/10.5061/dryad.db543",
+      "doi": "10.5061/dryad.db543",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:15:56Z", "method": "GET DataCite record (sizes 2,149,976,823 bytes, CC0) and Zenodo mirror listing: Horse2Trial4RAW.txt 2,316,180 bytes, Horse2Trial4Processed.csv 2,574, Data Summary.docx 23,969, two .avi videos of 1,073,806,848 bytes each; Dryad search 'force plate horse' returns the same record", "http_status": 200 },
+      "variables_present": [
+        "force-plate data from seven Thoroughbred horses galloped (ridden) over force plates, 26 full strides; summed vertical and cranio-caudal force for one trial (Horse2Trial4Processed.csv) and summary tables of analysed data, trial and subject information"
+      ],
+      "variables_missing": [
+        "gallop, not quiet standing",
+        "summed force for the trial shown (figure 1), not separate fore-limb and hind-limb vertical force in the processed file listed",
+        "only horses"
+      ],
+      "scope": "7 Thoroughbreds, 26 strides; raw data for one trial only in the file list",
+      "evidence": "DataCite description text and file names as quoted; Zenodo files list",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-limb-work-elbows-back-knees-forward",
+      "name": "Limb work and joint work minimisation reveal an energetic benefit to the elbows-back, knees-forward limb design (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.76hdr7sv4",
+      "access_url": null,
+      "doi": "10.5061/dryad.76hdr7sv4",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:15:51Z", "method": "Zenodo search hit for the DOI: 'Supplementary_Material_Folder.zip' 2,494,228 bytes; content and taxa not inspected", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["title suggests a limb-mechanics model; no evidence from the metadata fetched that it holds fore versus hind load shares for the named species"],
+      "scope": "unknown",
+      "evidence": "title and one file name from the Zenodo search result",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad search for force-plate and weight-distribution data",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=force%20plate%20horse&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:16:29Z", "method": "GET Dryad search: 'force plate horse' 1 hit (the galloping racehorse set), 'ground reaction force quadruped' 0, 'weight distribution forelimb hindlimb' 0, 'llama camel gait force' 0, 'elephant locomotion force' 1 (tube feet of echinoderms, unrelated)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no standing fore/hind load data for horses, elephants, camels or llamas surfaced"],
+      "scope": "Dryad-wide",
+      "evidence": "hit counts as listed",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:16:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["GPS and accelerometer tracking data hold no per-leg vertical load"],
+      "scope": "animal movement database",
+      "evidence": "HEAD 200; the repository's content type (tracks) is not force data",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "force plate horse; ground reaction force quadruped; weight distribution forelimb hindlimb; llama camel gait force; elephant locomotion force", "url": "https://datadryad.org/api/v2/search?q=force%20plate%20horse&per_page=6", "hits": 1, "note": "only the galloping racehorse set; others 0 or unrelated" },
+    { "source": "DataCite", "query": "external mechanical work galloping racehorse", "url": "https://api.datacite.org/dois?query=external%20mechanical%20work%20galloping%20racehorse&page[size]=6", "hits": 5, "note": "Dryad, Figshare ESM files and Royal Society collection of the same paper; 'weight distribution forelimb hindlimb standing horse camel llama' gave 0" },
+    { "source": "Zenodo", "query": "ground reaction force quadruped standing forelimb hindlimb", "url": "https://zenodo.org/api/records?q=ground%20reaction%20force%20quadruped%20standing%20forelimb%20hindlimb&size=6", "hits": 176869, "note": "noise; monitor-lizard GRF raw data (10.5061/dryad.rn8pk0p82) is not a named species" },
+    { "source": "Figshare", "query": "force plate elephant limb loading", "url": "https://api.figshare.com/v2/articles/search", "hits": 0, "note": "POST search returned an empty list" }
+  ],
+  "status": "gap",
+  "summary": "No open repository record was found for standing fore- versus hind-limb load in horses, elephants, camels or llamas. The only force-plate set located is a ridden-gallop Thoroughbred study (CC0, raw data for one trial), which is not quiet standing and covers only horses.",
+  "next_step": "Compile the published fore-limb load fractions per species from the veterinary and biomechanics literature (e.g. static weighing studies on horses and force-plate studies on elephants, camels and llamas), recording method and posture for each.",
+  "obstacles_confirmed": [
+    "Force-plate data for elephants, camels and llamas are not in the repositories searched.",
+    "The deposited horse series is a ridden gallop, not standing."
+  ]
+}

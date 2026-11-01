@@ -1,0 +1,209 @@
+{
+  "claim_id": "darwin1859-ch02-11",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "number of species per genus",
+    "homologous barcode sequences (e.g. COI) for congeneric species, from which pairwise genetic distances follow",
+    "morphological trait values per species within genera (alternative route to the same comparison)"
+  ],
+  "datasets": [
+    {
+      "id": "bold-systems",
+      "name": "BOLD Systems v5 (portal.boldsystems.org API)",
+      "landing_url": "https://www.boldsystems.org/",
+      "access_url": "https://portal.boldsystems.org/api/summary?query=tax:genus:Drosophila",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:13:07Z",
+        "method": "GET boldsystems.org and www.boldsystems.org; GET portal.boldsystems.org/api/summary?query=tax:genus:Drosophila&fields=specimens; GET .../summary?query=tax:class:Insecta&fields=specimens,bins,species; GET .../api/query?query=tax:genus:Drosophila then .../api/documents/<query_id>/download?format=tsv (first 2.5 KB read only)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "genus and species names per specimen record",
+        "COI-5P barcode sequences (nuc) and BIN assignments per specimen",
+        "specimen counts by taxon"
+      ],
+      "variables_missing": [
+        "morphological measurements",
+        "a pre-computed pairwise distance table"
+      ],
+      "scope": "Mainly animals, many insects; tax:class:Insecta returned counts species 986808 and specimens 17911975; tax:genus:Drosophila specimens 49676",
+      "evidence": "summary?query=tax:genus:Drosophila returned {'counts':{'specimens':49676}}; tax:class:Insecta returned species 986808 and specimens 17911975 (species field includes provisional 'sp.' names). api/query returned a query_id with extent_limit 1000. The TSV download header lists processid, bin_uri, genus, species, marker_code, nuc, coord, country/ocean among its columns; the first row was ABGEN093-20, BOLD:AAC7070, Drosophila neotestacea, COI-5P. Both landing hosts returned HTTP 200. The queue lists four BOLD entries under different names; merged here.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait-database",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": "https://www.try-db.org/TryWeb/Data.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:14:50Z",
+        "method": "GET https://www.try-db.org/ (meta refresh to TryWeb/Home.php); GET TryWeb/Home.php; GET TryWeb/Data.php",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant trait data (per the TRY site; counts not retrieved)"
+      ],
+      "variables_missing": [
+        "open download without registration or request",
+        "traits Darwin compared"
+      ],
+      "scope": "Plants only",
+      "evidence": "Landing redirected to TryWeb/Home.php (HTTP 200, 'TRY Plant Trait Database'). TryWeb/Data.php describes a TRY File Archive with free-registration download and Request Data / Explore Data pages for the main database. No data were fetched.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:14:50Z",
+        "method": "GET https://www.morphosource.org/ (returned an anti-bot interstitial 'Making sure you're not a bot!'); GET /api/media?per_page=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D media (e.g. CT scans) of specimens"
+      ],
+      "variables_missing": [
+        "species-level morphological distance tables",
+        "consistent character coding across genera"
+      ],
+      "scope": "Specimen scans; API pages total_count 209875 media",
+      "evidence": "The landing page returned a bot-check page; /api/media?per_page=1 returned JSON with pages.total_count 209875 and a first record 'MNHN_F_SOT084389_CT_scan' (Volumetric Image Series, MicroNanoXRayComputedTomography).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree opentree16.1, taxonomy OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/taxonomy/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:01Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /v3/taxonomy/about; POST /v3/tnrs/match_names",
+        "http_status": 200
+      },
+      "variables_present": [
+        "genus membership of species via the taxonomy",
+        "tree topology for within-genus relationships"
+      ],
+      "variables_missing": [
+        "pairwise genetic or morphological distances",
+        "(branch lengths not checked)"
+      ],
+      "scope": "2385875 tips; taxonomy ott3.7draft3",
+      "evidence": "tree_of_life/about returned num_tips 2385875, synth_id opentree16.1; taxonomy/about returned ott3.7draft3; tnrs/match_names resolved 'Pan' and 'Homo sapiens'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "avonet-bird-traits-figshare",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022)",
+      "landing_url": "https://api.datacite.org/dois/10.6084/m9.figshare.16586228",
+      "access_url": null,
+      "doi": "10.6084/m9.figshare.16586228",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:40Z",
+        "method": "GET https://api.datacite.org/dois/10.6084/m9.figshare.16586228",
+        "http_status": 200
+      },
+      "variables_present": [
+        "morphological trait values per bird species (per title)"
+      ],
+      "variables_missing": [
+        "taxa other than birds",
+        "traits Darwin compared"
+      ],
+      "scope": "Birds; species-level values; file contents and row counts not inspected",
+      "evidence": "DataCite record HTTP 200: title 'AVONET: morphological, ecological and geographical data for all birds (Tobias et al 2022 Ecology Letters ...)', publicationYear 2022, publisher figshare, rights CC BY 4.0. The figshare landing page and files were not fetched.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "interspecific genetic distance congeners genus size",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=interspecific%20genetic%20distance%20congeners%20genus%20size",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "barcode COI divergence congeneric species genus richness",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=barcode%20COI%20divergence%20congeneric%20species%20genus%20richness",
+      "hits": 1,
+      "note": "10.5061/dryad.qp1nd (species diversity overestimated by a fixed threshold), not examined"
+    },
+    {
+      "source": "DataCite",
+      "query": "AVONET avian trait database morphological",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=AVONET%20avian%20trait%20database%20morphological",
+      "hits": 21,
+      "note": "top hits are derived analyses; AVONET itself fetched directly by DOI"
+    },
+    {
+      "source": "DataCite",
+      "query": "interspecific genetic distance genus richness barcode",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=interspecific%20genetic%20distance%20genus%20richness%20barcode",
+      "hits": 1,
+      "note": "one anuran bioacoustics paper, irrelevant"
+    },
+    {
+      "source": "Zenodo",
+      "query": "genus size species richness interspecific genetic divergence congeners barcode",
+      "url": "https://zenodo.org/api/records?size=5&q=genus%20size%20species%20richness%20interspecific%20genetic%20divergence%20congeners%20barcode",
+      "hits": 1507404,
+      "note": "full-text noise; taxonomic descriptions"
+    },
+    {
+      "source": "GBIF",
+      "query": "dataset?q=barcode of life",
+      "url": "https://api.gbif.org/v1/dataset?q=barcode%20of%20life&limit=5",
+      "hits": 150,
+      "note": "iBOL BIN checklist and national barcode occurrence datasets exist on GBIF; not used"
+    }
+  ],
+  "status": "data-ready",
+  "summary": "BOLD holds the genetic route end to end: specimen records with genus, species and COI-5P sequence (confirmed on a downloaded TSV header and first row; 17,911,975 insect specimens, 986,808 species-name entries, 49,676 Drosophila specimens), from which species counts per genus and pairwise distances can be computed. Morphological routes are weaker: TRY is plants only and behind request/registration, MorphoSource holds scans not distance tables, AVONET covers birds only.",
+  "next_step": "Pre-register a BOLD extraction for a set of insect and plant genera (barcodes per species, BIN-level cleaning), with genus richness taken from a frozen taxonomy and genus age from Open Tree to address the oversplitting and age confounds.",
+  "obstacles_confirmed": [
+    "Species counts per genus in BOLD include provisional 'sp.' names.",
+    "The BOLD query reported extent_limit 1000 for the download I tried; large extractions may need a different route.",
+    "Taxonomic splitting practice cannot be removed from the data."
+  ]
+}
