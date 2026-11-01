@@ -995,6 +995,29 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     assert not pg2.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
 
+
+def test_about_team_shows_the_team_crest_and_the_off_the_clock_clip(browser, base):
+    """The team page shows the crest image and the short slingshot clip, served from site/artifacts/team (web.py streams MP4 only from
+    the artifact subtree). The clip is muted and looped, and it autoplays only when the visitor has not asked for reduced motion."""
+    team = ROOT / "site" / "artifacts" / "team"
+    for w, motion in ((1280, "no-preference"), (400, "reduce")):
+        pg = browser.new_page(viewport={"width": w, "height": 900}, reduced_motion=motion); _OPEN.append(pg); errs = []
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        pg.goto(base + "#/about/team"); pg.wait_for_selector(".about-team img")
+        img, v = pg.locator(".about-team img"), pg.locator("#team-fun-video")
+        img.scroll_into_view_if_needed()
+        pg.wait_for_function("(() => { const i = document.querySelector('.about-team img'); return i.complete && i.naturalWidth === 1600; })()")
+        assert "The Delphi Team" in img.get_attribute("alt") and "Distributed epistemic layer" in pg.locator(".about-team-crest figcaption").text_content()
+        assert v.evaluate("v => v.muted && v.loop && v.controls && v.playsInline") and v.evaluate("v => v.autoplay") is (motion != "reduce")
+        for attr, name in ((v.locator("source").get_attribute("src"), "team-darts-slingshot.mp4"), (v.get_attribute("poster"), "team-darts-slingshot-poster.jpg")):
+            assert attr == "artifacts/team/" + name and (team / name).is_file()
+            assert pg.request.get(base + attr).status == 200
+        assert "Off the clock" in pg.locator(".about-team-fun figcaption").text_content()
+        # the media sits above the role cards, and nothing overflows the narrow viewport
+        assert pg.locator(".about-team").bounding_box()["y"] < pg.locator(".about-cards").bounding_box()["y"]
+        assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+        assert not errs, errs
+
 def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(browser, base):
     pg = page(browser)
     pg.goto(base + "#/work?tab=built")
