@@ -11,14 +11,18 @@
 
   function family(f) {
     const st = STATUS[f.status] || ["unknown status", "no"]; const ok = f.status === "current";
+    const downloads = [...(f.files || []), ...(f.display_artifacts || []).filter((x) => x.status === "verified")];
     const head = html`<h2 id="${"proof-" + f.id + "-h"}">${f.title}</h2><p>${U.pill(st[0], st[1])} ${f.versions ? html`<span class="small faint">${f.versions.lean_version.split(",")[0]} · Mathlib ${String(f.versions.mathlib_rev || "").slice(0, 10)}</span>` : ""}</p>`;
     if (!ok) return html`<section class="panel proof" id="proof-${f.id}" aria-labelledby="proof-${f.id}-h">${head}<p class="note warn small"><b>Withheld.</b> ${f.summary}</p><ul class="small">${(f.reasons || []).map((r) => html`<li>${r}</li>`)}</ul><p class="small faint">A new Lean run, and a new receipt, are needed before this family is shown as compiled again.</p></section>`;
     const run = f.run, pos = run.positive, neg = run.negative;
     return html`<section class="panel proof" id="proof-${f.id}" aria-labelledby="proof-${f.id}-h">${head}
       <p>${f.summary}</p>
       <div class="proofeq">${f.equations.map((e) => html`<div class="eqcard"><h4>${e.label}</h4><div class="eq-math">${DF.texSpan(e.tex, true)}</div></div>`)}</div>
+      ${f.figure_href ? html`<figure class="prooffigure"><img src="${f.figure_href}" alt="Sphere and one-sided slab geometry with normalized model-only center oxygen response curves and diffusion limits"><figcaption class="small">Pinned geometry/control figure. Its threshold curves are conditional model implications, not biological measurements.</figcaption></figure>` : ""}
       <h3>Assumptions</h3><ul class="small">${f.assumptions.map((a) => html`<li>${a}</li>`)}</ul>
       ${f.proves ? html`<p class="small"><b>Proves:</b> ${f.proves}</p>` : ""}
+      ${f.check_results ? html`<h3>Recorded positive checks (${f.check_results.length})</h3><ul class="small proofchecks">${f.check_results.map((x) => html`<li><b>${x.name}</b> — ${x.status}; axioms: ${x.axioms.join(", ")}</li>`)}</ul>` : ""}
+      ${f.contextual_reuse ? html`<h3>Contextual reuse</h3><p class="small"><b>${f.contextual_reuse.status}.</b> These are exact Project-version links for a shared model rule; they do not imply that oxygen parameters or a project simulation exist.</p><div class="proofcontexts">${f.contextual_reuse.contexts.map((x) => html`<article class="panel"><h4>${x.title}</h4><p class="small"><code>${x.project_ref.namespace}/${x.project_ref.id}@${x.project_ref.version.slice(0, 12)}</code> · ${x.publication_status}</p><p class="small">${x.use}</p><p class="small"><b>Unknown:</b> ${Object.entries(x.parameter_status).map(([k, v]) => `${k}=${v}`).join(", ")}</p><p class="small"><b>Not established:</b> ${x.not_established.join(", ")}</p></article>`)}</div>` : ""}
       <h3>What the Lean statements say</h3>
       <div class="proofthms">${f.theorems.map((t) => html`<details><summary><b>${t.kind} ${t.name}</b> <span class="small faint">line ${t.line}</span></summary>${t.doc ? html`<p class="small">${t.doc}</p>` : ""}${code(t.statement, "Lean statement of " + t.name)}</details>`)}</div>
       <details class="proofsrc"><summary><b>Read the Lean source</b> <span class="small faint">${f.source_name}, ${lines(f.source).length} lines</span></summary>${code(f.source, "Lean source " + f.source_name)}</details>
@@ -33,7 +37,7 @@
       <ul class="proofneg">${f.negative_blocks.map((b) => html`<li><details><summary><b>${b.id.replace(/_/g, " ")}</b> ${b.rejected ? U.pill("rejected by Lean", "ok") : U.pill("NOT rejected", "no")}${b.first_error ? html` <span class="small faint">${b.first_error}</span>` : ""}</summary>${code(b.code, "Mutated Lean block " + b.id)}</details></li>`)}</ul>
       ${f.does_not_prove ? html`<h3>What it does not prove</h3><ul class="small">${f.does_not_prove.map((x) => html`<li>${x}</li>`)}</ul>` : ""}
       ${f.statement_origin ? html`<p class="small faint">${f.statement_origin}.</p>` : ""}
-      <h3>Downloads</h3><ul class="small prooffiles">${f.files.map((x) => html`<li><a href="${x.path}" download>${x.name}</a> <span class="faint">${x.role}</span> ${sha(x.sha256)}</li>`)}</ul>
+      <h3>Downloads</h3><ul class="small prooffiles">${downloads.map((x) => html`<li><a href="${x.path}" download>${x.name}</a> <span class="faint">${x.role}</span> ${sha(x.sha256)}</li>`)}</ul>
     </section>`;
   }
 
@@ -41,7 +45,7 @@
     const G = snap.lean_gallery;
     if (!G) return { html: html`<section class="pagehead"><h1>Lean proofs</h1><p class="empty">The Lean gallery is not in this snapshot, so no proof is shown.</p></section>` };
     return {
-      html: html`<section class="pagehead"><p class="eyebrow">Evidence</p><h1>Lean proofs</h1><p class="lede">Real Lean 4 source, the receipts of the runs that compiled it, and the mutated statements Lean refused. Three small families of exact mathematics that the design tools rely on.</p></section>
+      html: html`<section class="pagehead"><p class="eyebrow">Evidence</p><h1>Lean proofs</h1><p class="lede">Real Lean 4 source, the receipts of the runs that compiled it, and the mutated statements Lean refused. Four bounded families of mathematics with their assumptions and scope.</p></section>
         <section class="panel"><p class="note warn small"><span class="pillrow">${U.pill("recorded runs", "warn")} ${U.pill("mathematics, not biology", "warn")}</span> ${G.kind}.</p><ul class="small">${G.scope.map((s) => html`<li>${s}</li>`)}</ul>
           ${G.toolchain ? html`<p class="small">Toolchain: ${G.toolchain.lean_version}; Mathlib revision ${G.toolchain.mathlib_rev}; ${G.toolchain.toolchain}.</p>` : ""}
           <p class="small">The <a href="${DF.href("/formalize")}">proposal checker</a> writes Lean text for a request but does not compile it; it is a separate path from these hand-written theorems.</p></section>

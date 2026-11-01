@@ -393,6 +393,11 @@ def test_public_reads_work_anonymously_but_every_write_needs_a_valid_bearer(publ
                 assert len(proofs["families"]) == 1 and proofs["withheld"] == []
                 assert proofs["families"][0]["recorded_compile"] and not proofs["compile_executed"]
                 assert "convert_comp" in proofs["families"][0]["source"]["text"]
+                oxygen = val(await anon.call_tool("frontier_proofs", {"family": "steady-oxygen-bound", "include_source": True}))
+                assert len(oxygen["families"]) == 1 and oxygen["withheld"] == []
+                assert len(oxygen["families"][0]["check_results"]) == 6
+                assert len(oxygen["families"][0]["contextual_reuse"]["contexts"]) == 2
+                assert "/data/" not in json.dumps(oxygen) and "/tmp/" not in json.dumps(oxygen)
 
                 caps = val(await anon.call_tool("frontier_capabilities", {}))
                 assert caps["principal"] is None and caps["anonymous_reads"] is True and "Public reads need no credential" in caps["credentials"] and "Every write tool needs a valid bearer" in caps["credentials"]

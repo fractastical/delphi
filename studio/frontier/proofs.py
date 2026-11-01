@@ -9,13 +9,14 @@ import stat
 
 from scripts import lean_gallery
 
-FAMILY_IDS = ("geometric-similarity", "unit-algebra", "cantilever-guard")
-MAX_FILE_BYTES = 128_000
+FAMILY_IDS = ("geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound")
+MAX_FILE_BYTES = 512_000
 MAX_SOURCE_CHARS = 6_000
 RECEIPTS = {
     "geometric-similarity": "b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17",
     "unit-algebra": "f7d02122cf5fa6e6aad588161997820e5e633ecfbf9badda65be0c32c45751d6",
     "cantilever-guard": "2f5ebcb086f2dbe70a84a9f8863365736b1a59724744eb3a7101737a808c4be4",
+    "steady-oxygen-bound": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
 }
 SCOPE = "Recorded mathematical compile/control results only; not a new Lean run, scientific review, empirical finding, or proof of biological validity."
 
@@ -66,9 +67,14 @@ class ProofCatalog:
         }
         published = set()
         for spec in lean_gallery.FAMILIES:
-            source.add(f"{spec['dir']}/{spec['receipt']}")
+            source.add(spec.get("receipt_path", f"{spec['dir']}/{spec['receipt']}"))
+            source.update(spec.get("source_paths", {}).values())
+            source.update(item["path"] for item in spec.get("display_artifacts", []))
+            if spec.get("context_project_source"):
+                source.add(spec["context_project_source"]["path"])
             for name in [spec["theory"], Path(spec["receipt"]).name] + [spec[k] for k in ("positive_extra", "negative", "negative_file") if spec.get(k)]:
                 published.add(f"artifacts/lean-gallery/{spec['id']}/{name}")
+            published.update(f"artifacts/lean-gallery/{spec['id']}/{item['name']}" for item in spec.get("display_artifacts", []))
         self.source = _FixedReader(self.root, source)
         self.published = _FixedReader(self.root / "site", published)
 
@@ -82,7 +88,8 @@ class ProofCatalog:
             if family and spec["id"] != family:
                 continue
             try:
-                receipt = self.source.read(f"{spec['dir']}/{spec['receipt']}")
+                receipt_path = spec.get("receipt_path", f"{spec['dir']}/{spec['receipt']}")
+                receipt = self.source.read(receipt_path)
                 if sha256(receipt).hexdigest() != RECEIPTS[spec["id"]]:
                     raise ValueError("Recorded receipt changed")
                 checked = lean_gallery._family(spec, self.source, {}, self.root)
@@ -98,8 +105,22 @@ class ProofCatalog:
                     if public_host and re.fullmatch(r"(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}", public_host):
                         entry["public_url"] = f"https://{public_host}/{item['path']}"
                     files.append(entry)
+                for item in checked.get("display_artifacts", []):
+                    if item.get("status") != "verified":
+                        continue
+                    raw = self.published.read(item["path"])
+                    if sha256(raw).hexdigest() != item["sha256"] or len(raw) != item["bytes"]:
+                        raise ValueError("Published proof artifact changed")
+                    entry = {k: item[k] for k in ("name", "role", "sha256", "bytes")}
+                    entry["href"] = item["path"]
+                    if public_host and re.fullmatch(r"(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}", public_host):
+                        entry["public_url"] = f"https://{public_host}/{item['path']}"
+                    files.append(entry)
                 theory = next(x for x in files if x["role"] == "theory")
                 result = {k: checked[k] for k in ("id", "title", "summary", "assumptions", "equations")}
+                for key in ("proves", "does_not_prove", "statement_origin"):
+                    if key in checked:
+                        result[key] = checked[key]
                 result.update(status="recorded_compile_source_matched", recorded_compile=True,
                               versions=checked["versions"], files=files, source_href=theory["href"],
                               receipt_href=checked["receipt"]["href"],
@@ -107,6 +128,11 @@ class ProofCatalog:
                               positive_exit=checked["run"]["positive"]["exit"], negative_exit=checked["run"]["negative"]["exit"],
                               only_standard_axioms=checked["run"]["positive"]["only_standard_axioms"],
                               negative_control_ids=[x["id"] for x in checked["negative_blocks"]])
+                if checked.get("check_results") is not None:
+                    result["check_results"] = checked["check_results"]
+                for key in ("contextual_reuse", "figure_href", "rule_contract_href", "reuse_context_href"):
+                    if key in checked:
+                        result[key] = checked[key]
                 if include_source:
                     text = checked["source"]
                     result["source"] = {"text": text[:MAX_SOURCE_CHARS], "truncated": len(text) > MAX_SOURCE_CHARS,
