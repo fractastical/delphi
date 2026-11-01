@@ -207,6 +207,34 @@ def extract_result(lines: list[str]):
     return meta, blob
 
 
+def _recover_part_metadata(lines, chunks, header):
+    """Recover a clipped log header only through a verified outer-archive receipt."""
+    _, outer = extract_result(lines)
+    if outer is None:
+        raise ValueError("Clipped part metadata has no verified outer receipt")
+    with tarfile.open(fileobj=io.BytesIO(outer), mode="r:gz") as archive:
+        members = [m for m in archive.getmembers() if m.name in ("queue_receipts.json", "./queue_receipts.json")]
+        if len(members) != 1 or not members[0].isfile() or members[0].size > 1_000_000:
+            raise ValueError("Missing or oversized outer queue receipt")
+        receipts = json.loads(archive.extractfile(members[0]).read())["workloads"]
+    matches = []
+    for receipt in receipts:
+        if receipt.get("truncated") is not False or not isinstance(receipt.get("bytes"), int):
+            continue
+        if not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", receipt.get("id", "")) or type(receipt.get("seq")) is not int:
+            raise ValueError("Unsafe recovered part identity")
+        try:
+            blob = _checked_chunks(chunks, receipt)
+        except ValueError:
+            continue
+        matches.append((receipt, blob))
+    if len(matches) != 1:
+        raise ValueError("Clipped metadata payload does not uniquely match a verified receipt")
+    receipt, blob = matches[0]
+    return {**receipt, "metadata_recovery": "Exact digest/size match to verified outer queue receipt; original log header clipped",
+            "clipped_header_sha256": hashlib.sha256(header.encode()).hexdigest()}, blob
+
+
 def extract_parts(lines: list[str]):
     """Warm-worker parts: -> list of (meta, blob|None) for every COMPLETE part (BEGIN ... END) in log order; verifies sha256 per part; a part whose meta says truncated has blob None.
     Tolerates a log cut in the middle of a later part (that part is ignored: it is incomplete)."""
@@ -214,9 +242,15 @@ def extract_parts(lines: list[str]):
     for ln in lines:
         i = ln.find("COPS_PART_BEGIN ")
         if i >= 0:
-            cur = json.loads(ln[i + 16:]); b64 = []; continue
+            try:
+                cur = json.loads(ln[i + 16:])
+            except json.JSONDecodeError:
+                cur = {"clipped_header": ln[i + 16:]}
+            b64 = []; continue
         if cur is not None and "COPS_PART_END" in ln:
-            if cur.get("truncated"):
+            if "clipped_header" in cur:
+                parts.append(_recover_part_metadata(lines, b64, cur["clipped_header"]))
+            elif cur.get("truncated"):
                 parts.append((cur, None))
             else:
                 blob = _checked_chunks(b64, cur)
@@ -237,6 +271,8 @@ def write_parts(parts, outdir):
             d.mkdir(parents=True, exist_ok=True)
             tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz").extractall(d, filter="data") if hasattr(tarfile, "data_filter") else tarfile.open(fileobj=io.BytesIO(blob), mode="r:gz").extractall(d)
         rows.append({k: meta.get(k) for k in ("seq", "id", "rc", "timed_out", "start_utc", "end_utc", "wall_s", "bytes", "sha256", "truncated", "NOT_RETURNED")})
+        if "metadata_recovery" in meta:
+            rows[-1].update({key: meta[key] for key in ("metadata_recovery", "clipped_header_sha256")})
     save(outdir / "parts_manifest.json", rows)
     return rows
 
