@@ -68,7 +68,14 @@ def registry(sources):
              "latex": None} for identifier, scales, text in [
                  ("gene-to-fin-program", ["molecular", "developmental", "organ"], "No calibrated gene-to-channel-to-pattern-to-fin equation stack is established"),
                  ("tissue-to-EI", ["cellular", "tissue", "organ"], "No calibrated cell/contact/pattern-to-ray material/geometry map exists"),
-                 ("deformed-fin-to-polar", ["organ", "organism"], "No two-way fluid-structure transfer or measured deformed-fin aerodynamic polar"),
-                 ("neural-caudal-control", ["neural", "organism"], "No executable propulsion, active fin control or caudal swimming dynamics linked here"),
+                 ("deformed-fin-to-polar", ["organ", "organism"], "A bending-only static two-way FEM/VLM scenario is implemented. A measured deformed-fin polar, finite torsion, and calibrated continuous fluid-structure dynamics remain missing."),
+                 ("neural-caudal-control", ["neural", "organism"], "Bounded airborne fin feedback and neighbor-response scenarios are implemented. Calibrated neural control, underwater propulsion and the water-to-air transition remain missing."),
                  ("whole-life-history", ["developmental", "ecological", "evolutionary"], "No growth, ecological fitness or evolutionary reachability equations established")]]
+    implemented = {
+        "deformed-fin-to-polar": ["artifacts/aeroelastic/RESULTS.md", "artifacts/aeroelastic/index.json", "engineering/aeroelastic/model.py"],
+        "neural-caudal-control": ["artifacts/ecology/interface.json", "artifacts/ecology/uncertainty-aggregate/summary.json", "engineering/ecology/model.py"],
+    }
+    for gap in gaps:
+        if gap["id"] in implemented:
+            gap["evidence"].extend(sources.pin(path) for path in implemented[gap["id"]])
     return entries, gaps

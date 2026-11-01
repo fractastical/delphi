@@ -63,7 +63,7 @@
     const V3 = snap && snap.print_v3 && snap.print_v3.forms.filter((f) => f.files.some((x) => x.kind === "stl_prop"));
     if (V3 && V3.length) {                                           // v3 display props: three STL files per form, every one hash-checked by the build
       const id3 = id + "v3"; const b3 = document.createElement("div"); b3.className = "printv3";
-      b3.innerHTML = html`<label for="${id3}"><b>v3 display props</b> (STL, millimetres, display scale)</label> <select id="${id3}">${V3.map((f) => html`<option value="${f.id}">${f.id}</option>`)}</select>
+      b3.innerHTML = html`<label for="${id3}"><b>Printable fish revisions</b> (STL, millimetres, display scale)</label> <select id="${id3}">${V3.map((f) => html`<option value="${f.id}">${f.title}</option>`)}</select>
         <span class="v3links"></span><p class="small faint v3info" aria-live="polite"></p>
         <details><summary class="small">Print limits (printer and resin unknown, nothing sliced or printed)</summary><ul class="small">${snap.print_v3.limitations.map((x) => html`<li>${x}</li>`)}</ul></details>`.toString();
       host.appendChild(b3);

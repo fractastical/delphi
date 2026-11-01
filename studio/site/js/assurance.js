@@ -60,7 +60,7 @@
         <p class="small"><b>Variables.</b> ${(q.variables || []).map((v) => `${v.symbol} (${v.role}, ${v.unit})`).join("; ")}</p>
         <p class="small"><b>Assumptions.</b> ${(q.assumptions || []).join("; ") || "none stated"}</p><p class="small"><b>Domain.</b> ${q.domain}</p><p class="small"><b>Scope.</b> ${q.scope}</p>
         <details><summary class="small">sources and checks</summary>${ev([...(q.sources || []), ...(q.check_evidence || [])])}</details></article>`)}</div>
-      ${G.length ? html`<h4>Equation gaps: where no equation stack exists</h4><ul>${G.map((g) => html`<li><b>${g.id}</b> ${U.pill(String(g.status).replace(/_/g, " "), "no")} ${g.summary} <span class="faint small">(scales: ${(g.scales || []).join(", ")})</span><details><summary class="small">sources</summary>${ev(g.evidence)}</details></li>`)}</ul>` : ""}`;
+      ${G.length ? html`<h4>Unresolved biological connections</h4><ul>${G.map((g) => html`<li><b>${g.id}</b> ${U.pill(String(g.status).replace(/_/g, " "), "no")} ${g.summary} <span class="faint small">(scales: ${(g.scales || []).join(", ")})</span><details><summary class="small">sources</summary>${ev(g.evidence)}</details></li>`)}</ul>` : ""}`;
   }
 
   DF.assuranceWire = function (root, A, onScale) {
