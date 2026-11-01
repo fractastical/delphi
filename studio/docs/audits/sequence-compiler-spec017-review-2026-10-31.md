@@ -1,7 +1,7 @@
 # Sequence/compiler and SPEC-017 independent review
 
-Review status: final actual-ledger integration executed; two residual typed-input
-findings remain. This report concerns bookkeeping,
+Review status: scoped follow-up executed on reconciled compiler `1a084328`;
+the two recorded residual cases now reject. This report concerns bookkeeping,
 identity and validator rules, not measured biological function.
 
 SPEC-017 was read at root `cd0290f`; this worktree is based on root `c7b6f9e`.
@@ -80,7 +80,7 @@ expression-to-material/flight transfer unknown or blocked. The LEN deletion
 result specifically preserves the distinction between induced expression and
 required fin regeneration.
 
-## Final committed-source integration
+## Earlier committed-source integration (preserved)
 
 Executed the same bounded reviewer against compiler
 `3b2ca996e6095e3e4b20ed0255c687f31007e403`, file SHA256
@@ -115,6 +115,55 @@ Both residuals were sent directly to root/owner02. No existing biological
 calibration is established by the baseline, so neither finding changes any real
 functional result. `final-receipt.json` pins the source, ledger, script and outputs;
 focused Ruff passed. No full suite or provider inference was run.
+
+## Current reconciled source and DOE follow-up
+
+The bounded follow-up used exact pushed compiler
+`1a084328ae49ae2c065465d1c400cb8df3d6f78f`, file SHA256
+`14d47e69283e1561447f6b52c315e3c5df4ea75069f7d8dcfbb18189cbe454cb`,
+the same clean ledger `e187efb`, and corrected DOE `4d9628f`.
+`reconciled-check.json`, `reconciled-check.compiler.py.txt` and
+`reconciled-receipt.json` retain the exact read-only check and source pins.
+The old 17/19 receipt and outputs remain unchanged, tied to review `7d5d06b`.
+
+All **29 declared scoped conditions** behave as expected. This count includes
+the 19 original integration conditions, exact DOE input identity, eight explicitly
+uncalibrated instrument bindings, deterministic regeneration of four compiler
+artifacts, and tiny isolated source-binding controls. It is not a biological
+success rate or a general validation claim.
+
+Both residual cases reject at their intended gates: string endpoint flags are
+malformed rather than truthy, and arbitrary downstream strings are refused as
+non-digests. Actual ledger sequences, source contexts/directions, model-output
+unknown function and proposal-versus-evidence status remain intact. No candidate
+is endorsed and no biological interface becomes calibrated.
+
+The actual protocol, instrument-contracts and manifest bytes exactly match their
+`4d9628f` Git objects. The compiler reads eight current typed contracts, carrying
+`computed_uncalibrated` or `proposed_uncalibrated` status. Raw protocol file pins
+are distinct from the contract's canonical-JSON protocol digest. A changed raw
+file without a new pin is refused; isolated whitespace plus a matching new raw
+pin preserves the same canonical identity; a wrong canonical reference is
+refused. These fixture edits never modify owner files or scientific results.
+
+The changed compiler lines were read. No additional substantive bypass was found
+within those changes and these bounded probes. No general fuzzing or full test
+suite was attempted. Focused Ruff passed.
+
+## Optional final Delphi video scope review
+
+Viewed both final 60/120-second contact sheets and the 120-second cut's 100-second
+full frame; read the actual edited storyboard and TTS narration source. Exact
+six input file hashes and sampled findings are in `video-portal-qa.json`.
+The sampled visuals retain illustrative/schematic warnings, end-loaded theorem
+scope, intended compiler output versus current artifact checks, authenticated
+proposals versus executed results, and retained model nonconvergence. No blocking
+source-versus-result or biological overclaim was identified in those samples or
+the read narration text. Functional replacements are framed for context-specific
+testing, not guaranteed interchangeability or flight.
+
+This was not continuous full-video playback or audio listening. The absence of
+misleading frames elsewhere was not established. No video files were edited.
 
 ## Publication and molecular-queue checks
 

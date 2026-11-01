@@ -6,6 +6,7 @@ import json
 import tempfile
 import types
 import platform
+import shutil
 
 
 def main(compiler, ledger_root, output):
@@ -112,6 +113,38 @@ def main(compiler, ledger_root, output):
                 {'positive': 2, 'negative': 1, 'negative_rejected': True})
             results['bound_records_string_endpoint_diagnostic'] = bound_records('false', 'pass',
                 {'positive': 2, 'negative': 1, 'negative_rejected': True})
+    if getattr(module, 'INSTRUMENT_FILE', '').endswith('instrument-contracts.json'):
+        compiler_root = compiler.parents[2]
+        paths = [Path(module.INSTRUMENT_FILE), Path(module.INSTRUMENT_MANIFEST), Path(module.PROTOCOL_FILE)]
+        returned = module.instrument_contracts(compiler_root)
+        results['current_DOE_binding'] = {'returned': returned,
+            'input_files': [{'path': str(p), 'sha256': sha256((compiler_root/p).read_bytes()).hexdigest()}
+                            for p in paths]}
+        generated = module.build_files(compiler_root)
+        results['regenerated_compiler_artifacts_match'] = {
+            name: (compiler_root/'artifacts/biodesign-compiler'/name).read_text() == text
+            for name, text in generated.items()}
+        with tempfile.TemporaryDirectory() as dirname:
+            root = Path(dirname)
+            for p in paths:
+                (root/p).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(compiler_root/p, root/p)
+            results['DOE_exact_copy'] = module.instrument_contracts(root)
+            protocol = root / module.PROTOCOL_FILE
+            protocol.write_bytes(protocol.read_bytes()+b'\n')
+            results['DOE_changed_protocol_without_new_pin'] = module.instrument_contracts(root)
+            manifest = root / module.INSTRUMENT_MANIFEST
+            data = json.loads(manifest.read_text())
+            data['files']['protocol.json']['sha256'] = sha256(protocol.read_bytes()).hexdigest()
+            manifest.write_text(json.dumps(data))
+            results['DOE_whitespace_new_raw_pin_same_canonical'] = module.instrument_contracts(root)
+            contract = root / module.INSTRUMENT_FILE
+            doc = json.loads(contract.read_text())
+            doc['protocol_sha256'] = '0'*64
+            contract.write_text(json.dumps(doc))
+            data['files']['instrument-contracts.json']['sha256'] = sha256(contract.read_bytes()).hexdigest()
+            manifest.write_text(json.dumps(data))
+            results['DOE_wrong_canonical_protocol'] = module.instrument_contracts(root)
     output.write_text(json.dumps(results, indent=2, allow_nan=False)+'\n')
     print(json.dumps({'compiler_sha256': results['compiler_file_sha256'],
                      'valid_sequences': results['actual_ledger']['valid_sequences'],
