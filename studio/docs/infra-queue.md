@@ -149,3 +149,9 @@ At11:05pm PDT on October31, the45-arm aeroelastic packet was complete and VM04 h
 - [ ] Admit one frozen Voxcraft H100 compatibility/control probe after immutable-output packaging fixtures pass.
 - [ ] Admit the epithelial interval-threshold CPU sweep only after source/transport/finite-cardinality repairs. Thresholds remain intervals; descriptive and unevaluable gates are not passes.
 - [ ] Review the source-grounded VLM analytic diagnosis before any additional fin simulation.
+
+- [x] Admit Voxcraft job aijob-e00wfnzb38fccw6k57: accepted11:38:06pm PDT;11:42pm read IMAGE_PULLING, no kernel activity claimed.
+- [x] Admit VLM4CPU worker04 at11:41:04pm PDT,900s science bound; native and diagnostic variants remain separate.
+- [x] Admit epithelial8CPU worker02 at11:41:51pm PDT,5400s whole-tree bound; frozen interval/finite completeness criteria preserved.
+- [x] Start bounded automatic collection services for both Google prefixes.
+- [ ] Independently verify returned files and hand native science to their owners; retain compiler failures, incomplete families and unresolved brackets.
