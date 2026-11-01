@@ -870,6 +870,76 @@ LATER["materials"] = materials_chain
 ALL_CHAINS = {**CHAINS, **LATER}
 
 
+# ------------------------------------------------------------------------------------------------------------- fish regulatory research map
+RM = "artifacts/fish-regulatory-map"
+RM_DOC = "docs/research/fish-regulatory-map-2026-10-31.md"
+RM_SCALE = {"fin-multiome": "cellular", "fin-epigenome": "molecular", "enriched-fin-scrna": "cellular", "developmental-reference": "cellular"}
+
+
+def regmap_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """A source-only map of zebrafish regulatory datasets. Claims state what each cited source reports, for ONE species and assay; no Action, no inference.
+
+    Every row and dataset is Danio rerio. Nothing here maps DNA to fin shape or transfers to a flying fish (the map's own coupling ports are all `unknown`).
+    The map's source manifest names local response files outside the repository; their sha256 values are carried, never recomputed, and the paths are dropped.
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "regmap")
+    man = c.jblob(f"{RM}/manifest.json")
+    pinned = {f["path"]: c.same_hash(f"file.{f['path']}", f["path"], f["sha256"]) for f in man["files"]}
+    mp, sc = json.loads(pinned[f"{RM}/map.json"]), json.loads(pinned[f"{RM}/sources.json"])
+    doc = pinned[RM_DOC]
+    c.check("map.status", mp["status"] == "source-only" and mp["organism"] == "Danio rerio" and mp["target_organism_transfer"] == "flying-fish transfer unknown", f"status {mp['status']!r}, organism {mp['organism']!r}")
+    c.check("map.no_inference", mp["new_model_inference_performed"] is False and mp["blocked_generation_replayed"] is False and mp["whole_organism_genome_design_available"] is False and mp["biological_success_probability"] is None, "no inference, replay, genome design or success probability")
+    c.check("map.counts", (len(mp["rows"]), len(mp["datasets"]), len(mp["proposed_next_actions"])) == (7, 4, 3), f"rows {len(mp['rows'])}, datasets {len(mp['datasets'])}, actions {len(mp['proposed_next_actions'])}")
+    c.check("rows.all_zebrafish_untransferred", all(r["species"]["scientific_name"] == "Danio rerio" and r["biological_transfer_validated"] is False for r in mp["rows"]), "every row is Danio rerio with biological_transfer_validated false")
+    c.check("ports.all_unknown", all(p["status"] == "unknown" and p["value"] is None for p in mp["coupling_ports"]), f"{len(mp['coupling_ports'])} coupling ports, all unknown")
+    c.check("actions.all_unexecuted", all(a["status"] in ("proposed-not-executed", "conditional-proposal-not-executed") for a in mp["proposed_next_actions"]), f"statuses {[a['status'] for a in mp['proposed_next_actions']]}")
+    srcs = {x["id"]: x for x in sc["sources"]}
+    c.check("rows.sources_listed", all(i in srcs for r in mp["rows"] for i in r["source_ids"]) and all(i in srcs for d in mp["datasets"] for i in d["source_ids"]), "every cited source id is in the source manifest")
+    def src_cards(ids):
+        # A public GEO URL carries a query string; the curated-output guard refuses query-string URLs, so the query is split off and kept as its own field.
+        return [{"id": i, "primary_url": srcs[i]["primary_url"].split("?")[0], "url_query": srcs[i]["primary_url"].partition("?")[2] or None, "response_sha256": srcs[i]["response_sha256"], "response_bytes": srcs[i]["response_bytes"], "read_scope": srcs[i]["read_scope"]} for i in ids]
+    lim = [em.IMPORT_NOTE, "Source-only: a research map of what cited sources report in Danio rerio. No new sequence design, model inference or generation replay was performed.",
+           "Flying-fish transfer is unknown; no row is validated for transfer; all four coupling ports (expression to conductance, voltage to proliferation, cell state to deposition, deposition to ray geometry and EI) have value null and status unknown.", NOT_CALIBRATED,
+           "The source responses are retained outside the repository; their sha256 values are carried from the source manifest and were not recomputed here."]
+    arts = lambda: [c.artifact("input", f"{RM}/map.json", pinned[f"{RM}/map.json"], "regulatory map"), c.artifact("input", f"{RM}/sources.json", pinned[f"{RM}/sources.json"], "source manifest with response hashes"),  # noqa: E731
+                    c.artifact("input", RM_DOC, doc, "readable report"), c.artifact("log", f"{RM}/manifest.json", c.blob(f"{RM}/manifest.json"), "manifest pinning each file by sha256")]
+    for r in mp["rows"]:
+        sp, st = r["species"], r["states"]
+        acc = ", ".join(r["accessions"]) or "none recorded in the map"
+        stmt = (f"In {sp['scientific_name']} ({sp['common_name']}) {r['tissue']}, context {r['context']} ({st['condition']}" + (f"; {', '.join(str(x) for x in st['timepoints_dpa'])} dpa" if "timepoints_dpa" in st else "") + f"), the cited source reports {r['reported_measurements']} with markers {', '.join(r['genes_or_markers'])}. "
+                f"Assays: {', '.join(r['assays'])}; accessions: {acc}. Authors' demonstration: {r['demonstrated']} Inferred, not demonstrated: {r['inferred']}")
+        cl = _claim(c, f"run-regmap-claim-{r['id']}", f"Zebrafish {r['id'].replace('-', ' ')} regulatory program: what the cited source reports, source-only",
+                    stmt, f"Species Danio rerio only; transfer to flying fish unknown. Inference boundary: {r['inference_boundary']}. Missing bridge: {r['missing_bridge']}.",
+                    [f"Assays as the map lists them: {', '.join(r['assays'])}.", f"Paper selectors: {', '.join(r['paper_selectors'])}."], lim, f"{RM}/map.json", pinned[f"{RM}/map.json"], "Map row.")
+        _evidence(c, SRC, f"run-regmap-evidence-{r['id']}", cl, kind="source_assessment", relation="context_only", produced_by=None, source=em._source(c, f"{RM}/map.json", pinned[f"{RM}/map.json"], "Map row."),
+                  method=f"A researcher read the cited sources ({', '.join(r['source_ids'])}) at the selectors in the row and recorded what is demonstrated and what is inferred. No sequencing array was downloaded and no model ran.",
+                  context="A source assessment with no simulator Action by design. " + em.IMPORT_NOTE, assumptions=[f"Selectors: {', '.join(r['paper_selectors'])}."],
+                  provenance=_prov(c, row=r["id"], species=sp, tissue=r["tissue"], states=st, assays=r["assays"], accessions=r["accessions"], sources=src_cards(r["source_ids"]), biological_transfer_validated=False, response_bytes_in_repository=False),
+                  limitations=lim + [f"Missing bridge: {r['missing_bridge']}."], artifacts=arts(), uncertainty="Single reader; no interval. A row states what a source reports, not a measurement by this project.")
+    for d in mp["datasets"]:
+        scale = RM_SCALE[d["id"]]
+        stmt = (f"Dataset {d['id']}: {d['species']}, {d['tissue']}, state {d['state']}; assays {', '.join(d['assays'])}; accessions {', '.join(d['accessions'])}" + (f"; reference {d['reference']}" if d.get("reference") else "") + (f"; replication {d['replication']}" if d.get("replication") else "")
+                + ". " + (f"Checked: {d['checked']}." if d.get("checked") else "What was checked is NOT recorded in the map for this dataset.") + (f" Authors' demonstration: {d['demonstrated']}" if d.get("demonstrated") else ""))
+        cl = _claim(c, f"run-regmap-claim-dataset-{d['id']}", f"Zebrafish dataset {d['id']}: species, assay, accession and coverage as the map records them",
+                    stmt, f"Danio rerio only; scale declared as {scale} (the store has no genomic scale).", [], lim, f"{RM}/map.json", pinned[f"{RM}/map.json"], "Map dataset entry.")
+        _evidence(c, SRC, f"run-regmap-evidence-dataset-{d['id']}", cl, kind="source_assessment", relation="context_only", produced_by=None, source=em._source(c, f"{RM}/map.json", pinned[f"{RM}/map.json"], "Map dataset entry."),
+                  method=f"Dataset entry read from the research map; sources {', '.join(d['source_ids'])}. No sequencing data were downloaded for this record.", context="A source assessment of dataset availability and coverage. " + em.IMPORT_NOTE, assumptions=[],
+                  provenance=_prov(c, dataset=d["id"], accessions=d["accessions"], assays=d["assays"], sources=src_cards(d["source_ids"]), coverage_checked=d.get("checked"), response_bytes_in_repository=False),
+                  limitations=lim, artifacts=arts(), uncertainty="Metadata-level only; replicate identity and file manifests are exactly what the proposed coverage audit would check.")
+    for a in mp["proposed_next_actions"]:
+        c.add(c.draft("Problem", f"run-regmap-problem-{a['id']}", {
+            "title": f"{'Conditional proposal' if a['status'].startswith('conditional') else 'Proposed'}, not executed: {a['id']}", "known_state": f"Map status '{a['status']}': NOT executed" + (", and not dispatchable until labels and access permissions are established. " if a["status"].startswith("conditional") else ". ") + a["claim_boundary"], "question": a["question"], "problem_kind": "project_gap",
+            "novelty_status": "Not searched beyond the research map.", "data_access": "Inputs: " + "; ".join(a["inputs"]) + ". No data downloaded for this record.", "completeness": "recorded",
+            "next_action": a["method"], "cost_stop_bounds": f"{a['bound']}. Stop rule: {a['stop_rule']}", "required_capabilities": a["inputs"], "downstream_uses": ["Outputs the map names: " + "; ".join(a["outputs"])],
+            "dependencies": [], "source": em._source(c, f"{RM}/map.json", pinned[f"{RM}/map.json"], "Map proposed action."), "original": {"map_action_id": a["id"], "map_status": a["status"]}, "approach": "measurement"}, SRC))
+    return c
+
+
+LATER["regmap"] = regmap_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- bundles
 # Root is making the repository public after a credential/history audit: no curated output may carry a presigned URL or a secret-looking field.
 SECRETISH = re.compile(r"X-Amz|Signature=|Expires=|presign|[?&]token=|access[_-]?key|secret|passw(?:or)?d|api[_-]?key|bearer|authorization|AKIA[0-9A-Z]{8}|sk-[A-Za-z0-9]{16}|BEGIN [A-Z ]*PRIVATE|\.credentials|https?://[^\"\s]*\?", re.I)
