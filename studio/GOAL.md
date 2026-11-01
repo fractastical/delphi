@@ -90,6 +90,8 @@ about a proposed action.
   planner; connect observed-data updates to reusable transfer models (SPEC-013).
 - [ ] Track alternative organism assemblies, per-level iteration and explicit
   compilation failures or unresolved biological interfaces (SPEC-014).
+- [ ] Demonstrate bounded inverse design and held-out robustness checks; track
+  empirical first-attempt success as a future measured outcome (SPEC-015).
 
 Current owners, evidence and blockers are tracked in `tasks/BUILD.md`. A checked
 implementation is distinct from deployment, and either is distinct from biological
