@@ -18,10 +18,10 @@ sub:Head {
 
 sub:assertion {
   <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test> a delphi:Assessment ;
-    rdfs:label "Claim test of thompson1917-ch07-08: supports, confidence 0.65" ;
+    rdfs:label "Claim test of thompson1917-ch07-08: mixed, confidence 0.6" ;
     delphi:assessmentType "claim-test/0.1.0" ;
-    delphi:hasVerdict "supports" ;
-    delphi:hasConfidence "0.65"^^xsd:double ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
     delphi:hypothesis "If regular hexagonal packing arises only where cells are uniform in size (and forces uniform), then within an epithelium that Thompson names as the showcase of regular hexagons, the retinal pigment epithelium, the local regularity of the cell polygons must track the local uniformity of cell size: regions whose cells are more uniform in area must have a higher fraction of six-sided cells and a lower spread of neighbour numbers than regions whose cells vary more in area." ;
     delphi:passCriterion "Pre-registered. For every corrected RPE segmentation ROI of the 10 participants in Granger et al. 2018 (in vivo adaptive-optics imaging of the human RPE mosaic), identify the cells not touching the ROI border, their pixel areas and their numbers of neighbours. For ROIs with >= 30 interior cells compute the coefficient of variation of cell area (CV_A), the fraction of six-sided cells (f6) and the standard deviation of neighbour number (SD_n). The claim is supported if, across ROIs, Spearman's rho between f6 and CV_A is <= -0.3 with p < 0.01, and the mean f6 of the quartile of ROIs with the lowest CV_A exceeds that of the highest-CV_A quartile by at least 0.10 (ten percentage points). SD_n versus CV_A (expected positive) is reported as a consistency check." ;
     delphi:failCriterion "Pre-registered. The claim is refuted if Spearman's rho between f6 and CV_A is >= 0, or if the relation is not significant (p >= 0.05) with the quartile difference in f6 below 0.05, i.e. hexagon regularity does not track size uniformity. Intermediate results (e.g. significant but weak, rho in (-0.3, 0)) are 'mixed'. If fewer than 20 ROIs qualify the verdict is inconclusive (underpowered)." ;
@@ -41,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "Dryad downloads are served behind a proof-of-work interstitial (Anubis); analysis.py completes it automatically." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/229294d34560c617adbe4427c894083ec62faebb/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/fa08361f1619e8660cca144eeaac44dcbe0f187a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/result.json> .
   <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-08--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Data from: Human retinal pigment epithelium: in vivo cell morphometry, multispectral autofluorescence, and relationship to cone mosaic (Granger, Zhang, Liu, Morgan, Rossi, Williams 2018, Invest Ophthalmol Vis Sci 59:5705-5716)" ;
     dct:description "Participant archives NOR011, NOR025, NOR047, NOR053, NOR057, NOR062, NOR063, NOR064, NOR065, NOR073; the 'RPE ROIs - Corrected Segmentation' TIFFs (184 x 184 px, ~0.81-0.92 um/px, grader-corrected cell boundaries) were used; 206 ROIs in total" ;
@@ -67,17 +67,26 @@ sub:assertion {
     prov:atLocation <https://datadryad.org/downloads/file_stream/92656> ;
     prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.b41j15h> ;
     dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/activity/thompson1917-ch07-08--claim-test--revision-1> a prov:Activity ;
+    rdfs:label "Revision 1 of the thompson1917-ch07-08 claim test (2026-11-01)" ;
+    dct:description "Two further runs on expert-segmented Drosophila epithelia (wing-disc-timelapse/, pupal-wing-vein-intervein/). (1) Inside five proliferating wing discs, cells whose neighbours are uniform in size are no more often six-sided than cells in mixed-size neighbourhoods (decile gap -0.03 to +0.06, pre-registered pass 0.10), and the most uniform decile reaches only 0.32-0.38 hexagons; the within-tissue size effect is Lewis's law (own area predicts sides, rho 0.43-0.51, see thompson1917-ch07-10/lewis-law-timelapse) not an effect of uniformity. (2) In three pupal wings, vein cells under convergent extension are 1.5-1.8 times more elongated than inter-vein cells yet are more, not less, often hexagonal (0.75-0.84 vs 0.74-0.76), so 'directional traction' elongates hexagons but does not make the packing irregular in topology. Together with the RPE run (between-region support) and the cross-tissue correlation in claim-sources/cell-geometry (rho -0.9), the fair verdict for Thompson's sentence is mixed: its between-tissue reading holds, its mechanistic reading (uniform size and isotropic force produce the regularity) does not follow within tissues, and the 'elongated' arm of his disjunction is what traction actually produces." ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    prov:used <https://github.com/fractastical/delphisci/blob/fa08361f1619e8660cca144eeaac44dcbe0f187a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/wing-disc-timelapse/derived/summary.json;%20test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/pupal-wing-vein-intervein/derived/summary.json> ;
+    delphi:evidenceAgainst "Before: between RPE regions, six-sided fraction falls as cell-area CV rises (rho -0.6, quartile gap 0.17) (confidence 0.65). After: between tissues and regions size uniformity goes with hexagons; within a proliferating tissue local size uniformity predicts nothing; directional traction elongates hexagons without disrupting them (confidence 0.6)." ;
+    prov:wasInformedBy () .
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test> prov:qualifiedRevision <https://w3id.org/delphi/resource/activity/thompson1917-ch07-08--claim-test--revision-1> ;
+    dct:contributor  .
   <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test> .
 }
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/229294d34560c617adbe4427c894083ec62faebb/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/fa08361f1619e8660cca144eeaac44dcbe0f187a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/result.json>, <https://github.com/fractastical/delphisci/blob/fa08361f1619e8660cca144eeaac44dcbe0f187a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/wing-disc-timelapse/derived/summary.json;%20test-data/claim-tests/thompson-growth-form/thompson1917-ch07-08/pupal-wing-vein-intervein/derived/summary.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/229294d34560c617adbe4427c894083ec62faebb/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/fa08361f1619e8660cca144eeaac44dcbe0f187a/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/thompson-claim-tests-cf12)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -87,9 +96,9 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-11-01T04:42:19.080Z"^^xsd:dateTime ;
+  this: dct:created "2026-11-01T04:57:17.026Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
-    rdfs:label "Claim test of thompson1917-ch07-08: supports, confidence 0.65" ;
+    rdfs:label "Claim test of thompson1917-ch07-08: mixed, confidence 0.6" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     npx:hasNanopubType delphi:Assessment ;
     npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-08--claim-test> ;

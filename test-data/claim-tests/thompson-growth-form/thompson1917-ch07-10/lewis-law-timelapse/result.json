@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch07-10",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-10",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If close-packed cells of varying size are hexagonal on average, with the larger ones having more and the smaller ones fewer than six sides, then in expert-segmented epithelia the mean neighbour number of interior cells is 6 and neighbour number increases monotonically with cell area (Lewis 1928's relation, mean area linear in polygon class), in proliferating and in post-mitotic tissue alike.",
   "pass_criterion": "Pre-registered. In each of the five wing-disc movies (Dye et al., every 10th frame) and the three pupal wings (Etournay et al. 2015, every 10th frame), for interior cells: mean neighbour number; Spearman rho between area and neighbour number; and, for polygon classes 4 to 8 with at least 50 cells, the mean area relative to the frame median per class. Supported if in at least seven of the eight tissues the mean neighbour number lies in [5.85, 6.15], rho(area, n) >= 0.3, and the class means increase strictly from 4 through 8 sides. Diagnostic (Lewis's law proper): the least-squares slope of mean relative area against n over classes 4-8 and the R^2 of the linear fit; Lewis's original form predicts area proportional to (n - 2), i.e. a positive intercept-free fit in (n - 2).",
   "fail_criterion": "Pre-registered. Refuted if in at least four tissues rho(area, n) < 0.1 or the class means are not monotone (larger cells do not have more sides), or if the mean neighbour number falls outside [5.7, 6.3] in four or more tissues. Otherwise 'mixed'. The mean-neighbour-number part is forced by Euler's formula for three-way-vertex tilings and is reported as a check, not as evidence; the informative part is the size-sides relation, which Euler does not force.",
@@ -17,12 +17,367 @@
     "inference_method": "Per tissue: mean neighbour number, Spearman rho(area, n), monotonicity of class mean areas for 4-8 sides, slope and R^2 of area against n; verdict by count of tissues meeting all conditions."
   },
   "interpretation": "The first run of this claim (top-level result.json, Cellpose on five tissue images) confirmed the mean of six and noted that Euler forces it. Thompson's sentence has a second part, that where sizes vary irregularly 'some have fewer and some more than six sides', which he attributes to size: the bigger corallites take more neighbours. That is Lewis's law (F. T. Lewis 1928, Anat Rec 38:341, cucumber epidermis), and it is not forced by topology: a tiling can have varying areas with sides independent of area. This run tests that second part on 2.5 million expert-segmented cell-frames from two developmental states. Data are on disk from the ch07-09 runs; area-by-polygon-class statistics had not been computed before this pre-registration (the ch07-09 run reported only a pooled Spearman rho between relative area and n, 0.43-0.51 in the discs and 0.29-0.32 in the wings, which this run will re-derive per frame and extend to class means).",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "data_kind": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "local-agent", "model": "claude-fable-5.1", "run": "cursor local session, hexagon follow-up", "date": "2026-11-01" }
+  "datasets": [
+    {
+      "id": "zenodo-22760592-dye-2026-drosophila-wing-disc-timelapse-tissueminer",
+      "name": "Timelapse imaging, boundary segmentation, and cell tracking data from cultured proliferating Drosophila wing disc epithelia (Dye et al.; MPI-CBG Dresden)",
+      "landing_url": "https://zenodo.org/records/22760592",
+      "doi": "10.5281/zenodo.22760592",
+      "version": "published 2026-09-15",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/api/records/22760592/files/Ecd_20141010_P2.zip/content",
+          "byte_size": 508297574,
+          "sha256": "0eb41b1e0fbfb23b1af3950c14ad06834c40c6debf639ab572c2ecff006fb478",
+          "retrieved_at": "2026-11-01T03:10:55Z",
+          "role": "Ecd_20141010_P2"
+        },
+        {
+          "download_url": "https://zenodo.org/api/records/22760592/files/Ecd_20150310_P2.zip/content",
+          "byte_size": 753178795,
+          "sha256": "07b74f7594a99bd3243e7fde4f1c23967f7256db7db91cccc4a4eb0dd0de4a0c",
+          "retrieved_at": "2026-11-01T03:10:55Z",
+          "role": "Ecd_20150310_P2"
+        },
+        {
+          "download_url": "https://zenodo.org/api/records/22760592/files/Ecd_20150418_P1.zip/content",
+          "byte_size": 574366607,
+          "sha256": "dcfc9f79b387b0657723731bcf79fab0d600600161f57577cb54748239a1ef69",
+          "retrieved_at": "2026-11-01T03:10:55Z",
+          "role": "Ecd_20150418_P1"
+        },
+        {
+          "download_url": "https://zenodo.org/api/records/22760592/files/Ecd_20150608_P1.zip/content",
+          "byte_size": 508316581,
+          "sha256": "79c52b04b414fc0f4dcb1a73053c2e96f5db02b39b9dff3e0eb25a54e2d25f2d",
+          "retrieved_at": "2026-11-01T03:10:55Z",
+          "role": "Ecd_20150608_P1"
+        },
+        {
+          "download_url": "https://zenodo.org/api/records/22760592/files/Ecd_20161213_F0.zip/content",
+          "byte_size": 561531327,
+          "sha256": "8a3ee532c89950bc0f4880ff243593e0c7917f080e352bd41ac6f215ac9da6c0",
+          "retrieved_at": "2026-11-01T03:10:55Z",
+          "role": "Ecd_20161213_F0"
+        }
+      ],
+      "role": "five proliferating wing disc pouches, every 10th frame"
+    },
+    {
+      "id": "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing",
+      "name": "TissueMiner example datasets WT_1, WT_2, WT_3: the three wild-type E-cadherin-GFP Drosophila pupal wing time-lapses of Etournay et al. 2015 (eLife 4:e07090), as TissueMiner SQLite databases with the authors' frame-200 region-of-interest polygons (Etournay et al. 2016, eLife 5:e14334)",
+      "landing_url": "https://github.com/mpicbg-scicomp/tissue_miner#datasets",
+      "doi": "10.7554/eLife.14334",
+      "version": "databases dated 2016-01-10 inside the archives",
+      "license": "not stated for the data files; TissueMiner repository BSD-licensed (MPI-CBG), archives offered for public download",
+      "files": [
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_1.tar.gz",
+          "byte_size": 814414597,
+          "sha256": "994779314e39a906b9e171c7f2da0b12cacd94708bb09d6a70236ca62cec53ae",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "role": "WT_1"
+        },
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_2.tar.gz",
+          "byte_size": 814341054,
+          "sha256": "119d0facc43b480a7673ef4b8e0405368cccca28fc9456ed0a8767d77c4792dd",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "role": "WT_2"
+        },
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_3.tar.gz",
+          "byte_size": 581521619,
+          "sha256": "db5de2a3b6a1547eac5a19227c90cd7408de4b54db6a8992847963996faa8df8",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "role": "WT_3"
+        }
+      ],
+      "role": "three pupal wings, every 10th frame"
+    }
+  ],
+  "method": "For each of the eight TissueMiner databases, every 10th frame, interior cells (no bond with the margin cell) were listed with neighbour number n and area relative to the frame median. Per tissue: mean and SD of n, Spearman rho between relative area and n, mean relative area per polygon class for n = 4..8 (all classes had >= 276 cells), whether those class means increase strictly, the least-squares line of class mean area on n (slope, intercept, R^2), and Lewis's intercept-free form area = k (n - 2) with its R^2. Verdict by the pre-registered count of tissues meeting all three conditions.",
+  "measured": {
+    "value": 0.443,
+    "unit": "median over tissues of Spearman rho between relative cell area and neighbour number",
+    "n": 254970,
+    "uncertainty": "discs 0.44-0.51, pupal wings 0.29-0.32; class means monotone 4..8 in 8 of 8 tissues",
+    "extra": {
+      "per_tissue": [
+        {
+          "tissue": "Ecd_20141010_P2",
+          "stage": "disc",
+          "frames_used": 16,
+          "cell_frames": 30421,
+          "mean_n": 5.9262,
+          "sd_n": 1.0079,
+          "f6": 0.4016,
+          "rho_area_n": 0.499,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6388,
+            "5": 0.8644,
+            "6": 1.1015,
+            "7": 1.3377,
+            "8": 1.6481
+          },
+          "class_counts": {
+            "4": 1691,
+            "5": 8214,
+            "6": 12216,
+            "7": 6543,
+            "8": 1372
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2492,
+          "intercept": -0.3771,
+          "r2_linear": 0.9959,
+          "lewis_k": 0.2762,
+          "r2_lewis_n_minus_2": 0.9828
+        },
+        {
+          "tissue": "Ecd_20150310_P2",
+          "stage": "disc",
+          "frames_used": 16,
+          "cell_frames": 42805,
+          "mean_n": 5.9266,
+          "sd_n": 1.1838,
+          "f6": 0.381,
+          "rho_area_n": 0.461,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.7054,
+            "5": 0.9034,
+            "6": 1.1231,
+            "7": 1.3526,
+            "8": 1.7347
+          },
+          "class_counts": {
+            "4": 2906,
+            "5": 11632,
+            "6": 16309,
+            "7": 8626,
+            "8": 2327
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2508,
+          "intercept": -0.3408,
+          "r2_linear": 0.9809,
+          "lewis_k": 0.2865,
+          "r2_lewis_n_minus_2": 0.9585
+        },
+        {
+          "tissue": "Ecd_20150418_P1",
+          "stage": "disc",
+          "frames_used": 16,
+          "cell_frames": 36021,
+          "mean_n": 5.9129,
+          "sd_n": 1.0396,
+          "f6": 0.3795,
+          "rho_area_n": 0.438,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6842,
+            "5": 0.9008,
+            "6": 1.1431,
+            "7": 1.3625,
+            "8": 1.6809
+          },
+          "class_counts": {
+            "4": 2443,
+            "5": 9991,
+            "6": 13671,
+            "7": 7677,
+            "8": 1796
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2455,
+          "intercept": -0.3187,
+          "r2_linear": 0.9946,
+          "lewis_k": 0.2838,
+          "r2_lewis_n_minus_2": 0.9674
+        },
+        {
+          "tissue": "Ecd_20150608_P1",
+          "stage": "disc",
+          "frames_used": 15,
+          "cell_frames": 31439,
+          "mean_n": 5.9246,
+          "sd_n": 1.0209,
+          "f6": 0.39,
+          "rho_area_n": 0.447,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6783,
+            "5": 0.8968,
+            "6": 1.1109,
+            "7": 1.3621,
+            "8": 1.6625
+          },
+          "class_counts": {
+            "4": 1919,
+            "5": 8648,
+            "6": 12260,
+            "7": 6686,
+            "8": 1548
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2434,
+          "intercept": -0.3181,
+          "r2_linear": 0.9947,
+          "lewis_k": 0.2808,
+          "r2_lewis_n_minus_2": 0.9681
+        },
+        {
+          "tissue": "Ecd_20161213_F0",
+          "stage": "disc",
+          "frames_used": 18,
+          "cell_frames": 34818,
+          "mean_n": 5.9029,
+          "sd_n": 1.024,
+          "f6": 0.4001,
+          "rho_area_n": 0.511,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6539,
+            "5": 0.8765,
+            "6": 1.1163,
+            "7": 1.3726,
+            "8": 1.7628
+          },
+          "class_counts": {
+            "4": 2171,
+            "5": 9493,
+            "6": 13930,
+            "7": 7130,
+            "8": 1576
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2714,
+          "intercept": -0.472,
+          "r2_linear": 0.9861,
+          "lewis_k": 0.2871,
+          "r2_lewis_n_minus_2": 0.9824
+        },
+        {
+          "tissue": "WT_1",
+          "stage": "pupal",
+          "frames_used": 21,
+          "cell_frames": 27078,
+          "mean_n": 5.978,
+          "sd_n": 0.6989,
+          "f6": 0.6116,
+          "rho_area_n": 0.317,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6372,
+            "5": 0.8862,
+            "6": 1.0444,
+            "7": 1.2458,
+            "8": 1.5835
+          },
+          "class_counts": {
+            "4": 372,
+            "5": 5185,
+            "6": 16560,
+            "7": 4520,
+            "8": 390
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2252,
+          "intercept": -0.2719,
+          "r2_linear": 0.9832,
+          "lewis_k": 0.2649,
+          "r2_lewis_n_minus_2": 0.9489
+        },
+        {
+          "tissue": "WT_2",
+          "stage": "pupal",
+          "frames_used": 21,
+          "cell_frames": 28200,
+          "mean_n": 5.9805,
+          "sd_n": 0.665,
+          "f6": 0.6372,
+          "rho_area_n": 0.288,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6081,
+            "5": 0.8923,
+            "6": 1.0512,
+            "7": 1.2595,
+            "8": 1.5544
+          },
+          "class_counts": {
+            "4": 293,
+            "5": 5113,
+            "6": 17969,
+            "7": 4447,
+            "8": 336
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.226,
+          "intercept": -0.2828,
+          "r2_linear": 0.9901,
+          "lewis_k": 0.2636,
+          "r2_lewis_n_minus_2": 0.9593
+        },
+        {
+          "tissue": "WT_3",
+          "stage": "pupal",
+          "frames_used": 21,
+          "cell_frames": 24188,
+          "mean_n": 5.9773,
+          "sd_n": 0.6665,
+          "f6": 0.6335,
+          "rho_area_n": 0.299,
+          "p_area_n": 0.0,
+          "class_mean_rel_area": {
+            "4": 0.6638,
+            "5": 0.8861,
+            "6": 1.0383,
+            "7": 1.2397,
+            "8": 1.5848
+          },
+          "class_counts": {
+            "4": 248,
+            "5": 4458,
+            "6": 15322,
+            "7": 3846,
+            "8": 276
+          },
+          "monotone_4_to_8": true,
+          "slope_per_side": 0.2196,
+          "intercept": -0.2348,
+          "r2_linear": 0.9781,
+          "lewis_k": 0.265,
+          "r2_lewis_n_minus_2": 0.9311
+        }
+      ],
+      "verdict_counts": {
+        "tissues_all_conditions": 6,
+        "tissues_rho_lt_0_1_or_nonmonotone": 0,
+        "tissues_mean_n_outside_5_7_6_3": 0
+      },
+      "median_mean_n": 5.9264,
+      "median_r2_linear": 0.9881,
+      "median_r2_lewis_n_minus_2": 0.9634,
+      "literature_reference": "F. T. Lewis 1928, Anat Rec 38:341 (cucumber epidermis): mean cell area linear in number of sides, area proportional to (n - 2)."
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.6,
+  "caveats": [
+    "Pre-registered support criterion met in 6 of 8 tissues (7 required), refutation criterion in 0; verdict 'mixed' by the pre-registered rule. The substantive relation holds in every tissue: mean relative area rises strictly from 4- to 8-sided cells (about 0.65, 0.89, 1.1, 1.35, 1.65 in the discs; 0.63, 0.89, 1.04, 1.25, 1.57 in the pupal wings), linear in n with R^2 0.98-0.996 and a slope of 0.22-0.27 median-areas per side; Lewis's intercept-free form area = k (n - 2) fits with R^2 0.93-0.98. The two misses are the pupal wings WT_2 and WT_3 with rho 0.288 and 0.299 against the 0.3 threshold: rank correlation shrinks where area variance shrinks (area CV 0.34 post-mitotic against 0.5 proliferating), while the class means stay monotone and linear.",
+    "Mean neighbour number is 5.90-5.93 in the discs and 5.98 in the pupal wings, inside the pre-registered band; this part is forced by Euler's formula for tilings with three-way vertices (1.2-1.6% four-way vertices in the discs account for the deficit) and is a check, not evidence. The size-sides relation is the informative part and is not forced by topology.",
+    "This tests Thompson's 1917 sentence about close-packed cells of varying size and finds that its second clause is Lewis's law, stated by F. T. Lewis in 1928 from cucumber epidermis and here recovered in insect epithelia in two developmental states. Thompson's own example, coral corallites, is not tested; the first run of this claim (Cellpose on five tissue images) tested only the mean of six.",
+    "Cells of the same tissue across sampled frames are not independent (every 10th frame, 15-20 frames per tissue), so the Spearman p-values are descriptive. Relative area uses the frame median to remove growth and projection scale. Historical claim; one cell type, one lab's segmentation conventions for both datasets. Data were on disk before pre-registration (commit fa08361f); the pooled rho had been reported in the ch07-09 runs, the class means and fits had not been computed."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor local session, hexagon follow-up",
+    "date": "2026-11-01"
+  }
 }
