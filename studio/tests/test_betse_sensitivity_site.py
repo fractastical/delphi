@@ -19,10 +19,14 @@ def test_betse_sensitivity_card_preserves_run_and_reconstruction_provenance():
 
     card = build_card(lambda path: (ROOT / path).read_bytes(), publish)
 
-    assert copied == [
-        ("sensitivity.mp4", sha256((ROOT / f"{DIRECTORY}/reconstructed/sensitivity.mp4").read_bytes()).hexdigest()),
-        ("sensitivity-poster.png", sha256((ROOT / f"{DIRECTORY}/reconstructed/sensitivity-poster.png").read_bytes()).hexdigest()),
+    assert copied[:2] == [
+        ("reconstructed/sensitivity.mp4", sha256((ROOT / f"{DIRECTORY}/reconstructed/sensitivity.mp4").read_bytes()).hexdigest()),
+        ("reconstructed/sensitivity-poster.png", sha256((ROOT / f"{DIRECTORY}/reconstructed/sensitivity-poster.png").read_bytes()).hexdigest()),
     ]
+    assert len(copied) == 6
+    for rel, digest in copied:
+        assert sha256((ROOT / DIRECTORY / rel).read_bytes()).hexdigest() == digest
+    assert len([s for s in card["sources"] if s.get("href")]) == 3
     assert card["id"] == "betse-k-sensitivity-v1"
     assert "8/8 simulation exit codes 0" in card["numerical_checks"][0]["result"]
     assert "10× open-junction only" in card["numerical_checks"][3]["result"]

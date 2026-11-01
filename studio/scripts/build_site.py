@@ -1095,7 +1095,7 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         cards.append(module.build_card(ins.read, lambda name, sha: _vid(
-            ins, out, "betse-k-sensitivity-v1", "artifacts/bioelectric-tissue/sensitivity-v1/reconstructed", name, sha)))
+            ins, out, "betse-k-sensitivity-v1", "artifacts/bioelectric-tissue/sensitivity-v1", name, sha)))
     d = "artifacts/multicell"
     if (ROOT / d / "summary.json").exists():
         sm = json.loads(ins.read(f"{d}/summary.json")); arms = sm["arms"]; shas = {l.split()[1].split("/")[-1]: l.split()[0] for l in ins.text(f"{d}/mp4.sha256").splitlines() if l.strip()}

@@ -27,7 +27,8 @@ CONDITIONS = (
 
 def build_card(read, publish_media):
     """Validate the pinned run bundle and return its simulation card."""
-    index = json.loads(read(f"{DIRECTORY}/index.json"))
+    index_bytes = read(f"{DIRECTORY}/index.json")
+    index = json.loads(index_bytes)
     if index.get("schema") != "frontier.betse-k-sensitivity.artifact/1":
         raise ValueError("Unsupported BETSE sensitivity artifact schema")
     if index.get("status") != "complete_with_local_render_recovery":
@@ -138,8 +139,16 @@ def build_card(read, publish_media):
     if worker_files.get("sensitivity.mp4", {}).get("bytes") != 0:
         raise ValueError("Worker render failure should be preserved as a zero-byte output")
 
-    state, video_href = publish_media("sensitivity.mp4", video_sha)
-    poster_state, poster_href = publish_media("sensitivity-poster.png", poster_sha)
+    state, video_href = publish_media(video_name, video_sha)
+    poster_state, poster_href = publish_media(poster_name, poster_sha)
+    source_hrefs = {}
+    for rel in ("worker-return/protocol.json", "worker-return/collection_receipt.json", "reconstructed/summary.json"):
+        source_state, source_hrefs[rel] = publish_media(rel, pins[rel]["sha256"])
+        if source_state != "present_verified":
+            raise ValueError("BETSE sensitivity source was not published: " + rel)
+    manifest_state, manifest_href = publish_media("index.json", sha256(index_bytes).hexdigest())
+    if manifest_state != "present_verified":
+        raise ValueError("BETSE sensitivity manifest was not published")
     k_open = summary["effects_vs_same_packet_baseline"]
     half_dt = render_check
     return {
@@ -182,8 +191,9 @@ def build_card(read, publish_media):
         ],
         "equations": [],
         "sources": [
-            {"label": "Frozen BETSE sensitivity protocol", "locator": f"{DIRECTORY}/worker-return/protocol.json; SHA-256 {pins['worker-return/protocol.json']['sha256']}"},
-            {"label": "Provider return and render-failure receipt", "locator": f"{DIRECTORY}/worker-return/collection_receipt.json; GCS manifest SHA-256 {worker_receipt['manifest_sha256']}"},
+            {"label": "Frozen BETSE sensitivity protocol", "href": source_hrefs["worker-return/protocol.json"], "locator": f"{DIRECTORY}/worker-return/protocol.json; SHA-256 {pins['worker-return/protocol.json']['sha256']}"},
+            {"label": "Provider return and render-failure receipt", "href": source_hrefs["worker-return/collection_receipt.json"], "locator": f"{DIRECTORY}/worker-return/collection_receipt.json; GCS manifest SHA-256 {worker_receipt['manifest_sha256']}"},
+            {"label": "Saved-state reconstruction and numerical comparison", "href": source_hrefs["reconstructed/summary.json"], "locator": f"{DIRECTORY}/reconstructed/summary.json; SHA-256 {pins['reconstructed/summary.json']['sha256']}"},
             {"label": "Related bioelectric model interface", "locator": "artifacts/bioelectric-tissue/model_interface.json; measured voltage/permeability and tissue-voltage-to-growth mappings remain unknown"},
         ],
         "limitations": [
@@ -193,6 +203,7 @@ def build_card(read, publish_media):
         ],
         "couplings": [],
         "manifest": f"{DIRECTORY}/index.json",
+        "manifest_href": manifest_href,
         "native": True,
         "artifacts": [
             {"path": f"{DIRECTORY}/{rel}", "sha256": pins[rel]["sha256"], "bytes": pins[rel]["bytes"]}
