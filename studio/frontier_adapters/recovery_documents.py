@@ -23,15 +23,22 @@ DOCUMENTS = {
 SOURCE_IDS = {"src-fish1990", "src-parkchoi2010", "src-davenport1992", "src-davenport2003", "src-daane2021", "src-darwin1859", "src-lovejoy2004"}
 
 
-def build(root, *, namespace, issuer, created_at, source_commit):
+def build(root, *, namespace, issuer, created_at, source_commit, documents=None, source_ids=None):
+    """Register explicit documents, optionally alongside the original fish source register.
+
+    Secondary projects pass their own documents and an empty source_ids set;
+    they must not inherit Flying Fish bibliography or biological context.
+    """
     root = Path(root)
+    documents = DOCUMENTS if documents is None else documents
+    source_ids = SOURCE_IDS if source_ids is None else source_ids
     mission_path = "site/content/mission.json"
-    mission = json.loads((root / mission_path).read_text())
+    mission = json.loads((root / mission_path).read_text()) if source_ids else {"sources": []}
     source_rows = {"src-" + row["id"]: (index, row) for index, row in enumerate(mission["sources"])}
     records, rows = [], []
-    for identifier in [*DOCUMENTS, *sorted(SOURCE_IDS)]:
-        if identifier in DOCUMENTS:
-            path, title = DOCUMENTS[identifier]
+    for identifier in [*documents, *sorted(source_ids)]:
+        if identifier in documents:
+            path, title = documents[identifier]
             selector, upstream = "whole document", None
             read_level = "exact local document bytes read and hashed; reported past results are not rerun"
         else:
