@@ -191,6 +191,10 @@ def pack():
             "scientific_scope",
         ]
     }
+    manifest["outputs"] = [
+        name.replace("output/", "output-seed-placement/", 1)
+        for name in manifest["outputs"]
+    ]
     manifest.update(
         schema="frontier.nca.seed-placement-packet/1",
         archive_path=str(path.relative_to(ROOT)),
