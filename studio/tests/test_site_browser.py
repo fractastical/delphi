@@ -1803,6 +1803,11 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
         assert "cut=frontier-120s" in pg.locator("#demo-switch").get_attribute("href")
         assert pg.locator("#demo-video").get_attribute("controls") is not None and pg.locator("#demo-video").get_attribute("poster") == poster
         assert [pg.locator(".demostory li b").nth(i).text_content() for i in range(4)] == ["Goal", "Multiscale evidence", "Next experiment", "Reusable agent work"]
+        # concept headline; the film comes before the story cards and starts inside the first screen on desktop
+        assert "A design studio for" in pg.locator("h1").text_content() and "Start with a flying fish" in pg.locator(".demohead .lede").text_content()
+        vt, st = pg.locator("#demo-video").bounding_box()["y"], pg.locator(".demostory").bounding_box()["y"]
+        assert vt < st and (w < 900 or vt < 600), (vt, st)
+        assert pg.locator(".democta a:has-text('Open the studio')").count() == 1
         # both cuts are linked, and both have downloads
         assert pg.locator(".democut").count() == 2 and pg.locator(".demodl li a[download][href$='windtunnel.mp4']").count() == 2
         assert "burned into the video" in pg.locator("figcaption").text_content() and "No separate caption track" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
