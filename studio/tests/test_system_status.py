@@ -238,7 +238,7 @@ def test_board_specs_goal_are_parsed_and_marked_worker_report(checkout):
 def test_the_real_tree_is_described_without_failing():
     m = ss.curated_manifest(ROOT)
     assert len(m["board"]["rows"]) >= 10 and all({"priority", "deliverable", "owner"} <= set(r) for r in m["board"]["rows"])
-    assert {s["id"] for s in m["specs"]["specs"]} >= {"SPEC-001", "SPEC-005"} and m["goal"]["title"] == "Delphi Frontier"
+    assert {s["id"] for s in m["specs"]["specs"]} >= {"SPEC-001", "SPEC-005"} and m["goal"]["title"] == "MorphoSwarm Frontier"
 
 
 def test_oversized_and_hostile_files_are_bounded(tmp_path):
