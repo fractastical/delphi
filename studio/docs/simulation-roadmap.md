@@ -311,12 +311,27 @@ pattern splits at `x < nx/2`, so the refinement arm confounded lattice resolutio
 actuator-layout asymmetry. That is an artefact of our encoding, not of the engine.
 
 With the confound removed — the travelling-wave pattern sets phase as a gradient and
-so carries its own asymmetry at any `nx` — the coarse and fine bodies give 0.3644 and
-0.3744 body lengths, a 2.74% difference across a 2x refinement and an 8x voxel count.
-**That is a post-hoc observation on one pattern at two resolutions. It is not a
-convergence proof and must not be reported as one.** The timestep series does
-converge, 0.9% of the coarsest value across a 4x range of `dt`, and that statement is about `dt` on that one
-arm.
+so carries its own asymmetry at any `nx` — the two bodies move **14.577281 mm** and
+**16.847525 mm**, a **15.57% difference relative to the coarse run**.
+
+**An earlier version of this paragraph said 2.74%, and that figure is withdrawn.** It
+divided the two runs by two *different* denominators. The stored normalisation is
+`body_len = (nx-1) * voxel`, the centre-to-centre span, which is 40 mm for the coarse
+body and **45 mm** for the fine one, because halving the voxel while doubling the count
+adds half a lattice spacing. Dividing by two different lengths manufactured an agreement
+that is not in the data. The outer envelope `nx * voxel` is 50 x 30 x 30 mm for *both*
+bodies and the nominal mass is 45 g for both, so the envelope is the invariant length
+here; at that common 50 mm denominator the two give 0.291546 and 0.336950, which is the
+same **15.57%**. The frozen centre-span metric is preserved in the artifact beside the SI
+values and both denominators. Raised by independent review of `e6f1033`; all eight of its
+figures were recomputed here from the stored artifacts and all eight match.
+
+So the travelling pattern is far less resolution-sensitive than the longitudinal split's
+8.2x, and that is all. **15.6% is not agreement, and one pattern on two grids cannot
+establish convergence under any denominator.** The parity diagnosis does not cure the
+remaining discretisation and normalisation issues. The timestep series does converge,
+0.9% of the coarsest value across a 4x range of `dt`, and that statement is about `dt` on
+that one arm.
 
 ### The cross-scale interface this adds
 
@@ -340,7 +355,11 @@ travelling pattern, four behavioural controls, a timestep series and five analyt
 gates.
 
 **It is not a biological law.** It is a property of one numerical soft-body model under
-declared parameters, and no organism, tissue or cell measurement enters it. The known
+declared parameters, and no organism, tissue or cell measurement enters it. The object itself is a
+**numerical soft-voxel ground-contact mechanics benchmark, not tissue**: 45 nominal 10 mm
+voxels, an outer envelope of 50 x 30 x 30 mm, a 40 mm centre-to-centre span and a nominal
+45 g at the assumed 1000 kg/m^3. It is not tissue-scale, not a Xenopus or microcarrier
+model, and not material-calibrated. The known
 threat to its validity is that the rectifying ground reaction is part Coulomb friction
 and part global damping to an absolute frame — Voxelyze's global damping is a numerical
 term and not a fluid model, so no swimming interpretation is available — and the split

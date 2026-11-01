@@ -269,10 +269,29 @@
   },
   "clean_refinement_test": {
    "statement": "the travelling-wave pattern sets phase as a gradient 2*pi*x/nx and carries its own asymmetry at any nx, so it has no parity confound.",
-   "coarse_5x3x3_s10mm": 0.3644,
-   "fine_10x6x6_s5mm": 0.37439,
-   "relative_difference": "2.74% across a 2x lattice refinement and an 8x voxel count",
-   "reading": "the headline candidate survives mesh refinement; the longitudinal split does not, for a reason that is now identified and measured"
+   "relative_difference": "15.5739% at a common denominator, NOT 2.74%",
+   "reading": "at a common denominator the travelling-wave pattern differs by 15.6% across a 2x lattice refinement. That is far smaller than the longitudinal pattern's 8.2x, and it is NOT agreement and NOT convergence. A single pattern on two grids cannot establish convergence under any denominator, and the parity diagnosis does not cure the remaining discretisation and normalisation issues.",
+   "CORRECTION_2026-11-01": "WITHDRAWN READING. The 2.74% figure compared two DIFFERENT denominators. The stored normalisation is body_len = (nx-1)*voxel, which is the centre-to-centre span, and that span is 40 mm for the coarse body (nx=5, s=10mm) but 45 mm for the fine body (nx=10, s=5mm). Dividing by two different lengths manufactured an agreement that is not in the data. Raised by independent review of e6f1033; all eight of its figures were recomputed here from the stored artifacts and all eight match. The frozen stored metric is unchanged below; the SI values and both denominators are added.",
+   "stored_centre_span_normalised": {
+    "coarse": 0.364432,
+    "fine": 0.374389,
+    "denominator_coarse_mm": 40.0,
+    "denominator_fine_mm": 45.0,
+    "relative_difference_pct": 2.7322,
+    "WARNING": "these two numbers use different denominators and MUST NOT be compared to each other"
+   },
+   "raw_SI": {
+    "coarse_net_disp_mm": 14.577281,
+    "fine_net_disp_mm": 16.847525,
+    "relative_difference_pct_vs_coarse": 15.5739
+   },
+   "common_denominator_outer_envelope": {
+    "denominator_mm": 50.0,
+    "note": "outer envelope nx*voxel is 50 mm for BOTH bodies, so it is the invariant length here",
+    "coarse": 0.291546,
+    "fine": 0.33695,
+    "relative_difference_pct": 15.5739
+   }
   }
  },
  "extracted_relation": {
@@ -311,6 +330,24 @@
   "voxels": 45,
   "columns": "step,t_s,vox,ix,iy,iz,x_m,y_m,z_m,temp_C",
   "com_path": "artifacts/voxel-actuation/trajectory/travelling-com.csv",
-  "provenance": "produced by this run; it is NOT an upstream recording and no upstream video is reused anywhere in this artifact"
+  "provenance": "produced by this run; it is NOT an upstream recording and no upstream video is reused anywhere in this artifact",
+  "what_the_csv_DOES_NOT_contain": [
+   "voxel orientations",
+   "deformed voxel meshes or surfaces",
+   "forces or tractions",
+   "any measured cellular state"
+  ],
+  "rendering_constraint": "travelling-voxels.csv stores voxel CENTRES and the imposed temperature only. A renderer may draw centre points, a link graph or nominal glyphs, and must label them as such. It must not invent cellular textures, traction arrows or deformed tissue boundaries. temp_C is an imposed numerical thermal actuation signal, not a measured cellular state. Use SI axes; if body lengths are shown, state which denominator."
+ },
+ "model_scale_labelling": {
+  "what_this_object_is": "a numerical soft-voxel ground-contact mechanics benchmark, not tissue",
+  "baseline_body": "45 nominal 10 mm voxels; outer envelope 50 x 30 x 30 mm; centre-to-centre span 40 mm; nominal mass 45 g at the assumed density 1000 kg/m3",
+  "refined_body": "360 nominal 5 mm voxels; outer envelope 50 x 30 x 30 mm; centre-to-centre span 45 mm; same nominal mass 45 g",
+  "NOT": [
+   "a tissue-scale object",
+   "a Xenopus or microcarrier model",
+   "measured or material-calibrated"
+  ],
+  "no_fluid_interpretation": "global damping is a numerical absolute-frame term, not CFD and not fluid drag. No swimming interpretation is available."
  }
 }

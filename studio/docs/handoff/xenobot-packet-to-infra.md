@@ -187,15 +187,30 @@ moves 7.6×–17.8× further than its adjacent even neighbours (nx5/nx4 = 7.65, 
 encoding, not the engine.**
 
 With that confound removed — the travelling-wave pattern sets phase as a gradient and
-carries its own asymmetry at any nx — coarse gives 0.3644 and fine 0.3744 body
-lengths, a 2.74% difference. **This is a post-hoc observation on one pattern at two
-resolutions. It is not a convergence proof and must not be relabelled as one.**
+carries its own asymmetry at any nx — coarse and fine move **14.577281 mm** and
+**16.847525 mm**, a **15.57% difference relative to the coarse run**.
+
+**CORRECTED 2026-11-01.** An earlier version of this packet said 2.74%. That figure
+divided the two runs by two different denominators: the stored normalisation is the
+centre-to-centre span `(nx-1)*voxel`, which is 40 mm coarse and **45 mm** fine. The outer
+envelope is 50 x 30 x 30 mm and the nominal mass 45 g for *both*, so the envelope is the
+invariant length; at that common 50 mm denominator the two give 0.291546 and 0.336950 —
+the same 15.57%. Raised by independent review of `e6f1033`; all eight of its figures were
+recomputed from the stored artifacts and all eight match. The frozen centre-span metric is
+preserved in the artifact beside the SI values and both denominators.
+
+**15.6% is not agreement, and one pattern on two grids cannot establish convergence under
+any denominator.** The parity diagnosis does not cure the remaining discretisation and
+normalisation issues.
 
 ---
 
 ## 5. What this is not
 
-Generic soft-voxel mechanics under declared parameters. Nothing is calibrated to
+A **numerical soft-voxel ground-contact mechanics benchmark, not tissue**: 45 nominal
+10 mm voxels, outer envelope 50 x 30 x 30 mm, 40 mm centre-to-centre span, nominal 45 g at
+the assumed 1000 kg/m^3. Not tissue-scale, not a Xenopus or microcarrier model, not
+material-calibrated. Generic soft-voxel mechanics under declared parameters. Nothing is calibrated to
 Xenopus tissue, frog cells, cilia, or any measured organism. "Xenobot-inspired" names
 the design pattern, not biology. This is not a reproduction of Kriegman et al. 2020
 (PNAS 117(4):1853–1859, `10.1073/pnas.1910837117`) and it is not fish or frog
