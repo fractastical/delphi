@@ -290,4 +290,30 @@
     if (!a.unavailable && a.report && a.report.view) return { n: a.report.view.n_problems ?? (a.report.view.rows || []).length, source: "attention layer" };
     const r = await DF.api.catalog({ kind: "Problem", limit: 50 }); return { n: r.records.length + (r.next_cursor ? "+" : ""), source: "catalog first page" };
   };
+
+  /* Shared table behaviour, so no view needs its own markup: cells take their label from the header (the phone layout stacks them), wide tables get a sticky
+   * first column, and a table that scrolls sideways says so above it. Idempotent; runs as the page changes and when the window resizes. */
+  (function () {
+    const main = () => document.getElementById("main"); let queued = false;
+    const enhance = () => {
+      queued = false; const root = main(); if (!root) return;
+      root.querySelectorAll(".tablewrap table").forEach((t) => {
+        if (!t.dataset.enh) {
+          t.dataset.enh = "1"; const hr = t.tHead && t.tHead.rows[t.tHead.rows.length - 1]; const heads = hr ? [...hr.cells].map((h) => h.textContent.trim()) : [];
+          if (heads.length) t.querySelectorAll("tbody tr").forEach((tr) => [...tr.cells].forEach((c, i) => { if (c.tagName === "TD" && !c.hasAttribute("data-label") && heads[i]) c.setAttribute("data-label", heads[i]); }));
+          if (heads.length >= 7 || t.classList.contains("matrix") || t.classList.contains("ctable")) t.classList.add("widetable");
+          else if (heads.length && !t.classList.contains("qtable") && !t.querySelector("[colspan]")) t.classList.add("stackable");
+        }
+      });
+      root.querySelectorAll(".tablewrap").forEach((w) => {
+        const t = w.querySelector("table"); const stacked = t && getComputedStyle(t.querySelector("td, th") || t).display === "block"; const prev = w.previousElementSibling; const has = prev && prev.classList.contains("tablehint");
+        const over = !stacked && w.scrollWidth > w.clientWidth + 1;
+        if (over && !has) { const h = document.createElement("p"); h.className = "tablehint small faint"; h.textContent = "This table is wider than the screen: scroll sideways for the other columns."; w.parentNode.insertBefore(h, w); }
+        else if (!over && has) prev.remove();
+      });
+    };
+    const queue = () => { if (!queued) { queued = true; requestAnimationFrame(enhance); } };
+    window.addEventListener("resize", queue);
+    new MutationObserver(queue).observe(document.documentElement, { childList: true, subtree: true });
+  })();
 })();

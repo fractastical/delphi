@@ -310,3 +310,18 @@ video:focus,video:focus-visible{outline:3px solid var(--teal);outline-offset:2px
 /* Assemblies: axis cells are a short line plus a collapsed tree of the full fields. */
 .asinspect{margin-top:4px}.asinspect summary{cursor:pointer}.astree{margin:.2em 0;padding-left:1em}dl.astree{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:2px 10px;padding-left:0}dl.astree dt{font-weight:600;color:var(--dim);overflow-wrap:anywhere}dl.astree dd{margin:0;overflow-wrap:anywhere}.asline{margin:.3em 0}
 @media (max-width:600px){dl.astree{grid-template-columns:minmax(0,1fr)}}
+/* Tables, second pass: badges stay on one line, wide tables keep their first column in view, a table that scrolls says so, and narrow screens stack
+ * ordinary tables as label/value cards (the cells' labels are added by studio.js from each header). */
+.tablewrap td .pill,.tablewrap th .pill{white-space:nowrap}.tablewrap th{min-width:4.5em}
+.tablewrap{background:linear-gradient(to right,#fff 30%,rgba(255,255,255,0)),linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) 100% 0,radial-gradient(farthest-side at 0 50%,rgba(0,0,0,.3),transparent),radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.3),transparent) 100% 0;background-repeat:no-repeat;background-size:40px 100%,40px 100%,22px 100%,22px 100%;background-attachment:local,local,scroll,scroll}
+.tablehint{margin:6px 0 2px}
+.tablewrap table.widetable td:first-child,.tablewrap table.widetable th:first-child,.tablewrap table.matrix td:first-child,.tablewrap table.matrix th:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 var(--line)}
+.tablewrap table.widetable thead th:first-child,.tablewrap table.matrix thead th:first-child{background:#f4f1ea}
+@media (max-width:800px){
+  .tablewrap table.stackable,.tablewrap table.stackable thead,.tablewrap table.stackable tbody,.tablewrap table.stackable tr,.tablewrap table.stackable td,.tablewrap table.stackable th{display:block;width:100%;box-sizing:border-box}
+  .tablewrap table.stackable{min-width:0}.tablewrap table.stackable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .tablewrap table.stackable tr{border:1px solid var(--line);border-radius:8px;margin:0 0 10px;padding:6px 8px;background:#fff}
+  .tablewrap table.stackable td{border:0;padding:3px 0;max-width:none;min-width:0}.tablewrap table.stackable td:first-child{min-width:0;max-width:none;font-weight:700}
+  .tablewrap table.stackable td[data-label]:not(:first-child)::before{content:attr(data-label) ": ";font:600 .72rem var(--sans);color:var(--dim)}
+  .tablewrap table.stackable td .pill{white-space:normal}
+}
