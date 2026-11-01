@@ -179,19 +179,31 @@
       "job_id": "aijob-e00jmvgx169vje8ywk",
       "task": "Seed-placement NCA controlled comparison",
       "owner": "infra_director",
-      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "provider_state": "COMPLETED",
       "protocol": "artifacts/nca-seed-placement/packet/owner-manifest.json",
       "controller_manifest": "results/infra/nca-seed/manifest-infra28.json",
-      "scope": "No biological validation. Controls and negative outcomes retained."
+      "scope": "No biological validation. Controls and negative outcomes retained.",
+      "receipt": "results/resources/nca-seed-completion.json",
+      "science_audit_commit": "c34c372"
     },
     {
       "job_id": "aijob-e00dydgq6ps3hkzjfv",
       "task": "H100 cylinder controls and calibration only",
       "owner": "infra_director",
-      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "provider_state": "FAILED",
       "protocol": "artifacts/cfd-h100-calibration/protocol.json",
       "controller_manifest": "results/infra/cfd-h100-calibration/manifest-infra29.json",
-      "scope": "No biological validation. Controls and negative outcomes retained."
+      "scope": "No biological validation. Controls and negative outcomes retained.",
+      "receipt": "results/resources/cfd-h100-calibration-completion.json",
+      "interpretation": "Native rc10: intentional no-case calibration; numerical/runtimeGO does not mean fullassayPASS."
+    },
+    {
+      "job_id": "aijob-e00gjhtd6nk55b266v",
+      "task": "R2 frozen cylinder assay",
+      "owner": "infra_director",
+      "provider_state": "IMAGE_PULLING at2026-11-01T02:55:16Z",
+      "controller_manifest": "results/infra/cfd-r2-h100/manifest-infra30.json",
+      "protocol": "artifacts/cfd-h100-r2/protocol.json"
     }
   ],
   "preparation": [
@@ -199,13 +211,14 @@
       "task": "Collect four-model NCA comparison",
       "owner": "infra_director transport / mechanobio_sim science",
       "priority": 1,
-      "state": "running_training_first_arm_zero_fields",
+      "state": "complete_original0of48_failed_design_preserved",
       "job_id": "aijob-e00rhs6hdan4n57kv8",
       "packet": "inputs/items_infra_nca.json",
       "budget": "One H100; 2400s science, 48MiB complete return cap",
       "next_acceptance": "Same-job CPU/CUDA gates; four exact final checkpoints and 52 declared heldouts, source/target/mask hashes and finite state checks; preserve missing models and deadline outcomes",
       "stop_gate": "No extra seed jobs, no changed targets or thresholds, no training after heldout inspection",
-      "progress": "results/resources/nca-live-progress.json"
+      "progress": "results/resources/nca-live-progress.json",
+      "receipt": "results/resources/nca-completion.json"
     },
     {
       "task": "Complete two unstarted ecology scenario pairs",
@@ -350,10 +363,12 @@
       "task": "Static aeroelastic fin-to-flight bridge",
       "owner": "mechanobio_sim",
       "priority": 1,
-      "state": "owner_reports_20_primitive_controls_passed_packet_pending",
+      "state": "complete_36arms_independent_audit_reported",
       "budget": "4vCPU,12GiB,20min,<50MB; noGPU",
       "next_acceptance": "Exact frozen source/input hashes, force/moment-conserving load transfer, FEM exactness, actual lattice/fixed-point/glide refinement. Assumed EI and rigidized-shape glide limits remain.",
-      "stop_gate": "No admission until exact packet and independent preflight; no claimed measured tissue stiffness or continuous FSI."
+      "stop_gate": "No admission until exact packet and independent preflight; no claimed measured tissue stiffness or continuous FSI.",
+      "receipt": "results/resources/gcp/aeroelastic-completion.json",
+      "science_audit_commit": "a54f478"
     },
     {
       "task": "Zebrafish-GEM oxygen and medium constraints",
@@ -368,13 +383,15 @@
       "next_action": "No admission; preserve provider stop and existing results."
     },
     {
-      "task": "Additional membrane or molecular comparison",
-      "owner": "resource_scaling",
+      "task": "BETSE eight-condition generic permeability comparison",
+      "owner": "resource_scaling science / infra_director collection",
       "priority": 3,
-      "state": "scope_inventory_after_video_fixes",
-      "budget": "Bounded CPU or1H100 only if model justified",
+      "state": "admitted_GCP_VM04_dependency_setup_observed",
+      "budget": "4vCPU/12GiB/128tasks/1200s/<50MB",
       "next_acceptance": "Distinct existing-source question, original controls and input provenance, no arbitrary MD extension.",
-      "stop_gate": "No ungrounded membrane-voltage-to-growth bridge or provider-stopped sequence reroute."
+      "stop_gate": "No ungrounded membrane-voltage-to-growth bridge or provider-stopped sequence reroute.",
+      "packet": "inputs/gcp-betse-k-sensitivity.json",
+      "source_commit": "c7c49fd2d832eb704ab24930dec2f16a4caabaa9"
     },
     {
       "task": "Neutral point and rigid geometry stability",
@@ -389,11 +406,22 @@
       "task": "Full R2 cylinder CUDA assay",
       "owner": "infra_director + claude-04",
       "priority": 2,
-      "state": "blocked_pending_H100_timing_and_checkpoint_transport",
+      "state": "admitted_IMAGE_PULLING",
       "source_commit": "a40312ced2a4f629f000234366162bd3f966140b",
       "budget": "Not admitted",
       "next_acceptance": "Existing H100 controls/calibration plus coherent bounded checkpoint export before assay.",
-      "stop_gate": "Original L4NO-GO retained. Signed GCS upload blocked signBlob/setIamPolicy; no broad credential substitute."
+      "stop_gate": "Unchanged numerical and runtime gates;10800s science,4hprovider,0700Z operator cancellation timer. OriginalL4NO-GO/C1FAIL preserved.",
+      "job_id": "aijob-e00gjhtd6nk55b266v",
+      "packet": "inputs/items_infra_cfd_h100_r2.json"
+    },
+    {
+      "task": "NCA root-erasing damage curriculum comparison",
+      "owner": "mechanobio_sim training / infra_director independent evaluation and admission",
+      "state": "protocol_and_independent_evaluation_frozen_packet_preparing",
+      "protocol_commit": "3e571af",
+      "evaluation_commit": "f5db91a",
+      "budget": "1H100,8models\u00d72000steps,200probes,2400s,48MiB",
+      "stop_gate": "Same-job CPU/CUDA/gradient controls;8finalcheckpointSHAbarrier before evaluationmaskload; partial/failedpredicates preserved."
     }
   ],
   "policies": {
@@ -404,7 +432,7 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T02:26:06.822878+00:00",
+  "updated_at_utc": "2026-11-01T02:56:50.118145+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
@@ -537,14 +565,16 @@
       "results/resources/gcp/l4-east4a-operation-result.json",
       "results/resources/gcp/l4-size8-operation-result.json",
       "results/resources/gcp/l4-hint-operation-result.json"
-    ]
+    ],
+    "runtime_receipt": "results/resources/gcp/runtime-status.json"
   },
-  "next_ready_dispatch": "Two H100 jobs admitted: seed-only NCA comparison and same-source CFD controls/timing only. No fullR2 until measuredruntime and coherentcheckpoint transport; no additional ecology/MD jobs.",
+  "next_ready_dispatch": "NCA curriculum packet pending source freeze; fullR2 admittedandpulling, BETSE admittedandinstalling. Metabolism provider-stop preserved without replay.",
   "latest_returns": {
     "observed_utc": "2026-11-01T02:40:33Z",
     "seed_nca": "results/resources/nca-seed-completion.json",
     "aeroelastic": "results/resources/gcp/aeroelastic-completion.json",
     "h100_calibration": "results/resources/cfd-h100-calibration-completion.json",
-    "active_nebius_gpu_jobs": 0
+    "active_nebius_gpu_jobs": 1,
+    "allocation_state": "IMAGE_PULLING, no newkernel samples yet"
   }
 }
