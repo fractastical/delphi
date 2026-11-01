@@ -74,6 +74,37 @@ def ownership_class(job, historical=()):
     return "unattributed"
 
 
+def terminal_runtime_summary(directory, own_jobs):
+    """Deduplicate measured container durations, retaining each exact receipt."""
+    own = {row["id"]: row for row in own_jobs}
+    rows = {}
+    for path in sorted(Path(directory).rglob("manifest*.json")):
+        document = json.loads(path.read_text())
+        for run in document.get("owned", []):
+            jid = run.get("id")
+            result = run.get("result") or {}
+            seconds = result.get("wall_s")
+            if jid not in own or seconds is None:
+                continue
+            if isinstance(seconds, bool) or not isinstance(seconds, (int, float)) or not math.isfinite(seconds) or seconds < 0:
+                raise ValueError("Invalid measured container duration")
+            if own[jid]["state"] not in TERMINAL:
+                continue
+            row = {"job_id": jid, "kind": "gpu" if "gpu" in own[jid]["preset"] else "cpu",
+                   "provider_state": own[jid]["state"], "container_seconds": seconds,
+                   "receipt": str(path), "receipt_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                   "truncated": result.get("truncated"), "timed_out": result.get("timed_out")}
+            if jid in rows and rows[jid]["container_seconds"] != seconds:
+                raise ValueError("Conflicting measured durations for one job")
+            rows[jid] = row
+    totals = {kind: {"jobs": sum(r["kind"] == kind for r in rows.values()),
+                     "seconds": round(sum(r["container_seconds"] for r in rows.values() if r["kind"] == kind), 6)}
+              for kind in ("gpu", "cpu")}
+    return {"schema": "frontier.measured-container-runtime/1", "totals": totals,
+            "rows": list(rows.values()),
+            "scope": "Subset of exact owned terminal controller receipts, including failures. Container duration includes setup and emission; it is not GPU kernel time or all historical usage. GCP VM time is excluded."}
+
+
 def summarize_shared(document, observed, historical=()):
     if document.get("next_page_token"):
         raise ValueError("provider listing is paginated; refusing incomplete counts")
@@ -169,6 +200,13 @@ def refresh(path: Path, cli: str) -> dict:
     inventory = json.loads(path.read_text())
     prior = inventory["compute"]["nebius"]
     inventory["compute"]["nebius"] = {**prior, **snapshot}
+    runtime_directory = path.parent.parent / "infra"
+    if runtime_directory.is_dir():
+        runtime = terminal_runtime_summary(runtime_directory, snapshot["own_jobs"])
+        runtime_path = path.parent / "terminal-runtime-receipts.json"
+        runtime_path.write_text(json.dumps(runtime, indent=2) + "\n")
+        inventory["compute"]["nebius"]["measured_terminal_container_work"] = {
+            **runtime["totals"], "scope": runtime["scope"], "receipt": str(runtime_path)}
     local = observed.astimezone(ZoneInfo("America/Los_Angeles"))
     offset = local.strftime("%z")
     inventory["observed_at"] = {

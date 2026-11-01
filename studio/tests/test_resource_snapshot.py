@@ -101,3 +101,22 @@ def test_historical_attribution_is_exact_and_keeps_current_scope_separate():
 def test_historical_identity_mismatch_refuses_attribution():
     with pytest.raises(ValueError, match="ID/name mismatch"):
         ownership_class({"metadata": {"id": "old", "name": "changed"}}, [{"id": "old", "name": "original"}])
+
+
+def test_runtime_receipts_deduplicate_own_jobs_and_reject_conflicting_durations(tmp_path):
+    from frontier_compute.resource_snapshot import terminal_runtime_summary
+    import json
+    import pytest
+
+    own = [{"id": "ours", "preset": "1gpu-16vcpu", "state": "FAILED"}]
+    doc = {"owned": [{"id": "ours", "result": {"wall_s": 12.5}},
+                     {"id": "foreign", "result": {"wall_s": 999}}]}
+    (tmp_path / "manifest-a.json").write_text(json.dumps(doc))
+    (tmp_path / "manifest-b.json").write_text(json.dumps(doc))
+    result = terminal_runtime_summary(tmp_path, own)
+    assert result["totals"]["gpu"] == {"jobs": 1, "seconds": 12.5}
+    assert len(result["rows"]) == 1 and result["rows"][0]["provider_state"] == "FAILED"
+    doc["owned"][0]["result"]["wall_s"] = 13
+    (tmp_path / "manifest-b.json").write_text(json.dumps(doc))
+    with pytest.raises(ValueError, match="Conflicting"):
+        terminal_runtime_summary(tmp_path, own)
