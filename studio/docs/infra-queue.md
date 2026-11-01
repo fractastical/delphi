@@ -74,7 +74,7 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Collect H100 controls/timing: original numerical gates and5907s conservative runtime projection passed. Native rc10/providerFAILED preserve intentionally absent cases.
 - [ ] Complete production capability transport before the fullR2 assay.
 - [x] Admit and collect all36 aeroelastic CPU arms;161file hashes checked, independent numerical interpretation pending.
-- [ ] Admit the frozen metabolic and BETSE CPU packets after independent preflights.
+- [ ] Admit the independent BETSE CPU packet after its frozen preflight. Metabolic worker is provider-stopped; no packet or alternate-provider replay.
 - [ ] Collect the three already-running CPU cylinder cases and exact checkpoints.
 
 The angle batch requires a passing parity check in the same allocation. Its
