@@ -26,34 +26,6 @@ LAMBDA_V = (0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4, 12.8)
 GAP_K = (4, 7)
 SEEDS = (1, 2, 3)
 
-RUN_SH = r"""#!/usr/bin/env bash
-# Self-contained bounded Morpheus sweep. No git, no private access, CPU only, 1 thread per arm.
-# Usage: bash run_packet.sh [OUTDIR] [PARALLEL]    Needs: curl, sha256sum, tar.
-set -u
-HERE=$(cd "$(dirname "$0")" && pwd); OUT=${1:-$HERE/out}; PAR=${2:-4}; mkdir -p "$OUT"
-URL=https://gitlab.com/morpheus.lab/morpheus/-/package_files/178666119/download
-BIN_SHA=3d9a6e5a4cb86824b745500df1474596d39cce5deed24f767c0841df0f94d5ad
-BIN=$OUT/morpheus-2.3.9
-[ -x "$BIN" ] || { curl -sL -m 600 -o "$BIN" "$URL" && chmod +x "$BIN"; }
-[ "$(sha256sum "$BIN" | cut -d' ' -f1)" = "$BIN_SHA" ] || { echo "binary sha256 mismatch; refusing"; exit 3; }
-(cd "$HERE" && sha256sum -c SHA256SUMS) || { echo "packet files do not match SHA256SUMS; refusing"; exit 3; }
-export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
-run_one() {
-  a=$1; mkdir -p "$OUT/$a"; cp "$HERE/models/$a.xml" "$OUT/$a/model.xml"
-  ( cd "$OUT/$a" && timeout --kill-after=30 "${ARM_TIMEOUT_S:-600}" "$BIN" -f model.xml --no-gnuplot \
-      --num-threads 1 > stdout.log 2>&1; echo "exit=$?" > exit.txt
-    # keep only the small logger; drop frames and logs that are not needed for the threshold
-    rm -f ./*.tif ./*.tiff model_graph.dot )
-}
-export -f run_one; export OUT HERE
-ls "$HERE/models" | sed 's/\.xml$//' | xargs -P "$PAR" -I{} bash -c 'run_one {}'
-for a in $(ls "$HERE/models" | sed 's/\.xml$//'); do
-  echo "$a $(cat "$OUT/$a/exit.txt" 2>/dev/null) rows=$(wc -l < "$OUT/$a/logger.csv" 2>/dev/null || echo 0)"
-done | tee "$OUT/result.txt"
-(cd "$OUT" && tar czf ../epithelial-sweep-result.tgz --exclude=morpheus-2.3.9 .)
-sha256sum "$OUT/../epithelial-sweep-result.tgz"
-"""
-
 README = """Epithelial gap-closure J-scaling sweep (Morpheus v2.3.9, CPU only)
 
 WHAT IT TESTS
@@ -62,14 +34,26 @@ WHAT IT TESTS
   Phi is linear in lambda_V and inverse in J, so the closure threshold lambda_V* must be
   proportional to J. That has been verified LOCALLY at exactly one doubling: with gap k=4,
   the threshold bracket is (0.3, 1.0) at J=140 and (1, 2) at J=280. This sweep tests the
-  same proportionality across two decades of J at two gap sizes with three seeds.
+  same proportionality over J = 35 to 560, a FACTOR OF 16 (about 1.2 decades), at two gap
+  sizes with three seeds. An earlier draft of this file said "two decades"; that was wrong,
+  and the sweep range has not been changed to match the claim.
 
-ACCEPTANCE (declared before the run; do not adjust it to fit the outcome)
-  For each (k, seed), find the bracket: the largest lambda_V that CLOSED and the smallest
-  that ARRESTED, and take lambda* as their geometric mean. The rule PASSES if lambda*/J is
-  constant within a factor of 2 across J = 35..560 at each k, and FAILS otherwise.
-  An arm where no bracket exists inside the swept lambda_V range is reported as
-  NO-BRACKET, never silently dropped and never used to fit.
+ACCEPTANCE (declared in analyze_sweep.py, whose own sha256 is written into every report)
+  Per (gap, seed, J): the bracket is the largest lambda_V that CLOSED and the smallest that
+  ARRESTED; lambda* is their geometric mean; the statistic is lambda*/J.
+  PASS        every (gap, seed, J) cell resolved a bracket, AND max/min of lambda*/J within
+              each gap size is <= 2.0.
+  FAIL        all resolved, and that ratio exceeds 2.0 somewhere.
+  UNRESOLVED  any cell failed to bracket inside the swept lambda_V range. UNRESOLVED IS NOT A
+              PASS. An unresolved cell is named in the report and is never dropped so that the
+              remaining cells can satisfy the rule.
+  There is no flag that changes the tolerance. Changing it changes the criterion hash.
+
+HOW SUCCESS IS DECIDED
+  run_packet.sh NEVER decides its own success. Its exit status is audit_completeness.py's.
+  A run is complete only if all 240 declared arm ids are present, exited 0, and produced a
+  logger with every required field, at least two sampled times and finite values throughout.
+  Zero successful arms is never complete. Failures are preserved and listed by id.
 
 MEASUREMENT
   gap_nodes(t) = 40000 - sum(cell.volume) over living cells, read from logger.csv.
@@ -78,33 +62,50 @@ MEASUREMENT
   model time to closure and leaves the sweep count unchanged (measured locally, 240 both ways).
 
 CONTROLS CARRIED IN THE SWEEP
-  Every (k, J) column includes lambda_V values on both sides of the predicted threshold, so
+  Every (gap, J) column includes lambda_V values on both sides of the predicted threshold, so
   a column that closes everywhere or arrests everywhere is visible rather than inferred.
-  Three seeds per cell of the grid. Seeds share one model: their spread is descriptive, not
-  an empirical uncertainty.
+  Three seeds per grid cell. Seeds share one model: their spread is descriptive, not an
+  empirical uncertainty.
   Known floor, measured locally and NOT a mechanism: with both drives off the k=4 gap still
   reduces by 22.0 percent, because 61 surviving cells at a 625-node target claim 38125 of
   40000 nodes. Any closed fraction at k=4 must be read against that floor.
 
-COST AND CAPS
+COST, CAPS AND LAYOUT
   240 arms, single-thread CPU each, no GPU, no network after the binary fetch.
-  Locally comparable arms took 6 to 31 s; budget 600 s per arm as a hard timeout.
-  Run each arm under a cap: MemoryMax=2G MemorySwapMax=0 TasksMax=256 RuntimeMaxSec=600.
-  MemoryMax alone does not bound anything on a host with swap; keep MemorySwapMax=0.
-  Peak RSS measured locally: 160 MB per arm.
-  Output: one logger.csv per arm, a few hundred KB each; the result tarball is a few MB.
-  TIFF frames are deleted by the runner; this sweep needs no movies.
+  Locally comparable arms took 6 to 31 s. At 8 workers, 240 arms x 31 s worst case projects
+  about 930 s plus setup. Declared bounds, all enforced by run_packet.sh:
+      per arm (soft)    ARM_TIMEOUT_S=600, own process group, SIGTERM then SIGKILL after 30 s
+      whole job (hard)  JOB_TIMEOUT_S=5400
+      workers           argument 2, default 8   (8 workers fit 8 CPU / 8 GiB; ~160 MB RSS per arm)
+      output cap        OUTPUT_CAP_MB=512, checked before packaging; over cap exits 4
+      download cap      DOWNLOAD_CAP_BYTES=67108864, plus HTTP status and exact hash checks
+  The solver and all scratch live in WORKSPACE (mktemp, or PACKET_WORKSPACE), OUTSIDE the
+  output tree, so an automatic collector over OUTDIR never picks up the 15 MB executable.
+  OUTDIR gets binary-receipt.json instead: url, bytes, sha256 and environment.
+  TIFF frames are deleted as each arm finishes; a threshold sweep needs no movies.
+  Progress: result.txt and completeness.json; final: the result tarball's sha256 is printed,
+  and completeness.json carries a manifest_sha256 over every arm's logger hash.
+
+EXIT STATUS
+  run_packet.sh : 0 complete, 1 incomplete (see completeness.json), 3 refused before running,
+                  4 output cap exceeded.
+  analyze_sweep.py : 0 PASS, 1 FAIL, 2 UNRESOLVED.
 
 WHAT IS NOT CLAIMED
   Nothing here is calibrated to a cell line, a species or a measured tissue. CPM energies
   are model units from the upstream Act-model example. This is not a reproduction of any
-  published model; see docs/epithelial-repair-card.md section 1.
+  published model; see docs/epithelial-repair-card.md section 1. The rule's gap-size
+  dependence is already REFUTED locally and this sweep does not test it: k=1 never arrests
+  up to lambda_V 5000, and k=4 and k=7 share a bracket where Phi says they should differ
+  2.4x. A PASS here would confirm the J-dependence only.
 
 PROVENANCE
   Model XMLs in models/ were built as 12 named, exactly-once edits on the pinned upstream
   Examples/CPM/Protrusion_2D.xml at tag v2.3.9, base sha256
   da2a27c8e552041ee4a51d7ff1e7332466f5180762642c997594731c92737db2.
-  Each arm's parameters are in arms.json. Verify models/ against SHA256SUMS before running.
+  Each arm's parameters are in arms.json. run_packet.sh verifies the packet against
+  SHA256SUMS with verify_packet.py before anything runs, rejecting duplicates, symlinks,
+  path traversal, unlisted files and hash mismatches.
 """
 
 
@@ -133,16 +134,27 @@ def main() -> None:
 
     (stage / "arms.json").write_text(json.dumps(arms, indent=1))
     (stage / "README.md").write_text(README)
-    (stage / "run_packet.sh").write_text(RUN_SH)
+    for f in ("run_packet.sh", "verify_packet.py", "audit_completeness.py", "analyze_sweep.py"):
+        (stage / f).write_bytes((Path(__file__).parent / "packet_files" / f).read_bytes())
     sums = []
     for p in sorted(stage.rglob("*")):
         if p.is_file() and p.name != "SHA256SUMS":
             sums.append(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.relative_to(stage)}")
     (stage / "SHA256SUMS").write_text("\n".join(sums) + "\n")
 
+    # R2 (infra review of 4f33453): add REGULAR FILES ONLY, each exactly once. The previous
+    # version walked every member including directories, and tar.add recurses into a directory
+    # by default, so every file was archived twice.
+    files = sorted(q for q in stage.rglob("*") if q.is_file() and not q.is_symlink())
+    assert len({q.relative_to(stage) for q in files}) == len(files), "duplicate archive member"
     with tarfile.open(out, "w:gz") as tf:
-        for p in sorted(stage.rglob("*")):
-            tf.add(p, arcname=str(p.relative_to(stage)))
+        for q in files:
+            ti = tf.gettarinfo(str(q), arcname=str(q.relative_to(stage)))
+            assert ti.isfile(), f"refusing non-regular member {ti.name}"
+            ti.uid = ti.gid = 0
+            ti.uname = ti.gname = ""
+            with q.open("rb") as fh:
+                tf.addfile(ti, fh)
     subprocess.run(["rm", "-rf", str(stage)], check=True)
     digest = hashlib.sha256(out.read_bytes()).hexdigest()
     print(f"{out}  {out.stat().st_size} bytes  sha256 {digest}  arms {len(arms)}")
