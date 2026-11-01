@@ -151,7 +151,9 @@ in minutes, on any OS. Three sub-projects were built on one Windows machine and 
 scratch paths (`C:\Temp\...` in `anatomy-model/`, `sequences/`, `genotype/`, `lean/README.md`): these hold
 downloaded tools and raw data (Blender 4.2.23, MAFFT, BLAST+, genome and proteome downloads, the 44 MB
 `genotype/map.json`) that are not redistributed here. Each of those READMEs records the download source
-and hash, so substitute any scratch directory; nothing in the repo reads `C:\Temp` itself. Live services
+and hash, so substitute any scratch directory: the only code that mentions `C:\Temp` uses it as a default
+render directory (`anatomy-model/*/build*.py`, override with `--renders`) or as the last place to look for
+`elan` after `PATH` (`lean/report.mjs`). Live services
 (Ubergraph, ZFIN, Ensembl) are called by the genotype and development builders only, and every call is
 logged with URL, status and SHA-256 next to its output. A blind three-provider review of this repo on
 2026-11-01 flagged exactly these as the reproducibility risks; this paragraph is the response.
