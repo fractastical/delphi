@@ -99,7 +99,7 @@
     "persistence_predicate": "design_match at every saved checkpoint from256 through1024; scope saved checkpoints only",
     "recovery_predicate": "design_match before damage at256 AND after512recoveryupdates; failure to establish predamage pattern counts as failure",
     "comparison": "Paired differences across declared model/update seeds and masks; descriptive ranges, not biological success probabilities; show all candidates/failures",
-    "save_rgba_every_updates": 16,
+    "save_rgba_every_updates": 32,
     "full_state_snapshot_updates": [
       0,
       64,
@@ -109,14 +109,15 @@
       768,
       1024
     ],
-    "display_clipping": "RGBA display conversion may clip to[0,1], explicitly renderer-only; rawstate metrics and snapshots retained"
+    "display_clipping": "RGBA display conversion may clip to[0,1], explicitly renderer-only; rawstate metrics and snapshots retained",
+    "trace_sampling_scope": "Full RGBA histories/full-state snapshots only for update_seed7001 in undamaged persistence and central-square damage, selected before training. All52evaluationruns retain metrics every16updates and actual finalRGBA."
   },
   "controls": {
     "cpu_finite_difference_relative_error_max": 0.0001,
     "cpu_finite_difference_eps": 1e-05,
     "wrong_sign_gradient_relative_error_min": 1.0,
     "cpu_tiny_optimizer": "Finite nonzero gradient and changed weights on a bounded actual optimization step; no asserted target learning",
-    "local_rule_radius": "single update depends on3x3 only; empty state absorbing; zero updater cannot grow target",
+    "local_rule_radius": "Learned perception3x3; composed pre/post-living mask has bounded5x5 dependency. No global target or coordinate input at rollout.",
     "same_job_cpu_cuda_forward_maxabs": 1e-05,
     "same_job_cpu_cuda_gradient_relative_L2": 0.0001,
     "cuda_required_for_training": true,
@@ -162,5 +163,6 @@
     "checkpoint barrier before holdouts",
     "matched damage ablation and all failures",
     "actual saved-state video and final source/output hashes"
-  ]
+  ],
+  "pre_training_clarification": "The official pre/post living-mask composition widens total one-step dependency beyond the learned3x3 perception. Clarified before model implementation, controls or training, not after a failed result."
 }
