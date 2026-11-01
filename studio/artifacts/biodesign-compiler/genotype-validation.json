@@ -96,6 +96,10 @@
    "to": "behavior"
   }
  ],
+ "instrument_contracts_ref": {
+  "path": "artifacts/crossscale-doe/protocol.json",
+  "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993"
+ },
  "interfaces": {
   "I1": {
    "boundary": "DNA to expression in the stated cell state",
@@ -133,39 +137,30 @@
     "inverse": {
      "from": "expression",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "dna",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "dna",
    "input": "the candidate construct, as a pinned sequence artifact, introduced into the stated cell state, stage and condition",
    "instrument_slots": [
     {
-     "contract_ref": null,
-     "kind": "physical",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "contract_ref": {
+      "instrument_id": "P1-reporter-expression",
+      "observable": "enhancer/promoter reporter output",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposed_uncalibrated",
+      "unit": "relative units"
+     },
+     "kind": "physical"
     },
     {
      "contract_ref": null,
-     "kind": "virtual",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
     }
    ],
    "invalidated_by_context_change": true,
@@ -220,9 +215,10 @@
     "inverse": {
      "from": "growth_material",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "expression",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "expression",
@@ -230,29 +226,13 @@
    "instrument_slots": [
     {
      "contract_ref": null,
-     "kind": "physical",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
     },
     {
      "contract_ref": null,
-     "kind": "virtual",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
     }
    ],
    "invalidated_by_context_change": true,
@@ -317,39 +297,41 @@
     "inverse": {
      "from": "shape_mechanics",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "growth_material",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "growth_material",
    "input": "the growth/material state of the fin (deposition per ray) from the previous boundary",
    "instrument_slots": [
     {
-     "contract_ref": null,
-     "kind": "physical",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "contract_ref": {
+      "instrument_id": "P2-growth-to-EI",
+      "observable": "ray segment growth and mineral density vs stage",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposed_uncalibrated",
+      "unit": "m; kg/m^3"
+     },
+     "kind": "physical"
+    },
+    {
+     "contract_ref": {
+      "instrument_id": "R1-ray-bending",
+      "observable": "excised-ray clamped bending compliance",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposal_needs_calibration",
+      "unit": "ln(m/N) offset removed"
+     },
+     "kind": "physical"
     },
     {
      "contract_ref": null,
-     "kind": "virtual",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
     }
    ],
    "invalidated_by_context_change": true,
@@ -413,39 +395,41 @@
     "inverse": {
      "from": "performance",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "shape_mechanics",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "shape_mechanics",
    "input": "the measured fin shape, EI(x) and load field",
    "instrument_slots": [
     {
-     "contract_ref": null,
-     "kind": "physical",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "contract_ref": {
+      "instrument_id": "R2-inflow-tip",
+      "observable": "ray tip deflection/L in flow",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposal_needs_calibration",
+      "unit": "1"
+     },
+     "kind": "physical"
+    },
+    {
+     "contract_ref": {
+      "instrument_id": "R3-load",
+      "observable": "distributed load at the ray",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposal_needs_calibration",
+      "unit": "N/m"
+     },
+     "kind": "physical"
     },
     {
      "contract_ref": null,
-     "kind": "virtual",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
     }
    ],
    "invalidated_by_context_change": true,
@@ -516,9 +500,10 @@
     "inverse": {
      "from": "behavior",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "performance",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "performance",
@@ -526,29 +511,13 @@
    "instrument_slots": [
     {
      "contract_ref": null,
-     "kind": "physical",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
     },
     {
      "contract_ref": null,
-     "kind": "virtual",
-     "owner": "experimental-design instrument contracts (claude14)",
-     "required_fields": [
-      "instrument id and version",
-      "input schema with units",
-      "observation schema with units",
-      "noise or uncertainty model",
-      "replicate unit",
-      "cost and duration units"
-     ]
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
     }
    ],
    "invalidated_by_context_change": true,
@@ -579,13 +548,37 @@
   "behavior": {
    "compiler_axes": {},
    "independent_check": "no independent check exists for organism behaviour at this layer",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
+    },
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": true
   },
   "dna": {
    "compiler_axes": {},
    "independent_check": "sequence identity: sha256 of the pinned artifact and its source accession",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
+    },
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": false
   },
   "expression": {
@@ -594,13 +587,37 @@
     "implementation": "unresolved"
    },
    "independent_check": "regulatory map and blueprint pins",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
+    },
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": true
   },
   "growth_material": {
    "compiler_axes": {},
    "independent_check": "no independent check exists for growth or material at this layer",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
+    },
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": true
   },
   "performance": {
@@ -609,7 +626,19 @@
     "numerical": "measured, no frozen threshold: not called converged"
    },
    "independent_check": "aerodynamic domain and numerical checks of one geometry",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "physical"
+    },
+    {
+     "contract_ref": null,
+     "gap": "no contract exists for this boundary and kind",
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": true
   },
   "shape_mechanics": {
@@ -618,7 +647,53 @@
     "units_context": "mixed"
    },
    "independent_check": "geometry, panel and component pins; unit and context checks",
-   "note": "a layer's own check is untouched by an upstream change; the claims that link layers are what invalidates",
+   "instrument_slots": [
+    {
+     "contract_ref": {
+      "instrument_id": "R1-ray-bending",
+      "observable": "excised-ray clamped bending compliance",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposal_needs_calibration",
+      "unit": "ln(m/N) offset removed"
+     },
+     "kind": "physical"
+    },
+    {
+     "contract_ref": {
+      "instrument_id": "R4-length",
+      "observable": "ray length",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "proposal_needs_calibration",
+      "unit": "m"
+     },
+     "kind": "physical"
+    },
+    {
+     "contract_ref": {
+      "instrument_id": "V1-saved-deflection-section",
+      "observable": "w(x)/L at fixed sections of a saved FEM profile",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "simulation_derived",
+      "unit": "1 (m/m)"
+     },
+     "kind": "virtual"
+    },
+    {
+     "contract_ref": {
+      "instrument_id": "V2-saved-tip-and-slope",
+      "observable": "tip/L and max slope of a saved case",
+      "path": "artifacts/crossscale-doe/protocol.json",
+      "sha256": "6a10055c4c06fce6e5ee7131aca21d92ae5968ab9f32acd007dfac81a2c73993",
+      "status": "simulation_derived",
+      "unit": "1; rad"
+     },
+     "kind": "virtual"
+    }
+   ],
+   "note": "a layer's own check is untouched by an upstream change, for its original pinned model or geometry only; the claims that link layers are what invalidates",
    "retained_when_dna_changes": true
   }
  },

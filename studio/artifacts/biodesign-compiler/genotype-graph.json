@@ -24,9 +24,10 @@
     "inverse": {
      "from": "expression",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "dna",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "dna",
@@ -96,9 +97,10 @@
     "inverse": {
      "from": "growth_material",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "expression",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "expression",
@@ -167,9 +169,10 @@
     "inverse": {
      "from": "shape_mechanics",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "growth_material",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "growth_material",
@@ -226,9 +229,10 @@
     "inverse": {
      "from": "performance",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "shape_mechanics",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "shape_mechanics",
@@ -294,9 +298,10 @@
     "inverse": {
      "from": "behavior",
      "invertible": false,
-     "label": "candidate-set proposal, checked by the forward path",
+     "label": "candidate proposal; endorsement only through the forward path",
+     "proposable": true,
      "to": "performance",
-     "why": "the forward edge is not a calibrated transfer for any context"
+     "why": "the forward edge is not a calibrated transfer for any context, so no candidate can be endorsed through it"
     }
    },
    "from": "performance",
@@ -327,10 +332,11 @@
   }
  },
  "inverse_rules": [
-  "an interface that is not a calibrated transfer for the stated context is not inverted: the request is not proposable",
-  "every candidate carries provenance (proposer, method, sources) and a pinned sequence artifact, and passes the forward checks for the target before it is listed as passing",
+  "proposing a candidate and endorsing it are different: a proposal needs provenance and a sequence artifact (or an explicit unresolved reference) and asserts nothing about function",
+  "an interface that is not a calibrated transfer for the stated context is never inverted: no candidate is endorsed through it, but proposals are retained as unscreened hypotheses",
+  "endorsement needs a calibrated path to the target, passing forward checks and a validation plan whose required checks all passed",
   "an ortholog or homolog is not interchangeable: function does not transfer across species or contexts without its own context-matched measurement",
-  "the output is a candidate set with its provenance and the unresolved bridges, never a single guaranteed genome, and the compiler adds no sequence of its own"
+  "the output is a candidate set with provenance and the unresolved bridges, never a single guaranteed genome, and the compiler adds no sequence of its own"
  ],
  "must_not_say": [
   "a working genome or construct was designed",
