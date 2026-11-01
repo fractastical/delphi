@@ -85,7 +85,7 @@ def published_paths() -> set[str]:
     """What scripts/build_site.py model_downloads publishes: .stl/.glb/.zip members of each print manifest's files,
     plus a ZIP pinned by a download.json sidecar."""
     out = set()
-    manifests = [ROOT / "artifacts" / n / "manifest.json" for n in ("print-v3", "print-v2", "print")]
+    manifests = [ROOT / "artifacts" / n / "manifest.json" for n in ("print-v4", "print-v3", "print-v2", "print")]
     manifests += sorted((ROOT / "artifacts/glider").glob("*/manifest.json"))
     for m in manifests:
         d = m.parent.relative_to(ROOT).as_posix()
@@ -102,7 +102,8 @@ def test_index_covers_exactly_the_published_print_files(idx):
     assert len(paths) == len(set(paths))
     assert set(paths) == published_paths()
     assert sum(1 for p in paths if p.endswith(".stl")) == len(list((ROOT / "artifacts").glob("glider/*/stl/*.stl"))) \
-        + sum(len(list((ROOT / "artifacts" / n / "stl").glob("*.stl"))) for n in ("print", "print-v2", "print-v3"))
+        + sum(len(list((ROOT / "artifacts" / n / "stl").glob("*.stl")))
+              for n in ("print", "print-v2", "print-v3", "print-v4"))
 
 
 def test_each_row_carries_its_files_bytes_and_mass(idx):
@@ -197,3 +198,20 @@ def test_frozen_revisions_and_the_bundle_are_unchanged():
 def test_the_page_says_calculated_not_measured(idx):
     page = PLI.doc(idx)
     assert "measured" not in page.lower() and "not weighed" in page
+
+
+def test_print_v4_rows_carry_the_new_manufacturing_checks(idx):
+    rows = [f for f in idx["files"] if f["family"] == "print-v4" and f["kind"].startswith("stl_")]
+    assert len(rows) == 6                                       # two props x smooth, scale relief, stand
+    for f in rows:
+        st = {c["id"]: c["status"] for c in f["checks"]}
+        assert st["closed_oriented_manifold"] == "pass" and st["extremity_stoutness"] == "pass", f["path"]
+        assert st["chirality_mirror_pair"] == ("not_applicable" if f["kind"] == "stl_prop_relief" else "pass")
+        assert st["min_wall_dense"] == ("not_applicable" if f["kind"] == "stl_prop_relief" else "pass")
+        assert f["mass_g"] is None and "Alpha Grey V1" in f["mass_basis"]
+        rels = {x["law_id"]: x["relation"] for x in f["law_relations"]}
+        assert rels["extremity_stoutness"] == "checked" and rels["level_flight_lift"] == "not_applicable"
+        reinforced = f["part_id"].endswith("-reinforced") and f["kind"] != "stl_stand"
+        assert rels["euler_bernoulli_fin_root"] == ("inspired_only" if reinforced else "not_applicable")
+    older = [f for f in idx["files"] if f["family"] in ("print-v1", "print-v2", "print-v3") and f["kind"] != "glb_view"]
+    assert all({c["id"]: c["status"] for c in f["checks"]}["extremity_stoutness"] == "unknown" for f in older)
