@@ -34,7 +34,7 @@ def parts(cg):
     # Rendering-only vertex clustering; original source and physics are unchanged.
     # Biological component STLs are already in metres. Print STLs are separate.
     vertices = np.asarray(body.vertices)
-    cells = np.round(vertices / 0.0008).astype(int)
+    cells = np.round(vertices / 0.0015).astype(int)
     _, inverse = np.unique(cells, axis=0, return_inverse=True)
     counts = np.bincount(inverse)
     clustered = np.stack(
@@ -125,7 +125,7 @@ def draw_mesh(ax, frame, parts_data, school=False):
     ax.set_ylabel("Oblique world Y/Z projection (m)", color="#cbd5df", fontsize=8)
 
 
-def render(run, out, school=False):
+def render(run, out, school=False, stride=2):
     names = (
         ["escape-neighbors", "escape-no-neighbors"]
         if school
@@ -149,12 +149,13 @@ def render(run, out, school=False):
             for x in trajectory["frames"]
         }
     )
+    times = times[::stride] + ([times[-1]] if times[-1] not in times[::stride] else [])
     fig = plt.figure(figsize=(12.8, 7.2), facecolor="#071321")
     grid = fig.add_gridspec(2, 2, height_ratios=[2, 1], hspace=0.34, wspace=0.22)
     axs = [fig.add_subplot(grid[0, k]) for k in range(2)]
     plots = [fig.add_subplot(grid[1, k]) for k in range(2)]
     writer = FFMpegWriter(
-        fps=15, codec="libx264", extra_args=["-pix_fmt", "yuv420p", "-threads", "2"]
+        fps=10, codec="libx264", extra_args=["-pix_fmt", "yuv420p", "-threads", "2"]
     )
     out.mkdir(parents=True, exist_ok=True)
     video = out / ("school.mp4" if school else "glide.mp4")
@@ -274,7 +275,7 @@ def render(run, out, school=False):
                 }
                 for name in names
             ],
-            "geometry": "Original v3a body STL vertex-clustered at0.8mm for rendering only; exact original fin panels articulated at saved angles; no physics mesh replacement",
+            "geometry": "Original v3a body STL vertex-clustered at1.5mm for rendering only; exact original fin panels articulated at saved angles; no physics mesh replacement",
             "frame_method": "Actual saved-state selection without interpolation; stopped panels explicitly hold final observed state for comparison display, not new physics evidence",
             "video_frames": len(times),
             "video_sha256": sha256(video.read_bytes()).hexdigest(),
@@ -290,5 +291,6 @@ if __name__ == "__main__":
     parser.add_argument("--run", type=Path, default=ART / "run-v2")
     parser.add_argument("--out", type=Path, default=ART / "render-v2")
     parser.add_argument("--school", action="store_true")
+    parser.add_argument("--stride", type=int, default=2)
     args = parser.parse_args()
-    render(args.run, args.out, args.school)
+    render(args.run, args.out, args.school, args.stride)
