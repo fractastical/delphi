@@ -1,0 +1,165 @@
+{
+  "checks": {
+    "figure": "artifacts/oxygen-diffusion-rule/geometry-control.png",
+    "lean_receipt": "artifacts/oxygen-diffusion-rule/lean-receipt.json",
+    "mutants": [
+      "sphere coefficient 6 to 5 rejected",
+      "slab coefficient 2 to 1 rejected"
+    ],
+    "numerical_controls": [
+      "below-bound center positive",
+      "equality-bound center zero",
+      "above-bound center negative model-domain diagnostic",
+      "zero-size center equals boundary content",
+      "outer boundary equals C0"
+    ],
+    "numerical_receipt": "artifacts/oxygen-diffusion-rule/numerical-checks.json",
+    "positive_theorems": [
+      "sphere_center_oxygen_bound",
+      "slab_center_oxygen_bound",
+      "sphere_zero_radius_boundary",
+      "slab_zero_thickness_boundary",
+      "sphere_at_diffusion_limit",
+      "slab_at_diffusion_limit"
+    ]
+  },
+  "geometries": {
+    "slab": {
+      "center_profile": "Ccenter = C0 - a L^2/(2 D)",
+      "geometry_and_boundary": "one half of a symmetric slab: no-flux center at x=0 and supplied face C(L)=C0; a two-sided slab's total thickness is 2L",
+      "lean_definition": "engineering/formalize/lean/OxygenDiffusionBound.lean:slabCenterOxygen",
+      "limiting_half_thickness": "Llimit = sqrt(2 D C0/a) when a > 0",
+      "nonnegative_bound": "a L^2 <= 2 D C0",
+      "repository_profile": "engineering/lifecycle/diffusion.py:slab_profile",
+      "source_relation": "One-dimensional steady diffusion with constant consumption, D C'' = a; derived analogue, not a formula attributed to Grimes et al."
+    },
+    "sphere": {
+      "center_profile": "Ccenter = C0 - a R^2/(6 D)",
+      "geometry_and_boundary": "spherical domain with supplied outer boundary C(R)=C0 and symmetry at the center",
+      "lean_definition": "engineering/formalize/lean/OxygenDiffusionBound.lean:sphereCenterOxygen",
+      "limiting_radius": "Rlimit = sqrt(6 D C0/a) when a > 0",
+      "nonnegative_bound": "a R^2 <= 6 D C0",
+      "repository_profile": "engineering/lifecycle/diffusion.py:sphere_profile",
+      "source_relation": "Grimes et al. 2014, Eq. 2.2 spherical Laplacian and Eq. 2.6 diffusion-limit radius; written in partial-pressure form as r_l = sqrt(6 D p0/(a Omega))."
+    }
+  },
+  "model": {
+    "common_assumptions": [
+      "steady state",
+      "diffusion only; no perfusion or advection",
+      "spatially constant, nonnegative oxygen consumption a",
+      "constant isotropic diffusion coefficient D > 0",
+      "boundary oxygen content C0 >= 0",
+      "oxygen profile is evaluated only within the stated ideal geometry"
+    ],
+    "derived_output": "model-predicted center oxygen content Ccenter; Ccenter < 0 marks that the nonnegative-oxygen profile is outside this constant-consumption model's domain, not a physical negative concentration",
+    "units_note": "The existing lifecycle profiles use the same mass basis as the cited Grimes source: C0 is oxygen-gas volume per tissue mass and a is that volume consumed per tissue mass per second. C0/a is seconds. If a downstream context uses per-volume values, both must be converted consistently; this artifact does not do that conversion.",
+    "variables": {
+      "C0": {
+        "meaning": "oxygen content at supplied boundary",
+        "status": "context-specific unknown",
+        "unit": "m^3 O2 kg^-1"
+      },
+      "D": {
+        "meaning": "oxygen diffusion coefficient",
+        "status": "context-specific unknown",
+        "unit": "m^2 s^-1"
+      },
+      "Omega": {
+        "meaning": "paper's pressure-to-content conversion; C0 = p0/Omega",
+        "status": "source-context conversion, recheck temperature/material before use",
+        "unit": "mmHg kg m^-3"
+      },
+      "a": {
+        "meaning": "oxygen consumption per tissue mass per time",
+        "status": "context-specific unknown",
+        "unit": "m^3 O2 kg^-1 s^-1"
+      },
+      "p0": {
+        "meaning": "boundary oxygen partial pressure",
+        "status": "context-specific unknown",
+        "unit": "mmHg when using the Grimes pressure conversion"
+      }
+    }
+  },
+  "not_established": [
+    "cell viability threshold or tissue survival",
+    "cell-specific oxygen consumption or diffusion in either candidate project",
+    "actual oxygen supply in a microcarrier or repair patch",
+    "wound closure, epithelial barrier function, microcarrier motion or organism-level function",
+    "a transfer relation from tumor spheroids, fish, Xenobots, or another cell/material context"
+  ],
+  "reuses": [
+    {
+      "biological_claim": "none; this does not predict tissue viability, Xenobot actuation, deformation, or motion",
+      "candidate_endpoint": "model-predicted center oxygen nonnegativity under the declared steady spherical profile",
+      "draft_ref": "git:kganjam/delphi-frontier@f0e45382a48e79b170ed0e0613cf81322ed4ba37:projects/tissue-microcarrier.draft.json",
+      "draft_sha256": "e79b2c5b2035912631a1ee1b97bc5ac3f078f6780a69198b374fdaa4bb456828",
+      "parameter_status": {
+        "C0": "unknown",
+        "D": "unknown",
+        "a": "unknown",
+        "cell_or_material_context": "unknown"
+      },
+      "project_ref": "project-tissue-microcarrier",
+      "project_status": "authored draft; not yet a stored Project",
+      "selected_geometry": "sphere as a proposed geometry screen only",
+      "source_transfer": "No tumour spheroid DLD1 parameter or fitted value is transferred."
+    },
+    {
+      "biological_claim": "none; this does not predict wound closure, barrier recovery, or treatment outcome",
+      "candidate_endpoint": "model-predicted center oxygen nonnegativity under the declared steady slab profile",
+      "draft_ref": "git:kganjam/delphi-frontier@f0e45382a48e79b170ed0e0613cf81322ed4ba37:projects/epithelial-repair.draft.json",
+      "draft_sha256": "80f91abae3ae6ab152f2c3ed4379f968994cc33c0faf89d4d476d9409e5ff9b9",
+      "parameter_status": {
+        "C0": "unknown",
+        "D": "unknown",
+        "a": "unknown",
+        "cell_or_material_context": "unknown",
+        "oxygen_supply_face": "unknown"
+      },
+      "project_ref": "project-epithelial-repair",
+      "project_status": "authored draft; not yet a stored Project",
+      "selected_geometry": "one-sided slab as a counterfactual patch-thickness screen only",
+      "source_transfer": "No tumour spheroid DLD1 parameter or fitted value is transferred."
+    }
+  ],
+  "rule_id": "steady-constant-consumption-center-oxygen-bound",
+  "rule_version": "1.0.0",
+  "schema": "frontier.reusable-oxygen-rule/1",
+  "source_pins": {
+    "figure": {
+      "path": "artifacts/oxygen-diffusion-rule/geometry-control.png",
+      "sha256": "09c8e5d266b537dc07fc4916b2c4f25102a60659dc934ba5ee762f1c75997fea"
+    },
+    "figure_source": {
+      "path": "scripts/render_oxygen_diffusion_rule.py",
+      "sha256": "1c9372c9e5a652317cf4605c103e553116e9e2b8418ceb4736cf061b60a20143"
+    },
+    "lean_rule": {
+      "path": "engineering/formalize/lean/OxygenDiffusionBound.lean",
+      "sha256": "288eb515fc231a9471274728f18f1f127108a1355d0295a327900a237d73b85d"
+    },
+    "lean_runner": {
+      "path": "scripts/validate_oxygen_diffusion_lean.py",
+      "sha256": "f956480a8d96967c6a80eece35301e3f6f5936efc15e5303b4330815381adec8"
+    },
+    "negative_control": {
+      "path": "engineering/formalize/lean/OxygenDiffusionBound_negative_corrupt_law.lean",
+      "sha256": "b52bd39250b9aa5909f5011e20247dedcf0be49244d04e1ff850835c0cc181e9"
+    },
+    "numerical_validation": {
+      "path": "engineering/lifecycle/oxygen_rule_validation.py",
+      "sha256": "0711b8885e418ab0dc05750ab1570b486ae933f55cb120a2a0961983b8ff3448"
+    },
+    "primary_source_provenance": {
+      "path": "artifacts/oxygen-diffusion-rule/source-provenance.json",
+      "sha256": "07404c0c0a2df304f84c99b7879b2765e20857f878b5ca5c34c67561e7410cd6"
+    },
+    "repository_model": {
+      "path": "engineering/lifecycle/diffusion.py",
+      "sha256": "d7703d19d1e17cd353fb77da103fc5c93a3d9b70c2232648ff418cfa46e3a6f9"
+    }
+  },
+  "status": "formal-model-implication; biological-parameters-unknown"
+}
