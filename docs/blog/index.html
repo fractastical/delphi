@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog — Delphi</title>
+<link rel="stylesheet" href="../css/delphi.css">
+<style>
+  .post-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+  .post{display:block;padding:16px 18px;text-decoration:none;color:inherit}
+  .post h2{font-size:18px;letter-spacing:-.02em}
+  .post p{margin:6px 0 0;color:var(--ink-2)}
+  .post time{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14A8.5 8.5 0 0 1 10 4a8.5 8.5 0 1 0 10 10z"/></symbol></defs></svg>
+<header class="site-nav"><div class="site-nav-in"><button class="icon-button site-menu" id="site-menu" aria-label="Open menu" aria-expanded="false"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-menu"/></svg></button><a class="logo" href="../index.html"><svg class="brand-symbol" viewBox="0 0 32 40" fill="none" aria-hidden="true"><path d="M16 2L30 29 16 37 2 29 16 2Z" stroke="currentColor" stroke-width="1.2"/><path d="M16 2v35M2 29l14-8 14 8M5 23l11-6 11 6M9 16l7-4 7 4M2 29l14 2 14-2" stroke="currentColor" stroke-width=".8" opacity=".75"/></svg><span><b>Delphi</b></span></a><nav class="site-links" id="site-links" aria-label="Site"><a href="../index.html">Home</a><a href="../claim-graph.html">Claim graph</a><a href="../theorems.html">Theorems</a><a href="./" aria-current="page">Blog</a></nav><div class="site-actions"><button class="icon-button" id="site-theme" aria-label="Switch theme"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-moon"/></svg></button></div></div></header>
+<main>
+  <header class="page-head">
+    <div>
+      <div class="eyebrow accent">Delphi</div>
+      <h1>Blog</h1>
+      <p class="subtitle">Notes on the claims, the tests, and what the counts mean. Posts live in this folder as their own pages.</p>
+    </div>
+  </header>
+  <div class="post-list" id="posts">
+    <a class="post panel" href="science-claw-2026.html">
+      <time datetime="2026-11-01">1 November 2026</time>
+      <h2>What we built at Science Claw, and what it does not yet show</h2>
+      <p>The project report after the hackathon at MIT: the claims, the theorems, the data tests, the nanopublications, the species inventory, the five surfaces for checking a design, the measured swarm comparison, and what none of it establishes. Every figure is computed from the repository at build time (<code>node scripts/site/build-blog.mjs</code>).</p>
+    </a>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = 'delphi-theme-blue-pink-v1', root = document.documentElement;
+  function paint(t) {
+    root.dataset.theme = t;
+    var b = document.getElementById('site-theme');
+    if (b) { b.querySelector('use').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon'); b.setAttribute('aria-label', 'Switch to ' + (t === 'dark' ? 'light' : 'dark') + ' theme'); }
+  }
+  var saved = 'light';
+  try { var v = JSON.parse(localStorage.getItem(KEY)); if (v === 'dark' || v === 'light') saved = v; } catch (e) {}
+  paint(saved);
+  document.addEventListener('DOMContentLoaded', function () {
+    paint(root.dataset.theme);
+    document.getElementById('site-theme').addEventListener('click', function () {
+      var t = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      paint(t); try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) {}
+    });
+    var m = document.getElementById('site-menu'), l = document.getElementById('site-links');
+    m.addEventListener('click', function () { var o = l.classList.toggle('open'); m.setAttribute('aria-expanded', o); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -17,8 +17,9 @@ homepage `index.html` is `Delphi_Product_Platform.html` from
 mission-control dashboard stays on its Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
   `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, `deck/index.html` (the project
-  overview deck, the header's About link), plus `claims.json`, `problems.json`, `export/`, `thumbs/`,
-  `team/`. Don't edit these by hand; rebuild them.
+  overview deck, the header's About link), `blog/<post>.html` (posts, every count computed by
+  `scripts/site/build-blog.mjs` from its template; `blog/index.html` is the hand-kept list of posts),
+  plus `claims.json`, `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.
 
 ## Shared look
 
@@ -42,6 +43,7 @@ node scripts/site/build-claim-graph.mjs     # claim-graph, claims-query, theorem
 node problems/build/build-site.mjs          # problems.html, problems.json
 python3 scripts/site/build-team-page.py     # team.html
 node scripts/site/build-overview-deck.mjs   # deck/index.html (after build-claim-graph; reads claims.json)
+node scripts/site/build-blog.mjs            # blog/science-claw-2026.html (after build-claim-graph; reads claims.json)
 ```
 
 ## Refresh the portal

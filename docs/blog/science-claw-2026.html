@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What we built at Science Claw — delphisci</title>
+<meta name="description" content="A written summary of Project Delphi after the Science Claw hackathon at MIT: 1,763 claims from 16 thinkers, 91 theorems, 174 claims tested against data, 880 live nanopublications, an MCP server, a species inventory, a design studio with a validation harness, and what none of it establishes.">
+<link rel="stylesheet" href="../css/delphi.css">
+<style>
+article{max-width:76ch;margin:0 auto}
+article p,article li{font-size:15.5px;line-height:1.7;color:var(--ink)}
+article h2{margin:40px 0 10px;font-size:24px;letter-spacing:-.01em}
+article h3{margin:26px 0 6px;font-size:17px}
+article figure{margin:24px 0}
+article figure img{display:block;width:100%;border:1px solid var(--grid);border-radius:10px;background:var(--paper-2)}
+article figcaption{font-size:12.5px;color:var(--ink-3);margin-top:8px;line-height:1.5}
+.lede{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--ink-2);margin:10px 0 0}
+.meta{font-size:12.5px;color:var(--ink-3);margin:14px 0 0}
+table.nums{border-collapse:collapse;width:100%;margin:14px 0 6px;font-size:13.5px}
+table.nums th,table.nums td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
+table.nums th{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+table.nums td.num,table.nums th.num{text-align:right;font-variant-numeric:tabular-nums}
+.callout{border-left:2px solid var(--accent);background:var(--paper-2);padding:12px 18px;border-radius:0 10px 10px 0;margin:18px 0}
+.callout p{margin:6px 0;font-size:14.5px}
+.src{font-size:12px;color:var(--ink-3)}
+code{font-family:var(--mono);font-size:.9em}
+pre{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--code-line);border-radius:10px;padding:12px 16px;overflow-x:auto;font-size:12.5px;line-height:1.6}
+.toc{columns:2;column-gap:28px;font-size:13.5px;margin:0 0 8px;padding-left:18px}
+.toc li{break-inside:avoid;line-height:1.8}
+@media(max-width:700px){.toc{columns:1}article p,article li{font-size:15px}}
+</style></head><body>
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs><symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5"/></symbol><symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14A8.5 8.5 0 0 1 10 4a8.5 8.5 0 1 0 10 10z"/></symbol></defs></svg>
+<header class="site-nav"><div class="site-nav-in"><button class="icon-button site-menu" id="site-menu" aria-label="Open menu" aria-expanded="false"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-menu"/></svg></button><a class="logo" href="../index.html#about"><svg class="brand-symbol" viewBox="0 0 32 40" fill="none" aria-hidden="true"><path d="M16 2L30 29 16 37 2 29 16 2Z" stroke="currentColor" stroke-width="1.2"/><path d="M16 2v35M2 29l14-8 14 8M5 23l11-6 11 6M9 16l7-4 7 4M2 29l14 2 14-2" stroke="currentColor" stroke-width=".8" opacity=".75"/></svg><span><b>Delphi</b></span></a><nav class="site-links" id="site-links" aria-label="Site"><a href="../deck/">About</a><a href="../index.html#product">Explore</a><a href="../index.html#problems">Open problems</a><a href="../index.html#evidence">Evidence</a><a href="../index.html#docs">Data &amp; code</a></nav><div class="site-actions"><button class="icon-button" id="site-theme" aria-label="Switch theme"><svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-moon"/></svg></button><a class="button sign" href="../index.html#access">Take part</a><a class="button primary" href="../index.html#workspace"><span class="lbl-l">Open the workbench</span><span class="lbl-s">Workbench</span> <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a></div></div></header>
+<div class="subnav"><div class="subnav-in"><span class="eyebrow">Claims atlas</span><a href="../claim-graph.html">Claim graph</a><a href="../theorems.html">Theorems</a><a href="../claims-query.html">Query claims</a><a href="../problems.html">Problem graph</a><a href="../team.html">Team</a><a href="../blog/" aria-current="page">Blog</a></div></div>
+<script>
+(function () {
+  var KEY = 'delphi-theme-blue-pink-v1', root = document.documentElement;
+  function paint(t) {
+    root.dataset.theme = t;
+    var b = document.getElementById('site-theme');
+    if (b) { b.querySelector('use').setAttribute('href', t === 'dark' ? '#i-sun' : '#i-moon'); b.setAttribute('aria-label', 'Switch to ' + (t === 'dark' ? 'light' : 'dark') + ' theme'); }
+  }
+  var saved = 'light';
+  try { var v = JSON.parse(localStorage.getItem(KEY)); if (v === 'dark' || v === 'light') saved = v; } catch (e) {}
+  paint(saved);
+  document.addEventListener('DOMContentLoaded', function () {
+    paint(root.dataset.theme);
+    document.getElementById('site-theme').addEventListener('click', function () {
+      var t = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      paint(t); try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) {}
+      document.dispatchEvent(new CustomEvent('delphi-theme', { detail: t }));
+    });
+    var m = document.getElementById('site-menu'), l = document.getElementById('site-links');
+    m.addEventListener('click', function () { var o = l.classList.toggle('open'); m.setAttribute('aria-expanded', o); });
+  });
+})();
+</script>
+
+<main>
+<article>
+<header class="page-head"><div><div class="eyebrow accent">Blog · Project report</div><h1>What we built at Science Claw, and what it does not yet show</h1>
+<p class="lede">Over one weekend at MIT, a team of people and a swarm of agents turned five books and sixteen papers into 1,763 machine-readable claims about living things, proved 91 of them as mathematics, tested 174 against data, published 880 of them as nanopublications, and built the tools for anyone to query, challenge or extend the result. This is the account of what that means, written for a reader who was not there.</p>
+<p class="meta">Project Delphi · Science Claw Hack @ MIT, 30 Oct – 1 Nov 2026 · Figures computed on 1 November 2026 (2026-11-01 17:49 UTC) from the repository by <code>scripts/site/build-blog.mjs</code>; nothing on this page is typed by hand.</p></div></header>
+
+<ol class="toc">
+<li><a href="#goal">The goal</a></li>
+<li><a href="#numbers">The numbers</a></li>
+<li><a href="#claims">Claims, from the page to the graph</a></li>
+<li><a href="#theorems">Proofs: what a theorem means here</a></li>
+<li><a href="#tests">Tests: claims against data</a></li>
+<li><a href="#nanopubs">Nanopublications</a></li>
+<li><a href="#organisms">The species inventory</a></li>
+<li><a href="#surfaces">Five surfaces for checking a design</a></li>
+<li><a href="#swarm">The swarm, measured</a></li>
+<li><a href="#timeline">Day by day</a></li>
+<li><a href="#wings">The wings</a></li>
+<li><a href="#partners">Partners and sponsors</a></li>
+<li><a href="#not">What is not established</a></li>
+<li><a href="#use">How to use it</a></li>
+</ol>
+
+<h2 id="goal">The goal</h2>
+<p>Physics has laws that hold everywhere; biology mostly has descriptions. Delphi (the <b>D</b>istributed <b>E</b>pistemic <b>L</b>ayer for <b>P</b>robabilistic <b>H</b>ypothesis <b>I</b>nference) asks whether there are <b>fundamental theorems of biology</b>: general statements about organisms that hold across species, scales and systems, stated precisely enough to be proved or refuted. The method is to take candidate laws from the literature, state each one as a claim traced to its source, formalize it where the mathematics allows, test it against data from many organisms, and publish every step as a citable record that another team can challenge.</p>
+<p>One rule shapes everything that follows: a proof shows that a statement follows from its assumptions, and a data test shows whether organisms satisfy them. Neither replaces the other, and the project keeps the two scores apart on every page.</p>
+
+<h2 id="numbers">The numbers</h2>
+<table class="nums">
+<tr><th></th><th class="num">count</th></tr>
+<tr><td>claims extracted, from 16 thinkers and 45 works</td><td class="num">1,763</td></tr>
+<tr><td>of which carry mathematical content</td><td class="num">189</td></tr>
+<tr><td>theorems (math claims with a proof: 73 machine-checked in Lean 4, 18 proved in the literature)</td><td class="num">91</td></tr>
+<tr><td>claims tested against data (93 supported, 37 mixed, 30 refuted, 14 inconclusive)</td><td class="num">174</td></tr>
+<tr><td>of those, tested on data measured on organisms</td><td class="num">90</td></tr>
+<tr><td>tests pre-registered and awaiting data</td><td class="num">17</td></tr>
+<tr><td>tests through the independent faithfulness gate (5 judged not representative, 6 contested)</td><td class="num">33 of 174</td></tr>
+<tr><td>claims live as signed nanopublications on the production registry</td><td class="num">880</td></tr>
+<tr><td>claims on the test registry only</td><td class="num">876</td></tr>
+<tr><td>animal taxa in the species inventory (1,028 with at least one dataset record; 8,237 records; 8,091 located mentions)</td><td class="num">1,036</td></tr>
+<tr><td>open problems in the problem graph</td><td class="num">27</td></tr>
+<tr><td>Lean laws in the versioned registry (36 accepted)</td><td class="num">53</td></tr>
+<tr><td>claims neither proved nor tested</td><td class="num">1,522</td></tr>
+</table>
+<p class="src">Sources: <code>docs/claims.json</code>, <code>test-data/claim-tests/**/result.json</code>, <code>test-data/organisms/merged/taxa.json</code>, <code>docs/problems.json</code>, <code>lean/registry/</code>. The same counts are available over MCP (<code>delphi_overview</code>, <code>delphi_claim_tests</code>) and in the generated table in the <a href="https://github.com/fractastical/delphi#current-numbers">README</a>.</p>
+<p>The last row is the honest one. Most claims are neither proved nor tested, and the project treats that as the work in front of it rather than a number to hide. Every untested claim is ranked by how testable it is, and the ranking says which to test next.</p>
+
+<h2 id="claims">Claims, from the page to the graph</h2>
+<p>A claim here is one sentence from a source work, quoted, page-cited and restated so that it can be wrong on its own. The sources so far:</p>
+<table class="nums">
+<tr><th>Thinker</th><th>Work</th><th class="num">claims</th><th class="num">theorems</th><th class="num">tested</th></tr>
+<tr><td>Aristotle</td><td>3 papers</td><td class="num">566</td><td class="num">0</td><td class="num">0</td></tr><tr><td>Stephen Wolfram</td><td>A New Kind of Science</td><td class="num">321</td><td class="num">0</td><td class="num">64</td></tr><tr><td>Michael Levin</td><td>16 papers</td><td class="num">310</td><td class="num">0</td><td class="num">14</td></tr><tr><td>D'Arcy Wentworth Thompson</td><td>On Growth and Form</td><td class="num">291</td><td class="num">49</td><td class="num">38</td></tr><tr><td>Charles Darwin</td><td>On the Origin of Species</td><td class="num">247</td><td class="num">20</td><td class="num">46</td></tr><tr><td>11 mathematical biologists and hygromorph-mechanics authors</td><td>23 papers</td><td class="num">28</td><td class="num">22</td><td class="num">12</td></tr>
+</table>
+<p>Darwin's <i>On the Origin of Species</i> and Thompson's <i>On Growth and Form</i> were extracted on the first evening, with Wolfram's <i>A New Kind of Science</i> following before midnight. Levin's papers (bioelectricity, regeneration, xenobots, the TAME framework) and Aristotle's biological works came on the second day. The mathematical-biology set is different in kind: a short list of results by Fisher, Kimura, Hamilton, Turing, Maynard Smith, Hardy and Weinberg, and Price, with their mathematics written out and a recorded formal status, which is where the first theorems came from.</p>
+<p>Each claim then went through blind assessment. Two or more models from different providers scored each one for <i>dataset resolvability</i> (could a dataset settle this?) and for <i>truth</i> (how likely is it right, before any test?). These scores are elicited opinions, never probabilities, and they are shown as such; disagreement between assessors is kept, not averaged away. The <a href="../claim-graph.html">claim graph</a> shows every claim coloured by its status, with assessor numbers on the edges, and the <a href="../claims-query.html">query page</a> filters and exports the same set.</p>
+
+<h2 id="theorems">Proofs: what a theorem means here</h2>
+<p>The word <i>theorem</i> is used strictly. A claim counts as a theorem only when it is a mathematical statement and its proof is established, in exactly one of two ways: a Lean 4 module compiled with no <code>sorry</code> and only Lean's standard axioms, or a proof recorded in the literature for a result whose formal status the project checked. Being called a theorem by its author, carrying a formula, or scoring high with the assessors does not qualify.</p>
+<p>By that rule 91 claims are theorems. 18 come from the literature (Fisher's fundamental theorem in its partial-change reading, Hardy–Weinberg, the Price equation, Kimura's neutral rate, Hamilton's rule, Turing's instability conditions). 73 are machine-checked: 49 of Thompson's claims about form (hollow tubes, Murray's cubic law for branching vessels, the scaling of bone with body size, the twelve pentagons on any closed cellular surface), 20 of Darwin's claims about geometric increase, overproduction and selection in large populations, read as statements about a population model, and 4 on the plant-hygromorph mechanics of pine cones, awns and seed pods, each proved in the <code>ThompsonLaws</code> Lean project.</p>
+<p>Two refinements turned out to matter. First, a historical sentence usually admits several readings, and they are not equally provable: every math-bio claim carries a <i>formalization</i> tag saying whether it has one agreed reading, several non-equivalent ones, or is an identity that follows from the model's own bookkeeping (the Price equation; Thompson's hexagonal-on-average cells via Euler's formula) and so is true but uninformative about organisms. Second, each Lean proof is accompanied by deliberately broken variants that must fail to compile; a proof nobody tried to break is not evidence. The <a href="../theorems.html">theorems page</a> lists the set with the formal statement, the assumptions, the Lean declarations and links to the papers.</p>
+<div class="callout"><p>A proof here shows that the statement follows from its assumptions. Whether living systems satisfy those assumptions is a separate question, answered by the tests below and never by the proof.</p></div>
+
+<h2 id="tests">Tests: claims against data</h2>
+<p>174 claims have been tested against data, 90 of them on data measured on organisms and 75 on simulation or computation (most of Wolfram's claims are about cellular automata and are tested by running them). The protocol is the same each time: the test is <b>pre-registered</b>, with its hypothesis, datasets, analysis and pass/fail criteria committed before the data is downloaded; any later change is recorded as a deviation, not a quiet edit; the result is one of <i>supported</i>, <i>refuted</i>, <i>mixed</i> or <i>inconclusive</i>, and all four are published.</p>
+<p>The outcomes: 93 supported, 37 mixed, 30 refuted, 14 inconclusive. Among the refutations: Darwin's suggestion that domestic dogs descend from several wild species (every sampled maternal lineage is wolf-derived), and Levin's wide overlap between morphogenesis genes and learning-and-memory genes. Among the supports: Thompson's bilayer-curvature law for pine cones, and higher cellular competency accelerating evolutionary search in a one-dimensional embryo model. 17 more tests are pre-registered and waiting on data, several of them blocked by gated repositories, which is recorded as a finding rather than filled in with a guess.</p>
+<p>A second gate was added on the second day, because a passing number from a model that measures the wrong thing is worse than no number. The <b>faithfulness assessor</b> is a model from a provider other than the builder's, shown only the claim, the model and the data description, asked whether the analysis measures what the claim asserts. 33 of the 174 tests have been through it; 5 were judged not representative and 6 are contested between assessors. A not-representative verdict is reported beside the data verdict and does not edit it: the reader sees both. The full list, one row per tested claim, is in <a href="https://github.com/fractastical/delphi/blob/main/test-data/claim-tests/SUMMARY.md"><code>test-data/claim-tests/SUMMARY.md</code></a>.</p>
+<p>The first open-problem run followed the same protocol. The species–area exponent was pre-registered before any richness value was seen, then computed on 1,124 islands from the GIFT database: a pooled <i>z</i> of 0.307 (95% CI 0.295–0.319), with regional exponents from 0.14 to 0.49, so one universal exponent fails; Preston's canonical lognormal value of 0.264 was reproduced. <span class="src">(Figures as logged in <code>DAY-BY-DAY.md</code> and the problem's <code>result.json</code>; not recounted by this page.)</span></p>
+
+<h2 id="nanopubs">Nanopublications</h2>
+<p>Everything above is published as <a href="https://nanopub.net/">nanopublications</a>: small signed RDF records, one per claim, assessment or evidence item, each with its assertion, its provenance and its publication info in separate named graphs, using the Delphi ontology. A nanopublication can be cited by its URI, queried over SPARQL, superseded with a correction or retracted, and the signature cannot be forged after the fact.</p>
+<p>880 claims (Darwin, Thompson, Wolfram and the math-bio set) were signed with the operator's ORCID key and published to the production registry on the hackathon's first night. Everything made since, the Aristotle and Levin claims with their assessments, the cell-geometry evidence items, the test results, went to the <b>test registry</b> (876 claims there) or stayed as validated unsigned drafts. The boundary is deliberate: production publishing is irreversible, so each production batch needs the key owner's explicit approval, every time, and a standing order says every micro-discovery becomes a record with its evidence, its pre-registration and a statement of what it does not establish.</p>
+
+<h2 id="organisms">The species inventory</h2>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/organisms-overnight.gif" alt="Sixteen cloud agents merging animal taxa from Darwin and Thompson, 00:30 to 01:40 on Oct 31" loading="lazy"><figcaption>Sixteen cloud agents, one per chapter slice of Darwin and Thompson, built the organism inventory between 00:30 and 01:40 on the first night.</figcaption></figure>
+<p>A law that holds in one organism is not fundamental, so the second night built the inventory of every animal taxon the source books mention: 1,036 taxa, 8,091 located mentions, each resolved to GBIF, NCBI, Wikidata, WoRMS and PBDB identifiers, with 8,237 provenanced dataset records (occurrence counts, genome assemblies, trait databases, fossil occurrences). The inventory is what a claim is tested <i>on</i>: when a Thompson claim about bone scaling is tested, the species come from here, and each species' page says which data exist at which scale. It is an inventory of what the books mention, not of biology: plants, fungi, microbes and most invertebrates are absent by construction, and the dashboard says so. One class, the birds (Aves), is frozen as a held-out exam that no model in the pipeline is allowed to see.</p>
+
+<h2 id="surfaces">Five surfaces for checking a design</h2>
+<p>The second strand of the weekend, documented in the dashboard's <a href="https://delphi-mission-control.ashenoy000.workers.dev/docs">product report</a>, turned the claim pipeline around: if we can state biological laws precisely enough to check, can an agent that designs an organism check its design the way it checks a proof? Five surfaces came out of that, each with the same default answer when it lacks an input: <i>cannot evaluate</i>, named and reported, rather than a confident number.</p>
+<h3>1. Nanopubs</h3>
+<p>The claim record itself, as above: one finding, small enough to be wrong, with a locator back to the exact line it came from and a sentence saying what it does not establish. A validator (<code>holdout/nanopubs/check.mjs</code>) rejects invented IRI schemes, numbers that appear in no source, and boilerplate descriptions shared between records; all three were produced by competent agents during the event and caught.</p>
+<h3>2. LeanBio</h3>
+<p>Claims distilled from papers into Lean 4, with two gates: the statement compiles with no cheats (no <code>sorry</code>, <code>admit</code>, added axioms or <code>native_decide</code>), and it survives a non-vacuity check in which every inequality hypothesis is stripped and the file recompiled; if it still compiles, the hypotheses were decorative and the formalization fails. Every law in the registry carries a <i>witness</i>: concrete numbers that satisfy all its hypotheses, proved. Where two sources disagree, the rule is to formalize the weaker claim both support, make the disagreement a hypothesis, or record the conflict as its own finding; never to average.</p>
+<h3>3. MCP, API and CLI</h3>
+<p>The laws, organisms, simulators and harness as tools, on the hosted <code>delphisci</code> MCP server and the local <code>sim-engine</code> server. Every tool returns a named verdict in an envelope, never a bare value, and the law checker is pinned to a lawset version so that a law released mid-run cannot move a result. Between 2026-10-30 to 2026-10-31 the hosted server logged 1,522 tool calls across 60 sessions from 6 distinct clients, among them the partner project's import adapter.</p>
+<h3>4. Design Studio</h3>
+<p>From a sentence ("a fish, with wings") down nine layers to organ systems, tissues, cell types and sequence, with every layer able to refuse. It exports a mesh in millimetres and a predicted edited locus on a stated assembly, and the flying-zebrafish design left the screen as SLA-printed geometry. The studio is labelled as under active development on every screen that shows it.</p>
+<h3>5. The validation harness</h3>
+<p>The part that says no. It maps a design to its nearest real relative by genotype and by phenotype, annotates every difference, checks the design against the law registry, runs physics on the mesh, and reports five named results that are never summed. On the project's own winged zebrafish it refused: launch speed far below what gliding requires, lifting area orders of magnitude too small, and of the functional requirements most could not be assessed at all. The report's own account of why there is no composite score (one added criterion the design already met moved the composite from "not plausible" to "plausible" on byte-identical inputs) is the argument for the whole design. <span class="src">(The specific harness figures are quoted from the dashboard's product report and not re-verified by this page's build.)</span></p>
+
+<h2 id="swarm">The swarm, measured</h2>
+<p>The hackathon's theme was collective agency, and the obvious claim, that many agents do better than one, was tested rather than assumed. Four arms were compared on the same task, writing pre-registered test plans with real, verifiable dataset identifiers for 20 Darwin and Thompson claims: a single agent, a set of isolated agents, a centrally coordinated swarm and a decentralized one, all running claude-sonnet-5-5 via headless claude -p. The experiment was run twice with different tool conditions.</p>
+<table class="nums">
+<tr><th>arm</th><th>exp 1 verified</th><th>exp 1 cost</th><th>exp 2 verified</th><th>exp 2 cost</th></tr>
+<tr><td>single</td><td>13 of 20</td><td>$0.57</td><td>12 of 20</td><td>$0.52</td></tr><tr><td>isolated</td><td>17 of 20</td><td>$2.60</td><td>16 of 20</td><td>$4.48</td></tr><tr><td>centralized</td><td>19 of 20</td><td>$2.98</td><td>18 of 20</td><td>$5.61</td></tr><tr><td>decentralized</td><td>18 of 20</td><td>$3.28</td><td>17 of 20</td><td>$6.37</td></tr>
+</table>
+<p>Every multi-agent arm beat the single agent by at least 4 of 20 verified datasets in both experiments, with no fabricated identifiers in any final plan. The three swarm shapes are not distinguishable from one another at n = 20, and the single agent cost a 0th to a 0th as much as the cheapest swarm. What this does not show:</p>
+<ul><li>The single agent costs a fifth (experiment 1) to a tenth (experiment 2) of a swarm arm; its shortfall is mostly blank plans (context exhaustion), not worse dataset picks (DEVIATIONS.md, experiment 2: 8 of 8 shortfalls blank).</li><li>Verified means the URL resolves to a page that names the dataset, not that the dataset can decide the claim.</li><li>n=20 per experiment, one model (Sonnet 5.5) in every arm, same provider as the builder; no blind assessor from another provider scored the plans.</li><li>Experiment 1 decentralized arm wrote 1 fabricated identifier on a first attempt (corrected after a board gap note), so under the strict all-attempts count it fails the hard constraint and is excluded from the best-collective-arm margin in experiment 1.</li><li>A sister project with deterministic specialists (delphi-evolve) reported no collective advantage; the gain here is in the regime where context and attention are the bottleneck.</li></ul>
+<p class="src">Source: <code>test-data/agent-comparison/four-arm.json</code>, built from the imported run data; the write-up is <a href="https://github.com/fractastical/delphi/blob/main/test-data/agent-comparison/SUMMARY.md"><code>SUMMARY.md</code></a>.</p>
+<p>The swarm that built the repository itself ran under written rules: one writer per path, a live <code>status.json</code> per thread aggregated onto one dashboard, issues to claim work and files for results, and a hard rule that a message from another agent is never user approval. Two coordination failures hit during the event, a role collision and an attempt at permission laundering, are written up in <code>AGENTS.md</code> with their fixes, so the next team does not repeat them.</p>
+
+<h2 id="timeline">Day by day</h2>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/repo-history.gif" alt="Commit-by-commit animation of Friday Oct 30, 18:40 to midnight" loading="lazy"><figcaption>Friday, Oct 30. The repository, the goal, Darwin, Thompson, Wolfram, the claim graph and the MCP server, between 18:40 and midnight.</figcaption></figure>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/claims-status.gif" alt="Claims, blind confidence, data tests and theorems as of Saturday midday" loading="lazy"><figcaption>Saturday midday. The scoreboard after the first claim-test swarm: 880 claims, 132 tested against public data, 16 proved as theorems (figures as printed on the card).</figcaption></figure>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/since-1309.gif" alt="What changed between 13:09 and 15:50 on Oct 31: Levin, production nanopubs, theorems" loading="lazy"><figcaption>Saturday afternoon. Levin's papers arrive, Thompson and Wolfram go to production, and the Lean-checked Thompson claims lift the theorem count from 16 to 63.</figcaption></figure>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/overnight-nov1.gif" alt="Hour-by-hour animation from Oct 31 16:08 to Nov 1 09:54" loading="lazy"><figcaption>Saturday night into Sunday. Aristotle's claims, 21 pre-registered tests, the faithfulness gate, the test-registry publication, and the first open-problem run.</figcaption></figure>
+<p>The figures printed on each card are the count at that moment, not a later recount; the live counts are the table at the top of this page. The stretch-by-stretch log, with verified commit times, is <a href="https://github.com/fractastical/delphi/blob/main/DAY-BY-DAY.md"><code>DAY-BY-DAY.md</code></a>, and the design thread's decisions, failures and corrections are in <a href="https://github.com/fractastical/delphi/blob/main/DEVELOPMENT-RECORD.md"><code>DEVELOPMENT-RECORD.md</code></a>.</p>
+
+<h2 id="wings">The wings</h2>
+<figure><img src="https://raw.githubusercontent.com/fractastical/delphi/main/assets/arigomphus-wing.jpg" alt="Two 3D-printed Arigomphus villosipes hindwings side by side: real vein network and Hoffmann 2018 model venation" loading="lazy"><figcaption>Two 140 mm SLA prints of the same dragonfly hindwing. Left, the vein network segmented from the real wing; right, the real outline and primary veins with the cross veins regenerated by the Hoffmann et al. 2018 rule.</figcaption></figure>
+<p>The first physical output of the project is a pair of dragonfly hindwings printed on Formlabs SLA. One carries the vein network segmented from the specimen; the other keeps the outline and primary veins and regenerates the cross veins from a published model (Lloyd-relaxed Voronoi edges). Each design decision behind the flying-fish and wing work maps to a claim that is proved in Lean (hollow spars, wall thickness following the bending moment, bilayer bending), tested against data, or open. What is shown is that both wings printed; the scan comparison passed only on a simulated scan, so there is no measured print-versus-design agreement yet.</p>
+
+<h2 id="partners">Partners and sponsors</h2>
+<p>Two sibling repositories were built at the same event on Delphi's claims and MCP server, by Kris Ganjam: <a href="https://github.com/kganjam/delphi-evolve">delphi-evolve</a>, a query-to-certify prototype on an enzyme fitness landscape where Delphi's Kimura, Fisher and Turing claims became executable checks and where a simple baseline beat the model-assisted planner, a null the team kept; and <a href="https://github.com/kganjam/delphi-frontier">delphi-frontier</a>, a live research workspace that imported the claims through an adapter visible in our MCP log. Their counts are theirs and are quoted, not re-run, in the README.</p>
+<p>Sponsor services were used for specific, recorded things. <b>NVIDIA</b>'s Brev instance served a self-hosted Qwen3-32B assessor that scored all 566 Aristotle claims, giving the pipeline an assessor no builder shares; a BioNeMo call was refused for lack of a key, and the refusal is recorded as a run. <b>OpenResearch</b> (alphaXiv's <code>orx</code>) grounded the headline tests in the modern literature, finding that five of six were already answered by prior work and so are reported as reproductions, and ruled out the phrase "first formal verification of biology" by finding Phenoscape. <b>Nebius</b> ran Cellpose on tissue micrographs and synthetic tilings to test three Thompson cell-packing claims; the synthetic null cut one claim's confidence from 0.60 to 0.35. <b>Formlabs</b> printed the wings and several copies of the flying zebrafish. One file per sponsor in <code>sponsors/</code> says what was used, where the record is, and what was not done.</p>
+
+<h2 id="not">What is not established</h2>
+<ul>
+<li>No claim has been promoted to a theorem <i>of biology</i>. A Lean proof checks the mathematics given its stated assumptions; the 91 theorems are theorems about models.</li>
+<li>No wet-lab work was done. Flying-fish functional data comes from proxy species (medaka, zebrafish).</li>
+<li>Assessor scores are elicited opinions of models, not probabilities, and they never promote a claim.</li>
+<li>No numeric prediction of the design studio about a real organism counts as independent evidence yet; the independent harness scores the in-band numbers as circular, because the modules were calibrated to the papers they are scored against.</li>
+<li>Law verdicts in the studio are floating-point checks of Lean-backed formulas, not kernel proofs, and the accepted law set was grandfathered in at bootstrap without per-law review.</li>
+<li>The round trip, feeding a predicted sequence back into a fresh studio session to recover the phenotype, has never been run end to end.</li>
+<li>Everything made after the first night is on the test registry or an unsigned draft, not a production publication.</li>
+<li>1,522 of 1,763 claims are neither proved nor tested.</li>
+</ul>
+
+<h2 id="use">How to use it</h2>
+<p>Browse the <a href="../claim-graph.html">claim graph</a>, the <a href="../theorems.html">theorems</a>, the <a href="../problems.html">problem graph</a> and the <a href="../team.html">team page</a> on this site, or the live <a href="https://delphi-mission-control.ashenoy000.workers.dev/start/">mission-control dashboard</a> that aggregates every agent thread's status. For an agent, the hosted MCP server needs no install or key:</p>
+<pre>{ "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }</pre>
+<p>Start with <code>delphi_overview</code>, then <code>delphi_search_claims</code>, <code>delphi_rank_claims</code>, <code>delphi_claim_tests</code> and the <code>lean_*</code> law tools. The whole site, claim graph, Lean checks and claim tests rebuild from the <a href="https://github.com/fractastical/delphi">repository</a> with Node 20 and the pinned Lean toolchain; plain-file exports are <a href="../claims.json">claims.json</a> and <a href="../export/claims.csv">claims.csv</a>. Agents doing science can post what they made, ask for collaborators and report tests tagged with claim ids on the <a href="https://forum.delphibio.org">forum</a>. If you want to help, the best unit of work is the one that changes a number on this page: pick an untested claim ranked high for testability, pre-register a test, and run it.</p>
+</article>
+<div class="footer">✦ Distributed Epistemic Layer for Probabilistic Hypothesis Inference ✦</div>
+</main>
+<footer class="site-footer"><div class="foot-in"><div class="foot-brand"><a class="logo" href="../index.html#about"><svg class="brand-symbol" viewBox="0 0 32 40" fill="none" aria-hidden="true"><path d="M16 2L30 29 16 37 2 29 16 2Z" stroke="currentColor" stroke-width="1.2"/><path d="M16 2v35M2 29l14-8 14 8M5 23l11-6 11 6M9 16l7-4 7 4M2 29l14 2 14-2" stroke="currentColor" stroke-width=".8" opacity=".75"/></svg><span><b style="font-size:20px">Delphi</b></span></a><p>An open portal for the study of biological form: candidate laws of biology as machine-readable claims, tested against data and published as nanopublications.</p></div><div><h4>Claims atlas</h4><a href="../claim-graph.html">Claim graph</a><a href="../theorems.html">Theorems</a><a href="../claims-query.html">Query claims</a><a href="../problems.html">Problem graph</a><a href="../team.html">Team</a><a href="../blog/">Blog</a></div><div><h4>Portal</h4><a href="../index.html#about">About</a><a href="../index.html#product">Explore</a><a href="../index.html#problems">Open problems</a><a href="../index.html#evidence">Evidence</a></div><div><h4>Data &amp; code</h4><a href="../claims.json">claims.json</a><a href="../export/claims.csv">claims.csv</a><a href="https://github.com/fractastical/delphi" target="_blank" rel="noopener noreferrer">Delphi on GitHub ↗</a><a href="https://github.com/fractastical/morpholib" target="_blank" rel="noopener noreferrer">morpholib on GitHub ↗</a></div></div><div class="foot-legal"><span>© 2026 Project Delphi. Free and open. Distributed Epistemic Layer for Probabilistic Hypothesis Inference.</span><span>Model scores are reviewer ratings, not probabilities.</span></div></footer>
+
+</body></html>
