@@ -1,0 +1,175 @@
+{
+  "compiler_required_fields": [
+    "instrument id and version",
+    "input schema with units",
+    "observation schema with units",
+    "noise or uncertainty model",
+    "replicate unit",
+    "cost and duration units"
+  ],
+  "contracts": [
+    {
+      "acceptance": "max |w_saved - w_analytic|/L <= 1e-4",
+      "blocked_on": null,
+      "calibration_context": "no empirical calibration was performed (none is applicable to a saved simulated field); the instrument model is NOT calibrated to any biological system; context = the saved draw's assumed latents",
+      "cost and duration units": "CPU-seconds (reads saved fields; the whole run is ~95 s); duration: seconds, deterministic",
+      "evidence_type": "computed",
+      "input schema with units": "saved case: L_m (m), EI_Nm2 (N m^2), q_N_m (N/m), load_shape",
+      "instrument id and version": "V1-saved-deflection-section@1",
+      "kind": "virtual_simulation_readout",
+      "noise or uncertainty model": "y = w_saved(x)/L, deterministic; no noise sampled; uncertainty: numerical discretisation only (stored grid difference); no biological uncertainty",
+      "observation schema with units": "w(x)/L at x/L sections (1)",
+      "proposed_compiler_slot": {
+        "interface": "I4",
+        "kind": "virtual",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "closed-form analytic deflection of the same inputs; coarse/fine FEM difference stored with each case",
+      "replicate unit": "one saved simulated case (a draw x candidate x load shape); not a biological replicate",
+      "status": "simulation_derived"
+    },
+    {
+      "acceptance": "analytic_tip_relative_error <= 1e-7 (assurance protocol tolerance)",
+      "blocked_on": null,
+      "calibration_context": "no empirical calibration performed; instrument model not calibrated to biology; saved draw context",
+      "cost and duration units": "CPU-seconds; duration: seconds, deterministic",
+      "evidence_type": "computed",
+      "input schema with units": "saved case: L_m (m), EI_Nm2 (N m^2), q_N_m (N/m), load_shape",
+      "instrument id and version": "V2-saved-tip-and-slope@1",
+      "kind": "virtual_simulation_readout",
+      "noise or uncertainty model": "y = saved summary value, deterministic; uncertainty: numerical only",
+      "observation schema with units": "tip/L (1); max slope (rad)",
+      "proposed_compiler_slot": {
+        "interface": "I4",
+        "kind": "virtual",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "the assurance predicate's analytic residual field",
+      "replicate unit": "one saved simulated case; not a biological replicate",
+      "status": "simulation_derived"
+    },
+    {
+      "acceptance": "reference beam EI recovered within 2 SD of the declared noise",
+      "blocked_on": "no specimen, clamp or load-cell data",
+      "calibration_context": "needs clamp compliance and load-cell calibration; ex vivo",
+      "cost and duration units": "assumed_readout_cost_unit = 2 (not dollars); duration: not defined (prospective)",
+      "evidence_type": "proposed",
+      "input schema with units": "excised ray; applied load F (N, known); clamped length L (m)",
+      "instrument id and version": "R1-ray-bending@1",
+      "kind": "physical_measurement_proposal",
+      "noise or uncertainty model": "ln y = -ln EI + 3 ln L + e, e~N(0, 0.04) ASSUMED; uncertainty: assumed noise only; no fish data",
+      "observation schema with units": "ln(delta/F) offset removed (1)",
+      "proposed_compiler_slot": {
+        "interface": "I3",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "known-stiffness reference beam in the same clamp",
+      "replicate unit": "one ray from one fish (biological replicate = fish); repeats on one ray share clamp/setup error",
+      "status": "proposal_needs_calibration"
+    },
+    {
+      "acceptance": "rigid control within imaging resolution",
+      "blocked_on": "no flow-tank or imaging data",
+      "calibration_context": "needs flow-speed and imaging scale calibration; in vivo",
+      "cost and duration units": "assumed_readout_cost_unit = 3 (not dollars); duration: not defined (prospective)",
+      "evidence_type": "proposed",
+      "input schema with units": "ray in flow at target speed (m/s)",
+      "instrument id and version": "R2-inflow-tip@1",
+      "kind": "physical_measurement_proposal",
+      "noise or uncertainty model": "ln y = lnq + 3 ln L - ln EI + e + d, e~N(0,0.04), d~N(0,0.09) shared by repeats on one fish; ASSUMED; uncertainty: assumed",
+      "observation schema with units": "tip deflection / L (1)",
+      "proposed_compiler_slot": {
+        "interface": "I4",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "rigid-plate control in the same flow (expect zero deflection)",
+      "replicate unit": "one fish; repeated flows on one fish are technical repeats sharing the model discrepancy",
+      "status": "proposal_needs_calibration"
+    },
+    {
+      "acceptance": "zero-flow reading consistent with 0",
+      "blocked_on": "no sensor data",
+      "calibration_context": "needs pressure/force sensor calibration",
+      "cost and duration units": "assumed_readout_cost_unit = 2 (not dollars); duration: not defined (prospective)",
+      "evidence_type": "proposed",
+      "input schema with units": "flow condition (m/s)",
+      "instrument id and version": "R3-load@1",
+      "kind": "physical_measurement_proposal",
+      "noise or uncertainty model": "ln y = ln q + e, e~N(0,0.09) ASSUMED; uncertainty: assumed",
+      "observation schema with units": "distributed load (N/m)",
+      "proposed_compiler_slot": {
+        "interface": "I4",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "zero-flow reading",
+      "replicate unit": "one flow condition",
+      "status": "proposal_needs_calibration"
+    },
+    {
+      "acceptance": "gauge within resolution",
+      "blocked_on": "no imaging data",
+      "calibration_context": "needs scale-bar calibration",
+      "cost and duration units": "assumed_readout_cost_unit = 0.5 (not dollars); duration: not defined (prospective)",
+      "evidence_type": "proposed",
+      "input schema with units": "ray image or specimen",
+      "instrument id and version": "R4-length@1",
+      "kind": "physical_measurement_proposal",
+      "noise or uncertainty model": "ln y = ln L + e, e~N(0,0.0025) ASSUMED; uncertainty: assumed",
+      "observation schema with units": "length (m)",
+      "proposed_compiler_slot": {
+        "interface": "I3",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "gauge block",
+      "replicate unit": "one ray",
+      "status": "proposal_needs_calibration"
+    },
+    {
+      "acceptance": "not definable until the mapping is calibrated",
+      "blocked_on": "native mechanobio sequence-evidence ledger; no expression calibration",
+      "calibration_context": "needs matched cell state and reporter calibration",
+      "cost and duration units": "undefined; duration: undefined",
+      "evidence_type": "proposed",
+      "input schema with units": "pinned construct sequence artifact in a stated cell state/stage (units undefined)",
+      "instrument id and version": "P1-reporter-expression@1",
+      "kind": "sequence_expression_proposal",
+      "noise or uncertainty model": "undefined: no calibrated mapping from sequence to expression; uncertainty: unknown",
+      "observation schema with units": "reporter output (relative units; mapping to expression undefined)",
+      "proposed_compiler_slot": {
+        "interface": "I1",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "empty-vector and known-enhancer controls",
+      "replicate unit": "undefined until the design states it",
+      "status": "proposed_uncalibrated"
+    },
+    {
+      "acceptance": "not definable until the coupling is calibrated",
+      "blocked_on": "unresolved expression->growth->EI bridges in the design-control map",
+      "calibration_context": "needs staged imaging and density calibration",
+      "cost and duration units": "undefined; duration: undefined",
+      "evidence_type": "proposed",
+      "input schema with units": "expression perturbation in a stated cell state (units undefined)",
+      "instrument id and version": "P2-growth-to-EI@1",
+      "kind": "cell_growth_proposal",
+      "noise or uncertainty model": "undefined: expression->growth->EI coupling unresolved; uncertainty: unknown",
+      "observation schema with units": "segment growth (m) and density (kg/m^3) vs stage",
+      "proposed_compiler_slot": {
+        "interface": "I2",
+        "kind": "physical",
+        "state": "claude-14 proposal; compiler02 confirms the interface mapping"
+      },
+      "reference_control": "untreated sibling",
+      "replicate unit": "undefined until the design states it",
+      "status": "proposed_uncalibrated"
+    }
+  ],
+  "protocol_sha256": "633bf03203696c5fb1065ffecacc7223db64a980d2ba1c99c69a2df0a2060acf",
+  "rule": "contract_ref for a compiler slot = {path: artifacts/crossscale-doe/instrument-contracts.json, sha256: manifest files entry, pointer: /contracts/<index>}. A contract does not calibrate anything; no contract carries response data.",
+  "schema": "frontier.crossscale-doe.instrument-contracts/1"
+}
