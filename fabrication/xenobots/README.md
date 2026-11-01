@@ -47,6 +47,7 @@ scaled up for printing.
 
 ## What this does not establish
 
-No part has been printed or measured. A printed resin part does not move; in the simulator the bodies move
+The xenobot print job ran on the hackathon's Formlabs printers on 2026-11-01 (reported by the project lead;
+see `sponsors/FORMLABS.md`). No printed part has been photographed into the repo or measured. A printed resin part does not move; in the simulator the bodies move
 because contractile cells pulse, which the STL cannot carry. Fitness values are simulator predictions
 (dimensionless displacement over 10 s) and have never been compared with living xenobots.

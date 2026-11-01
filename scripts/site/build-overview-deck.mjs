@@ -16,7 +16,12 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const R = (...p) => path.join(ROOT, ...p);
 const TEMPLATE = R('scripts', 'site', 'templates', 'overview-deck.template.html');
-const OUTS = [R('docs', 'deck', 'index.html'), R('assets', 'deck', 'overview-deck.html')];
+// `--draft [dir]` writes index.html and overview-deck.pdf to a scratch directory (default /tmp/delphi-deck-draft)
+// and leaves docs/deck/ and assets/deck/ untouched, so a change can be reviewed before it reaches the live deck.
+const draftIdx = process.argv.indexOf('--draft');
+const OUTS = draftIdx >= 0
+  ? [path.resolve(process.argv[draftIdx + 1] && !process.argv[draftIdx + 1].startsWith('--') ? process.argv[draftIdx + 1] : '/tmp/delphi-deck-draft', 'index.html')]
+  : [R('docs', 'deck', 'index.html'), R('assets', 'deck', 'overview-deck.html')];
 
 const { listLaws } = await import(R('lib', 'lean-source.mjs'));
 
@@ -242,15 +247,59 @@ const stack = {
   STACK_OBSERVED: esc(frontier.observed_at.utc.slice(0, 16).replace('T', ' ') + ' UTC'),
 };
 
+// ---- One worker's run through the stack: Thompson's cell-packing claims, segmented with Cellpose on Nebius.
+// Counts come from claim-sources/cell-geometry/results/*/cellpose.json (one receipt per Nebius operation) and
+// summary.json; verdicts from the three result.json files that claim_tests.py wrote.
+const CG = R('claim-sources', 'cell-geometry', 'results');
+const cgSummary = JSON.parse(fs.readFileSync(path.join(CG, 'summary.json'), 'utf8'));
+const cgOps = fs.readdirSync(CG).filter((d) => fs.existsSync(path.join(CG, d, 'cellpose.json')))
+  .map((d) => JSON.parse(fs.readFileSync(path.join(CG, d, 'cellpose.json'), 'utf8')));
+const cgUsable = Object.values(cgSummary.images).filter((i) => i.sufficient);
+const cgTests = [
+  ['thompson1917-ch07-04', 'walls meet at 120°', (r) => `${r.measured.value} of ${r.measured.n} tissues beat the control`],
+  ['thompson1917-ch07-08', 'regular only with equal cells', (r) => `ρ = ${r.measured.value}, ${r.measured.uncertainty}, n = ${r.measured.n}`],
+  ['thompson1917-ch07-10', 'hexagonal on average', (r) => `${r.measured.value} of ${r.measured.n} tissues mean six`],
+].map(([id, label, measure]) => {
+  const dir = R('test-data', 'claim-tests', 'thompson-growth-form', id);
+  const multi = path.join(dir, 'cellpose-multi-tissue', 'result.json');
+  const r = JSON.parse(fs.readFileSync(fs.existsSync(multi) ? multi : path.join(dir, 'result.json'), 'utf8'));
+  if (!/Cellpose/.test(r.method) || !/Nebius/.test(r.method)) throw new Error(`${id}: expected the Cellpose-on-Nebius test`);
+  if (r.preregistered) throw new Error(`${id}: the panel describes it as exploratory; update the label`);
+  return { id, label, verdict: r.verdict, measure: measure(r) };
+});
+const cgThumb = R('assets', 'deck', 'cell-geometry-thumb.jpg'); // centre crop of results/drosophila-compound-eye/overlay.png
+const cellGeometry = {
+  CG_THUMB: `data:image/jpeg;base64,${fs.readFileSync(cgThumb).toString('base64')}`,
+  CG_OPS: cgOps.length,
+  CG_CELLS: cgOps.reduce((a, o) => a + o.object_count, 0),
+  CG_SECONDS: (cgOps.reduce((a, o) => a + o.timings.duration_s, 0) / cgOps.length).toFixed(1),
+  CG_MODEL: `${cgOps[0].model_id.split('/').pop()}, Cellpose ${cgOps[0].cellpose_version}`,
+  CG_TISSUES: cgUsable.length,
+  CG_INTERIOR: cgUsable.reduce((a, i) => a + i.interior_cells, 0),
+  CG_SPECIES: new Set(JSON.parse(fs.readFileSync(R('test-data', 'claim-tests', 'thompson-growth-form', 'thompson1917-ch07-08', 'cellpose-multi-tissue', 'result.json'), 'utf8')).datasets.map((d) => d.role.split(',')[0])).size,
+  CG_TESTS: cgTests.map((t) => `<li title="${t.id}"><span><b>${esc(t.label)}</b></span><span><span class="verdict ${t.verdict}">${esc(t.verdict)}</span>, ${esc(t.measure)}</span></li>`).join(''),
+};
+
+// ---- Sponsor logos for slide 4, as published on the Science Claw Hack site: assets/partners/partners.json.
+const partnerDoc = JSON.parse(fs.readFileSync(R('assets', 'partners', 'partners.json'), 'utf8'));
+const logo = (p) => {
+  const bytes = fs.readFileSync(R('assets', 'partners', p.file));
+  const mime = p.file.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
+  const style = `height:${p.height}px${p.filter ? `;filter:${p.filter}` : ''}`;
+  return `<img src="data:${mime};base64,${bytes.toString('base64')}" alt="${esc(p.name)}" style="${style}">`;
+};
+const PARTNER_EVENT = `${logo(partnerDoc.event)}<span>${esc(partnerDoc.event.name)} sponsors we used</span>`;
+const PARTNER_LOGOS = partnerDoc.partners.map((p) => `<span class="partner" title="${esc(p.name)}: ${esc(p.role)}">${logo(p)}</span>`).join('');
+
 const built = claimsDoc.built ? new Date(claimsDoc.built) : new Date();
 const DATE_SHORT = built.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 const DATE_LONG = built.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 const fmt = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : v);
 const vars = {
-  ...Object.fromEntries(Object.entries({ ...counts, ...swarm, ...collab, ...mcpVars, ...stack }).map(([k, v]) => [k, fmt(v)])),
+  ...Object.fromEntries(Object.entries({ ...counts, ...swarm, ...collab, ...mcpVars, ...stack, ...cellGeometry }).map(([k, v]) => [k, fmt(v)])),
   ...fourArmVars,
-  DATE_SHORT, DATE_LONG,
+  DATE_SHORT, DATE_LONG, PARTNER_EVENT, PARTNER_LOGOS,
   UNIVERSE_JSON: JSON.stringify(universe),
   PEOPLE: people.join(''), CODE: code.join(''), TEXTS: textItems.join(''), DATA: data.join(''),
 };
