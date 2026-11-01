@@ -31,6 +31,12 @@ World: 80 µm square, hexagonal lattice with BETSE's default disorder, **66 cell
 5. direction and reversal of the K control, 6. gap-junction block control, 7. the expectation that blocking junctions reduces the effect seen by untargeted cells: all met. The last is an expectation, and a miss would have been reported as a result.
 Test coverage: `tests/test_bioelectric_tissue.py` recomputes every committed check from the committed trajectories, hand-works the charge and GHK formulas, and has must-fail controls for each check.
 
+## Separate Dm_K sensitivity follow-up
+
+`artifacts/bioelectric-tissue/sensitivity-v1/index.json` records a later, separate eight-condition BETSE packet. It uses one newly generated world and shared initialization: baseline plus Dm_K multipliers ×2, ×5 and ×10 with gap junctions open or fully blocked, then one ×10/open half-time-step check. All eight simulation processes exited 0 and the returned full and partial trajectory arrays have matching hashes. The timestep comparison is only for the ×10/open condition; it is not an empirical error bound. The worker's movie render failed after simulation (libx264 rejected an odd-height frame). `engineering/bioelectric_tissue/render_sensitivity.py` reconstructs the movie and poster from those returned arrays; it does not rerun BETSE.
+
+The multipliers are dimensionless controls, not channel measurements. This follow-up adds no biological replicates, fish calibration, channel model, or tissue-voltage-to-growth mapping. The gallery card is separate from the original five-scenario run below and preserves both the worker render failure and the local reconstruction provenance.
+
 ## Mathematical interface (see `artifacts/bioelectric-tissue/model_interface.json`)
 Outputs: Vm (per cell and membrane), cytosolic ion concentrations, gap-junction open fraction, cell centres/volumes/areas. Inputs used: K-permeability multiplier, gap-junction block, cell size. **Gap conductance in siemens and channel conductance are UNKNOWN**: BETSE uses a junction surface fraction and membrane diffusion constants, and no conversion is made here. **Growth coupling is an assumption/open question** with no sourced mapping.
 
@@ -38,7 +44,7 @@ Outputs: Vm (per cell and membrane), cytosolic ion concentrations, gap-junction 
 Zebrafish Kcnj13 (UniProt Q0KIZ7 / NCBI BAF03613.1) is listed in `model_interface.json` as an **unparameterized, unverified channel candidate; conductance and gating are unknown**. The hosted OpenFold2 monomer (provider confidence 52.86, pTM 0.273, no membrane, tetramer or ligand; see `artifacts/bio-services/kcnj13_openfold2/bioelectric_handoff.md` on the integration branch) is a weak structural hypothesis and was **not** used to set or calibrate any BETSE parameter. The K+ permeability scale in `k_up` is a generic control, unrelated to Kcnj13. The RefSeq NP_001429136.1 source discrepancy stays open.
 
 ## Limits
-Not a fin, not zebrafish or any measured tissue; T = 310 K is the BETSE default (a fish fin is not at 37 °C). No ion depletion in the environment, no flow, no deformation, no gene regulation, no Kir2.1 or other gene-regulatory-network channels. One seed, one patch size, one intervention strength: no sensitivity sweep. BETSE itself has no independent re-implementation here, and not every BETSE equation was re-derived. The video is a rendering of saved samples (one frame per sample, 5 fps), not a separate computation.
+Not a fin, not zebrafish or any measured tissue; T = 310 K is the BETSE default (a fish fin is not at 37 °C). The original five-scenario run above uses one seed, one patch size and one intervention strength. The separate sensitivity follow-up adds Dm_K ×2/×5/×10 with open/blocked junction controls, but still uses one new world, one run per condition and no fish calibration. Neither run models ion depletion in the environment, flow, deformation, gene regulation, Kir2.1 or other gene-regulatory-network channels. BETSE itself has no independent re-implementation here, and not every BETSE equation was re-derived. Each movie is rendered from saved samples, not a separate computation.
 
 ## Reproduce
 ```
