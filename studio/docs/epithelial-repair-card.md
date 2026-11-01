@@ -71,6 +71,14 @@ is the sensitivity probe for it.
 
 `gap_nodes(t) = 40000 − Σ cell.volume(t)`, from the per-cell log.
 
+**"ARRESTED" means did not close within the declared simulated horizon** — `StopTime 1000`,
+i.e. 1 000 Monte-Carlo sweeps at `MCSDuration 1`. **It is not a demonstration of permanent
+arrest**, and that distinction is measurable rather than semantic here: of the 13 arrested
+arms, **5 were still closing when their horizon ended**, 4 had plateaued, and 4 showed the
+gap fluctuating slightly open — CPM is stochastic and a plateau is noisy, not static. Every
+arm's last-20% trend is in `results-r2.json` under `horizon`. *(Wording and analysis added
+2026-10-31 at the source-only reviewer's request; no run was repeated.)*
+
 Two gates check the instrument before any result is read:
 
 - **G1b is INCOMPLETE, not a pass.** It compares the gap against an **independent channel** —
@@ -206,7 +214,15 @@ interval. **No J=280 measurement entered the prediction.**
 
 What that is and is not: 1.414 is a **summary statistic of the bracket**, not a directly
 measured point threshold; the true threshold is somewhere in (1, 2) and the sweep spacing is
-all that is known about it. This is **one doubling at one gap size**. It was not repeated at
+all that is known about it.
+
+**And the bracket is horizon-dependent.** Its arrested side, `D-k4-J280-lamV2`, was **still
+closing when the run ended** — down 152 nodes over the last 20%, from 1 360 to 1 208. If that
+arm would close given a longer horizon, the bracket moves up from (1, 2) to at least (2, 4)
+and the 1.414 summary goes with it. At that rate it would need roughly 2.6× the current
+horizon, so this is an open question rather than a near miss. **The horizon is a declared
+parameter of this result, not a property of the model**, and G9 should be read as "inside the
+predicted interval *at StopTime 1000*". This is **one doubling at one gap size**. It was not repeated at
 *k*=7, and it does not establish exact linear proportionality in J — only that one
 out-of-sample bracket fell where the group said it would. The packet sweep in the infra
 handoff exists precisely because one doubling is one test.

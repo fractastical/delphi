@@ -89,6 +89,14 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
         rows.append((f"k={k} passive ceiling % of its gap", pct,
                      round(100 * (g0 - (40000 - survivors * 625)) / g0, 1)))
     rows += [
+        ("ARRESTED arms still closing at the horizon", 5,
+         sum(1 for r in A.values() if r["state"] == "ARRESTED" and r["horizon"]["trend"] == "still closing")),
+        ("ARRESTED arms in total", 13, sum(1 for r in A.values() if r["state"] == "ARRESTED")),
+        ("G9 arrested-side arm", "D-k4-J280-lamV2", G["G9"]["detail"]["horizon_caveat"]["arrested_side_arm"]),
+        ("G9 arrested side was still closing", "still closing",
+         G["G9"]["detail"]["horizon_caveat"]["trend"]["trend"]),
+        ("G9 arrested side delta over last 20%", -152,
+         round(G["G9"]["detail"]["horizon_caveat"]["trend"]["delta_last_20pct"])),
         ("unwounded sheet cells placed (not the nominal 64)", 65,
          A["A5-unwounded-POSITIVE"]["n_cells"]),
         ("realised mean cell area, nodes (target is 625)", 615.38,
