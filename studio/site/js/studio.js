@@ -108,6 +108,7 @@
     if (!H) return html`<section class="panel"><h2>Start from real fish anatomy.</h2><p class="empty">No fish3d candidate or fish-control data is present in this snapshot.</p></section>`;
     const downloads = (snap.model_downloads || {}).groups || [];
     const v3a = downloads.flatMap((g) => g.files).find((f) => f.name === "fish3d-v3a-fan-prop-scales.stl");
+    const newProps = ((snap.print_v3 || {}).forms || []).filter((f) => /^print-v(?:[4-9]|[1-9][0-9]+)$/.test(f.family || ""));
     const launchBundle = downloads.flatMap((g) => g.files).find((f) => f.format === "ZIP" && !f.withdrawn);
     const copied = new Set((snap.fish3d_viewer || {}).copied || []);
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
@@ -118,6 +119,7 @@
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p><p class="small"><a href="${DF.href("/history")}">How these candidates relate: the fish design history</a> (revisions, sibling variants and display props kept apart).</p>
         <div id="home-model-downloads" class="small">
           ${snap.print_laws && snap.print_laws.data ? html`<p><a href="${DF.href("/print-laws")}"><b>Why the print fails its mass budget · laws, checks & lineage</b></a></p>` : ""}
+          ${newProps.length ? html`<div class="latest-prints"><h3>Latest printable fish studies</h3><p class="faint">Source-conditioned geometry with thicker membranes and rays for printing. Each file has its own checks; these are display studies.</p><ul>${newProps.map((f) => html`<li><b>${f.title}</b>${f.prop_size_mm ? " · " + f.prop_size_mm.map((x) => Number(x).toFixed(1)).join(" × ") + " mm" : ""}<br>${f.files.filter((x) => ["stl_prop", "stl_prop_scale_relief"].includes(x.kind)).map((x) => html`<a href="${x.href}" download>${x.kind === "stl_prop" ? "Smooth STL" : "Scale-relief STL"}</a> · <a href="${DF.href("/print-laws", {file: x.href})}">File checks and laws</a> `)}</li>`)}</ul></div>` : ""}
           ${v3a ? html`<p><a href="${v3a.href}" download>Download v3a fish with scales · STL</a> <span class="faint">Display model, not the slingshot prototype.</span></p>` : ""}
           ${launchBundle ? html`<p><a href="${launchBundle.href}" download>Download corrected slingshot test-print set · ZIP</a> <span class="faint">Six parts and assembly notes. Fit/balance only: overweight, with a catch-wall concern unresolved. Not cleared for launch.</span></p>` : ""}
           <details><summary><b>All model downloads</b> · print revisions, stands and 3D candidates</summary>

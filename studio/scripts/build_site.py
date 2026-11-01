@@ -622,29 +622,57 @@ def formalize_examples(ins: Inputs) -> dict | None:
     return {"examples": ex, "schema": "frontier.formalize.request/1", "limits": {"max_bytes": 16384}}
 
 
+def print_families(min_version: int = 1) -> list[Path]:
+    """Discover numbered print editions without changing frozen earlier artifacts."""
+    families = []
+    for path in (ROOT / "artifacts").glob("print*"):
+        match = re.fullmatch(r"print(?:-v([1-9][0-9]*))?", path.name)
+        if path.is_dir() and match:
+            version = int(match[1] or 1)
+            if version >= min_version:
+                families.append((version, path))
+    return [path for _, path in sorted(families, key=lambda row: (row[0], row[1].name), reverse=True)]
+
+
 def print_v3_block(ins: Inputs, out: dict) -> dict | None:
-    """The v3 display props (STL prop, scale-relief variant, stand, preview images) copied only when each file's sha256 equals the declared digest."""
-    d = "artifacts/print-v3"
-    if not (ROOT / d / "downloads.json").exists():
-        return None
-    D = json.loads(ins.read(f"{d}/downloads.json")); forms = []; refused = []
-    for f in D["forms"]:
-        files = []
-        for x in f["files"]:
-            if x["kind"] in ("glb_prop", "design_json"):
-                continue                                           # the GLB prop and design JSON stay in the artifact tree; downloads here are STL and preview images
-            b = ins.read(f"{d}/{x['path']}") if (ROOT / d / x["path"]).exists() else None
-            if b is None or digest_bytes(b) != x["sha256"] or len(b) != x["bytes"]:
-                refused.append(x["path"]); continue
-            out[f"@artifacts/print-v3/{x['path']}"] = b
-            files.append({"kind": x["kind"], "href": f"artifacts/print-v3/{x['path']}", "bytes": x["bytes"], "sha256": x["sha256"], "units": x.get("units")})
-        forms.append({"id": f["id"], "title": f.get("title") or f["id"], "short": f.get("short"), "display_scale": f["display_scale"], "prop_size_mm": f.get("prop_size_mm"), "source_candidate": f.get("source_candidate"), "source_candidate_sha256": f.get("source_candidate_sha256"), "files": files})
-    return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
+    """Publish the v3 prop contract and later editions; retain the existing wire key."""
+    forms, refused, limitations, printer_resin = [], [], [], None
+    ids = set()
+    for directory in print_families(3):
+        d = directory.relative_to(ROOT).as_posix()
+        if not (directory / "downloads.json").is_file():
+            continue
+        data = json.loads(ins.read(f"{d}/downloads.json"))
+        if data.get("schema") != "frontier.print.downloads/1":
+            raise ValueError("Unsupported print downloads schema: " + d)
+        printer_resin = printer_resin or data["printer_resin"]
+        limitations.extend(x for x in data["limitations"] if x not in limitations)
+        for form in data["forms"]:
+            if form["id"] in ids:
+                raise ValueError("Duplicate printable form: " + form["id"])
+            ids.add(form["id"])
+            files = []
+            for item in form["files"]:
+                if item["kind"] in ("glb_prop", "design_json"):
+                    continue  # Full mesh downloads are also available in model_downloads.
+                member = Path(item["path"])
+                if member.is_absolute() or ".." in member.parts:
+                    refused.append(f"{d}/{item['path']}")
+                    continue
+                href = f"{d}/{item['path']}"
+                raw = ins.read(href) if (ROOT / href).is_file() else None
+                if raw is None or digest_bytes(raw) != item["sha256"] or len(raw) != item["bytes"]:
+                    refused.append(href)
+                    continue
+                out["@" + href] = raw
+                files.append({"kind": item["kind"], "href": href, "bytes": item["bytes"], "sha256": item["sha256"], "units": item.get("units")})
+            forms.append({"id": form["id"], "title": form.get("title") or form["id"], "short": form.get("short"), "display_scale": form["display_scale"], "prop_size_mm": form.get("prop_size_mm"), "source_candidate": form.get("source_candidate"), "source_candidate_sha256": form.get("source_candidate_sha256"), "family": directory.name, "files": files})
+    return {"forms": forms, "limitations": limitations, "printer_resin": printer_resin, "refused": refused} if forms else None
 
 
 def model_downloads(ins: Inputs, out: dict) -> dict:
     """Publish print revisions from manifest-pinned bytes, including earlier editions."""
-    manifests = [ROOT / "artifacts" / name / "manifest.json" for name in ("print-v3", "print-v2", "print")]
+    manifests = [directory / "manifest.json" for directory in print_families()]
     manifests += sorted((ROOT / "artifacts/glider").glob("*/manifest.json"))
     defects_path = "artifacts/glider/KNOWN_DEFECTS.json"
     defects = json.loads(ins.read(defects_path)) if (ROOT / defects_path).is_file() else {}
@@ -852,7 +880,7 @@ def fish_history(ins: Inputs) -> dict | None:
     need = ["artifacts/print/manifest.json", "artifacts/print-v2/manifest.json", "artifacts/fish3d/v3-index.json", "artifacts/print-v3/downloads.json"]
     if not all((ROOT / n).exists() for n in need):
         return None
-    P1 = json.loads(ins.read(need[0])); P2 = json.loads(ins.read(need[1])); V3 = json.loads(ins.read(need[2])); P3 = json.loads(ins.read(need[3]))
+    P1 = json.loads(ins.read(need[0])); P2 = json.loads(ins.read(need[1])); V3 = json.loads(ins.read(need[2]))
     nodes, edges, sib = [], [], []
     mk = lambda i, kind, title, man, extra=None: nodes.append({"id": i, "kind": kind, "title": title, "manifest": man, "manifest_sha256": ins.seen[man]["sha256"] if man in ins.seen else None, "first_commit_date": first_commit(man), **(extra or {})})
     sets1 = P1.get("sets", {}); sets2 = P2.get("sets", {})
@@ -878,9 +906,13 @@ def fish_history(ins: Inputs) -> dict | None:
         c = json.loads(ins.read(cj)); mk(vid, "3D candidate (1:1)", c.get("title") or vid, cj, {"candidate_sha256": meta["candidate_sha256"], "knobs": meta["knobs"]}); group.append(vid)
         edges.append({"from": vid, "to": c.get("baseline_candidate", base), "relation": "variant of", "label": "v3 rebuild of the baseline; siblings differ only in knobs", "source": f"{cj}: baseline_candidate", "chronological": False})
     sib.append({"group": "v3 variants", "members": group, "basis": V3["shared"], "manifest": need[2]})
-    for f in P3["forms"]:
-        mk(f["id"], "display prop (print, not a launch prototype)", f.get("title") or f["id"], need[3], {"display_scale": f["display_scale"], "set": f.get("set")})
-        edges.append({"from": f["id"], "to": f["source_candidate"], "relation": "printed from", "label": "display prop made from this 3D candidate", "source": f"{need[3]}: forms[].source_candidate", "chronological": False})
+    for directory in print_families(3):
+        path = (directory / "downloads.json").relative_to(ROOT).as_posix()
+        if not (ROOT / path).is_file():
+            continue
+        for f in json.loads(ins.read(path))["forms"]:
+            mk(f["id"], "display prop (print, not a launch prototype)", f.get("title") or f["id"], path, {"display_scale": f["display_scale"], "set": f.get("set")})
+            edges.append({"from": f["id"], "to": f["source_candidate"], "relation": "printed from", "label": "display prop made from this 3D candidate", "source": f"{path}: forms[].source_candidate", "chronological": False})
     # Launch glider print sets: lineage comes only from each manifest's parent_revision and source_candidate pins; chronology is never inferred from the names.
     gd = ROOT / "artifacts/glider"; gl = []
     defects = json.loads(ins.read("artifacts/glider/KNOWN_DEFECTS.json")) if (gd / "KNOWN_DEFECTS.json").exists() else {}
@@ -1750,8 +1782,12 @@ def build() -> dict[str, bytes]:
     return out
 
 
+def generated_artifact_families() -> list[str]:
+    return ["results", "fish3d", "molecular", "rd-diffusion", *(path.name for path in print_families())]
+
+
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular", SITE / "artifacts" / "print-v3", SITE / "artifacts" / "rd-diffusion"):
+    for d in (DATA / "docs", DATA / "results", *(SITE / "artifacts" / name for name in generated_artifact_families())):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -1764,7 +1800,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular", "print-v3", "rd-diffusion") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in generated_artifact_families() for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 
