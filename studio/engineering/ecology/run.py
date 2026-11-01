@@ -18,8 +18,8 @@ import numpy as np
 from .model import ART, FLIP, ROOT, aero, build, dump, protocol, simulate
 
 
-def controls():
-    p = protocol()
+def controls(config=None):
+    p = config or protocol()
     params = p["parameters"]
     dt = p["solver"]["dt_s"]
     m, d, _, ids, _ = build(1, params, dt)
@@ -163,20 +163,21 @@ def paired_comparison(a, b):
     }
 
 
-def run(out):
+def run(out, protocol_path=ART / "protocol.json"):
+    out = out.resolve()
     if out.exists():
         raise ValueError("output exists; refuse overwrite")
-    p = protocol()
+    p = json.loads(protocol_path.read_text())
     out.mkdir(parents=True)
     started = time.monotonic()
     cpu = time.process_time()
-    result = controls()
+    result = controls(p)
     dump(out / "controls.json", result)
     if not result["passed"]:
         raise RuntimeError("Frozen controls failed; no production run")
     summary = {}
     for case in p["cases"]:
-        main = simulate(case, deepcopy(p["parameters"]))
+        main = simulate(case, deepcopy(p["parameters"]), p["solver"]["dt_s"])
         fine = simulate(case, deepcopy(p["parameters"]), p["solver"]["refined_dt_s"])
         comparison = paired_comparison(main, fine)
         comparison["passes_frozen_discrepancy_bounds"] = (
@@ -205,7 +206,7 @@ def run(out):
             + p["parameters"]["work_budget_discrete_tolerance_J"],
         }
         if case["id"] == "glide-feedback":
-            replay = simulate(case, deepcopy(p["parameters"]))
+            replay = simulate(case, deepcopy(p["parameters"]), p["solver"]["dt_s"])
             check = paired_comparison(main, replay)
             summary[case["id"]]["deterministic_replay"] = check
         save_case(out / case["id"], main)
@@ -216,7 +217,7 @@ def run(out):
     receipt = {
         "schema": "frontier.ecology.simulation-receipt/1",
         "created_utc": datetime.now(timezone.utc).isoformat(),
-        "protocol_sha256": sha256((ART / "protocol.json").read_bytes()).hexdigest(),
+        "protocol_sha256": sha256(protocol_path.read_bytes()).hexdigest(),
         "source_commit": subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
@@ -251,5 +252,6 @@ def run(out):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=ART / "run")
+    parser.add_argument("--protocol", type=Path, default=ART / "protocol.json")
     args = parser.parse_args()
-    run(args.out)
+    run(args.out, args.protocol)
