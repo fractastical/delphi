@@ -128,3 +128,121 @@ def test_changed_dependency_file_content_invalidates_dependent_stages(tmp_path):
     with open(tmp_path / "engineering/biodesign_compiler/compile.py", "a") as f:
         f.write("\n")
     assert all(bc.stage_key(tmp_path, a, s) != after[s] for s in bc.AXES)
+
+
+def _tree(tmp_path):
+    """Bounded fixture: only the pinned files of the three assemblies, STAGE_FILES and model_interfaces."""
+    import shutil
+    want = {p["path"] for a in bc.run(ROOT)["assemblies"] for p in a["components"].values()}
+    want |= {f for fs in bc.STAGE_FILES.values() for f in fs}
+    want |= {str(f.relative_to(ROOT)) for f in (ROOT / "engineering/model_interfaces").glob("*.json")}
+    for rel in want:
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ROOT / rel, tmp_path / rel)
+    assert sum(f.stat().st_size for f in tmp_path.rglob("*") if f.is_file()) < 5_000_000
+    return tmp_path
+
+
+def test_externally_changed_bytes_with_unchanged_manifest_are_not_served_from_cache(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    cache = {}
+    assert bc.compile_assembly(t, a, cache=cache)["axes"]["structural_refs"]["status"] == "pass"
+    f = t / a["components"]["geometry_panels"]["path"]
+    f.write_bytes(f.read_bytes() + b" ")
+    out = bc.compile_assembly(t, a, cache=cache)
+    assert "structural_refs" not in out["reused_from_cache"] and out["axes"]["structural_refs"]["status"] == "fail"
+
+
+def test_empirical_and_implementation_read_the_pinned_file_not_a_hardcoded_path(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    b = copy.deepcopy(a)
+    b["components"]["genetic_blueprint"].update(path="artifacts/fish-regulatory-map/map.json", sha256=bc.sha((t / "artifacts/fish-regulatory-map/map.json").read_bytes()))
+    out = bc.compile_assembly(t, b)["axes"]
+    assert out["implementation"]["status"] == "blocked" and out["implementation"]["blocked_by"] == ["genetic_blueprint"]
+    assert "malformed" in out["implementation"]["reason"]
+    c = copy.deepcopy(a)
+    c["components"]["behavior"].update(path="artifacts/fish-regulatory-map/map.json", sha256=bc.sha((t / "artifacts/fish-regulatory-map/map.json").read_bytes()))
+    assert bc.compile_assembly(t, c)["axes"]["empirical"]["status"] == "blocked"
+
+
+def test_missing_or_malformed_pinned_file_returns_blocked_not_a_crash(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    (t / a["components"]["aero"]["path"]).unlink()
+    ax = bc.compile_assembly(t, a)["axes"]
+    assert set(ax) == set(bc.AXES) and ax["structural_refs"]["status"] == "fail"
+    assert ax["model_domain"]["status"] == ax["numerical"]["status"] == "blocked" and ax["model_domain"]["blocked_by"] == ["aero"]
+    assert ax["empirical"]["status"] == "unresolved"  # does not read aero: positive control, not blocked
+    f = t / a["components"]["behavior"]["path"]
+    f.write_text("{not json")
+    ax = bc.compile_assembly(t, a)["axes"]
+    assert ax["empirical"]["status"] == "blocked" and "behavior" in ax["empirical"]["blocked_by"]
+    assert bc.compare(t, [a])["rows"][0]["usable_for_comparison"] is False and "blocked" in bc.compare(t, [a])["rows"][0]
+
+
+def test_overridden_registry_or_couplings_do_not_reuse_default_cache():
+    a = _r()["assemblies"][0]
+    cache = {}
+    bc.compile_assembly(ROOT, a, cache=cache)
+    few = cp.default_couplings()[:2]
+    out = bc.compile_assembly(ROOT, a, couplings=few, cache=cache)
+    assert "units_context" not in out["reused_from_cache"] and sum(out["axes"]["units_context"]["counts"].values()) == 2
+    assert "units_context" in bc.compile_assembly(ROOT, a, couplings=few, cache=cache)["reused_from_cache"]
+    reg = cp.default_registry()
+    assert bc.registry_fingerprint(reg, few) != bc.registry_fingerprint(reg, cp.default_couplings())
+
+
+def test_non_string_status_and_non_numeric_refinement_are_blocked_not_a_crash(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    f = t / a["components"]["aero"]["path"]
+    o = json.loads(f.read_bytes())
+    o["status"] = 7
+    f.write_text(json.dumps(o))
+    a2 = copy.deepcopy(a)
+    a2["components"]["aero"]["sha256"] = bc.sha(f.read_bytes())
+    ax = bc.compile_assembly(t, a2)["axes"]
+    assert ax["model_domain"]["status"] == ax["numerical"]["status"] == "blocked"
+    assert "status is int, expected str" in ax["model_domain"]["reason"]
+    o["status"] = "ok"
+    o["refinement"]["CL_rel_change"] = "0.2"
+    f.write_text(json.dumps(o))
+    a2["components"]["aero"]["sha256"] = bc.sha(f.read_bytes())
+    ax = bc.compile_assembly(t, a2)["axes"]
+    assert ax["numerical"]["status"] == "blocked" and "expected number" in ax["numerical"]["reason"]
+    assert ax["model_domain"]["status"] == "unassessed"  # positive control: a valid string status still runs
+
+
+def test_missing_required_pin_or_bad_pin_shape_is_a_typed_failure_with_six_axes():
+    a = _r()["assemblies"][0]
+    for mut, msg in ((lambda x: x["components"].pop("behavior"), "missing required pin behavior"),
+                     (lambda x: x["components"]["aero"].update(sha256="abc"), "64-character sha256"),
+                     (lambda x: x.update(components=[]), "no components object")):
+        b = copy.deepcopy(a)
+        mut(b)
+        out = bc.compile_assembly(ROOT, b, cache={})
+        assert set(out["axes"]) == set(bc.AXES) and out["axes"]["structural_refs"]["status"] == "fail"
+        assert any(msg in f["reason"] for f in out["axes"]["structural_refs"]["failures"])
+        assert all(out["axes"][s]["status"] == "blocked" for s in bc.AXES if s != "structural_refs")
+    assert bc.compile_assembly(ROOT, a)["axes"]["structural_refs"]["status"] == "pass"
+
+
+def test_malformed_designs_are_blocked(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    f = t / a["components"]["genetic_blueprint"]["path"]
+    for bad in ([1], [{"expression_kinetics": {"status": "UNKNOWN"}}], "x", []):
+        o = json.loads(f.read_bytes())
+        o["designs"] = bad
+        f.write_text(json.dumps(o))
+        a2 = copy.deepcopy(a)
+        a2["components"]["genetic_blueprint"]["sha256"] = bc.sha(f.read_bytes())
+        assert bc.compile_assembly(t, a2)["axes"]["implementation"]["status"] == "blocked", bad
+
+
+def test_empty_couplings_list_is_not_replaced_by_defaults():
+    a = _r()["assemblies"][0]
+    out = bc.compile_assembly(ROOT, a, couplings=[])
+    assert out["axes"]["units_context"]["counts"] == {}
