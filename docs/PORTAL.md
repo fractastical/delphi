@@ -9,14 +9,14 @@ The Delphi website. Two parts live side by side here:
   `.nojekyll`. That import matches the portal tree byte for byte. Edit these in the portal repo and
   copy them over; don't restyle them here.
 
-GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The portal
-is served from `platform/`: `index.html`, `platform.html` (Lean for Biology), and `data/`.
-Relative links stay inside that folder (`/platform/data/…`, `/platform/platform.html`).
-`docs/index.html` only redirects to `/platform/`. The mission-control dashboard stays on its
-Cloudflare worker.
+GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The
+homepage is `index.html`. `platform.html` is the Lean for Biology page, also served at
+`/platform/` from `platform/index.html` (same file, with `<base href="/">` so its `data/`
+requests still load from `/data/`). The mission-control dashboard stays on its Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
-  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, plus `claims.json`,
-  `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.
+  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, `overview-deck.html` (the
+  project-overview slide deck), plus `claims.json`, `problems.json`, `export/`, `thumbs/`, `team/`.
+  Don't edit these by hand; rebuild them.
 
 ## Shared look
 
@@ -39,11 +39,12 @@ cd engine
 node scripts/site/build-claim-graph.mjs     # claim-graph, claims-query, theorems, claims.json, export
 node problems/build/build-site.mjs          # problems.html, problems.json
 python3 scripts/site/build-team-page.py     # team.html
+node scripts/site/build-overview-deck.mjs   # overview-deck.html (run after build-claim-graph; reads claims.json)
 ```
 
 ## Refresh the portal
 
-Copy `index.html`, `platform.html` and `data/` from a fresh checkout of the portal repo into
-`docs/platform/` (so the site stays at `/platform/`), and record the new commit above. Leave
-`docs/index.html` as the redirect to `/platform/`. If the portal changes its tokens, update the
-matching values in `css/delphi.css`.
+Copy `index.html`, `platform.html`, `data/` and `.nojekyll` from a fresh checkout of the portal repo
+into `docs/`, and record the new commit above. Then regenerate `docs/platform/index.html` as
+`platform.html` plus `<base href="/">`. If the portal changes its tokens, update the matching values in
+`css/delphi.css`.
