@@ -1,0 +1,27 @@
+{
+  "claim_id": "thompson1917-ch07-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-09",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If similar-sized cells in complete contact under a uniform force tend to form a pattern of hexagons, then in the Drosophila pupal wing blade, where cell division ceases during the imaged window (16-32 h APF) and the epithelium remains confluent under cortical tension, the fraction of six-sided cells must rise from the proliferating-epithelium value (about 0.4, measured in the first run of this claim) to a clear hexagonal majority (>= 0.60) by the end of the window, and the rise must track the fall in division rate and in cell-size variation.",
+  "pass_criterion": "Pre-registered. For each of the three wild-type pupal wing movies WT_1, WT_2, WT_3 (TissueMiner databases distributed with Etournay et al. 2016; the wings of Etournay et al. 2015, 16-32 h APF, 5 min frames), compute per frame for interior cells (no bond with the margin cell 10000) the fraction of six-sided cells f6, the mean and SD of neighbour number, the CV of cell area, the division rate (cells appearing by division per hour per 1,000 cells) and, every 20th frame, the fraction of interior three-way junctions with all three chord angles within 15 degrees of 120. Supported if in at least two of three wings f6 averaged over the last 2 h is >= 0.60 and exceeds f6 over the first 2 h by >= 0.10, with the three-way vertex fraction >= 0.95; secondary pre-registered expectations, reported but not required: Spearman rho(f6, division rate) across frames <= -0.3, rho(f6, CV_A) <= -0.3, and the fraction of near-120-degree junctions higher in the last 2 h than in the first 2 h.",
+  "fail_criterion": "Pre-registered. Refuted if in at least two of three wings f6 over the last 2 h is < 0.50, i.e. hexagons do not become a majority even after proliferation ends; or if f6 falls by >= 0.05 from first to last 2 h. In between (f6 in [0.50, 0.60), or wings split) is 'mixed'. If the databases cannot be obtained or do not cover the window up to >= 28 h APF the verdict is inconclusive with reason data-unavailable or underpowered.",
+  "planned_datasets": [
+    "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing"
+  ],
+  "test_contract": {
+    "expected_observation": "When cell division stops in a confluent epithelium under tension, the six-sided fraction rises to a clear majority (>= 0.60) and junctions approach 120 degrees, in step with falling division rate and falling cell-size variation.",
+    "disconfirming_observation": "The six-sided fraction stays below 0.50, or falls, after division ceases, so the end of proliferation and continued cortical tension do not produce a pattern of hexagons.",
+    "admissible_datasets": "Public, expert-corrected segmentations with cell tracking and lineage of a confluent epithelium followed through the end of its proliferative phase, not a tissue the claim's author used as an example, not produced by a segmenter shown in this repo to round junctions.",
+    "inference_method": "Per wing: f6 in the first and last 2 h and its change, three-way vertex fraction, Spearman rho of f6 against division rate and area CV across frames, chord-angle regularity early versus late; verdict by majority of wings against fixed thresholds."
+  },
+  "interpretation": "The first run of this claim (top-level result.json) refuted it as a sufficient rule in a proliferating epithelium where the size condition was only marginal. This run asks when, if ever, the rule turns on: the pupal wing is the classic case (Classen et al. 2005, Dev Cell 9:805) in which an irregular epithelium repacks into mostly hexagons between about 15 and 32 h APF as divisions cease, a repacking that the authors attribute to planar cell polarity-dependent junction remodelling rather than to surface tension alone. The test treats Thompson's conditions as the state of the tissue at the end of the window (no divisions, confluent, under tension) and asks whether the hexagon pattern follows; the secondary correlations ask whether it tracks the removal of division and size variation. Whole-wing interior cells are used; veins and inter-veins are not separated. The database format is identical to the ch07-09 first run, so the same code path is used. Data are not yet downloaded.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "data_kind": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "local-agent", "model": "claude-fable-5.1", "run": "cursor local session, hexagon follow-up", "date": "2026-10-31" }
+}
