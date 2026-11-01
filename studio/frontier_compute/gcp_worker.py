@@ -31,6 +31,9 @@ def validate(spec):
         raise ValueError("Invalid task ID")
     if spec["vcpus"] not in (4, 8, 16) or not 1 <= spec["memory_gb"] <= 56:
         raise ValueError("Invalid CPU or memory bound")
+    cpu_quota = spec.get("cpu_quota_percent", spec["vcpus"] * 100)
+    if type(cpu_quota) is not int or not 1 <= cpu_quota <= spec["vcpus"] * 100:
+        raise ValueError("Invalid CPU quota bound")
     if not 60 <= spec["runtime_s"] <= 79200:
         raise ValueError("Invalid task runtime bound")
     if not 300 <= spec["export_interval_s"] <= 3600:
@@ -59,7 +62,7 @@ def validate(spec):
 def systemd_argv(spec, source, output):
     validate(spec)
     args = ["systemd-run", "--wait", "--pipe", "--collect", "--unit=frontier-science",
-            "-p", f"WorkingDirectory={source}", "-p", f"CPUQuota={spec['vcpus'] * 100}%",
+            "-p", f"WorkingDirectory={source}", "-p", f"CPUQuota={spec.get('cpu_quota_percent', spec['vcpus'] * 100)}%",
             "-p", f"MemoryMax={spec['memory_gb']}G", "-p", "MemorySwapMax=0",
             "-p", f"TasksMax={spec.get('tasks_max', 256)}", "-p", f"RuntimeMaxSec={spec['runtime_s']}",
             "-p", "KillMode=control-group", "-p", "TimeoutStopSec=45",

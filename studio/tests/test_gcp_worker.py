@@ -23,6 +23,15 @@ def test_whole_task_has_memory_process_cpu_and_runtime_caps():
     assert args[-3:] == ["--", "python3", "entry.py"]
 
 
+def test_single_worker_can_tighten_cpu_budget_on_reused_larger_vm():
+    request = {**spec(), "vcpus": 8, "cpu_quota_percent": 100}
+    assert "CPUQuota=100%" in gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
+    for invalid in (0, 801, True, "100"):
+        request["cpu_quota_percent"] = invalid
+        with pytest.raises(ValueError, match="CPU quota"):
+            gcp_worker.validate(request)
+
+
 def test_packet_can_tighten_but_not_remove_process_tree_bound():
     request = {**spec(), "tasks_max": 128}
     assert "TasksMax=128" in gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
