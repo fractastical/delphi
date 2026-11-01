@@ -1,11 +1,43 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 11:56pm PDT.
+Coordinator: codex-03. Updated November 1, 2026, 12:16am PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 11:56pm PDT
+## Current checkpoint — November 1, 2026, 12:16am PDT
+
+- [x] Published `795f140` after scientific release `d87e5d1`: both secondary
+  studies have actual recordings, exact downloads, shared oxygen proofs and
+  related versioned records. Flying Fish remains the sole featured project.
+  Root's exact-parent 102 focused checks and four UI checks are separate runs;
+  public checks covered eight web responses, both studies at desktop/mobile,
+  navigation and all four MCP proof sources. Receipt:
+  `deploy/receipts/reuse-studies-live.json`. No biological validation inferred.
+- [x] Current study briefs and recordings now appear before detailed metrics;
+  original stored proposals remain accessible as historical provenance.
+- [x] Integrated completed 240-arm epithelial transport/completeness receipt:
+  all arms completed; native scaling analysis returned FAIL. Owner09's revised
+  fixed-horizon interpretation at `3c65c17` awaits independent mechanobio review
+  and page integration; no spatial frames were returned. Earlier 36-run videos
+  and their local held-out comparison remain distinct.
+- [x] Integrated extended VLM diagnostic receipt (372 solves) and exact Voxcraft
+  compile failure. The latter ran no simulation cases and all 40 GPU telemetry
+  samples were zero. A failed compilation is not GPU scientific work.
+- [ ] New six-target inverse Schnakenberg experiment admitted on one H100 at
+  12:12:53am PDT: `aijob-e00grxtt94bh26a9c0`. Last admission state provisioning;
+  actual device activity and outcomes pending. Equal solver budgets, same-job
+  CUDA parity, fixed controls and independent numerical checks are required.
+- [ ] Owner07 prepares the separately pinned paired collocation/fidelity study;
+  root awaits exact returned evidence before changing fish assurance. No blind
+  refinement or biological flight claim.
+- [ ] Native infra completed the d87 second-host 7,601-file restore at
+  12:10:54am PDT; final receipt integration and the small 795 source/static delta
+  remain pending. Broader fresh-host service recovery has separate prior evidence.
+- [ ] Independent delivery-gap audit in progress against GOAL/specs/current
+  runtime. Preserve unchecked acceptance until direct evidence supports closure.
+
+## Previous checkpoint — October 31, 2026, 11:56pm PDT
 
 - [x] Two secondary projects preserve the Flying Fish flagship. Existing public
   release `33bc598` has their exact stored Project proposals. The next release

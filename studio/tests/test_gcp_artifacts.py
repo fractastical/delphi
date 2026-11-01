@@ -8,6 +8,49 @@ import pytest
 from frontier_compute.gcp_artifacts import GCS, collect, safe_relpath, upload_run
 
 
+def test_local_collection_reuses_auth_subprocess_only_for_brief_window(monkeypatch):
+    from types import SimpleNamespace
+    from frontier_compute import gcp_artifacts
+
+    now, calls = [0.0], []
+
+    def command(argv, **kwargs):
+        calls.append(argv)
+        assert kwargs["capture_output"] and kwargs["timeout"] == 30
+        return SimpleNamespace(returncode=0, stdout=f"fixture-token-{len(calls)}\n")
+
+    monkeypatch.setattr(gcp_artifacts.subprocess, "run", command)
+    monkeypatch.setattr(gcp_artifacts.time, "monotonic", lambda: now[0])
+    client = GCS.local(gcloud="fixture-gcloud")
+    for _ in range(200):
+        assert client._auth_headers()["Authorization"] == "Bearer fixture-token-1"
+    assert calls == [["fixture-gcloud", "auth", "print-access-token"]]
+    now[0] = 29.999
+    assert client._auth_headers()["Authorization"] == "Bearer fixture-token-1"
+    now[0] = 30.0
+    assert client._auth_headers()["Authorization"] == "Bearer fixture-token-2"
+    assert len(calls) == 2
+
+
+def test_expired_local_token_is_not_reused_after_refresh_failure():
+    from frontier_compute.gcp_artifacts import _cached_local_token
+
+    now, calls = [0.0], []
+
+    def provider():
+        calls.append(True)
+        if len(calls) == 2:
+            raise RuntimeError("fixture authentication unavailable")
+        return f"fixture-token-{len(calls)}"
+
+    cached = _cached_local_token(provider, clock=lambda: now[0])
+    assert cached() == "fixture-token-1"
+    now[0] = 31.0
+    with pytest.raises(RuntimeError, match="unavailable"):
+        cached()
+    assert cached() == "fixture-token-3"
+
+
 def run_record(exit_code=0):
     return {
         "job_id": "frontier-cpu-20261031-01",
