@@ -1,11 +1,47 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 10:21pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 11:04pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 10:21pm PDT
+## Current checkpoint — October 31, 2026, 11:04pm PDT
+
+- [x] Published immutable release `ac95c4c`: four new normal-speed films (Delphi
+  and science, each 60/120 seconds), all older cuts preserved; actual Lean source
+  viewer/MCP, print-v4 download/review links, observed-data update and audited
+  System counts. Root ran 33 focused checks. Public verification: 103 media/hash/
+  playback/captions/seek/fullscreen checks, 8 web and 39 MCP checks; proof catalog
+  has three fixed families with optional source hashes matched. Receipts are in
+  `/data/artifacts/delphi-evolve-rethink/deploy/four-film-*.json`.
+- [x] Independent print-v4 review is integrated: smooth props pass the stated
+  sampled file checks. Relief texture is ungated and may not print as drawn;
+  the home-page cards state this. No manufactured, weighed or flown object.
+- [x] Integrated clean sequence ledger `e187efb`, compiler `1a084328`, corrected
+  DOE `4d9628f` and independent review `b02b51a`. Root82 focused tests passed.
+  36 sequence artifacts/44 contextual entries, five unresolved biological
+  interfaces, zero endorsed genomes. Compiler surface adapter is assigned02;
+  new artifact source is integrated, public surface is not yet updated.
+- [x] SPEC-017/013 documentary registration imported four exact records and
+  anonymous store readback matched all four as imported_unreviewed. They are
+  documentary inputs, not biological claims or executed experiments.
+- [ ] Additional project UI `f4508e8` integrated; independent review requested
+  source-specific wording/control fixes from06. Tissue-microcarrier and
+  epithelial-repair remain secondary proposed research studies; Flying Fish
+  stays the sole flagship. Live Project import waits for reviewed final drafts.
+- [ ] Xenobot15 has actual local Voxelyze trajectories and a failed grid/parity
+  control, pending full handoff. Epithelial09 is preflighting Morpheus. Native
+  resource_scaling is checking sourced oxygen sphere/slab bounds in Lean.
+- [ ] Infra reports the45-arm Google assay returned210 files,41,826,885 bytes,
+  science exit0. All18 earlier arms reproduced; no27 effect comparison met
+  magnitude-convergence criteria, so three design decisions stay undetermined.
+  Independent07 numerical review pending. Earlier10:46pm snapshot had no active
+  Nebius GPU jobs; no later GPU admission is asserted here.
+- [ ] Native infra owns additive encrypted off-host backup of release `ac95c4c`
+  and current database. Earlier snapshots remain unchanged. Ongoing new project
+  and scientific work will need a later additive capture.
+
+## Previous checkpoint — October 31, 2026, 10:21pm PDT
 
 - [ ] Added two secondary reuse studies without changing the Flying Fish hero:
   tissue microcarrier (claude15 source/simulation packet) and epithelial repair

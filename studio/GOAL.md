@@ -75,13 +75,13 @@ about a proposed action.
   validation limits, and map the story to the judging rubric (SPEC-016).
 - [x] Publish the additive 90-second MiniMax narrated cut, preserve older cuts,
   and check actual public playback, downloads, captions and fullscreen.
-- [ ] Deliver new science-focused 60- and 120-second cuts: actual Lean source and
+- [x] Deliver new science-focused 60- and 120-second cuts: actual Lean source and
   checks, multiscale design evidence, genetic-context limits and validation;
   retain old cuts and feature the new pair after public playback checks.
-- [ ] Add a second 60s/120s pair centered on the Delphi portal, retaining the
+- [x] Add a second 60s/120s pair centered on the Delphi portal, retaining the
   first science pair and all prior cuts; use taller scientific imagery and
   evidence-backed collaboration examples without claiming a pilot advantage.
-- [ ] Refresh System participant counts from scoped harness and child transcripts,
+- [x] Refresh System participant counts from scoped harness and child transcripts,
   distinguishing historical contributors, active workers and capacity.
 - [ ] Build a source-grounded DNA-to-design ledger, compiler dependency graph,
   candidate-screening/experimental-design workflow and virtual-instrument
@@ -96,7 +96,7 @@ about a proposed action.
 - [x] Run solver controls and a scoped Lean check with a failing mutant.
 - [x] Run a bounded simulation, numerical controls and uncertainty analysis.
 - [x] Produce an inspectable candidate geometry and downloadable print artifact.
-- [ ] Add improved printable fish revisions with source lineage, exact-file laws,
+- [x] Add improved printable fish revisions with source lineage, exact-file laws,
   mass/topology/wall checks, independent review and home-page downloads.
 - [x] Connect evidence adapters, source indexes and nanopublication draft export.
 - [x] Measure actual claim reuse and coordination; retain null results.
