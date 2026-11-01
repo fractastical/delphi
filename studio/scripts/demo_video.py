@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import copy
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import ssl
@@ -18,6 +20,7 @@ import subprocess
 import sys
 import tempfile
 import textwrap
+from datetime import datetime, timezone
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageFont
@@ -88,18 +91,23 @@ def load_story(path: Path) -> dict:
         scenes = cut.get("scenes")
         if not isinstance(scenes, list) or not scenes:
             raise ValueError(f"{cut['id']} has no scenes")
-        cursor = 0
+        cursor = 0.0
         for scene in scenes:
             if not isinstance(scene, dict) or not isinstance(scene.get("narration"), str) or not scene["narration"].strip():
                 raise ValueError(f"{cut['id']} scene must have narration text")
-            if not isinstance(scene.get("start_s"), int) or not isinstance(scene.get("duration_s"), int) or scene["duration_s"] <= 0:
+            start_s = scene.get("start_s")
+            duration_s = scene.get("duration_s")
+            if (isinstance(start_s, bool) or not isinstance(start_s, (int, float))
+                    or not math.isfinite(start_s) or isinstance(duration_s, bool)
+                    or not isinstance(duration_s, (int, float)) or not math.isfinite(duration_s)
+                    or duration_s <= 0):
                 raise ValueError(f"{cut['id']} scene has invalid timing")
-            if scene["start_s"] != cursor:
+            if abs(float(start_s) - cursor) > 1e-6:
                 raise ValueError(f"{cut['id']} scene timings must be contiguous")
             if not isinstance(scene.get("id"), str) or not isinstance(scene.get("headline"), str):
                 raise ValueError(f"{cut['id']} scene must have an id and headline")
-            cursor += scene["duration_s"]
-        if cursor != cut.get("duration_s"):
+            cursor += float(duration_s)
+        if abs(cursor - float(cut.get("duration_s", 0))) > 1e-6:
             raise ValueError(f"{cut['id']} scene durations do not equal requested duration")
     return story
 
@@ -296,6 +304,99 @@ async def _synthesize_story(cuts: list[dict], api_key: str, audio_root: Path, *,
     return [await synthesize_cut(cut, api_key, audio_root, voice_id=voice_id, speed=speed) for cut in cuts]
 
 
+def prepare_audio_edit(story_path: Path, tts_path: Path, output_root: Path, *, tempo: float) -> dict:
+    """Create pitch-preserved sped-up scene files and an exact retimed edit copy."""
+    if not 1.0 <= tempo <= 2.0:
+        raise ValueError("editorial tempo must be between 1.0 and 2.0")
+    story = load_story(story_path)
+    tts_manifest = json.loads(tts_path.read_text(encoding="utf-8"))
+    if tts_manifest.get("storyboard_sha256") != sha256_file(story_path):
+        raise ValueError("source TTS manifest does not match the exact frozen storyboard")
+    processed_root = output_root / "sources" / "voice" / f"processed-tempo-{tempo:.2f}"
+    edited_manifest = copy.deepcopy(tts_manifest)
+    duration_rows = []
+    for cut in edited_manifest["cuts"]:
+        scene_rows = {row["scene_id"]: row for row in cut["segments"]}
+        if set(scene_rows) != {scene["id"] for scene in next(c for c in story["cuts"] if c["id"] == cut["cut_id"])["scenes"]}:
+            raise ValueError("TTS scene IDs differ from frozen storyboard")
+        for scene_id, segment in scene_rows.items():
+            source_path = audio_file(segment)
+            if sha256_file(source_path) != segment.get("audio_sha256"):
+                raise ValueError(f"source narration hash mismatch for {scene_id}")
+            processed_path = processed_root / cut["cut_id"] / f"{scene_id}-atempo-{tempo:.2f}.mp3"
+            if processed_path.exists():
+                raise FileExistsError(f"processed audio already exists; inspect before reuse: {processed_path.name}")
+            processed_path.parent.mkdir(parents=True, exist_ok=True)
+            subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(source_path),
+                            "-map", "0:a:0", "-vn", "-af", f"atempo={tempo:.8g}", "-c:a", "libmp3lame",
+                            "-q:a", "2", "-ar", "32000", "-ac", "1", str(processed_path)],
+                           check=True, timeout=90, capture_output=True, text=True)
+            source_audio = {"path": segment["audio_path"], "sha256": segment["audio_sha256"],
+                            "bytes": segment["audio_bytes"], "duration_s": round(probe_duration(source_path), 3)}
+            segment.update({"original_audio": source_audio,
+                            "audio_path": stable_path(processed_path),
+                            "audio_sha256": sha256_file(processed_path),
+                            "audio_bytes": processed_path.stat().st_size,
+                            "audio_duration_s": round(probe_duration(processed_path), 6),
+                            "reused_existing_audio": True})
+            duration_rows.append({"cut_id": cut["cut_id"], "scene_id": scene_id,
+                                  "original_duration_s": source_audio["duration_s"],
+                                  "processed_duration_s": segment["audio_duration_s"]})
+    edited_manifest["audio_postprocessing"] = {
+        "method": "FFmpeg atempo filter; pitch preserved",
+        "tempo": tempo,
+        "tts_voice_speed": tts_manifest.get("voice_speed"),
+        "source_tts_manifest_path": stable_path(tts_path),
+        "source_tts_manifest_sha256": sha256_file(tts_path),
+        "provider_requests_this_edit": 0,
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    edited_tts_path = output_root / "tts-manifest-edited.json"
+    atomic_json(edited_tts_path, edited_manifest)
+
+    edit_story = copy.deepcopy(story)
+    edit_story["audio_source_storyboard_sha256"] = sha256_file(story_path)
+    edit_story["audio_source_storyboard_path"] = stable_path(story_path)
+    for cut in edit_story["cuts"]:
+        tts_cut = next(row for row in edited_manifest["cuts"] if row["cut_id"] == cut["id"])
+        audio = {row["scene_id"]: probe_duration(audio_file(row)) for row in tts_cut["segments"]}
+        total_audio = sum(audio[scene["id"]] for scene in cut["scenes"])
+        available = float(cut["duration_s"]) - total_audio
+        if available <= 0:
+            raise ValueError(f"processed narration exceeds {cut['id']} cut duration")
+        hold = available / len(cut["scenes"])
+        cursor = 0.0
+        timing_rows = []
+        for scene in cut["scenes"]:
+            original_budget = scene["duration_s"]
+            scene_duration = audio[scene["id"]] + hold
+            scene["start_s"] = cursor
+            scene["duration_s"] = scene_duration
+            timing_rows.append({"scene_id": scene["id"], "source_scene_budget_s": original_budget,
+                                "spoken_audio_s": round(audio[scene["id"]], 6),
+                                "hold_after_audio_s": round(hold, 6),
+                                "edited_scene_duration_s": round(scene_duration, 6)})
+            cursor += scene_duration
+        cut["scenes"][-1]["duration_s"] += float(cut["duration_s"]) - cursor
+        cut["editing"] = {"duration_s": cut["duration_s"], "spoken_audio_s": round(total_audio, 6),
+                          "distributed_scene_holds_s": round(available, 6), "scenes": timing_rows}
+    edit_story["revision"] = 3
+    edit_story["editing"] = {
+        "kind": "editorial timing revision; spoken narration unchanged",
+        "source_revision": story.get("revision"),
+        "audio_tempo": tempo,
+        "pitch_preserved": True,
+        "tts_source_voice_speed": tts_manifest.get("voice_speed"),
+        "audio_duration_rows": duration_rows,
+        "cuts": [row.get("editing") for row in edit_story["cuts"]],
+    }
+    edit_story_path = output_root / "edit-storyboard.json"
+    atomic_json(edit_story_path, edit_story)
+    return {"audio_manifest_path": stable_path(edited_tts_path), "edit_storyboard_path": stable_path(edit_story_path),
+            "audio_postprocessing": edited_manifest["audio_postprocessing"],
+            "cuts": edit_story["editing"]["cuts"]}
+
+
 def probe_duration(path: Path) -> float:
     result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
                             check=True, capture_output=True, text=True, timeout=30)
@@ -373,6 +474,8 @@ def validate_media_map(story: dict, media_map_path: Path) -> tuple[dict, list[di
                 duration = shot.get("duration_s")
                 if isinstance(duration, bool) or not isinstance(duration, (int, float)) or not 0 < duration <= scene["duration_s"]:
                     raise ValueError(f"invalid shot duration in {cut['id']}/{scene['id']}")
+                if len(shot.get("badge", "")) > 180:
+                    raise ValueError("shot badge is too long")
                 shot_total += float(duration)
                 for source in shot_sources:
                     if not isinstance(source, dict) or not {"path", "sha256", "kind", "label", "provenance"}.issubset(source) or set(source) - {"path", "sha256", "kind", "label", "provenance", "crop_y"}:
@@ -445,7 +548,7 @@ def _draw_overlay(scene_spec: dict, shot: dict, path: Path) -> dict:
     draw.rounded_rectangle(box, radius=24, fill=(5, 20, 35, 226), outline=(116, 230, 190, 150), width=2)
     draw.text((76, 25), "MORPHOSWARM FRONTIER", font=kicker_font, fill=(115, 238, 194, 255))
     draw.multiline_text((76, 58), title, font=title_font, fill=(255, 255, 255, 255), spacing=1)
-    badge = scene_spec.get("badge", "")
+    badge = shot.get("badge", scene_spec.get("badge", ""))
     if badge:
         draw.rounded_rectangle((48, badge_top, 1872, media_top), radius=14, fill=(5, 20, 35, 228))
         draw.text((72, badge_top + 10), badge, font=badge_font, fill=(255, 238, 188, 255))
@@ -637,13 +740,21 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
     story = load_story(story_path)
     media_map, source_rows = validate_media_map(story, media_map_path)
     tts_manifest = json.loads(tts_path.read_text(encoding="utf-8"))
-    if tts_manifest.get("storyboard_sha256") != sha256_file(story_path):
+    source_storyboard_sha = story.get("audio_source_storyboard_sha256", sha256_file(story_path))
+    if tts_manifest.get("storyboard_sha256") != source_storyboard_sha:
         raise ValueError("TTS manifest does not match the exact frozen storyboard")
     cuts_tts = {cut["cut_id"]: cut for cut in tts_manifest["cuts"]}
     rendered = []
     selected_cuts = [cut for cut in story["cuts"] if only_cut is None or cut["id"] == only_cut]
     if only_cut is not None and not selected_cuts:
         raise ValueError(f"requested cut is absent from frozen storyboard: {only_cut}")
+    for cut in selected_cuts:
+        entries = {row["scene_id"]: row for row in cuts_tts[cut["id"]]["segments"]}
+        if set(entries) != {scene["id"] for scene in cut["scenes"]}:
+            raise ValueError("edited storyboard scene IDs differ from the frozen narration")
+        for scene in cut["scenes"]:
+            if entries[scene["id"]].get("narration") != scene["narration"]:
+                raise ValueError("edited storyboard changed frozen narration text")
     for cut in selected_cuts:
         rendered.append(render_cut(cut, media_map["cuts"][cut["id"]], cuts_tts[cut["id"]],
                                    output_root, work_root, story_path, media_map_path))
@@ -658,18 +769,23 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
         reference = _source_reference(row["path"], renderer_commit)
         stable_sources.append({**row, "path": reference["path"], "source_commit": reference["commit"],
                                "source_url": reference["url"]})
-    try:
-        storyboard_rel = story_path.resolve().relative_to(ROOT).as_posix()
-    except ValueError:
-        storyboard_rel = str(story_path.resolve())
+    storyboard_rel = stable_path(story_path)
+    source_storyboard_path = story.get("audio_source_storyboard_path")
     manifest = {"schema": "frontier.demo-video.release/1", "status": "complete" if only_cut is None else "preview",
                 "storyboard": {"path": storyboard_rel, "sha256": sha256_file(story_path), "commit": media_map["storyboard_commit"]},
+                "source_storyboard": ({"path": source_storyboard_path,
+                                        "sha256": source_storyboard_sha}
+                                       if source_storyboard_path else None),
+                "editing": story.get("editing"),
                 "renderer_commit": renderer_commit,
                 "media_map": {"path": str(media_map_path.relative_to(ROOT)), "sha256": sha256_file(media_map_path)},
                 "tts_manifest": {"path": tts_path.resolve().relative_to(ROOT).as_posix() if tts_path.resolve().is_relative_to(ROOT) else str(tts_path.resolve()), "sha256": sha256_file(tts_path),
                                  "provider": tts_manifest["provider"], "model": tts_manifest["model"],
-                                 "voice_id": tts_manifest["voice_id"], "provider_requests_this_run": tts_manifest["provider_requests_this_run"]},
-                "source_capture_manifest": {"path": str(capture_manifest_path), "sha256": sha256_file(capture_manifest_path),
+                                 "voice_id": tts_manifest["voice_id"],
+                                 "voice_speed": tts_manifest.get("voice_speed"),
+                                 "provider_requests_this_run": tts_manifest["provider_requests_this_run"],
+                                 "audio_postprocessing": tts_manifest.get("audio_postprocessing")},
+                "source_capture_manifest": {"path": stable_path(capture_manifest_path), "sha256": sha256_file(capture_manifest_path),
                                              "release_sha": media_map["site_release_sha"]},
                 "source_files": stable_sources, "cuts": rendered,
                 "renderer_sha256": renderer_sha256,
@@ -683,7 +799,7 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("synthesize", "render"), help="Synthesis uses MiniMax; rendering uses only hash-pinned local media.")
+    parser.add_argument("command", choices=("synthesize", "prepare-edit", "render"), help="Synthesis uses MiniMax; editing and rendering use saved local media.")
     parser.add_argument("--storyboard", type=Path, default=DEFAULT_STORY)
     parser.add_argument("--audio-root", type=Path, default=DEFAULT_AUDIO)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
@@ -693,6 +809,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--cut", choices=("frontier-60s", "frontier-90s", "frontier-120s"), help="render one cut as a preview; omit for all cuts")
     parser.add_argument("--voice-id", default=VOICE_ID, help="MiniMax voice id; used only by synthesize")
     parser.add_argument("--speed", type=float, default=1.0, help="MiniMax voice speed in the provider's 0.5–2.0 range")
+    parser.add_argument("--tempo", type=float, default=1.3, help="pitch-preserving editorial atempo multiplier for prepare-edit")
     args = parser.parse_args(argv)
     try:
         if args.command == "synthesize":
@@ -701,6 +818,10 @@ def main(argv: list[str] | None = None) -> int:
             summary = {"ok": True, "manifest": str(args.output / "tts-manifest.json"),
                        "provider_requests_this_run": result["provider_requests_this_run"],
                        "cuts": [{"id": cut["cut_id"], "segments": len(cut["segments"])} for cut in result["cuts"]]}
+        elif args.command == "prepare-edit":
+            result = prepare_audio_edit(args.storyboard, args.tts_manifest or args.output / "tts-manifest.json",
+                                        args.output, tempo=args.tempo)
+            summary = {"ok": True, **result}
         else:
             tts_path = args.tts_manifest or args.output / "tts-manifest.json"
             result = render_storyboard(args.storyboard, args.media_map, tts_path, args.output, args.work_root, args.cut)
