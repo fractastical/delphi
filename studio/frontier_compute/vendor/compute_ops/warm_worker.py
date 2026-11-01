@@ -31,7 +31,16 @@ def save_receipts():
 def emit_part(seq, wid, meta, data):
     b64 = base64.b64encode(data).decode()
     lines = [b64[i:i + 900] for i in range(0, len(b64), 900)]
-    print("COPS_PART_BEGIN " + json.dumps(meta, sort_keys=True), flush=True)
+    # Provider log lines are clipped at 16 KiB. Preserve the full per-file
+    # manifest in the final archive and keep the independently usable part
+    # digest/size header small, including when the final archive is unavailable.
+    encoded = json.dumps(meta, sort_keys=True).encode()
+    filename = f"part-{seq:03d}-metadata.json"
+    with open(os.path.join(OUT, filename), "wb") as stream:
+        stream.write(encoded)
+    header = {key: value for key, value in meta.items() if key != "files"}
+    header["files_manifest"] = {"path": filename, "sha256": sha(encoded), "bytes": len(encoded)}
+    print("COPS_PART_BEGIN " + json.dumps(header, sort_keys=True), flush=True)
     for i, ln in enumerate(lines):
         print("COPS_B64 " + ln, flush=True)
         if i % 400 == 399:
