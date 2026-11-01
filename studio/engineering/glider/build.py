@@ -125,6 +125,21 @@ REVISIONS = {
                                            "(its liner is the bay's rear wall)"},
                  "main_cavity_x_mm": {"value": [6.0, 150.0], "status": "assumed; the loft range, clipped in front by "
                                                                        "the forward slot's axis plane"}},
+    "r3-daane": {"parent": "r2-light", "source_variant": "c-daane-length",
+                 "title": "r3 Daane: r2-light built on v3c (Daane/FAO pectoral length, +28% paired-fin area, "
+                          "pelvics at 0.48 SL) to raise the area per gram",
+                 "body_wall_mm": {"value": 0.5, "status": "provisional"},
+                 "catch": {"value": {"x_mm": [20.0, 34.0], "seat_offsets_mm": [-1.5, 0.0, 1.5, 3.0], "slot_mm": 3.5,
+                                     "rake_deg": 30.0, "liner_mm": 2.0, "plug_clearance_mm": 0.1,
+                                     "nominal": {"slot_x_mm": 20.0, "offset_mm": 0.0}},
+                           "status": "claude-07 R3 correction: seat at -1.5/0/+1.5/+3.0 mm from the design CG "
+                                     "height, two arms ~15 mm apart (25 and 40 mm ahead of a CG near 60 mm); start "
+                                     "tests at 0 and +1.5; slot shape, rake and plug fit assumed"},
+                 "ballast_bay": {"value": {"x_mm": [6.0, 30.0], "port_diameter_mm": 5.0, "port_x_mm": 11.0},
+                                 "status": "assumed; the loft range, clipped behind by the forward slot's axis plane "
+                                           "(its liner is the bay's rear wall)"},
+                 "main_cavity_x_mm": {"value": [6.0, 150.0], "status": "assumed; the loft range, clipped in front by "
+                                                                       "the forward slot's axis plane"}},
 }
 PAIRED = ("pectoral", "pelvic")
 RIDGE_INSET_MM = 0.08     # a ridge's top sits this far inside the membrane (no tangent faces in the union)
@@ -157,8 +172,8 @@ def wjson(path: Path, obj) -> None:
     path.write_text(json.dumps(obj, indent=2, sort_keys=True, default=float) + "\n")
 
 
-def source_candidate() -> tuple[dict, str]:
-    cand = V3.candidate(SOURCE_VARIANT)
+def source_candidate(variant: str = SOURCE_VARIANT) -> tuple[dict, str]:
+    cand = V3.candidate(variant)
     d = ROOT / "artifacts/fish3d" / cand["id"]
     committed = (d / "candidate.json").read_bytes()
     if B1.canon(cand) != committed:
@@ -328,7 +343,7 @@ def tongue_box(fan: FN.Fan, tg: dict, grow: float = 0.0, out_extra: float = 0.0)
 # ------------------------------------------------------------------ assembly
 def build(rev: str) -> dict:
     p = {**COMMON, **REVISIONS[rev]}
-    cand, csha = source_candidate()
+    cand, csha = source_candidate(REVISIONS[rev].get("source_variant", SOURCE_VARIANT))
     comps, rep, fans, _srec, body = V3.build_components(cand)
     wall = v(p["body_wall_mm"])
     sl = body.sl
@@ -756,6 +771,7 @@ def build_rev(rev: str, out_root: Path, render: bool) -> dict:
             "v_trim_m_s": {f"CL {cl}": {"dry": vtrim(dry["mass_g"], cl), "ballasted": vtrim(loaded_mass, cl)}
                            for cl in (0.4, 0.5, 0.6)},
             "mass_limit_g": MASS_LIMIT_G, "within_mass_limit": bool(loaded_mass <= v(MASS_LIMIT_G)),
+            "mass_for_v_trim_8_m_s_at_CL_0.5_on_this_area_g": 0.5 * 1.225 * 64.0 * 0.5 * S * 1e-6 / 9.81 * 1e3,
             "method": "V = sqrt(2 m g / (rho S C_L)), rho 1.225, S = paired flat area; hand number, not claimed"}
     # catch geometry relative to the CG
     hook = catch_record(g, dry, target) if "catch" in g else None

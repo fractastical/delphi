@@ -19,6 +19,7 @@ Fin and hook sections follow claude-07's print requirements R1–R4 (`glider-dyn
 | `r1-strong` | none | 0.8 mm | 19.95 g, CG x 69.3 mm | 28.9 g | 13.2 m/s |
 | `r1-light` | r1-strong | 0.5 mm | 17.14 g, CG x 68.2 mm | 24.0 g | 12.1 m/s |
 | `r2-light` | r1-light | 0.5 mm | 19.13 g, CG x 64.3 mm (with the nominal seat plug) | 24.9 g | 12.3 m/s |
+| `r3-daane` | r2-light | 0.5 mm | 20.33 g, CG x 63.6 mm | 26.1 g | 11.1 m/s |
 
 **r1 is immutable.** Commit `19f4546` rebuilds it byte for byte; this was checked with `cmp` in a clean worktree.
 - Later builder code reproduces r1's geometry but not its bytes. The r1-strong body volume differs by
@@ -38,7 +39,14 @@ Fin and hook sections follow claude-07's print requirements R1–R4 (`glider-dyn
 - **Mass:** the second liner adds mass forward. The dry CG moves 4 mm forward and the ballast needed falls, but the
   ballasted total is about the same.
 
-**All three revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
+**r3-daane** is r2-light built on the committed v3c candidate (`a6455a3d…`): the Daane/FAO pectoral length and
+pelvics at 0.48 SL.
+- Paired flat area 67.8 cm² against 52.9 cm². Each pectoral is 3.00 g against 2.40 g.
+- The mass for V_trim 8 m/s at C_L 0.5 on this area is 13.5 g, against 10.5 g.
+- Ballasted to CG x 52 mm it is 26.1 g. That still fails, but trim speed drops from 12.3 to 11.1 m/s.
+- Hand NP bracket 55.6–58.3 mm; pectoral MAC 30.9 mm.
+
+**All four revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
 V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with that failure stated.
 - **Measured split** (`r1-light`): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.
 - **Why the ballast is large.** The hollow body's CG sits at about x 69 mm, against claude-07's CG window of
