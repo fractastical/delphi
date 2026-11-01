@@ -32,7 +32,41 @@ def main(compiler, ledger_root, output):
                   'valid_sequences': sum(s['valid'] for s in consumed['sequences']),
                   'invalid_sequences': [{'id': s['id'], 'problems': s['problems']} for s in consumed['sequences'] if not s['valid']],
                   'LEN_context_consumed': context, 'LEN_context_original': next(e['context'] for e in ledger['entries'] if e['id'] == 'LEN-P2-positive'),
+                  'LEN_source_context_preserved': entries['LEN-P2-positive'].get('source_context'),
+                  'directions_preserved': all(entries[e['id']].get('direction') == e['direction'] for e in ledger['entries']),
+                  'model_outputs_still_unknown': all(entries[e['id']].get('functional_validation') == 'unknown'
+                      for e in ledger['entries'] if e['evidence_class'] == 'model_output'),
                   'entries': len(consumed['entries']), 'problems': consumed['problems']}}
+    if hasattr(module, 'baseline_graph'):
+        graph = module.baseline_graph(ledger_root)
+        design = {'schema': module.DESIGN_SCHEMA, 'id': 'actual-ledger-missing-context-negative',
+                  'claim': 'proposal', 'context': context, 'ledger': use}
+        forward = module.compile_design(ledger_root, graph, design)
+        old = [s for s in ledger['sequences'] if s['sequence_kind'] == 'existing_model_output'][:2]
+        candidates = [{'id': s['id'], 'source_ref': s['artifact_ref'], 'length_nt': s['length_nt'],
+                       'sequence_sha256': s['sequence_sha256'], 'evidence_kind': 'model_output',
+                       'provenance': {'proposer': 'original-recorded-generator',
+                         'method': 'Existing artifact retained in a missing-context refusal probe; no new design',
+                         'source_refs': s['source_refs']}} for s in old]
+        inverse = module.compile_inverse(ledger_root, graph,
+            {'schema': module.INVERSE_SCHEMA, 'id': 'actual-existing-output-refusal',
+             'target_node': 'expression', 'candidates': candidates}, design)
+        results['actual_forward_inverse'] = {'forward_verdict': forward['verdict'],
+            'forward_reasons': forward['reasons'], 'interface_state': forward['interface_state'],
+            'inverse': inverse, 'scope': 'Deliberately incomplete source-context test; prior outputs remain hypotheses, not fin candidates or function evidence'}
+        natural = next(s for s in ledger['sequences'] if s['id'] == 'fgf20a-transcript')
+        candidate = {'id': natural['id'], 'source_ref': natural['artifact_ref'],
+                     'length_nt': natural['length_nt'], 'sequence_sha256': natural['sequence_sha256']}
+        results['actual_sequence_positive'] = module.check_sequence(ledger_root, candidate)
+        results['actual_sequence_bad_declared_digest'] = module.check_sequence(ledger_root,
+            {**candidate, 'sequence_sha256': '0'*64})
+        other = next(s for s in ledger['sequences'] if s['id'] == 'kcnh2a-transcript')
+        results['actual_I1_matching_candidate'] = module._check_inputs(ledger_root, 'I1', {},
+            {'sequence_sha256': natural['sequence_sha256']}, {natural['sequence_sha256']})
+        results['actual_I1_wrong_candidate'] = module._check_inputs(ledger_root, 'I1', {},
+            {'sequence_sha256': natural['sequence_sha256']}, {other['sequence_sha256']})
+        results['downstream_non_digest_string_diagnostic'] = module._check_inputs(ledger_root, 'I3',
+            {'transfer_version': 'explicit-checker-fixture'}, {'upstream': 'not-a-digest'}, set())
     with tempfile.TemporaryDirectory() as dirname:
         root = Path(dirname)
         # Deliberately unrelated, explicitly non-execution bytes with a valid hash.
@@ -48,6 +82,36 @@ def main(compiler, ledger_root, output):
         na_plan = {**plan, 'required_checks': [{'id': 'c', 'endpoint': False}]}
         na_result = {**result, 'status': 'not_applicable', 'reason': 'Declared out of scope'}
         results['all_nonendpoint_not_applicable'] = module.evaluate_validation(root, {'validation_plans': [na_plan], 'validation_results': [na_result]})
+        # Properly pinned typed records isolate the count and missing-endpoint
+        # guards from the earlier unrelated-file gate. These are invalid checker
+        # fixtures, explicitly not empirical measurements or biological results.
+        if hasattr(module, 'PLAN_SCHEMA') and hasattr(module, 'RESULT_SCHEMA'):
+            dna_hash = next(s['sequence_sha256'] for s in ledger['sequences'] if s['id'] == 'fgf20a-transcript')
+
+            def bound_records(endpoint, status, cases):
+                frozen_plan = {'schema': module.PLAN_SCHEMA, 'id': 'typed-p', 'version': '1',
+                    'candidate_id': 'checker-fixture', 'candidate_sequence_sha256': dna_hash,
+                    'endpoint': 'Deliberately invalid validation bookkeeping fixture',
+                    'required_checks': [{'id': 'c', 'endpoint': endpoint, 'executable': True}]}
+                frozen_result = {'schema': module.RESULT_SCHEMA, 'plan_id': 'typed-p', 'plan_version': '1',
+                    'check_id': 'c', 'candidate_sequence_sha256': dna_hash, 'status': status, 'cases': cases,
+                    'reason': 'Deliberate validator fixture, no biology',
+                    'validator': {'role': 'synthetic_checker_fixture', 'identity': 'independent-review',
+                                  'dependence_identity': 'one-test-fixture'}}
+                (root/'plan.json').write_text(json.dumps(frozen_plan))
+                (root/'result.json').write_text(json.dumps(frozen_result))
+                def refs(name):
+                    return {'path': name, 'sha256': sha256((root/name).read_bytes()).hexdigest()}
+                return module.evaluate_validation(root, {'validation_plans': [{**frozen_plan, 'ref': refs('plan.json')}],
+                    'validation_results': [{**frozen_result, 'ref': refs('result.json')}]})
+
+            results['bound_records_bool_counts'] = bound_records(True, 'pass',
+                {'positive': True, 'negative': True, 'negative_rejected': True})
+            results['bound_records_all_NA'] = bound_records(False, 'not_applicable', {})
+            results['bound_records_structural_positive'] = bound_records(True, 'pass',
+                {'positive': 2, 'negative': 1, 'negative_rejected': True})
+            results['bound_records_string_endpoint_diagnostic'] = bound_records('false', 'pass',
+                {'positive': 2, 'negative': 1, 'negative_rejected': True})
     output.write_text(json.dumps(results, indent=2, allow_nan=False)+'\n')
     print(json.dumps({'compiler_sha256': results['compiler_file_sha256'],
                      'valid_sequences': results['actual_ledger']['valid_sequences'],

@@ -1,7 +1,7 @@
 # Sequence/compiler and SPEC-017 independent review
 
-Review status: initial findings delivered; awaiting owner02's fixed committed
-compiler for the final integration check. This report concerns bookkeeping,
+Review status: final actual-ledger integration executed; two residual typed-input
+findings remain. This report concerns bookkeeping,
 identity and validator rules, not measured biological function.
 
 SPEC-017 was read at root `cd0290f`; this worktree is based on root `c7b6f9e`.
@@ -79,6 +79,42 @@ GRCz11 sequence identity, context-matched candidate function and all biological
 expression-to-material/flight transfer unknown or blocked. The LEN deletion
 result specifically preserves the distinction between induced expression and
 required fin regeneration.
+
+## Final committed-source integration
+
+Executed the same bounded reviewer against compiler
+`3b2ca996e6095e3e4b20ed0255c687f31007e403`, file SHA256
+`44fae76024e13280c4ff4497479a51df6155678ca366d6d2e5b52a9897933ada`,
+and the clean ledger below. The exact compiler source snapshot and raw returned
+checks are retained in `fixed-check.compiler.py.txt` and `fixed-check.json`.
+The snapshot digest was compared with the committed Git object.
+
+Seventeen declared integration/refusal conditions now behave as expected:
+all 36 sequences and 44 entries are consumed; source context and direction are
+preserved; model-output function remains unknown; unrelated plaintext cannot
+authenticate a validation result; properly bound boolean counts fail at the
+count gate; properly bound all-NA records fail the missing-endpoint gate; valid
+typed bookkeeping passes; natural DNA identity passes and a wrong declared digest
+fails; I1 exact-candidate matching passes while a different candidate digest fails.
+Two actual prior model outputs remain `proposals_only`, with zero endorsed
+candidates; source-context gaps remain `invalid_document`, with all five
+biological interfaces unknown. These checks do not establish functional DNA.
+
+Two additional declared typed-boundary conditions **fail** in that committed
+source (17/19 scoped checks, not a biological success fraction):
+
+- `endpoint="false"` as a string is coerced truthy in a pinned plan and can
+  satisfy the endpoint condition. Require strict boolean endpoint/executable
+  types and unique, nonempty check IDs before evaluation.
+- A downstream I3 input string `not-a-digest` is accepted with no reason by
+  `_check_inputs`. It is nonempty but is not a verified digest/pin. Use a declared
+  typed-value contract or a strict digest/reference policy; do not label arbitrary
+  strings verified dependencies.
+
+Both residuals were sent directly to root/owner02. No existing biological
+calibration is established by the baseline, so neither finding changes any real
+functional result. `final-receipt.json` pins the source, ledger, script and outputs;
+focused Ruff passed. No full suite or provider inference was run.
 
 ## Publication and molecular-queue checks
 
