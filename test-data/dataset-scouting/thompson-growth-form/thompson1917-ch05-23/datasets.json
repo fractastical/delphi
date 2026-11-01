@@ -1,0 +1,112 @@
+{
+  "claim_id": "thompson1917-ch05-23",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:45:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "3D geometry of the trypanosome undulating membrane (whole membrane in frame) to compute mean curvature along it",
+    "ultrastructure of the membrane (presence/absence of cytoskeletal or fibrous elements, flagellum attachment zone) to distinguish a passive film from a structured fold",
+    "time-resolved membrane/flagellum waveform (high-speed video) to test whether undulations follow the flagellar beat or are self-generated",
+    "comparable data for related flagellates (e.g., Trichomonas) with undulating membranes"
+  ],
+  "datasets": [
+    {
+      "id": "electron-microscopy-data-bank",
+      "name": "EMDB (Electron Microscopy Data Bank)",
+      "landing_url": "https://www.ebi.ac.uk/emdb/",
+      "access_url": "https://www.ebi.ac.uk/emdb/api/search/(title:trypanosoma%20OR%20sample_name:trypanosoma)%20AND%20structure_determination_method:tomography?rows=50&fl=emdb_id,title",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:30:00Z", "method": "HEAD landing_url; GET search API (title/sample_name trypanosoma, with and without tomography filter); GET entry API for EMD-45648 and EMD-6748", "http_status": 200 },
+      "variables_present": ["cryo-ET tomograms of T. brucei flagellum/axoneme (3 tomography entries besides EMD-23621)", "many single-particle maps of trypanosome proteins (not relevant)"],
+      "variables_missing": ["whole undulating membrane in frame", "dynamics"],
+      "scope": "Search returned 100 entries matching trypanosoma (capped list; mostly single-particle maps); 4 with structure_determination_method tomography: EMD-45648 ('Representative cryo electron tomography reconstructions showing central pair microtubule alignment in a wild type Trypanosoma brucei cell', released 2024-09-11), EMD-6748/6749/6750 ('Representative tomogram for the Trypanosoma brucei mini cell', 2018-06-13).",
+      "evidence": "API returned list of 100 docs for the broad query and 4 for the tomography filter; entry titles as quoted. These tomograms centre on the axoneme/central pair, not the membrane sheet.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "emdb-emd-23621",
+      "name": "EMDB EMD-23621: A tomogram of the T. brucei flagellum in its bloodstream form",
+      "landing_url": "https://www.ebi.ac.uk/emdb/EMD-23621",
+      "access_url": "https://www.ebi.ac.uk/emdb/api/entry/EMD-23621",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:30:00Z", "method": "GET EMDB entry API", "http_status": 200 },
+      "variables_present": ["cryo-electron tomogram of the bloodstream-form T. brucei flagellum (pixel spacing 20.424 Å)", "ultrastructure of flagellum and adjacent membrane within the field of view"],
+      "variables_missing": ["whole undulating membrane and body for mean-curvature estimate", "any dynamics"],
+      "scope": "One tomogram; deposited 2021-03-14, released 2021-07-28; method tomography; primary citation first authors Zhang J, Wang H, Imhof S, Zhou X, Liao S, Atanasov I, …",
+      "evidence": "Entry API: title 'A tomogram of the T. brucei flagellum in its bloodstream form', structure determination method 'tomography', map pixel_spacing x/y/z 20.424 Å. Static ultrastructure only.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "empiar",
+      "name": "EMPIAR (Electron Microscopy Public Image Archive)",
+      "landing_url": "https://www.ebi.ac.uk/empiar/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:35:00Z", "method": "HEAD landing_url (200); GET api/search/?query=trypanosoma and api/search/trypanosoma/ (both 404 HTML); GET api/entry/all/ (404); GET api/entry/10000/ (404 'Not found'); BioStudies search collection=empiar query trypanosoma", "http_status": 200, "note": "Landing page is up but no API endpoint tried returned data; BioStudies EMPIAR-collection search returned totalHits 0 for trypanosoma." },
+      "variables_present": [],
+      "variables_missing": ["raw tilt series for any trypanosome dataset could not be confirmed"],
+      "scope": "Archive-wide; no trypanosome entry could be confirmed through the endpoints tried",
+      "evidence": "All EMPIAR API routes returned 404; BioStudies empiar collection search 'trypanosoma' totalHits 0.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=organism&value=Trypanosoma%20brucei",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:35:00Z", "method": "HEAD landing_url (302 redirect); GET searchengine image search organism=Trypanosoma brucei", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["any trypanosome images (organism search returned 0)"],
+      "scope": "IDR-wide; no images with organism Trypanosoma brucei",
+      "evidence": "searchengine results list empty (0 results) for organism = 'Trypanosoma brucei'. Note TrypTag is hosted in BioImage Archive (S-BIAD1866), not IDR.",
+      "verdict": "not-found",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-tryptag-s-biad1866",
+      "name": "BioImage Archive S-BIAD1866: TrypTag, genome-wide subcellular protein localisation in Trypanosoma brucei",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD1866",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Trypanosoma&collection=bioimages",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:38:00Z", "method": "GET BioStudies search API (collection bioimages, query Trypanosoma); GET studies/S-BIAD1866/info", "http_status": 200 },
+      "variables_present": ["fluorescence micrographs of procyclic T. brucei cells with tagged proteins, including flagellum-attachment-zone and flagellar proteins (localisation, not geometry)"],
+      "variables_missing": ["3D membrane curvature", "ultrastructure", "time-resolved waveform"],
+      "scope": "Genome-wide tagging images (procyclic form); 5 BioImage Archive hits for Trypanosoma in total: S-BIAD2480, S-BIAD1932, S-BIAD1080, S-BIAD1866, S-BIAD4306 (Leishmania)",
+      "evidence": "Search totalHits 5; titles as listed. Images are 2D widefield fluorescence for protein localisation, which can show which cytoskeletal proteins line the undulating membrane region but not its curvature or passivity.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "EMDB API", "query": "title:trypanosoma OR sample_name:trypanosoma", "url": "https://www.ebi.ac.uk/emdb/api/search/title:trypanosoma%20OR%20sample_name:trypanosoma?rows=200&fl=emdb_id,title,structure_determination_method", "hits": 100, "note": "list capped at 100; mostly single-particle maps" },
+    { "source": "EMDB API", "query": "… AND structure_determination_method:tomography", "url": "https://www.ebi.ac.uk/emdb/api/search/(title:trypanosoma%20OR%20sample_name:trypanosoma)%20AND%20structure_determination_method:tomography?rows=50&fl=emdb_id,title", "hits": 4, "note": "EMD-45648, EMD-6748, EMD-6749, EMD-6750 (EMD-23621 not matched by this field query but exists)" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "Trypanosoma", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Trypanosoma&collection=bioimages", "hits": 5, "note": "TrypTag and related localisation studies" },
+    { "source": "BioStudies EMPIAR collection", "query": "trypanosoma", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=trypanosoma&collection=empiar", "hits": 0, "note": "" },
+    { "source": "IDR search engine", "query": "organism = Trypanosoma brucei", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=organism&value=Trypanosoma%20brucei", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "trypanosoma flagellum (high-speed OR waveform OR beat), type dataset", "url": "https://zenodo.org/api/records?q=trypanosoma%20flagellum%20(high-speed%20OR%20waveform%20OR%20beat)&type=dataset&size=6", "hits": 19001, "note": "loose; top hits are Chlamydomonas beat data and unrelated; no trypanosome waveform dataset in top results" },
+    { "source": "Dryad", "query": "trypanosome flagellum motility waveform", "url": "https://datadryad.org/api/v2/search?q=trypanosome%20flagellum%20motility%20waveform", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "trypanosoma undulating membrane", "url": "https://api.datacite.org/dois?query=trypanosoma%20undulating%20membrane&page[size]=6", "hits": 24, "note": "taxonomic descriptions and figures (Plazi/Zenodo), no geometry or dynamics dataset" }
+  ],
+  "status": "partial",
+  "summary": "Static ultrastructure exists: EMDB holds the bloodstream-form flagellum tomogram EMD-23621 (20.4 Å voxels) and three further T. brucei cryo-tomograms (EMD-45648, EMD-6748–6750), all centred on the axoneme rather than the whole membrane; TrypTag (BioImage Archive S-BIAD1866) gives protein localisations along the flagellum attachment zone. No open dataset gives whole-membrane 3D curvature, time-resolved undulation dynamics, or other flagellates with undulating membranes; EMPIAR could not be queried (all API routes 404) and IDR has no trypanosome images.",
+  "next_step": "Segment the membrane sheet in EMD-23621 and the other tomograms to estimate local mean curvature where in frame; for the passive-vs-active question, high-speed video of trypanosome swimming would have to be sourced from paper supplements or newly recorded.",
+  "obstacles_confirmed": [
+    "Few datasets combine ultrastructure, curvature, and dynamics.",
+    "Available tomograms center on the axoneme and paraflagellar rod, so the mean curvature of the whole undulating membrane is only partly in frame.",
+    "Trichomonas and spermatozoa with undulating membranes are outside this trypanosome archive, and static maps do not show whether the wave is actively driven."
+  ]
+}

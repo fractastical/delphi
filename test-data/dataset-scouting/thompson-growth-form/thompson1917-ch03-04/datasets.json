@@ -1,0 +1,120 @@
+{
+  "claim_id": "thompson1917-ch03-04",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:08:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "size (mass or centroid size) of individuals of two or more related species at matched developmental stages (embryonic/fetal, juvenile, adult)",
+    "shape descriptors (landmark coordinates or linear measures) for the same individuals",
+    "developmental stage or age for each specimen, comparable across species",
+    "phylogenetic relatedness of the species pairs compared"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/physical-objects?q=juvenile&per_page=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:00:00Z", "method": "HEAD landing_url (200); GET API physical-objects q=juvenile (200, total_count 445); GET q='ontogenetic series' (200, total_count 25)", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "3D scans of vouchered specimens with taxonomy_name, taxonomy_gbif and sex; 445 physical objects match 'juvenile', 25 match 'ontogenetic series'",
+        "size and shape can be measured from the media, not delivered as fields"
+      ],
+      "variables_missing": ["no age/stage field in the physical-object record (fields: id, title, organization, catalog_number, taxonomy_name, taxonomy_gbif, sex, ...)", "no embryonic/fetal series surfaced in the API query", "no ready-made disparity or landmark tables"],
+      "scope": "Vertebrate museum specimens, adult-dominated; juvenile hits mostly FMNH fish lots",
+      "evidence": "API response pages.total_count 445 (q=juvenile) and 25 (q=ontogenetic series); record keys listed include sex but no age; example hits FMNH:Fishes:11068, FMNH:Fishes:87365, ouvc:12470 (Meleagris gallopavo).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies bioimages collection)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=embryo%20developmental%20series%20comparative%20species%20microCT&collection=bioimages&pageSize=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:01:00Z", "method": "GET BioStudies search API, collection=bioimages", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "stage-resolved whole-embryo microCT for one species: IMPC mouse embryos at E9.5 (S-BIAD3243), E14.5-E15.5 (S-BIAD3290), E18.5 (S-BIAD3331), including mutant lines",
+        "human fetal chondrocranium 3D atlas, middle trimester (S-BSST1227)"
+      ],
+      "variables_missing": ["no multi-species series of related taxa at matched stages", "size/shape not tabulated"],
+      "scope": "Query totalHits 517 (fuzzy); relevant hits are mouse (IMPC) and human only",
+      "evidence": "Accessions returned: S-BIAD3243, S-BIAD3331, S-BIAD3290, S-BIAD1130, S-BIAD602, S-BIAD1474, S-BIAD2201, S-BSST1227.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "e-mouse-atlas-project",
+      "name": "e-Mouse Atlas Project (EMAP)",
+      "landing_url": "https://www.emouseatlas.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:04:00Z", "method": "HEAD landing_url and GET /emap/home.html, two attempts with 20-25 s timeout", "http_status": null, "note": "curl returned 000 (no response within 20 s) on both attempts at 2026-11-01T00:02Z and 00:04Z" },
+      "variables_present": [],
+      "variables_missing": ["could not be checked"],
+      "scope": "Single species (mouse) by design; would at most give stage-specific 3D anatomy for one species",
+      "evidence": "No HTTP response received.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-anolis-ontogenetic-limb-allometry",
+      "name": "A highly conserved ontogenetic limb allometry and its evolutionary significance in the adaptive radiation of Anolis lizards (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.jsxksn08d",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.jsxksn08d/download",
+      "doi": "10.5061/dryad.jsxksn08d",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:06:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 4934773 },
+      "variables_present": [
+        "embryonic growth measurements of 13 fore- and hindlimb bones across 15 Anolis species (per abstract): related species, embryonic stages, size and limb proportions"
+      ],
+      "variables_missing": ["postnatal/juvenile and adult stages are not stated in the abstract fetched", "whole-body shape beyond limbs"],
+      "scope": "15 Anolis species, embryonic limb bones; 4.9 MB, not downloaded; primary article doi 10.1098/rspb.2021.0226",
+      "evidence": "Dryad API: publicationDate 2021-06-10, license CC0-1.0, storageSize 4934773; abstract: 'covariation of embryonic growth of 13 fore- and hindlimb bones in 15 [Anolis species]'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-shape-coordinates-adults-ontogenetic-series",
+      "name": "Shape coordinates and centroid size for adults and ontogenetic series analyzed in 'Predictable complexity of evolutionary allometry' (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.t4b8gtj5j",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.t4b8gtj5j/download",
+      "doi": "10.5061/dryad.t4b8gtj5j",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:06:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 5082464 },
+      "variables_present": ["landmark shape coordinates and centroid size for adults and ontogenetic series of multiple species (title); supports stage-matched size and shape disparity"],
+      "variables_missing": ["taxa, stage definitions and embryonic coverage not stated in the record fetched (abstract is theoretical)", "no fetal stages confirmed"],
+      "scope": "Multi-species ontogenetic series (taxa not confirmed); 5.1 MB; primary article doi 10.1007/s11692-022-09581-1",
+      "evidence": "Dryad API: title as given, publicationDate 2022-11-16, license CC0-1.0, storageSize 5082464.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "physical-objects q=juvenile", "url": "https://www.morphosource.org/api/physical-objects?q=juvenile&per_page=5", "hits": 445, "note": "no age field in records" },
+    { "source": "MorphoSource API", "query": "physical-objects q=ontogenetic series", "url": "https://www.morphosource.org/api/physical-objects?q=ontogenetic%20series&per_page=5", "hits": 25, "note": null },
+    { "source": "BioStudies (bioimages collection)", "query": "embryo developmental series comparative species microCT", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=embryo%20developmental%20series%20comparative%20species%20microCT&collection=bioimages&pageSize=8", "hits": 517, "note": "IMPC mouse embryo microCT at three stages; human fetal chondrocranium" },
+    { "source": "Dryad", "query": "ontogenetic allometry geometric morphometrics juvenile adult species", "url": "https://datadryad.org/api/v2/search?q=ontogenetic%20allometry%20geometric%20morphometrics%20juvenile%20adult%20species&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "ontogenetic allometry skull landmarks", "url": "https://datadryad.org/api/v2/search?q=ontogenetic%20allometry%20skull%20landmarks&per_page=8", "hits": 1, "note": "10.5061/dryad.tdz08kqb1 postnatal craniofacial growth in two pig breeds (within-species)" },
+    { "source": "DataCite", "query": "ontogenetic shape disparity embryo fetal comparative landmarks", "url": "https://api.datacite.org/dois?query=ontogenetic%20shape%20disparity%20embryo%20fetal%20comparative%20landmarks&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "ontogenetic allometry landmarks juvenile (dataset)", "url": "https://api.datacite.org/dois?query=ontogenetic%20allometry%20landmarks%20juvenile&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 2, "note": "dinosaur endocranial ontogeny (10.5061/dryad.3n5tb2rs2), Cambrian brachiopod allometry (10.5061/dryad.j0zpc86d8)" },
+    { "source": "Zenodo", "query": "title:(ontogenetic allometry) type=dataset", "url": "https://zenodo.org/api/records?q=title%3A%28ontogenetic%20allometry%29&type=dataset&size=8", "hits": 246, "note": "Dryad mirrors: Anolis limb ontogeny (10.5061/dryad.jsxksn08d), multi-species ontogenetic shape coordinates (10.5061/dryad.t4b8gtj5j), macaque skull ontogeny (10.5061/dryad.d2547d87h), bovid horn ontogeny (10.5061/dryad.qz612jmb4)" }
+  ],
+  "status": "partial",
+  "summary": "No single dataset gives size and shape for related species from fetal stages to adulthood; the pieces exist separately. Dryad holds multi-species ontogenetic morphometric series (Anolis embryonic limb bones for 15 species, 10.5061/dryad.jsxksn08d; shape coordinates for adults and ontogenetic series, 10.5061/dryad.t4b8gtj5j; macaque skull and bovid horn ontogeny), MorphoSource has 445 juvenile-tagged 3D specimens without an age field, and BIA has stage-resolved embryo microCT for mouse and human only.",
+  "next_step": "Download the two Dryad series (5 MB each, CC0) to confirm taxa and stage coverage, then pre-register a disparity-vs-stage test on Anolis limbs (embryonic) and on the multi-species shape-coordinate series; the mammalian fetal-to-adult contrast would need to be compiled from literature.",
+  "obstacles_confirmed": [
+    "Fetal and juvenile series are taxonomically sparse next to adult specimens: MorphoSource juvenile hits are 445 of a much larger adult-dominated archive and carry no stage field.",
+    "Embryos of related species are unevenly sampled: stage-resolved embryo imaging in BIA is mouse and human.",
+    "e-Mouse Atlas was unreachable during this scout."
+  ]
+}

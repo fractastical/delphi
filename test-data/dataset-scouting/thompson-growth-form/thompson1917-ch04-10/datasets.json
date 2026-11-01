@@ -1,0 +1,77 @@
+{
+  "claim_id": "thompson1917-ch04-10",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T03:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-2/thompson-ch01-05" },
+  "variables_needed": [
+    "egg cortical / surface tension measured immediately before first sperm fusion",
+    "egg cortical / surface tension time series in the first seconds to minutes after fusion",
+    "timing of later sperm exclusion (polyspermy block) in the same eggs",
+    "membrane potential and fertilization-envelope / cortical-granule status recorded in parallel, to separate alternative blocks"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI BioStudies)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=fertilization%20oocyte%20sperm&pageSize=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T03:05:00Z", "method": "GET BioStudies search API ('fertilization oocyte sperm' and '\"cortical tension\"')", "http_status": 200, "bytes": null },
+      "variables_present": ["fertilization imaging with sperm-entry kinetics (see S-BIAD2356 below)"],
+      "variables_missing": ["any cortical-tension measurement of eggs around fertilization ('cortical tension' query returned 2 studies, both on somatic cells)", "membrane potential"],
+      "scope": "Archive-wide: 68 hits for fertilization/oocyte/sperm, 2 for 'cortical tension' (S-BIAD1167 aster centration, S-BIAD2611 3T3 fibroblast cortex mechanics)",
+      "evidence": "Search API totalHits 68 and 2; S-BIAD2611 record lists organism Mus musculus, 3T3 fibroblasts, licence CC BY 4.0, no eggs.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad2356-mouse-polyspermy-block",
+      "name": "Role of the zona pellucida in gamete fusion and perivitelline space in blocking polyspermy in mice (S-BIAD2356)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD2356",
+      "access_url": "ftp://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/356/S-BIAD2356",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T03:08:00Z", "method": "GET BioStudies studies/S-BIAD2356 and /info", "http_status": 200, "bytes": null },
+      "variables_present": ["real-time bright-field and confocal imaging of inseminated mouse oocytes with kinetic tracking of sperm fusion and polyspermy prevention"],
+      "variables_missing": ["cortical or surface tension", "membrane potential", "non-mammalian eggs"],
+      "scope": "Mus musculus oocytes only; released 2025-10 (released 1761177600000)",
+      "evidence": "Study record: title, description 'combines real-time imaging, confocal microscopy and statistical analysis to investigate fertilization and polyspermy prevention dynamics in mice', organism Mus musculus, licence CC BY 4.0, FTP link returned.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-6502830-oocyte-membrane-segmentation",
+      "name": "Segmentation of membrane of mouse, sea urchin and human oocytes from transmitted light images (Zenodo)",
+      "landing_url": "https://zenodo.org/records/6502830",
+      "access_url": "https://zenodo.org/api/records/6502830",
+      "doi": "10.5281/zenodo.6502830",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T03:08:00Z", "method": "GET Zenodo API record", "http_status": 200, "bytes": null },
+      "variables_present": ["transmitted-light images of mouse, human oocytes and sea urchin eggs with membrane segmentations (shape, not tension)"],
+      "variables_missing": ["tension", "fertilization time course", "sperm entry events"],
+      "scope": "Static oocyte images for a phenotyping ML paper",
+      "evidence": "Zenodo record: title, licence cc-by-4.0, description 'images acquired in transmitted light ... of mouse and human oocytes and sea urchin eggs, with the correspon[ding segmentations]'.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "fertilization oocyte sperm", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=fertilization%20oocyte%20sperm&pageSize=6", "hits": 68, "note": "S-BIAD2356 (mouse polyspermy block imaging) is the only fertilization-kinetics dataset; the rest are sperm cryo-ET and oogenesis." },
+    { "source": "BioImage Archive", "query": "\"cortical tension\"", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=%22cortical%20tension%22&pageSize=6", "hits": 2, "note": "Both somatic-cell studies; no egg." },
+    { "source": "Dryad", "query": "polyspermy", "url": "https://datadryad.org/api/v2/search?q=polyspermy&per_page=8", "hits": 8, "note": "Bird polyspermy counts, Lepidoptera micropyles, sea urchin gamete-recognition evolution; no tension or fertilization time series." },
+    { "source": "Dryad", "query": "cortical tension", "url": "https://datadryad.org/api/v2/search?q=cortical%20tension&per_page=8", "hits": 0, "note": "No hits." },
+    { "source": "Zenodo", "query": "fertilization \"cortical tension\" oocyte", "url": "https://zenodo.org/api/records?q=fertilization%20%22cortical%20tension%22%20oocyte&size=5", "hits": 10736, "note": "Loose match; only the oocyte membrane segmentation set (6502830) is a dataset, and it has no tension." },
+    { "source": "DataCite", "query": "egg fertilization \"surface tension\" OR \"cortical tension\"", "url": "https://api.datacite.org/dois?query=egg%20fertilization%20%22surface%20tension%22%20OR%20%22cortical%20tension%22&page%5Bsize%5D=6", "hits": 1465, "note": "First page irrelevant (salmonid life history, transcriptomics, speculative preprints)." }
+  ],
+  "status": "gap",
+  "summary": "No public repository dataset contains egg cortical or surface tension measured through fertilization. The closest archived material is fertilization imaging (S-BIAD2356, mouse, CC BY 4.0, sperm-fusion kinetics without mechanics) and static oocyte shape images; tension time series at fertilization (micropipette aspiration, AFM, or cortical-flow-based estimates in sea urchin, Xenopus, mouse) live only in paper figures.",
+  "next_step": "Compile a table from the primary literature of pre- and post-fertilization cortical tension values with timing of the polyspermy block, membrane-potential change and cortical-granule exocytosis per species (sea urchin, Xenopus, mouse), or request raw traces from the authors; then pre-register whether a tension rise precedes or accompanies the block.",
+  "obstacles_confirmed": [
+    "Direct tension measurements are rarely archived with fertilization movies (none found).",
+    "Tension time series at fertilization are in papers on a few model eggs."
+  ]
+}

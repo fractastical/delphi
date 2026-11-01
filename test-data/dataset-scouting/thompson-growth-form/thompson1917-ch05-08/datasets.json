@@ -1,0 +1,110 @@
+{
+  "claim_id": "thompson1917-ch05-08",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:12:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "3D surface of each individual chamber of a multichambered foraminiferal test (segmented chamber meshes), with its boundary against the previous chambers",
+    "3D surface of the whole test for the same specimen",
+    "chamber order (ontogenetic sequence) per specimen",
+    "the same for desmid semicells (Thompson's second example)",
+    "evidence of fluid-to-rigid transition at chamber formation (live-imaging of chamber building)"
+  ],
+  "datasets": [
+    {
+      "id": "endless-forams",
+      "name": "Endless Forams (planktonic foraminifera image library) and its Zenodo training sets",
+      "landing_url": "http://www.endlessforams.org/",
+      "access_url": "https://zenodo.org/api/records?q=%22Endless%20Forams%22&size=5",
+      "doi": "10.5281/zenodo.3996436",
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:03:00Z", "method": "HEAD landing_url (200); GET Zenodo search \"Endless Forams\" (3 hits)", "http_status": 200 },
+      "variables_present": ["tens of thousands of 2D light-microscope images of planktonic foraminifera with species labels (Zenodo 10.5281/zenodo.3996436: Endless_Forams_training_set.zip 714,725,290 bytes; 10.5281/zenodo.7270253: 26,000+ machine-identified images, 909,253,708 bytes)"],
+      "variables_missing": ["3D chamber surfaces", "per-chamber segmentation", "desmids", "any growth-stage or live imaging"],
+      "scope": "Modern planktonic foraminifera, 2D silhouettes/umbilical views",
+      "evidence": "Landing page 200 (no counts parsed from HTML); Zenodo records give file sizes and dataset type. Images are 2D projections, which the assessors flag as an obstacle for fitting 3D equilibrium surfaces.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource micro-CT media tagged foraminifera",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=foraminifera&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:03:00Z", "method": "HEAD landing_url; GET api/media q=foraminifera (total_count 75), q=Globigerina (5), q=Rotalia (4)", "http_status": 200 },
+      "variables_present": ["75 open micro-CT mesh/volume media for foraminifera, e.g. Nummulites sp. mesh from NHMD (visibility open, modality MicroNanoXRayComputedTomography); 5 media matching Globigerina (incl. Globigerina subcretacea / Neogloboquadrina dutertrei sectioned-half CT), 4 matching Rotalia"],
+      "variables_missing": ["pre-segmented individual chambers (whole-test scans; chamber segmentation would have to be done)", "desmids", "live chamber-formation imaging"],
+      "scope": "Mixed fossil and modern foraminifera, small numbers per genus",
+      "evidence": "API JSON with total_count and media metadata as above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pangaea",
+      "name": "PANGAEA foraminiferal morphometry datasets (e.g. PANGAEA.908790, 952337)",
+      "landing_url": "https://www.pangaea.de/",
+      "access_url": "https://doi.pangaea.de/10.1594/PANGAEA.908790?format=metadata_jsonld",
+      "doi": "10.1594/PANGAEA.908790",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:07:00Z", "method": "HEAD landing_url; GET ws.pangaea.de ES search 'foraminifera chamber morphometry' (16,058 hits); GET JSON-LD metadata of PANGAEA.908790", "http_status": 200 },
+      "variables_present": ["PANGAEA.908790 'Ontogenetic disparity in early planktic foraminifers': per-chamber table with variables Event label, Species, Chamber number, Ontogenetic stage, Length, Height, Volume, Surface area, Surface area per volume (CC BY 4.0)", "PANGAEA.952337 shell characteristics of Praeorbulina/Orbulina (1,726 data points)"],
+      "variables_missing": ["chamber surface meshes (scalar per-chamber measures only)", "whole-test fit variables", "desmids", "live imaging"],
+      "scope": "Early (Jurassic–Cretaceous) and Miocene planktic foraminifera, micro-CT derived",
+      "evidence": "JSON-LD variableMeasured list as above; ES search total 16,058 (loose match).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-2593861-foram-microct-chamber-segments",
+      "name": "Micro-CT scans, whole-test meshes and internal chamber segments of 42 planktonic foraminifera (Zenodo)",
+      "landing_url": "https://zenodo.org/records/2593861",
+      "access_url": "https://zenodo.org/api/records/2593861",
+      "doi": "10.5281/zenodo.2593861",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:10:00Z", "method": "GET Zenodo API (2593860 redirects 302 to 2593861)", "http_status": 200, "bytes": 20241687537 },
+      "variables_present": ["tomographic reconstructions of 42 planktonic foraminifera from plankton tows and sediment traps", "whole-test meshes and shrink-wrapped (pore-closed) test meshes", "internal meshes of segmented individual chambers", "per-specimen metadata and volumetric measurements for tests and chambers"],
+      "variables_missing": ["desmids", "benthic genera (Rotalia)", "live fluid-stage observation"],
+      "scope": "42 modern planktonic foraminifera specimens; 6 files, 20.2 GB total",
+      "evidence": "Zenodo description: 'meshes and shrinkwrap meshes the whole tests and internal meshes of segmented chambers… volumetric measurements for the tests and chambers'; licence cc-by-4.0.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-41ns1rnrd-pulleniatina-microct",
+      "name": "Morphology of Pulleniatina: micro-CT internal volumes (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.41ns1rnrd",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.41ns1rnrd",
+      "doi": "10.5061/dryad.41ns1rnrd",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:10:00Z", "method": "GET Dryad dataset API", "http_status": 200, "bytes": 18661 },
+      "variables_present": ["volumetric data for seven Pulleniatina specimens across six species, from ZEISS Xradia micro-CT"],
+      "variables_missing": ["chamber surface meshes (volumes only, 18,661 bytes)", "desmids"],
+      "scope": "One planktonic genus, 7 specimens",
+      "evidence": "Dryad abstract as above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "foraminifera / Globigerina / Rotalia", "url": "https://www.morphosource.org/api/media?q=foraminifera&per_page=1", "hits": 75, "note": "Globigerina 5, Rotalia 4" },
+    { "source": "PANGAEA Elasticsearch", "query": "foraminifera chamber morphometry", "url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=foraminifera+chamber+morphometry&size=3", "hits": 16058, "note": "top ids 316060, 952337, 848773" },
+    { "source": "Zenodo", "query": "\"Endless Forams\"", "url": "https://zenodo.org/api/records?q=%22Endless%20Forams%22&size=5", "hits": 3, "note": "two image datasets, one unrelated paper" },
+    { "source": "DataCite", "query": "foraminifera micro-CT chamber volume", "url": "https://api.datacite.org/dois?query=foraminifera+micro-CT+chamber+volume&page[size]=5", "hits": 6, "note": "led to Zenodo 2593861, Dryad 41ns1rnrd, PANGAEA 908790/952337/907942" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "desmid", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=desmid&pageSize=3", "hits": 0, "note": "no desmid imaging datasets" }
+  ],
+  "status": "partial",
+  "summary": "For planktonic foraminifera the geometric part of the claim is data-ready: Zenodo 2593861 provides 42 micro-CT specimens with whole-test meshes and segmented per-chamber meshes (CC BY), supplemented by MorphoSource (75 foram CT media) and PANGAEA per-chamber tables. Nothing was found for desmids or for benthic Rotalia chambers, and no dataset documents the fluid-then-rigid formation of a chamber, so the mechanism clause and the desmid scope remain uncovered.",
+  "next_step": "Pre-register a constant-mean-curvature fit on the chamber meshes versus the shrink-wrapped whole-test meshes of Zenodo 2593861; scout literature imaging of live chamber formation (e.g. Amphistegina/Ammonia culture studies) separately.",
+  "obstacles_confirmed": [
+    "Desmid coverage is limited (no repository hits).",
+    "Rigid shells record final rather than fluid chamber geometry.",
+    "Desmids and many benthic chambered forms are outside this image set."
+  ]
+}

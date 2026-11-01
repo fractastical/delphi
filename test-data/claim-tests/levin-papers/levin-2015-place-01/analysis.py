@@ -12,17 +12,22 @@ SEEDS = range(20)
 # Paper: "small random expectations with a log precision of minus four" (sd = e^2);
 # DEM_morphogenesis.m: v = randn(n,n)/8 (log precision ~ +4.16). Both are run.
 INIT = {"code_randn_over_8": 1 / 8, "paper_log_precision_minus4": float(np.exp(2.0))}
+# Primary runs are deterministic, as pre-registered. Sensitivity runs add the SPM generative
+# process's sensory noise (precision exp(16)), omitted from the pre-registered re-implementation.
+CONDITIONS = [(k, sd, False) for k, sd in INIT.items()] + \
+    [(k + "+process_noise", sd, True) for k, sd in INIT.items()]
 
 
 def main():
     records, demo, demo_main, adem_t = M.load_source_info()
     tg = M.Target(demo["T"])
     rows, summary = [], {}
-    for name, sd in INIT.items():
+    for name, sd, noisy in CONDITIONS:
         passes, fdrop = 0, 0
         for seed in SEEDS:
             v, ax, as_ = M.initial_state(tg, np.random.default_rng(seed), sd)
-            traj, _ = M.run(tg, v, ax, as_)
+            nrng = np.random.default_rng(10_000 + seed) if noisy else None
+            traj, _ = M.run(tg, v, ax, as_, noise_rng=nrng)
             end = traj[-1]
             ok = M.assembled(tg, end)
             f_ok = bool(traj[-1]["F"] < traj[1]["F"])

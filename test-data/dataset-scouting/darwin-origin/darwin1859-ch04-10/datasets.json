@@ -1,0 +1,250 @@
+{
+  "claim_id": "darwin1859-ch04-10",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "effect sizes (phenotypic effect or % variance explained) of loci/alleles underlying adaptive change",
+    "adaptive context (selection or divergence) for the loci",
+    "frequency of polyploidy/whole-genome duplication among adaptive transitions (chromosome numbers)"
+  ],
+  "datasets": [
+    {
+      "id": "animal-qtldb",
+      "name": "Animal QTLdb (animalgenome.org)",
+      "landing_url": "https://www.animalgenome.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:45:00Z",
+        "method": "GET https://www.animalgenome.org/cgi-bin/QTLdb/index (redirected to https://www.animalgenome.org/)",
+        "http_status": 200,
+        "note": "Site displayed a maintenance notice at the time of the check."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not check variables"
+      ],
+      "scope": "Livestock QTL (per assessor)",
+      "evidence": "Request redirected to the animalgenome.org home page, whose text reads 'animalgenome.org is under maintenance'; no QTL records were retrievable.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "chromosome-counts-database",
+      "name": "Chromosome Counts Database (CCDB)",
+      "landing_url": "https://ccdb.tau.ac.il/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:45:20Z",
+        "method": "GET https://ccdb.tau.ac.il/, /services/, /Browse/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant chromosome counts via a documented API (Services page: 'API Services', 'R Package')"
+      ],
+      "variables_missing": [
+        "no effect-size or adaptation variables; polyploidy would have to be inferred from counts"
+      ],
+      "scope": "Plants",
+      "evidence": "Landing 200; Services page describes an API and an R package; the static Browse page text read '0 families in Browse', so the listing is loaded dynamically and no record count was confirmed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gwas-catalog",
+      "name": "GWAS Catalog",
+      "landing_url": "https://www.ebi.ac.uk/gwas/",
+      "access_url": "https://www.ebi.ac.uk/gwas/rest/api/v2/associations",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:45:23Z",
+        "method": "GET https://www.ebi.ac.uk/gwas/rest/api/v2/studies?size=1 and /associations?size=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "per-association effect estimates (beta, ci_lower, ci_upper, range, risk_frequency)",
+        "studies and traits"
+      ],
+      "variables_missing": [
+        "humans only: no adaptive or fitness context",
+        "non-human taxa"
+      ],
+      "scope": "Human GWAS",
+      "evidence": "v2 API: page.totalElements 232277 studies and 1205644 associations; an association record carries fields beta, ci_lower, ci_upper, range, risk_frequency, p_value. The older /gwas/rest/api/studies path returned 410.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-stickleback-skeletal-qtl",
+      "name": "Data from: Genetic architecture of skeletal evolution in European lake and stream stickleback",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.b2534",
+      "access_url": null,
+      "doi": "10.5061/dryad.b2534",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:45:10Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.b2534",
+        "http_status": 200,
+        "bytes": 2176724
+      },
+      "variables_present": [
+        "QTL mapping data (488 F2 individuals, 2011 SNPs) for skeletal divergence between lake and stream populations"
+      ],
+      "variables_missing": [
+        "one species pair, one trait class",
+        "effect-size table not inspected"
+      ],
+      "scope": "Gasterosteus aculeatus, one lake-stream system",
+      "evidence": "API: publicationDate 2014-02-13, storageSize 2176724; abstract: 'quantitative trait locus (QTL) mapping using 488 F2 individuals and 2011 single nucleotide polymorphisms'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-genetic-architecture-rapidly-adapting-life-history",
+      "name": "On the genetic architecture of rapidly adapting and convergent life history traits (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.w3r2280sk",
+      "access_url": null,
+      "doi": "10.5061/dryad.w3r2280sk",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:45:00Z",
+        "method": "GET https://datadryad.org/api/v2/search?q=QTL effect size adaptation wild (record in results)",
+        "http_status": 200,
+        "bytes": 72325855
+      },
+      "variables_present": [
+        "genetic architecture of adapting life-history traits (title)"
+      ],
+      "variables_missing": [
+        "only the title and size were read; organism and variables not inspected"
+      ],
+      "scope": "Unknown",
+      "evidence": "Search result listed storageSize 72325855.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-bioproject-genbank-sra",
+      "name": "NCBI BioProject / GenBank / SRA",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/bioproject",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET https://www.ncbi.nlm.nih.gov/sra (landing); esearch db=sra Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "raw reads and assemblies from adaptation studies (e.g. stickleback: 25745 SRA experiments)"
+      ],
+      "variables_missing": [
+        "no effect sizes; loci must be re-derived from each study"
+      ],
+      "scope": "All organisms",
+      "evidence": "esearch db=sra Gasterosteus aculeatus[Organism] count 25745. Landing page 200. BioProject landing not separately fetched.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "QTL effect size adaptation wild",
+      "url": "https://datadryad.org/api/v2/search?q=QTL%20effect%20size%20adaptation%20wild",
+      "hits": 3,
+      "note": "stickleback skeletal QTL; rice F2 SNPs; life-history architecture"
+    },
+    {
+      "source": "Dryad",
+      "query": "distribution of effect sizes adaptive mutations",
+      "url": "https://datadryad.org/api/v2/search?q=distribution%20of%20effect%20sizes%20adaptive%20mutations",
+      "hits": 12,
+      "note": "mostly simulation or single-system datasets"
+    },
+    {
+      "source": "Dryad",
+      "query": "large-effect locus adaptation QTL meta-analysis",
+      "url": "https://datadryad.org/api/v2/search?q=large-effect%20locus%20adaptation%20QTL%20meta-analysis",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "polyploidy chromosome number speciation angiosperms",
+      "url": "https://datadryad.org/api/v2/search?q=polyploidy%20chromosome%20number%20speciation%20angiosperms",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "QTL effect sizes adaptation meta-analysis (dataset type)",
+      "url": "https://api.datacite.org/dois?query=QTL+effect+sizes+adaptation+meta-analysis&page%5Bsize%5D=1&resource-type-id=dataset",
+      "hits": 1,
+      "note": "not relevant (single-cell multiomics)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"effect size\" QTL adaptive \"large-effect\"",
+      "url": "https://zenodo.org/api/records?q=%22effect%20size%22%20QTL%20adaptive%20%22large-effect%22&size=1",
+      "hits": 73860,
+      "note": "loose matching; first hit mirrors the stickleback QTL dataset"
+    }
+  ],
+  "status": "partial",
+  "summary": "Effect sizes are available in bulk only for human GWAS (1,205,644 associations in the GWAS Catalog, no adaptive context) and in single-system QTL datasets such as the stickleback skeletal map; Animal QTLdb was under maintenance and the Chromosome Counts Database gave no confirmed record count, and no cross-taxon compilation of effect sizes of adaptive alleles was found.",
+  "next_step": "Compile a table of adaptive-allele effect sizes from published QTL/GWAS meta-analyses and the single-system Dryad datasets, and add chromosome counts for the polyploidy arm; re-check Animal QTLdb when it is back.",
+  "obstacles_confirmed": [
+    "GWAS and QTL samples are biased toward large effects and toward crops, livestock, and humans.",
+    "The phrase 'infinitesimally small' lacks a unique modern threshold."
+  ]
+}

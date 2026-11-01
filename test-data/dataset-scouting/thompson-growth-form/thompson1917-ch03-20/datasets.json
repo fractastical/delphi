@@ -1,0 +1,129 @@
+{
+  "claim_id": "thompson1917-ch03-20",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "growth rate (root or shoot elongation, relative growth rate or biomass accumulation) measured at several controlled temperatures per species",
+    "species identity with a temperate vs warm-climate (e.g. maize, melon) classification",
+    "developmental stage / organ and acclimation history of the plants measured",
+    "fitted optimum temperature per species (derivable from the curve)"
+  ],
+  "datasets": [
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": "https://www.try-db.org/TryWeb/Data.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:08:00Z", "method": "HEAD landing_url (200); GET TryWeb/Data.php (200); GET dnld/TryAccTraits.txt (404)", "http_status": 200 },
+      "variables_present": [
+        "species-level functional traits; data page mentions temperature only as climate covariates (TemperatureSeasonality, KoeppenGeigerID) and one Arabidopsis temperature/N-supply study"
+      ],
+      "variables_missing": [
+        "no trait = growth rate as a function of controlled temperature; no per-species optimum temperature",
+        "data release requires registration and a request; no open API"
+      ],
+      "scope": "Global plant trait aggregator; not an experimental temperature-response archive",
+      "evidence": "Data.php HTML contains 'temperature and N supply on leaf and root tissue N content in Arabidops...' and 'TemperatureSeasonality, KoeppenGeigerID, AWC_mm' as the only temperature strings; TryAccTraits.txt download 404",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "environmental-data-initiative",
+      "name": "Environmental Data Initiative (EDI) repository / PASTA search",
+      "landing_url": "https://edirepository.org/",
+      "access_url": "https://pasta.lternet.edu/package/search/eml?q=plant+growth+temperature+response&rows=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:09:00Z", "method": "HEAD landing_url (405 Method Not Allowed), GET landing_url (200); GET PASTA search API twice (403 Forbidden, also with a User-Agent header)", "http_status": 403, "note": "landing page up but the PASTA search API refused both requests with 403, so holdings could not be queried" },
+      "variables_present": [],
+      "variables_missing": [
+        "could not search; EDI is in any case an LTER/field-ecology archive, not a controlled-temperature growth archive"
+      ],
+      "scope": "Unknown in this session",
+      "evidence": "pasta.lternet.edu returned 403 for q=growth+temperature+optimum+plant and q=plant+growth+temperature+response",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-nzs7h44p0-arable-weed-germination-growth",
+      "name": "Populations of arable weed species show intra-specific variability in germination base temperature but not in early growth rate (Dryad/Zenodo)",
+      "landing_url": "https://zenodo.org/records/4304927",
+      "access_url": "https://zenodo.org/api/records/4304927",
+      "doi": "10.5061/dryad.nzs7h44p0",
+      "license": "cc-zero",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:12:00Z", "method": "GET Zenodo record JSON", "http_status": 200 },
+      "variables_present": [
+        "germination base temperature for 13 temperate arable weed species and early post-emergence relative growth rate for 21 species, climate chamber and greenhouse, two seed populations (Germany, France); Rawdata.xlsx 591,184 bytes"
+      ],
+      "variables_missing": [
+        "growth rates measured at base/threshold temperatures rather than across a full series to an optimum; no maize or melon; no optimum temperature"
+      ],
+      "scope": "21 temperate arable weed species, seedlings",
+      "evidence": "Zenodo metadata description: 'germination base temperature among 13 arable weed species and the seedlings' early post-emergence relative growth rate among 21 species in climate chamber and green house experiments'; files: Rawdata.xlsx 591184",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-7wm37pvvq-mimulus-thermal-performance",
+      "name": "Data from: The evolution of thermal performance in native and invasive populations of Mimulus guttatus",
+      "landing_url": "https://datadryad.org/stash/dataset/doi:10.5061/dryad.7wm37pvvq",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.7wm37pvvq",
+      "doi": "10.5061/dryad.7wm37pvvq",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:11:00Z", "method": "GET Dryad dataset JSON", "http_status": 200 },
+      "variables_present": [
+        "thermal performance curves (growth across controlled temperatures) for native and invasive populations of one temperate plant, Mimulus guttatus; storageSize 72,562 bytes"
+      ],
+      "variables_missing": [
+        "single species; no warm-climate comparison"
+      ],
+      "scope": "One species, multiple populations",
+      "evidence": "abstract: 'we use thermal performance curves (TPCs) to test hypotheses about thermal adaptation during the invasion process'; license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-tqjq2bvw6-togashi-cardinal-temperatures",
+      "name": "Fungal and Oomycete cardinal temperatures (the Togashi dataset)",
+      "landing_url": "https://datadryad.org/stash/dataset/doi:10.5061/dryad.tqjq2bvw6",
+      "access_url": "https://api.datacite.org/dois?query=%22cardinal%20temperatures%22%20plant%20species%20growth&resource-type-id=dataset&page%5Bsize%5D=10",
+      "doi": "10.5061/dryad.tqjq2bvw6",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:11:00Z", "method": "appears in Dryad search and DataCite search results; record itself not fetched", "http_status": 200 },
+      "variables_present": [
+        "minimum/optimum/maximum growth temperatures compiled for fungi and oomycetes"
+      ],
+      "variables_missing": [
+        "not plants; relevant only as a template for a plant cardinal-temperature compilation"
+      ],
+      "scope": "Fungi and oomycetes",
+      "evidence": "title in DataCite and Dryad search hits; mirrored on Zenodo 3897456 (cc-zero)",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "TRY", "query": "trait list download and data page scan for 'temperature'", "url": "https://www.try-db.org/TryWeb/Data.php", "hits": null, "note": "Data.php 200 with '15 traits' snippets; TryAccTraits.txt 404; temperature appears only as climate covariate names" },
+    { "source": "EDI / PASTA", "query": "plant growth temperature response", "url": "https://pasta.lternet.edu/package/search/eml?q=plant+growth+temperature+response&rows=5", "hits": null, "note": "403 on both attempts" },
+    { "source": "Dryad", "query": "thermal performance curve plant growth temperature optimum", "url": "https://datadryad.org/api/v2/search?q=thermal%20performance%20curve%20plant%20growth%20temperature%20optimum", "hits": 3, "note": "Mimulus TPCs (7wm37pvvq), Togashi fungal cardinal temperatures, marine metabolic traits" },
+    { "source": "Zenodo", "query": "\"temperature response\" plant growth optimum species, type=dataset", "url": "https://zenodo.org/api/records?q=%22temperature%20response%22%20plant%20growth%20optimum%20species&type=dataset&size=10", "hits": 88660, "note": "loose matching; no multi-species plant temperature-optimum table in the top 10" },
+    { "source": "Zenodo", "query": "\"thermal performance\" plant growth rate temperature species, type=dataset", "url": "https://zenodo.org/api/records?q=%22thermal%20performance%22%20plant%20growth%20rate%20temperature%20species&type=dataset&size=10", "hits": 119756, "note": "4304927 arable weeds (germination base T, early RGR) is the only multi-species plant hit; others are fungi, insects, phytoplankton" },
+    { "source": "DataCite", "query": "\"cardinal temperatures\" plant species growth, dataset", "url": "https://api.datacite.org/dois?query=%22cardinal%20temperatures%22%20plant%20species%20growth&resource-type-id=dataset&page%5Bsize%5D=10", "hits": 4, "note": "only fungal/oomycete compilations" }
+  ],
+  "status": "partial",
+  "summary": "No open repository table gives growth-rate-versus-temperature curves or fitted optima across many temperate plant species plus maize and melon; what exists is single-species TPC data (Mimulus guttatus, Dryad CC0), a 21-species temperate weed seedling growth/germination table (Dryad/Zenodo CC0) without a temperature series to the optimum, and cardinal-temperature compilations for fungi only; TRY holds no such trait and EDI's search API was unreachable.",
+  "next_step": "Compile per-species cardinal/optimum temperatures from the agronomic and plant-physiology literature (crop cardinal-temperature reviews, root-elongation studies such as those Thompson cites from Sachs and Pfeffer) into one table with species, organ, stage and optimum, then pre-register the temperate-vs-warm-climate comparison.",
+  "obstacles_confirmed": [
+    "Temperature-response experiments are scattered and use different endpoints.",
+    "TRY does not directly provide complete temperature-response curves for all species.",
+    "Temperate crops are heavily over-represented relative to the common wild flora."
+  ]
+}

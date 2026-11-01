@@ -12,6 +12,10 @@ import morphogenesis as M  # noqa: E402
 
 SEEDS = range(20)
 INIT = {"code_randn_over_8": 1 / 8, "paper_log_precision_minus4": float(np.exp(2.0))}
+# Primary runs are deterministic, as pre-registered. Sensitivity runs add the SPM generative
+# process's sensory noise (precision exp(16)), omitted from the pre-registered re-implementation.
+CONDITIONS = [(k, sd, False) for k, sd in INIT.items()] + \
+    [(k + "+process_noise", sd, True) for k, sd in INIT.items()]
 T_SPLIT = 8
 
 
@@ -19,19 +23,23 @@ def main():
     records, demo, _, _ = M.load_source_info()
     tg = M.Target(demo["T"])
     rows, summary = [], {}
-    for name, sd in INIT.items():
+    for name, sd, noisy in CONDITIONS:
         for seed in SEEDS:
             rng = np.random.default_rng(seed)
             v, ax, as_ = M.initial_state(tg, rng, sd)
-            pre, states = M.run(tg, v, ax, as_, nbins=M.N_BINS)
+            nrng = np.random.default_rng(10_000 + seed) if noisy else None
+            pre, states = M.run(tg, v, ax, as_, nbins=M.N_BINS, noise_rng=nrng)
             row = {"init": name, "seed": seed}
             both = True
             dip_any = False
             for half, upper in (("upper_tail_cells", True), ("lower_head_cells", False)):
                 st = M.split_half(tg, states[T_SPLIT], upper, rng)
                 a0 = M.assess(tg, st[0], st[1])
-                traj, _ = M.run(tg, *st)
+                traj, post = M.run(tg, *st, noise_rng=nrng)
                 end = traj[-1]
+                ax_end = post[-1][1]
+                pair_sep = float(np.sqrt(((ax_end[:, : tg.n // 2] - ax_end[:, tg.n // 2:]) ** 2)
+                                         .sum(0)).min())
                 ok = M.assembled(tg, end)
                 dip = min(t["mean_max_p"] for t in traj[1:9]) < a0["mean_max_p"]
                 both &= ok
@@ -45,6 +53,7 @@ def main():
                              "rms_32": round(end["rms"], 4),
                              "correct_types_32": end["correct_types"],
                              "mean_max_p_32": round(end["mean_max_p"], 4),
+                             "min_duplicate_pair_separation_32": round(pair_sep, 4),
                              "regenerated": bool(ok), "dedifferentiation_dip": bool(dip),
                              "F_1": round(traj[1]["F"], 2), "F_32": round(end["F"], 2)}
             row["both_regenerated"] = bool(both)

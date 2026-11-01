@@ -1,0 +1,226 @@
+{
+  "claim_id": "darwin1859-ch02-10",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "number of species per genus (taxonomy with dated or undated membership)",
+    "recent or tip-level speciation rate per species (from time-calibrated phylogeny) or infraspecific/incipient-species counts",
+    "genus age and sampling fraction as controls"
+  ],
+  "datasets": [
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree 5",
+      "landing_url": "https://timetree.org/",
+      "access_url": "https://timetree.org/api/pairwise/8795/8797",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:16Z",
+        "method": "GET landing; GET https://timetree.org/api/pairwise/8795/8797",
+        "http_status": 200
+      },
+      "variables_present": [
+        "published molecular divergence times between species pairs/taxa (median ages, CI)"
+      ],
+      "variables_missing": [
+        "no bulk table of all genera or tip rates found in this check; clade-wide use needs many pairwise calls"
+      ],
+      "scope": "All taxa with published molecular dating",
+      "evidence": "Pairwise API returned a CSV with columns taxon_a_id, taxon_b_id, scientific_name_a, scientific_name_b, all_total, precomputed_age, precomputed_ci_low, precomputed_ci_high, adjusted_age (example row Rhea pennata vs Rhea americana, 11.44 Ma).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "timetree-5-pairwise-2026-10-31"
+    },
+    {
+      "id": "birdtree",
+      "name": "BirdTree (Jetz et al. bird phylogenies)",
+      "landing_url": "https://birdtree.org/",
+      "access_url": "https://birdtree.org/downloads/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://birdtree.org/ and https://birdtree.org/downloads/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "downloadable pseudo-posterior distributions of dated species-level bird trees (10K trees per distribution, zipped in 1K-tree archives)"
+      ],
+      "variables_missing": [
+        "tip speciation rates (derived, not supplied)",
+        "non-bird taxa"
+      ],
+      "scope": "Birds only",
+      "evidence": "Downloads page text: 'There are four choices of class-wide tree distribution to choose from, each containing 10K trees, stored as zip archives of 1K trees each.'",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "vertlife-phylogeny-subsets",
+      "name": "VertLife phylogeny subsets",
+      "landing_url": "https://vertlife.org/phylosubsets/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://vertlife.org/data/ and https://vertlife.org/phylosubsets/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "tool that subsets and samples dated vertebrate trees; full trees downloadable (per page text)"
+      ],
+      "variables_missing": [
+        "tip speciation rates (derived)",
+        "invertebrates, plants"
+      ],
+      "scope": "Vertebrates",
+      "evidence": "Phylosubsets page: 'This tool provides a simple way to produce distributions of trees with subsets of taxa. If larger subsets are required you can download full trees.' Class coverage was not read from the page.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "wcvp-world-checklist-vascular-plants",
+      "name": "World Checklist of Vascular Plants (WCVP) download",
+      "landing_url": "https://sftp.kew.org/pub/data-repositories/WCVP/",
+      "access_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:46:05Z",
+        "method": "HEAD wcvp.zip; range fetch of last 3000 bytes of wcvp.zip (zip central directory)",
+        "http_status": 200,
+        "bytes": 88179649,
+        "note": "Over 1 MB: not downloaded; only HEAD and a 3 KB range."
+      },
+      "variables_present": [
+        "plant names table (wcvp_names.csv) and distribution table (wcvp_distribution.csv) inside the zip"
+      ],
+      "variables_missing": [
+        "columns of wcvp_names.csv were not inspected, so infraspecific rank coding is unconfirmed",
+        "tip speciation rates"
+      ],
+      "scope": "Vascular plants",
+      "evidence": "wcvp.zip: Content-Length 88179649, Last-Modified 2026-06-04; zip directory lists wcvp_names.csv and wcvp_distribution.csv. POWO API (https://powo.science.kew.org/api/2/search) returned 403 (Cloudflare challenge page).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-sra",
+      "name": "NCBI Sequence Read Archive",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET landing; E-utilities esearch db=sra term=Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "raw sequencing reads deposited by population-genomic and evolve-and-resequence studies"
+      ],
+      "variables_missing": [
+        "no phenotype, heritability, fitness or selection columns; studies must be identified and downloaded individually"
+      ],
+      "scope": "Archive of reads, all organisms",
+      "evidence": "esearch db=sra for Gasterosteus aculeatus[Organism] returned count 25745 (one example taxon). Landing page 200.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "tip speciation rate DR statistic genus",
+      "url": "https://datadryad.org/api/v2/search?q=tip%20speciation%20rate%20DR%20statistic%20genus",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "subspecies number speciation rate phylogenetic",
+      "url": "https://datadryad.org/api/v2/search?q=subspecies%20number%20speciation%20rate%20phylogenetic",
+      "hits": 1,
+      "note": "one hit on the taxon cycle; not a genus-level rate table"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"tip speciation rates\" phylogeny genus",
+      "url": "https://zenodo.org/api/records?q=%22tip%20speciation%20rates%22%20phylogeny%20genus&size=1",
+      "hits": 606447,
+      "note": "hit count from loose matching; first hit an rDNA alignment, not relevant"
+    },
+    {
+      "source": "DataCite",
+      "query": "incipient speciation tip rates genus richness",
+      "url": "https://api.datacite.org/dois?query=incipient+speciation+tip+rates+genus+richness&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "diversification rates marine freshwater fishes time-calibrated phylogeny",
+      "url": "https://datadryad.org/api/v2/search?q=diversification%20rates%20marine%20freshwater%20fishes%20time-calibrated%20phylogeny",
+      "hits": 3,
+      "note": "fish trees; see darwin1859-ch04-16"
+    }
+  ],
+  "status": "partial",
+  "summary": "Dated trees are openly available for birds (BirdTree) and vertebrates (VertLife), from which tip rates and genus richness could be computed, and TimeTree and Open Tree cover more taxa; no repository was found that supplies precomputed tip-rate or incipient-species tables per genus, and plant infraspecific counts sit in a WCVP file whose columns were not inspected.",
+  "next_step": "Fix one clade (birds via BirdTree plus a genus assignment from the tree taxonomy), pre-register the tip-rate estimator and the age/sampling controls, and download the tree distribution (zip archives of 1K trees each).",
+  "obstacles_confirmed": [
+    "Tip-rate estimators are biased by tree shape, sampling fraction, and taxonomic splitting.",
+    "'Still forming' is not directly observable."
+  ]
+}

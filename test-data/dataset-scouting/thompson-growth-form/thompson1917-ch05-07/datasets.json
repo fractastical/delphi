@@ -1,0 +1,107 @@
+{
+  "claim_id": "thompson1917-ch05-07",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:56:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "local surface (wall/membrane) tension or wall stiffness at the future bud site vs elsewhere, through bud emergence",
+    "time-resolved cell outline / bud geometry during emergence (curvature, bud radius) in live yeast",
+    "polarity landmark or Cdc42 localisation timing relative to the first bulge",
+    "shape of the bud and budding outcome under perturbations of wall mechanics or turgor"
+  ],
+  "datasets": [
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR), Saccharomyces cerevisiae studies",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/screen/search/?key=Organism&value=Saccharomyces%20cerevisiae",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:49:00Z", "method": "GET searchengine project search Organism=Saccharomyces cerevisiae (200, 5 projects); GET screen search same key (200, 14 screens)", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "fixed-cell and live-cell yeast images with cell outlines and bud morphology as a by-product (idr0078-mattiazziusaj-endocyticcomp: 'widespread morphological pleiotropy'; idr0003-breker-plasticity; idr0040-aymoz-singlecell time-resolved gene expression)",
+        "genome-wide mutant screens from which budding-pattern phenotypes could be re-scored"
+      ],
+      "variables_missing": ["local tension or wall stiffness", "polarity-marker time-lapse through bud emergence", "mechanical perturbations"],
+      "scope": "5 projects + 14 screens tagged Organism = Saccharomyces cerevisiae; none designed around bud emergence or wall mechanics",
+      "evidence": "Project names returned: idr0027-dickerson-chromatin, idr0040-aymoz-singlecell, idr0047-neuert-yeastmrna, idr0067-king-yeastmeiosis, idr0063-newman-chromosomalloci; screens: idr0003, idr0004, idr0007, idr0011 (A-E), idr0078 (A,B), idr0140 (A,B), idr0145 (A,B).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies bioimages collection)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=yeast%20bud%20emergence%20live%20imaging%20Cdc42%20polarity&collection=bioimages&pageSize=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:50:00Z", "method": "GET BioStudies search API, collection=bioimages, two queries", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "live yeast time-lapse exists (S-BIAD449 'cell cycle Start is reversible under starvation'; S-BIAD2229 vesicle tethering in exocytosis; S-BIAD2259; S-BIAD326 CLSM/DIC time-lapse sets)"
+      ],
+      "variables_missing": ["no study annotated for bud-site tension, wall stiffness or polarity-marker timing vs first bulge"],
+      "scope": "Query 'yeast bud emergence live imaging Cdc42 polarity' totalHits 1187 (fuzzy); 'Saccharomyces bud site \"cell wall\" time-lapse' totalHits 301; top 8 of each are gene-expression, autophagy, kinetochore and unrelated (limb bud, chick) studies",
+      "evidence": "Accessions returned: S-BIAD491, S-BIAD1425, S-BIAD2259, S-BIAD2229, S-BIAD2338, S-BIAD607, S-BIAD449, S-BIAD2409; S-BIAD326, S-BIAD1925, S-BIAD1926, S-BIAD2338, S-BIAD1474, S-BIAD3015, S-BIAD2515, S-BIAD865.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "saccharomyces-genome-database",
+      "name": "Saccharomyces Genome Database (SGD) phenotype annotations",
+      "landing_url": "https://www.yeastgenome.org/",
+      "access_url": "https://www.yeastgenome.org/backend/locus/CDC42/phenotype_details",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:52:00Z", "method": "HEAD landing_url (200); GET /backend/phenotype/bud_morphology (404); GET /webservice/search?... (404); GET /backend/locus/CDC42/phenotype_details (200, 132437 bytes JSON)", "http_status": 200, "bytes": 132437 },
+      "variables_present": [
+        "curated qualitative phenotypes per gene, e.g. CDC42: 128 annotations including 'budding pattern: abnormal' (7), 'shmoo formation: decreased' (11)",
+        "gene-to-morphology links for landmark/polarity mutants (the alternative mechanism)"
+      ],
+      "variables_missing": ["no tension, stiffness or curvature measurements", "no images or time series"],
+      "scope": "Saccharomyces cerevisiae only; categorical phenotypes",
+      "evidence": "JSON list of 128 phenotype annotations for CDC42; most common: heat sensitivity increased (17), inviable (14), mating efficiency decreased (13), shmoo formation decreased (11), budding pattern abnormal (7).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-weaken-fill-repair-budding",
+      "name": "The weaken-fill-repair model for cell budding: linking cell wall biosynthesis with mechanics (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qjq2bvqn0",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qjq2bvqn0/download",
+      "doi": "10.5061/dryad.qjq2bvqn0",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:55:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 17530 },
+      "variables_present": [
+        "model code/parameters for S. cerevisiae budding as a wall-mechanics process (Newtonian mechanics over the wall coupled to wall biosynthesis), with mother-compartment size oscillation during division as the observable compared to experiment (per abstract)"
+      ],
+      "variables_missing": ["measured local tension", "raw time-lapse images", "only 17.5 KB: a model deposit, not an imaging or mechanics measurement dataset"],
+      "scope": "One species; theoretical model with experimental comparison; primary article doi 10.1016/j.isci.2024.110981",
+      "evidence": "Dryad API: publicationDate 2023-06-27, license CC0-1.0, storageSize 17530, versionNumber 4, authors Liu, Liu, Tang, Xiao, Wu; abstract describes a 'weaken-fill-repair' mechanical model of budding.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "IDR search engine", "query": "project Organism = Saccharomyces cerevisiae", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/project/search/?key=Organism&value=Saccharomyces%20cerevisiae", "hits": 5, "note": "no bud-mechanics study" },
+    { "source": "IDR search engine", "query": "screen Organism = Saccharomyces cerevisiae", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/screen/search/?key=Organism&value=Saccharomyces%20cerevisiae", "hits": 14, "note": "idr0078 morphological pleiotropy screen is the closest" },
+    { "source": "BioStudies (bioimages collection)", "query": "yeast bud emergence live imaging Cdc42 polarity", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=yeast%20bud%20emergence%20live%20imaging%20Cdc42%20polarity&collection=bioimages&pageSize=8", "hits": 1187, "note": "fuzzy; no direct match" },
+    { "source": "BioStudies (bioimages collection)", "query": "Saccharomyces bud site \"cell wall\" time-lapse", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Saccharomyces%20bud%20site%20%22cell%20wall%22%20time-lapse&collection=bioimages&pageSize=8", "hits": 301, "note": "fuzzy; S-BIAD326 generic CLSM/DIC time-lapse" },
+    { "source": "Zenodo", "query": "\"yeast\" AND (\"membrane tension\" OR \"cell wall tension\" OR turgor) AND bud", "url": "https://zenodo.org/api/records?q=%22yeast%22%20AND%20%28%22membrane%20tension%22%20OR%20%22cell%20wall%20tension%22%20OR%20turgor%29%20AND%20bud&size=8", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "yeast bud emergence cell wall mechanics", "url": "https://zenodo.org/api/records?q=yeast%20bud%20emergence%20cell%20wall%20mechanics&size=8", "hits": 268029, "note": "fuzzy; surfaced Dryad 10.5061/dryad.qjq2bvqn0 (weaken-fill-repair budding model) and 10.18452/20487 only via DataCite" },
+    { "source": "DataCite", "query": "yeast bud emergence cell wall mechanics turgor AFM", "url": "https://api.datacite.org/dois?query=yeast%20bud%20emergence%20cell%20wall%20mechanics%20turgor%20AFM&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "yeast budding cell wall elasticity AFM", "url": "https://api.datacite.org/dois?query=yeast%20budding%20cell%20wall%20elasticity%20AFM&page%5Bsize%5D=8", "hits": 1, "note": "10.18452/20487 'Morphogenesis and Cell Wall Mechanics of Saccharomyces cerevisiae' is a thesis (Text), not a dataset" },
+    { "source": "Dryad", "query": "yeast bud emergence mechanics", "url": "https://datadryad.org/api/v2/search?q=yeast%20bud%20emergence%20mechanics&per_page=8", "hits": 0, "note": "Dryad full-text search returned 0 although the dataset above exists there" }
+  ],
+  "status": "partial",
+  "summary": "Public yeast imaging (IDR: 5 projects and 14 screens; BIA live time-lapse sets) gives cell outlines and budding-pattern phenotypes, and SGD gives categorical budding phenotypes for polarity genes, but no repository dataset reports local surface tension or wall stiffness at the bud site through emergence. The only mechanics deposit found is a 17.5 KB model (Dryad 10.5061/dryad.qjq2bvqn0, CC0) that treats budding as a wall-weakening process.",
+  "next_step": "Locate the raw data behind AFM / wall-elasticity papers on yeast bud sites (e.g. the thesis 10.18452/20487 and the iScience 2024 article 10.1016/j.isci.2024.110981) or compile a bud-emergence time-lapse with a Cdc42 marker from IDR/BIA and measure curvature; then pre-register the tension-drop vs landmark test.",
+  "obstacles_confirmed": [
+    "Direct local tension reporters are uncommon in archived yeast data: none found in 9 searches.",
+    "Phenotype databases record shape and gene, not local tension (SGD CDC42: 'budding pattern: abnormal', no mechanics).",
+    "Coverage is excellent for Saccharomyces and thin for other budding yeasts: every hit was S. cerevisiae."
+  ]
+}

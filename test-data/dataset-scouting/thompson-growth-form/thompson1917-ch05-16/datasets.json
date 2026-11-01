@@ -1,0 +1,119 @@
+{
+  "claim_id": "thompson1917-ch05-16",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:05:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "cell shape class and cell dimensions per bacterial strain or species",
+    "the same strain imaged across growth phase, medium and preparation method (within-strain shape series)",
+    "non-morphological species identity per strain (16S/genome or physiological profile)",
+    "species label per image for classifier training"
+  ],
+  "datasets": [
+    {
+      "id": "bacdive",
+      "name": "BacDive, the Bacterial Diversity Metadatabase (DSMZ)",
+      "landing_url": "https://bacdive.dsmz.de/",
+      "access_url": "https://api.bacdive.dsmz.de/fetch/4409",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T22:57:00Z", "method": "HEAD landing_url (200); GET https://api.bacdive.dsmz.de/ (200, page states 'No Registration Required'); GET /fetch/1 and /fetch/4409 (200, JSON); GET /taxon/Escherichia/coli (200)", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "cell shape class per strain (e.g. Morphology.cell morphology.cell shape = 'rod-shaped')",
+        "gram stain, motility per strain",
+        "non-morphological identity per strain (taxonomy with NCBI tax id, 'Physiology and metabolism' block, 'Sequence information' block)"
+      ],
+      "variables_missing": [
+        "within-strain shape series across growth phase, medium and preparation",
+        "images (records are curated text/categorical fields, one shape per strain)"
+      ],
+      "scope": "Landing page states over 100,000 strains; taxon endpoint for Escherichia coli returned count 1975 strain records",
+      "evidence": "GET /fetch/4409 returned JSON with top-level sections General | Name and taxonomic classification | Morphology | Culture and growth conditions | Physiology and metabolism | Sequence information; Morphology.cell morphology = {gram stain: negative, cell shape: rod-shaped, motility: yes}. API doc page: 'freely accessible, no sign-up, no account needed'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacteria%20morphology%20phase%20contrast&collection=bioimages&pageSize=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T22:59:00Z", "method": "HEAD landing_url (200); GET BioStudies search API restricted to collection=bioimages", "http_status": 200, "bytes": null },
+      "variables_present": ["microscopy image sets with species metadata, per study"],
+      "variables_missing": ["no single study found in the top hits that images many bacterial species across growth phase and preparation"],
+      "scope": "Archive of imaging studies; query 'bacteria morphology phase contrast' in the bioimages collection returned totalHits 1040, top 8 were placenta histology, diatom EM, Hydrurus alga, breast cancer (none bacterial)",
+      "evidence": "JSON response with totalHits 1040 (isTotalHitsExact false); accessions S-BIAD1045, S-BIAD2407, S-BIAD2819, S-BIAD1348, S-BIAD4000, S-BIAD1176 in the first page, none a bacterial species-shape dataset.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (EMBL-EBI)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacterial%20cell%20shape%20growth%20phase&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T22:59:30Z", "method": "HEAD landing_url (200); GET search API", "http_status": 200, "bytes": null },
+      "variables_present": ["paper supplements on shape change with growth phase for single species (e.g. S-EPMC7911496 'Growth Phase Dependent Cell Shape of Haloarcula', 1 file; S-EPMC11549454 'Cell shape affects bacterial colony growth under physical confinement', 8 files)"],
+      "variables_missing": ["multi-species shape-by-condition table", "species classifier training set"],
+      "scope": "Query returned totalHits 1125740 (mostly Europe PMC article records); the relevant top hits are single-species paper supplements, Haloarcula is an archaeon",
+      "evidence": "JSON hits with accession, title, files count and isPublic true for S-EPMC7911496 and S-EPMC11549454.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idr0065-camsund-crispri",
+      "name": "IDR idr0065 Camsund et al. CRISPRi E. coli imaging (experimentA)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=Organism&value=Escherichia%20coli",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:02:00Z", "method": "GET IDR searchengine API, key=Organism value=Escherichia coli", "http_status": 200, "bytes": null },
+      "variables_present": ["time-lapse phase-contrast images of Escherichia coli under genetic (CRISPRi) perturbation, from which cell shape can be segmented"],
+      "variables_missing": ["multiple species", "preparation-method or medium series", "species labels beyond E. coli"],
+      "scope": "19,077 image records in IDR with Organism = Escherichia coli, all from study idr0065-camsund-crispri/experimentA (first page)",
+      "evidence": "Search response: results.size 19077, 20 pages; study_name on returned records 'idr0065-camsund-crispri/experimentA'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-pasteuria-morphotypes",
+      "name": "Data and code from: Imaging flow cytometry enables label-free cell sorting of morphological variants from populations of the unculturable bacterium Pasteuria ramosa",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.1g1jwsv86",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.1g1jwsv86/download",
+      "doi": "10.5061/dryad.1g1jwsv86",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:03:00Z", "method": "GET Dryad search API; dataset record in search response", "http_status": 200, "bytes": null },
+      "variables_present": ["imaging-flow-cytometry morphology features for morphological variants within one bacterial species (within-strain shape heterogeneity)"],
+      "variables_missing": ["multiple species", "growth-phase and preparation series", "non-morphological identity comparison"],
+      "scope": "One species, Pasteuria ramosa",
+      "evidence": "Dryad search response: identifier doi:10.5061/dryad.1g1jwsv86, license https://spdx.org/licenses/CC0-1.0.html, abstract on morphological heterogeneity and morphotype sorting.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BacDive API", "query": "taxon Escherichia coli", "url": "https://api.bacdive.dsmz.de/taxon/Escherichia/coli", "hits": 1975, "note": "count of strain IDs; API open without registration" },
+    { "source": "BioStudies (bioimages collection)", "query": "bacteria cell morphology", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacteria%20cell%20morphology&collection=bioimages&pageSize=5", "hits": 1363, "note": "inexact total; EFO term expansion dominated by unrelated anatomy" },
+    { "source": "BioStudies (bioimages collection)", "query": "bacteria morphology phase contrast", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacteria%20morphology%20phase%20contrast&collection=bioimages&pageSize=8", "hits": 1040, "note": "top 8 not bacterial" },
+    { "source": "BioStudies (all)", "query": "bacterial cell shape growth phase", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacterial%20cell%20shape%20growth%20phase&pageSize=5", "hits": 1125740, "note": "two relevant single-species paper supplements: S-EPMC7911496, S-EPMC11549454" },
+    { "source": "Zenodo", "query": "\"bacterial cell shape\" microscopy", "url": "https://zenodo.org/api/records?q=%22bacterial%20cell%20shape%22%20microscopy&size=6&sort=bestmatch", "hits": 28463, "note": "top hits irrelevant; 10.5281/zenodo.18748279 'Bacterial species identification' is a review PDF, not data" },
+    { "source": "Zenodo", "query": "bacterial cell morphology segmentation species microscopy (mostviewed)", "url": "https://zenodo.org/api/records?q=bacterial%20cell%20morphology%20segmentation%20species%20microscopy&size=8&sort=mostviewed", "hits": 1399598, "note": "OR-matching, useless ordering; nothing relevant" },
+    { "source": "DataCite", "query": "\"bacterial cell shape\" microscopy images, resource-type dataset", "url": "https://api.datacite.org/dois?query=%22bacterial%20cell%20shape%22%20microscopy%20images&page%5Bsize%5D=6&resource-type-id=dataset", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "bacterial cell shape morphology", "url": "https://datadryad.org/api/v2/search?q=bacterial%20cell%20shape%20morphology&per_page=6", "hits": 1, "note": "doi:10.5061/dryad.1g1jwsv86 (Pasteuria ramosa morphotypes)" },
+    { "source": "IDR searchengine", "query": "Organism = Escherichia coli (images)", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=Organism&value=Escherichia%20coli", "hits": 19077, "note": "all from idr0065" }
+  ],
+  "status": "partial",
+  "summary": "BacDive openly serves one curated cell-shape class, gram stain, size and physiological/sequence identity per strain for >100,000 strains, which covers the identifiability half of the test; no repository dataset found images many bacterial species across growth phase, medium and preparation. IDR idr0065 (19,077 E. coli images) and a Dryad Pasteuria ramosa morphotype set give within-species shape variation for single species only.",
+  "next_step": "Pull BacDive shape/size fields for all strains via the open API to tabulate how many species share each shape class; for the within-strain variation half, compile growth-phase shape measurements from single-species imaging studies (BioStudies/IDR) or collect new images.",
+  "obstacles_confirmed": [
+    "Most strains carry one curated shape, not a series across life stages and preparations.",
+    "No multi-species, multi-condition bacterial morphology image dataset surfaced in BioImage Archive, Zenodo, DataCite or Dryad searches."
+  ]
+}

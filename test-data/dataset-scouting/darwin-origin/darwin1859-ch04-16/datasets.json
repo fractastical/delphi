@@ -1,0 +1,278 @@
+{
+  "claim_id": "darwin1859-ch04-16",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "habitat realm (freshwater / marine / terrestrial) per extant species or fossil occurrence",
+    "origination and extinction (or net diversification) rates per realm, from fossil ages or dated phylogenies",
+    "lineage age / phylogenetic distinctiveness of species-poor lineages per realm"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-environment-ages",
+      "name": "Paleobiology Database occurrences by environment (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:26Z",
+        "method": "GET occs/list.json with base_name and envtype filters, rowcount; show=env,class,time",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil occurrences with paleoenvironment (env) and early/late age (eag, lag), taxon class",
+        "environment filters: terrestrial, lacustrine, fluvial, marine (documented values)"
+      ],
+      "variables_missing": [
+        "extant-lineage ages and dated phylogeny",
+        "sampling-standardisation (must be done by the user)"
+      ],
+      "scope": "Fossil animals, all intervals; freshwater coded via lacustrine/fluvial environments",
+      "evidence": "base_name=Animalia: envtype=lacustrine,fluvial records_found 80261; envtype=terrestrial 246430; envtype=marine 1090138. base_name=Actinopterygii: total 26920; lacustrine,fluvial 3684; marine 18938. A record shows env 'lagoonal', eag 372.15, lag 358.86, cll Actinopterygii.",
+      "verdict": "holds",
+      "reuses_organism_dataset": "paleobiology-database-occurrence-counts-2026-10-31"
+    },
+    {
+      "id": "fishbase-v25-04-species",
+      "name": "FishBase species table v25.04 (rfishbase parquet on Hugging Face)",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "access_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:35Z",
+        "method": "GET Hugging Face tree API for data/fb/v25.04/parquet; range fetch of last 120000 bytes of species.parquet (parquet footer)",
+        "http_status": 200,
+        "bytes": 5272364
+      },
+      "variables_present": [
+        "habitat flags: footer lists column names Fresh, Brack, Saltwater, DemersPelag",
+        "Genus, Species, SpecCode, FamCode"
+      ],
+      "variables_missing": [
+        "no ages, extinction or diversification variables",
+        "fishes only"
+      ],
+      "scope": "Fishes; table has 36132 valid species per the vendored organisms record",
+      "evidence": "Tree API listed species.parquet at 5272364 bytes (not downloaded); column-name strings Fresh, Brack, Saltwater, DemersPelag, Genus, Species, SpecCode, FamCode found in its footer. The /info endpoint of the datasets-server described a different default table.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "fishbase-v25-04-species"
+    },
+    {
+      "id": "fish-tree-of-life",
+      "name": "Fish Tree of Life (fishtreeoflife.org)",
+      "landing_url": "https://fishtreeoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:45:54Z",
+        "method": "GET https://fishtreeoflife.org/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "time-calibrated ray-finned fish phylogenies for download (page text 'Download the time-calibrated phy...')",
+        "taxonomy and fossil calibration points"
+      ],
+      "variables_missing": [
+        "freshwater/marine coding is not part of the tree files (to be joined from FishBase)"
+      ],
+      "scope": "Ray-finned fishes",
+      "evidence": "Landing page 200 (10257 bytes) with Downloads menu and the link text about downloading the time-calibrated phylogeny; file sizes not fetched.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "figshare-marine-to-freshwater-fish-transitions",
+      "name": "Datasets for 'Repeated marine-to-freshwater fish transitions reveal paleoenvironmental modulation of adaptive radiation'",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.33749176.v2",
+      "access_url": null,
+      "doi": "10.6084/m9.figshare.33749176.v2",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:46:46Z",
+        "method": "GET https://api.figshare.com/v2/articles/33749176",
+        "http_status": 200,
+        "bytes": 8420264
+      },
+      "variables_present": [
+        "Newick trees (_Trees_NewickFormat.txt, 8420264 bytes)",
+        "diversification-rate analyses (CLADS, MiSSE) and stem/crown ages of subclades"
+      ],
+      "variables_missing": [
+        "Sahul (Australia/New Guinea) freshwater fishes only"
+      ],
+      "scope": "Fishes of Sahul",
+      "evidence": "Figshare API: type dataset, doi 10.6084/m9.figshare.33749176.v2, license CC BY 4.0, 11 files including _README.txt and _Analysis_NetDivRates_MoM_MiSSE.zip (3266050 bytes).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-acanthomorph-diversification",
+      "name": "Data from: Phylogeny and tempo of diversification in the superradiation of spiny-rayed fishes",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.d3mb4",
+      "access_url": null,
+      "doi": "10.5061/dryad.d3mb4",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:46:46Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.d3mb4",
+        "http_status": 200,
+        "bytes": 5428838
+      },
+      "variables_present": [
+        "time-calibrated phylogeny of 520 acanthomorph species with 37 fossil constraints"
+      ],
+      "variables_missing": [
+        "habitat coding",
+        "non-acanthomorph fishes, other realms"
+      ],
+      "scope": "Acanthomorph fishes",
+      "evidence": "API: publicationDate 2013-07-16, storageSize 5428838; abstract as paraphrased in variables.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence and species indices",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://api.gbif.org/v1/occurrence/search?limit=0 and /species/search?rank=GENUS&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "georeferenced occurrence records of extant (and fossil-specimen) taxa",
+        "taxonomic backbone (genus and species names)"
+      ],
+      "variables_missing": [
+        "no trait, abundance-through-time, mating-system or sequence-origin variables"
+      ],
+      "scope": "Global, all taxa",
+      "evidence": "occurrence/search?limit=0 returned count 3887469368; basisOfRecord=FOSSIL_SPECIMEN returned count 10258418; species/search?rank=GENUS returned count 4225471 (name usages across checklists, not unique accepted genera).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB",
+      "query": "envtype freshwater/terrestrial/marine counts for Animalia and Actinopterygii",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Actinopterygii&envtype=lacustrine,fluvial&limit=1&rowcount",
+      "hits": 3684,
+      "note": "envtype values 'fresh','terr','lacust' were rejected by the API; documented values used"
+    },
+    {
+      "source": "Dryad",
+      "query": "diversification rates marine freshwater fishes time-calibrated phylogeny",
+      "url": "https://datadryad.org/api/v2/search?q=diversification%20rates%20marine%20freshwater%20fishes%20time-calibrated%20phylogeny",
+      "hits": 3,
+      "note": "acanthomorph phylogeny d3mb4 relevant"
+    },
+    {
+      "source": "DataCite",
+      "query": "freshwater marine diversification rate fishes (dataset type)",
+      "url": "https://api.datacite.org/dois?query=freshwater+marine+diversification+rate+fishes&page%5Bsize%5D=1&resource-type-id=dataset",
+      "hits": 10,
+      "note": "top hit: Sahul marine-to-freshwater transitions (figshare)"
+    },
+    {
+      "source": "DataCite",
+      "query": "ray-finned fishes time-calibrated phylogeny species diversification",
+      "url": "https://api.datacite.org/dois?query=ray-finned+fishes+time-calibrated+phylogeny+species+diversification&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 6,
+      "note": "jaw-diversification and ontogenetic phase datasets; not rate tables"
+    },
+    {
+      "source": "Hugging Face",
+      "query": "cboettig/fishbase v25.04 parquet listing",
+      "url": "https://huggingface.co/api/datasets/cboettig/fishbase/tree/main/data/fb/v25.04/parquet",
+      "hits": 216,
+      "note": "216 entries in the listing (all tables)"
+    }
+  ],
+  "status": "partial",
+  "summary": "The Paleobiology Database holds fossil occurrences with environment and age, including freshwater (lacustrine and fluvial) versus marine and terrestrial counts, which supports origination/extinction comparisons; for living lineages, FishBase gives freshwater/marine flags, and the Fish Tree of Life plus one Sahul dataset give dated fish trees, but no source joins habitat, lineage age and rates across realms beyond fishes.",
+  "next_step": "Pre-register a fossil-only test (per-realm origination/extinction from PBDB with sampling standardisation) and a fish-only test (FishBase habitat joined to the Fish Tree of Life); decide a relict criterion separately.",
+  "obstacles_confirmed": [
+    "Freshwater fossils are preserved less completely than marine shelly faunas.",
+    "Relict is a judgment about morphological oddity as well as phylogenetic age.",
+    "Habitat shifts move lineages across the categories being compared."
+  ]
+}

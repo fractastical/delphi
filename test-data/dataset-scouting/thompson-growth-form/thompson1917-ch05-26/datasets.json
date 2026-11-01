@@ -1,0 +1,77 @@
+{
+  "claim_id": "thompson1917-ch05-26",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "whole-cell 3D shape of spiral/non-spherical decapod sperm and ciliates (Infusoria)",
+    "co-registered position and orientation of intracellular fibrils (volume EM or tomography) in the same cells",
+    "fibril elasticity or a perturbation that removes/relaxes fibrils with the resulting shape change",
+    "a surface-tension (Plateau) reference figure for the same cell to measure the departure"
+  ],
+  "datasets": [
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=crustacean%20sperm",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:55:00Z", "method": "GET keyword search pages ('crustacean sperm', 'amoeba'); HEAD landing 200; /api/search 404 (same session as thompson1917-ch05-25)", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["co-registered fibril ultrastructure and whole-cell shape", "perturbation series"],
+      "scope": "Curated 2D/3D micrographs incl. protists; client-rendered search gives no programmatic hit counts; no quantitative shape-vs-fibril tables",
+      "evidence": "Search pages 200 with no parsable result counts; API path 404.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "empiar",
+      "name": "EMPIAR — Electron Microscopy Public Image Archive",
+      "landing_url": "https://www.ebi.ac.uk/empiar/",
+      "access_url": "https://www.ebi.ac.uk/ebisearch/ws/rest/empiar?query=sperm&format=json&size=5&fields=title",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:03:00Z", "method": "HEAD landing (200); EBI Search REST over the empiar domain for sperm, ciliate genera, Tetrahymena tomography; GET /empiar/api/entry/11221/", "http_status": 200, "bytes": null },
+      "variables_present": ["cryo-ET of mouse sperm flagella after FIB-SEM milling (EMPIAR-11221, 194 GB) — a fibril/axoneme-vs-shape volume for a non-decapod sperm"],
+      "variables_missing": ["decapod sperm volumes (0 hits)", "ciliate cortex volumes (0 hits for Paramecium/Stentor/Euplotes/Spirostomum/Vorticella; Tetrahymena hits are ribozyme and mitochondrial single-particle sets)", "perturbation series"],
+      "scope": "Mostly single-particle cryo-EM; whole-cell volumes of the named taxa absent",
+      "evidence": "EBI Search empiar hitCount: 'sperm' 7 (EMPIAR-11635/11628/11629/11630 SpSLC9C1 nanodiscs, EMPIAR-11221 mouse sperm flagella cryo-ET); ciliate genera 0; Tetrahymena 4 (ribozyme, mitochondrial complexes); Tetrahymena AND (tomography OR cortex OR basal body) 0. EMPIAR-11221 entry: title 'CryoET tilt series of mouse sperm flagella after FIB-SEM milling', dataset_size '194.0 GB'. The guessed /empiar/api/search/ path returned 404.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-s-biad598-tara-protist-sem",
+      "name": "BioImage Archive S-BIAD598: SEM images of protists with taxonomic annotations (Tara Oceans, Marquesas)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD598",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD598/info",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:06:00Z", "method": "BioStudies search (Paramecium OR Tetrahymena OR Stentor OR ciliate) then GET study JSON and /info", "http_status": 200, "bytes": null },
+      "variables_present": ["external SEM morphology of marine protists with taxonomic labels (1,075 files)"],
+      "variables_missing": ["internal fibril ultrastructure", "decapod sperm", "perturbations"],
+      "scope": "Marine plankton protists from one region; surface shape only",
+      "evidence": "Study title 'A large collection of Scanning Electron Microscopy images of protists and their taxonomic annotations from the Marquesas Island area (Tara Oceans survey…)', License CC BY 4.0; /info files=1075.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "EBI Search (EMPIAR)", "query": "sperm", "url": "https://www.ebi.ac.uk/ebisearch/ws/rest/empiar?query=sperm&format=json&size=5&fields=title", "hits": 7, "note": "EMPIAR-11221 mouse sperm flagella cryo-ET; rest are SLC9C1 single-particle" },
+    { "source": "EBI Search (EMPIAR)", "query": "ciliate OR Paramecium OR Tetrahymena OR infusoria", "url": "https://www.ebi.ac.uk/ebisearch/ws/rest/empiar?query=ciliate+OR+Paramecium+OR+Tetrahymena+OR+infusoria&format=json&size=5&fields=title", "hits": 4, "note": "Tetrahymena ribozyme and mitochondrial complexes only" },
+    { "source": "EBI Search (EMPIAR)", "query": "Paramecium OR Stentor OR Euplotes OR Spirostomum OR Vorticella OR \"ciliate cortex\"", "url": "https://www.ebi.ac.uk/ebisearch/ws/rest/empiar?query=Paramecium+OR+Stentor+OR+Euplotes+OR+Spirostomum+OR+Vorticella+OR+%22ciliate+cortex%22&format=json&size=6&fields=title", "hits": 0, "note": null },
+    { "source": "BioImage Archive (BioStudies API)", "query": "Paramecium OR Tetrahymena OR Stentor OR ciliate", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Paramecium+OR+Tetrahymena+OR+Stentor+OR+ciliate&collection=bioimages&pageSize=6", "hits": 5, "note": "S-BIAD598 Tara protist SEM collection is the only morphological set" },
+    { "source": "Zenodo", "query": "(Stentor OR Spirostomum OR Vorticella OR Paramecium) (cortex OR myoneme OR contraction) (tomography OR microscopy), type=dataset", "url": "https://zenodo.org/api/records?q=%28Stentor+OR+Spirostomum+OR+Vorticella+OR+Paramecium%29+%28cortex+OR+myoneme+OR+contraction%29+%28tomography+OR+microscopy%29&size=5&type=dataset", "hits": 11076, "note": "first page irrelevant except AlphaFold models of Spirostomum Sfi1 repeats (10.5281/zenodo.19501986), structural predictions not images" },
+    { "source": "Dryad", "query": "crustacean spermatozoa", "url": "https://datadryad.org/api/v2/search?q=crustacean+spermatozoa&per_page=5", "hits": 0, "note": "shared with thompson1917-ch05-25" }
+  ],
+  "status": "gap",
+  "summary": "No public dataset co-registers intracellular fibrils with whole-cell shape for decapod sperm or ciliates: EMPIAR has no decapod sperm or ciliate-cortex volumes (only mouse sperm flagella cryo-ET and Tetrahymena single-particle sets), the BioImage Archive's only protist morphology set is external SEM of Tara Oceans plankton (S-BIAD598, 1,075 files, CC BY 4.0), and the Cell Image Library offers uncounted 2D micrographs. The fibril-removal perturbation and the Plateau reference figure would have to be produced by new experiments; the comparative ultrastructure is in individual papers, not repositories.",
+  "next_step": "Compile from the literature a table of ciliate/decapod-sperm shape vs. documented fibril systems (myonemes, kinetodesmal fibres, sperm arms/spikes) as a first qualitative test; for a quantitative test deposit volume-EM of a spiral decapod sperm with and without fibril disruption.",
+  "obstacles_confirmed": [
+    "Cortex and sperm ultrastructure are spread across individual papers, with quantitative shape-versus-fibril tables for only a few model ciliates.",
+    "Sparse taxonomic coverage limits the broad generalization (no decapod or ciliate whole-cell volumes in EMPIAR)."
+  ]
+}

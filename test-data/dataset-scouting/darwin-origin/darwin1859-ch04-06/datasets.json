@@ -1,0 +1,334 @@
+{
+  "claim_id": "darwin1859-ch04-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "mating system / degree of polygyny per species",
+    "male weapon presence and size (horns, antlers, spurs, enlarged claws) per species, plus body size",
+    "male-male combat intensity or a proxy (e.g. sexual size dimorphism)",
+    "phylogeny for the sampled species"
+  ],
+  "datasets": [
+    {
+      "id": "pantheria-1-0",
+      "name": "PanTHERIA 1.0 (mammal life history, ecology and geography)",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "access_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+      "doi": "10.1890/08-1494.1",
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:17Z",
+        "method": "GET Range 0-3999 of PanTHERIA_1-0_WR05_Aug2008.txt (header row)",
+        "http_status": 206,
+        "note": "Range request of the first 4 KB only (file is 2.36 MB)."
+      },
+      "variables_present": [
+        "adult body mass (5-1_AdultBodyMass_g)",
+        "social group size (10-2_SocialGrpSize)",
+        "species-level geography and climate columns"
+      ],
+      "variables_missing": [
+        "no mating-system column",
+        "no weapon or horn/antler variable",
+        "no combat variable"
+      ],
+      "scope": "Mammals (WR05 taxonomy); 5416 species per vendored record",
+      "evidence": "Header row lists MSW05_Order/Family/Genus/Species/Binomial, 1-1_ActivityCycle, 5-1_AdultBodyMass_g, ..., 10-2_SocialGrpSize, 12-2_Terrestriality, ... 28-2_Temp_Mean_01degC, 30-2_PET_Mean_mm; no column name mentions mating or weapons.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pantheria-1-0"
+    },
+    {
+      "id": "avonet-figshare-v7",
+      "name": "AVONET: morphological, ecological and geographical data for all birds",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://api.figshare.com/v2/articles/16586228",
+        "http_status": 200,
+        "bytes": 21524673
+      },
+      "variables_present": [
+        "eleven continuous morphological traits, six ecological variables, range size per species",
+        "raw measurements from 90020 individuals of 11009 bird species"
+      ],
+      "variables_missing": [
+        "no mating-system variable stated in the description",
+        "no weapon (spur) variable stated in the description"
+      ],
+      "scope": "All extant birds",
+      "evidence": "Figshare API: doi 10.6084/m9.figshare.16586228.v7, license CC BY 4.0, files 'AVONET Supplementary dataset 1.xlsx' (21524673 bytes), 'Supplementary dataset 2.xlsx' (1241301), ELEData.zip, ELECode.zip; description as quoted in the variables. Spreadsheet columns not opened (over 1 MB).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-v7"
+    },
+    {
+      "id": "dryad-flight-hampers-weapons-birds",
+      "name": "Data and codes from: Flight hampers the evolution of weapons in birds (species_spur_data.csv, Jetz_trees.nex)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.r2280gbdk",
+      "access_url": null,
+      "doi": "10.5061/dryad.r2280gbdk",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:44:45Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.r2280gbdk and versions/165445/files",
+        "http_status": 200,
+        "bytes": 1565132
+      },
+      "variables_present": [
+        "species-level avian spur (weapon) data in species_spur_data.csv (1565132 bytes)",
+        "phylogenetic trees (Jetz_trees.nex, 46389486 bytes)"
+      ],
+      "variables_missing": [
+        "mating-system coding not stated in the abstract",
+        "file contents not opened: Dryad file download returned 401/403 without credentials"
+      ],
+      "scope": "Birds (global spur dataset per abstract)",
+      "evidence": "Dataset API: publicationDate 2022-03-03, license CC0-1.0, storageSize 35012105346; file list: brms_outputs.zip, bt3_outputs.zip, Jetz_trees.nex, README.txt, simmap_outputs.zip, species_spur_data.csv. Abstract: 'Bayesian phylogenetic comparative analyses using a global spur dataset'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-bovid-horns-territoriality-sociality",
+      "name": "Territoriality, sociality and male weaponry shape horn investment in female bovids",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.fxpnvx16w",
+      "access_url": null,
+      "doi": "10.5061/dryad.fxpnvx16w",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:44:45Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.fxpnvx16w and versions/411083/files",
+        "http_status": 200,
+        "bytes": 25422
+      },
+      "variables_present": [
+        "horn investment, body size, group size, monogamy vs polygyny coding at family level (per abstract; N = 115 species)",
+        "male horn investment"
+      ],
+      "variables_missing": [
+        "only Bovidae",
+        "actual column names not inspected (file download needs credentials)"
+      ],
+      "scope": "Bovidae, N = 115 species (per abstract)",
+      "evidence": "Dataset API: publicationDate 2025-12-01, license CC0-1.0, storageSize 1683089; files: BEHECO-2025-0139.R2_Data.csv (25422 bytes), Alloutput.nex, FemHoroutput.nex, Dryad_Code.R, README.md. Abstract mentions 'social structure (monogamy vs. polygyny)'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-fiddler-crab-claw-mating-system",
+      "name": "Allometric constraints and the modulation of weapon evolution by mating system in fiddler crabs",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.1zcrjdg64",
+      "access_url": null,
+      "doi": "10.5061/dryad.1zcrjdg64",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:44:45Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.1zcrjdg64 and versions/404553/files",
+        "http_status": 200,
+        "bytes": 17834560
+      },
+      "variables_present": [
+        "claw morphological traits and two-category mating system (burrow vs surface) per species (per abstract)"
+      ],
+      "variables_missing": [
+        "one genus of crabs, a different weapon/mating contrast than polygyny",
+        "columns not inspected"
+      ],
+      "scope": "Fiddler crabs (Uca/Leptuca group)",
+      "evidence": "Dataset API: publicationDate 2025-10-29, license CC0-1.0, storageSize 19982336; files: data.zip (17834560 bytes), code.zip, README.md, Fiddler-claw-evol.html.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "eol-traitbank",
+      "name": "Encyclopedia of Life TraitBank",
+      "landing_url": "https://eol.org/traitbank",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:39Z",
+        "method": "GET https://eol.org/traitbank",
+        "http_status": 403,
+        "note": "403 from the HTTP client used."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not check"
+      ],
+      "scope": "Unknown",
+      "evidence": "HTTP 403 with a 5456-byte body; no data were visible.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "mammal-diversity-database",
+      "name": "Mammal Diversity Database",
+      "landing_url": "https://www.mammaldiversity.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://www.mammaldiversity.org/ (landing); GET https://api.mammaldiversity.org/api/v1/species?limit=1 (no response)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "mammal taxonomy"
+      ],
+      "variables_missing": [
+        "mating system",
+        "weapons"
+      ],
+      "scope": "Mammals, taxonomy",
+      "evidence": "Landing 200; the guessed API URL gave no response (HTTP 000). Taxonomy only, so no study variable.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "vertlife-phylogeny-subsets",
+      "name": "VertLife phylogeny subsets",
+      "landing_url": "https://vertlife.org/phylosubsets/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://vertlife.org/phylosubsets/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated vertebrate trees (subset tool; full trees downloadable)"
+      ],
+      "variables_missing": [
+        "traits"
+      ],
+      "scope": "Vertebrates",
+      "evidence": "Phylosubsets page text describes subsetting and sampling tree distributions and notes full trees can be downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "weapon size mating system phylogenetic comparative",
+      "url": "https://datadryad.org/api/v2/search?q=weapon%20size%20mating%20system%20phylogenetic%20comparative",
+      "hits": 1,
+      "note": "fiddler crabs"
+    },
+    {
+      "source": "Dryad",
+      "query": "horn antler size polygyny sexual selection species",
+      "url": "https://datadryad.org/api/v2/search?q=horn%20antler%20size%20polygyny%20sexual%20selection%20species",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "sexual selection weaponry comparative dataset",
+      "url": "https://datadryad.org/api/v2/search?q=sexual%20selection%20weaponry%20comparative%20dataset",
+      "hits": 1,
+      "note": "bird spurs"
+    },
+    {
+      "source": "DataCite",
+      "query": "polygyny weapon size comparative mammals (dataset type)",
+      "url": "https://api.datacite.org/dois?query=polygyny+weapon+size+comparative+mammals&page%5Bsize%5D=1&resource-type-id=dataset",
+      "hits": 1,
+      "note": "bovid horns dataset"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"mating system\" weapon polygyny species",
+      "url": "https://zenodo.org/api/records?q=%22mating%20system%22%20weapon%20polygyny%20species&size=1",
+      "hits": 1216709,
+      "note": "loose matching; first hit a rhino weapon/body-size study mirror, single species"
+    }
+  ],
+  "status": "partial",
+  "summary": "No repository table pairs mating system with male weapon size across a broad animal sample: PanTHERIA and AVONET (the assessor-named tables) lack both variables, while three Dryad datasets cover pieces for birds (spurs), bovids (horns plus monogamy/polygyny) and fiddler crabs (claws plus mating system); the Lukas and Clutton-Brock mammal compilation named by an assessor was not found as a dataset.",
+  "next_step": "Compile a mammal (or bovid+cervid) table from the bovid Dryad dataset plus a published mating-system source, and pre-register the phylogenetic regression with body size as covariate.",
+  "obstacles_confirmed": [
+    "Combat intensity and 'special weapons' require subjective coding.",
+    "Mating system and weapon inventories are spread through handbooks and supplements rather than one global table.",
+    "Birds are less consistently coded than large mammals."
+  ]
+}

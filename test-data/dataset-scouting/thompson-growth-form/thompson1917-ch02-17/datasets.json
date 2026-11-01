@@ -1,0 +1,82 @@
+{
+  "claim_id": "thompson1917-ch02-17",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:00:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "soma size (volume, surface or diameter) of neurons in a homologous ganglion across species",
+    "total neuron count per homologous ganglion per species",
+    "adult body size or mass per species",
+    "enough species spanning a wide body-size range within one lineage"
+  ],
+  "datasets": [
+    {
+      "id": "neuromorpho-org",
+      "name": "NeuroMorpho.Org digital reconstructions and morphometry API",
+      "landing_url": "https://neuromorpho.org/",
+      "access_url": "https://neuromorpho.org/api/morphometry?size=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:54:00Z", "method": "HEAD landing_url; GET api/neuron?size=1 (totalElements), api/neuron/fields/species, api/neuron/fields/brain_region, api/morphometry?size=1", "http_status": 200 },
+      "variables_present": [
+        "300,495 reconstructed neurons (page.totalElements) from 95 species (fields/species)",
+        "per-neuron morphometry including soma_Surface, volume, surface, length (morphometry endpoint, e.g. neuron 1 soma_Surface 834.0)",
+        "brain_region vocabulary (500 terms) includes 16 ganglion terms: dorsal root ganglion, subesophageal ganglion, superior cervical ganglion, abdominal ganglion, trigeminal ganglion, stomatogastric ganglion, …"
+      ],
+      "variables_missing": ["total cell count per ganglion (reconstructions are selected neurons, not censuses)", "body mass per species (not a NeuroMorpho field)", "unbiased sampling of ganglion cells"],
+      "scope": "95 species, dominated by mouse, rat, Drosophila, human; ganglion reconstructions are a small subset",
+      "evidence": "API responses above; soma_Surface is a per-neuron measurement that can be aggregated by species and brain_region. Body size must come from another table.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "allen-brain-atlas",
+      "name": "Allen Brain Map (brain-map.org) and Allen API",
+      "landing_url": "https://portal.brain-map.org/",
+      "access_url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::Organism",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:57:00Z", "method": "HEAD landing_url (redirects to https://brain-map.org/); GET Allen API model::Organism", "http_status": 200 },
+      "variables_present": ["44 organism records in the Allen API (mostly mouse, human, macaque plus viruses/reagents); single-cell electrophysiology/morphology for mouse and human cortical neurons"],
+      "variables_missing": ["peripheral or invertebrate ganglia", "cell counts per ganglion", "body size", "a cross-species body-size gradient"],
+      "scope": "Mouse and human cortex, some macaque",
+      "evidence": "Organism query returned total_rows 44 including Zoanthus, Urocitellus parryii, AAV6 etc.; no ganglion-level census data.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-3xsj3txdt-hymenoptera-brain-cell-number",
+      "name": "Allometric analysis of brain cell number in Hymenoptera (Godfrey, Gronenberg et al.), Dryad",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.3xsj3txdt",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3xsj3txdt",
+      "doi": "10.5061/dryad.3xsj3txdt",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:57:00Z", "method": "GET Dryad dataset API", "http_status": 200, "bytes": 64821 },
+      "variables_present": ["brain cell number (isotropic fractionator) per species with brain and body size across Hymenoptera (abstract: 'general brain-body relationships… cell number and density')"],
+      "variables_missing": ["soma size per cell", "ganglia other than the brain (ventral nerve cord ganglia not covered)", "non-insect taxa"],
+      "scope": "Hymenoptera (ants, bees, wasps); one insect order",
+      "evidence": "Dryad API title and abstract; file columns not inspected (storageSize 64,821 bytes).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "NeuroMorpho API", "query": "fields/species; fields/brain_region (filter 'gangl'); neuron count", "url": "https://neuromorpho.org/api/neuron/fields/brain_region", "hits": 16, "note": "16 ganglion region terms out of 500 regions; 300,495 neurons, 95 species" },
+    { "source": "DataCite", "query": "neuron number ganglion body size scaling", "url": "https://api.datacite.org/dois?query=neuron+number+ganglion+body+size+scaling&page[size]=5", "hits": 1, "note": "10.5061/dryad.3xsj3txdt" },
+    { "source": "Dryad", "query": "neuron number brain size insects", "url": "https://datadryad.org/api/v2/search?q=neuron%20number%20brain%20size%20insects&per_page=5", "hits": 1, "note": "same Hymenoptera dataset" },
+    { "source": "Zenodo", "query": "title:(neuron AND number AND brain) AND resource_type.type:dataset", "url": "https://zenodo.org/api/records?q=title%3A%28neuron%20AND%20number%20AND%20brain%29%20AND%20resource_type.type%3Adataset&size=6", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "\"neuron number\" \"body mass\" type=dataset", "url": "https://zenodo.org/api/records?q=%22neuron%20number%22%20%22body%20mass%22&type=dataset&size=5", "hits": 1907, "note": "loose match; top hits are body-mass tables unrelated to neurons" },
+    { "source": "Allen API", "query": "model::Organism", "url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::Organism", "hits": 44, "note": "" }
+  ],
+  "status": "partial",
+  "summary": "Soma size across species is available at scale in NeuroMorpho (300k reconstructions, 95 species, 16 ganglion region labels), but it samples selected neurons and has no body-size field. Whole-ganglion cell counts across a body-size gradient exist only for insect brains in one Dryad table (Hymenoptera); no dataset pairs homologous-ganglion counts with soma size and body mass across phyla.",
+  "next_step": "Pull NeuroMorpho morphometry for ganglion-labelled neurons by species, join species body mass from AnAge/the organisms tables, and add the Hymenoptera cell-number table; the cross-phylum count comparison still needs literature compilation (e.g. Aplysia, leech, crustacean stomatogastric ganglion counts).",
+  "obstacles_confirmed": [
+    "Repositories emphasize selected neurons rather than unbiased cell counts.",
+    "Body-size metadata are often missing.",
+    "Reconstructions over-represent mammalian cortex rather than whole ganglia of small invertebrates."
+  ]
+}

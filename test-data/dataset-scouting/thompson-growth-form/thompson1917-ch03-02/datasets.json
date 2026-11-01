@@ -1,0 +1,105 @@
+{
+  "claim_id": "thompson1917-ch03-02",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "repeated measurements of the same individuals along at least two body axes (or landmark configurations) through time",
+    "time or age at each measurement, spanning more than one growing season",
+    "a shape descriptor (axis ratio or Procrustes shape coordinates) per time point",
+    "body mass or bulk per time point"
+  ],
+  "datasets": [
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection of DEB parameter estimates and referenced data",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/species_list.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:24:00Z", "method": "HEAD landing_url; GET species_list.html (gzip, 309,638 bytes; 7,456 <tr> rows)", "http_status": 200 },
+      "variables_present": [
+        "per-species age-length and age-weight data sets (univariate 'tL', 'tW' series) referenced to literature, one entry per species",
+        "DEB parameters including shape coefficient per species"
+      ],
+      "variables_missing": [
+        "multi-axis measurements on the same individual (AmP data are mostly one length measure plus weight)",
+        "shape trajectories or landmark data",
+        "individual-level longitudinal series (most tL data are population or cross-sectional)"
+      ],
+      "scope": "Thousands of animal species (species_list.html table has 7,456 rows; the exact species count is not stated in the page text); data as MATLAB mydata files per species",
+      "evidence": "species_list.html returned 200 and a large table of species entries; per-species mydata_*.m files hold the referenced age-length / age-weight series (not fetched).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ices-datras",
+      "name": "ICES DATRAS trawl-survey exchange data (web service)",
+      "landing_url": "https://datras.ices.dk/Data_products/Download/Download_Data_public.aspx",
+      "access_url": "https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2020&quarter=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:25:00Z", "method": "HEAD landing_url; GET getSurveyList (30 surveys) and getCAdata for NS-IBTS 2020 Q1 (XML)", "http_status": 200 },
+      "variables_present": [
+        "per-fish length class (LngtClass), individual weight (IndWgt), age, maturity, sex, species (Aphia code), survey, year and quarter",
+        "repeated seasonal/annual sampling across 30 surveys"
+      ],
+      "variables_missing": [
+        "a second body axis (only length and weight, so form is a length-weight proxy)",
+        "repeated measures on the same individual (cross-sectional sampling)"
+      ],
+      "scope": "North-east Atlantic and Baltic fish; 30 surveys (BITS, BTS, NS-IBTS, ...); CA records carry length, weight and age per sampled fish",
+      "evidence": "getSurveyList returned 30 <Survey> elements. getCAdata XML record fields: RecordType, Survey, Quarter, Country, Ship, Gear, Year, SpecCode, LngtClass, Sex, Maturity, Age, CANoAtLngt, IndWgt, FishID, Valid_Aphia.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource 3D specimen repository (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/physical-objects?q=ontogenetic%20series&per_page=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:25:00Z", "method": "HEAD landing_url; GET physical-objects API for 'ontogenetic series'", "http_status": 200 },
+      "variables_present": ["3D surface/CT scans of specimens with taxonomy, sex and catalogue number; 25 physical objects match 'ontogenetic series'"],
+      "variables_missing": ["age or time per specimen as a structured field", "longitudinal (same-individual) series; specimens are cross-sectional", "landmark coordinates (would need to be digitised from meshes)"],
+      "scope": "Cross-sectional museum specimens; 25 hits for 'ontogenetic series' (first hits: Meleagris gallopavo, Ohio University Vertebrate Collection)",
+      "evidence": "API JSON response.pages.total_count=25, total_pages=9 at per_page=3; records have taxonomy_name, sex, ark, institution_code.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=light-sheet%20embryo%20development%20time-lapse&pageSize=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:26:00Z", "method": "GET BioStudies BioImages search", "http_status": 200 },
+      "variables_present": ["time-lapse embryo image series from which axis lengths could be measured, e.g. S-BIAD1474 'Time-Lapse Imaging of Early Chick Embryo Development ex ovo', S-BIAD553 chick gastrulation"],
+      "variables_missing": ["extracted growth-rate or shape measurements (images only)", "series longer than a season (embryonic time-lapses span hours to days)"],
+      "scope": "596 hits for the query; embryonic time scales only",
+      "evidence": "totalHits=596; first hits S-BIAD1474, S-BIAD553, S-BIAD3277, S-BIAD2201, S-BIAD2119, S-BIAD628.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "light-sheet embryo development time-lapse", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=light-sheet%20embryo%20development%20time-lapse&pageSize=6", "hits": 596, "note": "chick embryo time-lapse S-BIAD1474, S-BIAD553" },
+    { "source": "Dryad", "query": "longitudinal growth allometry shape ontogeny repeated measures", "url": "https://datadryad.org/api/v2/search?q=longitudinal%20growth%20allometry%20shape%20ontogeny%20repeated%20measures&per_page=6", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "longitudinal geometric morphometrics ontogeny landmarks, resource-type dataset", "url": "https://api.datacite.org/dois?query=longitudinal%20geometric%20morphometrics%20ontogeny%20landmarks&resource-type-id=dataset&page%5Bsize%5D=6", "hits": 0, "note": null },
+    { "source": "MorphoSource", "query": "ontogenetic series", "url": "https://www.morphosource.org/api/physical-objects?q=ontogenetic%20series&per_page=3", "hits": 25, "note": null },
+    { "source": "ICES DATRAS", "query": "getSurveyList", "url": "https://datras.ices.dk/WebServices/DATRASWebService.asmx/getSurveyList", "hits": 30, "note": "survey codes BITS, BTS, NS-IBTS, ..." }
+  ],
+  "status": "partial",
+  "summary": "Each candidate covers one piece: AmP has age-length and age-weight series for thousands of species, DATRAS has per-fish length, weight and age across 30 repeated surveys, MorphoSource has 25 cross-sectional ontogenetic-series specimens, and BioImage Archive has embryo time-lapses; none provides same-individual multi-axis measurements spanning more than a growing season, which the seasonal clause needs.",
+  "next_step": "Use DATRAS length-weight-age by quarter as the length/weight proxy test of ratio constancy within vs across seasons; for true multi-axis form, compile longitudinal fish or reptile morphometric series from paper supplements or run a time-lapse.",
+  "obstacles_confirmed": [
+    "The seasonal-duration assertion needs long time series rarely available.",
+    "Length and weight are a single-number proxy for multi-axis form."
+  ]
+}

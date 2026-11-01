@@ -1,0 +1,127 @@
+{
+  "claim_id": "thompson1917-ch01-06",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:18:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "measured cortical / surface tension of amoeboid or other free cells (micropipette aspiration, AFM) per cell",
+    "cell outline / boundary curvature and roundness of the same cells, over time",
+    "the contacting medium or substrate as an experimental variable (medium composition, substrate, adhesion)",
+    "perturbations lowering or raising cortical tension (e.g. blebbistatin, latrunculin) with resulting shape change"
+  ],
+  "datasets": [
+    {
+      "id": "bia-s-biad915-human-embryo-compaction-tension",
+      "name": "S-BIAD915: Mechanics of human embryo compaction (time-lapse during surface-tension mapping)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD915",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD915",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:12:00Z", "method": "GET BioStudies study JSON; GET BioImages search for the accession (107 files, released 2023-12-22)", "http_status": 200 },
+      "variables_present": [
+        "light-microscopy time-lapse of human preimplantation embryos while cell surface tension was mapped by micropipette aspiration ('Timelapse of embryos during surface tension mapping'), plus confocal immunostaining; 107 files",
+        "contractility as the shape-driving variable (the study's stated question)"
+      ],
+      "variables_missing": [
+        "blastomeres, not amoebae; the medium is not varied",
+        "the tension values themselves are in the paper's supplementary tables, not confirmed in the archive metadata"
+      ],
+      "scope": "Human preimplantation embryos (ethics-approved donated embryos)",
+      "evidence": "study JSON: Organism 'Homo sapiens (human)', Biological entity 'human preimplantation embryos', section titles 'Timelapse of embryos during surface tension mapping', 'Confocal imaging of immunostained embryos', License CC BY 4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad2611-membrane-cortex-distance-mechanics",
+      "name": "S-BIAD2611: The membrane-to-cortex distance regulates mDia1 activity to control cortical mechanics",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD2611",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD2611",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:12:00Z", "method": "GET BioStudies study JSON (2447 files per search listing)", "http_status": 200 },
+      "variables_present": [
+        "imaging of mouse 3T3 fibroblasts in a study of cortical mechanics and cell-surface shape regulation; 2447 files"
+      ],
+      "variables_missing": [
+        "adherent fibroblasts, not amoeboid cells; tension measurements not confirmed in the metadata; medium not varied"
+      ],
+      "scope": "One mouse cell line",
+      "evidence": "study JSON: Title as given, Organism 'Mus musculus (mouse)', sample '3T3 fibroblasts', description 'The shape of animal cells is controlled by their surface, which comprises the cell cortex...', License CC BY 4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cortical%20tension%20cell%20shape%20micropipette%20OR%20AFM",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:10:00Z", "method": "HEAD landing_url (200, 23:32); GET BioImages search 'cortical tension cell shape micropipette OR AFM' (2049 hits) and 'amoeboid cell shape blebbing cortex contractility' (2079 hits)", "http_status": 200 },
+      "variables_present": [
+        "amoeboid shape-change movies: S-JCBD-201204157 'Compression and dilation of the membrane-cortex layer generates rapid changes in cell shape' (12 files), S-JCBD-201307106 traction forces in amoeboid motility (15), S-BIAD901 nucleokinesis in amoeboid migration (24), S-BIAD295 membrane blebbing response (35)"
+      ],
+      "variables_missing": [
+        "no study of free-living Amoeba; no study varying the contacting medium with paired tension measurements"
+      ],
+      "scope": "Archive-wide; Dictyostelium and mammalian cells",
+      "evidence": "totalHits 2049 and 2079; accessions and file counts from the hits arrays",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL, UCSD)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=amoeba",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T01:14:00Z", "method": "GET /images?k=amoeba (200); earlier in session /images?k=Amoeba+proteus returned HTML with 0 parseable image links, JSON endpoints 404, REST host cilia.crbs.ucsd.edu timed out", "http_status": 200, "note": "portal responds but holdings could not be enumerated through any machine-readable endpoint" },
+      "variables_present": [],
+      "variables_missing": [
+        "even if amoeba images exist, no tension or medium variable accompanies them"
+      ],
+      "scope": "Not verifiable in this session",
+      "evidence": "HTTP 200 only",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=200",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T01:13:00Z", "method": "GET OMERO JSON API projects list (200) filtered by name for cortex|tension|bleb|amoeb|dictyo|shape|mechanic", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [
+        "no project name matches cortex/tension/bleb/amoeboid/Dictyostelium/shape/mechanics among the 147 projects"
+      ],
+      "scope": "147 public projects, mostly screens",
+      "evidence": "project-name filter returned 0 matches",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive (BioStudies API)", "query": "cortical tension cell shape micropipette OR AFM", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cortical%20tension%20cell%20shape%20micropipette%20OR%20AFM&pageSize=10", "hits": 2049, "note": "S-BIAD915 (human embryo surface-tension mapping) and S-BIAD2611 (cortical mechanics, 3T3) relevant" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "amoeboid cell shape blebbing cortex contractility", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=amoeboid%20cell%20shape%20blebbing%20cortex%20contractility&pageSize=10", "hits": 2079, "note": "S-JCBD-201204157, S-JCBD-201307106, S-BIAD901, S-BIAD295 are amoeboid/bleb shape movies" },
+    { "source": "Zenodo", "query": "\"cortical tension\" cell shape measurements, type=dataset", "url": "https://zenodo.org/api/records?q=%22cortical%20tension%22%20cell%20shape%20measurements&type=dataset&size=10", "hits": 52221, "note": "loose matching; no paired tension/shape dataset in the top 10 (10782118 'Cell shape analysis' is a generic shape set)" },
+    { "source": "Zenodo", "query": "(Dictyostelium OR amoeba OR amoeboid) AND (\"cortical tension\" OR \"surface tension\" OR \"micropipette aspiration\"), type=dataset", "url": "https://zenodo.org/api/records?q=(Dictyostelium%20OR%20amoeba%20OR%20amoeboid)%20AND%20(%22cortical%20tension%22%20OR%20%22surface%20tension%22%20OR%20%22micropipette%20aspiration%22)&type=dataset&size=10", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "cortical tension cell shape", "url": "https://datadryad.org/api/v2/search?q=cortical%20tension%20cell%20shape", "hits": 0, "note": "" },
+    { "source": "IDR OMERO API", "query": "project names matching cortex|tension|bleb|amoeb|dictyo|shape|mechanic", "url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=200", "hits": 0, "note": "" }
+  ],
+  "status": "partial",
+  "summary": "Paired tension-and-shape imaging exists in the BioImage Archive for human embryo blastomeres (S-BIAD915, micropipette surface-tension mapping with time-lapse, CC BY 4.0) and mouse fibroblast cortical mechanics (S-BIAD2611), and amoeboid shape-change movies exist for Dictyostelium, but no repository dataset measures cortical tension of a free-living amoeba while varying the contacting medium; the classic Amoeba interfacial-tension experiments remain in paper tables.",
+  "next_step": "Treat cortical tension as the modern referent, pre-register a tension-vs-outline-curvature analysis on S-BIAD915 (and its supplementary tension table), and compile Dictyostelium micropipette-aspiration tension values from the literature for the amoeboid case; a medium-dependence test needs new data.",
+  "obstacles_confirmed": [
+    "Paired tension-and-shape series sit in paper supplements rather than in the image archives.",
+    "Most image datasets lack independent force measurements."
+  ]
+}

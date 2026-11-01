@@ -1,0 +1,79 @@
+{
+  "claim_id": "thompson1917-ch03-09",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:25:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "size (length or mass) at age from birth/hatching to growth cessation, per species, as raw series (not only fitted parameters)",
+    "age of maximum growth velocity (derivable from the series)",
+    "species maximum longevity, to separate long-lived from short-lived species",
+    "taxonomic breadth (vertebrates and invertebrates)"
+  ],
+  "datasets": [
+    {
+      "id": "anage",
+      "name": "AnAge: the Animal Ageing and Longevity Database (HAGR)",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "access_url": "https://genomics.senescence.info/species/dataset.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:15:00Z", "method": "HEAD -L landing_url; HEAD dataset.zip", "http_status": 200, "bytes": 169150 },
+      "variables_present": ["maximum longevity per species", "adult body mass, age at maturity, gestation/incubation, growth rate parameter where recorded"],
+      "variables_missing": ["size-at-age series", "age of maximum growth velocity"],
+      "scope": "4,671 entries (species) per landing page; mostly vertebrates",
+      "evidence": "Landing page 200 shows '4,671 entries'. dataset.zip HEAD 200, content-type application/zip, content-length 169150. Provides the longevity classification needed for the long-/short-lived split but no growth trajectories.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "anage-build-15"
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase PopGrowth table (von Bertalanffy Loo, K, t0 by population)",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://www.fishbase.se/PopDyn/PopGrowthList.php?ID=1341&GenusName=Pleuronectes&SpeciesName=platessa&fc=440",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:03:00Z", "method": "HEAD landing_url; GET PopGrowthList HTML for plaice; GET fishbase.ropensci.org API (no response, status 000)", "http_status": 200 },
+      "variables_present": ["fitted von Bertalanffy parameters per population for thousands of fish species"],
+      "variables_missing": ["raw length-at-age (needed to see an early slow phase; VBGF forces maximum rate at t0, as the obstacle notes)", "non-fish taxa"],
+      "scope": "Fishes only; parameter table, not raw series. Already vendored for plaice, haddock and Mustelus canis in the organisms project.",
+      "evidence": "Landing 200; plaice PopGrowthList page 200 with 30 table rows. The ropensci API host did not respond. Fitted parameters cannot reveal the slow-start phase the claim describes.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "fishbase-popgrowth-pleuronectes-platessa-2026-10-31"
+    },
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection of DEB entries, with raw time–length and time–weight data in mydata_*.m files",
+      "landing_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://www.bio.vu.nl/thb/deb/deblab/add_my_pet/entries/Danio_rerio/mydata_Danio_rerio.m",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:20:00Z", "method": "HEAD -L landing_url (both bio.vu.nl and www.bio.vu.nl); GET species_list.html (309,638 B, JavaScript-rendered, no count parsed); GET entries_web/Danio_rerio/Danio_rerio_res.html; GET entries/Danio_rerio/mydata_Danio_rerio.m (33,317 B)", "http_status": 200, "bytes": 33317 },
+      "variables_present": [
+        "raw age–length series (data.tL_*) and age–weight series (data.tW_*) transcribed from literature, with units, labels and bibkeys, per species entry",
+        "zero-variate life-history data (age at birth, puberty, lifespan, sizes) per entry",
+        "entries across animal phyla (fish, mammals, birds, reptiles, invertebrates)"
+      ],
+      "variables_missing": ["a single consolidated table (data are in per-species MATLAB files)", "uniform coverage from birth to cessation in every entry"],
+      "scope": "Collection-wide; 'about' page says the collection passed 1000 entries (exact current count not parsed, species list is JS-rendered). Danio rerio entry includes tL_Schi2002 (time since fertilization d, total length cm) and tL_EatoFarl1974 (age dpf, standard length).",
+      "evidence": "mydata_Danio_rerio.m lines: 'data.tL_Schi2002 = [... % time since birth (day), TL (mm) at 28.5 C', 'units.tL_Schi2002 = {\\'d\\', \\'cm\\'}; label.tL_Schi2002 = {\\'time since fertilization\\', \\'total length\\'}', 'bibkey.tL_Schi2002 = {\\'Schi2002\\'}', and a second series tL_EatoFarl1974. HEAD of the .m file 200, 33,317 bytes. GitHub repo add-my-pet/AmPtool (Matlab analysis functions) exists, license NOASSERTION; AmPdata repo lookup returned nothing.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "\"Add-my-Pet\" OR \"AmP collection\"", "url": "https://zenodo.org/api/records?q=%22Add-my-Pet%22%20OR%20%22AmP%20collection%22&size=5", "hits": 27, "note": "DEB-related datasets (DEBTraits-NER corpus; DEB calibration ML dataset 17524004; parental provisioning 4970363); no consolidated growth-curve table" },
+    { "source": "GitHub API", "query": "repos/add-my-pet/AmPtool", "url": "https://api.github.com/repos/add-my-pet/AmPtool", "hits": 1, "note": "Matlab functions for the AmP collection; license NOASSERTION" },
+    { "source": "DataCite", "query": "growth curves size-at-age animals compilation (datasets)", "url": "https://api.datacite.org/dois?query=growth%20curves%20size-at-age%20animals%20compilation&resource-type-id=dataset&page[size]=8", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "ontogenetic growth curve body mass age species", "url": "https://datadryad.org/api/v2/search?q=ontogenetic%20growth%20curve%20body%20mass%20age%20species", "hits": 0, "note": "" }
+  ],
+  "status": "data-ready",
+  "summary": "Add-my-Pet holds raw literature-transcribed age–length and age–weight series (tL/tW data blocks with units and bibkeys) per species across animal phyla, openly served as mydata_*.m files; this covers the size-at-age variable across long- and short-lived taxa, with AnAge (4,671 species, dataset.zip 169 KB) supplying maximum longevity for the long-/short-lived split. FishBase gives only fitted von Bertalanffy parameters, which cannot show an early slow phase. Coverage of the earliest and latest ages varies entry by entry and the raw data must be parsed out of MATLAB files.",
+  "next_step": "Parse tL/tW blocks from all AmP mydata files into one table (species, age, size, source), join AnAge longevity, then pre-register the test for position of maximum growth velocity and terminal slowdown per species.",
+  "obstacles_confirmed": [
+    "Von Bertalanffy fits force the maximum growth rate to the origin and can hide an early slow start.",
+    "Comparable raw longitudinal growth curves are scattered."
+  ]
+}

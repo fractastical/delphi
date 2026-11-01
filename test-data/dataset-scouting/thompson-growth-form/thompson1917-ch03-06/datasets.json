@@ -1,0 +1,60 @@
+{
+  "claim_id": "thompson1917-ch03-06",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:35:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "measured standing height per adult individual",
+    "age at measurement (through at least 80+)",
+    "repeated measurements of the same individuals over decades (to separate shrinkage from cohort/secular effects)"
+  ],
+  "datasets": [
+    {
+      "id": "nhanes-body-measures",
+      "name": "CDC National Health and Nutrition Examination Survey — Body Measures (BMX) and Demographics (DEMO) files",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "access_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:31:00Z", "method": "HEAD access_url and DEMO_J.xpt; GET BMX_J.htm codebook; HEAD 1999 BMX.xpt", "http_status": 200, "bytes": 1466000 },
+      "variables_present": ["measured standing height per adult individual (BMXHT, cm)", "age at measurement (RIDAGEYR in DEMO file, top-coded at 80)"],
+      "variables_missing": ["repeated measurements of the same individuals"],
+      "scope": "US civilian non-institutionalized population, cross-sectional, 2-year cycles 1999–2018 and later; each cycle ~9,000 examined persons of all ages",
+      "evidence": "BMX_J.xpt HEAD 200, Content-Length 1466000; DEMO_J.xpt HEAD 200, Content-Length 3412720; codebook BMX_J.htm lists 'BMXHT - Standing Height (cm)'; 1999-2000 BMX.xpt HEAD 200, 2827840 bytes. Both assessor URLs (www.cdc.gov/nchs/nhanes/ and wwwn.cdc.gov/nchs/nhanes/) returned 200. Note: the older file path wwwn.cdc.gov/Nchs/Nhanes/2017-2018/BMX_J.XPT returns a 200 HTML 'Page Not Found' page; the Public/<year>/DataFiles path works. Age is top-coded at 80 in public DEMO files, limiting 'extreme old age'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "health-and-retirement-study",
+      "name": "Health and Retirement Study (University of Michigan)",
+      "landing_url": "https://hrs.isr.umich.edu/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:31:30Z", "method": "HEAD landing_url (with and without browser User-Agent)", "http_status": 403, "note": "Site returns 403 to curl; HRS public files are known to require free registration, so download could not be verified programmatically" },
+      "variables_present": [],
+      "variables_missing": ["could not inspect: measured height (physical measures from 2006 on), age, longitudinal panel"],
+      "scope": "US adults 50+, biennial panel since 1992; physical measures (incl. measured height) in enhanced face-to-face interviews from 2006",
+      "evidence": "HTTP 403 on https://hrs.isr.umich.edu/ for both plain curl and a browser UA; nothing beyond the status code was observed.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "longitudinal height loss aging stature", "url": "https://api.datacite.org/dois?query=longitudinal+height+loss+aging+stature&page%5Bsize%5D=5", "hits": 0, "note": "no results" },
+    { "source": "DataCite", "query": "\"height loss\" age", "url": "https://api.datacite.org/dois?query=%22height+loss%22+age&page%5Bsize%5D=5", "hits": 38, "note": "Mostly forestry; one relevant item is a paper/figshare record 10.25405/ncl.34621644 'Self-report overestimates true height loss' (Newcastle), a publication not a measured-height dataset" },
+    { "source": "Zenodo", "query": "\"height loss\" aging longitudinal", "url": "https://zenodo.org/api/records?q=%22height%20loss%22%20aging%20longitudinal&size=5", "hits": 109686, "note": "Top hits are birth-cohort survey-mapping documents; no stature-by-age dataset in the first page" },
+    { "source": "Zenodo", "query": "title:(stature OR height) AND title:age AND title:adult, type=dataset", "url": "https://zenodo.org/api/records?q=title%3A%28stature%20OR%20height%29%20AND%20title%3Aage%20AND%20title%3Aadult&size=5&type=dataset", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "stature height aging longitudinal", "url": "https://datadryad.org/api/v2/search?q=stature+height+aging+longitudinal&per_page=5", "hits": 0, "note": null }
+  ],
+  "status": "partial",
+  "summary": "NHANES Body Measures files (BMXHT standing height, with RIDAGEYR age in DEMO) are openly downloadable as SAS transport files for every 2-year cycle since 1999 and give measured adult stature by age, but cross-sectionally and with age top-coded at 80, so they mix shrinkage with secular trend and cannot reach 'extreme old age'. HRS, the one longitudinal source named, returned 403 to curl and needs registration. No repository dataset of repeated measured heights in the same adults was found in DataCite, Zenodo or Dryad.",
+  "next_step": "Pre-register a cross-sectional NHANES test (pooled 1999–2018 BMXHT by RIDAGEYR, 20–80, sex-stratified) as a first pass; for the timing claim register for HRS or a European panel (ELSA/SHARE) to get within-person height change across waves.",
+  "obstacles_confirmed": [
+    "Cross-sectional height-by-age mixes shrinkage with the secular increase in peak height.",
+    "Longitudinal series that separate those effects are less directly downloadable than NHANES (HRS site blocks anonymous access).",
+    "NHANES public age is top-coded at 80, so 'extreme old age' is not resolvable there."
+  ]
+}

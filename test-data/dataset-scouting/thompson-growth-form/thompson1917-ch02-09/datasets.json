@@ -1,0 +1,91 @@
+{
+  "claim_id": "thompson1917-ch02-09",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "maximal jump height (or take-off velocity) per individual or species",
+    "body mass and body length per individual or species",
+    "limb (lever) lengths or a similar-construction grouping (e.g. same clade / same jumping mode)",
+    "jumping mechanism flags (elastic power amplification, catapult) to exclude non-similar construction"
+  ],
+  "datasets": [
+    {
+      "id": "animaltraits",
+      "name": "AnimalTraits database (Herberstein et al. 2022), Zenodo 6468938",
+      "landing_url": "https://animaltraits.org/",
+      "access_url": "https://zenodo.org/records/6468938/files/observations.csv?download=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:32:00Z", "method": "HEAD landing_url (200); GET landing HTML (links to Zenodo record 6468938); HEAD observations.csv (301 then 200, Content-Length 1644415); GET column-documentation.csv (200, 44 lines)", "http_status": 200 },
+      "variables_present": [
+        "standardised body mass per observation with taxonomy (phylum..species), sex, sample size and source reference; also metabolic rate and brain size"
+      ],
+      "variables_missing": [
+        "no jump height, take-off velocity, body length or limb length: column documentation has no column matching jump / velocity / speed / length"
+      ],
+      "scope": "Cross-phylum compilation of body mass, metabolic rate and brain size",
+      "evidence": "landing HTML: 'body mass, metabolic rate and brain size'; column-documentation.csv columns include 'body mass', 'metabolic rate', 'brain size' and their units/method fields; grep for jump|velocity|speed|length returned nothing; observations.csv Content-Length 1644415",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-5003401-anuran-jumping-power",
+      "name": "What explains vast differences in jumping power within a clade? Diversity, ecology, and evolution of anuran jumping power (Intraspecific_dataset.xlsx)",
+      "landing_url": "https://zenodo.org/records/5003401",
+      "access_url": "https://zenodo.org/records/5003401/files/Intraspecific_dataset.xlsx?download=1",
+      "doi": "10.7280/D1295X",
+      "license": "cc-zero",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:35:00Z", "method": "GET Zenodo record JSON; GET the 89,988-byte xlsx and read its header and shared strings", "http_status": 200 },
+      "variables_present": [
+        "per-individual peak instantaneous take-off velocity (m/s) and peak acceleration (m/s^2) for 68 anuran species (340 data rows, 14 columns)",
+        "columns also include Sex, Muscle mass/Body mass ratio, body-mass-specific and muscle-mass-specific power, microhabitat (terrestrial, arboreal, burrowing, semi-aquatic, torrential), data source (Mendoza et al.; Moen et al. 2013), specimen tag",
+        "body mass values (numeric cells, not visible in shared strings) implied by the mass-specific power columns"
+      ],
+      "variables_missing": [
+        "jump height itself (derivable from take-off velocity and angle, but angle is not a column)",
+        "body length and limb lengths; mechanism flags beyond the muscle-mass ratio",
+        "one clade only (frogs), spanning a limited size range"
+      ],
+      "scope": "68 anuran species, 340 individuals",
+      "evidence": "xlsx shared strings: 'Peak Instantaneous Velocity (m/s)', 'Peak Instantaneous Acceleration (m/s^2)', 'Muscle mass/Body mass ratio', 'Body-mass-specific power (m^2/m^3)/kg', microhabitat flags; 341 <row> elements; 68 distinct Genus_species strings; Zenodo metadata license cc-zero, DOI 10.7280/D1295X",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-5733873-dipodomys-leaping",
+      "name": "Comparative analysis of Dipodomys species indicates that kangaroo rat hindlimb anatomy is adapted for rapid evasive leaping (Zenodo/Dryad mirror)",
+      "landing_url": "https://zenodo.org/records/5733873",
+      "access_url": "https://zenodo.org/api/records?q=%22jump%22%20%22take-off%20velocity%22%20body%20mass%20species&type=dataset&size=10",
+      "doi": null,
+      "license": "cc-zero",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:33:00Z", "method": "appears in Zenodo search results (title and licence from the hits array); record not opened", "http_status": 200 },
+      "variables_present": [
+        "hindlimb anatomy across kangaroo-rat species, per title"
+      ],
+      "variables_missing": [
+        "jump height / velocity not confirmed; contents not inspected"
+      ],
+      "scope": "Dipodomys (kangaroo rats) only",
+      "evidence": "search hit: id 5733873, licence cc-zero",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "jump height take-off velocity body mass scaling", "url": "https://datadryad.org/api/v2/search?q=jump%20height%20take-off%20velocity%20body%20mass%20scaling", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "jumping performance frogs body size interspecific", "url": "https://datadryad.org/api/v2/search?q=jumping%20performance%20frogs%20body%20size%20interspecific", "hits": 0, "note": "Dryad full-text search returned nothing although the anuran dataset carries a Dryad-style DOI 10.7280/D1295X (UC Irvine)" },
+    { "source": "Zenodo", "query": "\"jump\" \"take-off velocity\" body mass species, type=dataset", "url": "https://zenodo.org/api/records?q=%22jump%22%20%22take-off%20velocity%22%20body%20mass%20species&type=dataset&size=10", "hits": 87052, "note": "relevant: 5003401 anuran jumping power (68 spp.), 5733873 Dipodomys leaping anatomy, 4582727 jumping-spider take-off, 4989318 cricket jump performance, 4984705 leafhopper jumping; others are human/sensor or robotics" },
+    { "source": "AnimalTraits (via Zenodo 6468938)", "query": "column documentation grep jump|velocity|speed|length", "url": "https://zenodo.org/records/6468938/files/column-documentation.csv?download=1", "hits": 0, "note": "44-line column list; body mass, metabolic rate, brain size only" }
+  ],
+  "status": "partial",
+  "summary": "No single open table holds jump height against body size across similarly built animals from insects to large mammals; the best repository data are a CC0 Zenodo table of per-individual take-off velocity, acceleration and muscle/body-mass ratio for 68 frog species (340 individuals), plus single-taxon sets (kangaroo rats, jumping spider, crickets, leafhoppers); AnimalTraits supplies body mass only and has no locomotor columns.",
+  "next_step": "Use the anuran table (take-off velocity vs body mass within one clade and jumping mode) for a first pre-registered test of size-independence of take-off velocity, and compile the cross-taxon jump-height literature (fleas, locusts, galagos, kangaroos, humans) into a supplementary table with mechanism flags.",
+  "obstacles_confirmed": [
+    "Jump height against size, from small jumpers to large mammals, is scattered through papers rather than held in one public dataset.",
+    "Elastic tendons and crouched postures violate the similar-construction premise and change the expected scaling."
+  ]
+}

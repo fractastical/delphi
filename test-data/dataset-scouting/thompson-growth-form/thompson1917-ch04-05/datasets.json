@@ -1,0 +1,130 @@
+{
+  "claim_id": "thompson1917-ch04-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:05:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "images of cytoplasmic and nuclear meshwork texture in living, unfixed cells (light or cryo) with resolution to measure junction angles and cell/vesicle polygon geometry",
+    "matched images of the same cell type after chemical fixation (coagulating fixatives), to tell fixation-induced reticulum from native structure",
+    "temporal dynamics of the meshwork (rearrangement, coalescence) in live cells",
+    "an interfacial-tension or perturbation variable (e.g. hexanediol, osmotic or temperature change) applied to the same cells"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=phase%20separation%20condensate%20live%20cell",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:58:00Z", "method": "HEAD landing_url (200, checked 23:32); GET BioImages search for 'phase separation condensate live cell' (2176 hits) and 'fixation artifact live cell comparison cytoplasm' (2125 hits)", "http_status": 200 },
+      "variables_present": [
+        "live-cell studies of liquid-like condensates and their dynamics, e.g. S-BIAD2192 (fluorescent tags alter condensate formation in vivo and in vitro, 8165 files), S-BIAD1666 (hexanediol effect on FUS phase separation, 119 files), S-BIAD2412 (PGL-3 phase separation, 4 files), S-BIAD2383 (clathrin adaptor phase separation, 84 files)",
+        "a perturbation of interfacial behaviour (1,6-hexanediol) in S-BIAD1666"
+      ],
+      "variables_missing": [
+        "no study designed as a live-versus-fixed comparison of whole-cytoplasm 'alveolar' texture",
+        "no junction-angle or foam-geometry measurements in metadata; the condensate studies image one protein species, not the bulk cytoplasm reticulum Thompson describes"
+      ],
+      "scope": "Archive-wide; relevant studies are modern condensate / phase-separation imaging in cultured cells and C. elegans",
+      "evidence": "totalHits 2176 and 2125 for the two queries; accession list and file counts from the hits array",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL, UCSD)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=cytoplasm",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:59:00Z", "method": "HEAD landing_url (200); GET /images?k=cytoplasm returned 200 HTML with no image links or hit count parseable; GET /images/search?q=amoeba&format=json 404; GET /images/35052.json 404; GET https://cilia.crbs.ucsd.edu/rest/public_ids timed out (30 s, no response)", "http_status": 200, "note": "landing page up, but the search page is script-rendered and the REST host did not respond, so contents could not be verified" },
+      "variables_present": [],
+      "variables_missing": [
+        "could not confirm any micrograph of cytoplasmic/nuclear texture through the API in this session"
+      ],
+      "scope": "Portal of light and EM micrographs; scope not verifiable here",
+      "evidence": "HTTP 200 on landing; 0 matches for 'images/[0-9]' in the search HTML; 404 on two JSON endpoints; timeout on cilia.crbs.ucsd.edu",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "electron-microscopy-public-image-archive",
+      "name": "EMPIAR (Electron Microscopy Public Image Archive)",
+      "landing_url": "https://www.ebi.ac.uk/empiar/",
+      "access_url": "https://www.ebi.ac.uk/empiar/api/entry/10094/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:00:00Z", "method": "HEAD landing_url (200); GET /empiar/api/search/ and /empiar/search/ (404, no search API at those paths); GET /empiar/api/entry/10094/ (200)", "http_status": 200 },
+      "variables_present": [
+        "volume EM of whole cells, e.g. EMPIAR-10094 'Serial Block Face SEM of HeLa cell pellet with 10 nm pixels and 50 nm slices (benchmark dataset)', released 2019-05-21, 129.8 GB, 518 single-frame DM4 micrographs at 10x10x50 nm voxels",
+        "BioStudies search also lists EMPIAR cryo-ET of condensates (EMPIAR-13711 synaptic ribbon condensates; EMPIAR-11701 polyphosphate condensate)"
+      ],
+      "variables_missing": [
+        "all EMPIAR volumes are of fixed/vitrified cells; no live imaging and no interfacial-tension variable",
+        "no paired coagulating-fixative versus cryo-fixed comparison of the same cytoplasm identified"
+      ],
+      "scope": "Ultrastructure of fixed or vitrified cells; HeLa and other cultured cells",
+      "evidence": "entry JSON: title, release_date 2019-05-21, dataset_size '129.8 GB', imageset num_images_or_tilt_series 518, header_format DM4",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:34:00Z", "method": "HEAD landing_url (302 to public login redirect); GET OMERO JSON API projects (200, totalCount 147)", "http_status": 200 },
+      "variables_present": [
+        "147 public imaging projects (high-content screens and light-sheet/embryo studies), many of live cultured cells"
+      ],
+      "variables_missing": [
+        "no project searched or identified in this session that targets cytoplasmic meshwork geometry or live-versus-fixed texture",
+        "no interfacial-tension variable"
+      ],
+      "scope": "Mostly fluorescence screens of cultured cells; useful only as raw live-cell texture images",
+      "evidence": "{\"meta\": {\"totalCount\": 147}}",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "openorganelle-janelia",
+      "name": "OpenOrganelle (Janelia COSEM FIB-SEM whole-cell volumes)",
+      "landing_url": "https://openorganelle.janelia.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:01:00Z", "method": "HEAD landing_url only; dataset listing not queried", "http_status": 200, "note": "contents (isotropic FIB-SEM volumes of HeLa, macrophage, Jurkat, etc. with organelle segmentations) known from the project's publications but not verified by an API call in this session" },
+      "variables_present": [],
+      "variables_missing": [
+        "fixed (high-pressure-frozen, freeze-substituted) cells only; no live imaging; no tension variable"
+      ],
+      "scope": "Whole-cell ultrastructure of a few cultured cell types",
+      "evidence": "HTTP/2 200 on landing page; nothing else fetched",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive (BioStudies API)", "query": "phase separation condensate live cell", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=phase%20separation%20condensate%20live%20cell&pageSize=10", "hits": 2176, "note": "S-BIAD2192, S-BIAD1666 (hexanediol/FUS), S-BIAD2412, S-BIAD2383, S-BIAD3320 relevant to two-fluid demixing in live cells" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "fixation artifact live cell comparison cytoplasm", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=fixation%20artifact%20live%20cell%20comparison%20cytoplasm&pageSize=10", "hits": 2125, "note": "no live-vs-fixed comparison study in the top 10; S-BIAD728 (RER/vacuole architecture) and S-BIAD187 (transmitted-light movies) are the closest" },
+    { "source": "Cell Image Library", "query": "k=cytoplasm; search?q=amoeba (json)", "url": "https://www.cellimagelibrary.org/images?k=cytoplasm", "hits": null, "note": "HTML search not parseable; JSON endpoints 404; REST host cilia.crbs.ucsd.edu timed out" },
+    { "source": "EMPIAR", "query": "api/search cytoplasm volume FIB-SEM; search/?query=FIB-SEM whole cell", "url": "https://www.ebi.ac.uk/empiar/api/search/?query=cytoplasm%20volume%20FIB-SEM", "hits": null, "note": "both paths 404; entry API /api/entry/10094/ works and was used instead" },
+    { "source": "IDR searchengine", "query": "project value=zygote (earlier in session, shows API works)", "url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=0", "hits": 147, "note": "project count only; no topic search run for cytoplasm texture" }
+  ],
+  "status": "partial",
+  "summary": "Modern live-cell imaging of liquid-like condensates (BioImage Archive, incl. a hexanediol perturbation set) and volume EM of whole fixed cells (EMPIAR-10094, OpenOrganelle) exist, so foam-versus-filament geometry can be measured in both regimes, but no dataset pairs coagulating-fixative images with live images of the same cytoplasm and none records interfacial tension; the Cell Image Library could not be queried.",
+  "next_step": "Define the modern referent (ER/condensate network vs cytoskeleton), then pre-register a junction-angle and topology comparison between live condensate movies (e.g. S-BIAD1666 before/after hexanediol) and a fixed-cell EM volume; the fixation-artefact half needs a new paired live/fixed image set.",
+  "obstacles_confirmed": [
+    "Interfacial tension of the supposed fluids is not in the image metadata.",
+    "Historical fixatives are only partly matched by modern correlative datasets.",
+    "The historical structure may not map uniquely to a modern organelle."
+  ]
+}

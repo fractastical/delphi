@@ -1,0 +1,107 @@
+{
+  "claim_id": "thompson1917-ch02-07",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T02:45:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-2/thompson-ch01-05" },
+  "variables_needed": [
+    "body mass per bird species (extant, including ostrich and the heaviest flying birds)",
+    "wing dimensions (wing length / wing area or wing loading) per species",
+    "flight-muscle (pectoral) mass fraction or a proxy for available muscle power",
+    "moa body-mass estimates and skeletal/wing-reduction measurements (fossil)"
+  ],
+  "datasets": [
+    {
+      "id": "avonet-figshare-16586228",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.16586228",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T02:35:00Z", "method": "GET Figshare API article record; HEAD opentraits.org landing", "http_status": 200, "bytes": 21524673 },
+      "variables_present": ["body mass per species", "wing length, secondary length, Kipp's distance, hand-wing index per species (AVONET trait set)", "covers all ~11,000 extant bird species including Struthio camelus"],
+      "variables_missing": ["wing area / wing loading", "pectoral muscle mass", "moa (extinct)"],
+      "scope": "All extant birds; files: AVONET Supplementary dataset 1.xlsx (21,524,673 bytes), Supplementary dataset 2.xlsx, ELEData.zip, ELECode.zip",
+      "evidence": "Figshare API: title 'AVONET: morphological, ecological and geographical data for all birds', licence CC BY 4.0, four files with sizes listed; opentraits.org/datasets/avonet.html 200.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource (3D media)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Struthio%20camelus&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T02:38:00Z", "method": "GET MorphoSource media API for 'Struthio camelus' and 'Dinornithiformes' / 'Dinornis'", "http_status": 200, "bytes": null },
+      "variables_present": ["3 CT media records for Struthio camelus (element unspecified)"],
+      "variables_missing": ["moa scans (0 media for Dinornithiformes and Dinornis)", "body mass", "muscle mass", "wing area"],
+      "scope": "3 ostrich CT series; no moa; 209,875 media overall",
+      "evidence": "API total_count 3 for q=Struthio camelus (first: 'Element Unspecified [CTImageSeries] [CT]'); total_count 0 for q=Dinornithiformes and q=Dinornis.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database (Dinornithiformes occurrences and taxa)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Dinornithiformes&rowcount",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T02:36:00Z", "method": "GET PBDB occs/list.json and taxa/list.json (show=size)", "http_status": 200, "bytes": null },
+      "variables_present": ["108 fossil occurrences of Dinornithiformes", "25 moa species names"],
+      "variables_missing": ["body mass (taxa show=size returned null body-size fields for Dinornis species)", "wing or skeletal measurements"],
+      "scope": "Moa occurrences and taxonomy only",
+      "evidence": "occs/list.json records_found 108; taxa/list.json rank=species returned 25 records with jbs/jbl (body size) null for Dinornis ingens, D. maximus, D. dromoides, D. novaezealandiae.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-1th6k-heart-size-flight-capacity",
+      "name": "Data from: Aerobic power and flight capacity in birds: a phylogenetic test of the heart-size hypothesis (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.1th6k",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.1th6k",
+      "doi": "10.5061/dryad.1th6k",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T02:40:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 827697 },
+      "variables_present": ["heart size and flight-capacity categories across bird species (per abstract; column list not fetched)"],
+      "variables_missing": ["wing area", "pectoral muscle mass (not confirmed)", "moa"],
+      "scope": "Comparative extant-bird dataset, 827,697 bytes",
+      "evidence": "API record: title, CC0 licence, storageSize 827697, abstract on oxygen delivery to pectoral muscles and flight capacity.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-jsxksn0ng-sternum-traits",
+      "name": "Data from: Enlargement of sternum traits facilitated the evolution of powered flight in birds (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.jsxksn0ng",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.jsxksn0ng",
+      "doi": "10.5061/dryad.jsxksn0ng",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T02:40:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 880113 },
+      "variables_present": ["sternum/keel measurements across living birds and near-bird dinosaurs, a skeletal proxy for flight-muscle attachment"],
+      "variables_missing": ["direct muscle mass", "wing area", "moa not confirmed in metadata"],
+      "scope": "Comparative skeletal dataset, 880,113 bytes",
+      "evidence": "API record: title, CC0 licence, storageSize 880113, abstract on sternal keel and powered flight.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "bird flight muscle mass", "url": "https://datadryad.org/api/v2/search?q=bird%20flight%20muscle%20mass&per_page=6", "hits": 13, "note": "dryad.1th6k (heart size vs flight capacity) and dryad.jsxksn0ng (sternum traits) are comparative; others are single-species migration physiology." },
+    { "source": "Dryad", "query": "moa body mass", "url": "https://datadryad.org/api/v2/search?q=moa%20body%20mass&per_page=6", "hits": 1, "note": "Only hit is a goose phylogeny; no moa mass dataset on Dryad." },
+    { "source": "Zenodo", "query": "bird \"wing loading\" \"body mass\" dataset", "url": "https://zenodo.org/api/records?q=bird%20%22wing%20loading%22%20%22body%20mass%22%20dataset&size=5", "hits": 340431, "note": "Loose match; first page is figures and bat/tit datasets; no bird wing-loading table surfaced." },
+    { "source": "MorphoSource", "query": "Dinornithiformes; Dinornis; Struthio camelus", "url": "https://www.morphosource.org/api/media?q=Dinornithiformes&per_page=1", "hits": 0, "note": "0 moa media; 3 ostrich CT media." }
+  ],
+  "status": "partial",
+  "summary": "AVONET (CC BY 4.0, Figshare) gives body mass and linear wing measurements for every extant bird including the ostrich and the heaviest fliers, but not wing area or pectoral muscle mass; PBDB has 108 moa occurrences and 25 species names with no body-size values; MorphoSource has 3 ostrich CT series and no moa. Muscle-power and moa-mass inputs would have to be compiled from the literature (e.g. published moa mass regressions), and comparative sternum/heart datasets on Dryad are skeletal or cardiovascular proxies only.",
+  "next_step": "Combine AVONET mass and wing length with a compiled table of pectoral-muscle fractions and wing areas (literature) and published moa mass estimates; then pre-register a required-vs-available power comparison across the mass range up to ~70 kg.",
+  "obstacles_confirmed": [
+    "Moa mass and wing reduction are fossil estimates with wide error; PBDB holds no body-size values for Dinornis.",
+    "No repository dataset pairs wing area with flight-muscle mass across large birds."
+  ]
+}

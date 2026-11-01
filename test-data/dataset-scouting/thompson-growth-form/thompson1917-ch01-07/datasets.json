@@ -1,0 +1,108 @@
+{
+  "claim_id": "thompson1917-ch01-07",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:52:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "effective cytoplasmic viscosity (Pa·s) of Amoeba or similar naked amoeboid cells, with measurement method and length scale",
+    "time-resolved deformation (creep / aspiration length vs time) under a known applied pressure or force",
+    "viscosity of water at the same temperature as reference",
+    "timescale of spontaneous shape change (pseudopod extension) in the same cells"
+  ],
+  "datasets": [
+    {
+      "id": "bionumbers",
+      "name": "BioNumbers (Harvard) cytoplasm viscosity entries",
+      "landing_url": "https://bionumbers.hms.harvard.edu/",
+      "access_url": "https://bionumbers.hms.harvard.edu/search.aspx?trm=cytoplasm+viscosity",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:45:00Z", "method": "HEAD landing_url (302 to /search.aspx, then 200); GET search 'cytoplasm viscosity' (200, 20 BioNumber links parsed); GET search 'amoeba viscosity' (200); GET bionumber.aspx?id=105903", "http_status": 200 },
+      "variables_present": [
+        "curated single values with references: BNID 105903 'In vivo cytoplasm viscosity', 108527 'Macroscopic viscosity of the cytoplasm', 102561/102560 'Relative viscosity of cytoplasm versus water (photobleaching recovery)', 117135 'Typical viscosity of cytoplasm compared to that of water', 110194 'Apparent rotational viscosities of the cytoplasm', 104279 'Shear viscosity of intranuclear region', plus water viscosity (103392, 108528)"
+      ],
+      "variables_missing": [
+        "no Amoeba-specific entry: the 'amoeba viscosity' search returned the same generic entries; BNID 105903 lists Organism 'Unspecified' (Ando & Skolnick 2010)",
+        "no creep or deformation-vs-time records; single numbers only, methods differ (FRAP, rotational probes, micropipette)"
+      ],
+      "scope": "Generic cytoplasm of cultured/model cells; ~20 entries",
+      "evidence": "search page lists 20 bionumber.aspx links; entry 105903 shows Organism 'Unspecified', Reference 'Ando T, Skolnick J ... PNAS 2010 107(43):18457-62'",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL, UCSD)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=Amoeba+proteus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:46:00Z", "method": "GET /images?k=Amoeba+proteus (200 HTML, 0 image links parseable); earlier in session JSON endpoints 404 and REST host cilia.crbs.ucsd.edu timed out", "http_status": 200, "note": "portal up but search is script-rendered and the REST API gave no response; holdings not verified" },
+      "variables_present": [],
+      "variables_missing": [
+        "even if amoeba movies exist there, no applied pressure or force is recorded (obstacle confirmed by design of an image library)"
+      ],
+      "scope": "Not verifiable in this session",
+      "evidence": "200 on search page; 0 matches for 'images/[0-9]'",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-46kk44r-micropipette-cytoplasmic-viscosity",
+      "name": "Data from: Characterization of cytoplasmic viscosity of hundreds of single tumor cells based on micropipette aspiration",
+      "landing_url": "https://zenodo.org/records/4937114",
+      "access_url": "https://zenodo.org/api/records/4937114",
+      "doi": "10.5061/dryad.46kk44r",
+      "license": "cc-zero",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:48:00Z", "method": "GET Zenodo record JSON (Dryad mirror)", "http_status": 200 },
+      "variables_present": [
+        "aspiration length vs time at -10 kPa and -5 kPa translated to cytoplasmic viscosity for hundreds of single cells (H1299, A549, drug-treated H1299); 'data in summary 20181012.xlsx', 142,429 bytes"
+      ],
+      "variables_missing": [
+        "tumour cell lines, not Amoeba or other free-living naked cells; no spontaneous shape-change timescale"
+      ],
+      "scope": "Human tumour cell lines",
+      "evidence": "description: 'aspirated continuously through a micropipette at a pressure of -10 kPa or -5 kPa where aspiration lengths as a function of time were obtained and translated to cy[toplasmic viscosity]'; license cc-zero",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-dictyostelium-motility",
+      "name": "BioImage Archive / JCB DataViewer amoeboid motility studies (Dictyostelium)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Amoeba%20proteus%20OR%20Dictyostelium%20micropipette%20aspiration%20deformation",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:49:00Z", "method": "GET BioImages search (41 hits)", "http_status": 200 },
+      "variables_present": [
+        "time-lapse of amoeboid Dictyostelium cells: S-JCBD-201306147 bleb-driven chemotaxis (9 files), S-JCBD-201307106 traction-force dynamics of amoeboid motility (15 files), S-BIAD901 nucleokinesis in amoeboid migration (24 files); cryo-ET of Dictyostelium under hypo-osmotic stress (EMPIAR-11944) and control (EMPIAR-11845)"
+      ],
+      "variables_missing": [
+        "no Amoeba proteus; no calibrated applied pressure except traction-force data in S-JCBD-201307106; viscosity must be inferred"
+      ],
+      "scope": "Dictyostelium discoideum, a close functional analogue",
+      "evidence": "totalHits 41; accessions and file counts from the hits array",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioNumbers", "query": "cytoplasm viscosity", "url": "https://bionumbers.hms.harvard.edu/search.aspx?trm=cytoplasm+viscosity", "hits": 20, "note": "generic cytoplasm values; none for Amoeba" },
+    { "source": "BioNumbers", "query": "amoeba viscosity", "url": "https://bionumbers.hms.harvard.edu/search.aspx?trm=amoeba+viscosity", "hits": 8, "note": "same generic entries plus 'Cytokinesis by the numbers' (109562)" },
+    { "source": "Zenodo", "query": "(amoeba OR Dictyostelium OR Physarum) (viscosity OR rheology OR micropipette), type=dataset", "url": "https://zenodo.org/api/records?q=(amoeba%20OR%20Dictyostelium%20OR%20Physarum)%20(viscosity%20OR%20rheology%20OR%20micropipette)&type=dataset&size=10", "hits": 1062, "note": "only 4937114 (tumour-cell micropipette viscosity) is rheological; the rest are Dictyostelium ecology/evolution tables" },
+    { "source": "Dryad", "query": "cytoplasm viscosity amoeba rheology", "url": "https://datadryad.org/api/v2/search?q=cytoplasm%20viscosity%20amoeba%20rheology", "hits": 0, "note": "" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "Amoeba proteus OR Dictyostelium micropipette aspiration deformation", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Amoeba%20proteus%20OR%20Dictyostelium%20micropipette%20aspiration%20deformation&pageSize=10", "hits": 41, "note": "Dictyostelium motility movies and cryo-ET; no Amoeba proteus study" },
+    { "source": "Cell Image Library", "query": "k=Amoeba proteus", "url": "https://www.cellimagelibrary.org/images?k=Amoeba+proteus", "hits": null, "note": "HTML not parseable; API unreachable" }
+  ],
+  "status": "partial",
+  "summary": "Cytoplasmic viscosity values relative to water exist as curated single numbers in BioNumbers (~20 entries, organism unspecified or cultured cells) and as a CC0 per-cell micropipette creep table for tumour cell lines; amoeboid deformation movies exist for Dictyostelium in the BioImage Archive; nothing public gives Amoeba proteus viscosity or creep under a calibrated pressure, which remains in the 1920s–1950s microrheology papers (Heilbrunn, Allen).",
+  "next_step": "Compile the Amoeba/Physarum cytoplasm viscosity literature (Heilbrunn centrifuge, Allen, Yagi) into a table with method, length scale and temperature alongside the BioNumbers entries, and pair a Dictyostelium movie set with its traction-force data for a creep-timescale comparison.",
+  "obstacles_confirmed": [
+    "Viscosities differ by method and are not gathered in one downloadable rheology table.",
+    "Public images seldom include calibrated applied pressure."
+  ]
+}

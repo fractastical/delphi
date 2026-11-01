@@ -1,0 +1,130 @@
+{
+  "claim_id": "thompson1917-ch05-19",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:58:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "morphological descriptors (outline/shape coordinates or images) of minute organisms such as foraminifera, radiolaria or ciliates, labelled to species",
+    "a morphological-complexity or character-count score per taxon",
+    "molecular sequences (e.g. SSU rDNA) for the same taxa to build phylogenies independent of morphology",
+    "occurrence of the same simple forms at different times and places (fossil occurrences by age and locality)"
+  ],
+  "datasets": [
+    {
+      "id": "endless-forams",
+      "name": "Endless Forams (Hsiang et al. 2019) and derived image sets on Zenodo",
+      "landing_url": "http://www.endlessforams.org/",
+      "access_url": "https://zenodo.org/api/records/7270253",
+      "doi": "10.5281/zenodo.7270253",
+      "license": "CC BY 4.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:50:00Z", "method": "HEAD landing_url (200); GET Zenodo search \"Endless Forams\" (3 hits); GET Zenodo records 7270253 and 3996436", "http_status": 200, "bytes": 909253708 },
+      "variables_present": [
+        "26,663 images of modern planktonic foraminifera from 23 Atlantic coretops with machine-assigned species labels (Zenodo 7270253, 909 MB, CC BY 4.0)",
+        "human-labelled training images: 'Endless Foram, MD022508 and MD9712138 training datasets' (Zenodo 3996436, three files 825/715/676 MB, CC BY 4.0)"
+      ],
+      "variables_missing": ["no molecular sequences", "no shape coordinates or complexity scores delivered (must be extracted from images)", "modern planktonic forams only; no radiolaria or ciliates, no fossils"],
+      "scope": "Modern planktonic foraminifera, Atlantic coretops; tens of thousands of species-labelled images",
+      "evidence": "Zenodo 7270253 description: 'This dataset contains 26,663 images of Modern planktonic foraminifera taken as part of the Endless Forams (endlessforams.org) initiative ... assigned species labels using a deep learning classifier with a validation accuracy of 87.4%'; license cc-by-4.0; file size 909253708.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "genbank",
+      "name": "GenBank / NCBI Nucleotide",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Foraminifera%5BOrganism%5D%20AND%2018S&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:51:00Z", "method": "GET E-utilities esearch nuccore 'Foraminifera[Organism] AND 18S'", "http_status": 200, "bytes": null },
+      "variables_present": ["6,975 nucleotide records for Foraminifera matching 18S: sequences for molecular phylogenies independent of morphology"],
+      "variables_missing": ["no morphology; linking to imaged specimens requires the same individuals (rare)"],
+      "scope": "All taxa; count shown for foraminiferal 18S only",
+      "evidence": "esearch JSON count 6975.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pr2-protist-ribosomal-reference",
+      "name": "PR2: Protist Ribosomal Reference database, v5.1.1",
+      "landing_url": "https://pr2-database.org/",
+      "access_url": "https://api.github.com/repos/pr2database/pr2database/releases/latest",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:52:00Z", "method": "HEAD landing_url (200); GET GitHub releases/latest API (200)", "http_status": 200, "bytes": 123285109 },
+      "variables_present": ["curated SSU rRNA sequences with a 9-level taxonomy for protists (files pr2_version_5.1.1_SSU_*.fasta.gz ~51-60 MB, merged.xlsx 123 MB), suitable for genealogical distance among morphologically classified taxa"],
+      "variables_missing": ["no morphology or images"],
+      "scope": "All eukaryotes with protist focus; release v5.1.1 published 2025-10-27",
+      "evidence": "GitHub release tag v5.1.1, published_at 2025-10-27T17:47:26Z; assets include pr2_version_5.1.1_SSU_taxo_long.fasta.gz (59640632 bytes), pr2_version_5.1.1_merged.xlsx (123285109).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "mikrotax",
+      "name": "mikrotax (pforams@mikrotax, radiolaria@mikrotax, Nannotax)",
+      "landing_url": "https://www.mikrotax.org/",
+      "access_url": "https://www.mikrotax.org/pforams/index.php",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:52:00Z", "method": "HEAD landing_url (200); GET pforams/index.php (200, 168984 bytes HTML)", "http_status": 200, "bytes": 168984 },
+      "variables_present": ["image-backed taxon pages for planktonic foraminifera, radiolaria and nannofossils through geological time (website; no API or bulk download found)"],
+      "variables_missing": ["no structured morphometric or sequence data", "no bulk export confirmed"],
+      "scope": "Expert taxonomy with images and stratigraphic ranges; human-readable only",
+      "evidence": "Both pages returned 200; HTML not parsed for counts.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "neotoma-paleoecology",
+      "name": "Neotoma Paleoecology Database",
+      "landing_url": "https://www.neotomadb.org/",
+      "access_url": "https://api.neotomadb.org/v2.0/data/taxa?taxonname=Foraminifera&limit=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:53:00Z", "method": "HEAD landing_url (200); GET API taxa taxonname=Globigerina* (200, data []); GET taxa taxonname=Foraminifera (200, 1 taxon, ecolgroup FORM); GET datasets?datasettype=foraminifera (200, data [])", "http_status": 200, "bytes": null },
+      "variables_present": ["a Foraminifera taxon entry (taxonid 620, ecolgroup FORM)"],
+      "variables_missing": ["no foraminiferal datasets or Globigerina taxa returned; Neotoma is Quaternary and dominated by pollen/vertebrates, so deep-time microfossil continuity is out of scope"],
+      "scope": "Quaternary paleoecology; foraminifera essentially absent in these queries",
+      "evidence": "API responses: taxa Globigerina* -> data []; taxa Foraminifera -> taxonid 620; datasets datasettype=foraminifera -> data [].",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pbdb-foraminifera-occurrences",
+      "name": "Paleobiology Database, Foraminifera occurrences",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Foraminifera&limit=1&rowcount",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:54:00Z", "method": "GET PBDB data1.2 occs/list.json base_name=Foraminifera rowcount", "http_status": 200, "bytes": null },
+      "variables_present": ["196,776 fossil occurrence records of Foraminifera with age and locality: the 'different times and places' variable"],
+      "variables_missing": ["no morphology beyond the taxon name", "no sequences"],
+      "scope": "Phanerozoic; foraminifera only queried (radiolaria would be a second query)",
+      "evidence": "JSON records_found 196776.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "\"Endless Forams\"", "url": "https://zenodo.org/api/records?q=%22Endless%20Forams%22&size=5", "hits": 3, "note": "10.5281/zenodo.7270253 (26,663 machine-labelled images), 10.5281/zenodo.3996436 (training sets)" },
+    { "source": "NCBI E-utilities", "query": "Foraminifera[Organism] AND 18S (nuccore)", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore&term=Foraminifera%5BOrganism%5D%20AND%2018S&retmode=json", "hits": 6975, "note": null },
+    { "source": "Neotoma API", "query": "taxa Globigerina*; taxa Foraminifera; datasets datasettype=foraminifera", "url": "https://api.neotomadb.org/v2.0/data/taxa?taxonname=Foraminifera&limit=3", "hits": 1, "note": "one taxon, zero datasets" },
+    { "source": "PBDB", "query": "occurrences base_name=Foraminifera", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Foraminifera&limit=1&rowcount", "hits": 196776, "note": null },
+    { "source": "GitHub releases API (PR2)", "query": "pr2database latest release", "url": "https://api.github.com/repos/pr2database/pr2database/releases/latest", "hits": 1, "note": "v5.1.1, 2025-10-27" },
+    { "source": "DataCite", "query": "radiolaria OR foraminifera morphospace convergence molecular phylogeny (dataset)", "url": "https://api.datacite.org/dois?query=radiolaria%20OR%20foraminifera%20morphospace%20convergence%20molecular%20phylogeny&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 6, "note": "all macro-organism convergence datasets (rodents, fishes, beetles, crocodylians); none on microorganisms" },
+    { "source": "Dryad", "query": "foraminifera morphology molecular phylogeny convergence", "url": "https://datadryad.org/api/v2/search?q=foraminifera%20morphology%20molecular%20phylogeny%20convergence&per_page=8", "hits": 0, "note": null }
+  ],
+  "status": "partial",
+  "summary": "The ingredients exist separately for planktonic foraminifera: species-labelled image sets (Endless Forams, 26,663 + training images on Zenodo, CC BY 4.0), SSU sequences (6,975 foraminiferal 18S records in GenBank; PR2 v5.1.1 curated taxonomy) and 196,776 dated fossil occurrences in PBDB. No dataset joins morphology, molecular phylogeny and time for the same taxa, and nothing comparable was found for radiolaria or ciliates; Neotoma holds no foraminiferal datasets.",
+  "next_step": "Build a species-level table for planktonic forams joining Endless Forams shape descriptors (via AutoMorph outlines), a PR2/GenBank 18S phylogeny and PBDB first/last occurrences; then pre-register a test of whether morphologically near-identical species pairs are more often non-sister than in a character-rich comparison group.",
+  "obstacles_confirmed": [
+    "Morphological descriptions and molecular samples rarely come from the same individuals: image sets and sequence databases are disjoint.",
+    "Soft-bodied infusoria lack a fossil record: no ciliate morphology or occurrence dataset surfaced; the deep-time half is testable only for forams/radiolaria.",
+    "Neotoma, suggested by one assessor, is Quaternary and returned no foraminiferal datasets."
+  ]
+}

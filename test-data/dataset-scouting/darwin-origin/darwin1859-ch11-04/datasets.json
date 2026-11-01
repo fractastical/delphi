@@ -1,0 +1,249 @@
+{
+  "claim_id": "darwin1859-ch11-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "regional assemblage composition of living taxa (occurrences or ranges)",
+    "regional assemblage composition of fossil taxa, linked to living clades",
+    "molecular phylogeny independent of morphology, plus environmental variables per region"
+  ],
+  "datasets": [
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence and species indices",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://api.gbif.org/v1/occurrence/search?limit=0 and /species/search?rank=GENUS&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "georeferenced occurrence records of extant (and fossil-specimen) taxa",
+        "taxonomic backbone (genus and species names)"
+      ],
+      "variables_missing": [
+        "no trait, abundance-through-time, mating-system or sequence-origin variables"
+      ],
+      "scope": "Global, all taxa",
+      "evidence": "occurrence/search?limit=0 returned count 3887469368; basisOfRecord=FOSSIL_SPECIMEN returned count 10258418; species/search?rank=GENUS returned count 4225471 (name usages across checklists, not unique accepted genera).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pbdb-regional-fossils",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:17Z",
+        "method": "GET occs/list.json?base_name=Mammalia&limit=1&rowcount",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil occurrences with taxon names and ages (collection IDs, locality via collection records)"
+      ],
+      "variables_missing": [
+        "link of extinct taxa to a molecular tree",
+        "environment variables per region"
+      ],
+      "scope": "Fossil taxa",
+      "evidence": "occs base_name=Mammalia: records_found 128307; records carry tna, rnk, eag, lag, oei, cid (collection id).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "paleobiology-database-occurrence-counts-2026-10-31"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (nuccore)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "E-utilities esearch db=nuccore term=Gasterosteus aculeatus[Organism]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "sequences from which molecular trees are built"
+      ],
+      "variables_missing": [
+        "regional assignment, trees themselves"
+      ],
+      "scope": "All taxa",
+      "evidence": "esearch db=nuccore count 373001 for the example taxon.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-evoregions-muroidea",
+      "name": "Evoregions: mapping shifts in phylogenetic turnover across biogeographic regions",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.6wwpzgmwp",
+      "access_url": null,
+      "doi": "10.5061/dryad.6wwpzgmwp",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:46:46Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.6wwpzgmwp",
+        "http_status": 200,
+        "bytes": 9906631
+      },
+      "variables_present": [
+        "phylogenetic turnover across biogeographic regions for Muroidea (rats and mice), with a tree and distributions (per abstract)"
+      ],
+      "variables_missing": [
+        "one clade",
+        "no fossil taxa",
+        "environment variables not stated"
+      ],
+      "scope": "Muroidea",
+      "evidence": "API: publicationDate 2020-09-04, storageSize 9906631; abstract: four evoregions recovered for Muroidea.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-butterfly-biogeographic-regionalization",
+      "name": "A global biogeographic regionalization for butterflies",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.w3r2280zf",
+      "access_url": null,
+      "doi": "10.5061/dryad.w3r2280zf",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:45:52Z",
+        "method": "GET https://api.datacite.org/dois?query=phylogenetic regionalization ... (record in results); Dryad search record",
+        "http_status": 200,
+        "bytes": 4481421356
+      },
+      "variables_present": [
+        "global regionalization of one insect clade (title)"
+      ],
+      "variables_missing": [
+        "only the title and size were read",
+        "no fossils"
+      ],
+      "scope": "Butterflies",
+      "evidence": "Search result listed storageSize 4481421356 bytes (4.5 GB; not downloaded).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "phylogenetic regionalization global biogeographic regions phylogenetic turnover",
+      "url": "https://datadryad.org/api/v2/search?q=phylogenetic%20regionalization%20global%20biogeographic%20regions%20phylogenetic%20turnover",
+      "hits": 11,
+      "note": "evoregions (Muroidea), butterfly regionalization and others"
+    },
+    {
+      "source": "DataCite",
+      "query": "phylogenetic regionalization biogeographic realms beta diversity tetrapods (dataset type)",
+      "url": "https://api.datacite.org/dois?query=phylogenetic+regionalization+biogeographic+realms+beta+diversity+tetrapods&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 1,
+      "note": "butterfly regionalization"
+    },
+    {
+      "source": "PBDB",
+      "query": "Mammalia occurrences",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mammalia&limit=1&rowcount",
+      "hits": 128307,
+      "note": null
+    },
+    {
+      "source": "GBIF",
+      "query": "occurrence count",
+      "url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "hits": 3887469368,
+      "note": null
+    },
+    {
+      "source": "Open Tree of Life",
+      "query": "tree_of_life/about",
+      "url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "hits": null,
+      "note": "num_tips 2385875"
+    }
+  ],
+  "status": "partial",
+  "summary": "Living occurrences (GBIF), fossil occurrences (PBDB), a species-level synthetic tree (Open Tree) and sequence archives are all open, and two Dryad deposits map phylogenetic turnover across regions for single clades (Muroidea, butterflies); no resource joins living and fossil regional assemblages to an independent molecular tree with environmental covariates.",
+  "next_step": "Restrict to one clade with a molecular tree and fossil record (e.g. a mammal order), build regional species lists from GBIF and PBDB, and pre-register the partitioning of turnover into ancestry and environment.",
+  "obstacles_confirmed": [
+    "A tree built from the same traits that display the affinity would make the inheritance test circular.",
+    "Fossil and living taxonomies are unevenly linked.",
+    "Joint phylogenetic and geographic coverage is partial for the full living and fossil scope."
+  ]
+}

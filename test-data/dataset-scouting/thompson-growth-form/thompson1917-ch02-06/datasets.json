@@ -1,0 +1,99 @@
+{
+  "claim_id": "thompson1917-ch02-06",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "body mass per bird species",
+    "wing area (or wing length and chord/wing loading) per species, for a linear-size measure",
+    "minimum sustained or characteristic flight speed per species (field-measured)",
+    "flight (pectoral) muscle mass per species, as the muscle-power proxy",
+    "measured mechanical or metabolic flight power per species (optional)"
+  ],
+  "datasets": [
+    {
+      "id": "avonet-figshare-16586228-v7",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022), figshare v7",
+      "landing_url": "https://opentraits.org/datasets/avonet.html",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:21:00Z", "method": "HEAD opentraits landing (200); GET figshare API article 16586228 (200, JSON with files)", "http_status": 200, "bytes": 21524673 },
+      "variables_present": [
+        "eleven continuous morphological traits per species (description), which include body mass and external wing linear measures; raw measurements from 90,020 individuals of 11,009 extant species plus species averages",
+        "coverage: all extant bird species in Supplementary dataset 1.xlsx"
+      ],
+      "variables_missing": ["wing area / wing loading (external skin measures only; column names not read)", "flight speed", "flight muscle mass", "flight power"],
+      "scope": "11,009 extant bird species; external museum-skin morphology only",
+      "evidence": "figshare API: title 'AVONET: morphological, ecological and geographical data for all birds', doi 10.6084/m9.figshare.16586228.v7, license CC BY 4.0, description 'six ecological variables, eleven continuous morphological traits ... 90020 individuals of 11009 extant bird species', files AVONET Supplementary dataset 1.xlsx (21524673 bytes), Supplementary dataset 2.xlsx (1241301), ELEData.zip (17758930), ELECode.zip (38817). Column names not read (xlsx > 1 MB).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-figshare-16586228-v7"
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank animal tracking database",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": "https://www.movebank.org/movebank/service/direct-read?entity_type=study",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:22:00Z", "method": "HEAD landing_url (302 -> 200); GET direct-read?entity_type=study with and without i_have_download_access (both 401 Unauthorized); GET service/public/json?entity_type=study (no response, 000)", "http_status": 401, "bytes": 687 },
+      "variables_present": ["GPS tracks from which ground speed per individual can be derived (per the two Movebank Data Repository DOIs surfaced by DataCite: 10.5441/001/1.37r2b884/1 'Vultures Acopian Center USA 2003-2016')"],
+      "variables_missing": ["airspeed and minimum flight speed are not stored as such; need wind correction", "no morphology", "study listing requires a Movebank login (401)"],
+      "scope": "Thousands of studies, mostly large birds carrying tags; access per study, many restricted",
+      "evidence": "REST study listing returned HTTP 401 'Unauthorized' without credentials; Movebank Data Repository DOIs (10.5441/001/...) exist for individual open studies.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-sternum-variation-locomotion-birds",
+      "name": "The relationship between sternum variation and mode of locomotion in birds (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.x3ffbg7jj",
+      "access_url": null,
+      "doi": "10.5061/dryad.x3ffbg7jj",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:27:00Z", "method": "Dryad search API hit (200); dataset record itself not fetched", "http_status": 200, "bytes": null },
+      "variables_present": ["sternum (keel) morphology across bird species, a skeletal correlate of flight-muscle size (title only)"],
+      "variables_missing": ["flight muscle mass itself", "wing area", "flight speed"],
+      "scope": "Comparative bird sample; size not confirmed",
+      "evidence": "Dryad search 'flight muscle birds flightlessness' total 1: doi:10.5061/dryad.x3ffbg7jj. Companion DataCite hit: 10.5061/dryad.jsxksn0ng 'Enlargement of sternum traits facilitated the evolution of powered flight in birds'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-giant-petrels-wing-loading-flight-energetics",
+      "name": "Data from: Wind, waves, wing loading and the flight energetics of giant petrels (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.pk0p2nh48",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.pk0p2nh48/download",
+      "doi": "10.5061/dryad.pk0p2nh48",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:28:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 289336 },
+      "variables_present": ["hourly GPS positions and flapping rates for 36 northern and 42 southern giant petrels with wind speed and swell height (per abstract); wing loading in title"],
+      "variables_missing": ["only two species of one genus", "no muscle mass or power measurement", "speed must be derived from hourly fixes"],
+      "scope": "Macronectes halli and M. giganteus, Bird Island, South Georgia, 2022-2023",
+      "evidence": "Dryad API: publicationDate 2026-04-16, license CC0-1.0, storageSize 289336; abstract as summarised.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "figshare API", "query": "article 16586228 (AVONET)", "url": "https://api.figshare.com/v2/articles/16586228", "hits": 1, "note": "4 files, CC BY 4.0" },
+    { "source": "DataCite", "query": "bird flight speed wing loading species (dataset)", "url": "https://api.datacite.org/dois?query=bird%20flight%20speed%20wing%20loading%20species&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 5, "note": "giant petrels (10.5061/dryad.pk0p2nh48); Movebank vultures (10.5441/001/1.37r2b884/1, /2)" },
+    { "source": "DataCite", "query": "\"flight muscle\" birds species mass (dataset)", "url": "https://api.datacite.org/dois?query=%22flight%20muscle%22%20birds%20species%20mass&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 5, "note": "sternum evolution (10.5061/dryad.jsxksn0ng); blackpoll warbler muscle physiology (10.5061/dryad.s4mw6m9hc, 10.5061/dryad.xd2547dh9); no multi-species muscle-mass table" },
+    { "source": "DataCite", "query": "flight speeds among bird species allometric phylogenetic", "url": "https://api.datacite.org/dois?query=flight%20speeds%20among%20bird%20species%20allometric%20phylogenetic&page%5Bsize%5D=6", "hits": 0, "note": "Alerstam et al. 2007 (138 species radar speeds) is not in DataCite as a dataset" },
+    { "source": "Dryad", "query": "bird flight muscle mass wing area species", "url": "https://datadryad.org/api/v2/search?q=bird%20flight%20muscle%20mass%20wing%20area%20species&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "flight muscle birds flightlessness", "url": "https://datadryad.org/api/v2/search?q=flight%20muscle%20birds%20flightlessness&per_page=8", "hits": 1, "note": "10.5061/dryad.x3ffbg7jj sternum variation" },
+    { "source": "Zenodo", "query": "bird flight speed tracking radar species wing loading (dataset)", "url": "https://zenodo.org/api/records?q=bird%20flight%20speed%20tracking%20radar%20species%20wing%20loading&type=dataset&size=8", "hits": 88372, "note": "fuzzy; radar hits are aggregate migration density/speed profiles (10.5281/zenodo.4587338, 10.5281/zenodo.3405904), not per-species; 10.5061/dryad.8ch1b hummingbird CFD simulation" }
+  ],
+  "status": "partial",
+  "summary": "AVONET (figshare 16586228 v7, CC BY 4.0) gives body mass and wing linear measures for every bird species but no wing area, flight speed or muscle mass. Per-species flight speeds exist only in paper supplements (Alerstam et al. 2007 was not found as a repository dataset), Movebank tracks require a login to list, and flight-muscle mass is scattered across single-species deposits; the closest comparative proxy found is a sternum-morphology dataset (10.5061/dryad.x3ffbg7jj).",
+  "next_step": "Compile a species table joining AVONET mass and wing measures with Alerstam 2007 radar speeds and a flight-muscle-mass compilation (e.g. from Wright et al. 2016 or Greenewalt 1962), then pre-register the exponent tests (speed ~ L^0.5, required power ~ L^3.5, muscle ~ L^3).",
+  "obstacles_confirmed": [
+    "Flight power and muscle power are seldom directly measured in open comparative datasets: no multi-species flight-muscle or power table surfaced.",
+    "External morphology does not contain muscle mass or measured flight power: AVONET confirms this.",
+    "Movebank requires authentication even to list studies (HTTP 401)."
+  ]
+}

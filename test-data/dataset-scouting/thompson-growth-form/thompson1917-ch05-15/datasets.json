@@ -1,0 +1,120 @@
+{
+  "claim_id": "thompson1917-ch05-15",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:44:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "cell shape class (rod, coccus, spiral, filament, ...) per species or strain for bacteria, protozoa and other minute cells",
+    "cell size (length, width or volume) per species, to define the 'minute' range",
+    "a comparable shape-class inventory for larger organisms or cells, as the contrast group",
+    "physical conditions under which the shape was recorded (temperature, medium, osmolarity) for within-taxon variation"
+  ],
+  "datasets": [
+    {
+      "id": "bacdive",
+      "name": "BacDive: the Bacterial Diversity Metadatabase (DSMZ)",
+      "landing_url": "https://bacdive.dsmz.de/",
+      "access_url": "https://api.bacdive.dsmz.de/fetch/1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:34:00Z", "method": "HEAD landing_url (200); GET api.bacdive.dsmz.de/fetch/1, /fetch/100, /fetch/1000 (200, JSON strain records); GET /fetch/1,2,3 (404); GET advsearch Cell shape contains rod (200, HTML, count not parsed)", "http_status": 200, "bytes": 3230 },
+      "variables_present": [
+        "strain records with a 'Morphology' section alongside 'Culture and growth conditions' and 'Physiology and metabolism' (sections seen in the JSON for BacDive-ID 1)",
+        "growth conditions (temperature, medium) per strain, i.e. the physical-condition variable"
+      ],
+      "variables_missing": [
+        "a 'cell morphology'/'cell shape' entry was empty in the three strains fetched (IDs 1, 100, 1000), so coverage of shape could not be confirmed from the API",
+        "protozoa and other eukaryotic minute cells (bacteria and archaea only)"
+      ],
+      "scope": "Bacterial and archaeal strains (count not read); advanced search by 'Cell shape' field exists on the website but the hit count was not parsed",
+      "evidence": "fetch/1 JSON sections: General, Name and taxonomic classification, Morphology, Culture and growth conditions, Physiology and metabolism, Isolation..., Sequence information, Genome-based predictions; Morphology was {} for ID 1 and 100 and only a photo link for ID 1000 (Bacillus subtilis FR1-49con).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "algaebase",
+      "name": "AlgaeBase",
+      "landing_url": "https://www.algaebase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:35:00Z", "method": "GET landing_url (200); API not queried (another scout recorded api.algaebase.org v1.3 returning 401 Authorization Required earlier this session)", "http_status": 200, "bytes": null },
+      "variables_present": ["taxonomic names and images of microalgae (website)"],
+      "variables_missing": ["no structured cell-shape or size field confirmed", "API requires a key"],
+      "scope": "Algal taxonomy; a second sample of minute-cell outlines only via unstructured images",
+      "evidence": "HTTP 200 on landing page; no record content retrieved.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:35:00Z", "method": "HEAD landing_url (200, earlier this session); search endpoints /images/search, /api/search, /pages/search returned 404 and /images?k= returned an empty body", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["no queryable listing obtained; shape/size annotations cannot be confirmed"],
+      "scope": "Curated reference images; no API found",
+      "evidence": "Landing 200; four search attempts 404/empty.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/all/searchvalues/?value=Escherichia%20coli",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:36:00Z", "method": "GET searchengine searchvalues value=Escherichia coli (200)", "http_status": 200, "bytes": null },
+      "variables_present": ["projects with Organism = escherichia coli; yeast screens (14 screens, see thompson1917-ch05-07 record); perturbation screens where cell outline can be segmented"],
+      "variables_missing": ["no cross-taxon shape inventory", "protozoa absent (0 Dictyostelium projects found earlier)", "physical-condition series (temperature, osmolarity) not annotated as such"],
+      "scope": "Model organisms (mammalian cells, yeast, E. coli, Drosophila, Arabidopsis); not a morphospace survey",
+      "evidence": "searchvalues JSON: project key Organism value 'escherichia coli'; image key Gene Description hits.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "madin-bacterial-archaeal-trait-synthesis",
+      "name": "A synthesis of bacterial and archaeal phenotypic trait data (Madin et al., figshare collection v3, v1.2.0 files)",
+      "landing_url": "https://figshare.com/collections/A_synthesis_of_bacterial_and_archaeal_phenotypic_trait_data/4843290/3",
+      "access_url": "https://api.figshare.com/v2/collections/4843290/articles?page_size=20",
+      "doi": "10.6084/m9.figshare.c.4843290.v3",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:42:00Z", "method": "DataCite query (8 hits) then GET figshare API collection 4843290 and its articles list", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "14 phenotypic traits, 5 quantitative genomic traits and 4 environmental characteristics for ~170,000 strain-level and ~15,000 species-aggregated records of bacteria and archaea, merged from 26 sources (collection description)",
+        "files: condensed_traits_NCBI v1.2.0 (figshare 13557827), condensed_traits_GTDB (13557818), condensed_species_NCBI (13557821), condensed_species_GTDB (13557824), references (13557812)"
+      ],
+      "variables_missing": ["the trait list (whether cell shape and cell dimensions are among the 14) was not read from the response", "no protozoa or other eukaryotes", "shape under varying physical conditions not included by design (one value per record)"],
+      "scope": "Bacteria and archaea, species-aggregated and strain-level; published 2021-01-12",
+      "evidence": "figshare API collection: title as given, doi 10.6084/m9.figshare.c.4843290.v3, published_date 2021-01-12, description quoted above; 5 articles listed with ids and DOIs.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BacDive API", "query": "fetch/1, fetch/100, fetch/1000", "url": "https://api.bacdive.dsmz.de/fetch/1", "hits": 3, "note": "records returned without authentication; Morphology section empty or photo-only in these three" },
+    { "source": "BioStudies (bioimages collection)", "query": "bacterial cell shape morphology osmotic temperature protist", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=bacterial%20cell%20shape%20morphology%20osmotic%20temperature%20protist&collection=bioimages&pageSize=8", "hits": 1407, "note": "fuzzy; S-BIAD2916 SEM of P. aeruginosa under predation, S-BIAD4000 Hydrurus alga morphology, S-BIAD2407 diatom EM; no shape survey" },
+    { "source": "IDR search engine", "query": "searchvalues value=Escherichia coli", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/all/searchvalues/?value=Escherichia%20coli", "hits": null, "note": "E. coli projects present" },
+    { "source": "Zenodo", "query": "title:(bacterial cell shape) OR title:(cell morphology database bacteria) (dataset)", "url": "https://zenodo.org/api/records?q=title%3A%28bacterial%20cell%20shape%29%20OR%20title%3A%28cell%20morphology%20database%20bacteria%29&type=dataset&size=8", "hits": 15465, "note": "fuzzy; nothing but 10.5281/zenodo.10782118 'Cell shape analysis' (unspecified) and a T6SS toxin morphology deposit" },
+    { "source": "DataCite", "query": "bacterial cell shape size database species (dataset)", "url": "https://api.datacite.org/dois?query=bacterial%20cell%20shape%20size%20database%20species&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 3, "note": "GBIF species-description records only" },
+    { "source": "DataCite", "query": "synthesis bacterial archaeal phenotypic trait data", "url": "https://api.datacite.org/dois?query=synthesis%20bacterial%20archaeal%20phenotypic%20trait%20data&page%5Bsize%5D=6", "hits": 8, "note": "figshare collection 10.6084/m9.figshare.c.4843290 (v1-v3) and its Scientific Data metadata record 10.6084/m9.figshare.12221732" },
+    { "source": "figshare API", "query": "collection 4843290 and its articles", "url": "https://api.figshare.com/v2/collections/4843290/articles?page_size=20", "hits": 5, "note": "condensed_traits / condensed_species NCBI and GTDB, references" }
+  ],
+  "status": "partial",
+  "summary": "For bacteria and archaea, structured shape and growth-condition records exist: BacDive strain records (API reachable, Morphology section present but empty in the three strains sampled) and the Madin et al. trait synthesis (14 phenotypic traits for ~170,000 strain and ~15,000 species records, figshare 10.6084/m9.figshare.c.4843290.v3), though whether cell shape is among its traits was not read. No comparable shape inventory was found for protozoa or other eukaryotic minute cells, and no dataset records the same organism's shape across physical conditions; AlgaeBase and the Cell Image Library expose no queryable structured data.",
+  "next_step": "Download condensed_traits_NCBI (figshare 13557827) to confirm cell-shape and cell-size columns and count the distinct shape classes; find or compile a protist shape/size table (e.g. from PR2 or a ciliate trait database) and define the macro-organism contrast group before pre-registering a morphospace-breadth test.",
+  "obstacles_confirmed": [
+    "Protozoa are poorly represented next to bacteria: every structured shape source found is prokaryotic.",
+    "Shape fields are coarse categories: BacDive/trait syntheses store shape as a class, so 'limited range' will depend on the coding scheme.",
+    "No dataset records shape of the same taxon under varying temperature or osmotic conditions."
+  ]
+}

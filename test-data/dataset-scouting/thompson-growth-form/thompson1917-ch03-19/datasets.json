@@ -1,0 +1,130 @@
+{
+  "claim_id": "thompson1917-ch03-19",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:22:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "size of several parts/organs measured repeatedly through ontogeny in the same species (organ growth trajectories)",
+    "whole-body size over the same ages (aggregate growth rate)",
+    "the same organ trajectories in a related species or genotype with different adult form",
+    "an adult shape or proportion measure for each species/genotype"
+  ],
+  "datasets": [
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection of DEB parameters",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/AmPdata/AmPdata.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:43:00Z", "method": "HEAD landing_url (200); HEAD AmPdata.zip (200, application/zip, 23302091 bytes); species pages for three mammals (200) - checked for thompson1917-ch03-11 in this session", "http_status": 200, "bytes": 23302091 },
+      "variables_present": ["whole-organism growth parameters per species (DEB model), bulk zip downloadable"],
+      "variables_missing": ["organ-specific growth rates (DEB abstracts the body into reserve/structure, not organs)", "field names not confirmed from the responses"],
+      "scope": "Thousands of animal species, whole-body level",
+      "evidence": "HEAD AmPdata.zip: content-type application/zip, content-length 23302091.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies bioimages collection)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=organ%20growth%20time-lapse%20development%20whole%20embryo%20light%20sheet%20morphometrics&collection=bioimages&pageSize=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:12:00Z", "method": "GET BioStudies search API, collection=bioimages", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "whole-organism developmental time-lapse from which organ sizes could be segmented: S-BIAD1474 chick embryo ex ovo time-lapse, S-BIAD1405 whole-organism zebrafish development imaging, S-BIAD2844 brain and ventricle volume by light sheet, S-BIAD499 zebrafish gastrulation light sheet"
+      ],
+      "variables_missing": ["no tabulated organ-growth rates", "single-species studies; no matched related-species series"],
+      "scope": "Query totalHits 1010 (fuzzy); relevant hits are chick and zebrafish",
+      "evidence": "Accessions returned: S-BIAD1474, S-BIAD499, S-BIAD326, S-BIAD2844, S-BIAD3530, S-BIAD1941, S-BIAD2201, S-BIAD1405.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bionumbers",
+      "name": "BioNumbers: the database of useful biological numbers",
+      "landing_url": "https://bionumbers.hms.harvard.edu/",
+      "access_url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&trm=organ+growth+rate",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T01:12:00Z", "method": "HEAD landing_url (302 -> 200); GET search 'organ growth rate' (200, 21932 bytes HTML)", "http_status": 200, "bytes": 21932 },
+      "variables_present": ["scattered single values: e.g. BNID 105789 'Organ Mass and Metabolic Rate in Humans' (table), growth-rate entries for plants and bacteria"],
+      "variables_missing": ["no organ growth trajectories or rates by age for any animal", "entries are isolated numbers, not series"],
+      "scope": "Curated numbers with references; result list for the query shows human organ mass table, SIV clearance, Rubus and Staphylococcus growth rates",
+      "evidence": "Result rows in the HTML: 'Organ Mass and Metabolic Rate in Humans ... 105789', 'Growth rate Plant Rubus spp. ~8 cm/day 113533', 'Growth rate Bacteria Staphylococcus aureus ...'.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "e-mouse-atlas-project",
+      "name": "e-Mouse Atlas Project (EMAP)",
+      "landing_url": "https://www.emouseatlas.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:12:00Z", "method": "GET landing_url, third attempt this session (15 s timeout) after two failures at 00:02Z and 00:04Z", "http_status": null, "note": "curl returned 000 (no response) on all three attempts" },
+      "variables_present": [],
+      "variables_missing": ["could not be checked"],
+      "scope": "Mouse only",
+      "evidence": "No HTTP response received.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-trilobite-axial-growth-gradients",
+      "name": "Data from: Axial growth gradients across the postprotaspid ontogeny of the Silurian trilobite Aulacopleura koninckii (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.6069g",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.6069g/download",
+      "doi": "10.5061/dryad.6069g",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:18:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 244233 },
+      "variables_present": ["segment-by-segment (cephalon and trunk) growth measurements across meraspid and holaspid ontogeny of one trilobite species: part-specific growth rates and the resulting axial growth gradients (per abstract)"],
+      "variables_missing": ["one fossil species; no related-species contrast", "no soft organs"],
+      "scope": "Aulacopleura koninckii, ~429 Ma; 244 KB; primary article doi 10.1017/pab.2016.5",
+      "evidence": "Dryad API: publicationDate 2017-01-04, license CC0-1.0, storageSize 244233; abstract: 'axial growth gradient in the cephalon in the meraspid period, flatter and opposite in direction to that of the trunk'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "impc-organ-weights",
+      "name": "International Mouse Phenotyping Consortium (IMPC) organ weight parameters",
+      "landing_url": "https://www.mousephenotype.org/",
+      "access_url": "https://www.ebi.ac.uk/mi/impc/solr/genotype-phenotype/select?q=parameter_name:%22Heart%20weight%22&rows=0&wt=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:19:00Z", "method": "GET IMPC Solr genotype-phenotype (200, numFound 505 for 'Heart weight'); GET Solr pipeline parameter facet *weight* (200, numFound 1730; parameters include Body weight, Body weight curve, Spleen weight, Heart weight)", "http_status": 200, "bytes": null },
+      "variables_present": ["terminal organ weights (heart, spleen) and body-weight curves across thousands of knockout mouse lines: a genotype-level test of whether altering a part's growth changes form"],
+      "variables_missing": ["single adult time point for organs (no organ trajectories)", "one species", "shape measures limited"],
+      "scope": "Mus musculus knockout lines; 505 significant genotype-phenotype associations for Heart weight",
+      "evidence": "Solr JSON numFound 505 (genotype-phenotype, Heart weight); pipeline facet parameter_name: 'Body weight' 181, 'Spleen weight' 49, 'Body weight curve' 30, 'Heart weight' 24.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioStudies (bioimages collection)", "query": "organ growth time-lapse development whole embryo light sheet morphometrics", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=organ%20growth%20time-lapse%20development%20whole%20embryo%20light%20sheet%20morphometrics&collection=bioimages&pageSize=8", "hits": 1010, "note": "chick and zebrafish whole-organism time-lapse" },
+    { "source": "BioNumbers", "query": "organ growth rate", "url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&trm=organ+growth+rate", "hits": null, "note": "isolated numbers only" },
+    { "source": "Dryad", "query": "organ growth allometry ontogeny species relative growth rate", "url": "https://datadryad.org/api/v2/search?q=organ%20growth%20allometry%20ontogeny%20species%20relative%20growth%20rate&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "organ growth allometry ontogeny", "url": "https://datadryad.org/api/v2/search?q=organ%20growth%20allometry%20ontogeny&per_page=8", "hits": 2, "note": "plant biomass allocation (10.5061/dryad.ksn02v72k); pig craniofacial postnatal growth, two breeds (10.5061/dryad.tdz08kqb1)" },
+    { "source": "Dryad", "query": "wing disc growth rate Drosophila species allometry", "url": "https://datadryad.org/api/v2/search?q=wing%20disc%20growth%20rate%20Drosophila%20species%20allometry&per_page=6", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "organ mass ontogeny allometry growth species (dataset)", "url": "https://api.datacite.org/dois?query=organ%20mass%20ontogeny%20allometry%20growth%20species&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 1, "note": "plant biomass allocation only" },
+    { "source": "Zenodo", "query": "title:(organ growth) AND (allometry OR ontogeny OR development) (dataset)", "url": "https://zenodo.org/api/records?q=title%3A%28organ%20growth%29%20AND%20%28allometry%20OR%20ontogeny%20OR%20development%29&type=dataset&size=8", "hits": 550, "note": "fuzzy; relevant: trilobite axial growth gradients (10.5061/dryad.6069g), red deer growth data (10.5281/zenodo.7896000), metabolic scaling/growth data for animals (10.5281/zenodo.6782436), Lepidoptera larval growth (10.5061/dryad.p2ngf1vmz)" },
+    { "source": "IMPC Solr", "query": "parameter_name:\"Heart weight\" (genotype-phenotype) and parameter facet *weight* (pipeline)", "url": "https://www.ebi.ac.uk/mi/impc/solr/genotype-phenotype/select?q=parameter_name:%22Heart%20weight%22&rows=0&wt=json", "hits": 505, "note": "organ weights at necropsy plus body-weight curves" }
+  ],
+  "status": "partial",
+  "summary": "Organ-specific growth trajectories are published piecemeal, as the assessors expected: the only repository deposit found that measures part-by-part growth through ontogeny is a single trilobite species (Dryad 10.5061/dryad.6069g, CC0), and the pig craniofacial dataset (10.5061/dryad.tdz08kqb1) compares two breeds postnatally. IMPC gives adult organ weights and body-weight curves across thousands of mouse genotypes, BIA holds chick/zebrafish whole-organism time-lapse from which organ sizes could be segmented, Add-my-Pet is whole-body only, BioNumbers has isolated values, and the e-Mouse Atlas was unreachable.",
+  "next_step": "Define the test on a tractable system with existing series (pig breeds 10.5061/dryad.tdz08kqb1 for cranial parts; IMPC organ weights vs body weight across genotypes), or compile organ-mass-by-age tables for two related mammals from the literature; then pre-register how much adult shape difference the local-rate differences predict.",
+  "obstacles_confirmed": [
+    "Organ-specific growth rates are published piecemeal: no multi-species organ-trajectory dataset in Dryad, DataCite or Zenodo.",
+    "Comparable trajectories across taxa are sparse: the one ontogenetic part-growth deposit found is a single fossil species.",
+    "e-Mouse Atlas unreachable in three attempts."
+  ]
+}

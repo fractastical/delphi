@@ -1,0 +1,114 @@
+{
+  "claim_id": "thompson1917-ch04-07",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:28:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "3D positions of chromosomes or kinetochores over time from nuclear-envelope breakdown through metaphase",
+    "positions of the two spindle poles (centrosomes) in the same frames, to define the bipolar field axis and equatorial plane",
+    "chromosome positions under perturbation of microtubule attachment or motors (e.g. nocodazole, kinesin inhibition)",
+    "magnetic susceptibility of mitotic chromatin, or chromosome response to an applied magnetic gradient (for the literal reading)"
+  ],
+  "datasets": [
+    {
+      "id": "zenodo-5551168-kinetochore-life-histories",
+      "name": "Kinetochore life histories reveal an Aurora B dependent error correction mechanism in anaphase (RPE1 kinetochore tracking dataset)",
+      "landing_url": "https://zenodo.org/records/5551168",
+      "access_url": "https://zenodo.org/api/records/5551168",
+      "doi": "10.5281/zenodo.5551168",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:24:00Z", "method": "GET Zenodo record JSON", "http_status": 200 },
+      "variables_present": [
+        "3D kinetochore tracks (Ndc80-eGFP) in human RPE1 cells from prometaphase through anaphase; 93 z-planes at 307 nm, 4.7 s per stack",
+        "perturbations: nocodazole arrest-and-release vs DMSO, and Aurora B inhibition (ZM), indicated in folder names",
+        "one zip, KinetochoreLifeHistoriesTrackingDataset.zip, 159,278,704 bytes"
+      ],
+      "variables_missing": [
+        "spindle-pole coordinates are not mentioned in the metadata (may be derivable from the sister-kinetochore axis)",
+        "no magnetic susceptibility or applied-field variable"
+      ],
+      "scope": "One human cell line; kinetochores rather than whole chromatin",
+      "evidence": "metadata.description: 'Dataset of kinetochore tracks in human RPE1 cells showing chromosome dynamics and segregation from prometaphase through to anaphase ... 3D time-lapse movies of Ndc80-eGFP ... 93 z-planes, 307 nm z-step ... 4.7 s/z-stack'; files: 1, 159278704 bytes; license cc-by-4.0",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR): idr0013 MitoCheck, idr0041 mitotic protein atlas, idr0045 zygote dual spindle",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/screens/?limit=100",
+      "doi": "10.17867/10000112",
+      "license": "CC0 1.0 (idr0013); CC BY 4.0 (idr0041, idr0045)",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:20:00Z", "method": "GET OMERO JSON API screens (105 total) and projects; GET webclient map annotations for screen 1101 and projects 404, 405; GET screens/1101/plates count", "http_status": 200 },
+      "variables_present": [
+        "idr0013-neumann-mitocheck screenA: genome-wide time-lapse RNAi screen of human cell division (H2B-GFP chromatin), 510 plates, CC0 1.0; publication 10.1038/nature08869",
+        "idr0041-cai-mitoticatlas: 4D confocal + FCS protein atlas of human cell division, CC BY 4.0, Data DOI 10.17867/10000112, publication 10.1038/s41586-018-0518-z",
+        "idr0045-reichmann-zygotespindle: light-sheet imaging of mouse zygote dual-spindle formation, CC BY 4.0, publication 10.1126/science.aar7462"
+      ],
+      "variables_missing": [
+        "MitoCheck is 2D wide-field at low magnification, so pole positions and 3D chromosome trajectories are coarse; phenotype calls rather than tracks are the deposited annotations",
+        "no magnetic-field variable"
+      ],
+      "scope": "Human cultured cells (HeLa) and mouse zygotes",
+      "evidence": "screens totalCount 105; map annotations list Organism, Imaging Method, Publication Title, License as quoted; plates totalCount 510 for screen 1101",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=chromosome%20congression%20live%20imaging%20metaphase",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:21:00Z", "method": "HEAD landing_url (200, 23:32); GET BioImages search 'chromosome congression live imaging metaphase' (1335 hits)", "http_status": 200 },
+      "variables_present": [
+        "live mitosis studies: S-BIAD1946 Kif11-haploinsufficient oocytes and chromosome biorientation (68 files), S-BIAD2417 Aurora B substrate geometry (6 files), S-JCBD-200904153 kinetochore flux (8 files), S-BIAD2325 human preimplantation embryo mitotic errors (9 files)"
+      ],
+      "variables_missing": [
+        "no deposited coordinate tracks; movies would need segmentation",
+        "several top hits are EMPIAR cryo-EM of nucleosomes from metaphase chromosomes (EMPIAR-10691/10743/10745/10746), not trajectories"
+      ],
+      "scope": "Archive-wide; mouse oocytes, human cells, human embryos",
+      "evidence": "totalHits 1335; accession list and file counts from hits array",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL, UCSD)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=metaphase",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:25:00Z", "method": "GET /images?k=metaphase (200 HTML, 0 image links parseable); earlier in session JSON endpoints 404 and REST host cilia.crbs.ucsd.edu timed out", "http_status": 200, "note": "portal responds but its search is script-rendered and the REST API did not answer, so holdings were not verified" },
+      "variables_present": [],
+      "variables_missing": [
+        "still images only by design (per grok's own role); no trajectories, no pole positions"
+      ],
+      "scope": "Not verifiable in this session",
+      "evidence": "200 on search page, 0 matches for 'images/[0-9]'",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "IDR OMERO API", "query": "screens and projects named mitosis/mitotic/chromosome/spindle/kinetochore", "url": "https://idr.openmicroscopy.org/api/v0/m/screens/?limit=100", "hits": 5, "note": "idr0013 screenA/B, idr0061 spindle positioning, idr0041 mitotic atlas, idr0045 zygote spindle" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "chromosome congression live imaging metaphase", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=chromosome%20congression%20live%20imaging%20metaphase&pageSize=10", "hits": 1335, "note": "mix of EMPIAR nucleosome cryo-EM and live mitosis movie studies" },
+    { "source": "Zenodo", "query": "kinetochore tracking trajectories mitosis live, type=dataset", "url": "https://zenodo.org/api/records?q=kinetochore%20tracking%20trajectories%20mitosis%20live&type=dataset&size=10", "hits": 15913, "note": "5551168 kinetochore life histories (tracks) is directly relevant; 7378236 augmin/kinetochore fibers and 805869 TRACMIT also mitosis" },
+    { "source": "Zenodo", "query": "\"magnetic susceptibility\" chromatin OR chromosome, type=dataset", "url": "https://zenodo.org/api/records?q=%22magnetic%20susceptibility%22%20chromatin%20OR%20chromosome&type=dataset&size=5", "hits": 3500, "note": "loose OR matching; no dataset on magnetic susceptibility of mitotic chromatin in the top 5" },
+    { "source": "Dryad", "query": "chromosome congression kinetochore tracking", "url": "https://datadryad.org/api/v2/search?q=chromosome%20congression%20kinetochore%20tracking", "hits": 0, "note": "" },
+    { "source": "Cell Image Library", "query": "k=metaphase", "url": "https://www.cellimagelibrary.org/images?k=metaphase", "hits": null, "note": "HTML not parseable; API unreachable" }
+  ],
+  "status": "data-ready",
+  "summary": "The geometric half of the claim (chromatin moving from the poles to a peripheral ring on the equatorial plane, and what happens when microtubule attachment is perturbed) is testable from Zenodo 5551168, a CC BY 4.0 set of 3D kinetochore tracks in human RPE1 cells from prometaphase to anaphase with nocodazole and Aurora-B-inhibitor conditions, backed by IDR MitoCheck movies (CC0) and the idr0041 mitotic atlas; no archive holds magnetic susceptibility of mitotic chromatin or chromosome motion in an applied field, so the literal diamagnetic reading has no data.",
+  "next_step": "Pre-register, on the 5551168 tracks, the radial and axial position of kinetochores relative to the inferred spindle axis over time and the equatorial-ring geometry at metaphase, and compare untreated with nocodazole-release conditions; treat the diamagnetic mechanism as the analogy Thompson states it to be.",
+  "obstacles_confirmed": [
+    "Magnetic susceptibility of chromatin during mitosis is not an archived variable.",
+    "Equatorial congress is also the prediction of microtubule attachment and congression."
+  ]
+}

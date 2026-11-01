@@ -1,0 +1,301 @@
+{
+  "claim_id": "darwin1859-ch04-20",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:02:19Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "total community biomass, abundance or productivity per plot or site",
+    "functional or structural (trait) diversity per plot or site",
+    "species richness and environmental covariates for the same plots"
+  ],
+  "datasets": [
+    {
+      "id": "cedar-creek-e120-aboveground-biomass",
+      "name": "Cedar Creek Biodiversity II (E120): plant aboveground biomass data (EDI)",
+      "landing_url": "https://portal.edirepository.org/nis/mapbrowse?packageid=knb-lter-cdr.273.12",
+      "access_url": null,
+      "doi": "10.6073/pasta/87b179ac496a0343e6860b19f33158fc",
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET api.datacite.org/dois/10.6073/pasta/87b179ac496a0343e6860b19f33158fc; GET https://cedarcreek.umn.edu/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plot aboveground plant biomass",
+        "experimentally manipulated plant species number"
+      ],
+      "variables_missing": [
+        "functional/structural trait diversity metric (would need a trait join, e.g. TRY)"
+      ],
+      "scope": "Cedar Creek LTER grassland, Minnesota; experiment manipulating number and kinds of plant species",
+      "evidence": "DataCite record (HTTP 200) titled 'Plant aboveground biomass data: Biodiversity II: Effects of Plant Biodiversity on Population and Ecosystem Processes', url knb-lter-cdr.273.12; description: designed to determine how the number of plant species affects ecological processes by manipulating the number and kinds of species. I did not open the EDI data table (PASTA API returned 403 to public access).",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-functional-phylogenetic-diversity-biomass",
+      "name": "Data from: Functional and phylogenetic diversity explain different components of diversity effects on biomass production (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.8w9ghx3j1",
+      "access_url": null,
+      "doi": "10.5061/dryad.8w9ghx3j1",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET datadryad.org/api/v2/datasets/doi:10.5061/dryad.8w9ghx3j1",
+        "http_status": 200,
+        "bytes": 75563
+      },
+      "variables_present": [
+        "plot biomass production",
+        "functional dispersion/functional diversity of traits (abstract mentions FDis of height)",
+        "phylogenetic diversity treatment"
+      ],
+      "variables_missing": [
+        "wild/natural communities; animal communities"
+      ],
+      "scope": "Two plant biodiversity experiments (one synthetic-assembled, one semi-natural functional-group removal)",
+      "evidence": "Dryad API 200; storageSize 75563 bytes; license CC0-1.0; published 2020-04-24; abstract: net biodiversity effect of biomass production partitioned; functional dispersion of height named as a predictor.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-16-grassland-biodiversity-studies-reexamination",
+      "name": "Data from: Species richness, but not phylogenetic diversity, influences community biomass production... re-examination of 16 grassland biodiversity studies (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.s2h01",
+      "access_url": null,
+      "doi": "10.5061/dryad.s2h01",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET datadryad.org/api/v2/datasets/doi:10.5061/dryad.s2h01",
+        "http_status": 200,
+        "bytes": 174979
+      },
+      "variables_present": [
+        "community biomass production",
+        "species richness",
+        "phylogenetic diversity"
+      ],
+      "variables_missing": [
+        "trait-based functional diversity"
+      ],
+      "scope": "16 grassland biodiversity experiments",
+      "evidence": "Dryad API 200; storageSize 174979 bytes; license CC0-1.0; abstract reports re-examination of 16 grassland experiments for richness and phylogenetic diversity effects on biomass.",
+      "verdict": "partial"
+    },
+    {
+      "id": "jena-experiment-pangaea",
+      "name": "Jena Experiment datasets on PANGAEA (aboveground community and species-specific plant biomass)",
+      "landing_url": "https://www.pangaea.de/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET www.pangaea.de/advanced/search.php?q=Jena+Experiment+aboveground+biomass",
+        "http_status": 200
+      },
+      "variables_present": [
+        "aboveground community plant biomass per plot",
+        "sown species richness (experiment design)",
+        "species-specific biomass"
+      ],
+      "variables_missing": [
+        "animal community biomass; direct functional-trait-diversity table (28 'Jena Experiment plant functional traits species richness' hits not individually inspected)"
+      ],
+      "scope": "Jena Experiment grassland plots, several experiment/year records (main experiment 2002, dominance experiment 2006/2008 etc.)",
+      "evidence": "PANGAEA search returned 161 hits for 'Jena Experiment aboveground biomass'; top hits include doi:10.1594/PANGAEA.846320 'Aboveground community and species-specific plant biomass from the Jena Experiment (Main Experiment, year 2002)', .845450 (Dominance Experiment 2006), .846672 (2008).",
+      "verdict": "holds"
+    },
+    {
+      "id": "biotime-zenodo",
+      "name": "BioTIME (Zenodo 1211105; St Andrews portal)",
+      "landing_url": "https://biotime.st-andrews.ac.uk/",
+      "access_url": "https://zenodo.org/api/records/1211105",
+      "doi": "10.5281/zenodo.1211105",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET zenodo.org/api/records/1211105 file list; GET biotime.st-andrews.ac.uk",
+        "http_status": 200
+      },
+      "variables_present": [
+        "community abundance/biomass time-series records (BioTIMEQuery file) with metadata file"
+      ],
+      "variables_missing": [
+        "functional or structural diversity metric",
+        "productivity",
+        "environment covariates"
+      ],
+      "scope": "Global time series from many taxa and realms; query CSV 1.22 GB (not downloaded)",
+      "evidence": "Zenodo record lists BioTIMEQuery02_04_2018.csv (1,220,083,337 bytes), BioTIMEMetadata_02_04_2018.csv (988,966 bytes), SQL dump; license CC BY 4.0 (DataCite record 10.5281/zenodo.1211105).",
+      "verdict": "partial"
+    },
+    {
+      "id": "splotopen",
+      "name": "sPlotOpen (iDiv dataset 3474; Sabatini et al. 2021 GEB)",
+      "landing_url": "https://idata.idiv.de/ddm/Data/ShowData/3474",
+      "access_url": null,
+      "doi": "10.1111/geb.13346",
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET idata.idiv.de/ddm/Data/ShowData/3474; GET api.crossref.org/works/10.1111/geb.13346 (the doi.org link returned 403 to curl)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "vegetation plot species composition/cover",
+        "plot locations"
+      ],
+      "variables_missing": [
+        "measured plant biomass/productivity",
+        "directly measured structural diversity (needs TRY join)"
+      ],
+      "scope": "Global open-access vegetation plot database; iDiv version 2.0",
+      "evidence": "iDiv page 200 shows dataset 3474 'sPlotOpen', version 2.0, uploaded 07.03.2023; Crossref 200 confirms the paper (GEB 2021, CC BY on accepted manuscript). Contents of the data files not opened.",
+      "verdict": "partial"
+    },
+    {
+      "id": "nutnet-subset-zenodo",
+      "name": "Nutrient Network (NutNet) coordinated grassland experiment; EDI/Zenodo derived data",
+      "landing_url": "https://nutnet.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET nutnet.org; DataCite search 'Nutrient Network NutNet biomass' (40 hits)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plot biomass and species composition in standardized grassland plots (per DataCite titles)"
+      ],
+      "variables_missing": [
+        "trait diversity in the primary data",
+        "non-grassland ecosystems"
+      ],
+      "scope": "Global grassland sites",
+      "evidence": "DataCite lists e.g. 10.5281/zenodo.20070363 'Nutrient Network Subset for: Climate influences how belowground traits regulate grassland biomass' and 10.6073/pasta/2edbdb37cdd1256832e5f6b751d6216e (EDI). Zenodo record API later returned 403 (rate limit), so file contents unchecked.",
+      "verdict": "partial"
+    },
+    {
+      "id": "try-database",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/TryWeb/Home.php",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET www.try-db.org (meta refresh) and www.try-db.org/TryWeb/Data.php",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant functional traits per species (to compute functional diversity)"
+      ],
+      "variables_missing": [
+        "community biomass",
+        "plot membership"
+      ],
+      "scope": "Global plant traits; data by request/registration",
+      "evidence": "Data.php (200) states data download from the TRY File Archive requires free registration; the main database is via the 'Request Data' route. Archive list includes a 'Community species composition, above ground biomass...' item (truncated; not opened).",
+      "verdict": "partial"
+    },
+    {
+      "id": "compadre",
+      "name": "COMPADRE Plant Matrix Database",
+      "landing_url": "https://compadre-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:02:19Z",
+        "method": "GET compadre-db.org; GET compadre-db.org/Data/Compadre",
+        "http_status": 200
+      },
+      "variables_present": [
+        "population-level demographic matrices"
+      ],
+      "variables_missing": [
+        "community biomass",
+        "functional diversity"
+      ],
+      "scope": "Single-population projection matrices",
+      "evidence": "Landing pages 200 describe plant demographic matrices; not community-level biomass.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "Jena Experiment biomass",
+      "url": "https://api.datacite.org/dois?query=%22Jena+Experiment%22+biomass",
+      "hits": 211,
+      "note": "BORIS, PANGAEA-type records"
+    },
+    {
+      "source": "PANGAEA",
+      "query": "Jena Experiment aboveground biomass",
+      "url": "https://www.pangaea.de/advanced/search.php?q=Jena+Experiment+aboveground+biomass&count=3",
+      "hits": 161,
+      "note": "main and dominance experiment biomass tables"
+    },
+    {
+      "source": "Dryad",
+      "query": "biodiversity experiment functional diversity biomass",
+      "url": "https://datadryad.org/api/v2/search?q=biodiversity+experiment+functional+diversity+biomass&per_page=4",
+      "hits": 89,
+      "note": "two relevant datasets recorded"
+    },
+    {
+      "source": "DataCite",
+      "query": "Cedar Creek Biodiversity II plant aboveground biomass (EDI)",
+      "url": "https://api.datacite.org/dois?query=%22Biodiversity+II%22+%22Effects+of+plant+biodiversity%22",
+      "hits": 110,
+      "note": "E120 biomass, cover, soil packages"
+    },
+    {
+      "source": "DataCite",
+      "query": "Nutrient Network NutNet biomass",
+      "url": "https://api.datacite.org/dois?query=%22Nutrient+Network%22+NutNet+biomass",
+      "hits": 40,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "Biomass-versus-richness data in manipulated plant communities are open (Cedar Creek E120 on EDI, Jena Experiment on PANGAEA, two Dryad syntheses incl. one with functional dispersion), but they are all plant experiments, and the structural/functional diversity variable must be built from traits (TRY needs registration). No dataset pairs whole-biota 'amount of life' with structural diversity.",
+  "next_step": "Pick one experiment (Jena main experiment or Cedar Creek E120), join species trait values, pre-register the diversity metric and biomass definition.",
+  "obstacles_confirmed": [
+    "Data are mostly temperate grassland plants",
+    "'amount of life' ambiguous (biomass/abundance/production)",
+    "Productivity-diversity reverse causality"
+  ]
+}
