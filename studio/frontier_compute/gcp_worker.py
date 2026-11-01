@@ -18,6 +18,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.request
 
 
 ROOT = Path("/work/frontier")
@@ -30,6 +31,9 @@ def validate(spec):
         raise ValueError("Invalid task ID")
     if spec["vcpus"] not in (4, 8, 16) or not 1 <= spec["memory_gb"] <= 56:
         raise ValueError("Invalid CPU or memory bound")
+    cpu_quota = spec.get("cpu_quota_percent", spec["vcpus"] * 100)
+    if type(cpu_quota) is not int or not 1 <= cpu_quota <= spec["vcpus"] * 100:
+        raise ValueError("Invalid CPU quota bound")
     if not 60 <= spec["runtime_s"] <= 79200:
         raise ValueError("Invalid task runtime bound")
     if not 300 <= spec["export_interval_s"] <= 3600:
@@ -41,6 +45,11 @@ def validate(spec):
         raise ValueError("Task command must be an argv list")
     if not re.fullmatch(r"[a-f0-9]{64}", spec["source_sha256"]):
         raise ValueError("Source hash required")
+    if spec.get("source_url"):
+        if not re.fullmatch(r"https://raw\.githubusercontent\.com/kganjam/delphi-frontier/[a-f0-9]{40}/[A-Za-z0-9_./-]+", spec["source_url"]) or ".." in spec["source_url"].split("/"):
+            raise ValueError("Source URL must pin a public Frontier commit")
+        if type(spec.get("source_bytes")) is not int or not 1 <= spec["source_bytes"] <= 10_000_000:
+            raise ValueError("Source download size must be bounded")
     if not re.fullmatch(r"out(?:-[a-z0-9]+)*", spec.get("output_directory", "out")):
         raise ValueError("Invalid output directory")
     # Only declared, nonsensitive task parameters are permitted in metadata.
@@ -53,7 +62,7 @@ def validate(spec):
 def systemd_argv(spec, source, output):
     validate(spec)
     args = ["systemd-run", "--wait", "--pipe", "--collect", "--unit=frontier-science",
-            "-p", f"WorkingDirectory={source}", "-p", f"CPUQuota={spec['vcpus'] * 100}%",
+            "-p", f"WorkingDirectory={source}", "-p", f"CPUQuota={spec.get('cpu_quota_percent', spec['vcpus'] * 100)}%",
             "-p", f"MemoryMax={spec['memory_gb']}G", "-p", "MemorySwapMax=0",
             "-p", f"TasksMax={spec.get('tasks_max', 256)}", "-p", f"RuntimeMaxSec={spec['runtime_s']}",
             "-p", "KillMode=control-group", "-p", "TimeoutStopSec=45",
@@ -70,6 +79,10 @@ def build(spec, packet, exporter, destination):
         raise ValueError("Source packet hash mismatch")
     files = {"packet.tar": packet_bytes, "config.json": json.dumps(spec).encode(),
              "gcp_worker.py": Path(__file__).read_bytes(), "gcp_artifacts.py": Path(exporter).read_bytes()}
+    if spec.get("source_url"):
+        if len(packet_bytes) != spec["source_bytes"]:
+            raise ValueError("Source packet size mismatch")
+        del files["packet.tar"]
     text = "#!/bin/bash\nset -euo pipefail\nmkdir -p /work/frontier\ncd /work/frontier\n"
     # No shell interpolation of task content: all bytes are base64 encoded.
     for name, payload in files.items():
@@ -167,6 +180,15 @@ def prepare_source(spec, output):
     import tarfile
 
     packet = ROOT / "packet.tar"
+    if spec.get("source_url"):
+        validate(spec)
+        with urllib.request.urlopen(spec["source_url"], timeout=30) as response:
+            content = response.read(spec["source_bytes"] + 1)
+        if len(content) != spec["source_bytes"] or hashlib.sha256(content).hexdigest() != spec["source_sha256"]:
+            raise ValueError("Downloaded source size/hash mismatch")
+        temporary = ROOT / "packet.download"
+        temporary.write_bytes(content)
+        temporary.replace(packet)
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
     source = Path(tempfile.mkdtemp(prefix=f"source-{spec['task_id']}-", dir=ROOT))

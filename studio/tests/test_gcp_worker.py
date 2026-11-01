@@ -23,6 +23,15 @@ def test_whole_task_has_memory_process_cpu_and_runtime_caps():
     assert args[-3:] == ["--", "python3", "entry.py"]
 
 
+def test_single_worker_can_tighten_cpu_budget_on_reused_larger_vm():
+    request = {**spec(), "vcpus": 8, "cpu_quota_percent": 100}
+    assert "CPUQuota=100%" in gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
+    for invalid in (0, 801, True, "100"):
+        request["cpu_quota_percent"] = invalid
+        with pytest.raises(ValueError, match="CPU quota"):
+            gcp_worker.validate(request)
+
+
 def test_packet_can_tighten_but_not_remove_process_tree_bound():
     request = {**spec(), "tasks_max": 128}
     assert "TasksMax=128" in gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
@@ -141,3 +150,33 @@ def test_reused_vm_cannot_import_stale_previous_packet_files(monkeypatch, tmp_pa
     assert sorted(path.name for path in second.iterdir()) == ["entry.py"]
     assert (old / "unlisted.py").exists()
     assert (first / "runtime-leftover.py").read_text() == "leftover"
+
+
+def test_public_packet_requires_exact_commit_size_and_digest(monkeypatch, tmp_path):
+    monkeypatch.setattr(gcp_worker, "ROOT", tmp_path)
+    buffer = io.BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w") as archive:
+        member = tarfile.TarInfo("source.py")
+        member.size = 5
+        archive.addfile(member, io.BytesIO(b"pass\n"))
+    content = buffer.getvalue()
+    request = {**spec(), "source_url": "https://raw.githubusercontent.com/kganjam/delphi-frontier/" + "a" * 40 + "/packet.tar",
+               "source_bytes": len(content), "source_sha256": hashlib.sha256(content).hexdigest()}
+    observed_reads = []
+
+    class Response(io.BytesIO):
+        def read(self, size=-1):
+            observed_reads.append(size)
+            return super().read(size)
+
+    monkeypatch.setattr(gcp_worker.urllib.request, "urlopen", lambda *a, **kw: Response(content))
+    source = gcp_worker.prepare_source(request, tmp_path)
+    assert (source / "source.py").read_bytes() == b"pass\n"
+    assert observed_reads == [len(content) + 1]
+    request["source_sha256"] = "b" * 64
+    with pytest.raises(ValueError, match="size/hash"):
+        gcp_worker.prepare_source(request, tmp_path)
+    assert (tmp_path / "packet.tar").read_bytes() == content
+    request["source_url"] = request["source_url"].replace("a" * 40, "main")
+    with pytest.raises(ValueError, match="pin a public"):
+        gcp_worker.validate(request)
