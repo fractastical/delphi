@@ -61,7 +61,9 @@
     "structural_model": "one constant-EI clamped-free equivalent spanwise scaffold per fin; chord/axial directions constrained, no finite torsional compliance; NOT anatomy-resolved fin rays or ecology hinge stiffness",
     "beam_kernel": "superpose existing Hermite FEM tip-load responses at each actual span load station; unloaded portion extends linearly; no duplicate beam solver",
     "deflection_map": "Xdeformed=Xsource+w(s)*n_up; normals transformed by inverse-transpose of I+w_prime*n_up tensor e_u, then normalized; source camber normals retained as VLM approximation",
-    "load_map": "VLM bound-segment forces applied at segment midpoint; projectnormalforces, group common span stations; preserve normal resultant,firstmoment andvirtualwork. Full tangentialforce/torsional/moment constraint reactions retained separately, not silently discarded."
+    "load_map": "VLM bound-segment forces applied at segment midpoint; projectnormalforces, group common span stations; preserve normal resultant,firstmoment andvirtualwork. Full tangentialforce/torsional/moment constraint reactions retained separately, not silently discarded.",
+    "S_reference": "sum of undeformed source fin area_flat_m2, fixed across arms/meshes; CL normalization never changes to disguise force differences",
+    "beam_kernel_scope": "FE1/2/4 comparisons establish exactness/roundoff of constantEI point-load kernels, NOT a convergence rate; fluid lattice and fixed-point/glide refinements are separate"
   },
   "parameters": {
     "rho_kg_m3": 1.204,
@@ -162,7 +164,12 @@
       "negative EI rejected",
       "zero-load and stiff limit",
       "deliberately excessive compliance20 retained as model-domain exit"
-    ]
+    ],
+    "zero_load_CL_absolute_difference_max": 1e-12,
+    "ballistic_range_relative_error_max": 1e-06,
+    "gravity_energy_relative_variation_max": 1e-07,
+    "drag_energy_max_step_increase_J": 1e-09,
+    "lift_power_relative_error_max": 1e-12
   },
   "glide": {
     "engine": "existing engineering.simulation.glide.integrate; actualRK4states",
