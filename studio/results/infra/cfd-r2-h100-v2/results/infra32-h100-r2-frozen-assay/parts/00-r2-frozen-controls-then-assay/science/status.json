@@ -1,0 +1,202 @@
+{
+ "schema": "cfd3d-cyl2d-status-0.2",
+ "packet_sha256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153",
+ "platform_dry_run": false,
+ "packet_file": "r2_packet.json",
+ "device": "cuda",
+ "science": "model diagnostics; never 'passed'. eval.json here evaluates R2 alone (R2_fidelity and periodicity); control_passes needs R1, R3 and M1 from the CPU packet as well, combined by cyl2d_eval.py afterwards. The 3-D C1 sphere reference gate FAILED and stays failed. No fin, fish, swimming or flight claim.",
+ "reference_gate": {
+  "C1_sphere_3d": "FAILED (|Cd| 0.875 at D16 CPU, 0.918/0.881 at D32 GPU, vs band [0.95, 1.35]); blocks physical-validation wording",
+  "cyl2d": "frozen contract + band; evaluator fails closed (a92d80e)"
+ },
+ "outer_budget_s": 10800.0,
+ "completion": "complete",
+ "rc": 0,
+ "stages": {
+  "telemetry": {
+   "ok": true,
+   "t_s": 0.1
+  },
+  "julia": {
+   "ok": true,
+   "t_s": 10.1,
+   "sha256": "4e7e9e776634d24835250de67cde39b0d4af15bc432eb20697e6be6c28ea69e8"
+  },
+  "env": {
+   "ok": true,
+   "t_s": 470.2,
+   "rc": 0,
+   "log_tail": "   4962.5 ms  \u2713 cuRAND\n   7560.7 ms  \u2713 cuSPARSE\n  10867.3 ms  \u2713 cuBLAS\n   7554.3 ms  \u2713 cuSOLVER\n  12515.4 ms  \u2713 CUDATools\n   5149.3 ms  \u2713 CUDA\n   5108.4 ms  \u2713 WaterLily \u2192 WaterLilyCUDAExt\n  136 dependencies successfully precompiled in 237 seconds. 24 already precompiled.\n  24 dependencies precompiled but different versions are currently loaded (ArgTools, Base64, Dates, Downloads, JuliaSyntaxHighlighting, LibCURL, LibCURL_jll, LibGit2, LibGit2_jll, LibSSH2_jll, Logging, Markdown, MozillaCACerts_jll, NetworkOptions, OpenSSL_jll, Pkg, Printf, StyledStrings, TOML, Tar, UUIDs, Zlib_jll, nghttp2_jll and p7zip_jll). Restart julia to access the new versions. Otherwise, 88 dependents of these packages may trigger further precompilation to work with the unexpected versions.\nCANON d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc\nCUDA functional true NVIDIA H100 80GB HBM3\nCFD3D-ENV WaterLily 1.10.0"
+  },
+  "restart_check": {
+   "ok": true,
+   "t_s": 721.0,
+   "rc_straight": 0,
+   "rc_first_segment": 75,
+   "rc_resumed": 0,
+   "first_segment_wrote_no_output": true,
+   "series_identical": true,
+   "segments": [
+    1,
+    2
+   ],
+   "steps": [
+    198,
+    198
+   ],
+   "cp_samples": [
+    14,
+    14
+   ],
+   "cp_after_split": 7,
+   "final_state_identical": true,
+   "foreign_checkpoint_refused": true,
+   "cuda": {
+    "rc": [
+     0,
+     75,
+     0
+    ],
+    "log_tail": "",
+    "bit_identical": true,
+    "gap": {
+     "Cd": 0.0,
+     "Cd_p": 0.0,
+     "Cl": 0.0,
+     "t": 0.0,
+     "n": 198
+    },
+    "gpu": [
+     true,
+     true
+    ],
+    "ok": true
+   }
+  },
+  "platform": {
+   "ok": true,
+   "t_s": 844.3,
+   "rc_base": 75,
+   "rc_cpu": 75,
+   "rc_cuda": 75,
+   "t_state": 100.05042266845703,
+   "steps": [
+    1594,
+    1594
+   ],
+   "aligned": {
+    "Cd": 3.345194398516313e-05,
+    "Cd_p": 3.2948149648037184e-05,
+    "Cl": 7.657673924314452e-06,
+    "t": 0.0,
+    "n": 20
+   },
+   "shifted": {
+    "Cd": 0.00625500973088838,
+    "Cd_p": 0.006124627756440184,
+    "Cl": 0.12394086308917336,
+    "t": 0.006233641055123652,
+    "n": 20
+   },
+   "max_abs_du": 1.513958e-05,
+   "tolerance": {
+    "Cd": 0.005,
+    "Cd_p": 0.005,
+    "Cl": 0.005,
+    "t": 0.001,
+    "u_abs": 0.01
+   },
+   "aligned_within": true,
+   "shifted_within": false
+  },
+  "calibration": {
+   "ok": true,
+   "t_s": 899.3,
+   "rc": 0,
+   "peak_host_rss_gb": 1.84,
+   "rule": "GO only if: TIMING rc 0 on the device; steps_projected[1] (340k, the developed-wake dt) x measured s/step x run_overhead 1.3 <= time left before the outer budget minus emit and checkpoint margins; nvidia-smi device-memory peak <= 0.8 x card total; host RSS peak <= 10 GB. Otherwise rc 11: stop with the controls, calibration.json and nvidia-smi kept; no R2 started. fits_time_lower_only reports when only the 204k-step projection would fit (a decision for root/infra, not taken here)",
+   "gpu_mem_peak_mib": 1905,
+   "gpu_mem_total_mib": 81559,
+   "ms_per_step": 14.155,
+   "ns_per_cell_step": 0.958927298831341,
+   "dt_grid_last": 0.19740241765975952,
+   "gpu": true,
+   "projected_wall_s": [
+    3754,
+    6256
+   ],
+   "left_s": 9301,
+   "fits_time": true,
+   "fits_time_lower_only": false,
+   "fits_memory": true,
+   "go": true
+  },
+  "cases": {
+   "ok": true,
+   "t_s": 4475.2,
+   "states": {
+    "R2": "finished"
+   },
+   "all_finished": true
+  },
+  "eval": {
+   "ok": true,
+   "t_s": 4475.7,
+   "verdict": {
+    "R2_fidelity": false,
+    "invalid_runs": [],
+    "periodic_R1_R2_R3": false,
+    "surface_internal": true,
+    "control_passes": false,
+    "missing": [
+     "grid_pair",
+     "mutant"
+    ],
+    "pressure_coupling_allowed": false
+   },
+   "stderr": ""
+  },
+  "output": {
+   "ok": true,
+   "t_s": 4475.7,
+   "bytes": 2700778,
+   "cap": 12000000
+  }
+ },
+ "cases": {
+  "R2": {
+   "threads": 2,
+   "mem_gb": 11,
+   "budget_s": 172800,
+   "segments": [
+    {
+     "rc": 0,
+     "peak_rss_gb": 2.6,
+     "t_s": 4474.7
+    }
+   ],
+   "state": "finished",
+   "exports": [],
+   "steps": 186748,
+   "t_end_reached": 600.0025634765625,
+   "finite": true,
+   "wall_s": 3512.9013040065765,
+   "ns_per_cell_step": 1.2743692039985686,
+   "segments_in_run": 1,
+   "output_sha256": "9b349d9c1a0532bd183f93c13a314ab4bf076129f5b40f4daab2be58e344da04",
+   "checkpoint_local": {
+    "path": "/work/cfd-h100-r2/cases/R2/R2.ckpt",
+    "bytes": 794267928,
+    "exported": false
+   }
+  }
+ },
+ "host": {
+  "nproc": 16,
+  "python": "3.12.3",
+  "lscpu": "s physical, 57 bits virtual\nByte Order:                           Little Endian\nCPU(s):                               16\nOn-line CPU(s) list:                  0-15\nVendor ID:                            GenuineIntel\nBIOS Vendor ID:                       QEMU\nModel name:                           Intel(R) Xeon(R) Platinum 8468\nBIOS Model name:                      pc-q35-10.1  CPU @ 2.0GHz\nBIOS CPU family:                      1\nCPU family:                           6\nModel:                                143\nThread(s) per core:                   2\nCore(s) per socket:                   8\nSocket(s):                            1\nStepping:                             8\nBogoMIPS:                             4200.00\nFlags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq dtes64 ssse3 fma cx16 pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves avx_vnni avx512_bf16 wbnoinvd arat avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b fsrm md_clear serialize tsxldtrk amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\nHypervisor vendor:                    KVM\nVirtualization type:                  full\nL1d cache:                            384 KiB (8 instances)\nL1i cache:                            256 KiB (8 instances)\nL2 cache:                             16 MiB (8 instances)\nL3 cache:                             105 MiB (1 instance)\nNUMA node(s):                         1\nNUMA node0 CPU(s):                    0-15\nVulnerability Gather data sampling:   Not affected\nVulnerability Itlb multihit:          Not affected\nVulnerability L1tf:                   Not affected\nVulnerability Mds:                    Not affected\nVulnerability Meltdown:               Not affected\nVulnerability Mmio stale data:        Not affected\nVulnerability Reg file data sampling: Not affected\nVulnerability Retbleed:               Not affected\nVulnerability Spec rstack overflow:   Not affected\nVulnerability Spec store bypass:      Mitigation; Speculative Store Bypass disabled via prctl\nVulnerability Spectre v1:             Mitigation; usercopy/swapgs barriers and __user pointer sanitization\nVulnerability Spectre v2:             Mitigation; Enhanced / Automatic IBRS; IBPB conditional; RSB filling; PBRSB-eIBRS SW sequence; BHI BHI_DIS_S\nVulnerability Srbds:                  Not affected\nVulnerability Tsx async abort:        Mitigation; TSX disabled\n",
+  "free": "               total        used        free      shared  buff/cache   available\nMem:             196           2         171           0          23         193\nSwap:              0           0           0\n"
+ },
+ "packet_file_sha256": "263b2f1f749b46dff75cf1b5042078b6a93c54b1ccb9881f46784c62c8c8ba44",
+ "cap_mechanism": "watchdog only (no systemd scope)"
+}

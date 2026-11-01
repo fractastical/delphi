@@ -1,0 +1,64 @@
+{
+ "rule": "GO only if: every arm's TIMING rc 0 on the device; the sum over R1, M1_mutant, R3_domain of (steps_projected[1] x measured s/step x run_overhead 1.3 + that arm's measured process start-up) <= time left before the outer budget minus emit and checkpoint margins; every arm's nvidia-smi device-memory peak <= 0.8 x card total; every host RSS peak <= 10 GB. Otherwise rc 11: stop with the controls, calibration.json and nvidia-smi kept; no arm started. fits_time_lower_only reports when only the lower projections would fit (a decision for root/infra, not taken here). After GO the arms run in packet order; an arm whose own projection exceeds the time left when it would start is not started and is recorded so",
+ "arms": {
+  "R1": {
+   "rc": 0,
+   "peak_host_rss_gb": 1.66,
+   "gpu_mem_peak_mib": 945,
+   "gpu_mem_total_mib": 81559,
+   "ms_per_step": 4.734,
+   "ns_per_cell_step": 1.2814789936197084,
+   "dt_grid_last": 0.29990437626838684,
+   "gpu": true,
+   "startup_s": 43.6,
+   "projected_wall_s": [
+    456,
+    733
+   ],
+   "fits_memory": true,
+   "arm_ok": true
+  },
+  "M1_mutant": {
+   "rc": 0,
+   "peak_host_rss_gb": 1.66,
+   "gpu_mem_peak_mib": 945,
+   "gpu_mem_total_mib": 81559,
+   "ms_per_step": 4.704,
+   "ns_per_cell_step": 1.2733682540335665,
+   "dt_grid_last": 0.12444587796926498,
+   "gpu": true,
+   "startup_s": 43.6,
+   "projected_wall_s": [
+    1004,
+    1297
+   ],
+   "fits_memory": true,
+   "arm_ok": true
+  },
+  "R3_domain": {
+   "rc": 0,
+   "peak_host_rss_gb": 1.7,
+   "gpu_mem_peak_mib": 1905,
+   "gpu_mem_total_mib": 81559,
+   "ms_per_step": 13.337,
+   "ns_per_cell_step": 0.9035112970941463,
+   "dt_grid_last": 0.29997488856315613,
+   "gpu": true,
+   "startup_s": 46.0,
+   "projected_wall_s": [
+    1242,
+    2040
+   ],
+   "fits_memory": true,
+   "arm_ok": true
+  }
+ },
+ "projected_wall_s": [
+  2702,
+  4070
+ ],
+ "left_s": 5770,
+ "fits_time": true,
+ "fits_time_lower_only": false,
+ "go": true
+}
