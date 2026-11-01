@@ -24,13 +24,13 @@ For simulations we ran paired arms and fidelity checks, and published the ones t
 | v3c | 2.9% | Yes |
 | v3b | 26% | **No, not converged** |
 
-All three were run under matched conditions: 4 degrees angle of attack, a horseshoe vortex lattice, isolated paired fins. When the lattice was refined, v3a and v3c barely changed. v3b's lift changed by about a quarter, so the manifest flags it as unusable for comparison and gives no feasibility score. We would rather publish an unusable number with a warning than a rank order built on it.
+All three were run under matched conditions: 4 degrees angle of attack, a lifting-surface method (a horseshoe vortex lattice, which represents the wing as a grid of simple vortices) and isolated paired fins. When the lattice was refined, v3a and v3c barely changed. v3b's lift changed by about a quarter, so the manifest flags it as unusable for comparison and gives no feasibility score. We have not diagnosed why v3b fails to converge; that is recorded as open rather than guessed at. We would rather publish an unusable number with a warning than a rank order built on it.
 
-The same attitude applies to the diffusion-model pilot on an abstract reaction-diffusion pattern problem. The visuals on the Generative biology page come from arrays returned by a recorded GPU job. Their scope line says no replacement was generated, no new simulation was run and no biological validation is claimed. The first attempt timed out before evaluation, and the recovery job was an evaluation-only rerun of the frozen checkpoint, which is recorded as such.
+The same attitude applies to the diffusion-model pilot on an abstract reaction-diffusion pattern problem. The visuals on the Generative biology page come from arrays returned by a recorded GPU job. Their scope line says no replacement was generated, no new simulation was run and no biological validation is claimed. The first attempt timed out before evaluation, and the recovery job was an evaluation-only rerun of the saved, unchanged model checkpoint, which is recorded as such.
 
 ## Interface checks
 
-The public MCP endpoint passed 12 of 12 recorded checks covering connectivity, search, schema discovery and rejection of anonymous writes. Those checks wrote zero scientific records, and passing them is not scientific acceptance.
+The public MCP endpoint (Model Context Protocol, the standard way an AI agent calls tools on a server; here it exposes search, records and bounded calculations) passed 12 of 12 recorded checks covering connectivity, search, schema discovery and rejection of anonymous writes. Those checks wrote zero scientific records, and passing them is not scientific acceptance.
 
 ## What we did not test
 

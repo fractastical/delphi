@@ -19,7 +19,7 @@ Every one is labelled as a simulation. None is presented as an observation.
 
 ## The coupling layer
 
-Each model declares an interface: named input and output ports with a quantity, a unit, a scale, a context (organism or design envelope), a provenance status and bounds. A proposed connection then gets one of three verdicts.
+Each model declares an interface as a small structured record (`frontier.model.interface/1`): named input and output ports, each with a quantity, a unit, a scale, a context (organism or design envelope), a provenance status (measured, fitted, assumed, simulated or unknown) and bounds. The checker is ordinary code that reads these records and the declared mapping; it does not run the simulations. The full contract is in the model-coupling document on the Documentation page. A proposed connection then gets one of three verdicts.
 
 | Verdict | Meaning | May it run? |
 |---|---|---|
@@ -27,11 +27,11 @@ Each model declares an interface: named input and output ports with a quantity, 
 | `scenario` | Only under named assumptions, with unknown bounds or uncertainty. | Yes, labelled, never as evidence about an organism |
 | `refused` | A bridge is missing or inconsistent. | No |
 
-The current manifest holds 13 proposed couplings: 4 composable, 5 scenario, 4 refused. The composable ones are the honest, boring ones: a wing area passed from the constraint model to the glide model, the same span, the same quantity in the same unit.
+The current manifest holds 13 proposed couplings: 4 composable, 5 scenario, 4 refused. None of this is exotic. Much of it is careful type and unit checking, and we do not present it as a research breakthrough. What matters is that it is applied to every bridge and that its refusals are published. The composable ones are the honest, boring ones: a wing area passed from the constraint model to the glide model, the same span, the same quantity in the same unit.
 
 ## The refusals are the point
 
-One refused coupling is the one a reader is most tempted to draw: a Delta-Notch asymmetry from the two-cell model feeding fin flexural rigidity. The layer refuses it for stated reasons. No mapping exists. The scale changes from cell to organ. The context changes from the species named in the SBML file to the flying-fish design envelope. The Delta-Notch model is non-dimensional as stored, so it cannot be identity-mapped to an SI quantity.
+One refused coupling is the one a reader is most tempted to draw: a Delta-Notch asymmetry from the two-cell model feeding fin flexural rigidity. The layer refuses it for stated reasons. No mapping exists. The scale changes from cell to organ. The context changes from the species named in the SBML file to the flying-fish design envelope. The Delta-Notch model (a published two-cell lateral-inhibition model) is non-dimensional as stored, so it cannot be identity-mapped to an SI quantity.
 
 An assumption is never allowed to stand in for a jump across biological scale or species. That needs a calibration, a structural record of measured or fitted-to-measured data with a closed domain and an uncertainty. **No calibration is registered today**, so every cross-scale bridge is either refused or labelled assumption-level, and the missing bridge becomes an open question on the Frontier page instead of a hidden constant.
 
