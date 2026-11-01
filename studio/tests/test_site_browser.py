@@ -1984,3 +1984,27 @@ def test_aeroelastic_and_nca_cards_follow_the_review_wording_and_pin_their_media
     assert "original run: 0 of 48" in t and "corrected seed placement: 32 of 48" in t
     pg.goto(base + "#/studio/flying-fish?scale=organ")
     pg.wait_for_function("document.querySelector('#main').textContent.includes('Static aeroelastic coupling')")
+
+
+def test_assemblies_axis_cells_are_short_with_checks_in_a_disclosure(browser, base):
+    R = json.loads((ROOT / "artifacts/biodesign-compiler/report.json").read_text())
+    uc = R["compiled"][0]["axes"]["units_context"]
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/assemblies"); pg.wait_for_selector("#axis-units_context")
+        row = pg.locator("#axis-units_context")
+        shown = row.inner_text()                                   # closed disclosures are not part of inner_text
+        assert "4 composable" in shown and "5 SCENARIO" in shown and "4 refused" in shown and "not these variants" in shown
+        assert "failed checks" not in shown and "mapping" not in shown, "full fields stay collapsed"
+        if w >= 900:
+            assert row.bounding_box()["height"] < 330, row.bounding_box()
+        assert pg.locator(".asinspect[open]").count() == 0
+        # failure stays visible without opening anything
+        assert "NOT CONVERGED" in pg.locator("#axis-model_domain").inner_text() and "fail" in pg.locator("#axis-model_domain").inner_text()
+        pg.locator("#axis-units_context .asinspect summary").first.click()
+        opened = row.inner_text()
+        assert uc["refused"][0]["coupling"] in opened and "scope" in opened and "mapping" in opened
+        assert pg.locator("#axis-units_context dl.astree").count() >= 1
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
