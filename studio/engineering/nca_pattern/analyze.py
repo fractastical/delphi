@@ -1,6 +1,7 @@
 """Audit and display returned NCA states without selecting a successful model."""
 
 import argparse
+from datetime import datetime
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -94,6 +95,13 @@ def audit(root, out):
     if digest(barrier_path) != summary["checkpoint_barrier_sha256"]:
         raise ValueError("Checkpoint barrier pin changed")
     checkpoints = {x["sha256"] for x in barrier["completed_checkpoints"]}
+    for model in barrier["models"]:
+        if model["status"] == "complete" and (
+            model["training_steps"] != 2000
+            or datetime.fromisoformat(model["finished_utc"])
+            > datetime.fromisoformat(barrier["created_utc"])
+        ):
+            raise ValueError("Final checkpoint count/time barrier mismatch")
     for checkpoint in barrier["completed_checkpoints"]:
         if digest(artifact_path(root, checkpoint["path"])) != checkpoint["sha256"]:
             raise ValueError("Checkpoint bytes changed")
@@ -108,6 +116,7 @@ def audit(root, out):
         "negative_passed": 0,
     }
     traces = {}
+    zero_visible_design_finals = 0
     for item in summary["evaluations"]:
         identity = (item["model_id"], item["kind"], item["update_seed"])
         if identity in identities:
@@ -170,12 +179,15 @@ def audit(root, out):
             if bool(passed) != item["criterion_passed"]:
                 raise ValueError("Saved-metric predicate disagrees")
             name = "negative" if item["kind"] == "all-erased-negative" else "design"
+            if name == "design" and np.count_nonzero(visible) == 0:
+                zero_visible_design_finals += 1
             counts[name + "_executed"] += 1
             counts[name + "_passed"] += int(passed)
             if bool(data["recorded_trace"]):
                 traces[identity] = {k: data[k].copy() for k in data.files}
     result.update(
         counts=counts,
+        zero_visible_final_design_count=zero_visible_design_finals,
         evaluation_identities=len(identities),
         checkpoint_count=len(checkpoints),
         paired_training_checks=load(root / "paired-training-checks.json"),
@@ -185,9 +197,155 @@ def audit(root, out):
         ),
         analysis_code_sha256=digest(Path(__file__)),
     )
+    result["nonexact_visible_metric_count"] = sum(
+        not x["exact"] for x in result["checks"]
+    )
+    result["max_visible_metric_absolute_difference"] = max(
+        (x["absolute_difference"] for x in result["checks"]), default=0.0
+    )
+    result["selected_full_state_diagnostics"] = [
+        {
+            "model_id": key[0],
+            "kind": key[1],
+            "update_seed": key[2],
+            "saved_update_step": int(step),
+            "phase": str(phase),
+            "nonzero_full_state_values": int(np.count_nonzero(state)),
+        }
+        for key, trace in traces.items()
+        for step, phase, state in zip(
+            trace["full_state_update_step"],
+            trace["full_state_phase"],
+            trace["full_state"],
+            strict=True,
+        )
+    ]
+    result["native_design_counts_match_recomputed"] = (
+        summary["design_target_tests"]["executed"] == counts["design_executed"]
+        and summary["design_target_tests"]["passed"] == counts["design_passed"]
+    )
+    result["native_negative_counts_match_recomputed"] = (
+        summary["all_erased_negative_controls"]["executed"]
+        == counts["negative_executed"]
+        and summary["all_erased_negative_controls"]["absorbing_state_checks_passed"]
+        == counts["negative_passed"]
+    )
     dump(out / "audit.json", result)
+    plot(root, out, summary)
     render(root, out, summary, traces, goal)
+    report(root, out, summary, result, receipt)
     return result
+
+
+def report(root, out, summary, result, receipt):
+    rows = []
+    for model in summary["models"]:
+        runs = [
+            x
+            for x in summary["evaluations"]
+            if x["model_id"] == model["id"]
+            and x["kind"] != "all-erased-negative"
+            and not x["status"].startswith("not-started")
+        ]
+        rows.append(
+            f"| {model['id']} | {model['training_steps']} | {model['status']} | {sum(x['criterion_passed'] for x in runs)}/{len(runs)} executed |"
+        )
+    cpu = load(root / "cpu-controls.json")
+    cuda = load(root / "cuda-controls.json")
+    text = (
+        f"""# Actual inverse-pattern NCA experiment
+
+**Execution: {summary["status"]}. Design tests: {result["counts"]["design_passed"]}/{48} declared passed, {result["counts"]["design_executed"]} executed.** Completing training is separate from achieving the target. Empty-state negative controls: {result["counts"]["negative_passed"]}/{4} declared passed.
+
+| Frozen candidate | Actual training steps | Status | Design predicates |
+| --- | --- | --- | --- |
+"""
+        + "\n".join(rows)
+        + f"""
+
+Of the executed design tests, {result["zero_visible_final_design_count"]} end with exactly zero raw RGBA. An empty field fails the target predicate. Under this rule, the activity mask makes the empty full state absorbing; the initial root seed lies outside the target silhouette (one pixel from its nearest foreground). Those source facts suggest an optimization-collapse mechanism, but seed placement alone does not establish its cause and no causal repair experiment was run.
+
+The goal is a fixed 64×64 design raster of the existing biological-v3a pectoral fin/rays (653 foreground pixels), with synthetic colors. It is **not an observed tissue or cellular image**. The seed is at the projected geometric root [8,42]. Computational updates/pixels have no biological time/cell-size calibration.
+
+## Implemented rule and inverse objective
+
+The shared 16-channel rule computes identity and two Sobel perceptions, a 48→128 ReLU→16 residual, then stochastic per-cell updates (fire probability0.5). Pre/post alpha-neighborhood masks restrict activity. Learned perception is3×3; composing the activity masks makes total one-step dependency5×5. The 12 hidden channels have no measured biochemical identity. There are8336 learned parameters.
+
+Adam minimizes raw RGBA mean-square error to the design goal. Both regimes use the same pool128, batch8, unroll64–95, final2000-step budget and paired initialization/update schedules. Damage training additionally erases random circles. Final checkpoints are pinned before held-out masks load; no best-model or held-out selection occurs. This adapts [Distill2020, Model and Experiments2/3](https://distill.pub/2020/growing-ca/) and its [official notebook](https://github.com/google-research/self-organising-systems/blob/master/notebooks/growing_ca.ipynb); pool/budget/target/framework differ, so this is not an exact benchmark reproduction.
+
+Held-out evaluation uses three update seeds, persistence to1024 updates, and three fixed erasure masks after256 growth updates plus512 recovery updates. Match requires silhouette IoU≥0.75 and raw RGBA MSE≤0.02. Persistence requires every saved checkpoint256–1024; recovery requires a valid pre-damage pattern AND final recovery. All-erased controls test an absorbing zero state and are excluded from the48 design tests. Repeated probes share learned weights and source assumptions; counts are descriptive, not biological probabilities or independent biological replicates.
+
+## Numerical and provenance checks
+
+Same-job CPU controls passed: {cpu["passed"]}; CPU/CUDA controls passed: {cuda["passed"]}. The numerical tolerances were frozen before training and remain unchanged. {result["nonexact_visible_metric_count"]} final metric comparisons differ bit-for-bit; maximum absolute difference {result["max_visible_metric_absolute_difference"]:.17g}. Exact reproduction remains false where recorded; the separately frozen roundoff comparison is not substituted for it. Returned-byte audit checked {result["files_checked"]} files/{result["bytes_checked"]}bytes; final visible-state metrics exact reproduction: {result["exact_visible_metric_reproduction"]}; separately named fixed-roundoff diagnostic: {result["fixed_roundoff_visible_metric_reproduction"]}. Predicate counts are recomputed from raw final RGBA plus saved per-checkpoint metrics. Hidden-state all-zero assertions rely on saved whole-state summary metrics except where full-state snapshots were preselected; this audit does not independently rerun training or every hidden-state trajectory.
+
+Actual device: {receipt["device"]}. Environment: {json.dumps(receipt["environment"], sort_keys=True)}. Native science wall time: {receipt["wall_seconds"]:.3f}s. Dollar cost unknown/null. Final checkpoint barrier SHA256: {summary["checkpoint_barrier_sha256"]}. Protocol SHA256: {receipt["protocol_sha256"]}. Source hashes, final/periodic checkpoints, optimizer/RNG state, all52 evaluation records where executed, raw final RGBA, and eight preselected histories are retained. The training pool is not serialized: checkpoints do not promise exact training resume.
+
+The video uses only actual selected central-square/update-seed7001 states; saved update256 before/after erasure are distinct phases. It does not interpolate physics or invent intermediate patterns. RGBA is clipped only for display; every loss/IoU uses raw state values. Simulation/training and render provenance remain separate.
+
+## Applicability and next question
+
+Pattern growth/recovery, if achieved, would establish only this computational local-rule design objective. It would not implement DNA, measured cell signaling, tissue material, fish neural control or organism feasibility. All failed target predicates, empty/collapsed patterns, incomplete arms and numerical failures stay visible. A further optimization repair would require a separately frozen experiment; this report does not alter the target, initial seed, loss, evaluation masks, thresholds or original results.
+"""
+    )
+    (out / "RESULTS.md").write_text(text)
+
+
+def plot(root, out, summary):
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, axes = plt.subplots(1, 3, figsize=(12.8, 4.8), layout="constrained")
+    for index, model in enumerate(summary["models"]):
+        if "history_path" in model:
+            history = load(artifact_path(root, model["history_path"]))
+            axes[0].plot(
+                [x["training_step"] for x in history],
+                [x["batch_output_loss_before_parameter_update"] for x in history],
+                label=model["id"],
+                linewidth=1.4,
+            )
+        runs = [
+            x
+            for x in summary["evaluations"]
+            if x["model_id"] == model["id"]
+            and x["kind"] != "all-erased-negative"
+            and "final" in x
+        ]
+        for axis, key in [(axes[1], "silhouette_IoU"), (axes[2], "rgba_MSE")]:
+            values = [x["final"][key] for x in runs if key in x["final"]]
+            axis.scatter([index] * len(values), values, alpha=0.65, label=model["id"])
+    baseline = float(
+        np.mean(np.load(ART / "target.npz")["rgba"].astype(np.float64) ** 2)
+    )
+    axes[0].axhline(
+        baseline, color="black", linestyle="--", label="Empty-field baseline"
+    )
+    axes[0].set(
+        xlabel="Actual training step",
+        ylabel="Raw batch RGBA MSE",
+        title="All frozen training arms",
+    )
+    axes[0].legend(fontsize=6)
+    for axis in axes[1:]:
+        axis.set_xticks(
+            range(4),
+            ["seed1\nundamaged", "seed1\ndamage", "seed2\nundamaged", "seed2\ndamage"],
+            fontsize=8,
+        )
+        axis.set_xlabel("Returned model (repeated probes share weights)")
+    axes[1].axhline(0.75, color="black", linestyle="--")
+    axes[1].set(ylabel="Final silhouette IoU", title="Frozen IoU criterion >=0.75")
+    axes[2].axhline(0.02, color="black", linestyle="--")
+    axes[2].set(ylabel="Final raw RGBA MSE", title="Frozen MSE criterion <=0.02")
+    fig.suptitle(
+        "Computational fin design goal; no measured tissue or biological probability",
+        fontsize=12,
+    )
+    fig.savefig(out / "training-and-holdout.png", dpi=120)
+    plt.close(fig)
 
 
 def render(root, out, summary, traces, goal):
@@ -313,7 +471,11 @@ def render(root, out, summary, traces, goal):
             "sha256": digest(out / name),
             "bytes": (out / name).stat().st_size,
         }
-        for name in ("poster.png", "damage-trajectories.mp4")
+        for name in (
+            "poster.png",
+            "damage-trajectories.mp4",
+            "training-and-holdout.png",
+        )
     ]
     dump(out / "render-provenance.json", provenance)
 
