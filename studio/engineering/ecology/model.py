@@ -15,8 +15,13 @@ FLIP = np.diag([-1.0, -1.0, 1.0])
 
 
 def dump(path, value):
+    def scalar(item):
+        if isinstance(item, np.generic):
+            return item.item()
+        raise TypeError(f"Unsupported JSON value: {type(item).__name__}")
+
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
+    path.write_text(json.dumps(value, indent=2, allow_nan=False, default=scalar) + "\n")
 
 
 def protocol():
