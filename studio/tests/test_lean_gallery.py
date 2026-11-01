@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import lean_gallery as L  # noqa: E402
 
-PIECES = ["engineering/formal", "engineering/formalize/lean", "engineering/constraints.py"]
+PIECES = ["engineering/formal", "engineering/formalize/lean", "engineering/constraints.py",
+          "artifacts/oxygen-diffusion-rule", "projects/reuse-studies/live-projects.json"]
 
 
 class Ins:
@@ -43,14 +44,17 @@ def test_three_recorded_families_are_current_and_only_pinned_files_are_published
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: (_ for _ in ()).throw(AssertionError("the helper must not run any process")))
     g, out = run(ROOT)
     fams = {f["id"]: f for f in g["families"]}
-    assert set(fams) == {"geometric-similarity", "unit-algebra", "cantilever-guard"} and g["refused"] == []
+    assert set(fams) == {"geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound"} and g["refused"] == []
     assert all(f["status"] == "current" and not f["reasons"] for f in fams.values())
     # the assembled sources that were compiled are rebuilt from the current files and equal the receipt's hashes
     assert fams["geometric-similarity"]["assembled_sources_match"] is True and fams["unit-algebra"]["assembled_sources_match"] is True
     names = {f["id"]: sorted(x["name"] for x in f["files"]) for f in fams.values()}
     assert names["geometric-similarity"] == ["GeometricSimilarity.lean", "MutantRefutations.lean", "NegativeControls.lean", "RECEIPT.json"]
     assert names["cantilever-guard"] == ["CantileverGuard.lean", "CantileverGuard_negative_corrupt_law.lean", "RECEIPT.json"]
-    assert sorted(out) == sorted("@" + x["path"] for f in fams.values() for x in f["files"]) and all(k.startswith("@artifacts/lean-gallery/") for k in out)
+    assert names["steady-oxygen-bound"] == ["OxygenDiffusionBound.lean", "OxygenDiffusionBound_negative_corrupt_law.lean", "lean-receipt.json"]
+    published = [x["path"] for f in fams.values() for x in f["files"]]
+    published += [x["path"] for f in fams.values() for x in f.get("display_artifacts", []) if x["status"] == "verified"]
+    assert sorted(out) == sorted("@" + x for x in published) and all(k.startswith("@artifacts/lean-gallery/") for k in out)
     for f in fams.values():
         for x in f["files"]:
             assert hashlib.sha256(out["@" + x["path"]]).hexdigest() == x["sha256"]
@@ -60,6 +64,15 @@ def test_three_recorded_families_are_current_and_only_pinned_files_are_published
     assert [t["name"] for t in fams["cantilever-guard"]["theorems"]] == ["cantilever_guard", "cantilever_guard_hypotheses_satisfiable", "cantilever_guard_needs_stiffness"]
     assert [b["id"] for b in fams["geometric-similarity"]["negative_blocks"]] == ["wl_k2", "mass_exponent", "stall_k2", "corrupted_certificate"]
     assert len(fams["unit-algebra"]["negative_blocks"]) == 4 and len(fams["cantilever-guard"]["negative_blocks"]) == 1
+    oxygen = fams["steady-oxygen-bound"]
+    assert {t["name"] for t in oxygen["theorems"] if t["kind"] == "theorem"} == set(L.FAMILIES[-1]["positive_check_names"])
+    assert len(oxygen["check_results"]) == 6 and all(x["status"] == "recorded compile passed" for x in oxygen["check_results"])
+    assert [b["id"] for b in oxygen["negative_blocks"]] == ["sphere_parametric", "slab_parametric", "sphere_witness", "slab_witness"]
+    assert all(b["rejected"] for b in oxygen["negative_blocks"])
+    assert oxygen["contextual_reuse"]["status"] == "exact project versions matched the live registry"
+    assert {x["project_id"] for x in oxygen["contextual_reuse"]["contexts"]} == {"project-epithelial-repair", "project-tissue-microcarrier"}
+    assert all(set(x["parameter_status"].values()) == {"unknown"} for x in oxygen["contextual_reuse"]["contexts"])
+    assert "viability threshold" in " ".join(oxygen["does_not_prove"])
     assert all(b["rejected"] for f in fams.values() for b in f["negative_blocks"])
     assert "conflict_instance" in fams["geometric-similarity"]["certificate"]["lean"] and "neg_corrupted" in fams["geometric-similarity"]["certificate"]["corrupted_lean"]
     # a statement is copied verbatim from the source, up to ':='
@@ -68,7 +81,8 @@ def test_three_recorded_families_are_current_and_only_pinned_files_are_published
 
 
 @pytest.mark.parametrize("family, name", [("geometric-similarity", "engineering/formal/GeometricSimilarity.lean"), ("unit-algebra", "engineering/formal/UnitAlgebra.lean"),
-                                          ("cantilever-guard", "engineering/formalize/lean/CantileverGuard.lean")])
+                                          ("cantilever-guard", "engineering/formalize/lean/CantileverGuard.lean"),
+                                          ("steady-oxygen-bound", "engineering/formalize/lean/OxygenDiffusionBound.lean")])
 def test_a_positive_receipt_with_changed_source_is_stale_and_its_files_are_not_published(tree, family, name):
     p = tree / name
     p.write_text(p.read_text() + "\n-- edited after the receipt\n")
@@ -98,6 +112,36 @@ def test_a_receipt_that_records_a_failed_run_or_missing_file_is_refused(tree):
     (tree / "engineering/formal/UNIT_ALGEBRA_RECEIPT.json").unlink()
     g, _ = run(tree)
     assert next(f for f in g["families"] if f["id"] == "unit-algebra")["status"] == "missing"
+
+
+def test_oxygen_receipt_is_hash_pinned_and_does_not_publish_mutated_evidence(tree):
+    path = tree / "artifacts/oxygen-diffusion-rule/lean-receipt.json"
+    receipt = json.loads(path.read_text())
+    receipt["positive"]["only_standard_axioms"] = False
+    path.write_text(json.dumps(receipt))
+    gallery, out = run(tree)
+    oxygen = next(x for x in gallery["families"] if x["id"] == "steady-oxygen-bound")
+    assert oxygen["status"] == "stale" and oxygen["files"] == [] and "source" not in oxygen
+    assert not any("steady-oxygen-bound" in key for key in out)
+
+
+def test_oxygen_display_artifact_and_live_context_fail_separately_from_proof(tree):
+    figure = tree / "artifacts/oxygen-diffusion-rule/geometry-control.png"
+    figure.write_bytes(figure.read_bytes() + b"tamper")
+    gallery, out = run(tree)
+    oxygen = next(x for x in gallery["families"] if x["id"] == "steady-oxygen-bound")
+    assert oxygen["status"] == "current" and len(oxygen["check_results"]) == 6
+    assert next(x for x in oxygen["display_artifacts"] if x["name"] == "geometry-control.png")["status"] == "withheld"
+    assert not any(key.endswith("geometry-control.png") for key in out)
+
+    projects = tree / "projects/reuse-studies/live-projects.json"
+    data = json.loads(projects.read_text())
+    data["projects"][0]["target"]["version"] = "0" * 64
+    projects.write_text(json.dumps(data))
+    gallery, _ = run(tree)
+    oxygen = next(x for x in gallery["families"] if x["id"] == "steady-oxygen-bound")
+    assert oxygen["status"] == "current" and oxygen["contextual_reuse"]["contexts"] == []
+    assert oxygen["contextual_reuse"]["status"] == "pinned project references could not be matched"
 
 
 def test_a_changed_checker_dependency_is_stale(tree):

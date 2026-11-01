@@ -74,12 +74,12 @@ def test_each_family_shows_real_source_receipt_mutants_and_downloads(browser, ba
     t = pg.locator("#main").inner_text()
     for must in ("recorded runs", "mathematics, not biology", "Mathlib", "proposal checker", "does not compile it"):
         assert must in t, must
-    assert pg.locator(".proof").count() == 3 and pg.locator("h1").text_content() == "Lean proofs"
+    assert pg.locator(".proof").count() == 4 and pg.locator("h1").text_content() == "Lean proofs"
     for f in gallery["families"]:
         sec = pg.locator(f"#proof-{f['id']}")
         assert "recorded compile matches these files" in sec.inner_text()
         assert sec.locator(".proofthms details").count() == len(f["theorems"])
-        src = (ROOT / f["files"][0]["path"].replace("artifacts/lean-gallery/" + f["id"] + "/", "engineering/formal/" if f["id"] != "cantilever-guard" else "engineering/formalize/lean/")).read_text()
+        src = (ROOT / f["source_input_path"]).read_text()
         rows = sec.locator(".proofsrc .ll")
         assert rows.count() == len(src.splitlines()) == len(f["source"].splitlines())
         assert rows.nth(0).locator("code").text_content() == src.splitlines()[0]
@@ -93,6 +93,11 @@ def test_each_family_shows_real_source_receipt_mutants_and_downloads(browser, ba
     geo = pg.locator("#proof-geometric-similarity").inner_text()
     assert "conflict_instance" in geo and "unsat" in geo and "10" in geo
     assert pg.locator("#proof-cantilever-guard").inner_text().count("What it does not prove") == 1 and "anything about biology" in pg.locator("#proof-cantilever-guard").inner_text()
+    oxygen = pg.locator("#proof-steady-oxygen-bound")
+    assert oxygen.locator(".proofchecks li").count() == 6
+    assert oxygen.locator(".proofneg li").count() == 4
+    assert oxygen.locator(".prooffigure img").get_attribute("src").endswith("steady-oxygen-bound/geometry-control.png")
+    assert "oxygen adequacy" in oxygen.inner_text() and "D=unknown" in oxygen.inner_text() and "a=unknown" in oxygen.inner_text()
     pg.locator(".proof .eq-math .katex").first.wait_for(timeout=15000)
     assert pg.locator(".proof .katex-error").count() == 0 and not pg.errors
 

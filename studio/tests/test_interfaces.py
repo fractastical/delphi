@@ -126,9 +126,14 @@ def test_official_mcp_stdio_reads_same_persisted_record(store):
             assert {t.name for t in tools} == READ_TOOLS
             assert all(t.annotations.readOnlyHint for t in tools)
             proofs = val(await session.call_tool("frontier_proofs", {}))
-            assert len(proofs["families"]) == 3 and proofs["withheld"] == []
+            assert len(proofs["families"]) == 4 and proofs["withheld"] == []
             assert not proofs["compile_executed"] and not proofs["biological_validation"]
             assert all("source" not in f for f in proofs["families"])
+            oxygen = val(await session.call_tool("frontier_proofs", {"family": "steady-oxygen-bound", "include_source": True}))
+            assert len(oxygen["families"]) == 1 and oxygen["withheld"] == []
+            assert len(oxygen["families"][0]["check_results"]) == 6
+            assert oxygen["families"][0]["contextual_reuse"]["status"] == "exact project versions matched the live registry"
+            assert "sphere_center_oxygen_bound" in oxygen["families"][0]["theorem_names"]
             theorem = val(await session.call_tool("frontier_proofs", {"family": "cantilever-guard", "include_source": True}))
             assert "cantilever_guard_hypotheses_satisfiable" in theorem["families"][0]["source"]["text"]
             assert (await session.call_tool("frontier_proofs", {"family": "../../secret"})).isError
