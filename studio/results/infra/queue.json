@@ -150,10 +150,20 @@
       "task": "Exact-checkpoint evaluation-only recovery",
       "job_id": "aijob-e00fb6jhvdt12fgsje",
       "owner": "infra_director",
-      "provider_state": "STARTING",
+      "provider_state": "COMPLETED",
       "protocol": "artifacts/rd-diffusion/recovery-protocol.json",
       "source_commit": "7729292",
-      "scope": "Exact failed-primary weights; no retraining; original full-primary FAIL retained; original evaluator/controls and new1800s evaluation bound"
+      "scope": "Exact checkpoint recovery, strict completeness passed; original primary timeout FAIL retained; no retraining or speedup claim.",
+      "result": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json"
+    },
+    {
+      "task": "Preregistered exact-W1/amplitude-stratified secondary evaluation",
+      "job_id": "aijob-e00dw01t3zcsg4az55",
+      "owner": "infra_director",
+      "provider_state": "COMPLETED",
+      "scope": "Structural coverage passes; strict exact-W1 metric audit FAILED, all raw metrics retained. No retraining.",
+      "manifest": "results/infra/diffusion-secondary/manifest-infra26.json",
+      "result": "results/infra/diffusion-secondary/collection-audit.json"
     }
   ],
   "preparation": [
@@ -269,40 +279,119 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T00:07:33.979840Z",
+  "updated_at_utc": "2026-11-01T01:06:34.075010+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
+    "observed_at_utc": "2026-11-01T01:05:59.509116+00:00",
     "global_cpu_limit": 32,
-    "observed_instances": 0,
-    "gpu_quota_granted": 0,
-    "gpu_quota_requested": 1,
-    "state": "isolated network, dedicated bucket-only identity and private artifact bucket ready; awaiting frozen scientific CPU packets and exporter",
+    "gpu_quota_granted": 1,
+    "gpu_vm_created": true,
+    "instances": [
+      {
+        "id": "4732435591005420012",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
+        "name": "frontier-cpu-20261031-01",
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "id": "731385783382653564",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-8",
+        "name": "frontier-cpu-20261031-02",
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "id": "8843861969326519893",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
+        "name": "frontier-cpu-20261031-03",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "id": "946761909192569249",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
+        "name": "frontier-cpu-20261031-04",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "guestAccelerators": [
+          {
+            "acceleratorCount": 1,
+            "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/acceleratorTypes/nvidia-l4"
+          }
+        ],
+        "id": "4266786588371661074",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
+        "name": "frontier-gpu-20261031-01",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
+      }
+    ],
+    "active_allocated_vcpus": 24,
+    "instantaneous_cpu_utilization": null,
+    "state": "VM03 runs R1/R3/M1 cylinder controls; VM04 ecology dependency setup and same-job controls; GPU01 L4 startup driver recognized and frozen calibration pipeline started. VM01/02 stopped; genomics23/23 exported. Allocation is not measured utilization.",
     "plan": [
       {
-        "vm": "frontier-cpu-20261031-01",
-        "vcpu": 16,
-        "work": "CFD controlled cylinder/domain/mutant",
-        "ready": false
+        "vm": "frontier-cpu-20261031-03",
+        "vcpus": 16,
+        "task": "controlled-cfd-argv-repair",
+        "source_sha256": "3507d462f7a4f6b6a1cd8f6cb67e6c1dc9bbf6d450fb2a3e476af38811f0418a",
+        "task_runtime_s": 79200
       },
       {
-        "vm": "frontier-cpu-20261031-02",
-        "vcpu": 8,
-        "work": "23public-genome residue survey",
-        "ready": false
+        "vm": "frontier-cpu-20261031-04",
+        "vcpus": 4,
+        "task": "ecology-axial-uncertainty",
+        "source_sha256": "755a23a592f3f07b87512d476a7560105bc203d3b2f5af8e85029a1db702c796",
+        "task_runtime_s": 1200
       },
       {
-        "vcpu": 8,
-        "work": "reserved glider design sweeps",
-        "ready": false
+        "vm": "frontier-gpu-20261031-01",
+        "vcpus": 4,
+        "task": "cylinder-r2-l4-calibration",
+        "source_sha256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153",
+        "task_runtime_s": 10800
       }
     ],
     "network": "frontier-workers-20261031",
     "ingress": "explicit priority0 deny-all",
-    "credentials": "short-lived metadata identity; no embedded key",
-    "expiry": "user states account deletes Sunday night2026-11-01; export promptly, exact UTC cutoff unknown"
-  }
+    "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
+    "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+    "cost": null,
+    "failure_receipts": [
+      "results/resources/gcp/cfd-bootstrap-failure.json",
+      "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
+    ],
+    "status_update_utc": "2026-11-01T01:05:59.509116+00:00",
+    "genomics_completed": "results/resources/gcp/genomics-completion.json",
+    "automatic_collection": {
+      "service": "frontier-cfd-collector",
+      "prefix": "jobs/frontier-cpu-20261031-03/controlled-cfd-argv-repair/",
+      "runtime_s": 86400,
+      "interval_s": 300,
+      "state_path": "/data/artifacts/delphi-evolve-rethink/gcp/cfd-argv-watch.json",
+      "completion_is_export_not_science": true
+    },
+    "next_ecology": {
+      "state": "admitted, initial export succeeded; same-job controls pending",
+      "receipt": "results/resources/gcp/ecology-admission.json"
+    },
+    "l4_admission": {
+      "id": "4266786588371661074",
+      "zone": "us-central1-c",
+      "actual_cuda_science_pass": null,
+      "stockout_failures": [
+        "us-central1-a",
+        "us-central1-b"
+      ],
+      "receipt": "results/resources/gcp/cfd-r2-l4-verified.json"
+    }
+  },
+  "next_ready_dispatch": "Current L4 controls/calibration and ecology uncertainty admitted; native mechanobio is preparing distinct NCA training packet, no other frozen GPU packet ready."
 }

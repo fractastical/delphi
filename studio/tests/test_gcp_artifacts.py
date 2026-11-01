@@ -217,3 +217,61 @@ def test_streaming_download_removes_oversized_partial_file(tmp_path):
         client.download_to_path("bucket", "prefix/object", destination, 3, "0" * 64)
     assert not destination.exists()
     assert list(destination.parent.glob(".gcs-download-*")) == []
+
+
+def test_verified_local_artifact_avoids_repeat_remote_download(tmp_path):
+    payload = b"preserved exact artifact"
+    destination = tmp_path / "data.bin"
+    destination.write_bytes(payload)
+
+    def no_network(*args, **kwargs):
+        raise AssertionError("cached verified artifact must not be downloaded again")
+
+    client = GCS(lambda: "test-token", no_network)
+    digest = hashlib.sha256(payload).hexdigest()
+    assert client.download_to_path("bucket", "object", destination, len(payload), digest) == (digest, len(payload))
+    assert client.download_to_path("bucket", "object", destination, len(payload) + 5, digest) == (digest, len(payload))
+    with pytest.raises(ValueError, match="size"):
+        client.download_to_path("bucket", "object", destination, len(payload) - 1, digest)
+    destination.write_bytes(b"X" * len(payload))
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        client.download_to_path("bucket", "object", destination, len(payload), digest)
+
+
+@pytest.mark.parametrize("ancestor", [False, True])
+def test_cached_artifact_still_refuses_symlinks(tmp_path, ancestor):
+    actual = tmp_path / "actual"
+    actual.mkdir()
+    payload = b"same bytes cannot authorize a linked path"
+    (actual / "data.bin").write_bytes(payload)
+    linked = tmp_path / "linked"
+    linked.symlink_to(actual if ancestor else actual / "data.bin")
+    destination = linked / "data.bin" if ancestor else linked
+    client = GCS(lambda: "test-token", lambda *args, **kwargs: pytest.fail("network accessed"))
+    with pytest.raises(ValueError, match="symlink|linked"):
+        client.download_to_path("bucket", "object", destination, len(payload), hashlib.sha256(payload).hexdigest())
+
+
+def test_only_newest_manifest_is_read_and_corrupt_newest_never_falls_back(tmp_path):
+    output = tmp_path / "output"
+    output.mkdir()
+    for i in range(5):
+        (output / f"result-{i}.json").write_text(str(i))
+    fake = FakeGCS()
+    client = GCS(lambda: "test-token", fake)
+    upload_run(client, "bucket", "jobs/job/task", output, run_record())
+    original = client.download
+    reads = []
+
+    def counted(bucket, name, **kwargs):
+        reads.append(name)
+        return original(bucket, name, **kwargs)
+
+    client.download = counted
+    receipt = collect(client, "bucket", "jobs/job/task", tmp_path / "durable")
+    assert reads == [receipt["manifest_object"]]
+    assert len(receipt["artifacts"]) == 5
+    fake.objects[receipt["manifest_object"]]["data"] = b"corrupt newest manifest"
+    with pytest.raises(ValueError, match="SHA mismatch"):
+        collect(client, "bucket", "jobs/job/task", tmp_path / "durable")
+    assert reads[-1] == receipt["manifest_object"]

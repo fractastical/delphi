@@ -24,7 +24,7 @@ ROOT = Path("/work/frontier")
 
 
 def validate(spec):
-    if not re.fullmatch(r"frontier-cpu-\d{8}-\d{2}", spec["vm"]):
+    if not re.fullmatch(r"frontier-(?:cpu|gpu)-\d{8}-\d{2}", spec["vm"]):
         raise ValueError("Invalid owned VM name")
     if not re.fullmatch(r"[a-z0-9-]{1,64}", spec["task_id"]):
         raise ValueError("Invalid task ID")

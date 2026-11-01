@@ -103,3 +103,12 @@ def test_legacy_python_extraction_preserves_link_and_traversal_refusals(monkeypa
                 with pytest.raises(ValueError, match="Unsafe"):
                     gcp_worker.extract_source(archive, source, tmp_path)
     assert not (tmp_path / "escape").exists()
+
+
+def test_gpu_worker_keeps_same_whole_tree_bounds_and_owned_name_scope():
+    request = {**spec(), "vm": "frontier-gpu-20261031-01", "vcpus": 4, "memory_gb": 12, "runtime_s": 10800}
+    args = gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
+    assert "CPUQuota=400%" in args and "MemoryMax=12G" in args
+    request["vm"] = "other-gpu-20261031-01"
+    with pytest.raises(ValueError, match="owned VM"):
+        gcp_worker.validate(request)

@@ -21,6 +21,7 @@ import shutil
 import sys
 from hashlib import sha256
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -343,23 +344,40 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
     usage = None
     if U:
-        pdt = lambda iso: (datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")) - datetime.timedelta(hours=7)).strftime("%H:%M:%S PDT")
-        sc = U["own_job_state_counts"]; ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        def pdt(iso):
+            return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
+        def job_kind(job):
+            platform = job.get("platform", "")
+            return "gpu" if platform.startswith("gpu-") else "cpu" if platform.startswith("cpu-") else "unknown"
+        # Derive processor counts from the preserved individual records. Producers
+        # have published both flat and processor-nested state summaries.
+        sc = {kind: collections.Counter(j["state"] for j in U["own_jobs"] if job_kind(j) == kind) for kind in ("gpu", "cpu", "unknown")}
+        ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        attribution = U.get("team_attribution") or {}
+        owners = attribution.get("ownership_breakdown") or {"current_frontier": attribution.get("current_frontier_jobs", "unknown"), "historical_team": attribution.get("historical_team_jobs", "unknown"), "unattributed": attribution.get("unattributed_jobs", "unknown")}
+        attribution_note = f" Separate attribution snapshot ({attribution.get('observed_at_seattle', 'time not recorded')}): {owners['current_frontier']} current Frontier jobs, {owners['historical_team']} historical team jobs, {owners['unattributed']} unattributed (not asserted to be other teams)." if attribution else ""
         st = lambda d: ", ".join(f"{n} {k.lower()}" for k, n in d.items() if n)
         gp = "results/resources/gcp/readiness.json"
-        if (ROOT / gp).exists():                       # a dated receipt replaces the earlier terms-of-service note
+        runtime_path = "results/resources/gcp/runtime-status.json"
+        if (ROOT / runtime_path).is_file():
+            g = json.loads(ins.read(runtime_path))
+            gpu_count = sum(a.get("acceleratorCount", 0) for instance in g.get("instances", []) if instance.get("status") == "RUNNING" for a in instance.get("guestAccelerators", []))
+            gcp_note = f" Google Cloud allocation snapshot ({g['observed_at_utc']}): {g.get('active_allocated_vcpus', 'unknown')} allocated vCPUs and {gpu_count} attached GPU(s) on RUNNING instances. Reservations are not measured utilization; spend remains unknown."
+        elif (ROOT / gp).exists():                       # a dated receipt replaces the earlier terms-of-service note
             g = json.loads(ins.read(gp)); gcp_note = f" Google Cloud, from the dated readiness receipt ({g['observed_at_utc']}): {g['state']}; observed instances {g['observed_instances']}; GPU quota granted {g['gpu_quota_granted']}, requested {g['gpu_quota_requested']}. No VM usage and no spend are inferred from this."
         else:
             gcp_note = " Google Cloud: no dated readiness receipt is in this tree; an earlier terms-of-service block is superseded and is not repeated. No VM usage is inferred."
         counters = [
             {"quantity": "Agents", "value": f"{ag['native_running_snapshot']} native agents with orchestrator status running; {ag['known_contributors_in_audited_slice']} identified contributors in the audited {ag['contributor_window_seattle']} slice", "status": "partial", "note": ag["definition"] + " Total distinct agents and currently active agents: unknown. No collective speedup is measured.", "source": uf},
-            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use." + ((" Team attribution kept apart: " + str(U["team_attribution"]["current_frontier_jobs"]) + " current Frontier jobs, " + str(U["team_attribution"]["historical_team_jobs"]) + " historical team jobs listed separately, " + str(U["team_attribution"]["unattributed_jobs"]) + " unattributed (not asserted to be other teams).") if U.get("team_attribution") else ""), "source": uf},
+            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])}. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use." + attribution_note, "source": uf},
             {"quantity": "CPU jobs (own)", "value": f"{sum(sc['cpu'].values())}: {st(sc['cpu'])}", "status": "actual", "note": "CPU seconds are not recorded: unknown.", "source": uf},
             {"quantity": "GPU container work seconds", "value": (f"{U['measured_completed_container_work']['gpu']['seconds']} s across {U['measured_completed_container_work']['gpu']['jobs']} completed GPU jobs and {U['measured_completed_container_work']['cpu']['seconds']} s across {U['measured_completed_container_work']['cpu']['jobs']} completed CPU jobs, from controller receipts" if U.get("measured_completed_container_work") else f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs"), "status": "partial", "note": (U["measured_completed_container_work"]["scope"] + " " if U.get("measured_completed_container_work") else "") + U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
             {"quantity": "GPU utilisation", "value": f"{len(U['historical_gpu_telemetry'])} sampled windows, listed below; current utilisation unknown", "status": "partial", "note": "Windows include low and zero values; no project-wide average is inferred.", "source": uf},
             {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb['embedding_requests']} requests, {emb['documents_embedded']} documents, {emb['failed_requests']} failed. Bioservices ledger: {bio['calls']} calls, {bio['input_tokens']} input and {bio['output_tokens_including_thinking']} output tokens (thinking included). Hosted OpenFold2: {of.get('count', 0)} operation, {of.get('final_status', '')}", "status": "partial", "note": "Named ledgers only; embedding and generation units are not merged. Total tokens: unknown. BioNeMo-specific execution: not established.", "source": uf},
             {"quantity": "Cost", "value": "Unknown (not $0)", "status": "unknown", "note": U["cost"]["interpretation"] + gcp_note, "source": uf}]
-        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": "GPU" if "gpu" in j["platform"] else "CPU", "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
+        if sc["unknown"]:
+            counters.append({"quantity": "Jobs with unknown processor kind", "value": f"{sum(sc['unknown'].values())}: {st(sc['unknown'])}", "status": "unknown", "note": "Not assigned to CPU or GPU totals.", "source": uf})
+        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": job_kind(j).upper(), "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
             "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
             "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
     return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
@@ -610,6 +628,37 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
                        "warning": "Archived revision: right-fin print files are withdrawn because they duplicate left fins. Use r4-daane-printfix." if withdrawn_right else None,
                        "manifest_href": href, "files": files})
     return {"groups": groups, "refused": refused}
+
+
+def diffusion_pilot(ins: Inputs, out: dict) -> dict | None:
+    """Recorded denoising frames and evaluation receipts, with failed checks preserved."""
+    directory = "artifacts/rd-diffusion/visuals"
+    manifest_path = f"{directory}/manifest.json"
+    if not (ROOT / manifest_path).is_file():
+        return None
+    manifest = json.loads(ins.read(manifest_path))
+    files, refused = [], []
+    for name, pin in manifest["files"].items():
+        rel = f"{directory}/{name}"
+        data = ins.read(rel) if (ROOT / rel).is_file() else None
+        if data is None or len(data) != pin["bytes"] or digest_bytes(data) != pin["sha256"]:
+            refused.append(name)
+            continue
+        out["@" + rel] = data
+        files.append({"name": name, "href": rel, **pin})
+    receipts = {}
+    sources = {
+        "recovery": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json",
+        "secondary_audit": "results/infra/diffusion-secondary/collection-audit.json",
+    }
+    for kind, path in sources.items():
+        if (ROOT / path).is_file():
+            data = ins.read(path)
+            href = f"artifacts/rd-diffusion/{kind}.json"
+            out["@" + href] = data
+            receipts[kind] = {"href": href, "sha256": digest_bytes(data), "data": json.loads(data)}
+    out["@" + manifest_path] = ins.read(manifest_path)
+    return {"manifest": manifest, "manifest_href": manifest_path, "files": files, "refused": refused, "receipts": receipts}
 
 
 def runtime_inputs(ins: Inputs, out: dict, stem: str) -> dict | None:
@@ -1328,6 +1377,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
+    diffusion = diffusion_pilot(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
     secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
     fish_hist = fish_history(ins)
@@ -1371,6 +1421,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
+        "diffusion_pilot": diffusion,
         "recovery_inputs": recovery_in,
         "secondary_inputs": secondary_in,
         "fish_history": fish_hist,
