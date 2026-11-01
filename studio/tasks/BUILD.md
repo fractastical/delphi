@@ -1,11 +1,11 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated November 1, 2026, 12:45am PDT.
+Coordinator: codex-03. Updated November 1, 2026, 12:54am PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — November 1, 2026, 12:45am PDT
+## Current checkpoint — November 1, 2026, 12:54am PDT
 
 - [x] Integrated the independently reviewed 240-arm epithelial followup with
   source-bound intervals, the original frozen FAIL and corrected figure counts.
@@ -28,12 +28,24 @@ Every status distinguishes implementation, integration, publication and biologic
   exact files and command exit 0. Scientific owner reviews remain separate; a
   returned batch is not acceptance. At 12:39am PDT all 94 Nebius records were
   terminal (63 attributed to this team); Google VM03 alone retained 16 vCPU.
-- [ ] Publish this exact source/UI/proof cut after focused integration and public
-  read/playback/source checks; current live release is still 795f140.
-- [ ] Owner02 joins a pinned fish candidate, meaningful positive/negative checks,
-  input-change invalidation and a proposed next Action into one validation cycle.
-- [ ] Owner06 exposes bounded dated queue, resource and recovery projections in
-  System. Owner09 prepares a distinct horizon experiment; infra alone dispatches.
+- [x] Published 98a8fa6 after 108 focused integration checks. Public checks
+  covered eight web responses, both study pages at desktop/mobile, source/media
+  hashes, 11 dated mixed-outcome compute receipts and all five MCP proof sources.
+  Receipt: deploy/receipts/interval-sweep-live.json. No database writes.
+- [ ] Owner02 produced the validation cycle at 8877fdc; root review requires
+  actual-path unit/context refusal, source-derived control counts and honest
+  same-code dependence before integration. Recorded mechanical inputs remain
+  assumed; missing biological interfaces and sequence function remain blocked.
+- [ ] Owner06 produced System Operations at 1793304; root review requires
+  deterministic build provenance, current receipt-shape handling and collapsed
+  detail tables before integration. Native resource agent audits current routes.
+- [ ] Infra caught a false pass in the proposed horizon analyzer: time-1000 logs
+  were reported as time-8000 observations. Owner09 must reject truncated returns
+  and pass frozen controls before dispatch. Owner14 prepares a separately frozen
+  matched-budget one- versus multi-initial-condition GPU comparison.
+- [ ] Native mechanobio prepares source-bound graph records for the epithelial
+  followup, retaining the local pass and the non-dispatchable horizon Action.
+  Root owns credentialed imports. Infra captures the 98a8fa6 additive backup.
 - [ ] Delivery audit is recorded in docs/audits/completion-gap-audit-2026-11-01.md.
   Broader acceptance remains open; do not infer biological validation or a measured
   multi-agent advantage from the scoped checks or review corrections.
