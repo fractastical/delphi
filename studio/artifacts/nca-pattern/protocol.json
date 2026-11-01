@@ -1,0 +1,166 @@
+{
+  "schema": "frontier.nca.inverse-pattern.protocol/1",
+  "question": "Can a learned local3x3 update rule grow the declared v3a fin/ray image and preserve or recover it under unseen stochastic updates and damage masks?",
+  "scope": "Inverse image-pattern optimization only; not observed tissue, biochemical signals, DNA design, biological nervous system or a validated organism",
+  "target": {
+    "path": "artifacts/nca-pattern/target.npz",
+    "sha256": "1598e62b2a5cf9a154f6a36564bb2b6b6ab43d84ed780acb78001c73427c7875",
+    "manifest": "artifacts/nca-pattern/target-manifest.json",
+    "heldout_masks_path": "artifacts/nca-pattern/heldout-masks.npz",
+    "heldout_masks_sha256": "6546e8dcab6ef733d11298a9177f5a014c3a57410b714a0584481e68fcd4d4fc",
+    "interpretation": "ONE synthetic design goal projected from existing biological v3a fin geometry/rays, not an empirical image"
+  },
+  "model": {
+    "channels": 16,
+    "visible_channels": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "hidden_channel_meaning": "none assigned; dimensionless computational state, not measured chemicals/voltage",
+    "perception": "fixed per-channel identity,SobelX/8,SobelY/8 over3x3 with zero padding",
+    "learned_rule": "1x1 conv48->128,ReLU,1x1 conv128->16, residual state increment; last layer initial weights/bias0",
+    "parameter_count": 8336,
+    "cell_update_probability": 0.5,
+    "living_mask": "(max_pool3x3(alpha_pre)>.1) AND (max_pool3x3(alpha_post)>.1); all channels zero outside mask",
+    "state_abs_failure_limit": 100,
+    "state_dtype": "float32; TF32/AMP disabled",
+    "time_units": "one computational update; no biological seconds or cell-size calibration"
+  },
+  "training": {
+    "regimes": [
+      "undamaged-pool",
+      "damage-pool"
+    ],
+    "comparison": "Both use identical pool training and budgets; only explicit circular damage differs. Undamaged-pool is growth/persistence without damage, not fresh-seed-only training.",
+    "model_seeds": [
+      20261031,
+      20261101
+    ],
+    "models_expected": 4,
+    "steps_per_model": 2000,
+    "batch_size": 8,
+    "pool_size": 128,
+    "pool_note": "Reduced from official notebook1024 as declared adaptation",
+    "unroll_updates_inclusive": [
+      64,
+      95
+    ],
+    "optimizer": "Adam lr.002,betas(.9,.999),eps1e-7",
+    "gradient": "Each parameter gradient divided by itsL2norm+1e-8, finite checks before update",
+    "loss": "Unweighted rawRGBA mean squared error against premultiplied target; no clipping of model states",
+    "seed": "one computational pixel at frozen projected rootxy; RGB0,alpha+hidden1",
+    "pool_update": "sample8withoutreplacement,sort by targetMSEdescending,reseedworst; detach outputs backinto samepoolindices",
+    "damage_training": "damage only3lowest-loss selectedstates with random circular erasure of ALL16channels; centersnormalized[-.5,.5],radii[.1,.4]; no heldout mask file read",
+    "rng_policy": "Separate paired streams for initialization,poolselection/unroll,stochasticfire and trainingdamage; same seed draws across regimes; no biological replication implied",
+    "checkpoints_every_steps": 250,
+    "checkpoint_scope": "Weights,optimizer,step,RNG states; pool not serialized, so no exact resume claim",
+    "holdout_barrier": "Finish or explicitly abort training phase, save final completed checkpoints+SHAmanifest BEFORE loading heldout masks or computing holdout metrics. Evaluate fixed final2000-step checkpoints only; no holdout model selection or tuning."
+  },
+  "evaluation": {
+    "update_seeds": [
+      7001,
+      7002,
+      7003
+    ],
+    "undamaged_persistence": {
+      "grow_updates": 1024,
+      "metrics_every_updates": 16,
+      "expected_runs": 12
+    },
+    "damage": {
+      "masks": [
+        "left-half",
+        "central-square",
+        "diagonal-slit"
+      ],
+      "before_damage_updates": 256,
+      "recovery_updates": 512,
+      "expected_runs": 36,
+      "operator": "zero ALL16channels in frozen mask, record both pre/postevent states at update256"
+    },
+    "negative_all_erased": {
+      "mask": "all-erased-negative",
+      "update_seed": 7001,
+      "expected_runs": 4,
+      "expected_property": "all-zero absorbing state; no spontaneous pattern; report separately from primary damage tests"
+    },
+    "total_expected_evaluation_runs": 52,
+    "metrics": [
+      "rawRGBA MSE",
+      "alpha>.1 silhouetteIoU",
+      "livingpixelcount",
+      "ray-mask RGBMSE",
+      "nonfinite/maxabs failure",
+      "pre-damage versus final pattern quality"
+    ],
+    "design_match_predicate": "IoU>=.75 AND rawRGBA_MSE<=.02 at declared checkpoints; thresholds fixed before training",
+    "persistence_predicate": "design_match at every saved checkpoint from256 through1024; scope saved checkpoints only",
+    "recovery_predicate": "design_match before damage at256 AND after512recoveryupdates; failure to establish predamage pattern counts as failure",
+    "comparison": "Paired differences across declared model/update seeds and masks; descriptive ranges, not biological success probabilities; show all candidates/failures",
+    "save_rgba_every_updates": 16,
+    "full_state_snapshot_updates": [
+      0,
+      64,
+      256,
+      257,
+      512,
+      768,
+      1024
+    ],
+    "display_clipping": "RGBA display conversion may clip to[0,1], explicitly renderer-only; rawstate metrics and snapshots retained"
+  },
+  "controls": {
+    "cpu_finite_difference_relative_error_max": 0.0001,
+    "cpu_finite_difference_eps": 1e-05,
+    "wrong_sign_gradient_relative_error_min": 1.0,
+    "cpu_tiny_optimizer": "Finite nonzero gradient and changed weights on a bounded actual optimization step; no asserted target learning",
+    "local_rule_radius": "single update depends on3x3 only; empty state absorbing; zero updater cannot grow target",
+    "same_job_cpu_cuda_forward_maxabs": 1e-05,
+    "same_job_cpu_cuda_gradient_relative_L2": 0.0001,
+    "cuda_required_for_training": true,
+    "no_cpu_fallback_training": true,
+    "negative_control": "Untrained/zero updater and all-erased controls must fail the design-match target while staying finite"
+  },
+  "resources": {
+    "GPU": 1,
+    "training_soft_deadline_s": 1800,
+    "total_soft_deadline_s": 2100,
+    "outer_hard_runtime_s": 2400,
+    "cpu_threads": 2,
+    "output_raw_cap_bytes": 50331648,
+    "checkpoint_and_trace_transport": "Preserve partial checkpoints/logs; optional multi-part output if archive>16MiB; no truncation or replacement runs"
+  },
+  "sources": [
+    {
+      "url": "https://distill.pub/2020/growing-ca/",
+      "doi": "10.23915/distill.00023",
+      "selectors": [
+        "Model",
+        "Experiment2:samplepool",
+        "Experiment3:randomcirculardamage"
+      ],
+      "evidence": "source-only model reference; not independent biological validation"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/google-research/self-organising-systems/master/notebooks/growing_ca.ipynb",
+      "response_sha256": "b53f365fce70d59aa1c8936f1e1f600625957d4a6d14d69dd9821e7d00583928",
+      "selectors": [
+        "CAModel.call",
+        "train_step",
+        "TrainingLoop",
+        "make_circle_masks"
+      ],
+      "adaptation": "PyTorch implementation,128pool,2000steps,onefish-derived target; not exact published benchmark reproduction"
+    }
+  ],
+  "checklist": [
+    "freeze target/protocol/source before training",
+    "CPUgradient/finite/locality sanity controls",
+    "same-job CPU/CUDA controls before training",
+    "checkpoint barrier before holdouts",
+    "matched damage ablation and all failures",
+    "actual saved-state video and final source/output hashes"
+  ]
+}
