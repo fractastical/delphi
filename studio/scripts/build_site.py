@@ -15,6 +15,7 @@ import argparse
 import collections
 import copy
 import datetime
+import importlib.util
 import json
 import re
 import shutil
@@ -1046,6 +1047,14 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     """Wind-tunnel, behavior controller and scale-growth manifests as gallery cards, with equations, sources and limitations.
     Every number is copied from the worker's own receipt; verdicts and misses are carried, never softened."""
     cards = []
+    if (ROOT / "artifacts/fin-ray/artifact-manifest.json").is_file():
+        module_path = "engineering/fin_ray/site.py"
+        ins.read(module_path)
+        spec = importlib.util.spec_from_file_location("frontier_fin_ray_card", ROOT / module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        cards.append(module.build_card(ins.read, lambda name, sha: _vid(
+            ins, out, "fin-ray-bilaminar", "artifacts/fin-ray", name, sha)))
     d = "artifacts/windtunnel"
     if (ROOT / d / "render-manifest.json").exists() and (ROOT / d / "summary.json").exists():
         rm = json.loads(ins.read(f"{d}/render-manifest.json")); sm = json.loads(ins.read(f"{d}/summary.json")); o = rm["outputs"]

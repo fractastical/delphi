@@ -682,12 +682,24 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
 
 
 def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
-    pg = page(browser)
-    pg.goto(base + "#/work?tab=connect")
+    pg = page(browser, 390, 900)
+    pg.add_init_script("Object.defineProperty(navigator, 'clipboard', {value: {writeText: async (text) => {window.copiedMcp = text;}}});")
+    pg.goto(base + "#/home")
+    pg.locator('.aboutmenu summary').click()
+    pg.get_by_role('link', name='MCP for agents', exact=True).click()
     pg.wait_for_selector("#cn-h")
     txt = pg.locator("#main").inner_text().lower()
     assert "is not tested" in txt and "official mcp sdk client" in txt and "never put a credential" in txt
     assert pg.input_value("#sharelink").startswith("http")
+    endpoint = 'https://frontier.morphoswarm.ai/mcp'
+    assert pg.locator('#mcp-endpoint').get_attribute('href') == endpoint
+    pg.locator('#copy-mcp').click()
+    pg.wait_for_function("window.copiedMcp === 'https://frontier.morphoswarm.ai/mcp'")
+    pg.get_by_text('Client configuration', exact=True).click()
+    pg.locator('#copy-mcp-config').click()
+    pg.wait_for_selector('#mcp-config-copied:has-text("Copied.")')
+    assert json.loads(pg.evaluate('window.copiedMcp'))['mcpServers']['frontier'] == {'type': 'http', 'url': endpoint}
+    assert _overflow(pg) <= 0 and not pg.errors
 
 
 def test_gallery_has_every_verified_video_with_a_player(browser, base):
@@ -2122,3 +2134,18 @@ def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(brow
         pg.wait_for_selector('.democut[aria-current=page]:has-text("1 minute")')
         assert pg.locator('#demo-video source').get_attribute('src') == next(c['href'] for c in old if c['id'] == 'frontier-60s')
         assert _overflow(pg) <= 0 and not pg.errors
+
+
+def test_single_ray_card_preserves_same_equation_scope_and_source_discrepancy(browser, base):
+    pg = page(browser)
+    pg.goto(base + '#/simulations')
+    pg.wait_for_selector('#sim-fin-ray-bilaminar')
+    card = pg.locator('#sim-fin-ray-bilaminar')
+    assert card.locator('video').count() == 0
+    text = card.text_content()
+    for phrase in ('24/24', 'same-equation', 'UNRESOLVED', 'G=200 is not 200 Pa', 'no measured flying-fish material or whole-fin validation'):
+        assert phrase in text
+    assert card.locator('.tex-fallback').count() == 0 and card.locator('.katex').count() == 3
+    image = card.locator('img').first
+    assert pg.request.get(base + image.get_attribute('src')).ok
+    assert not pg.errors
