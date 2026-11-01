@@ -86,8 +86,8 @@ def load_story(path: Path) -> dict:
     if not isinstance(cuts, list) or not cuts:
         raise ValueError("storyboard needs at least one cut")
     for cut in cuts:
-        if not isinstance(cut, dict) or cut.get("id") not in {"frontier-60s", "frontier-90s", "frontier-120s"}:
-            raise ValueError("storyboard cut id must be frontier-60s, frontier-90s, or frontier-120s")
+        if not isinstance(cut, dict) or cut.get("id") not in {"frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s"}:
+            raise ValueError("unsupported demo cut id")
         scenes = cut.get("scenes")
         if not isinstance(scenes, list) or not scenes:
             raise ValueError(f"{cut['id']} has no scenes")
@@ -896,7 +896,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--media-map", type=Path, default=DEFAULT_MEDIA_MAP)
     parser.add_argument("--tts-manifest", type=Path, default=None)
     parser.add_argument("--work-root", type=Path, default=DEFAULT_RENDER_WORK)
-    parser.add_argument("--cut", choices=("frontier-60s", "frontier-90s", "frontier-120s"), help="render one cut as a preview; omit for all cuts")
+    parser.add_argument("--cut", choices=("frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s"), help="render one cut as a preview; omit for all cuts")
     parser.add_argument("--voice-id", default=VOICE_ID, help="MiniMax voice id; used only by synthesize")
     parser.add_argument("--speed", type=float, default=1.0, help="MiniMax voice speed in the provider's 0.5–2.0 range")
     parser.add_argument("--tempo", type=float, default=1.3, help="pitch-preserving editorial atempo multiplier for prepare-edit")
