@@ -19,7 +19,7 @@ const RUNS = join(HERE, "runs");
 const LOGS = join(RUNS, "logs");
 const STD_AXIOMS = new Set(["propext", "Classical.choice", "Quot.sound"]);
 const WALL_CLOCK = /(^|[._])(seconds|secs|elapsed|runtime|duration|wall_?time|timing)s?($|[._[])/i;
-const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow"];
+const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow", "openpyxl", "pdfplumber"];
 
 const args = process.argv.slice(2);
 const opt = { claims: [], jobs: 1, rtol: 1e-6, atol: 1e-9 };
