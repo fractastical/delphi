@@ -195,7 +195,7 @@
 
     return {
       html: html`
-      <section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier · open work</p><h1>What we know.<br>What's next.<br>Who's working on it.</h1></div>
+      <section class="hero compact"><div><p class="eyebrow">MorphoSwarm Studio · Frontier, open work</p><h1>What we know.<br>What's next.<br>Who's working on it.</h1></div>
         <div class="herotext"><p class="lede">An open-questions whiteboard where a design goal and the literature meet. <b>Top-down</b>: goal, then constraints, then what is unresolved. <b>Bottom-up</b>: theory and evidence fitted to known biology, then challenged and reconciled. The questions column is where they have to agree.</p>
           <p class="mission"><b>Mission</b> Engineer toward a flying fish.</p></div></section>
 

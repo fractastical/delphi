@@ -49,7 +49,7 @@ Single-reader (collab), not Codex-reviewed. Root owns install, start and routing
 Root `/data/services/delphi-frontier` (mode 700): `pgdata/`, `run/` (the private socket directory), `backups/`, `credentials/`, marker `.frontier-instance`, and, when root creates it, `app/` (a checkout of merged `main`).
 Unix socket only: `listen_addresses = ''`, socket `run/.s.PGSQL.5471` (the number only names the file), `unix_socket_permissions = 0700`, `pg_hba.conf` = `local frontier frontier_app peer map=frontier` and `local all <service user> peer`
 (no `host` lines, no `trust`, no password anywhere). Role `frontier_app` is `NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION CONNECTION LIMIT 30` and owns database `frontier`; the OS service user maps to it through `pg_ident.conf`.
-DSN: `host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app`. The Frontier schema lives in that database's `public` schema (`--schema public`).
+DSN: `host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app`. The Studio schema lives in that database's `public` schema (`--schema public`).
 `init-cluster.sh` **refuses** (exit 3, nothing changed) a root that is non-empty and lacks our marker (an `app/` directory is allowed) or a data directory it did not create, so it can never adopt or reconfigure an unrelated cluster; it rewrites only its own `pg_hba.conf`, `pg_ident.conf` and its marked block in `postgresql.conf`.
 Service bounds: PostgreSQL `MemoryMax=2G MemorySwapMax=0 TasksMax=64`; web `MemoryMax=1G MemorySwapMax=0 TasksMax=64`, `OMP/OPENBLAS/MKL_NUM_THREADS=1`. Both are persistent (no `RuntimeMaxSec`); tests and builds keep `RuntimeMaxSec=600`.
 

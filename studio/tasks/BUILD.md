@@ -537,9 +537,9 @@ the browser protocol, then all 30 checks ran successfully. Site CSP stayed intac
 - [x] Site and MCP release `d531330` deployed: 13 website and 37 MCP checks
   passed. Transient contributor credentials and exact-version discussion/history
   are live. Root browser checks passed; separate route critique continues.
-- [x] Fixed public static-asset throttling in the Frontier nginx configuration
+- [x] Fixed public static-asset throttling in the Studio nginx configuration
   (`d3c8890`): API routes retain request limits; static JS no longer shares that
-  limit. Config validation passed; only the Frontier vhost changed, with Orchestra
+  limit. Config validation passed; only the Studio vhost changed, with Orchestra
   hashes unchanged. Independent fresh-browser confirmation remains pending.
 - [x] Exact-Claim reuse and independent review readback integrated. Both resulting
   Evidence records are disputed; scoped numerical reproduction does not establish

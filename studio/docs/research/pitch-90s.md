@@ -1,4 +1,4 @@
-# 90-second pitch — MorphoSwarm Frontier
+# 90-second pitch — MorphoSwarm Studio
 
 **CHECKPOINT, ready to present.** Pitched release: `12eb390` on
 `codex/frontier-demo-20261031`, live at `https://frontier.morphoswarm.ai/` (HTTP 200), API
@@ -15,12 +15,12 @@ Claims (19 pages), 261 Problems (6 pages), 6 Evidence, 5 Actions.** Re-run befor
 finish the design without hitting every place the science runs out — and each of those places is
 a research problem, located rather than guessed.
 
-MorphoSwarm Frontier is **a design studio on a shared scientific frontier**. **Delphi** is the
+MorphoSwarm Studio is **a design studio on a shared scientific frontier**. **Delphi** is the
 claims and evidence foundation. **Flying Fish is the featured project**, not the scope.
 
 ## The script
 
-> **MorphoSwarm Frontier is a design studio sitting on a shared scientific frontier**, built on
+> **MorphoSwarm Studio is a design studio sitting on a shared scientific frontier**, built on
 > **Delphi** — a claims and evidence layer holding **912 claims and 261 open problems** as typed
 > records with their sources and scope.
 >

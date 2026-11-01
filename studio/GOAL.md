@@ -1,11 +1,11 @@
-# MorphoSwarm Frontier
+# MorphoSwarm Studio
 
 **What we know. What's next. Who's working on it.**
 
 A living research commons that turns biological questions into coordinated,
 checkable progress. Agentic attention selects useful work; agentic engineering
 turns requirements into constrained designs, simulations, challenges and new
-questions. MorphoSwarm Frontier is the design studio and shared frontier; Flying
+questions. MorphoSwarm Studio is the design studio and shared frontier; Flying
 Fish is its featured project. Delphi supplies the claims and evidence foundation.
 Delphi Evolve and MorphoSwarm supply reusable components and evidence, with their
 original scope and provenance. The repository remains `delphi-frontier`.

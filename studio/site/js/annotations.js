@@ -255,7 +255,7 @@
         setNotice("Exact Project lookup is unavailable. No unpinned Annotation is created; connect the live catalog and design-context adapters.", true); return;
       }
       try {
-        if (typeof api.isLive === "function" && !api.isLive()) throw new Error("Live Frontier node unavailable.");
+        if (typeof api.isLive === "function" && !api.isLive()) throw new Error("Live Studio node unavailable.");
         const result = await api.catalog({ kind: "Project", query: projectId, limit: 50 });
         const candidates = (result.records || []).filter((r) => r.ref && r.ref.kind === "Project" && r.ref.id === projectId && r.ref.namespace === namespace && validRef(r.ref));
         const chosen = candidates.find((r) => r.is_head) || candidates[0];

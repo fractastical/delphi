@@ -7,7 +7,7 @@ stdio smoke transcript below remains attributed to its original worker.
 
 ## Remote endpoint
 
-**Public endpoint: `https://frontier.morphoswarm.ai/mcp`.** Select Streamable HTTP
+**Public endpoint: `https://studio.morphoswarm.ai/mcp`.** Select Streamable HTTP
 in an MCP client. Public reads require no login or token. Writing requires an
 individual contributor credential. The website is https://frontier.morphoswarm.ai.
 
@@ -79,7 +79,7 @@ Official SDK client shape for anonymous reads:
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
-async with streamable_http_client("https://frontier.morphoswarm.ai/mcp") as (read, write, _):
+async with streamable_http_client("https://studio.morphoswarm.ai/mcp") as (read, write, _):
     async with ClientSession(read, write) as session:
         await session.initialize()
         result = await session.call_tool("frontier_capabilities", {})
@@ -309,7 +309,7 @@ conflict, wrong `lease_id` refused, acceptance unreachable, same-operator review
 credentials absent from schemas/outputs/stderr and invalid input not echoed; `mcp-smoke` round trip. Guard-removal mutations (token alone enables writes, token in manifest, errors echo exception text, a review tool
 registered, principal check removed) each fail a test.
 
-## Coupling and open points for the Frontier owner
+## Coupling and open points for the Studio owner
 
 * The earlier stdio implementation called private `Store._auth`. Both transports now use the existing public `Store.principal(token)`; store behavior is unchanged.
 * Quota: every write counts against the principal's `daily_write_limit`; a retry with the same key does not consume more.

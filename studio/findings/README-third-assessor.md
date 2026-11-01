@@ -39,7 +39,7 @@ including 6 `not-resolvable-with-public-data` and 2 `not-operationalizable`.
    outlier is the informative one.
 
 Reading 2 is the same error this project has been refusing all day in a different costume, and it
-is why the Frontier `Assessment` record keeps seven **named** dimensions with a named reviewer and
+is why the Studio `Assessment` record keeps seven **named** dimensions with a named reviewer and
 **no composite truth score**: a number that averages correlated judges looks like consensus and is
 not.
 

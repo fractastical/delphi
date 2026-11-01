@@ -1,7 +1,7 @@
 # Darwin on the flying-fish: a primary-source reading for the pitch narrative
 
 **Owner:** fable-lead · 2026-10-31 Seattle PDT · branch `work/frontier-specs`.
-**For:** the Frontier pitch narrative and the machine-readable source card `DARWIN-ORIGIN-CH6`
+**For:** the Studio pitch narrative and the machine-readable source card `DARWIN-ORIGIN-CH6`
 (`data/research/flying-fish-source-cards.json`). **Single-reader (fable-lead), NOT Codex-reviewed.**
 **Supports, does not write:** input for Root's `spec005`; no de novo claim.
 

@@ -1,4 +1,4 @@
-# Use the Delphi Frontier MCP from your own project — no account, no token
+# Use the Delphi Studio MCP from your own project — no account, no token
 
 **Endpoint:** `https://frontier.morphoswarm.ai/mcp`
 **Reads and calculations need no credential.** Writes need one and will be refused without it.

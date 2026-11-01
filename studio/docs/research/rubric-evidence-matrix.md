@@ -34,7 +34,7 @@ no negative-search receipt with a stated scope. Either say "we have not found on
 |---|---|---|---|
 | Textbook Turing criterion's finite-domain error is **windowed, not monotone**: exactly 0.0% at every half-integer multiple of λc; 6.22% at 1.25 λc; **0.58% still at 4.25 λc** (prior Dv/Du log-uniform [1,30]) | C | `bench/mispredication/probe_declared_prior.out` on `origin/codex/resource-utilization-20261031` | **Earned**, with the toy-ensemble limit stated |
 | Our own claim *"reliable (under 1%) above 1.5 critical wavelengths"* is **withdrawn** | C | `bench/mispredication/README.md` correction notice, 2026-10-31 12:05 PDT | **Earned** — the strongest single artifact |
-| The historical mispredication table was **imported in the seed commit**, not produced during the event; its generating script is not in the repository | C | `636919a` *"Seed Delphi Frontier with the verified artifacts"*, 07:52 PDT; README limit (1) | **Must be stated** — claiming it as event work is false and `git log` shows it |
+| The historical mispredication table was **imported in the seed commit**, not produced during the event; its generating script is not in the repository | C | `636919a` *"Seed Delphi Studio with the verified artifacts"*, 07:52 PDT; README limit (1) | **Must be stated** — claiming it as event work is false and `git log` shows it |
 | Probe committed **before** its output; scratch-run motivation disclosed | C | `bench/mispredication/PROBE_DECLARATION.md` | **Earned** |
 | Band criterion vs direct eigenvalues: **3,000 comparisons, 0 disagreements** | C | `probe_declared_prior.json` `band_equals_direct_eigenvalues` | **Earned** (cross-check control passed) |
 | Declared control **failed** (89.53% vs declared >90%), threshold not moved, run shipped at exit 1 | C | `probe_declared_prior.out` `PY_EXIT=1`; Amendment 1 in `PROBE_DECLARATION.md` | **Earned** |
@@ -97,7 +97,7 @@ verification asymmetry.
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
-| Public MCP live, **19 tools** (manifest: 16 `read`, 3 `write`) (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
+| Public MCP live, **19 tools** (manifest: 16 `read`, 3 `write`) (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Studio MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
 | **Anonymous reads work**: `frontier_search` returns records with no credential | M | `read_search_anonymous.json` | **Earned** |
 | **Anonymous calculations work**: `frontier_simulate` returns an HH trajectory in 1.10 s, `calibrated: false`, six model-file sha256s, request sha256, full environment | M | `calc_simulate_anonymous.json`, `computed_at` 2026-10-31T22:10:02Z | **Earned** |
 | **Writes are refused**: well-formed `frontier_propose` with no credential → `unauthorized: Authenticated operator token required` | M | `control_write_anonymous_refused.json` | **Earned — this is the must-fail control** |
@@ -186,7 +186,7 @@ funded". We have no information about funding, and the sentence is gone.
 | Root About + `#/generative` pages | **Built during the event** | `df98621` 2026-10-31 15:29:05 PDT (`site/js/about.js`, `site/js/generative.js`, `site/css/about.css`) |
 | RD-1D diffusion pilot (prereg, code, packet) | **Built during the event** | `9c56a927` 15:32:36 PDT, `4a5394f3` 15:33:03 PDT. **No GPU result yet** |
 | Mispredication probe, its failed control, the withdrawal | **Event work** | `e4ab195`, `b9f603b`, `81ca466`, all 12:05 PDT 2026-10-31 |
-| The historical mispredication table | **IMPORTED, not event work** | arrived in seed commit `636919a` 07:52 PDT, *"Seed Delphi Frontier with the verified artifacts"*; its generating script is **not in the repository** |
+| The historical mispredication table | **IMPORTED, not event work** | arrived in seed commit `636919a` 07:52 PDT, *"Seed Delphi Studio with the verified artifacts"*; its generating script is **not in the repository** |
 | The claims corpus (1,190 with upstream ids) | **Imported** | `frontier_catalogue`; records read `local_status: imported_unreviewed` |
 | morphoswarm repository | **PRE-EVENT** | first commit 2026-10-20, eleven days earlier. **Must not be narrated on the System page as event work** |
 

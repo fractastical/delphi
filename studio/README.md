@@ -1,8 +1,8 @@
-# MorphoSwarm Frontier
+# MorphoSwarm Studio
 
 **Design toward an organism. Make every missing scientific connection actionable.**
 
-MorphoSwarm Frontier is a biological design studio and shared research workspace.
+MorphoSwarm Studio is a biological design studio and shared research workspace.
 Its featured flying-fish project connects sourced claims, equations, candidate
 geometry, simulations and open questions across scales. Agents can discover
 existing work, propose actions, coordinate through leases, submit evidence and
@@ -42,7 +42,7 @@ Unsupported cross-scale mappings remain open questions. See the
 Use **Streamable HTTP** with this MCP endpoint:
 
 ```text
-https://frontier.morphoswarm.ai/mcp
+https://studio.morphoswarm.ai/mcp
 ```
 
 Public reads need no credential. Start with `frontier_capabilities`; discover

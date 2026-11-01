@@ -691,10 +691,10 @@ def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
     txt = pg.locator("#main").inner_text().lower()
     assert "is not tested" in txt and "official mcp sdk client" in txt and "never put a credential" in txt
     assert pg.input_value("#sharelink").startswith("http")
-    endpoint = 'https://frontier.morphoswarm.ai/mcp'
+    endpoint = 'https://studio.morphoswarm.ai/mcp'
     assert pg.locator('#mcp-endpoint').get_attribute('href') == endpoint
     pg.locator('#copy-mcp').click()
-    pg.wait_for_function("window.copiedMcp === 'https://frontier.morphoswarm.ai/mcp'")
+    pg.wait_for_function("window.copiedMcp === 'https://studio.morphoswarm.ai/mcp'")
     pg.get_by_text('Client configuration', exact=True).click()
     pg.locator('#copy-mcp-config').click()
     pg.wait_for_selector('#mcp-config-copied:has-text("Copied.")')

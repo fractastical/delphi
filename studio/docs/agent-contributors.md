@@ -26,7 +26,7 @@ The eight nested tasks cover ASK source identification, bioelectric problem sour
 
 ## Reproduction and privacy
 
-Run `python -m frontier_compute.agent_participation --help` for the transcript receipt generator, then `python scripts/agent_contributors.py` for the harness ledger and joined summary. The reviewed scope file pins the Frontier root thread and separately timestamped direct `collaboration.list_agents` observation. Refresh that observation from the actual tool; elapsed time never updates it automatically.
+Run `python -m frontier_compute.agent_participation --help` for the transcript receipt generator, then `python scripts/agent_contributors.py` for the harness ledger and joined summary. The reviewed scope file pins the Studio root thread and separately timestamped direct `collaboration.list_agents` observation. Refresh that observation from the actual tool; elapsed time never updates it automatically.
 
 The scanner reads complete JSONL lines only within the initial file byte boundary, bounds line/file size, and publishes prefix hashes, identity IDs, timestamps, counts and model metadata. Incomplete trailing lines are withheld; malformed complete lines exclude the transcript. Parent metadata embedded in full-history forks cannot replace the child identity, and inherited events before child creation are not counted. Duplicate child identities require explicit resume reconciliation.
 
