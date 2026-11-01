@@ -120,6 +120,9 @@ Five top-level folders, plus the services that run from the repo root:
  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
  counts, genomes, trait databases). Merged view in `test-data/organisms/merged/`; see `test-data/organisms/README.md`.
  - `truth/`: blinded batches and model truth scores feeding the claim graph.
+ - `agent-comparison/`: the measured collective-vs-single-agent comparison (four arms, two pre-registered
+ 20-claim experiments, every plan and verifier record); `SUMMARY.md` and `four-arm.json` are built by
+ `node test-data/agent-comparison/build.mjs` from the imported run data in `four-arm/`.
 - `scripts/`: repo-wide tooling.
  - `exec/`: executable claims. `npm run claims:manifest` collects every claim with a Lean proof
  (`<project>/lean/reports`) or a data test (`test-data/claim-tests/`) into `scripts/exec/manifest.json`;
