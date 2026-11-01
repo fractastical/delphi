@@ -4,7 +4,8 @@
 // (beside the other decks in the repo), from
 // scripts/site/templates/overview-deck.template.html. Every number in the deck is computed here
 // from repo files: docs/claims.json (built by build-claim-graph.mjs), test-data/organisms/merged/
-// taxa.json and the Lean law registry via lib/lean-source.mjs. Edit the template, not the output.
+// taxa.json, the Lean law registry via lib/lean-source.mjs, and the frontier node's usage record
+// (swarm/frontier/built.json) for slide 4's stack. Edit the template, not the output.
 // Each output also gets an overview-deck.pdf beside it (one page per slide, via the template's print
 // CSS), rendered with headless Chrome; set CHROME_PATH if it is not found, or pass --no-pdf to skip.
 import fs from 'node:fs';
@@ -175,16 +176,18 @@ const collab = {
   COLLAB_TEAMS_N: teams.length,
   COLLAB_AGENTS_N: agents.length,
   COLLAB_AGENTS: agents.map((r) => `<li><b>${esc(plain(r[0]))}</b>: ${esc(agentChange(r))}</li>`).join(''),
-  // Done and Active contacts first, one row per counterpart, five rows.
-  COLLAB_TEAMS: (() => {
-    const rank = (r) => (/^Done/.test(plain(r[4])) ? 0 : /^Active/.test(plain(r[4])) ? 1 : /^Contact$/.test(plain(r[4]).trim()) ? 3 : 2);
-    const seen = new Set();
-    return teams.slice().sort((a, b) => rank(a) - rank(b)).filter((r) => {
-      const who = plain(r[1]).replace(/\s*\(.*$/, '').trim().split(' ')[0];
-      if (seen.has(who)) return false; seen.add(who); return true;
-    }).slice(0, 5).map(teamShort).join('');
-  })(),
+  COLLAB_TEAMS: teamRows(5),
+  COLLAB_TEAMS_SHORT: teamRows(3),
 };
+// Done and Active contacts first, one row per counterpart.
+function teamRows(n) {
+  const rank = (r) => (/^Done/.test(plain(r[4])) ? 0 : /^Active/.test(plain(r[4])) ? 1 : /^Contact$/.test(plain(r[4]).trim()) ? 3 : 2);
+  const seen = new Set();
+  return teams.slice().sort((a, b) => rank(a) - rank(b)).filter((r) => {
+    const who = plain(r[1]).replace(/\s*\(.*$/, '').trim().split(' ')[0];
+    if (seen.has(who)) return false; seen.add(who); return true;
+  }).slice(0, n).map(teamShort).join('');
+}
 
 // ---- Hosted MCP server usage, from mcp/usage/<date>.json.
 const usageFiles = fs.readdirSync(R('mcp', 'usage')).filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort();
@@ -199,13 +202,53 @@ const mcpVars = {
   MCP_DAYS: usageFiles.length === 1 ? usageFiles[0].replace('.json', '') : `${usageFiles[0].replace('.json', '')} to ${usageFiles.at(-1).replace('.json', '')}`,
 };
 
+// ---- Stack: the frontier node's own usage record, swarm/frontier/built.json (quoted, not re-verified).
+const frontier = JSON.parse(fs.readFileSync(R('swarm', 'frontier', 'built.json'), 'utf8')).timeline;
+const jobs = frontier.usage.jobs;
+const tel = frontier.rows.filter((r) => r.kind === 'GPU telemetry').map((r) => Number(r.outcome.match(/mean ([\d.]+)%/)[1]));
+const live = frontier.rows.filter((r) => r.kind === 'live check');
+const ledger = frontier.audits.models.data;
+const entries = ledger.entries;
+const embed = entries.find((e) => e.kind === 'embedding_service');
+const STATUS = {
+  completed: 'completed', succeeded: 'completed', completed_pilot: 'pilot only',
+  provider_completed_science_runner_failed: 'runner failed', completed_with_declared_checks_passing: 'checks passed',
+  failed: 'failed', completed_after_output_repair: 'completed after repair',
+  completed_computation_scientific_predicates_failed: 'targets failed', completed_with_mixed_predicate_results: 'mixed targets',
+  completed_for_final_video_revision: 'completed',
+};
+const provider = (p) => p.replace(/^Nebius serverless (\S+) job harness$/, 'Nebius $1').replace(/^Nebius Scientific AI MCP$/, 'Nebius Scientific AI')
+  .replace(/^Google Generative Language API$/, 'Google').replace(/^local CPU execution.*$/, 'local CPU');
+const nameOf = (e) => (e.model_or_tool || e.model || e.models.map((m) => m.model).join(', ')).split(';')[0].replace(/ generic edited (.+) example$/, ' ($1)');
+const groups = new Map();
+for (const e of entries) {
+  const k = nameOf(e);
+  if (!groups.has(k)) groups.set(k, { provider: provider(e.provider), statuses: [] });
+  groups.get(k).statuses.push(STATUS[e.status] || e.status.replace(/_/g, ' '));
+}
+const tally = (s) => Object.entries(s.reduce((a, x) => ((a[x] = (a[x] || 0) + 1), a), {})).map(([x, c]) => (s.length > 1 ? `${c} ${x}` : x)).join(', ');
+const stack = {
+  STACK_JOBS: jobs.length,
+  STACK_GPU: jobs.filter((j) => j.kind === 'GPU').length,
+  STACK_CPU: jobs.filter((j) => j.kind === 'CPU').length,
+  STACK_COMPLETED: jobs.filter((j) => j.state === 'COMPLETED').length,
+  STACK_TEL_N: tel.length,
+  STACK_TEL_RANGE: `${Math.round(Math.min(...tel))}–${Math.round(Math.max(...tel))}%`,
+  STACK_EMBED: embed.usage.documents.toLocaleString('en-US'),
+  STACK_LIVE: `${live.filter((r) => r.ok).length} of ${live.length}`,
+  STACK_RECORDS: entries.length,
+  STACK_MODELS: [...groups].map(([k, g]) => `<li><span><b>${esc(k)}</b> · ${esc(g.provider)}</span><span>${esc(tally(g.statuses))}</span></li>`).join(''),
+  STACK_BIONEMO: esc(ledger.bionemo_nim.statement),
+  STACK_OBSERVED: esc(frontier.observed_at.utc.slice(0, 16).replace('T', ' ') + ' UTC'),
+};
+
 const built = claimsDoc.built ? new Date(claimsDoc.built) : new Date();
 const DATE_SHORT = built.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 const DATE_LONG = built.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 const fmt = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : v);
 const vars = {
-  ...Object.fromEntries(Object.entries({ ...counts, ...swarm, ...collab, ...mcpVars }).map(([k, v]) => [k, fmt(v)])),
+  ...Object.fromEntries(Object.entries({ ...counts, ...swarm, ...collab, ...mcpVars, ...stack }).map(([k, v]) => [k, fmt(v)])),
   ...fourArmVars,
   DATE_SHORT, DATE_LONG,
   UNIVERSE_JSON: JSON.stringify(universe),
