@@ -18,15 +18,22 @@ from .model import version
 from .run import ART, ROOT, dump
 
 
-def prepare(source_commit, created_at, out):
+def prepare(source_commit, created_at, out, run_subdir="run"):
+    if run_subdir not in {"run", "run-component-purge-v2-complete"}:
+        raise ValueError("Unknown pinned observed assay directory")
     source_commit = resolve_commit(str(ROOT), source_commit)
     c = Chain(str(ROOT), source_commit, "delphi-frontier", "mechanobio-observed-update", created_at, "observed-allometry")
     prefix = "artifacts/observed-allometry"
-    receipt = c.jblob(prefix + "/run/receipt.json")
-    for item in receipt["files"] + receipt["code"] + [receipt["protocol"], receipt["import_contract"], receipt["source_observations"]]:
+    run_prefix = prefix + "/" + run_subdir
+    receipt = c.jblob(run_prefix + "/receipt.json")
+    producer = Chain(str(ROOT), receipt["source_commit"], "delphi-frontier", "mechanobio-observed-update", created_at, "producer-code")
+    for item in receipt["code"]:
+        producer.same_hash("producer-code:" + item["path"], item["path"], item["sha256"])
+    c.checks.extend(producer.checks)
+    for item in receipt["files"] + [receipt["protocol"], receipt["import_contract"], receipt["source_observations"]] + ([receipt["protocol_correction"]] if receipt.get("protocol_correction") else []):
         c.same_hash("producer-pin:" + item["path"], item["path"], item["sha256"])
-    update = c.jblob(prefix + "/run/update.json")
-    summary = c.jblob(prefix + "/run/summary.json")
+    update = c.jblob(run_prefix + "/update.json")
+    summary = c.jblob(run_prefix + "/summary.json")
     original = receipt["source_observations"]["path"]
     source_uri = "urn:frontier:observed-allometry:documentary-import"
 
@@ -64,7 +71,7 @@ def prepare(source_commit, created_at, out):
         "title": "A real observed-subset update changes prediction but worsens this held-out species",
         "statement": f"Under the frozen allometry recipe, adding 19 observed rows to 12 training rows changes the same {update['query']['SL_cm']:g} cm SL pectoral prediction from {update['old_result']['predicted_cm']:.4g} to {update['refreshed_result']['predicted_cm']:.4g} cm, rejects a stale cached result and recomputes it. Held-out 18-row RMSE increases from {errors['heldout_before']:.4g} to {errors['heldout_after']:.4g} log10 units.",
         "context": update["scope"], "assumptions": ["Fixed log10 OLS; training-only residual noise and catalog jackknife; no held-out tuning."],
-        "limitations": limits, "source": source(prefix + "/run/update.json"), "origin": "derived",
+        "limitations": limits, "source": source(run_prefix + "/update.json"), "origin": "derived",
     }, source_uri))
     action = c.add(c.draft("Action", "observed-allometry-documentary-analysis", {
         "target": result_claim, "title": "Prepared record of the completed local observed-data analysis; no Store lifecycle",
@@ -79,7 +86,7 @@ def prepare(source_commit, created_at, out):
         "inputs": [raw_claim, raw_evidence],
     }, source_uri))
     c.add(c.draft("Evidence", "observed-allometry-predicted-evidence", {
-        "target": result_claim, "evidence_kind": "predicted", "source": source(prefix + "/run/update.json"),
+        "target": result_claim, "evidence_kind": "predicted", "source": source(run_prefix + "/update.json"),
         "created_time": {"value": None, "basis": "unknown"}, "retrieved_time": {"value": created_at, "basis": "declared"},
         "method": "Producer-executed frozen species/catalog-blocked analysis and observed-subset fit update. Adapter recomputed producer SHA pins from immutable git blobs; it did not rerun fitting or acquire measurements.",
         "context": "Reused preserved-specimen internal validation only; outcomes are predictions/residuals from observed source data.",
@@ -91,8 +98,8 @@ def prepare(source_commit, created_at, out):
         "source_dependence": {"group": "same data/code/author as derived Claim; dependent reused internal folds", "independent_replication": False},
         "uncertainty": "Training-only working bands; held-out error worsened. Not a calibrated organism success probability.",
         "limitations": limits, "relation": "supports", "produced_by": action,
-        "artifacts": [c.artifact("output", prefix + "/run/" + name) for name in ["update.json", "validation.json", "summary.json"]]
-                     + [c.artifact("protocol", prefix + "/protocol.json"), c.artifact("log", prefix + "/run/receipt.json")],
+        "artifacts": [c.artifact("output", run_prefix + "/" + name) for name in ["update.json", "validation.json", "summary.json"]]
+                     + [c.artifact("protocol", prefix + "/protocol.json"), c.artifact("log", run_prefix + "/receipt.json")],
     }, source_uri))
     c.add(c.draft("Problem", "observed-allometry-transfer-gap", {
         "title": "Can context-specific observed fits transfer without hiding worsening held-out errors?",
@@ -105,7 +112,7 @@ def prepare(source_commit, created_at, out):
         "next_action": "Independent review of this documentary bundle before any new experiment or model selection.",
         "required_capabilities": ["source/data statistical review"], "cost_stop_bounds": "Read-only bounded review; no new provider job.",
         "downstream_uses": ["Observed allometry choices and dependent prediction invalidation; not flight/genetic feasibility"],
-        "dependencies": [result_claim, action], "source": source(prefix + "/run/update.json"), "approach": "theory_fit",
+        "dependencies": [result_claim, action], "source": source(run_prefix + "/update.json"), "approach": "theory_fit",
         "scales": ["organ", "organism"], "context_tags": ["reused-observations", "internal-validation", "unknown-species-transfer"],
     }, source_uri))
     bundle = build_bundle([c])
@@ -113,7 +120,7 @@ def prepare(source_commit, created_at, out):
         raise ValueError("Fresh documentary bundle directory required")
     dump(out / "bundle.frontier-bundle-0.1.json", bundle)
     dump(out / "manifest.json", {"schema": "frontier.observed-allometry.bundle/1", "status": "PREPARED ONLY; no DB/import/lease/review/acceptance",
-         "source_commit": source_commit, "created_at": created_at,
+         "source_commit": source_commit, "run_subdir": run_subdir, "created_at": created_at,
          "adapter_code_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
          "adapter_environment": {"python": platform.python_version(), "numpy": np.__version__},
          "counts": {kind: sum(r["kind"] == kind for r in c.records) for kind in ["Claim", "Problem", "Action", "Evidence"]},
@@ -127,6 +134,7 @@ if __name__ == "__main__":
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--created-at", default=datetime.now(timezone.utc).isoformat())
     parser.add_argument("--out", type=Path, default=ART / "prepared-bundle-final")
+    parser.add_argument("--run-subdir", default="run")
     args = parser.parse_args()
-    result = prepare(args.source_commit, args.created_at, args.out)
+    result = prepare(args.source_commit, args.created_at, args.out, args.run_subdir)
     print({"records": len(result["records"]), "bundle_sha256": result["bundle_sha256"]})

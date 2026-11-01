@@ -124,3 +124,12 @@ def test_transitive_cross_species_catalog_component_is_fully_purged():
     split = next(x for x in blocked_folds(rows, "species") if x["heldout_block"] == "held")
     assert [x["id"] for x in split["train"]] == ["independent"]
     assert set(split["purged_ids"]) == {"bridge", "transitive"}
+
+
+def test_actual_corrected_outputs_preserve_all_numeric_values_and_no_original_leak(tmp_path):
+    from engineering.observed_update.audit import compare
+
+    comparisons, leaks = compare(ART / "run", ART / "run-component-purge-v2-complete", tmp_path / "audit.json")
+    assert not leaks and len(comparisons) == 5
+    assert all(x["all_scientific_fields_exactly_equal"] for x in comparisons)
+    assert any(not x["bytes_equal"] for x in comparisons)
