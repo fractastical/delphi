@@ -1,0 +1,81 @@
+{
+  "claim_id": "thompson1917-ch07-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-04",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered": true,
+  "preregistration_note": "This file is committed before Human_Corneal_Endothelium.csv is downloaded. The scouting record (test-data/dataset-scouting/thompson-growth-form/thompson1917-ch07-04/datasets.json) read only the Figshare API metadata and the column list; no row of the data has been seen.",
+  "reading_under_test": "Thompson's 'irrespective of size' clause. The claim says walls meet three at a time at 120 degrees irrespective of cell size, and that relative sizes set only wall curvature. Read at the level of polygon sides (Lewis's law links side count to area, and in a three-way-vertex tiling the mean side count is six by Euler's formula), this predicts that in a settled, non-dividing epithelium the fraction of hexagonal cells does not depend on how variable the cell sizes are. The top-level result.json found 120-degree angles appear only once division stops; the human corneal endothelium does not divide in adults, so it is the tissue where the claim's condition is best met and the 'irrespective of size' clause gets its best chance.",
+  "hypothesis": "If junction geometry is independent of cell size in a non-dividing epithelium, then across 2,000 specular images of 678 organ-cultured human donor corneas the per-image hexagonal fraction is uncorrelated with the per-image coefficient of variation of cell area. The clinical reading (specular microscopy reports falling hexagonality together with rising area CV as cell loss) predicts a strong negative correlation instead.",
+  "planned_datasets": [
+    "auckland-nz-eye-bank-voronoi-endothelium-2017"
+  ],
+  "datasets": [
+    {
+      "id": "auckland-nz-eye-bank-voronoi-endothelium-2017",
+      "name": "Measurements of ex vivo human corneal endothelium using Voronoi segmentation (Brookes, University of Auckland / New Zealand National Eye Bank, 2017)",
+      "landing_url": "https://auckland.figshare.com/articles/dataset/5701087",
+      "doi": "10.17608/k6.auckland.5701087",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://ndownloader.figshare.com/files/9990307",
+          "name": "Human_Corneal_Endothelium.csv",
+          "byte_size_from_api": 105329539,
+          "retrieved_at": null,
+          "sha256": null
+        }
+      ],
+      "role": "Homo sapiens, corneal endothelium, 354,998 cells in 2,000 images from 678 corneas of 351 donors, Voronoi-segmented after organ-culture storage",
+      "method_paper": "Brookes NH. Morphometry of organ-cultured corneal endothelium using Voronoi segmentation. Cell Tissue Bank 2017;18:167-183. doi 10.1007/s10561-017-9622-9 (cited in the dataset record; not fetched)"
+    }
+  ],
+  "method": "Pre-registered. Load the CSV. Columns are per the record's field list: image-level fields (Dataset ID, Image Number, mean cell area, cell area CV, mean cell density, 4- to 9-sides cell counts, total cells, mean hexagonal regularity, number of pleomorphs, mean cell sides, cell sides CV, shape index) repeated on each per-cell row (cell area, number of sides, hexagonal regularity, shape index). Collapse to one row per image (Dataset ID + Image Number). Exclude images with fewer than 50 cells. Per image: f6 = 6-sides count / total cells; CV_area = the image's cell area CV as given; density = mean cell density. Primary statistic: Spearman rho between CV_area and f6 across images, with a 95% bootstrap CI (2,000 resamples). Repeat with images aggregated to one row per Dataset ID (mean of f6 and CV_area over that cornea's images) because images from the same cornea are not independent. Secondary, not deciding: Spearman rho between density and f6 (the clinical reading: cell loss goes with lost hexagonality); within-image Spearman rho between per-cell area and per-cell side count, median over images (Lewis's law, for comparison with ch07-09); sensitivity run restricted to images with density >= 2000 cells/mm^2 to check that the result is not driven by poor-quality or badly damaged tissue.",
+  "pass_criterion": "Pre-registered. The 'irrespective of size' reading is supported if |rho(CV_area, f6)| < 0.15 at both the image level and the cornea level, with the bootstrap 95% CI inside (-0.30, 0.30).",
+  "fail_criterion": "Pre-registered. Refuted if rho(CV_area, f6) <= -0.30 at both the image and the cornea level with the upper 95% CI bound below -0.15 (more size variation goes with fewer hexagons even in the tissue where Thompson's condition is best met). Any other outcome, including the two levels disagreeing, is 'mixed'. If the CSV does not have the stated columns or image identifiers cannot be recovered, 'inconclusive'.",
+  "test_contract": {
+    "expected_observation": "Hexagonal fraction is flat across the range of cell-area CV in non-dividing human corneal endothelium: |rho| < 0.15.",
+    "disconfirming_observation": "Hexagonal fraction falls as cell-area CV rises: rho <= -0.30, at image and cornea level.",
+    "admissible_data": "Per-cell side counts and per-image area CV in a non-dividing epithelium, segmented by a method that does not itself impose hexagons. Voronoi segmentation imposes three-way vertices and straight walls, so it can speak to side counts but not to the 'by threes' half of the claim, which this run does not test.",
+    "inference_method": "Spearman rank correlation with bootstrap CI at two levels of aggregation; no model fitting."
+  },
+  "interpretations": [
+    {
+      "id": "irrespective-of-size",
+      "reading": "In a settled epithelium, packing regularity (hexagonal fraction) does not depend on cell size variation.",
+      "provable": false,
+      "why": "Empirical: an epithelium can rearrange after cell loss; whether it recovers hexagons is not fixed by the force-balance proof."
+    },
+    {
+      "id": "lewis-law-consequence",
+      "reading": "Side count tracks area (Lewis's law), so more area variation means more side variation and fewer hexagons, whatever the junction angles do.",
+      "provable": false,
+      "why": "Lewis's law is empirical. If this reading holds, the 'irrespective of size' clause is false at the level of sides while the 120-degree force balance can still hold at each vertex."
+    },
+    {
+      "id": "clinical-marker",
+      "reading": "Loss of hexagonality and rise in area CV are joint signs of endothelial cell loss (specular-microscopy practice).",
+      "provable": false,
+      "why": "Secondary here. Supported if rho(density, f6) > 0.30; the dataset has no donor age or disease status so it cannot separate cause from state."
+    }
+  ],
+  "what_this_does_not_establish": [
+    "Nothing about junction angles: the dataset carries polygon sides, not angles.",
+    "Nothing about whether walls meet by threes: Voronoi segmentation assumes it.",
+    "Nothing causal about disease or age: no donor age, diagnosis or time course in the listed columns.",
+    "Nothing about dividing tissue: all corneas are adult, post-mortem, organ-cultured."
+  ],
+  "data_kind": "biological",
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor local session, corneal follow-up to the deck review",
+    "date": "2026-11-01"
+  },
+  "idea": "decisions/ideas.json#idea-corneal-hex-clinical",
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "deviations": []
+}

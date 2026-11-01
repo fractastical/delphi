@@ -1,0 +1,175 @@
+{
+  "claim_id": "thompson1917-ch07-04",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T20:05:00Z",
+  "scout": {
+    "kind": "cursor-agent",
+    "model": "claude-fable-5.1",
+    "run": "deck-review/corneal-endothelium follow-up"
+  },
+  "context": "The existing test (test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json) scored the human corneal endothelium as its most regular tissue (75% of junctions within 15 degrees of 120, 0 T-junctions) from one Wikimedia image, and found in Drosophila wing that junction angles approach 120 degrees only as cell division stops. Clinical ophthalmology measures the same geometry routinely: specular microscopy reports percent hexagonal cells (HEX), cell-area coefficient of variation (CV) and endothelial cell density (ECD), and reads falling HEX as corneal stress or cell loss (aging, surgery, Fuchs' dystrophy). This scouting locates datasets that would let a follow-up test ask whether departure from hexagonal packing tracks cell loss and donor age in a non-dividing human epithelium, i.e. the reverse reading of the ch07-04 finding. Recorded as idea-corneal-hex-clinical in decisions/ideas.json (reach-synthesis).",
+  "variables_needed": [
+    "per-cell polygon side count or per-image hexagonal fraction in human corneal endothelium",
+    "endothelial cell density (cells/mm^2) per image or eye",
+    "cell-area coefficient of variation per image or eye",
+    "a covariate that indexes cell loss or settling: donor age, time since surgery, disease status, or storage duration"
+  ],
+  "search_log": [
+    {
+      "source": "Zenodo",
+      "query": "corneal endothelium specular microscopy",
+      "url": "https://zenodo.org/api/records?q=corneal%20endothelium%20specular%20microscopy&size=10",
+      "hits": 31595,
+      "note": "Top 10 are mostly PDF journal articles (cataract and diabetes cohorts reporting ECD/HEX/CV summaries, CC BY 4.0) rather than data; 10.5281/zenodo.7378507 is a segmentation code release (182 MB zip, 'simplified version'); one Dryad record 10.5061/dryad.hhmgqnkjc (healthy children, CC0) surfaced."
+    },
+    {
+      "source": "Zenodo",
+      "query": "corneal endothelial cell segmentation",
+      "url": "https://zenodo.org/api/records?q=corneal%20endothelial%20cell%20segmentation&size=10",
+      "hits": 155318,
+      "note": "Same pattern: clinical PDFs (glaucoma, phacoemulsification, aging in Indian cohorts), no raw per-cell data in the top 10."
+    },
+    {
+      "source": "DataCite",
+      "query": "corneal endothelium specular microscopy (resource-type dataset)",
+      "url": "https://api.datacite.org/dois?query=corneal%20endothelium%20specular%20microscopy&page[size]=10&resource-type-id=dataset",
+      "hits": 12,
+      "note": "Mostly supplementary tables for case reports; one ex vivo swine specular dataset (10.6084/m9.figshare.23584886) not followed up (wrong species for the human reading)."
+    },
+    {
+      "source": "DataCite",
+      "query": "corneal endothelial cell segmentation (resource-type dataset)",
+      "url": "https://api.datacite.org/dois?query=corneal%20endothelial%20cell%20segmentation&page[size]=10&resource-type-id=dataset",
+      "hits": 5,
+      "note": "Found the two University of Auckland Voronoi-segmentation datasets (10.17608/k6.auckland.5701087 and 10.17608/k6.auckland.31360192), which carry per-cell side counts."
+    },
+    {
+      "source": "Figshare",
+      "query": "corneal endothelium specular microscopy (item_type dataset)",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 10,
+      "note": "POST search, page_size 10. Returned PLOS/Frontiers supplementary tables (summary statistics only) plus the Auckland datasets."
+    },
+    {
+      "source": "Dryad",
+      "query": "record 10.5061/dryad.hhmgqnkjc",
+      "url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.hhmgqnkjc",
+      "hits": 1,
+      "note": "Fetched the record, its abstract, methods and file list."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "auckland-nz-eye-bank-voronoi-endothelium-2017",
+      "name": "Measurements of ex vivo human corneal endothelium using Voronoi segmentation (Brookes, University of Auckland / New Zealand National Eye Bank, 2017)",
+      "landing_url": "https://auckland.figshare.com/articles/dataset/5701087",
+      "access_url": "https://ndownloader.figshare.com/files/9990307",
+      "doi": "10.17608/k6.auckland.5701087",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T20:00:00Z",
+        "method": "GET https://api.figshare.com/v2/articles/5701087 (title, description with field list, files, licence); file not downloaded",
+        "http_status": 200,
+        "bytes": 105329539
+      },
+      "variables_present": [
+        "per-cell polygon side count or per-image hexagonal fraction in human corneal endothelium",
+        "endothelial cell density (cells/mm^2) per image or eye",
+        "cell-area coefficient of variation per image or eye"
+      ],
+      "variables_missing": [
+        "a covariate that indexes cell loss or settling: donor age, time since surgery, disease status, or storage duration"
+      ],
+      "scope": "354,998 cells from 2,000 routine assessment images of 678 organ-cultured donor corneas from 351 donors, measured by Voronoi segmentation before release for transplantation. One CSV, Human_Corneal_Endothelium.csv (105 MB).",
+      "evidence": "Figshare API description lists 40 columns including per image: Mean Cell Area, Cell Area CV, Mean Cell Density, 4- to 9-sides cell counts and % area, Mean Hexagonal Cell Regularity, Number of Pleomorphs, Mean Cell Sides, Cell Sides CV, Shape Index; per cell: Cell Area, Number of Sides, Hexagonal Cell Regularity, Shape Index. Donor age is not in the listed columns. Method paper: Brookes NH, Cell Tissue Bank 2017;18:167-183, doi 10.1007/s10561-017-9622-9 (cited in the record description, not fetched).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null,
+      "note": "Side counts, not junction angles: hexagonal fraction and sides CV are the Lewis-law / topological face of the 120-degree claim (compare thompson1917-ch07-09), not a direct angle measurement. Voronoi segmentation imposes straight walls and three-way vertices by construction, so this data cannot test the 'by threes' half of the claim. Large enough to replace the single Wikimedia image for the 'settled human epithelium is near-hexagonal' reading."
+    },
+    {
+      "id": "auckland-endothelium-pre-post-transplant-2026",
+      "name": "Comparative Morphometric Analysis of Corneal Endothelium Before and After Transplantation Using Voronoi Segmentation (Brookes & Allen, University of Auckland, 2026)",
+      "landing_url": "https://auckland.figshare.com/articles/dataset/31360192",
+      "access_url": "https://ndownloader.figshare.com/files/62001730",
+      "doi": "10.17608/k6.auckland.31360192",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T20:00:00Z",
+        "method": "GET https://api.figshare.com/v2/articles/31360192 (title, description, files, licence); file not downloaded",
+        "http_status": 200,
+        "bytes": 18168
+      },
+      "variables_present": [
+        "per-cell polygon side count or per-image hexagonal fraction in human corneal endothelium",
+        "endothelial cell density (cells/mm^2) per image or eye",
+        "cell-area coefficient of variation per image or eye",
+        "a covariate that indexes cell loss or settling: donor age, time since surgery, disease status, or storage duration"
+      ],
+      "variables_missing": [],
+      "scope": "Paired ex vivo donor-tissue images (pre-transplant) and in vivo confocal images of the same tissue after transplant; one 18 KB xlsx of results. Sample size not stated in the record description.",
+      "evidence": "Figshare API description lists donor age, death-to-storage hours, organ-culture days, days between pre and post images, ECD, cell area, % area of squares through nonagons, number of sides, hexagonal regularity, CV of cell area, CV of number of sides, shape index, topological charge, number of cells. Published 2026-02-18.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null,
+      "note": "Covers every variable but is a small summary table (18 KB), with pre/post images from different instruments (ex vivo vs in vivo confocal). Useful as a covariate-rich companion to the 2017 dataset, not as the main sample."
+    },
+    {
+      "id": "dryad-malaysian-children-endothelium-2022",
+      "name": "Corneal endothelial morphology of healthy myopic Malaysian children of Chinese ethnicity aged 8-9 years and its association with axial length (Dryad, 2022)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.hhmgqnkjc",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.hhmgqnkjc/download",
+      "doi": "10.5061/dryad.hhmgqnkjc",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T20:02:00Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.hhmgqnkjc and its /versions and files listing; files not downloaded",
+        "http_status": 200,
+        "bytes": 19455
+      },
+      "variables_present": [
+        "per-cell polygon side count or per-image hexagonal fraction in human corneal endothelium",
+        "endothelial cell density (cells/mm^2) per image or eye",
+        "cell-area coefficient of variation per image or eye"
+      ],
+      "variables_missing": [
+        "a covariate that indexes cell loss or settling: donor age, time since surgery, disease status, or storage duration"
+      ],
+      "scope": "111 healthy children aged 8-9 (37 emmetropes, 37 mild myopes, 37 moderate myopes), Topcon specular microscope HEX, COV, ECD, CCT per eye, plus axial length. Files: F1000_ECD_raw_data_submitted.xlsx (19,006 bytes), README.txt (449 bytes).",
+      "evidence": "Dryad abstract and methods: instrument-reported ECD, HEX (hexagonality), COV, CCT averaged over three 0.5 x 0.25 mm selections per eye; axial length by A-scan. Published 2022-03-17.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null,
+      "note": "Instrument-reported per-eye summaries only, no images or per-cell data. Its covariate is axial length (eye elongation), which is a mechanical-stretch proxy rather than cell loss; a healthy young baseline for HEX."
+    },
+    {
+      "id": "zenodo-opi-lab-signed-distance-maps",
+      "name": "opi-lab/signed-distance-maps-for-corneal-endothelium: Article version (Zenodo software release)",
+      "landing_url": "https://zenodo.org/records/7378507",
+      "access_url": null,
+      "doi": "10.5281/zenodo.7378507",
+      "license": "other-open",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T20:00:00Z",
+        "method": "GET https://zenodo.org/api/records/7378507",
+        "http_status": 200,
+        "bytes": 182423319
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "per-cell polygon side count or per-image hexagonal fraction in human corneal endothelium",
+        "endothelial cell density (cells/mm^2) per image or eye",
+        "cell-area coefficient of variation per image or eye",
+        "a covariate that indexes cell loss or settling: donor age, time since surgery, disease status, or storage duration"
+      ],
+      "scope": "Segmentation code (resource type: software), 182 MB zip, described as a simplified version without postprocessing. Whether it bundles specular images is not stated and was not checked.",
+      "evidence": "Zenodo record metadata: resource_type software, one file opi-lab/signed-distance-maps-for-corneal-endothelium-v1.0.0.zip.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null,
+      "note": "A method, not a dataset. Relevant only if a junction-angle (not Voronoi) re-measurement of specular images is attempted; it would need its own segmenter-bias null as in revisions[0] of the existing test."
+    }
+  ],
+  "status": "partial",
+  "summary": "No public dataset carries junction angles for human corneal endothelium. Two University of Auckland datasets (CC BY 4.0) carry per-cell side counts and hexagonal regularity from Voronoi segmentation: 354,998 cells from 678 donor corneas (10.17608/k6.auckland.5701087, no donor age in the listed columns) and a small paired pre/post-transplant table with donor age, storage time and topological charge (10.17608/k6.auckland.31360192). A Dryad CC0 table gives instrument-reported HEX/CV/ECD for 111 healthy children (10.5061/dryad.hhmgqnkjc). Together they support a side-count (Lewis-law) reading of the 120-degree claim in a settled human epithelium, and a test of whether hexagonality falls with cell loss, but not a direct angle measurement, and Voronoi segmentation assumes three-way vertices so it cannot test the 'by threes' half. Clinical PDFs on Zenodo report ECD/HEX/CV only as cohort summaries."
+}
