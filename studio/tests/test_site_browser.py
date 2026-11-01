@@ -896,7 +896,12 @@ def test_system_built_tab_links_evidence_keeps_failures_and_labels_the_repo_publ
     assert "ResourceExhausted" in t and "UREQ_TOS_NOT_ACCEPTED" in t and "INCONCLUSIVE" in t and "POSITIVE" in t
     assert "actual spend" in t.lower() or "Unknown" in t
     assert pg.locator("tbody tr").count() >= 13
-    assert pg.locator(".tablewrap td:has-text('preregistered')").count() == 0   # date-only verdicts are not placed on the dated timeline
+    timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
+    # A dated telemetry filename may contain "preregistered". Check the actual
+    # invariant: date-only verdicts are not promoted onto the timed record.
+    assert all("T" in row["time"] for row in timeline["rows"])
+    dated = pg.locator("table").filter(has=pg.locator("caption", has_text="Dated build and run records"))
+    assert dated.locator("tbody tr").count() == len(timeline["rows"])
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
 
@@ -956,7 +961,10 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
     assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
-    assert "3184.1 s across 9 completed GPU jobs" in t and "historical team jobs listed separately" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
+    timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
+    for counter in timeline["counters"]:
+        assert counter["value"] in t
+    assert "historical team jobs" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
     assert "%" not in pg.locator(".tablewrap").first.text_content()
     assert "scorecard" not in t.lower() and "rubric" not in t.lower()
 
@@ -1371,6 +1379,23 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
     assert all("fish3d-v3b-glide-pose-prop" in h and h.endswith(".stl") for h in hrefs), hrefs
     assert "printer and resin unknown" in pg.locator(".printv3").text_content() and "not organisms" in pg.locator(".printv3 .v3info").text_content()
     assert pg.request.get(base + hrefs[0]).status == 200
+
+
+def test_generative_page_shows_recorded_denoising_and_retains_failed_audit(browser, base):
+    import hashlib
+    pilot = json.loads((ROOT / "site/data/snapshot.json").read_text())["diffusion_pilot"]
+    assert not pilot["refused"]
+    for file in pilot["files"]:
+        data = (ROOT / "site" / file["href"]).read_bytes()
+        assert len(data) == file["bytes"] and hashlib.sha256(data).hexdigest() == file["sha256"]
+    pg = page(browser)
+    pg.goto(base + "#/generative")
+    pg.wait_for_selector("#diffusion-recorded img")
+    text = pg.locator("#diffusion-recorded").text_content()
+    assert "Strict secondary audit: failed" in text and "Denoising steps are not physical time" in text
+    assert "No inference speedup demonstrated" in text
+    assert "157 finite DDPM metrics" in text and "zero solver-amplitude denominator" in text
+    assert pg.locator("#diffusion-recorded img").count() == 3
 
 
 def test_morpheus_full_horizon_chart_is_labelled_a_chart_not_a_spatial_movie(browser, base):
