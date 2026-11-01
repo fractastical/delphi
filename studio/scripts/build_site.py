@@ -612,7 +612,7 @@ def genetic_blueprints(ins: Inputs) -> dict | None:
         return None
     B = json.loads(ins.read(f"{d}/blueprints.json")); S = json.loads(ins.read(f"{d}/sources.json")) if (ROOT / d / "sources.json").exists() else {}
     return {"status": B["status"], "species_scope": B["species_scope"], "date": B["date"], "designs": B["designs"], "comparison": B["comparison"], "global_causal_gaps": B["global_causal_gaps"], "not_done": B["not_done"],
-            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "source_index": {x["id"]: {k: x.get(k) for k in ("citation", "primary_url", "read_level")} for x in S.get("sources", []) if x.get("id")}, "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
 
 
 def openresearch_exemplars(ins: Inputs) -> dict | None:
