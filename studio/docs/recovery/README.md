@@ -246,3 +246,38 @@ The withheld0440 and0450 captures remain recorded; neither was uploaded. The lat
 16 print-v4 paths being replaced during active repair. Print-v4 and new science videos are
 explicitly deferred until their final publication, as are later cloud states not yet returned.
 This is a declared recovery cutoff, not a claim to capture future writes.
+
+## Four-film release and final Project database add-on
+
+`20261101T0610` preserves exact live release `ac95c4c260d19ce8b26ea347e830884132644bfe`:
+all four normal-speed films and their source media/captions, print-v4 and review, source refs,
+24 declared transcript prefixes, the completed 45-arm mechanics return, and the three private
+sequence-source HTML caches. The caches remain encrypted/private and are not public mirrors.
+The archive is **848,233,945 bytes**, SHA256
+`d6d5b0f5c036412cb63ca18d29cea7e679dabe8265e016d0b28de74e22784317`.
+Actual S3 download, public-access denial and sb03 decrypt/rehash passed at **11:10:27pm PDT**:
+**561 files / 1,197,455,541 logical bytes**, no capture errors.
+
+Its database predates the new documentary/Project imports. The separate `20261101T0620`
+add-on contains a new read-only transaction with **3,936 versions / 1,976 events**, the
+complete partial regulatory return, and the incremental source objects through
+`46dc3c78431a773c6e942c6b0d6b7b5b8998cde7`. All 18 table counts reproduced in scratch;
+operational sanitization preserved scientific envelopes. This archive is **47,470,426 bytes**,
+SHA256 `e62b472aaaf551a15c5993d9cfad1ab91d9dfbbda13e538ee72ffa1e2427fe11`.
+Actual S3 download and sb03 decrypt verified **18 files / 47,730,362 logical bytes** at
+**11:12:44pm PDT**. Snapshot names are identifiers; receipt timestamps define the capture windows.
+
+Restore the earlier base for older artifacts/environment recipes, then these two additive trees.
+Clone `0610/restored/metadata/frontier-all-refs.bundle` as a mirror before verifying/fetching
+`0620/restored/metadata/source-incremental.bundle`; the incremental bundle requires the base
+objects. This exact sequence recovered the source checkpoint on sb03. Use the **0620 sanitized
+dump** with fresh credentials. Its actual sb03 digest is
+`9c17f8098a9edd4a57c525c77d356e0226717f4159b791b1d901223b32683dc4`
+(23,384,829 bytes). The raw encrypted dump remains available for private forensic recovery.
+
+The joined public-safe receipt is `results/resources/backup-recovery-four-film-20261101.json`.
+No whole application drill is claimed for these newer bytes: the earlier real separate-host
+service drill remains tied to its exact older source and dump. Moving experiments, future writes
+and original CPU cylinder states not yet returned remain outside this cutoff. The first broad
+inventory attempt refused an unsafe selected path; its local failure was retained, and the
+successful explicit frozen-release capture did not weaken the path or stability gates.
