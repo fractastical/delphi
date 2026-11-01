@@ -109,7 +109,10 @@ Five top-level folders, plus the services that run from the repo root:
  Thompson Lake project (`thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean`); see its README.
  - `cell-geometry/`: micrograph segmentation for Thompson's cell-packing claims.
 - `test-data/`: what claims are tested against.
- - `claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`.
+ - `claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`, plus
+ `faithfulness.json` where the A9 gate has run (an assessor from another provider judging
+ whether the analysis measures what the claim asserts; `FAITHFULNESS.md`). A `not-representative`
+ verdict is reported in `SUMMARY.md`, never used to edit the data verdict.
  - `dataset-scouting/<project>/<claim-id>/datasets.json`: where the data to test an untested claim
  are. A swarm of scouts checks the datasets the assessors named against the live source and
  searches for more, following `test-data/dataset-scouting/INSTRUCTIONS.md`; `build-queue.mjs`

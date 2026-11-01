@@ -1,0 +1,43 @@
+{
+  "claim_id": "wolfram2002-ch12-23",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.97,
+  "variables": {
+    "claim_asserts": "Across all 4096 two-state, two-color machines under Wolfram's convention, observed halting-time growth rates are linear, quadratic, or exponential, and exponential computations have bounded-time equivalents.",
+    "test_measures": "Finite-input maximum halting-time curves T(n), classified by exact or 15%-RMS fits, plus exact partial-function identity including non-halting inputs.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Exhaustive machine enumeration under the stated convention is the correct modality and reproduces the book's principal census and example formulas."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The decisive classifier treats bounded parity or period-4 modulation around linear or quadratic growth as a different growth rate, and the partner criterion requires identical undefined-input patterns rather than the halting-domain equivalence under which all exponential cases have constant-time partners."
+  },
+  "scope": {
+    "claim_scope": "All 4096 two-state, two-color Turing machines under Wolfram's halting convention.",
+    "test_scope": "All 4096 machines, but functions and T(n) are inferred from x <= 1023, with selected machines extended through x <= 16383.",
+    "narrower": true
+  },
+  "reasons": [
+    "The enumeration itself is highly aligned: it exactly reproduces 748 never-halting, 3348 sometimes-halting, 1683 always-halting machines and all listed example formulas.",
+    "The refutation's 49 'other' pairs are not other growth rates: the supplementary parity-aware analysis classifies them as constant, linear, or quadratic except two quadratic curves with period-4 modulation.",
+    "For example, machine 791 has T(n) = 7,19,15,27,23,35,31,43,..., a linear trend with bounded parity modulation; rejecting it for exceeding a 0.15 RMS fit does not test the claimed growth-rate category.",
+    "The second failure comes from counting undefined inputs as part of function identity; on each exponential machine's halting domain, the derived results find 261-269 constant-time partners, matching the claim's substantive bounded-computation comparison."
+  ],
+  "what_would_change_it": "Classify growth rates allowing bounded periodic modulation and initial transients, and apply Wolfram's intended equivalence convention for partial functions; retain the exact 4096-machine census and extend inputs only as a robustness check.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/measurements.json",
+    "derived/machines.csv"
+  ]
+}

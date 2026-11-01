@@ -1,0 +1,33 @@
+{
+  "claim_id": "darwin1859-ch09-03",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:43:10Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful",
+  "confidence": 0.86,
+  "variables": {
+    "claim_asserts": "On the stated erosion premise, denudation of the Weald required about 300 million years (306,662,400 years), so far more than 300 million years have elapsed since the latter part of the Secondary period / the latter part of the Chalk.",
+    "test_measures": "Radiometric age of the top of the Cretaceous, the Mesozoic and the Maastrichtian (Macrostrat and PBDB/ICS v2024/12) and the BGS Chalk Group youngest age; all seven readings are 66.0 Ma. Pass if that age is >= 300 Ma; outright refutation if < 150 Ma. The largest reading is used.",
+    "match": "exact"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Darwin states a number of years since the late Chalk. The International Chronostratigraphic Chart ages, cross-checked on Macrostrat and the Paleobiology Database and on the BGS Lexicon record for the Chalk Group, are a measurement of that number of years. The inch-per-century cliff premise is not re-measured; result.json says so, and the elapsed time is an upper bound on how long the denudation can have taken."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "Mapping 'latter part of the Secondary period' and 'latter part of the Chalk formation' to the top of the Cretaceous / the youngest age of the Chalk Group is the horizon Darwin named, not a new claim. Shifting the target to the Cenomanian base (100.5 Ma in the same tables) still leaves the interval far below 300 Myr. The test assumes the ICS calibration is the time scale; that is what a claim about years elapsed requires."
+  },
+  "scope": {
+    "claim_scope": "Geological time since the late Cretaceous (Chalk) in south-east England, and the duration of Weald denudation.",
+    "test_scope": "Age of the K/Pg boundary on the global ICS chart, plus the BGS Chalk Group (oldest 100.5 Ma, youngest 66.0 Ma), the youngest unit removed over the Weald.",
+    "narrower": false
+  },
+  "reasons": [
+    "The quantity in the conclusion is years since the latter part of the Chalk. analysis.py takes the maximum of macrostrat_top_cretaceous, macrostrat_top_mesozoic, macrostrat_top_maastrichtian, the three PBDB late ages, and bgs_chalk_group_youngest. All seven are 66.0, so darwin_over_measured is 4.55 against darwin_claim_myr 300.",
+    "The pre-registered rule refutes only below 150 Ma (half of Darwin's figure) and would support at or above 300 Ma. 66 is below the outright-refutation threshold. That is Darwin's own number, not a substituted standard.",
+    "The denudation duration is not recomputed from cliff height and retreat rate. It is constrained as an upper bound: removal of the Chalk cannot have occupied more years than have elapsed since the youngest Chalk. interpretation states that the erosion-rate premise is not tested and that only the numerical conclusion is. The refutation is of that conclusion (more than 300 million years since the late Secondary, and a 300-million-year denudation), which is what the quote asserts."
+  ],
+  "what_would_change_it": "A test that measured only present-day cliff retreat, or only Weald geometry, and never compared a duration with the age of the late Chalk, would be about the premise rather than the stated number of years. Dating a horizon other than the end of the Chalk / Secondary (for example the base of the Cambrian, or the base of the Mesozoic at 251.9 Ma, which the script records but does not use as the target) would change the quantity.",
+  "files_read": ["result.json", "analysis.py", "derived/measured.json"]
+}

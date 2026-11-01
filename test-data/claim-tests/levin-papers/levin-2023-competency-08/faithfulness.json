@@ -1,0 +1,43 @@
+{
+  "claim_id": "levin-2023-competency-08",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.99,
+  "variables": {
+    "claim_asserts": "The genotype-phenotype fitness correlation reported for the evolvable-competency simulation falls to zero within about 20 generations.",
+    "test_measures": "A newly defined per-generation Pearson correlation across 100 individuals, averaged across repeats, rather than the authors' within-bin correlation of repeat-mean best-fitness curves.",
+    "match": "different"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Replication of the evolvable-competency simulation is appropriate, but the primary statistic is not the statistic used to make the reported claim."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The test interprets 'for all individuals' as an across-individual correlation each generation; the authors' code instead correlates best-genotypic and best-phenotypic curves within ten-generation bins and maps undefined correlations to zero."
+  },
+  "scope": {
+    "claim_scope": "The reported correlation in the in silico 1D embryo model with evolvable competency.",
+    "test_scope": "The same simulation family over 30 repeats and 1,000 generations, but with a different primary correlation estimand.",
+    "narrower": false
+  },
+  "reasons": [
+    "The primary mean_r_gen21_40 = 0.3107 and mean_r_gen41_1000 = 0.2972 are across-individual correlations, whereas the claim's reported zero came from the authors' binned best-curve statistic.",
+    "The test's own secondary result reproduces the reported statistic exactly: authors_binned_correlation is 0.9957 in the first bin and 0.0 in every later bin.",
+    "Those later zeros occur because best phenotypic fitness is constant at 1.0, making Pearson correlation undefined, and the authors' code sets undefined values to zero; a different correlation can critique that interpretation but cannot refute the reported statistic.",
+    "The selection differential on genotypic fitness, 0.00154 over generations 41-1000, supports the claim's accompanying interpretation that selection ceases to improve structural genes, but it is not used to decide the refutation."
+  ],
+  "what_would_change_it": "Use the authors' within-bin best-curve correlation as the primary variable and assess its undefined-to-zero convention explicitly; if testing population-level decoupling instead, state that as a distinct modern claim rather than a refutation of the reported result.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/correlation_curves.json",
+    "derived/measured.json"
+  ]
+}

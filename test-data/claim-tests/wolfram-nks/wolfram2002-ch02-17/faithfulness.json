@@ -1,0 +1,42 @@
+{
+  "claim_id": "wolfram2002-ch02-17",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.94,
+  "variables": {
+    "claim_asserts": "The distribution of prime numbers seems random in many respects despite its simple generating rule.",
+    "test_measures": "The number of seven selected statistics for primes below 10^8 that meet fixed thresholds against an independent Cramer-model sequence.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Computational statistics on the prime sequence are an appropriate modality, and the sieve was validated against OEIS counts and terms."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The refutation assumes that 'many respects random' means at least five of seven hand-selected Cramer-model thresholds; neither the quote nor stated scope supplies that majority rule or those thresholds, and the result changes to support under small threshold changes reported in result.json."
+  },
+  "scope": {
+    "claim_scope": "Distribution of prime numbers.",
+    "test_scope": "Primes below 10^8, chiefly the interval [5x10^7, 10^8], evaluated in seven selected respects.",
+    "narrower": true
+  },
+  "reasons": [
+    "The measured R1-R7 quantities are relevant prime-distribution properties, but the decisive variable is a constructed count, n_random_like = 3 of 7, not an author-stated quantity.",
+    "The FAIL rule equates four threshold misses with refuting 'seems in many respects random' even though the regularity triggers did not fire: R6_lzma_ratio_raw was 0.553 and R5_fourier_peak_share_of_total was 0.0418.",
+    "Three failures are marginal by the test's own account: R1 was 0.0363 against 0.03 and R6 was 0.9617 against 0.98; result.json states thresholds 0.05 and 0.95 would produce five of seven and support.",
+    "R5's period-3 sieve peak is a known arithmetic regularity, but the claim allows randomness 'in many respects' rather than requiring resemblance to Cramer's model in a majority of an arbitrary panel."
+  ],
+  "what_would_change_it": "Use a set of statistical respects and acceptance standard explicitly stated by Wolfram, or report the seven comparisons descriptively without treating an assessor-chosen majority threshold as a refutation; extending beyond 10^8 would address the finite scope but not the criterion mismatch.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/measurements.json"
+  ]
+}

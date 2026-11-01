@@ -1,0 +1,33 @@
+{
+  "claim_id": "thompson1917-ch15-08",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:43:10Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.9,
+  "variables": {
+    "claim_asserts": "Following Looss, the lateral spine of some schistosome eggs is moulded in a funnel-shaped part of the uterus, so lateral-spined and terminal-spined eggs are mechanical modifications of the same thing and the spine does not show a separate species, S. mansoni.",
+    "test_measures": "Uncorrected cox1 p-distance on local pairwise alignments of GenBank sequences (overlap >= 300 nt). Mean S. mansoni vs S. haematobium distance is 0.1676 (range 0.1475–0.2054, 1481 pairs). Refutes if there is a complete barcode gap (min between-group > max within either species), the mean is >= 0.10, and the mean is at least the mean for S. haematobium vs S. bovis (0.1039) and S. mansoni vs S. rodhaini (0.1173). Within-species maxima are 0.0712 and 0.0638, so the gap holds.",
+    "match": "different"
+  },
+  "modality": {
+    "appropriate": false,
+    "note": "The stated scope is the eggs of S. haematobium and S. mansoni, and the quote is about a mechanical cause of form. The data are partial mitochondrial cox1 sequences of adult worms labeled with those names (40 + 40, plus other nominal species for calibration). Spine position, ootype shape and whether one female's eggs vary are not in the FASTA or the accession list."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "interpretation and the caveats call the reading a modern reinterpretation: 'separate species' is taken as a reciprocally separated mitochondrial lineage, a criterion that did not exist in 1917. Thompson's standard is Looss's uterine mould and the claim that the spine is therefore not a species mark. A barcode gap between names now used for the two worms does not measure that mould, and it does not test whether the spine was the evidence for the split. The hypothesis adds a conditional he did not state: if the eggs are mechanical variants of one species, cox1 distances must overlap and the mean must be <= 0.03."
+  },
+  "scope": {
+    "claim_scope": "Eggs of Schistosoma haematobium and S. mansoni: lateral versus terminal spine as a mechanical product of the uterus, and the species inference drawn from that.",
+    "test_scope": "cox1 of nominal S. mansoni and S. haematobium, calibrated on S. bovis, S. rodhaini and other named species. The mechanical half is explicitly not tested. Only the taxonomic conclusion is scored, under a genetic species concept.",
+    "narrower": true
+  },
+  "reasons": [
+    "The quote's evidence is anatomical: a mechanical principle shows two egg forms are modifications of the same thing and destroys the chief evidence for a new species. analysis.py never reads an egg character. The decision uses barcode_gap, mean_between 0.1676, max_within, and the two reference means.",
+    "The refutation can be true of modern species limits and still not be about the claim. Two lineages can be distinct on cox1 while the spine remains a moulded character, or while the spine fails as a diagnostic. The caveat equates the genetic result with 'the egg forms cannot be variants of one species whatever their mechanical origin', which replaces the mechanical claim rather than measuring it.",
+    "Dropping the mechanism would be a narrower scope only if the remaining half used Thompson's standard for 'the same thing' and 'a supposed new species'. The 0.10 distance floor, the barcode gap and the comparison with S. bovis and S. rodhaini are not that standard. interpretation states that they are a reinterpretation."
+  ],
+  "what_would_change_it": "Measure ootype or uterus geometry and spine position on eggs from the same females, and test whether a funnel moulds the lateral spine and whether one worm produces both forms. That would be the variable Looss and Thompson assert. A genetic distance would stay a different quantity unless the claim under test were modern species delimitation rather than the 1917 mechanical argument.",
+  "files_read": ["result.json", "analysis.py", "fetch.py", "derived/accessions.csv", "derived/schistosoma_cox1.fasta"]
+}

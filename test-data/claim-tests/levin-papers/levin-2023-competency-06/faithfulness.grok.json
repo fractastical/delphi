@@ -1,0 +1,33 @@
+{
+  "claim_id": "levin-2023-competency-06",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:44:08Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful-with-narrower-scope",
+  "confidence": 0.64,
+  "variables": {
+    "claim_asserts": "In mixed populations of 200 hardwired and competent 1D embryos, the competency a minority needs in order to dominate falls as its initial share rises (75 at 10%, 40 at 20%, 10 at 30%), takeover takes two or three generations, and at 2.5% they do not dominate even at competency 95.",
+    "test_measures": "c*, the smallest competency on a 5-step grid from 5 to 95 such that the mean competent share at generation 20 exceeds 0.5 at that level and every higher level, over 50 repeats; plus that mean share at share 0.025 and competency 95. Dominance and the two-or-three-generation window are read off the same mean-share curves.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "The run is the mixed-population genetic algorithm the claim is about: 200 embryos, competent counts 5/20/40/60, competent embryos selected on phenotypic fitness and hardwired on genotypic fitness, top 20 kept, crossover, mutation probability from the shared model, 20 generations. develop() and fitness() are imported from the sibling competency-04 test; this directory specifies the labels, selection, and share statistic."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "Heritable type labels travelling with the left crossover segment, and selection of competents on phenotype, match the experiment the paper describes. interpretation states that the paper never defines 'dominate' or the number of runs. Mean share > 0.5 over 50 repeats is a declared proxy. At 2.5% and competency 95 the mean share is 0.94 (47 of 50 runs a majority), which is dominance on any ordinary reading of the word, so the proxy is not what makes that clause fail."
+  },
+  "scope": {
+    "claim_scope": "In silico mixed populations of 200 hardwired and competent 1D embryos, as the reported experiment.",
+    "test_scope": "The model as the prose describes it. A sensitivity that copies two quirks of the authors' Exp2 code (point mutation can overwrite the type label; the last structural gene is never mutated) is computed and excluded from the verdict.",
+    "narrower": true
+  },
+  "reasons": [
+    "The variables are the claim's: competent share against competency and initial proportion, and how many generations until the competent share exceeds half. On the decisive run, c* is 60, 35, 15, 15 at initial shares 0.025, 0.1, 0.2, 0.3, against the claimed 75, 40, and 10. The pre-registered fail that actually fires is share_2.5pct_competency_95_mean_share_gen20 = 0.94 > 0.75. The distance rule |c* − claimed| > 40 does not fire (the gaps are 40, 25, and 5), and c*(0.3) = 15 is not ≥ c*(0.1) = 35. P1 fails only because c* is 15 at both 20% and 30%, so the threshold does not keep falling, and P4 fails because at the threshold the mean share first exceeds 0.5 at generation 5–8 rather than by generation 4.",
+    "interpretation states both narrowings: dominance is the tester's mean-share rule, and the verdict follows the prose model rather than the released code. The authors_code_quirk_variant, which does not decide, gives c* = 100, 65, 35, 25 and a mean share of 0.3983 at 2.5% and competency 95, so no tested level dominates at 2.5%, and the thresholds sit nearer 75/40/10. The caveat says the published numbers likely depend on that label-mutation quirk. Scoring the prose model is still a test of the experiment the claim describes; it is not the program that the test itself finds closer to the reported figures, and that restriction is declared.",
+    "The qualitative direction in the quote (a larger share or a higher competency makes takeover more likely) is visible in mean_share_gen20 on the main grid. The refutation is the specific 2.5% non-dominance clause, under the declared proxy and the declared program."
+  ],
+  "what_would_change_it": "Let the authors' Exp2 program, including label mutation and the unmutated last gene, or the paper's own dominance rule if Table 2 states one, decide the verdict. If that computation still showed no dominance at 2.5% up to competency 95 and thresholds near 75, 40, and 10, the prose-model refutation would be about a different run from the reported one. If 0.94 were scored as non-dominance by the paper's own rule, the criterion would not be the author's.",
+  "files_read": ["result.json", "analysis.py", "derived/measured.json", "derived/conditions.json"]
+}

@@ -1,0 +1,44 @@
+{
+  "claim_id": "levin-2023-competency-06",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.97,
+  "variables": {
+    "claim_asserts": "In the authors' mixed-population simulation, takeover competency thresholds fall with initial competent share, with reported thresholds near 75, 40, and 10 and no takeover from 2.5% at competency 95.",
+    "test_measures": "Generation-20 mean competent share and derived c* thresholds in a cleaned model-description implementation; the released-code behavior is secondary.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Repeated runs of the mixed-population simulation are the correct modality, and competent share by generation directly measures takeover."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The primary implementation changes the released experiment's mutation behavior by preserving type labels and mutating the last structural gene; the authors-code-quirk condition, which retains those behaviors, yields results much closer to the claimed simulation."
+  },
+  "scope": {
+    "claim_scope": "The authors' in silico mixed populations of 200 hardwired and competent embryos.",
+    "test_scope": "A reimplementation of the paper's prose model over 50 repeats, with the released-code implementation treated only as a sensitivity variant.",
+    "narrower": false
+  },
+  "reasons": [
+    "The outcome variables are well aligned: mean competent share, c* on the 5-swap grid, and first generation above 0.5 directly represent dominance and takeover time.",
+    "The refuting main variant gives c* = 35, 15, 15 at 10%, 20%, and 30%, and mean share 0.94 at 2.5%/95.",
+    "The released-code variant instead gives c* = 65, 35, 25 and mean share 0.3983 at 2.5%/95, reproducing the claimed no-dominance result and approaching the reported thresholds.",
+    "Because the claim reports the authors' simulation result, demoting the actual code's label-overwrite and mutation-range behavior to sensitivity status makes the primary verdict about a corrected reinterpretation rather than the simulation that generated the claim.",
+    "The test also imposes its own dominance definition, mean share at generation 20 greater than 0.5, while result.json states the paper did not specify its dominance criterion or number of runs."
+  ],
+  "what_would_change_it": "Make the released authors' code at the identified commit the primary implementation, preserve its label and mutation behavior, and use the paper's original dominance calculation or reconstruct it from the reported experiment before comparing thresholds.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/measured.json",
+    "derived/conditions.json"
+  ]
+}

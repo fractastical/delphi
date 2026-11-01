@@ -52,7 +52,7 @@ for (const [page, data] of [["claim-graph", DATA], ["claims-query", DATA], ["the
 const rows = claims.map(c => ({ id: c.id, key: c.key, label: c.label, statement: c.text, quote: c.quote || null, thinker: c.thinker, year: c.year,
   work: c.work, chapter: c.section || null, kind: c.kind, status: c.status, proof: c.proof ?? null, verification: c.verification,
   math: c.math, theorem: c.theorem, notation: c.notation || null, lean_theorems: c.lean?.theorems ?? null,
-  evidence: c.evidence, evidence_kind: c.evidenceKind, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, data_kind: c.dataTest.dataKind, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions } : null,
+  evidence: c.evidence, evidence_kind: c.evidenceKind, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, data_kind: c.dataTest.dataKind, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions, faithfulness: c.dataTest.faithfulness } : null,
   morpholib: c.morpholib.map(m => ({ id: m.id, relation: m.relation, note: m.note, label: m.label, organism: m.organism, verdict: m.verdict,
     score: m.score, thompson_verdict: m.thompsonVerdict, nanopub: m.nanopub, registry: m.registry, report: m.report })),
   thumbnail: c.thumb ? { file: `docs/${c.thumb.src}`, morpholib: c.thumb.morpholib, source: c.thumb.source } : null,
@@ -78,6 +78,11 @@ const walk = d => { for (const f of readdirSync(d, { withFileTypes: true })) {
 if (existsSync(TESTS)) walk(TESTS);
 const pending = runs.filter(r => r.status === "preregistered");
 const tested = claims.filter(c => c.evidence);
+// A9 faithfulness gate (test-data/claim-tests/FAITHFULNESS.md): which tests an independent provider has checked
+// for measuring what the claim asserts, and with what outcome.
+const FAITH = ["faithful", "faithful-with-narrower-scope", "not-representative"];
+const faithed = tested.filter(c => c.dataTest.faithfulness);
+console.log(`faithfulness: ${faithed.length} of ${tested.length} tests checked (${FAITH.map(v => `${faithed.filter(c => c.dataTest.faithfulness.status === "agreed" && c.dataTest.faithfulness.verdict === v).length} ${v}`).join(", ")}, ${faithed.filter(c => c.dataTest.faithfulness.status === "contested").length} contested)`);
 const byThinker = [...new Set(tested.map(c => c.thinker))];
 const n = (cs, f) => cs.filter(f).length;
 const cell = k => k || "·";
@@ -101,12 +106,29 @@ const summary = [
   "Same numbers by query: `node mcp/cli.mjs overview`, the `delphi_overview` MCP tool, or",
   "`jq '[.claims[] | select(.evidence)] | group_by(.evidence) | map({(.[0].evidence): length}) | add' docs/claims.json`.",
   "",
+  `## Faithfulness gate (${faithed.length} of ${tested.length} tests checked)`,
+  "",
+  "Does the analysis measure what the claim asserts? Judged by an assessor from a provider other than the builder's, reading only the claim and the test directory ([FAITHFULNESS.md](FAITHFULNESS.md)). " +
+    "A `not-representative` verdict means the number is about something else and the evidence does not count, whatever it said; every such verdict gets a blind second opinion, and the test is `contested` when the assessors disagree. The data verdict column is left as the test reported it.",
+  "",
+  `| Outcome | Tests |`,
+  `|---|---:|`,
+  ...FAITH.map(v => `| ${v} (agreed) | ${n(faithed, c => c.dataTest.faithfulness.status === "agreed" && c.dataTest.faithfulness.verdict === v)} |`),
+  `| contested | ${n(faithed, c => c.dataTest.faithfulness.status === "contested")} |`,
+  `| not yet checked | ${tested.length - faithed.length} |`,
+  "",
+  ...(faithed.some(c => c.dataTest.faithfulness.verdict === "not-representative" || c.dataTest.faithfulness.status === "contested") ? [
+    "| Claim | Data verdict | Faithfulness | Assessors |",
+    "|---|---|---|---|",
+    ...faithed.filter(c => c.dataTest.faithfulness.verdict === "not-representative" || c.dataTest.faithfulness.status === "contested").sort((a, b) => a.id.localeCompare(b.id)).map(c =>
+      `| [\`${c.id}\`](${gh(c.dataTest.path).replace(/result\.json$/, "")}) | ${c.evidence} | ${c.dataTest.faithfulness.status === "agreed" ? `**${c.dataTest.faithfulness.verdict}**` : "contested"} | ${c.dataTest.faithfulness.assessors.map(a => `${a.assessor}: ${a.verdict}`).join("; ")} |`),
+    ""] : []),
   "## Every tested claim",
   "",
-  "| Claim | Verdict | Confidence | Data | Statement |",
-  "|---|---|---:|---|---|",
+  "| Claim | Verdict | Confidence | Data | Faithfulness | Statement |",
+  "|---|---|---:|---|---|---|",
   ...tested.sort((a, b) => a.id.localeCompare(b.id)).map(c =>
-    `| [\`${c.id}\`](${gh(c.dataTest.path)}) | ${c.evidence} | ${c.dataTest.confidence ?? "·"} | ${c.evidenceKind ?? "·"} | ${c.label.replace(/\|/g, "\\|")} |`),
+    `| [\`${c.id}\`](${gh(c.dataTest.path)}) | ${c.evidence} | ${c.dataTest.confidence ?? "·"} | ${c.evidenceKind ?? "·"} | ${c.dataTest.faithfulness ? (c.dataTest.faithfulness.status === "agreed" ? c.dataTest.faithfulness.verdict : "contested") : "·"} | ${c.label.replace(/\|/g, "\\|")} |`),
   "",
   `## Pre-registered, awaiting data (${pending.length})`,
   "",
@@ -130,6 +152,7 @@ if (readme.includes(START) && readme.includes(END)) {
     `| claims tested against data | ${tested.length} (${EVIDENCE.map(v => `${n(tested, c => c.evidence === v)} ${v}`).join(", ")}) |`,
     `| of those, tested on organisms | ${n(tested, c => c.evidenceKind === "biological")} |`,
     `| tests pre-registered, awaiting data | ${pending.length} |`,
+    `| tests through the faithfulness gate | ${faithed.length} of ${tested.length} (${n(faithed, c => c.dataTest.faithfulness.status === "agreed" && c.dataTest.faithfulness.verdict === "not-representative")} not representative, ${n(faithed, c => c.dataTest.faithfulness.status === "contested")} contested) |`,
     `| claims neither proved nor tested | ${count(c => c.verification === "untested" && !c.evidence)} |`,
     "",
     "Every tested claim with its verdict: [`test-data/claim-tests/SUMMARY.md`](test-data/claim-tests/SUMMARY.md). Per-claim fields: [`docs/claims.json`](docs/claims.json) (`evidence`, `data_test`, `theorem`). Over MCP: `delphi_claim_tests` (summary, one claim's full result, and untested claims ranked by testability).",
