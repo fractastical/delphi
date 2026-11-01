@@ -21,7 +21,7 @@ def test_unchanged_snapshot_is_not_downloaded_again_and_final_stops(tmp_path):
 
     class Client:
         def list_objects(self, *_):
-            return [{"name": "jobs/frontier-cpu-20261031-03/task/manifests/m.json",
+            return [{"name": "jobs/frontier-gpu-20261031-01/task/manifests/m.json",
                      "generation": "1" if clock.now < 600 else "2"}]
 
     calls = []
@@ -30,7 +30,7 @@ def test_unchanged_snapshot_is_not_downloaded_again_and_final_stops(tmp_path):
         calls.append(clock.now)
         return {"complete": clock.now == 600, "receipt_path": "fixture.json", "artifacts": []}
 
-    rc = watch(Client(), "bucket", "jobs/frontier-cpu-20261031-03/task", tmp_path,
+    rc = watch(Client(), "bucket", "jobs/frontier-gpu-20261031-01/task", tmp_path,
                tmp_path / "watch.json", monotonic=clock.monotonic, sleep=clock.sleep,
                collector=collector, runtime_s=1000)
     assert rc == 0

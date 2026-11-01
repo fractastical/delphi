@@ -13,7 +13,7 @@ def watch(gcs, bucket, prefix, destination, state_path, *, max_bytes=3_200_000_0
           sleep=time.sleep, collector=collect):
     if not 1 <= runtime_s <= 86_400 or not 1 <= interval_s <= 3600:
         raise ValueError("Invalid bounded collection schedule")
-    if not prefix.startswith("jobs/frontier-cpu-") or ".." in prefix.split("/"):
+    if not prefix.startswith(("jobs/frontier-cpu-", "jobs/frontier-gpu-")) or ".." in prefix.split("/"):
         raise ValueError("Only owned Frontier task prefixes are allowed")
     start = monotonic()
     generation = None
