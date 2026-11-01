@@ -35,3 +35,10 @@ def test_changing_target_instead_of_seed_is_rejected(tmp_path, monkeypatch):
     monkeypatch.setattr(experiment, "VARIANT", tmp_path)
     with pytest.raises(ValueError, match="target array changed"):
         experiment.validate()
+
+
+def test_original_run_cannot_be_relabelled_as_changed_seed_experiment(tmp_path):
+    from engineering.nca_pattern.analyze import audit
+
+    with pytest.raises(ValueError, match="Frozen protocol changed"):
+        audit(experiment.ART / "run-original", tmp_path, experiment.VARIANT)

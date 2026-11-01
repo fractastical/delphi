@@ -10,7 +10,7 @@ import subprocess
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from .model import ART, ROOT, dump, protocol
+from .model import ART, ROOT, dump
 
 
 def load(path):
@@ -61,7 +61,10 @@ def visible_metrics(visible, goal, ray):
     return metrics
 
 
-def audit(root, out):
+def audit(root, out, inputs=ART):
+    cfg = load(inputs / "protocol.json")
+    if digest(inputs / "target.npz") != cfg["target"]["sha256"]:
+        raise ValueError("Analysis target bytes do not match protocol")
     receipt = load(root / "job-receipt.json")
     for item in receipt["files"]:
         path = root / item["path"]
@@ -69,7 +72,7 @@ def audit(root, out):
             raise ValueError("Receipt path escapes output")
         if path.stat().st_size != item["bytes"] or digest(path) != item["sha256"]:
             raise ValueError("Returned file digest/size mismatch")
-    if receipt["protocol_sha256"] != digest(ART / "protocol.json"):
+    if receipt["protocol_sha256"] != digest(inputs / "protocol.json"):
         raise ValueError("Frozen protocol changed")
     for relative, expected in receipt["sources"].items():
         if digest(ROOT / relative) != expected:
@@ -83,6 +86,10 @@ def audit(root, out):
         "environment": receipt["environment"],
         "device": receipt["device"],
         "checks": [],
+        "input_artifacts": str(inputs),
+        "target_sha256": digest(inputs / "target.npz"),
+        "seed_xy": np.load(inputs / "target.npz")["seed_xy"].tolist(),
+        "evaluation_reused_from_parent": "seed_placement_follow_up" in cfg,
         "scope": "Returned-byte integrity and independent saved-visible-state metric recomputation; not biological validation or independent training replication.",
     }
     if not (root / "summary.json").exists():
@@ -105,7 +112,7 @@ def audit(root, out):
     for checkpoint in barrier["completed_checkpoints"]:
         if digest(artifact_path(root, checkpoint["path"])) != checkpoint["sha256"]:
             raise ValueError("Checkpoint bytes changed")
-    target = np.load(ART / "target.npz")
+    target = np.load(inputs / "target.npz")
     goal = np.moveaxis(target["rgba"], -1, 0).astype(np.float64)
     ray = target["ray_mask"]
     identities = set()
@@ -231,13 +238,16 @@ def audit(root, out):
         == counts["negative_passed"]
     )
     dump(out / "audit.json", result)
-    plot(root, out, summary)
-    render(root, out, summary, traces, goal)
-    report(root, out, summary, result, receipt)
+    plot(root, out, summary, inputs)
+    render(root, out, summary, traces, goal, cfg)
+    report(root, out, summary, result, receipt, inputs)
     return result
 
 
-def report(root, out, summary, result, receipt):
+def report(root, out, summary, result, receipt, inputs):
+    target = np.load(inputs / "target.npz")
+    xy = target["seed_xy"].tolist()
+    inside = bool(target["silhouette"][xy[1], xy[0]])
     rows = []
     for model in summary["models"]:
         runs = [
@@ -263,9 +273,9 @@ def report(root, out, summary, result, receipt):
         + "\n".join(rows)
         + f"""
 
-Of the executed design tests, {result["zero_visible_final_design_count"]} end with exactly zero raw RGBA. An empty field fails the target predicate. Under this rule, the activity mask makes the empty full state absorbing; the initial root seed lies outside the target silhouette (one pixel from its nearest foreground). Those source facts suggest an optimization-collapse mechanism, but seed placement alone does not establish its cause and no causal repair experiment was run.
+Of the executed design tests, {result["zero_visible_final_design_count"]} end with exactly zero raw RGBA. An empty field fails the target predicate. Under this rule, the activity mask makes the empty full state absorbing. Current seed_xy is {xy}; membership in target silhouette: {inside}. The original projected root[8,42] lies outside the silhouette, one pixel from foreground. The additive experiment tests seed placement as a possible mechanism without replacing that original failure or presuming a repair.
 
-The goal is a fixed 64×64 design raster of the existing biological-v3a pectoral fin/rays (653 foreground pixels), with synthetic colors. It is **not an observed tissue or cellular image**. The seed is at the projected geometric root [8,42]. Computational updates/pixels have no biological time/cell-size calibration.
+The goal is a fixed 64×64 design raster of the existing biological-v3a pectoral fin/rays (653 foreground pixels), with synthetic colors. It is **not an observed tissue or cellular image**. The computational seed_xy is {xy}. Computational updates/pixels have no biological time/cell-size calibration.
 
 ## Implemented rule and inverse objective
 
@@ -273,7 +283,7 @@ The shared 16-channel rule computes identity and two Sobel perceptions, a 48→1
 
 Adam minimizes raw RGBA mean-square error to the design goal. Both regimes use the same pool128, batch8, unroll64–95, final2000-step budget and paired initialization/update schedules. Damage training additionally erases random circles. Final checkpoints are pinned before held-out masks load; no best-model or held-out selection occurs. This adapts [Distill2020, Model and Experiments2/3](https://distill.pub/2020/growing-ca/) and its [official notebook](https://github.com/google-research/self-organising-systems/blob/master/notebooks/growing_ca.ipynb); pool/budget/target/framework differ, so this is not an exact benchmark reproduction.
 
-Held-out evaluation uses three update seeds, persistence to1024 updates, and three fixed erasure masks after256 growth updates plus512 recovery updates. Match requires silhouette IoU≥0.75 and raw RGBA MSE≤0.02. Persistence requires every saved checkpoint256–1024; recovery requires a valid pre-damage pattern AND final recovery. All-erased controls test an absorbing zero state and are excluded from the48 design tests. Repeated probes share learned weights and source assumptions; counts are descriptive, not biological probabilities or independent biological replicates.
+Evaluation uses three update seeds (reused from the parent: {result["evaluation_reused_from_parent"]}; reused cases are not fresh untouched heldouts), persistence to1024 updates, and three fixed erasure masks after256 growth updates plus512 recovery updates. Match requires silhouette IoU≥0.75 and raw RGBA MSE≤0.02. Persistence requires every saved checkpoint256–1024; recovery requires a valid pre-damage pattern AND final recovery. All-erased controls test an absorbing zero state and are excluded from the48 design tests. Repeated probes share learned weights and source assumptions; counts are descriptive, not biological probabilities or independent biological replicates.
 
 ## Numerical and provenance checks
 
@@ -291,7 +301,7 @@ Pattern growth/recovery, if achieved, would establish only this computational lo
     (out / "RESULTS.md").write_text(text)
 
 
-def plot(root, out, summary):
+def plot(root, out, summary, inputs):
     import matplotlib
 
     matplotlib.use("Agg")
@@ -318,7 +328,7 @@ def plot(root, out, summary):
             values = [x["final"][key] for x in runs if key in x["final"]]
             axis.scatter([index] * len(values), values, alpha=0.65, label=model["id"])
     baseline = float(
-        np.mean(np.load(ART / "target.npz")["rgba"].astype(np.float64) ** 2)
+        np.mean(np.load(inputs / "target.npz")["rgba"].astype(np.float64) ** 2)
     )
     axes[0].axhline(
         baseline, color="black", linestyle="--", label="Empty-field baseline"
@@ -348,13 +358,13 @@ def plot(root, out, summary):
     plt.close(fig)
 
 
-def render(root, out, summary, traces, goal):
+def render(root, out, summary, traces, goal, cfg):
     font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
     small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
     models = [
         f"{regime}-s{seed}"
-        for seed in protocol()["training"]["model_seeds"]
-        for regime in protocol()["training"]["regimes"]
+        for seed in cfg["training"]["model_seeds"]
+        for regime in cfg["training"]["regimes"]
     ]
     selected = [traces.get((model, "central-square", 7001)) for model in models]
     count = max((len(x["rgba"]) for x in selected if x is not None), default=0)
@@ -484,6 +494,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--input-artifacts", type=Path, default=ART)
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
-    print({k: v for k, v in audit(args.root, args.out).items() if k != "checks"})
+    print(
+        {
+            k: v
+            for k, v in audit(args.root, args.out, args.input_artifacts).items()
+            if k != "checks"
+        }
+    )
