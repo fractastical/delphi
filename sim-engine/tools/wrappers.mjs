@@ -5,10 +5,11 @@
 // None of these modules is edited from here. If a number looks wrong, it is wrong in the module.
 
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { envelope, p } from '../lib/provenance.mjs';
 
 const root = path.resolve(import.meta.dirname, '..', '..');
-const mod = rel => import(new URL(`file:///${path.resolve(root, rel).replace(/\\/g, '/')}`).href);
+const mod = rel => import(pathToFileURL(path.resolve(root, rel)).href);
 
 // ── physiology_chain ───────────────────────────────────────────────────────
 export const physiologySchema = {

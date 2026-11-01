@@ -12,6 +12,7 @@
 // Every tool returns { result, provenance, scope }. A caller that ignores `provenance` and `scope`
 // is using numbers without knowing whether they were measured, borrowed or assumed.
 
+import { pathToFileURL } from 'node:url';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
@@ -64,7 +65,7 @@ server.setRequestHandler(CallToolRequestSchema, async request => {
   }
 });
 
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, '/')}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   // --dump-contract writes the schemas CONTRACT.md documents, so the document cannot drift from the
   // code: regenerate it rather than editing the schemas by hand in two places.
   if (process.argv.includes('--dump-contract')) {
