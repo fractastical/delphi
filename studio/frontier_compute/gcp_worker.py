@@ -162,18 +162,24 @@ def export_snapshot(spec, output, rc, started):
         return result.returncode
 
 
-def run(spec):
+def prepare_source(spec, output):
+    """Extract each admission into a fresh directory, preserving prior sources."""
     import tarfile
 
-    validate(spec)
-    source, output = ROOT / "src", ROOT / spec.get("output_directory", "out")
-    source.mkdir(exist_ok=True)
-    output.mkdir(exist_ok=True)
     packet = ROOT / "packet.tar"
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
+    source = Path(tempfile.mkdtemp(prefix=f"source-{spec['task_id']}-", dir=ROOT))
     with tarfile.open(packet) as archive:
         extract_source(archive, source, output)
+    return source
+
+
+def run(spec):
+    validate(spec)
+    output = ROOT / spec.get("output_directory", "out")
+    output.mkdir(exist_ok=True)
+    source = prepare_source(spec, output)
     started = now()
     (output / "dispatch.json").write_text(json.dumps({"spec": spec, "started_utc": started}, indent=2))
     try:

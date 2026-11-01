@@ -121,3 +121,23 @@ def test_gpu_worker_keeps_same_whole_tree_bounds_and_owned_name_scope():
     request["vm"] = "other-gpu-20261031-01"
     with pytest.raises(ValueError, match="owned VM"):
         gcp_worker.validate(request)
+
+
+def test_reused_vm_cannot_import_stale_previous_packet_files(monkeypatch, tmp_path):
+    monkeypatch.setattr(gcp_worker, "ROOT", tmp_path)
+    old = tmp_path / "src"
+    old.mkdir()
+    (old / "unlisted.py").write_text("raise RuntimeError('stale source')")
+    packet = tmp_path / "packet.tar"
+    with tarfile.open(packet, "w") as archive:
+        member = tarfile.TarInfo("entry.py")
+        member.size = 7
+        archive.addfile(member, io.BytesIO(b"pass\n#\n"))
+    request = {**spec(), "source_sha256": hashlib.sha256(packet.read_bytes()).hexdigest()}
+    first = gcp_worker.prepare_source(request, tmp_path)
+    (first / "runtime-leftover.py").write_text("leftover")
+    second = gcp_worker.prepare_source(request, tmp_path)
+    assert second != first and second != old
+    assert sorted(path.name for path in second.iterdir()) == ["entry.py"]
+    assert (old / "unlisted.py").exists()
+    assert (first / "runtime-leftover.py").read_text() == "leftover"
