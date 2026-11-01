@@ -141,10 +141,13 @@ def code_sha() -> str:
 def laws(card: dict, dyn_ev: list, rev_ev: list) -> list:
     idx = {"by": "this index", "artifact_path": "artifacts/print-law-index.json", "artifact_sha256": None,
            "commit": None, "recomputed_in_this_index": True}
-    builder = lambda what: {"by": "glider builder (claude-05), recorded in each frozen manifest", "what": what,
-                            "artifact_path": "artifacts/glider/<revision>/manifest.json", "artifact_sha256": None,
-                            "commit": None, "recomputed_in_this_index": False}
-    sel = lambda ev, key: [e for e in ev if key in e["what"]]
+    def builder(what):
+        return {"by": "glider builder (claude-05), recorded in each frozen manifest", "what": what,
+                "artifact_path": "artifacts/glider/<revision>/manifest.json", "artifact_sha256": None,
+                "commit": None, "recomputed_in_this_index": False}
+
+    def sel(ev, key):
+        return [e for e in ev if key in e["what"]]
     return [
         {"id": "mass_from_mesh_volume", "title": "Mass from mesh volume and cured density", "kind": "physical_law",
          "latex": r"m=\rho V,\qquad V=\tfrac{1}{3}\oint_{\partial\Omega}\mathbf{x}\cdot\mathbf{n}\,dA",
@@ -609,7 +612,8 @@ def assembly(revn, d, m, meshes, density, dy, rv, zrow, rootc) -> dict:
     rows = {row["cg_target_x_mm"]: row for row in m["ballast"]["rows"]}
     nom = rows[52.0]
     ballasted = nom["total_mass_g"]
-    vt = lambda mg: math.sqrt(2 * mg * 1e-3 * G / (RHO_AIR * S * 1e-6 * CL))
+    def vt(mg):
+        return math.sqrt(2 * mg * 1e-3 * G / (RHO_AIR * S * 1e-6 * CL))
     np_b = m["hand_neutral_point"]["np_x_mm_bracket"]
     mac = m["hand_neutral_point"]["pectoral_mac_mm"]
     win = CG_WINDOWS["v3c" if "v3c" in m["source_candidate"]["id"] else "v3a"]

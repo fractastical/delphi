@@ -68,6 +68,36 @@ def test_build_is_current_and_portable():
     assert "def test_" not in src
 
 
+def test_print_laws_keep_mass_failure_exact_files_and_display_scope(browser, base):
+    from urllib.parse import urlencode
+
+    pg = page(browser)
+    pg.goto(base + "#/print-laws")
+    pg.wait_for_selector("#print-file")
+    text = pg.locator("#main").inner_text()
+    assert "20.33 g" in text and "26.07 g" in text and "13.55 g" in text
+    assert "not cleared" in text and "not weighed" in text
+    assert pg.locator("#main .katex").count() > 5
+    assert pg.locator("#main .tex-fallback").count() == 0
+    assert pg.get_by_role("link", name="Download this file").get_attribute("href").endswith("r4-daane-printfix/stl/body.stl")
+    prop = "artifacts/print-v3/stl/fish3d-v3a-fan-prop-scales.stl"
+    pg.select_option("#print-file", prop)
+    pg.wait_for_selector("#print-file-title:has-text('fish3d-v3a-fan-prop-scales.stl')")
+    assert "No flight-mass budget" in pg.locator("#main").inner_text()
+    assert pg.locator("#print-assembly").count() == 0
+    withdrawn = "artifacts/glider/r3-daane/stl/pectoral_R.stl"
+    pg.goto(base + "#/print-laws?" + urlencode({"file": withdrawn}))
+    pg.wait_for_selector("#print-file-title")
+    assert "Withdrawn." in pg.locator("#main").inner_text()
+    assert pg.get_by_role("link", name="Download this file").count() == 0
+    pg.set_viewport_size({"width": 390, "height": 844})
+    assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#home-model-downloads")
+    assert pg.locator('#home-model-downloads a[href*="/print-laws?file="]').count() >= 123
+    assert pg.errors == []
+
+
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
     for route in ["experimentation", "assemblies", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
