@@ -1,0 +1,107 @@
+{
+  "schema": "frontier.nca.gpu-job-packet/1",
+  "archive_path": "artifacts/nca-pattern/nca-h100-packet.tar.gz",
+  "archive_sha256": "27bba4e0f1a5dba9f869b05ff87ce20a0421921dea94d5137060e668eaa25262",
+  "archive_bytes": 17111,
+  "source_commit": "52ac1d393066b63475d98419df3901512b5f4d15",
+  "image": "nvcr.io/nvidia/pytorch:25.12-py3; infrastructure supplies exact digest/actual runtime receipt",
+  "entry_argv": [
+    "python",
+    "-m",
+    "engineering.nca_pattern.job",
+    "--out",
+    "output"
+  ],
+  "environment": {
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8"
+  },
+  "dependency_policy": "Use existing Torch/NumPy in known NVIDIA image and record actual versions; no installs or model/API calls. LocalCPU2.11.0+cu130; same-jobCPU/CUDA gates mandatory on actual image2.10alpha/CUDA13.1 before training.",
+  "resources": {
+    "gpus": 1,
+    "cpu_threads": 2,
+    "scientific_hard_s": 2400,
+    "training_soft_deadline_s": 1800,
+    "total_soft_deadline_s": 2100,
+    "raw_output_cap_bytes": 50331648,
+    "compressed_transport_cap_bytes": 50331648,
+    "transport_budget_note": "Separate image-pull/export allowance; no increase to scientific training/evaluation budgets"
+  },
+  "experiment": "4models(2pairedseeds\u00d72matchedpoolregimes),2000steps/model;52heldout trajectories if allcomplete. ONE synthetic v3a fin/ray design target, hiddenchannels unassigned.",
+  "inputs_self_contained": true,
+  "network_or_credentials_required": false,
+  "same_job_gates": "CPU finite-difference/negative/locality/optimizer and CUDA forward<=1e-5,gradientL2<=1e-4,TF32off; fail beforetraining if gatefails",
+  "checkpoint_order": "Final completed weights SHAmanifest written BEFORE heldout masks loaded; fixed final2000steps only, no heldout tuning",
+  "outputs": [
+    "output/cpu-controls.json",
+    "output/cuda-controls.json",
+    "output/training/<model>/{latest,final,partial}.pt asapplicable",
+    "output/checkpoint-before-holdout.json",
+    "output/evaluation/progress.json",
+    "output/evaluation/<model>/*.json and *.npz",
+    "output/summary.json",
+    "output/job-receipt.json",
+    "output/failure.json ifany"
+  ],
+  "partial_policy": "All failures/incomplete models kept; only complete2000-step models evaluated; no checkpoint resume claim because trainingpoolnotserialized. No retry/replacement to force targetmatch.",
+  "scientific_scope": "Inverse computational pattern control, not biochemical/genetic implementation, observed tissue regeneration or organism validation",
+  "files": [
+    {
+      "path": "engineering/nca_pattern/__init__.py",
+      "sha256": "52e5f75caf97295cf1f14b0b61f414420724ef37f58aa5c53b0320c735e33de6",
+      "bytes": 87
+    },
+    {
+      "path": "engineering/nca_pattern/evaluate.py",
+      "sha256": "5856ec109acd7cea19ca2ed5b468bf6065f30f31d7516b0edd1b9e79d3983d86",
+      "bytes": 8335
+    },
+    {
+      "path": "engineering/nca_pattern/job.py",
+      "sha256": "da2f43130a901ff8ceb8a5bca9910aaec5b5546449b2569493966c6187349d2e",
+      "bytes": 9353
+    },
+    {
+      "path": "engineering/nca_pattern/model.py",
+      "sha256": "8a278ebd201603c87cefae4e8b64137e770c1ebe731aa07b87e02646064c5b98",
+      "bytes": 9042
+    },
+    {
+      "path": "engineering/nca_pattern/target.py",
+      "sha256": "afa93a7891de5ccf58bcb6c80bc11d96d810ed61cb7c2e1437fdd64121471b0c",
+      "bytes": 4400
+    },
+    {
+      "path": "engineering/nca_pattern/train.py",
+      "sha256": "14cb74c5712955e9f0549cba161e8722a15aa45c41f5ae76e740dd647b832bae",
+      "bytes": 6680
+    },
+    {
+      "path": "artifacts/nca-pattern/protocol.json",
+      "sha256": "cfb3296ee781931c378080216fa2e1e5de4478d55415690e9e8c751b9273accb",
+      "bytes": 8516
+    },
+    {
+      "path": "artifacts/nca-pattern/target.npz",
+      "sha256": "1598e62b2a5cf9a154f6a36564bb2b6b6ab43d84ed780acb78001c73427c7875",
+      "bytes": 1519
+    },
+    {
+      "path": "artifacts/nca-pattern/heldout-masks.npz",
+      "sha256": "6546e8dcab6ef733d11298a9177f5a014c3a57410b714a0584481e68fcd4d4fc",
+      "bytes": 1035
+    },
+    {
+      "path": "artifacts/nca-pattern/target-manifest.json",
+      "sha256": "59364bfeec689fb39c2a8a4a927bf282af0ecbb8a57df1b15ae00c92491b67f8",
+      "bytes": 1618
+    },
+    {
+      "path": "artifacts/nca-pattern/cpu-controls.json",
+      "sha256": "f96efd81e7fc4da4b9876b628203b0342b7965867914ee345dd90d8a583fe974",
+      "bytes": 1355
+    }
+  ]
+}

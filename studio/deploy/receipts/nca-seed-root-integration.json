@@ -1,0 +1,43 @@
+{
+  "schema": "frontier.integration-checks/1",
+  "at": "2026-10-31T19:44:39.207415-07:00",
+  "audit_tested_commit": "15dfcbce6aadd62e047d0f2a6bd08f07249515fb",
+  "unit_tests_tested_commit": "c63f1d7690e607d64e2e4978b8aec005c18582fc",
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest tests/test_nca_pattern.py tests/test_nca_seed_placement.py -q",
+      "exit": 0,
+      "passed": 8
+    },
+    {
+      "command": "ruff check engineering/nca_pattern tests/test_nca_pattern.py tests/test_nca_seed_placement.py",
+      "exit": 0
+    },
+    {
+      "command": ".venv/bin/python -m engineering.nca_pattern.analyze --root artifacts/nca-seed-placement/run --input-artifacts artifacts/nca-seed-placement --out /data/artifacts/delphi-evolve-rethink/deploy/root-nca-seed-audit",
+      "exit": 0
+    }
+  ],
+  "audit_sha256": "98dbaec88becccb21eac7048fa02f6cc54140f7d91fde1cf7bbf101b2339dc33",
+  "readback": {
+    "counts": {
+      "design_executed": 48,
+      "design_passed": 32,
+      "negative_executed": 4,
+      "negative_passed": 4
+    },
+    "files_checked": 128,
+    "bytes_checked": 9875825,
+    "evaluation_identities": 52,
+    "missing_evaluation_identities": [],
+    "checkpoint_count": 4,
+    "exact_visible_metric_reproduction": false,
+    "fixed_roundoff_visible_metric_reproduction": true,
+    "max_visible_metric_absolute_difference": 5.551115123125783e-17,
+    "scope": "Returned-byte integrity and independent saved-visible-state metric recomputation; not biological validation or independent training replication."
+  },
+  "limits": [
+    "Reuses author analysis code; independent rerun of saved-state audit, not independent training.",
+    "Reused evaluation cases; no new-target or biological generalization."
+  ]
+}
