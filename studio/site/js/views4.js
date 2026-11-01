@@ -17,6 +17,26 @@
     return { html: html`${head}${out.html}`, after: out.after };
   };
 
+  const repository = (path, rev = "main") => `https://github.com/kganjam/delphi-frontier/blob/${encodeURIComponent(rev)}/${String(path).split("/").map(encodeURIComponent).join("/")}`;
+  function counterTable(counters) {
+    return html`<div class="tablewrap"><table class="build-table build-counters"><caption class="sr">Counters recorded in receipts; unknown where no counter exists</caption><thead><tr><th scope="col">Quantity</th><th scope="col">Recorded</th><th scope="col">Status</th><th scope="col">Limit and source</th></tr></thead><tbody>${counters.map((c) => html`<tr><th scope="row" data-label="Quantity">${c.quantity}</th><td data-label="Recorded">${c.value}</td><td data-label="Status">${U.pill(c.status, c.status === "actual" ? "ok" : c.status === "unknown" ? "no" : "warn")}</td><td class="small" data-label="Limit and source">${c.note}<span class="build-source"><code>${c.source}</code></span></td></tr>`)}</tbody></table></div>`;
+  }
+  function auditPanels(audits = {}) {
+    const A = audits.contributors, M = audits.models, a = A && A.data, m = M && M.data;
+    const evidenceLink = (e, rev) => html`<li><a href="${repository(e.path, rev)}" target="_blank" rel="noopener noreferrer">${e.path}</a> ${e.sha256 ? U.sha(e.sha256) : ""}</li>`;
+    return html`${a ? html`<details class="contributor-audit"><summary>Who contributed? Inspect the dated identity audit</summary>
+      <p class="small">Observed ${new Date(a.window.observed_utc).toLocaleString("en-US", {timeZone: "America/Los_Angeles", timeZoneName: "short"})}. ${a.not_summed}. ${a.contribution_activity}.</p>
+      <div class="two"><article><h4>Contributing harnesses · supported minimum</h4><ul>${Object.entries(a.supported_harnesses).map(([id, v]) => html`<li><code>${id}</code> — ${v.mapping ? v.mapping.role : v.basis}</li>`)}</ul></article>
+      <article><h4>Native collaborators · separate identities</h4><ul>${a.native_contributors.entries.map((v) => html`<li><code>${v.identity}</code> — ${v.role}</li>`)}</ul></article></div>
+      <p class="small">Identity links include coordinator attestations. Artifact checks establish that the work exists, not independent proof of authorship. Historical contribution does not mean a worker is currently active.</p>
+      <p class="small"><a href="${repository(A.path)}" target="_blank" rel="noopener noreferrer">Full audit, mappings and deduplication rules</a> ${U.sha(A.sha256)}</p></details>` : ""}
+      ${m ? html`<details class="model-usage-audit"><summary>Models and simulators actually exercised · ${m.entries.length} scoped records</summary>
+      <p class="small">${m.scope}</p><p class="note small">${m.bionemo_nim.statement} NVIDIA Brev use is not established by this ledger. Total billing and provider-wide LLM usage remain unknown.</p>
+      <div class="tablewrap"><table class="build-table"><caption class="sr">Scoped model executions, outcomes and evidence</caption><thead><tr><th scope="col">Model or simulator</th><th scope="col">Provider</th><th scope="col">Recorded outcome</th><th scope="col">Usage and evidence</th></tr></thead><tbody>
+      ${m.entries.map((r) => html`<tr><th scope="row" data-label="Model or simulator">${r.model || r.model_or_tool || (r.models || []).map((x) => x.model).join(", ")}<br><code class="small">${r.id}</code></th><td class="small" data-label="Provider">${r.provider}</td><td class="small" data-label="Recorded outcome">${r.status.replace(/_/g, " ")}<p>${r.scope_note || ""}</p></td><td class="small" data-label="Usage and evidence"><details><summary>Inspect receipt and scope</summary>${tree(r.usage || r.calls || {usage: "See the named receipt; no aggregate is inferred."}, 0)}<ul>${(r.evidence || []).map((e) => evidenceLink(e, m.source_tree_commit))}</ul></details></td></tr>`)}</tbody></table></div>
+      <p class="small">${m.source_tree_note} <a href="${repository(M.path)}" target="_blank" rel="noopener noreferrer">Full ledger and result artifacts</a> ${U.sha(M.sha256)}</p></details>` : ""}`;
+  }
+
   /* How it was built: dated receipts, usage windows, provider outcomes and preregistered verdicts, each with its file and sha256. Spend and total usage stay unknown. */
   function built(snap) {
     const T = snap.timeline;
@@ -28,11 +48,12 @@
       <p class="note small"><b>Source repository:</b> <a href="https://github.com/kganjam/delphi-frontier" rel="noopener">github.com/kganjam/delphi-frontier</a> ${U.pill("public source", "ok")}. Browse the code, model inputs and recorded checks without signing in.</p>
       <p class="small">Every row is a file in the tree with its sha256. Times are UTC as recorded; Seattle local time is UTC−7 (PDT) on 2026-10-31. A row shows what that file records, not that the work was correct, independent or complete. Inventory observed ${T.observed_at.seattle}.</p>
       <h3>Recorded counters (event window from ${T.event_window_start_utc.slice(0, 10)})</h3>
-      <div class="tablewrap"><table class="build-table build-counters"><caption class="sr">Counters recorded in receipts; unknown where no counter exists</caption><thead><tr><th scope="col">Quantity</th><th scope="col">Recorded</th><th scope="col">Status</th><th scope="col">Limit and source</th></tr></thead><tbody>${T.counters.map((c) => html`<tr><th scope="row" data-label="Quantity">${c.quantity}</th><td data-label="Recorded">${c.value}</td><td data-label="Status">${U.pill(c.status, c.status === "actual" ? "ok" : c.status === "unknown" ? "no" : "warn")}</td><td class="small" data-label="Limit and source">${c.note}<span class="build-source"><code>${c.source}</code></span></td></tr>`)}</tbody></table></div>
+      ${counterTable(T.counters)}
+      ${auditPanels(T.audits)}
       <p class="small">Counts cover use recorded inside the event window only. Earlier work is not narrated here; where a result rests on published sources or earlier data, its card cites them with their hashes and licences.</p>
       <h3>Reuse</h3>
       <p class="small">What others can take and check: the claims and evidence through the <a href="${DF.href("/work", { tab: "connect" })}">public read interface and MCP tools</a>, every simulation with its manifest and limits on the <a href="${DF.href("/simulations")}">simulations page</a>, printable models and the 3D mesh on <a href="${DF.href("/home")}">Home</a>, and exact record pins on each entity page. Reuse by anyone outside this team is not recorded. The one recorded example of versioned reuse is a <a href="${DF.href("/reuse")}">worked case</a>: two computations read one exact Claim, and an independent reviewer disputed both results; it is a count of uses, not a measured benefit.</p>
-      ${T.usage ? html`<h3>Roles recorded (a count of contributors, not a count of agents)</h3>
+      ${T.usage ? html`<h3>Role assignments in the earlier usage slice</h3><p class="small faint">One session can fill several roles. This table is not added to the contributor counts above.</p>
       <div class="tablewrap"><table class="build-table build-roles"><caption class="sr">Identified roles and their recorded status</caption><thead><tr><th scope="col">Contributor</th><th scope="col">Kind</th><th scope="col">Role</th><th scope="col">Status as recorded</th></tr></thead><tbody>${T.usage.roles.map((r) => html`<tr><td data-label="Contributor"><code>${r.id}</code></td><td data-label="Kind">${r.kind}</td><td class="small" data-label="Role">${r.role}</td><td class="small" data-label="Status as recorded">${r.status}</td></tr>`)}</tbody></table></div>
       <h3>Own provider jobs (${T.usage.jobs.length}, ${T.usage.observed_at_seattle})</h3>
       <details><summary class="small">Show every job record</summary><div class="tablewrap"><table class="build-table build-jobs"><caption class="sr">Own GPU and CPU job records</caption><thead><tr><th scope="col">Created</th><th scope="col">Kind</th><th scope="col">Job</th><th scope="col">Provider state</th></tr></thead><tbody>${T.usage.jobs.map((j) => html`<tr><td class="small" data-label="Created">${j.created}</td><td data-label="Kind">${j.kind}</td><td data-label="Job"><code class="small">${j.name}</code></td><td data-label="Provider state">${U.pill(j.state.toLowerCase(), j.state === "FAILED" ? "no" : j.state === "COMPLETED" ? "st-unk" : "warn")}</td></tr>`)}</tbody></table></div></details>
@@ -108,16 +129,13 @@
   }
 
   function resources(snap, S, live) {
-    return { html: html`${inventoryPanel(snap.resource_inventory)}<section class="panel"><h2>Resources: actual versus unknown</h2><div class="tablewrap"><table><thead><tr><th>Quantity</th><th>Actual (receipt)</th><th>Status</th></tr></thead><tbody>
-      <tr><td>CPU jobs, utilisation</td><td>none in this tree</td><td>${U.pill("unknown", "st-unk")}</td></tr><tr><td>GPU jobs, utilisation</td><td>none in this tree</td><td>${U.pill("unknown", "st-unk")}</td></tr>
-      <tr><td>Provider-billed cost</td><td>none; the board says it is not yet known</td><td>${U.pill("unknown", "st-unk")}</td></tr><tr><td>Resource bounds used for runs</td><td>stated in <code>tasks/BUILD.md</code> (author report)</td><td>${AUTHOR}</td></tr></tbody></table></div>
-      <ul>${S.unknown.map((u) => html`<li>${u}</li>`)}</ul><p class="small faint">An estimate is not an actual. Figures appear here only when the runtime reports them.</p></section><div id="sysraw"></div>`,
+    return { html: html`${inventoryPanel(snap.resource_inventory)}<section class="panel build-report"><h2>Recorded use and its limits</h2>
+      ${snap.timeline ? counterTable(snap.timeline.counters) : html`<p class="empty">No counter receipt is included in this snapshot.</p>`}
+      ${auditPanels((snap.timeline || {}).audits)}<p class="small">These are dated observations. <a href="${DF.href("/work", {tab: "built"})}">How it was built</a> has the run timeline and failed attempts. Actual spend is unknown until a billing meter is queried.</p></section><div id="sysraw"></div>`,
       async after(root) {
         const host = root.querySelector("#sysraw");
         if (live) { const r = await DF.api.system(); host.innerHTML = liveSystem(r).toString(); return; }
-        try { const m = await DF.api.getJSON("data/system-manifest.json", 3000);
-          host.innerHTML = html`<section class="panel"><h2>Static system manifest ${AUTHOR}</h2><p class="note small">Worker reports only; nothing in this manifest is measured. Generated ${m.generated_at || "at an unstated time"}. ${m.measured || ""}</p>${workerSections(m)}</section>`.toString();
-        } catch (e) { host.innerHTML = ""; }
+        host.innerHTML = html`<p class="small faint">Live runtime details are unavailable in snapshot mode. The dated records above remain available.</p>`.toString();
       } };
   }
 
@@ -202,15 +220,29 @@
 
   /* Connect and share: what a person or agent can actually use, with what is and is not verified. Nothing is claimed beyond the repository's own documents. */
   function connect(snap, S, live) {
-    const origin = location.origin;
+    const origin = "https://frontier.morphoswarm.ai";
+    const endpoint = origin + "/mcp";
+    const config = JSON.stringify({ mcpServers: { frontier: { type: "http", url: endpoint } } }, null, 2);
     const apis = [["GET /api/health", "service status"], ["GET /api/catalog, /api/record, /api/events", "records, with exact pins"], ["GET /api/discovery?q=", "search (the response says which engine ran)"], ["GET /api/graph", "neighbourhood of one exact record"], ["GET /api/artifacts, /api/media?sha256=", "declared artifacts; node-verified local copies"], ["GET /api/attention, /api/system, /api/counts", "open work, system report, corpus counts"], ["POST /api/engineering/solve, /api/beliefs/solve, /api/simulations/run", "bounded calculations; they store nothing"]];
     return { html: html`<section class="panel" aria-labelledby="cn-h"><h2 id="cn-h">Connect an agent (MCP)</h2>
+      <p>Give your agent access to the shared frontier: find claims, inspect projects and artifacts, explore open questions, and run bounded calculations.</p>
+      <p><b>Streamable HTTP endpoint:</b> <a id="mcp-endpoint" href="${endpoint}">${endpoint}</a> <button class="btn small" type="button" id="copy-mcp">Copy endpoint</button> <span id="mcp-copied" class="small" role="status"></span></p>
+      <p class="small">Public reads need no token. Use this URL in your MCP client's remote-server settings; it is a protocol endpoint, not a web page.</p>
+      <details><summary>Client configuration</summary><p class="small">For clients that accept an <code>mcpServers</code> JSON configuration. Other clients ask for the URL directly.</p><pre class="json" id="mcp-config" tabindex="0">${config}</pre><button class="btn small" type="button" id="copy-mcp-config">Copy configuration</button> <span id="mcp-config-copied" class="small" role="status"></span></details>
       <p class="note small"><b>What is verified.</b> The public endpoint <code>${origin}/mcp</code> passed ${snap.mcp_check ? snap.mcp_check.passed + " of " + snap.mcp_check.total : "recorded"} checks with the official MCP SDK client (Streamable HTTP): initialisation, tool discovery, anonymous public identity, schema resources, a public fish search, anonymous writes denied before validation, an invalid token rejected, and public system metadata${snap.mcp_check ? ", at " + snap.mcp_check.checked_at : ""}. ${snap.mcp_check ? "Records written by that check: " + snap.mcp_check.scientific_records_written + "." : ""} <b>A specific product client (for example a desktop or IDE assistant) is not tested.</b> Report what yours actually does. <span class="faint">${snap.mcp_check ? snap.mcp_check.scope : ""}</span></p>
       <ul><li><b>Reading</b> public records, artifacts and schemas needs no credential on a public-read node.</li><li><b>Writing</b> (propose, lease, change state) needs the calling operator's own bearer credential; it is checked per request and an invalid one is refused, never treated as anonymous. Proposals stay <i>proposed</i> until an independent operator reviews them.</li><li>Never put a credential in a prompt, a URL or a shared link.</li></ul>
       <p class="small">Tools declared in <code>docs/mcp.md</code>: ${snap.capabilities.map((t) => html`<code>${t.name}</code> (${t.mode}) `)}. ${U.src("doc:mcp", "Read the MCP document")}</p></section>
       <section class="panel"><h2>Use the node directly (HTTP, read-only unless noted)</h2><div class="tablewrap"><table><thead><tr><th>Endpoint</th><th>What it gives</th></tr></thead><tbody>${apis.map(([e, w]) => html`<tr><td><code>${e}</code></td><td>${w}</td></tr>`)}</tbody></table></div><p class="small faint">Calculation endpoints need a session token from <code>GET /api/session</code> and send it as <code>X-CSRF-Token</code>.</p></section>
       <section class="panel"><h2>Share this view</h2><p class="small">The address bar carries the exact view, record pin or filter. Links to records include their version, so a shared link names the same record version for everyone.</p><p><input id="sharelink" type="text" readonly value="${location.href}" size="60" aria-label="Link to this view"> <button class="btn small" type="button" id="copylink">Copy link</button> <span id="copied" class="small" role="status"></span></p></section>`,
-      after(root) { const inp = root.querySelector("#sharelink"); root.querySelector("#copylink").addEventListener("click", async () => { inp.select(); try { await navigator.clipboard.writeText(inp.value); root.querySelector("#copied").textContent = "Copied."; } catch (e) { root.querySelector("#copied").textContent = "Select the text and copy it; this browser blocked clipboard access."; } }); } };
+      after(root) {
+        const copy = (button, text, status) => root.querySelector(button).addEventListener("click", async () => {
+          try { await navigator.clipboard.writeText(text()); root.querySelector(status).textContent = "Copied."; }
+          catch (e) { root.querySelector(status).textContent = "Select the text and copy it; this browser blocked clipboard access."; }
+        });
+        copy("#copy-mcp", () => endpoint, "#mcp-copied");
+        copy("#copy-mcp-config", () => config, "#mcp-config-copied");
+        copy("#copylink", () => root.querySelector("#sharelink").value, "#copied");
+      } };
   }
 
   function runtime(snap, S, live) {

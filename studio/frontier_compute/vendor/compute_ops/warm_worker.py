@@ -3,24 +3,60 @@
 Shipped as the item script by compute_ops.batch; the queue file is part of the bundle, so every workload is frozen (and hashable) before submission.
 
   python3 compute_ops/warm_worker.py warm_queue.json
-queue.json = {"queue_id": str, "max_wall_s": <= 7200, "margin_s": 60, "env": {...shared env, e.g. HF_HOME}, "max_part_bytes": 3000000,
+queue.json = {"queue_id": str, "max_wall_s": <= 14400, "margin_s": 60, "env": {...shared env, e.g. HF_HOME}, "max_part_bytes": 3000000,
               "workloads": [{"id": str, "argv": [...], "timeout_s": int, "env": {...}, "max_part_bytes": optional, "setup": false}]}
 For each workload, in order: run argv in the bundle directory with COPS_OUT=<fresh dir>, inner timeout; then pack that dir as tar.gz and emit it to the job log between
 COPS_PART_BEGIN {meta} / COPS_B64 ... / COPS_PART_END (flushed BEFORE the next workload starts, so a later crash or timeout keeps earlier outputs); append a receipt row.
 Stops when the queue is empty or when the remaining wall budget cannot cover the next workload's timeout plus margin (that workload is recorded not_run_budget, never dropped silently).
 Per-workload output over its cap is NOT emitted, and the part says so loudly with per-file sha256. Shared state that persists across workloads: the container's pip packages and any
 cache directory named in env (HF_HOME etc.); nothing is persisted outside the container. The final COPS_OUT (queue_receipts.json, telemetry) is returned by cops_run as usual."""
-import base64, hashlib, io, json, os, shutil, subprocess, sys, tarfile, time
+import base64, csv, hashlib, io, json, math, os, shutil, subprocess, sys, tarfile, threading, time
+
+from warm_budget import queue_budget
 
 T0 = time.time()
 Q = json.load(open(sys.argv[1]))
 OUT = os.environ.get("COPS_OUT", "/work/out"); os.makedirs(OUT, exist_ok=True)
 PARTS = os.environ.get("WARM_PARTS_DIR", "/work/parts")
-MAX_WALL = min(float(Q.get("max_wall_s", 7200)), 7200.0)
-MARGIN = float(Q.get("margin_s", 60))
+MAX_WALL, MARGIN = queue_budget(Q)
 utc = lambda: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 sha = lambda b: hashlib.sha256(b).hexdigest()
 receipts = []
+
+
+
+def gpu_window(path):
+    """Recent actual sampler rows; invalid or unsupported samples stay unavailable."""
+    with open(path) as stream:
+        rows = list(csv.reader(stream))[-60:]
+    values = []
+    for row in rows:
+        if len(row) != 7:
+            continue
+        try:
+            utilization, memory = float(row[1]), float(row[3])
+        except ValueError:
+            continue
+        if not (math.isfinite(utilization) and 0 <= utilization <= 100 and math.isfinite(memory) and memory >= 0):
+            continue
+        values.append((row[0].strip(), utilization, memory))
+    if not values:
+        return None
+    return {"samples": len(values), "window_device_clock": [values[0][0], values[-1][0]],
+            "gpu_utilization_pct_mean": sum(v[1] for v in values) / len(values),
+            "gpu_utilization_pct_max": max(v[1] for v in values),
+            "gpu_memory_used_mib_max": max(v[2] for v in values),
+            "scope": "Sampled GPU allocation window, including setup; not kernel-time accounting."}
+
+
+def live_telemetry(path, stop):
+    while not stop.wait(60):
+        try:
+            record = gpu_window(path)
+            if record:
+                print("COPS_GPU_WINDOW " + json.dumps({"observed_utc": utc(), **record}), flush=True)
+        except (OSError, ValueError):
+            print("COPS_GPU_WINDOW " + json.dumps({"observed_utc": utc(), "available": False}), flush=True)
 
 
 def save_receipts():
@@ -58,6 +94,7 @@ if os.environ.get("PREFLIGHT"):       # validate the frozen queue locally: run e
 os.makedirs(PARTS, exist_ok=True)
 receipts_start = utc()
 tel = None
+telemetry_stop = threading.Event()
 if shutil.which("nvidia-smi"):                                     # one sampler for the whole allocation; per-workload windows are in the receipts
     try:
         f = open(os.path.join(OUT, "telemetry_device.csv"), "w")
@@ -66,6 +103,8 @@ if shutil.which("nvidia-smi"):                                     # one sampler
                                 "--format=csv,noheader,nounits", "-lms", "1000"], stdout=f, stderr=subprocess.DEVNULL)
     except Exception as e:                                          # noqa: BLE001
         print("telemetry unavailable:", repr(e), flush=True)
+if tel:
+    threading.Thread(target=live_telemetry, args=(os.path.join(OUT, "telemetry_device.csv"), telemetry_stop), daemon=True).start()
 print(f"WARM start {receipts_start} queue={Q.get('queue_id')} n={len(Q['workloads'])} max_wall_s={MAX_WALL}", flush=True)
 for seq, w in enumerate(Q["workloads"]):
     wid = w["id"]
@@ -102,6 +141,7 @@ for seq, w in enumerate(Q["workloads"]):
     receipts.append({k: meta[k] for k in ("seq", "id", "rc", "timed_out", "start_utc", "end_utc", "wall_s", "bytes", "sha256", "truncated")} | {"status": "done" if rc == 0 else "failed"})
     save_receipts()
     print(f"WARM end {seq} {wid} rc={rc} wall={meta['wall_s']}s bytes={meta['bytes']}", flush=True)
+telemetry_stop.set()
 if tel:
     tel.terminate()
 save_receipts()

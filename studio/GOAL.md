@@ -74,6 +74,9 @@ about a proposed action.
 - [x] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.
 - [ ] Leave a 24-hour resource queue, owners, stop rules and remaining blockers.
+- [ ] Capture a private off-host backup of the database, source revisions, artifacts,
+  scoped logs and deployment configuration; exclude or protect credentials and
+  demonstrate a fresh-VM restore without changing production.
 - [ ] Deliver the human-readable studio, project/annotation model, actual vector
   discovery and interactive knowledge/asset graph specified in SPEC-007.
 - [ ] Complete a separate Playwright critique of every route and major interaction,
