@@ -51,3 +51,43 @@ def test_batch_freezes_seven_axial_settings_and_paired_seed_design():
     assert len(p["settings"]) * len(p["seeds"]) * len(p["neighbor_modes"]) == 28
     assert p["endpoint_time_s"] == 0.6
     assert p["dt_s"] / p["half_dt_s"] == 2
+
+
+def test_missing_only_continuation_rejects_recipe_change_and_repeated_case():
+    import copy
+    import pytest
+    from engineering.ecology.continuation import validate_missing_tasks
+
+    original = {
+        "settings": [{"id": "hinge-stiff", "overrides": {"fin_stiffness_Nm_rad": 0.3}}],
+        "seeds": [1, 2],
+        "neighbor_modes": [True, False],
+    }
+    tasks = [
+        {
+            "id": f"hinge-stiff-s2-{'neighbors' if mode else 'ablated'}",
+            "setting": "hinge-stiff",
+            "overrides": {"fin_stiffness_Nm_rad": 0.3},
+            "seed": 2,
+            "neighbors": mode,
+        }
+        for mode in [True, False]
+    ]
+    done = ["hinge-stiff-s1-neighbors", "hinge-stiff-s1-ablated"]
+    summary = {
+        "results": [{"id": name, "status": "computed"} for name in done]
+        + [
+            {"id": task["id"], "status": "not-started: soft deadline reached"}
+            for task in tasks
+        ]
+    }
+    cfg = {"tasks": tasks, "prohibited_already_computed_ids": done}
+    assert validate_missing_tasks(cfg, summary, original) == tasks
+    changed = copy.deepcopy(cfg)
+    changed["tasks"][0]["overrides"]["fin_stiffness_Nm_rad"] = 0.4
+    with pytest.raises(ValueError, match="recipe changed"):
+        validate_missing_tasks(changed, summary, original)
+    changed = copy.deepcopy(cfg)
+    changed["tasks"][0]["id"] = done[0]
+    with pytest.raises(ValueError, match="repeat/change"):
+        validate_missing_tasks(changed, summary, original)
