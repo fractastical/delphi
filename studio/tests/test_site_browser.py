@@ -262,7 +262,7 @@ def test_system_view_keeps_author_report_and_measured_apart(browser, base):
     txt = pg.locator("#main").inner_text().lower()
     assert "author report" in txt and "measured" in txt and "not reported: a snapshot cannot know it" in txt
     pg.get_by_role("link", name="Resources").click()
-    pg.wait_for_selector("h2:has-text('actual versus unknown')")
+    pg.wait_for_selector("h2:has-text('Recorded resource inventory')")
     assert pg.locator("#main").inner_text().lower().count("unknown") >= 3
     pg.get_by_role("link", name="Receipts").click()
     pg.wait_for_selector("h2:has-text('What has been measured')")
