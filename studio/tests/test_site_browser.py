@@ -2008,3 +2008,38 @@ def test_assemblies_axis_cells_are_short_with_checks_in_a_disclosure(browser, ba
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def _load_faq(pg, base):
+    pg.goto(base + "#/home"); pg.wait_for_selector("#main h1")
+    if "js/faq.js" not in (ROOT / "site/index.html").read_text():          # the shell registers it; until then the test registers the view itself
+        pg.add_script_tag(path=str(ROOT / "site/js/faq.js"))
+    pg.evaluate("location.hash = '#/faq'"); pg.wait_for_selector(".faqitem")
+
+
+def test_faq_answers_are_grounded_hedged_and_linked_to_real_documents(browser, base):
+    import re as _re
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    site_docs = {d["id"]: d["href"] for d in snap["documents"]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        _load_faq(pg, base)
+        assert pg.locator(".faqitem").count() == 10 and pg.locator(".faqindex li").count() == 10
+        t = pg.locator("#main").inner_text()
+        for must in ("not an established fact", "never \"accepted\"", "no accept tool", "no shared token", "not complete genomics", "gap in source coverage is not a claim that a gene is lost",
+                     "tie", "not evidence that agents coordinate better", "not verified here", "No organism was built", "we do not claim a decentralised architecture was exercised", "no running federated network"):
+            assert must.lower() in t.lower().replace("’", "'"), must
+        assert not _re.search(r"\b\d+\s+(autonomous\s+)?agents\b", t), "no agent count is stated"
+        for a in pg.locator(".faqlinks a[target=_blank]").all():
+            href = a.get_attribute("href")
+            assert href.startswith("https://github.com/kganjam/delphi-frontier/blob/main/") and (ROOT / href.split("/blob/main/")[1]).is_file(), href
+        for a in pg.locator(".faqlinks a:not([target])").all():
+            href = a.get_attribute("href")
+            if href.startswith("data/docs/"):
+                assert href in site_docs.values(), href
+        assert all(pg.locator(f"#faq-{q} .faqlinks a").count() >= 2 for q in ("claims", "mcp", "scales", "hosting", "nanopub", "genomes", "lean", "collective", "compute", "organism"))
+        pg.click(".faqindex a[data-q=lean]")
+        assert pg.evaluate("document.activeElement.id") == "faq-lean-h" and "q=lean" in pg.evaluate("location.hash")
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
