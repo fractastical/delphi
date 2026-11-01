@@ -17,16 +17,20 @@ from engineering.ecology.model import FLIP
 from .model import ART, GEOM, dump, protocol
 
 
-def render(root=ART / "control-slice", out=ART / "render-control"):
+def render(root=ART / "control-slice", out=ART / "render-control", selections=None):
     out.mkdir(parents=True, exist_ok=True)
-    case = root / "two-way-static-feedback"
+    names = ["rigid", "one-way-frozen-load", "two-way-static-feedback"]
+    selections = selections or {name: name for name in names}
+    case = root / selections["two-way-static-feedback"]
     record = json.loads((case / "result.json").read_text())
     states = np.load(case / "static-states.npz")
     arms = {
-        name: json.loads((root / name / "result.json").read_text())
+        name: json.loads((root / selections[name] / "result.json").read_text())
         for name in ["rigid", "one-way-frozen-load", "two-way-static-feedback"]
     }
-    flights = {name: np.load(root / name / "glide-main.npz") for name in arms}
+    flights = {
+        name: np.load(root / selections[name] / "glide-main.npz") for name in arms
+    }
     source = json.loads((GEOM / "panels.json").read_text())["fins"]
     bodypath = GEOM / "components/body.stl"
     # Reuse coherent rendering-only clustering; reverse its display rotation.
@@ -175,7 +179,7 @@ def render(root=ART / "control-slice", out=ART / "render-control"):
             pathax.set(
                 xlabel="Horizontal position (m)",
                 ylabel="Height (m)",
-                title="Separate rigidized-shape point-mass glide",
+                title="Separate fixed-α assumed-release descent",
             )
             pathax.xaxis.label.set_color("white")
             pathax.yaxis.label.set_color("white")
@@ -183,7 +187,7 @@ def render(root=ART / "control-slice", out=ART / "render-control"):
             pathax.legend(fontsize=7)
             pathax.tick_params(labelsize=8, colors="white")
             fig.suptitle(
-                f"Equivalent-fin stiffness → deformation → recomputed aerodynamic force\nActual static iteration {index}"
+                f"Bending-only, torsion-rigid scaffold → deformation → recomputed force\nActual static iteration {index}"
                 + (" • terminal hold" if movie_frame >= len(histories) else ""),
                 color="white",
                 fontsize=15,
@@ -191,7 +195,7 @@ def render(root=ART / "control-slice", out=ART / "render-control"):
             fig.text(
                 0.5,
                 0.055,
-                "Coarse8×2 control slice | assumed equivalent EI | no finite torsion, viscous flow, tissue calibration or continuous FSI",
+                f"{record['mesh']} {record['actual_lattice']['span']}×{record['actual_lattice']['chord']} | assumed EI | fixed-α release | no tissue calibration or continuous FSI",
                 ha="center",
                 color="#b8c8d3",
                 fontsize=10,
@@ -219,7 +223,7 @@ def render(root=ART / "control-slice", out=ART / "render-control"):
         case / "static-states.npz",
         bodypath,
         GEOM / "panels.json",
-    ] + [root / name / "glide-main.npz" for name in arms]
+    ] + [root / selections[name] / "glide-main.npz" for name in arms]
     dump(
         out / "provenance.json",
         {
