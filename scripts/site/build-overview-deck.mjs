@@ -5,9 +5,12 @@
 // scripts/site/templates/overview-deck.template.html. Every number in the deck is computed here
 // from repo files: docs/claims.json (built by build-claim-graph.mjs), test-data/organisms/merged/
 // taxa.json and the Lean law registry via lib/lean-source.mjs. Edit the template, not the output.
+// Each output also gets an overview-deck.pdf beside it (one page per slide, via the template's print
+// CSS), rendered with headless Chrome; set CHROME_PATH if it is not found, or pass --no-pdf to skip.
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const R = (...p) => path.join(ROOT, ...p);
@@ -224,6 +227,26 @@ for (const out of OUTS) {
   console.log(`wrote ${path.relative(ROOT, out)} (${(html.length / 1024).toFixed(0)} KB)`);
 }
 console.table(counts);
+
+if (!process.argv.includes('--no-pdf')) {
+  const chrome = [
+    process.env.CHROME_PATH,
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    '/Applications/Chromium.app/Contents/MacOS/Chromium',
+    ...['google-chrome', 'google-chrome-stable', 'chromium', 'chromium-browser'].map((b) => {
+      try { return execFileSync('which', [b], { encoding: 'utf8' }).trim(); } catch { return null; }
+    }),
+  ].find((p) => p && fs.existsSync(p));
+  if (!chrome) {
+    console.warn('no Chrome found (set CHROME_PATH): overview-deck.pdf not rebuilt and may be stale');
+  } else {
+    const pdf = path.join(path.dirname(OUTS[0]), 'overview-deck.pdf');
+    execFileSync(chrome, ['--headless=new', '--disable-gpu', '--no-pdf-header-footer', '--virtual-time-budget=8000',
+      `--print-to-pdf=${pdf}`, pathToFileURL(OUTS[0]).href], { stdio: 'ignore' });
+    for (const out of OUTS.slice(1)) fs.copyFileSync(pdf, path.join(path.dirname(out), 'overview-deck.pdf'));
+    for (const out of OUTS) console.log(`wrote ${path.relative(ROOT, path.join(path.dirname(out), 'overview-deck.pdf'))} (${(fs.statSync(pdf).size / 1024).toFixed(0)} KB)`);
+  }
+}
 
 // Also escapes quotes and backslashes so a value can sit inside the deck-data JSON block.
 function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\\/g, '&#92;'); }

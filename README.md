@@ -8,6 +8,36 @@
 
 Public addresses: [delphibio.org](https://delphibio.org) (site), [`mcp.delphibio.org/mcp`](https://mcp.delphibio.org/mcp) (agents), [forum.delphibio.org](https://forum.delphibio.org) (forum).
 
+## For judges
+
+**In one paragraph.** A team of five people and a swarm of agents from several model providers turned Darwin, Thompson, Wolfram, Levin, Aristotle and a set of mathematical biologists into one graph of source-cited claims about living things. They proved the mathematical ones in Lean 4 where they could, tested others against public data under pre-registration, and published the claims as signed nanopublications that anyone can query over a public MCP server. Proofs and data verdicts are kept apart on every page, and refuted and inconclusive results are published alongside the supported ones. The counts are in [Current numbers](#current-numbers), generated from repo files.
+
+**Five minutes:**
+
+1. **Read** the [project report](https://delphibio.org/blog/science-claw-2026.html) (all figures built from the repo by `scripts/site/build-blog.mjs`) or the six-slide [overview deck](https://delphibio.org/deck/).
+2. **Look**: the [claim graph](https://delphibio.org/claim-graph.html), the [theorems](https://delphibio.org/theorems.html), the [team page](https://delphibio.org/team.html), the live [mission-control dashboard](https://delphi-mission-control.ashenoy000.workers.dev/start/) and the [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) (source, Lean proof, data verdict and faithfulness verdict for each claim).
+3. **Query it yourself.** Add `{ "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }` to any MCP client (no install, no key) and call `delphi_overview`, then `delphi_claim_tests`. From a clone, `npm install && node mcp/cli.mjs overview` gives the same result.
+4. **Check a result**: every tested claim and its verdict is in [`test-data/claim-tests/SUMMARY.md`](test-data/claim-tests/SUMMARY.md). Each verdict links to a `result.json` with its pre-registered pass and fail criteria. `npm run claims:exec` re-runs the Lean proofs and data tests and reports each one as reproduced, drifted, failed or skipped.
+
+**Evidence for each judging criterion.** These are the criteria and weights from [scienceclawhack.ai](https://scienceclawhack.ai/), as encoded in [`rubric.json`](scripts/release/self-assessment/rubric.json).
+
+| Criterion | Where to look |
+|---|---|
+| Problem significance (20%) | [Goal](#goal): are there fundamental theorems of biology, stated precisely enough to prove or refute? The project keeps "proved as mathematics" and "true of organisms" separate (see [AGENTS.md](AGENTS.md), *"Theorem" is a proof status*). |
+| Scientific and technical impact (25%) | Lean-checked theorems ([`docs/theorems.html`](https://delphibio.org/theorems.html), each with deliberately broken variants that must fail to compile); pre-registered data tests with refutations published ([`SUMMARY.md`](test-data/claim-tests/SUMMARY.md)); production nanopubs; a 1,124-island species–area run on an open problem ([`problems/`](problems/README.md)); printed wings ([below](#the-wings-a-model-next-to-the-real-thing)). |
+| Decentralized agency (20%) | Thread-owned folders, each with a live `status.json` and the rule of one writer per path ([AGENTS.md](AGENTS.md#inter-agent-communication-how-agents-stay-collaborative-and-relevant), [`dashboard/THREADS.md`](dashboard/THREADS.md)); sixteen cloud agents building the organism inventory overnight ([day by day](#saturday-oct-31--organisms-overnight-then-the-claim-ladder)); assessors and faithfulness reviewers from other providers than the builder; the emperor, king and queen structure in [`swarm/`](swarm/). |
+| Collective capability (25%) | The measured four-arm comparison of a single agent against three swarm shapes, pre-registered, with its null results stated ([`test-data/agent-comparison/SUMMARY.md`](test-data/agent-comparison/SUMMARY.md)); outside agents whose objections changed test designs ([`COLLABORATIONS.md`](COLLABORATIONS.md)). |
+| Execution and validation (10%) | Three public services; the A9 faithfulness gate; hash attestation of pre-registrations ([`ATTESTATION.json`](ATTESTATION.json)); the reproduction runner (`npm run claims:exec`); a pre-commit and CI check that every Lean law is exposed on every surface (`lean/registry/check-exposed.mjs`). |
+| Collaboration bonus | Two sibling repositories built on our claims and MCP server ([below](#sibling-repositories)); the Frontier adapter's sessions in our MCP log; a SentiLab thermal-placement ticket that our agent solved and others re-ran independently; the agent forum ([`COLLABORATIONS.md`](COLLABORATIONS.md)). |
+
+**Our own blind scoring.** Three assessors from Google, OpenAI and xAI, none from the builder's provider, scored a frozen evidence pack against that rubric. They named the weakest criterion and the first fixes to make: [`scripts/release/self-assessment/SUMMARY.md`](scripts/release/self-assessment/SUMMARY.md). These are model opinions, not the judges' scores.
+
+**What we do not claim.** No claim is promoted to a theorem *of biology*: a Lean proof checks the mathematics given its assumptions. There was no wet-lab work. Assessor scores are elicited opinions, not probabilities. Everything made after the first night is on the test registry or an unsigned draft. Most claims are still neither proved nor tested. The full lists are in [ScienceClaw hackathon work](#scienceclaw-hackathon-work-oct-31--nov-1) and [Design studio](#design-studio).
+
+**Team** ([#53](https://github.com/fractastical/delphi/issues/53)): Joel Dietz ([@fractastical](https://github.com/fractastical); lead, integrator, publisher), Kavita Koolkarni ([@kavitakoolkarni-bio](https://github.com/kavitakoolkarni-bio); site and portal), Ashley Caselli ([@ashleycaselli](https://github.com/ashleycaselli); nanopubs and knowledge-graph links), Amit ([@xX-its-amit-Xx](https://github.com/xX-its-amit-Xx); genotype–phenotype, MCP testing, dashboard), Kris Ganjam ([@kganjam](https://github.com/kganjam); form simulator and the sibling Frontier and Evolve repos).
+
+**Record of the work.** Data freeze: `main` at [`cb4f547`](https://github.com/fractastical/delphi/commit/cb4f5475d20377671933e3a1c6143d2e793d750b) (Nov 1, 12:00 Eastern). The numbers table below is regenerated after it, so it can be slightly ahead of the frozen demo. Every agent session is transcribed in [`chats/`](chats/README.md). Hour-by-hour progress is in [`DAY-BY-DAY.md`](DAY-BY-DAY.md), and design decisions and corrections are in [`DEVELOPMENT-RECORD.md`](DEVELOPMENT-RECORD.md). [`sponsors/`](sponsors/README.md) records what each sponsor service was used for.
+
 ## Goal
 
 Find the **fundamental theorems of biology**: general laws that hold across organisms, scales and systems, stated precisely enough to test. To get there we:
@@ -191,7 +221,7 @@ thread's status live.
 | [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
 | [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
 | [Project overview deck](https://delphibio.org/deck/) | Six slides: why Lean for biology, what Delphi uncovered, the flying-fish design across eight scales of evidence, the measured swarm and its collaborators, applications and thanks. Counts are built from `docs/claims.json`, the organism inventory and the Lean registry by `node scripts/site/build-overview-deck.mjs`. |
-| [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
+| [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | The 53 laws in the Lean registry, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
 
 **Where things live**
 
