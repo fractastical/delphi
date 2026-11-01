@@ -97,9 +97,10 @@ def main() -> None:
                     "-i", str(work / "f%04d.png"), "-c:v", "libx264", "-pix_fmt", "yuv420p",
                     "-vf", "pad=ceil(iw/2)*2:ceil(ih/2)*2", str(out)], check=True)
     poster = out.with_name(out.stem + "_poster.png")
-    # poster is a frame of the finished video, not a re-render
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-sseof", "-0.2", "-i", str(out),
-                    "-frames:v", "1", str(poster)], check=True)
+    # poster is a frame of the finished video, not a re-render. Taken a quarter of the way in,
+    # where a closing arm is mid-closure; the last frame of a closed arm shows nothing of the event.
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", str(round(nfr / (4 * a.fps), 3)),
+                    "-i", str(out), "-frames:v", "1", str(poster)], check=True)
     for p in work.glob("*.png"):
         p.unlink()
     work.rmdir()
