@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 import subprocess
 
-from .planner import canonical_json, plan_experiments, sha256_json
+from .planner import plan_experiments, sha256_json
 
 
 ROOT = Path(__file__).resolve().parents[2]
