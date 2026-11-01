@@ -1,7 +1,7 @@
 # Making claims and math queryable: the delphisci MCP server
 
-- **Started:** 2026-10-30 21:22 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 21:35 UTC-4 (EDT)
+- **Started:** 2026-10-30 21:22 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 21:35 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 2
 - **Subagents:** 0
 - **Transcript ID:** `06a78db4-bb53-4975-b8f9-44d2717a03a5`

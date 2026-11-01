@@ -1,7 +1,7 @@
 # Overnight run: provenanced datasets for every animal taxon
 
-- **Started:** 2026-10-31 00:19 UTC-4 (EDT)
-- **Last activity:** 2026-10-31 09:46 UTC-4 (EDT)
+- **Started:** 2026-10-31 00:19 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-31 09:46 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 3
 - **Subagents:** 0
 - **Transcript ID:** `27028139-575c-4d52-88a4-7cf0e6427c36`

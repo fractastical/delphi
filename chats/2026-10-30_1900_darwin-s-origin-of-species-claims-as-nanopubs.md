@@ -1,7 +1,7 @@
 # Darwin's Origin of Species claims as nanopubs
 
-- **Started:** 2026-10-30 19:00 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 21:44 UTC-4 (EDT)
+- **Started:** 2026-10-30 19:00 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 21:44 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 2
 - **Subagents:** 22
 - **Transcript ID:** `8d4f37ad-4e36-4c5c-a37d-c0e094f85b68`

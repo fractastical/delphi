@@ -1,7 +1,7 @@
 # Ranking animal datasets by completeness (incl. bioelectric data)
 
-- **Started:** 2026-10-31 09:20 UTC-4 (EDT)
-- **Last activity:** 2026-10-31 10:04 UTC-4 (EDT)
+- **Started:** 2026-10-31 09:20 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-31 10:05 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 4
 - **Subagents:** 0
 - **Transcript ID:** `3af5b1b0-11d8-4ed7-a9a6-cbf60c36c714`
@@ -181,4 +181,28 @@ _Tools used: Read ×3, ReadLints, Shell ×6, StrReplace ×9, Write_
 
 I should check how the Fly instance is deployed by looking for fly.toml, a Dockerfile, or a deploy workflow.
 
-_Tools used: Shell_
+I notice HEAD moved to a new commit that regenerated the merged view with 938 taxa and 1679 datasets, so I need to check whether my files survived that regeneration and whether coverage.json still exists along with the deploy workflow paths.
+
+I notice the deploy workflow already anticipates organisms/merged/*.json and the dockerignore setup, and git status shows nothing pending for organisms/mcp, suggesting my files are already committed under the latest regeneration commit. I want to verify whether mcp/organisms.mjs and coverage.mjs are tracked properly.
+
+Everything's committed and pushed, main matches origin/main, and coverage.json is in sync, so the Fly deploy should've triggered. I should check the workflow run status via gh and verify the healthz endpoint.
+
+The healthz "built" timestamp likely refers to when docs/claims.json was built rather than the deploy time, so I should actually verify the live server has the organisms tools and the 938-taxa data by calling tools/list directly — no session ID header means this is stateless.
+
+Probably a session requirement; I'll use the SDK client against the HTTP endpoint instead of raw curl.
+
+Yes. I verified against the live instance at `https://delphisci-mcp.fly.dev/mcp` just now:
+
+- It lists all eight tools, including `delphi_organisms` and `delphi_get_organism`.
+- The coverage overview it returns is the current `main` snapshot: 938 taxa, 1,679 datasets (the regenerated merged view from commit `6295cab`, which added 6 coarse slices beyond the 782 I worked from earlier). Axis counts: genome 334, traits 359, morphology3d 142, fossil 585, occurrence 888, bioelectric 0, barcode 0.
+- Top species ranking is served (`Columba livia`, `Gallus gallus`, `Oryctolagus cuniculus` at 64.3).
+
+How it stays current, for reference:
+
+- `.github/workflows/deploy-mcp.yml` redeploys to Fly on every push to `main` touching `mcp/**`, `organisms/merged/*.json`, `docs/claims.json`, or any `**/nanopubs/**`. The last two runs (commits `b7ccf88` "add organisms coverage tools" and `6295cab` "regenerate merged view") both succeeded, the latest at 14:04 UTC.
+- `.dockerignore` whitelists `organisms/merged/*.json`, so `coverage.json` ships in the image.
+- The one manual step: `coverage.json` is a committed artifact, so whoever regenerates `organisms/merged/` must run `node organisms/coverage.mjs` after `merge.mjs` and commit both. Right now they're in sync (938 taxa in each). If that step is skipped, the Fly server would serve stale coverage for new taxa; `generated` in every response tells you the snapshot date. If you want that risk removed, the deploy workflow could run `coverage.mjs` itself before `flyctl deploy`, or `merge.mjs` could call it at the end. Say which and I'll wire it.
+
+Local note: `.cursor/mcp.json` and `.mcp.json` show as modified in your working tree; I didn't touch those, so that's from the branch switch or another session.
+
+_Tools used: Shell ×6_

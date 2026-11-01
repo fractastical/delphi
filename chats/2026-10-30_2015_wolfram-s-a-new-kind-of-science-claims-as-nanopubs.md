@@ -1,7 +1,7 @@
 # Wolfram's A New Kind of Science claims as nanopubs
 
-- **Started:** 2026-10-30 20:15 UTC-4 (EDT)
-- **Last activity:** 2026-10-31 01:42 UTC-4 (EDT)
+- **Started:** 2026-10-30 20:15 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-31 01:42 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 3
 - **Subagents:** 26
 - **Transcript ID:** `8a9f75b5-8c3b-4101-b2b5-850610a06c1e`

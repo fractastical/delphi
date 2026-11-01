@@ -1,8 +1,8 @@
 # Subagent: Truth scores batch 12 (Grok)
 
 - **Parent chat:** [Interactive claim graph site (docs/) with truth and testability scores](../2026-10-30_2022_interactive-claim-graph-site-docs-with-truth-and-testability.md)
-- **Started:** 2026-10-30 20:46 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 20:47 UTC-4 (EDT)
+- **Started:** 2026-10-30 20:46 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 20:47 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **Final status:** success
 - **Transcript ID:** `15ecc93b-e58c-4f53-bec9-1961b02ad75b`
 

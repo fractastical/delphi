@@ -12,7 +12,26 @@ from pathlib import Path
 
 TRANSCRIPTS = Path.home() / ".cursor/projects/Users-jdietz-Documents-GitHub-dev-delphisci/agent-transcripts"
 OUT = Path(__file__).resolve().parent
-TZ = "UTC-4 (EDT)"
+# Transcript clocks are the machine's local time. US DST ended 2026-11-01 02:00,
+# so earlier stamps are EDT (UTC-4) and later ones EST (UTC-5).
+TZ = "EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)"
+KEEP = {"SWARM_COORDINATION.md"}
+
+# Public repo. Never write credentials, coupon codes, or credit-redemption links.
+SECRET_RES = [
+    # Only a long token-like value, so "authorization: value" in prose is left alone.
+    (re.compile(r"(?i)\b((?:api[_-]?key|access[_-]?key|secret|password|authorization|bearer)"
+                r"\s*[:=]\s*(?:bearer\s+)?)([A-Za-z0-9_\-./+]{16,})"),
+     r"\1[REDACTED]"),
+    (re.compile(r"\b(?:sk-[A-Za-z0-9_\-]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|"
+                r"xai-[A-Za-z0-9]{20,}|nvapi-[A-Za-z0-9_\-]{20,}|AKIA[0-9A-Z]{16}|"
+                r"sk-ant-[A-Za-z0-9_\-]{20,}|FlyV1[A-Za-z0-9_\-]{16,}|fm2_[A-Za-z0-9_\-]{16,})\b"),
+     "[REDACTED]"),
+    (re.compile(r"mit-ai-agents-hack-[A-Za-z0-9]+"), "[REDACTED-COUPON]"),
+    (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(?:com|edu|org|net|io|ai|dev)\b"),
+     "[REDACTED-EMAIL]"),
+    (re.compile(r"https?://\S*(?:coupon|redeem|redemption|credit-link)[^\s)]*", re.I), "[REDACTED-URL]"),
+]
 
 TITLES = {
     "3eb906a8-fa17-4377-bc46-c211f956a5f4": "README, best-practice guide and project goals",
@@ -66,6 +85,19 @@ def slug(text):
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:60]
 
 
+def redact(text):
+    if not text:
+        return text
+    for pattern, repl in SECRET_RES:
+        text = pattern.sub(repl, text)
+    return text
+
+
+def clean_title(text):
+    text = redact(re.sub(r"\s+", " ", text or "")).strip()
+    return (text[:80] or "untitled")
+
+
 def load(path):
     records = []
     for line in path.read_text().splitlines():
@@ -98,6 +130,7 @@ def parse_turns(records):
                 kind = "system"
             if raw.lstrip().startswith("[Image]"):
                 body = ("[Image attached] " + body).strip()
+            body = redact(body)
             if kind == "system" and not body:
                 continue
             cur = {"ts": ts, "kind": kind, "prompt": body, "replies": [], "tools": {}, "status": None}
@@ -105,7 +138,7 @@ def parse_turns(records):
         elif role == "assistant" and cur is not None:
             for c in r["message"]["content"]:
                 if c.get("type") == "text" and c["text"].strip():
-                    cur["replies"].append(c["text"].strip())
+                    cur["replies"].append(redact(c["text"].strip()))
                 elif c.get("type") == "tool_use":
                     name = c["name"]
                     if name == "CallDynamicTool":
@@ -123,7 +156,17 @@ def task_descriptions(records):
         for c in r.get("message", {}).get("content", []):
             if c.get("type") != "tool_use":
                 continue
-            args = c["input"].get("arguments", c["input"]) if c["name"] == "CallDynamicTool" else c["input"]
+            raw_args = c.get("input") or {}
+            if c["name"] == "CallDynamicTool" and isinstance(raw_args, dict):
+                raw_args = raw_args.get("arguments", raw_args)
+            if isinstance(raw_args, str):
+                try:
+                    raw_args = json.loads(raw_args)
+                except json.JSONDecodeError:
+                    continue
+            args = raw_args
+            if not isinstance(args, dict):
+                continue
             if c["name"] not in ("Task", "CallDynamicTool") or "description" not in args:
                 continue
             if args.get("resume"):
@@ -158,7 +201,8 @@ def first_last(turns, path):
 
 def main():
     for p in OUT.glob("*.md"):
-        p.unlink()
+        if p.name not in KEEP:
+            p.unlink()
     shutil.rmtree(OUT / "subagents", ignore_errors=True)
     (OUT / "subagents").mkdir()
 
@@ -172,7 +216,7 @@ def main():
         records = load(path)
         turns = parse_turns(records)
         start, end = first_last(turns, path)
-        title = TITLES.get(d.name) or (turns[0]["prompt"][:60] if turns else d.name)
+        title = TITLES.get(d.name) or clean_title(turns[0]["prompt"] if turns else d.name)
         chats.append({"id": d.name, "dir": d, "path": path, "records": records,
                       "turns": turns, "start": start, "end": end, "title": title})
     chats.sort(key=lambda c: (c["start"] or datetime.max, c["id"]))
@@ -193,7 +237,7 @@ def main():
                 m = ASSESS_RE.search(sturns[0]["prompt"])
                 if m:
                     desc = f"Assess claims {m.group(1)} ({m.group(2)})"
-            desc = desc or (sturns[0]["prompt"].splitlines()[0][:60] if sturns else sp.stem)
+            desc = redact(desc or (sturns[0]["prompt"].splitlines()[0][:80] if sturns else sp.stem))
             sname = f"{sstart.strftime('%Y-%m-%d_%H%M') if sstart else 'unknown'}_{slug(desc)}_{sp.stem[:8]}.md"
             status = next((r.get("status") for r in reversed(srec) if r.get("type") == "turn_ended"), "unknown")
             subs.append({"name": sname, "desc": desc, "start": sstart, "end": send, "status": status, "id": sp.stem})
@@ -233,7 +277,7 @@ def main():
     for c in chats:
         for t in c["turns"]:
             if t["kind"] == "user":
-                first = t["prompt"].splitlines()[0] if t["prompt"] else "(empty message)"
+                first = redact(t["prompt"].splitlines()[0] if t["prompt"] else "(empty message)")
                 timeline.append((t["ts"] or datetime.max, c["title"], first[:140]))
     timeline.sort(key=lambda x: x[0])
 

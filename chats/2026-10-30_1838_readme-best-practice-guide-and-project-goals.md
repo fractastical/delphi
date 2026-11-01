@@ -1,7 +1,7 @@
 # README, best-practice guide and project goals
 
-- **Started:** 2026-10-30 18:38 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 19:24 UTC-4 (EDT)
+- **Started:** 2026-10-30 18:38 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 19:24 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 7
 - **Subagents:** 0
 - **Transcript ID:** `3eb906a8-fa17-4377-bc46-c211f956a5f4`

@@ -1,7 +1,7 @@
 # Science Claw sponsor integration issues and BioNeMo
 
-- **Started:** 2026-10-30 18:38 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 19:45 UTC-4 (EDT)
+- **Started:** 2026-10-30 18:38 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 19:45 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 5
 - **Subagents:** 0
 - **Transcript ID:** `22da6dfb-dc5d-445d-93e6-8169cc277bdd`

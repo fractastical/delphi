@@ -1,7 +1,7 @@
 # Math-meets-biology thinkers, theorem claims as nanopubs
 
-- **Started:** 2026-10-30 18:44 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 20:11 UTC-4 (EDT)
+- **Started:** 2026-10-30 18:44 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 20:11 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 9
 - **Subagents:** 13
 - **Transcript ID:** `c29e9980-5788-4107-9e35-7144377c4fde`

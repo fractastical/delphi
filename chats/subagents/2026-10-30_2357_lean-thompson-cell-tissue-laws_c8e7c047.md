@@ -1,8 +1,8 @@
 # Subagent: Lean: Thompson cell & tissue laws
 
 - **Parent chat:** [Thompson's On Growth and Form claims as nanopubs](../2026-10-30_2015_thompson-s-on-growth-and-form-claims-as-nanopubs.md)
-- **Started:** 2026-10-30 23:57 UTC-4 (EDT)
-- **Last activity:** 2026-10-31 01:53 UTC-4 (EDT)
+- **Started:** 2026-10-30 23:57 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-31 01:53 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **Final status:** success
 - **Transcript ID:** `c8e7c047-38ef-4859-a713-4be9c9c5a1e2`
 

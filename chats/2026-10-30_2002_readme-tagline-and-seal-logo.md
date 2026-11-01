@@ -1,7 +1,7 @@
 # README tagline and seal logo
 
-- **Started:** 2026-10-30 20:02 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 20:25 UTC-4 (EDT)
+- **Started:** 2026-10-30 20:02 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 20:25 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 5
 - **Subagents:** 0
 - **Transcript ID:** `eca66075-1d01-412c-9f7b-6380a3cf5e8e`
@@ -126,7 +126,7 @@ Three things touch on ownership indirectly:
 - **Sharing is rewarded, not required.** Teams can earn up to 10 bonus points when other teams reuse their tools, data, or infrastructure. Nothing makes you license your work openly, but if you want that bonus, putting a license on the repo makes reuse easier.
 - **Event-provided code has its own licenses.** The organizers' ScienceClaw platform ([lamm-mit/scienceclaw](https://github.com/lamm-mit/scienceclaw)) is Apache 2.0, which is permissive. Some bundled skills, though, are Anthropic materials that can't be copied or redistributed. I checked, and this repo contains none of that code, so it doesn't affect you now. Avoid copying it in later.
 
-Participants may have agreed to extra terms in the Luma application or on Discord that aren't public. If you want it in writing, email the organizers at scienceclaw@mit.edu and ask whether there are any IP or licensing terms for submitted projects.
+Participants may have agreed to extra terms in the Luma application or on Discord that aren't public. If you want it in writing, email the organizers at [REDACTED-EMAIL] and ask whether there are any IP or licensing terms for submitted projects.
 
 The official name is written "ScienceClaw" (one word), but the README says "Science Claw Hack @ MIT." I can update that if you'd like.
 

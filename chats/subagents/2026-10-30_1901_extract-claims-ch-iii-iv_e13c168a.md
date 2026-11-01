@@ -1,8 +1,8 @@
 # Subagent: Extract claims: Ch III-IV
 
 - **Parent chat:** [Darwin's Origin of Species claims as nanopubs](../2026-10-30_1900_darwin-s-origin-of-species-claims-as-nanopubs.md)
-- **Started:** 2026-10-30 19:01 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 19:12 UTC-4 (EDT)
+- **Started:** 2026-10-30 19:01 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 19:12 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **Final status:** success
 - **Transcript ID:** `e13c168a-afc2-4d46-a75e-49ac654d0277`
 

@@ -1,7 +1,7 @@
 # Which Delphi ontology version are we using
 
-- **Started:** 2026-10-30 19:11 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 19:11 UTC-4 (EDT)
+- **Started:** 2026-10-30 19:11 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 19:11 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 1
 - **Subagents:** 0
 - **Transcript ID:** `2a7af20d-910d-49d9-b275-fa134c462b29`

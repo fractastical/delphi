@@ -54,9 +54,11 @@ Known issue: `npm run status` fails because `levin-2015-place-01`, `-05` and `-0
 
 ## Known gaps
 
-- The chat log was last regenerated 2026-10-31 10:05 (22 chats, 119 subagent runs); the snapshot
-  above counts 101 chats and 262 subagents. `generate.py` has a hand-kept title map and only names
-  chats it knows, so regenerating does not pick up new chats automatically.
+- The chat log was regenerated 2026-11-01 12:52 EST (157 chats, 349 subagent runs). The snapshot
+  above is the earlier 2026-10-31 22:05 EDT count (101 chats, 262 subagents), so the two numbers
+  are from different times. `generate.py` still keeps a title map for the first 22 chats; every
+  later chat is titled from its first user message. Coupon codes, API tokens and email addresses
+  are redacted on write.
 - Cloud agents, background processes and the external identities are counted by hand. There is no
   script that produces the snapshot table.
 - The use-case table and the chat log are not cross-linked: a row does not say which chats it came

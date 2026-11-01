@@ -1,7 +1,7 @@
 # Interactive claim graph site (docs/) with truth and testability scores
 
-- **Started:** 2026-10-30 20:22 UTC-4 (EDT)
-- **Last activity:** 2026-10-30 23:47 UTC-4 (EDT)
+- **Started:** 2026-10-30 20:22 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
+- **Last activity:** 2026-10-30 23:47 EDT (UTC-4) through 2026-11-01 02:00, then EST (UTC-5)
 - **User messages:** 20
 - **Subagents:** 26
 - **Transcript ID:** `c8a29bd7-8d22-4063-87dc-1a56f4d1371d`
