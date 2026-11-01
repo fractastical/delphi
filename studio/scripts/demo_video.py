@@ -604,7 +604,8 @@ def render_shot(shot: dict, scene_spec: dict, output: Path, overlay_path: Path, 
     else:
         title_lines = textwrap.wrap(scene_spec["headline"], width=64)
         media_top = (202 if len(title_lines) > 1 else 142) + 72
-        tile_width, tile_height = (960, 820 - media_top) if shot["layout"] == "grid-2" else (960, (820 - media_top) // 2)
+        tile_width, tile_height = ((960, 820 - media_top) if shot["layout"] == "grid-2"
+                                   else (960, ((820 - media_top) // 2 // 2) * 2))
         labels = []
         for index in range(len(sources)):
             filters.append(f"[{index}:v]scale={tile_width}:{tile_height}:force_original_aspect_ratio=decrease,pad={tile_width}:{tile_height}:(ow-iw)/2:(oh-ih)/2:color=0x07121f,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration={duration},trim=duration={duration},setpts=PTS-STARTPTS[v{index}]")
