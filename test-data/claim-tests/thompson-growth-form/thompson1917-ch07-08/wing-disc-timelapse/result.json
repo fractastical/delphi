@@ -1,0 +1,27 @@
+{
+  "claim_id": "thompson1917-ch07-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-08",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If regular hexagons occur only where cells are uniform in size and the forces on them uniform, then inside a proliferating epithelium whose overall hexagon fraction is low (Drosophila wing disc pouch, f6 about 0.39 in the ch07-09 test), neighbourhoods whose cells are locally uniform in size must be markedly more hexagonal than neighbourhoods of mixed size, and neighbourhoods under directional traction (high local cell elongation) must be less hexagonal than isotropic ones.",
+  "pass_criterion": "Pre-registered. In each of the five movies, every 10th frame, for every interior cell (not touching the margin cell and with no margin-touching neighbour) compute (a) the coefficient of variation of area over its neighbours, excluding the cell itself (CV_nb), and (b) the mean elongation magnitude of the cell and its neighbours, sqrt(elong_xx^2 + elong_xy^2) from the TissueMiner cells table (E_loc). Pool cell-frames per movie and cut CV_nb into deciles. Size clause: the claim is supported in a movie if the fraction of six-sided cells f6 in the lowest-CV_nb decile exceeds that in the highest decile by at least 0.10 and Spearman rho between decile rank and decile f6 is <= -0.3. Force clause (reported, pre-registered direction): f6 in the lowest E_loc decile should exceed the highest by >= 0.05. Overall verdict supports if the size clause holds in at least four of five movies.",
+  "fail_criterion": "Pre-registered. Refuted if in at least four of five movies the lowest-to-highest CV_nb decile difference in f6 is below 0.05 or its sign is reversed (local size uniformity does not go with hexagons). Between the two (difference in [0.05, 0.10), or movies split) is 'mixed'. The force clause does not change the verdict but is reported with its pre-registered direction; a reversed sign is recorded as a failed sub-prediction. Diagnostic, not part of the verdict: the same statistic on a Poisson-Voronoi partition (the within-image relation exists in any space-filling partition, claim-sources/cell-geometry found rho 0.23 on random tilings), and the f6 reached in the most uniform decile, compared with Thompson's regular tissues (RPE 0.67, compound eye 0.99 in claim-sources/cell-geometry).",
+  "planned_datasets": [
+    "zenodo-22760592-dye-2026-drosophila-wing-disc-timelapse-tissueminer"
+  ],
+  "test_contract": {
+    "expected_observation": "Within one epithelium, cells whose neighbours are uniform in size are hexagonal much more often than cells whose neighbours vary in size (decile gap in six-sided fraction >= 0.10, monotone), and cells in locally elongated (anisotropically stressed) regions are hexagonal less often.",
+    "disconfirming_observation": "The six-sided fraction does not depend on the local size uniformity of neighbours (gap < 0.05 or reversed), i.e. hexagon regularity is set by something other than size and force uniformity.",
+    "admissible_datasets": "Public, licensed, expert-corrected segmentations of a confluent epithelium with per-cell areas, neighbour relations and a per-cell shape tensor, from a tissue not used by the claim's author as an example, large enough for decile analysis (>= 1,000 cells per frame); not produced by a segmenter shown in this repo to round junctions.",
+    "inference_method": "Per movie: pooled cell-frames cut into deciles of neighbour-area CV; f6 per decile; lowest-minus-highest decile gap and Spearman rho over decile ranks; verdict by majority of movies against fixed thresholds; Poisson-Voronoi partition as the null for a non-biological space-filling tiling; elongation deciles for the force clause."
+  },
+  "interpretation": "The first run of this claim (top-level result.json) tested between regions of the human RPE, a tissue Thompson names as regular. This run tests within a tissue Thompson would call irregular, the proliferating Drosophila wing disc, asking whether his conditional still holds locally: are the uniform patches hexagonal? 'Uniform in size' is read as the CV of area over a cell's immediate neighbours, excluding the cell itself so that a small, recently divided cell does not by itself make its own neighbourhood look non-uniform. 'Uniform forces' has no direct measurement; the TissueMiner cell elongation tensor (Etournay et al. 2015 use it as the cell-shape contribution to tissue shear) is used as the proxy for directional traction, which is what Thompson contrasts with uniform force. The data were already on disk from the ch07-09 test (commit 370fa74f); this analysis was specified before any of these local statistics were computed.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "data_kind": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "local-agent", "model": "claude-fable-5.1", "run": "cursor local session, hexagon follow-up", "date": "2026-10-31" }
+}
