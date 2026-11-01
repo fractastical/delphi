@@ -33,8 +33,23 @@
         <li class="aboutmenu"><details><summary class="${route.view === "about" || route.view === "generative" ? "on" : ""}">About</summary><ul aria-label="About">${ABOUT.map(([h, t]) => html`<li><a href="${DF.href(h)}">${t}</a></li>`)}</ul></details></li></ul></nav>
       <form class="gsearch" role="search" id="gs"><label class="sr" for="gq">Search the catalog</label><input id="gq" type="search" placeholder="Search records" value="${route.view === "search" ? route.params.q || "" : ""}"><button class="btn small" type="submit">Search</button></form>
       <span class="mode ${live ? "live" : "snap"}" title="${esc(s.reason)}">${live ? "Live runtime" : "Snapshot"}</span></div>
-      ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
+      ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status" id="sessbanner"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
       ${live ? "" : html`<div class="banner" role="status"><b>Snapshot, not live.</b> No runtime answered (${s.reason}). Everything shown comes from <code>${snap ? snap.label : "the committed snapshot"}</code>. Local controls are calculations in this browser; nothing is submitted.</div>`}`;
+  }
+
+  /* If the node is up but would not mint a browser session (the backend limits new anonymous sessions per network), say that and offer Retry instead of the generic sign-in text. */
+  async function sessionProbe(hdr) {
+    const b = hdr.querySelector("#sessbanner"); if (!b || b.dataset.probed) return; b.dataset.probed = "1";
+    try {
+      const r = await fetch("api/session", { headers: { Accept: "application/json" }, cache: "no-store", credentials: "same-origin" });
+      if (r.status === 429) {
+        b.textContent = "";
+        const t = document.createElement("span"); t.innerHTML = "<b>The node is limiting new browser sessions from this network.</b> Public pages and the committed snapshot still work; anything that needs a session is unavailable for a moment. Nothing was changed. ";
+        const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn small"; btn.textContent = "Retry";
+        btn.addEventListener("click", async () => { btn.disabled = true; btn.textContent = "Retrying…"; try { await DF.api.load(); } finally { render(); } });
+        b.append(t, btn);
+      }
+    } catch (e) { /* the generic banner stays */ }
   }
 
   async function render() {
@@ -64,7 +79,9 @@
         console.error(e); main.innerHTML = html`<section class="pagehead"><h1>This view could not be drawn</h1><p class="lede">${e.message}</p><p>The data may be malformed. <a href="${DF.href("/frontier")}">Return to Frontier</a>.</p></section>`.toString();
       }
     }
-    if (lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
+    if (lastView !== null && lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
+    DF.ready = true;                                 // lets boot.js know the app drew
+    sessionProbe(hdr);
     lastView = route.view; window.scrollTo(0, y);
     await drawer(route);
   }

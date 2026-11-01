@@ -1554,3 +1554,68 @@ def test_openresearch_exemplars_are_local_recorder_provenance_not_a_cloud_dispat
     pg2 = page(browser, 400, 800)
     pg2.goto(base + "#/work?tab=built"); pg2.wait_for_selector("#bt-h")
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+
+
+_FOCUS_JS = """() => { const e = document.activeElement; if (!e || e === document.body) return null; const cs = getComputedStyle(e); const r = e.getBoundingClientRect();
+  return {tag: e.tagName, ring: (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== 'none', vis: cs.visibility !== 'hidden' && r.width > 0}; }"""
+
+
+def test_every_keyboard_stop_has_a_visible_focus_style_on_a_phone(browser, base):
+    """The video element itself must show our ring when it first takes focus. Further Tab presses move through the browser's own media controls
+    (activeElement stays the same <video>), which the browser styles; those are not counted as page stops."""
+    for route in ("#/home", "#/frontier", "#/simulations", "#/studio/flying-fish"):
+        pg = page(browser, 400, 860); pg.goto(base + route); pg.wait_for_timeout(1200)
+        bad = []; last = None
+        for _ in range(45):
+            pg.keyboard.press("Tab")
+            ident = pg.evaluate("(() => { const e = document.activeElement; if (!e || e === document.body) return null; if (!e.__stop) e.__stop = Math.random(); return e.__stop; })()")
+            r = pg.evaluate(_FOCUS_JS)
+            if ident is not None and ident == last:
+                continue                                   # same element still active: focus is inside its native controls
+            last = ident
+            if r and r["vis"] and not r["ring"]:
+                bad.append(r["tag"])
+        assert bad == [], (route, bad)
+        pg.close()
+
+
+def test_bare_graph_route_makes_no_unnamed_link_and_the_skip_link_keeps_the_route(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/graph"); pg.wait_for_selector("h1:has-text('Neighbourhood graph')")
+    hrefs = pg.locator("#main a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert all(h and h != "#/entity//" and "entity//" not in h for h in hrefs) and "No record is selected" in pg.locator("#main").text_content()
+    pg = page(browser)                                  # a fresh page: Tab starts from the top of the document
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".board")
+    pg.keyboard.press("Tab")
+    assert pg.evaluate("document.activeElement.className") == "skip" and pg.locator(".skip").is_visible()
+    pg.keyboard.press("Enter")
+    assert pg.evaluate("document.activeElement.id") == "main" and pg.evaluate("location.hash") == "#/frontier", "the skip link must move focus without changing the route"
+
+
+def test_a_failed_script_shows_a_retry_message_not_a_blank_page(browser, base):
+    pg = page(browser)
+    pg.route("**/js/util.js", lambda r: r.fulfill(status=429, body="Too Many Requests"))
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector(".bootfail", timeout=15000)
+    t = pg.locator(".bootfail").text_content()
+    assert "could not finish loading" in t and "util.js" in t and pg.locator(".bootfail button:has-text('Try again')").count() == 1
+
+
+def test_session_limit_shows_a_retry_state_and_public_reads_stay_available(browser, base):
+    calls = {"n": 0}
+
+    def session(route):
+        calls["n"] += 1
+        route.fulfill(status=429, json={"error": "rate_limited", "message": "slow down"}) if calls["n"] < 3 else route.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"})
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", session)
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#sessbanner button:has-text('Retry')", timeout=15000)
+    t = pg.locator("#sessbanner").text_content()
+    assert "limiting new browser sessions" in t and "snapshot still work" in t and "sign in" not in t.lower()
+    assert pg.locator("h1").count() >= 1, "pages still draw while the session is limited"
+    pg.click("#sessbanner button")
+    pg.wait_for_function("!document.querySelector('#sessbanner')", timeout=15000)
