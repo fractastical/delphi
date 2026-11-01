@@ -273,6 +273,7 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 ## Related projects
 
 - [Project Delphi Ontology](https://github.com/fractastical/project-delphi-ontology) ([open PRs](https://github.com/fractastical/project-delphi-ontology/pulls))
+- [Project Delphi Nanopub skills](https://github.com/knowledgepixels/project-delphi-nanopubs)
 - [delphi-evolve](https://github.com/kganjam/delphi-evolve) and [delphi-frontier](https://github.com/kganjam/delphi-frontier), summarized [above](#sibling-repositories)
 
 ## Nanopublication resources
@@ -281,5 +282,5 @@ To query this project's claims, their math and their assessment rankings, use th
 
 - [Nanodash](https://nanodash.knowledgepixels.com/): browse, search and publish in the browser.
 - [Nanopub Query](https://query.knowledgepixels.com/) ([docs](https://github.com/knowledgepixels/nanopub-query)): SPARQL endpoints over the network.
-- Libraries: [nanopub-js](https://github.com/Nanopublication/nanopub-js) (our publish scripts), [nanopub-py](https://github.com/fair-workflows/nanopub) (`np check`), [nanopub-java](https://github.com/Nanopublication/nanopub-java).
+- Libraries: [nanopub-js](https://github.com/Nanopublication/nanopub-js) (our publish scripts), [nanopub-py](https://github.com/Nanopublication/nanopub-py) (`np check`), [nanopub-java](https://github.com/Nanopublication/nanopub-java).
 - [Nanopub registry](https://github.com/knowledgepixels/nanopub-registry), [nanopub.net](https://nanopub.net/), [guidelines](https://nanopub.net/guidelines/working_draft/).
