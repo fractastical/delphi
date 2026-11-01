@@ -1782,6 +1782,21 @@ def belief_example(ins: Inputs) -> dict | None:
     return json.loads(json.dumps(EXAMPLE_SCENARIO))
 
 
+def blog_posts(ins: Inputs, extra: dict) -> list[dict]:
+    """About > Blog. Posts are tracked markdown in docs/blog/: `# Title`, then `Date:` and `Summary:` lines. The text is copied into data/docs and fetched by the page."""
+    posts = []
+    for p in sorted((ROOT / "docs" / "blog").glob("*.md")):
+        rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); lines = text.splitlines()
+        title = next((l[2:].strip() for l in lines if l.startswith("# ")), p.stem)
+        meta = {m.group(1).lower(): m.group(2).strip() for m in (re.match(r"^(Date|Summary):\s*(.+)$", l) for l in lines[:6]) if m}
+        body_words = len(re.findall(r"\w+", text)); slug = re.sub(r"^\d+-", "", p.stem)
+        extra[f"docs/blog-{slug}.md.txt"] = text.encode()
+        posts.append({"id": slug, "title": title, "date": meta.get("date"), "summary": meta.get("summary", ""), "minutes": max(1, round(body_words / 220)),
+                      "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/blog-{slug}.md.txt"})
+    posts.sort(key=lambda x: x["path"])  # same-day posts keep their numbered order; newer dates come first
+    return sorted(posts, key=lambda x: x["date"] or "", reverse=True)
+
+
 def build() -> dict[str, bytes]:
     ins = Inputs()
     seeds = ins.json("seeds/frontier-data.json")
@@ -1864,6 +1879,7 @@ def build() -> dict[str, bytes]:
     gen_bp = genetic_blueprints(ins)
     orx_ex = openresearch_exemplars(ins)
     experimentation = experimentation_block(ins)
+    blog = blog_posts(ins, extra)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1915,6 +1931,7 @@ def build() -> dict[str, bytes]:
         "genetic_blueprints": gen_bp,
         "openresearch": orx_ex,
         "experimentation": experimentation,
+        "blog": blog,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

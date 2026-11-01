@@ -19,7 +19,7 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
-  const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"], ["/demo", "Demo videos"], ["/faq", "FAQ"], ["/proofs", "Lean proofs"], ["/work", "MCP for agents", { tab: "connect" }]];
+  const ABOUT = [["/about", "Overview"], ["/about/blog", "Blog"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"], ["/demo", "Demo videos"], ["/faq", "FAQ"], ["/proofs", "Lean proofs"], ["/work", "MCP for agents", { tab: "connect" }]];
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
   const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize", "history", "regulatory", "reuse", "blueprints", "experimentation", "ecology", "assemblies", "print-laws", "design-control", "proofs"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");

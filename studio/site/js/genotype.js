@@ -26,7 +26,7 @@
     return html`<details class="gif" id="gif-${i.id}"><summary><b>${i.id}</b> ${nodeText(i.from)} <span aria-hidden="true">→</span> ${nodeText(i.to)} ${U.pill(st[0], st[1])}</summary>
       <p class="small">${i.text}.</p><p class="small"><b>A calibrated transfer here needs:</b> ${i.required_measurement}.</p>
       ${i.bridges.length ? html`<p class="small"><b>Recorded bridges:</b> ${i.bridges.map((b) => html`<code>${b.id}</code> `)}</p>` : ""}
-      ${v ? html`<div class="gslice"><h4>Validation slice</h4><ul class="small"><li><b>Input:</b> ${v.input}</li><li><b>Observation:</b> ${v.observation}</li><li><b>Decision rule:</b> ${v.decision_rule}</li></ul>
+      ${v ? html`<div class="gslice"><h3>Validation slice</h3><ul class="small"><li><b>Input:</b> ${v.input}</li><li><b>Observation:</b> ${v.observation}</li><li><b>Decision rule:</b> ${v.decision_rule}</li></ul>
         <p class="small"><b>Controls:</b> ${(v.controls || []).join("; ") || "none stated"}</p>
         <p class="small"><b>Instrument slots:</b> ${v.instrument_slots.map((s) => s.id ? html`<span class="gslot">${s.kind}: <code>${s.id}</code> ${U.pill("uncalibrated", "warn")}</span> ` : html`<span class="gslot">${s.kind}: <span class="faint">${s.gap}</span></span> `)}</p>
         <p class="small faint">${v.invalidated_by_dna_change ? "A changed DNA sequence invalidates this boundary's evidence. " : ""}${v.invalidated_by_context_change ? "A changed context invalidates it too." : ""}</p>

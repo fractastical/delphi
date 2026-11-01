@@ -987,7 +987,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/proofs", "#/work?tab=connect"]
+    assert hrefs == ["#/about", "#/about/blog", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/proofs", "#/work?tab=connect"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
@@ -2418,3 +2418,74 @@ def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs
                 assert hashlib.sha256(response.body()).hexdigest() == file["sha256"]
         assert pg.evaluate("document.documentElement.scrollWidth <= innerWidth + 1")
     assert pg.errors == []
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_system_operations_shows_dated_receipts_and_expandable_details(browser, base, width):
+    projection = json.loads((ROOT / "site/artifacts/system-operations/operations.json").read_text())
+    pg = page(browser, width, 900)
+    pg.goto(base + "#/system?tab=operations")
+    pg.wait_for_selector("#op-h")
+    text = pg.locator("#opsroot").inner_text()
+    assert "Latest source observation" in text and "historical sampled intervals" in text
+    assert "unknown right now" in text and "spend unknown" in text
+    assert "Preparation and partial results" in text and "not an audit queue" in text
+    assert "18" in text and "failed" in text
+    assert "363" in text and "32.3 / 37" in text
+    assert "biological validation" not in text.lower() or "no biological validation" in text.lower()
+    assert pg.locator("#opsroot details.ops-detail[open]").count() == 0
+    sources = pg.locator('details.ops-detail', has=pg.locator('summary', has_text="Show receipts, pin status and digests"))
+    sources.locator("summary").click()
+    assert sources.locator("tbody tr").count() == len(projection["sources"])
+    assert _overflow(pg) <= 0 and not pg.errors
+    pg.close()
+
+
+def test_operations_missing_samples_remain_unknown_and_load_failure_is_visible(browser, base):
+    projection = json.loads((ROOT / "site/artifacts/system-operations/operations.json").read_text())
+    for row in projection["plans"]["sampled_utilization"]["windows"]:
+        row["gpu_utilization_pct_mean"] = None
+        row["gpu_utilization_pct_max"] = None
+    pg = page(browser, 390, 900)
+    pg.route("**/artifacts/system-operations/operations.json", lambda route: route.fulfill(json=projection))
+    pg.goto(base + "#/system?tab=operations")
+    pg.wait_for_selector("#op-p")
+    text = pg.locator('[aria-labelledby="op-p"]').inner_text()
+    assert "unknown / unknown" in text and "0.0 /" not in text and "NaN" not in text
+    assert _overflow(pg) <= 0 and not pg.errors
+    pg.close()
+    pg = page(browser, 390, 900)
+    pg.route("**/artifacts/system-operations/operations.json", lambda route: route.fulfill(status=404, body="missing"))
+    pg.goto(base + "#/system?tab=operations")
+    pg.wait_for_selector("#opsroot .note")
+    assert "Unavailable" in pg.locator("#opsroot").inner_text()
+    assert "not zero activity" in pg.locator("#opsroot").inner_text()
+    assert not pg.errors
+    pg.close()
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_about_blog_docs_groups_and_lean_page_are_readable(browser, base, width):
+    """Blog posts come from docs/blog/*.md through the snapshot, load their body, and never overflow; the Documentation page groups every
+    snapshot document exactly once; the Lean page opens with a plain-language gloss per family and keeps the detail inside folded sections."""
+    posts = sorted((ROOT / "docs" / "blog").glob("*.md"))
+    assert len(posts) >= 4
+    pg = page(browser, width, 900)
+    pg.goto(base + "#/about/blog"); pg.wait_for_selector(".about-posts article")
+    assert pg.locator(".about-posts article").count() == len(posts) and _overflow(pg) <= 0
+    pg.goto(base + "#/about/blog/lean-for-biology"); pg.wait_for_selector("#post-body h3")
+    body = pg.locator("#post-body").inner_text()
+    assert "What Lean cannot tell you" in body and "Loading" not in body and "Date:" not in body and _overflow(pg) <= 0
+    assert pg.locator('#post-body a[href="#/proofs"]').count() == 1       # in-site links work and are not opened in a new tab
+    pg.goto(base + "#/about/blog/no-such-post"); pg.wait_for_selector(".about-hero")
+    assert "Post not found" in pg.locator(".about-page").inner_text()
+    pg.goto(base + "#/about/docs"); pg.wait_for_selector(".about-docs article")
+    snap = json.loads((ROOT / "site" / "data" / "snapshot.json").read_text())
+    assert pg.locator(".about-docs article").count() == len(snap["documents"]) and "*" not in pg.locator(".about-page").inner_text()
+    assert pg.locator(".about-section h2").count() >= 4 and _overflow(pg) <= 0
+    pg.goto(base + "#/proofs"); pg.wait_for_selector(".proof-plain")
+    fams = len(snap["lean_gallery"]["families"])
+    assert pg.locator(".proofindex-cards a").count() == fams and pg.locator(".proof-plain").count() == fams
+    assert pg.locator("details.pfold:not([open])").count() >= fams * 3 and _overflow(pg) <= 0
+    assert not pg.errors
+    pg.close()
