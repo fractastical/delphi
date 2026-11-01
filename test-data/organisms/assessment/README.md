@@ -106,6 +106,14 @@ been scored by the project, not marked as such. Agreement on the seeds (every di
 a seed is reported as a rubric issue naming the dimension, because two assessors reading one
 record differently is evidence the anchor text is ambiguous, not that one of them is wrong.
 Seed scores are kept in `seeds.json` (not shared with assessors) and compared by script.
+Seeds come in two kinds: `mid`, an ordinary scored record, which sets the trust condition; and
+`known-bad`, a record the project is confident sits at the bottom of one dimension (for
+independence: a re-query of a count already vendored under another record). Both assessors
+sliding the same way on a known-bad seed localizes a broken rubric anchor, which agreement-only
+seeds cannot. `scripts/make_batch.mjs <batch-id>` builds `batches/<batch-id>.json` (full records,
+seeds mixed in unmarked, sources round-robined); `scripts/compare_seeds.mjs <batch-id> <assessor>`
+reports agreement once `records/<assessor>/<batch-id>.json` exists. Outside assessors are named in
+`seeds.json` under each seed's `batches`.
 
 When two assessors score the same record:
 
