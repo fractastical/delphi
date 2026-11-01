@@ -189,9 +189,9 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
                 "result": propose(request),
                 "scope": "A formalization result is a computation/proposal; no Evidence is created or independently reviewed by this tool."}
 
-    def frontier_proofs(family: Literal["geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound"] | None = None,
+    def frontier_proofs(family: Literal["geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound", "scaled-threshold-intervals"] | None = None,
                         include_source: bool = False) -> dict:
-        """Read four fixed recorded Lean theorem families, assumptions and verified public source/receipt pins; never compile or execute code."""
+        """Read five fixed recorded Lean theorem families, assumptions and verified public source/receipt pins; never compile or execute code."""
         from .proofs import ProofCatalog
         return ProofCatalog().read(family, include_source, public_host)
 

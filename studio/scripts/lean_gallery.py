@@ -7,6 +7,7 @@ compiled, and its source is not published. What Lean checked is only the stated 
 a genotype-to-fin causal link or any empirical fact."""
 from __future__ import annotations
 
+from fractions import Fraction
 import hashlib
 import json
 import re
@@ -94,6 +95,56 @@ FAMILIES = [
          "The slab is a derived 1-D analogue, not a Grimes equation; neither geometry proves repair, barrier recovery, actuation, motion or organism function.",
      ],
      "statement_origin": "Hand-authored Lean algebra after the source-to-equation interpretation; the solver does not verify that translation or any empirical premise."},
+
+    {"id": "scaled-threshold-intervals", "title": "Scaled threshold intervals: a fixed-horizon incompatibility certificate",
+     "dir": "engineering/formalize/lean", "receipt": "lean-receipt.json",
+     "receipt_path": "artifacts/epithelial/interval-certificate/lean-receipt.json",
+     "receipt_sha256": "233b57e33c0fd95b0f9202bd7f5cc9602262cceeb60c02693776eba3eda0e69c",
+     "theory": "ScaledThresholdIntervals.lean", "negative_file": "ScaledThresholdIntervalsNegative.lean",
+     "source_paths": {
+         "ScaledThresholdIntervals.lean": "engineering/formalize/lean/ScaledThresholdIntervals.lean",
+         "ScaledThresholdIntervalsNegative.lean": "engineering/formalize/lean/ScaledThresholdIntervalsNegative.lean",
+         "source-witnesses.json": "artifacts/epithelial/interval-certificate/source-witnesses.json",
+         "validate.py": "artifacts/epithelial/interval-certificate/validate.py",
+         "reviewed-sweep-audit.json": "artifacts/epithelial/interval-certificate/reviewed-sweep-audit.json",
+         "review.json": "artifacts/audits/epithelial-sweep/review.json",
+     },
+     "binding_inputs": {
+         "reviewed-sweep-audit.json": "7a4c85fcfeb80643d2468bb54af39b99aec381e82e3121aca31dd9832680208c",
+         "review.json": "d083b080849219190931630144c4c4c0214cc8af2724d1aeab2c9cd22745ee41",
+     },
+     "display_artifacts": [
+         {"name": "source-witnesses.json", "path": "artifacts/epithelial/interval-certificate/source-witnesses.json", "sha256": "519c56cae2013476f23e59f48dc581761dd6ee844723747a881f7d4d80a6f590", "role": "four source cells and eight pinned logger witnesses"},
+         {"name": "validate.py", "path": "artifacts/epithelial/interval-certificate/validate.py", "sha256": "4dd256ab27227d570230aa753b80146cb6668c33b155291cdc75ea8c78e13754", "role": "recorded validation code; never executed by this reader"},
+         {"name": "reviewed-sweep-audit.json", "path": "artifacts/epithelial/interval-certificate/reviewed-sweep-audit.json", "sha256": "7a4c85fcfeb80643d2468bb54af39b99aec381e82e3121aca31dd9832680208c", "role": "exact historical 3c65c17 source audit; later prose corrections do not rewrite it"},
+         {"name": "review.json", "path": "artifacts/audits/epithelial-sweep/review.json", "sha256": "d083b080849219190931630144c4c4c0214cc8af2724d1aeab2c9cd22745ee41", "role": "independent same-data returned-model review"},
+     ],
+     "check_roles": {
+         "generic_interval_logic": ["factor_band_forces_endpoint_bound", "separated_intervals_reject_factor_band"],
+         "recorded_bound_instances": ["k4_recorded_intervals_reject_factor_two", "k7_recorded_intervals_reject_factor_two"],
+         "nonempty_premise_checks": ["k4_interval_premises_nonempty", "k7_interval_premises_nonempty"],
+         "false_variant_counterexamples": ["reverse_lower_counterexample", "reverse_upper_counterexample", "nonstrict_separation_counterexample", "dropped_factor_counterexample"],
+     },
+     "summary": "Two generic interval implications, two source-bound parametric instances, two nonempty-premise witnesses and four rational counterexamples were compiled. Four false inequality/factor variants were rejected. These are mathematical checks, not ten biological laws or a new simulation.",
+     "equations": [
+         {"label": "Necessary endpoint inequality", "tex": "a\\le x,\\ y\\le b,\\ x\\le ty,\\ t\\ge0 \\ \\Rightarrow\\ a\\le tb"},
+         {"label": "Strict interval separation", "tex": "a>tb \\ \\Rightarrow\\ \\neg(x\\le ty)"},
+         {"label": "Recorded k4 and k7 exclusions at t=2", "tex": "\\frac{2}{175}>2\\frac{1}{350},\\qquad \\frac{1}{175}>2\\frac{1}{1400}"},
+     ],
+     "assumptions": [
+         "x and y are positive scaled thresholds in a fixed CPM model-unit convention; t is nonnegative.",
+         "a <= x and y <= b are input interval premises. The relevant source brackets describe closure at sampled times by StopTime 1000, not permanent arrest.",
+         "The factor-two band would require x <= 2y for every selected pair; the recorded k4/k7 pairs contradict it.",
+         "The source audit and eight logger hashes bind inputs; Lean does not verify their extraction or threshold monotonicity between tested values.",
+     ],
+     "proves": "For every positive x,y and nonnegative t satisfying a <= x and y <= b, x <= t*y implies a <= t*b. Strict endpoint separation therefore rejects that band; the recorded k4/k7 bounds reject tolerance two.",
+     "does_not_prove": [
+         "No biological law, tissue validation, physical time calibration or long-horizon stochastic arrest is established.",
+         "No simulator execution, CSV-parser correctness, between-sample monotonicity or source-to-model interpretation is proved by Lean.",
+         "The native fixed-horizon FAIL and historical local G9 pass remain separate recorded simulation results.",
+     ],
+     "statement_origin": "Hand-authored parametric Lean algebra with rational inputs pinned to the reviewed 3c65c17 audit; source binding is a recorded Python check, not a Lean theorem about the raw simulations."},
+
 ]
 
 
@@ -148,6 +199,75 @@ def _read(root: Path, rel: str, ins) -> bytes | None:
     return ins.read(rel) if f.is_file() else None
 
 
+
+def _interval_record(spec, receipt, ins, root):
+    """Inspect fixed recorded bytes only; never import or execute the pinned validator."""
+    expected = [name for group in spec["check_roles"].values() for name in group]
+    compiled = {Path(row["path"]).name: row["sha256"] for row in receipt["source_pins"]}
+    pins = {**compiled, **spec["binding_inputs"]}
+    raws = {name: _read(root, spec["source_paths"][name], ins) for name in pins}
+    inputs_ok = all(raws[name] is not None and _sha(raws[name]) == pin for name, pin in pins.items())
+    source_ok = False
+    if inputs_ok:
+        witness = json.loads(raws["source-witnesses.json"])
+        audit = json.loads(raws["reviewed-sweep-audit.json"])
+        review = json.loads(raws["review.json"])
+        cells = witness["cells"]
+        source_ok = (len(cells) == 4 and {cell["id"] for cell in cells} == {
+            "k4-s1-J35", "k4-s1-J560", "k7-s1-J35", "k7-s1-J560"}
+            and len({arm["id"] for cell in cells for arm in cell["arms"]}) == 8
+            and witness["source_audit"]["sha256"] == pins["reviewed-sweep-audit.json"]
+            and witness["independent_review"]["sha256"] == pins["review.json"]
+            and witness["native_criterion_sha256"] == audit["native"]["criterion_sha256"] == review["criterion_sha256"]
+            and witness["frozen_tolerance"] == "2"
+            and witness["source_ensemble"]["stop_time_model_units"] == 1000)
+        for cell in cells:
+            bracket = audit["brackets"][cell["id"]]
+            source_ok = (source_ok and len(cell["arms"]) == 2
+                         and [Fraction(x) for x in cell["lambda_bracket"]] == [Fraction(str(bracket[k])) for k in ["lo", "hi"]]
+                         and [Fraction(x) for x in cell["scaled_ratio_interval"]] == [Fraction(str(bracket[k])) / cell["J"] for k in ["lo", "hi"]])
+            for arm in cell["arms"]:
+                recorded = review["arms"][arm["id"]]
+                source_ok = (source_ok and arm["logger_sha256"] == recorded["logger_sha256"]
+                             and arm["rows"] == recorded["rows"] > 0
+                             and arm["closed_by_1000"] is recorded["closed_by_1000"])
+    positive = receipt["positive"]
+    rows = re.findall(r"'ScaledThresholdIntervals\.(\w+)' depends on axioms: \[([^\]]*)\]", positive["stdout"])
+    axioms = {name: sorted(x.strip() for x in raw.split(",") if x.strip()) for name, raw in rows}
+    positive_ok = (receipt["status"] == "pass" and positive["exit"] == 0
+                   and [name for name, _ in rows] == expected
+                   and positive["expected_theorems"] == expected
+                   and set(axioms) == set(positive["axioms_per_theorem"])
+                   and all(axioms[name] == sorted(positive["axioms_per_theorem"][name])
+                           and set(axioms[name]) <= STANDARD_AXIOMS for name in expected)
+                   and "sorryAx" not in positive["stdout"] + positive["stderr"])
+    negative = receipt["negative"]
+    ranges = {}
+    if inputs_ok:
+        for number, line in enumerate(raws[spec["negative_file"]].decode().splitlines(), 1):
+            if line.startswith("-- MUTATION-BEGIN "):
+                ranges[line.split()[-1]] = [number, None]
+            elif line.startswith("-- MUTATION-END "):
+                ranges[line.split()[-1]][1] = number
+    errors = [int(n) for n in re.findall(r"ScaledThresholdIntervalsNegative\.lean:(\d+):\d+: error:", negative["stdout"] + negative["stderr"])]
+    controls = receipt["mutation_roles"]
+    negative_ok = (negative["exit"] == 1 and list(ranges) == controls
+                   and set(negative["each_block_rejected"]) == set(controls)
+                   and all(value is True for value in negative["each_block_rejected"].values())
+                   and len(errors) == 4 and errors == negative["diagnostic_lines"]
+                   and all(sum(lo < n < hi for n in errors) == 1 for lo, hi in ranges.values())
+                   and negative["errors_outside_blocks"] == []
+                   and negative["unchanged_law_twins_compiled"] is True
+                   and negative["stdout"].count("linarith failed to find a contradiction") == 4)
+    run = {"positive": {"exit": positive["exit"], "seconds": positive["seconds"],
+                        "axioms": sorted({a for values in axioms.values() for a in values}),
+                        "only_standard_axioms": positive_ok, "axioms_per_theorem": axioms},
+           "negative": {"exit": negative["exit"], "seconds": negative["seconds"],
+                        "rejected": negative_ok, "each_block_rejected": negative["each_block_rejected"],
+                        "first_error": "Four false inequality/factor variants rejected in their marked proof blocks; unchanged-law twins compile."}}
+    return pins, run, {"positive": positive_ok, "negative": negative_ok, "source_binding": source_ok}
+
+
 def _family(spec: dict, ins, out: dict, root: Path) -> dict:
     d = spec["dir"]; rel = lambda n: f"{d}/{n}"
     def source_path(name):
@@ -156,16 +276,17 @@ def _family(spec: dict, ins, out: dict, root: Path) -> dict:
         return f"{Path(d).parent.as_posix()}/{name[3:]}" if name.startswith("..") else rel(name)
     receipt_path = spec.get("receipt_path", rel(spec["receipt"]))
     fam = {k: spec[k] for k in ("id", "title", "summary", "equations", "assumptions")}
-    for optional in ("proves", "does_not_prove", "statement_origin"):
+    for optional in ("proves", "does_not_prove", "statement_origin", "check_roles"):
         if optional in spec:
             fam[optional] = spec[optional]
     reasons: list[str] = []; files: dict[str, bytes] = {}
     receipt_b = _read(root, receipt_path, ins)
     if receipt_b is None:
         return {**fam, "status": "missing", "reasons": [f"{receipt_path} is not in the tree"], "files": [], "theorems": [], "negative_blocks": []}
-    R = json.loads(receipt_b); fam["receipt"] = {"path": receipt_path, "sha256": _sha(receipt_b), "bytes": len(receipt_b)}
+    fam["receipt"] = {"path": receipt_path, "sha256": _sha(receipt_b), "bytes": len(receipt_b)}
     if spec.get("receipt_sha256") and _sha(receipt_b) != spec["receipt_sha256"]:
-        reasons.append("the pinned Lean receipt changed")
+        return {**fam, "status": "stale", "reasons": ["the pinned Lean receipt changed"], "files": [], "theorems": [], "negative_blocks": []}
+    R = json.loads(receipt_b)
     # which hashes the receipt pinned, and what the run claimed
     if spec["id"] == "geometric-similarity":
         L = R["lean_checks"]; prov = L["provenance"]; pins = dict(prov["files"]); pos, neg = L["positive"], L["negative"]; flags = {"positive": pos.get("exit") == 0 and pos.get("only_standard_axioms"), "negative": L["negative"].get("exit") == 1 and all(L["negative"]["each_block_rejected"].values()) and not L["negative"]["errors_outside_blocks"]}
@@ -245,6 +366,19 @@ def _family(spec: dict, ins, out: dict, root: Path) -> dict:
         fam["check_results"] = [{"name": name, "status": "recorded compile passed", "axioms": axiom_map[name]}
                                 for name in expected_names if name in axiom_map]
         fam["receipt"]["all_ok"] = all(flags.values()) and not reasons
+    elif spec["id"] == "scaled-threshold-intervals":
+        pins, run, flags = _interval_record(spec, R, ins, root)
+        assembled = {}
+        versions = {"lean_version": R["lean_version"], "mathlib_rev": R["mathlib"]["revision"], "toolchain": R["toolchain"]}
+        roles = {name: role for role, names in spec["check_roles"].items() for name in names}
+        fam["check_results"] = [{"name": name, "role": roles[name], "status": "recorded compile passed",
+                                 "axioms": run["positive"]["axioms_per_theorem"][name]} for name in roles]
+        fam["source_binding"] = {"status": "four source cells and eight recorded logger witnesses matched" if flags["source_binding"] else "withheld",
+                                 "cells": 4, "logger_witnesses": 8,
+                                 "scope": "Pinned returned-data audit only; reader does not re-execute validator, CSV parsing, simulation or Lean."}
+        if not flags["source_binding"]:
+            reasons.append("the pinned nonempty source/witness binding is missing or changed")
+        fam["receipt"]["all_ok"] = all(flags.values())
     else:
         pins = dict(R["files_sha256"]); prov = R["provenance"]; assembled = {}; versions = {"lean_version": R["lean_version"], "mathlib_rev": prov.get("mathlib_rev"), "toolchain": prov.get("lean_toolchain_file")}
         flags = {"positive": R["positive"].get("exit") == 0 and R["positive"].get("only_standard_axioms"), "negative": R["negative_corrupt_law"].get("rejected") is True}
@@ -344,6 +478,18 @@ def _family(spec: dict, ins, out: dict, root: Path) -> dict:
                 end += 1
             fam["negative_blocks"].append({"id": block_id, "code": "\n".join(text_lines[start:end]).strip(),
                                             "rejected": True, "first_error": "Exact rational counterexample leaves the mutated nonnegative claim unproved."})
+    elif spec["id"] == "scaled-threshold-intervals":
+        active = None
+        for line in negtext.splitlines():
+            if line.startswith("-- MUTATION-BEGIN "):
+                active = {"id": line.split()[-1], "code": []}
+            elif line.startswith("-- MUTATION-END "):
+                fam["negative_blocks"].append({"id": active["id"], "code": "\n".join(active["code"]),
+                                                "rejected": run["negative"]["each_block_rejected"][active["id"]],
+                                                "first_error": "Recorded false inequality/factor variant was rejected."})
+                active = None
+            elif active is not None:
+                active["code"].append(line)
     else:
         fam["negative_blocks"].append({"id": "corrupt_law", "code": negtext, "rejected": bool(run["negative"].get("rejected")), "first_error": run["negative"].get("first_error")})
     fam["display_artifacts"] = []

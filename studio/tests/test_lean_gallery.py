@@ -13,7 +13,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import lean_gallery as L  # noqa: E402
 
 PIECES = ["engineering/formal", "engineering/formalize/lean", "engineering/constraints.py",
-          "artifacts/oxygen-diffusion-rule", "projects/reuse-studies/live-projects.json"]
+          "artifacts/oxygen-diffusion-rule", "projects/reuse-studies/live-projects.json",
+          "artifacts/epithelial/interval-certificate", "artifacts/audits/epithelial-sweep/review.json"]
 
 
 class Ins:
@@ -40,11 +41,11 @@ def run(root):
     return L.build(Ins(root), out, root=root), out
 
 
-def test_three_recorded_families_are_current_and_only_pinned_files_are_published(monkeypatch):
+def test_five_recorded_families_are_current_and_only_pinned_files_are_published(monkeypatch):
     monkeypatch.setattr(subprocess, "run", lambda *a, **k: (_ for _ in ()).throw(AssertionError("the helper must not run any process")))
     g, out = run(ROOT)
     fams = {f["id"]: f for f in g["families"]}
-    assert set(fams) == {"geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound"} and g["refused"] == []
+    assert set(fams) == {"geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound", "scaled-threshold-intervals"} and g["refused"] == []
     assert all(f["status"] == "current" and not f["reasons"] for f in fams.values())
     # the assembled sources that were compiled are rebuilt from the current files and equal the receipt's hashes
     assert fams["geometric-similarity"]["assembled_sources_match"] is True and fams["unit-algebra"]["assembled_sources_match"] is True
@@ -65,7 +66,7 @@ def test_three_recorded_families_are_current_and_only_pinned_files_are_published
     assert [b["id"] for b in fams["geometric-similarity"]["negative_blocks"]] == ["wl_k2", "mass_exponent", "stall_k2", "corrupted_certificate"]
     assert len(fams["unit-algebra"]["negative_blocks"]) == 4 and len(fams["cantilever-guard"]["negative_blocks"]) == 1
     oxygen = fams["steady-oxygen-bound"]
-    assert {t["name"] for t in oxygen["theorems"] if t["kind"] == "theorem"} == set(L.FAMILIES[-1]["positive_check_names"])
+    assert {t["name"] for t in oxygen["theorems"] if t["kind"] == "theorem"} == set(next(s for s in L.FAMILIES if s["id"] == "steady-oxygen-bound")["positive_check_names"])
     assert len(oxygen["check_results"]) == 6 and all(x["status"] == "recorded compile passed" for x in oxygen["check_results"])
     assert [b["id"] for b in oxygen["negative_blocks"]] == ["sphere_parametric", "slab_parametric", "sphere_witness", "slab_witness"]
     assert all(b["rejected"] for b in oxygen["negative_blocks"])
@@ -82,7 +83,8 @@ def test_three_recorded_families_are_current_and_only_pinned_files_are_published
 
 @pytest.mark.parametrize("family, name", [("geometric-similarity", "engineering/formal/GeometricSimilarity.lean"), ("unit-algebra", "engineering/formal/UnitAlgebra.lean"),
                                           ("cantilever-guard", "engineering/formalize/lean/CantileverGuard.lean"),
-                                          ("steady-oxygen-bound", "engineering/formalize/lean/OxygenDiffusionBound.lean")])
+                                          ("steady-oxygen-bound", "engineering/formalize/lean/OxygenDiffusionBound.lean"),
+                                          ("scaled-threshold-intervals", "engineering/formalize/lean/ScaledThresholdIntervals.lean")])
 def test_a_positive_receipt_with_changed_source_is_stale_and_its_files_are_not_published(tree, family, name):
     p = tree / name
     p.write_text(p.read_text() + "\n-- edited after the receipt\n")
@@ -172,3 +174,33 @@ def test_receipt_summary_cannot_hide_incomplete_or_contradictory_checks(tree, mu
     result = next(f for f in gallery["families"] if f["id"] == family)
     assert result["status"] == "receipt_failed" and not result["receipt"]["all_ok"]
     assert not any(f"/{family}/" in key for key in out)
+
+
+def test_interval_roles_and_exact_published_dependencies():
+    gallery, out = run(ROOT)
+    family = next(f for f in gallery["families"] if f["id"] == "scaled-threshold-intervals")
+    assert family["status"] == "current" and family["receipt"]["all_ok"]
+    assert [len(group) for group in family["check_roles"].values()] == [2, 2, 2, 4]
+    assert len(family["check_results"]) == 10
+    assert len(family["negative_blocks"]) == 4 and all(x["rejected"] for x in family["negative_blocks"])
+    assert "not ten biological laws" in family["summary"]
+    assert family["source_binding"]["cells"] == 4 and family["source_binding"]["logger_witnesses"] == 8
+    assert len(family["source"]) < 6000
+    assert {a["name"] for a in family["display_artifacts"]} == {"source-witnesses.json", "validate.py", "reviewed-sweep-audit.json", "review.json"}
+    assert all(a["status"] == "verified" and "@" + a["path"] in out for a in family["display_artifacts"])
+
+
+@pytest.mark.parametrize("path", [
+    "artifacts/epithelial/interval-certificate/source-witnesses.json",
+    "artifacts/epithelial/interval-certificate/validate.py",
+    "artifacts/epithelial/interval-certificate/reviewed-sweep-audit.json",
+    "artifacts/audits/epithelial-sweep/review.json",
+    "artifacts/epithelial/interval-certificate/lean-receipt.json",
+])
+def test_changed_interval_binding_refuses_entire_family(tree, path):
+    target = tree / path
+    target.write_bytes(target.read_bytes() + b" mutation")
+    gallery, out = run(tree)
+    family = next(f for f in gallery["families"] if f["id"] == "scaled-threshold-intervals")
+    assert family["status"] != "current" and family["files"] == [] and "source" not in family
+    assert not any("/scaled-threshold-intervals/" in key for key in out)

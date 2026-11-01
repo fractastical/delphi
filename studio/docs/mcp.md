@@ -153,7 +153,7 @@ because subsequent deployment changes may differ from this dated record.
 | `frontier_artifact_inspect` | Exact-hash matching Evidence declarations, guarded local-media matches and optional text | `include_text=true` reads published UTF-8 JSON, plain text or CSV only, after rechecking the complete file digest. Maximum file size is 1,000,000 bytes; `max_chars` defaults to 8,000 and is bounded to 1–16,000. Truncation and unavailable/unsupported content are explicit. Remote URIs are never fetched. Declaration alone is not byte verification. |
 | `frontier_simulate` | One allowlisted bioelectric or mechanobiology preview | Fixed bounded local adapter; ephemeral `SimulationResult`, never accepted Evidence. No arbitrary code, cloud job or external inference. |
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
-| `frontier_proofs` | Three fixed recorded Lean theorem families, assumptions and source/receipt links | Checks current source/dependency pins and the exact published source/receipt bytes on every read. Optional fixed family and bounded Lean text; no compiler, arbitrary path or biological validity claim. |
+| `frontier_proofs` | Five fixed recorded Lean theorem families, assumptions and source/receipt links | Checks current source/dependency pins and the exact published source/receipt bytes on every read. Optional fixed family and bounded Lean text; no compiler, arbitrary path or biological validity claim. |
 | `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |
 | `frontier_belief` | Existing finite scenario calculation | Conditional on declared inputs and explicitly uncalibrated; ephemeral and not accepted. |
 | `frontier_plan_experiments` | Prospective linear-Gaussian design comparison | Returns assumption-based covariance and rank diagnostics, no measurements or writes. Check the connected server's capabilities for availability. |
@@ -320,8 +320,8 @@ registered, principal check removed) each fail a test.
 ## Share recorded Lean theorems
 
 `frontier_proofs()` returns compact summaries for `geometric-similarity`,
-`unit-algebra` and `cantilever-guard`. `family` accepts only one of those three
-names; `include_source` defaults to false. For example:
+`unit-algebra`, `cantilever-guard`, `steady-oxygen-bound` and
+`scaled-threshold-intervals`. `family` accepts only one of those five names; `include_source` defaults to false. For example:
 
 ```python
 await session.call_tool("frontier_proofs", {
@@ -336,10 +336,22 @@ A safe configured public hostname also supplies HTTPS links. Optional theory
 text is bounded to 6,000 characters per family and explicitly reports truncation;
 the full-file digest and download link remain available.
 
-The three receipt digests are fixed in code. Original sources/checker dependencies
+The five receipt digests are fixed in code. Original sources/checker dependencies
 are checked by the existing source-matched gallery helper; published copies must
 also match byte for byte. A missing, edited, symlinked or stale family is withheld
 rather than reported as compiled. No caller supplies a path, code or formula, and
 no Lean process, model, network fetch, Store write, review or acceptance occurs.
 `recorded_compile` names a past receipt; `compile_executed` is false. These are
 conditional mathematical statements, not proof of fish biology or feasibility.
+
+The `scaled-threshold-intervals` family contains two generic interval statements,
+two recorded-bound parametric instances, two nonempty-premise checks and four
+rational counterexamples. Four false inequality/factor variants were rejected.
+These are not ten biological laws. It exposes the exact witness, historical
+reviewed source audit, independent returned-data review and validator download
+pins alongside the Lean source and receipt. Every required dependency and
+published copy must match; a changed witness/validator/audit withholds the whole
+family. The tool never executes the validator. The 4,272-character theory fits
+the existing 6,000-character optional source limit. Its certificate is conditional
+on sampled closure brackets at StopTime1000, not source extraction, simulator
+fidelity, a stochastic asymptotic threshold or biological validity.

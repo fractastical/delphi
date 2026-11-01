@@ -1,8 +1,9 @@
-"""The #/proofs page in a real browser. The snapshot is the repository's, with the Lean gallery added from the helper, because the builder does not
-publish it yet; a stale family and hostile source text are injected to prove they are refused and never run as HTML."""
+"""The #/proofs page in a real browser. Inject a freshly source-matched gallery into
+its snapshot to isolate rendering; stale and hostile-text fixtures check refusal/escaping.
+The production builder publishes the same helper's recorded artifacts without running Lean.
+"""
 import copy
 import functools
-import hashlib
 import http.server
 import json
 import sys
@@ -74,7 +75,7 @@ def test_each_family_shows_real_source_receipt_mutants_and_downloads(browser, ba
     t = pg.locator("#main").inner_text()
     for must in ("recorded runs", "mathematics, not biology", "Mathlib", "proposal checker", "does not compile it"):
         assert must in t, must
-    assert pg.locator(".proof").count() == 4 and pg.locator("h1").text_content() == "Lean proofs"
+    assert pg.locator(".proof").count() == 5 and pg.locator("h1").text_content() == "Lean proofs"
     for f in gallery["families"]:
         sec = pg.locator(f"#proof-{f['id']}")
         assert "recorded compile matches these files" in sec.inner_text()
@@ -98,6 +99,10 @@ def test_each_family_shows_real_source_receipt_mutants_and_downloads(browser, ba
     assert oxygen.locator(".proofneg li").count() == 4
     assert oxygen.locator(".prooffigure img").get_attribute("src").endswith("steady-oxygen-bound/geometry-control.png")
     assert "oxygen adequacy" in oxygen.inner_text() and "D=unknown" in oxygen.inner_text() and "a=unknown" in oxygen.inner_text()
+    interval = pg.locator("#proof-scaled-threshold-intervals")
+    assert interval.locator(".proofchecks li").count() == 10
+    assert interval.locator(".proofneg li").count() == 4
+    assert "not ten biological laws" in interval.inner_text()
     pg.locator(".proof .eq-math .katex").first.wait_for(timeout=15000)
     assert pg.locator(".proof .katex-error").count() == 0 and not pg.errors
 
