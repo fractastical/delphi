@@ -1,0 +1,100 @@
+{
+  "schema": "frontier.nca.one-factor-seed-protocol/1",
+  "status": "Frozen before any follow-up training or evaluation",
+  "parent_source_commit": "9b204921de9dbefa855e835fb8f6f7e36f3088d8",
+  "parent_receipt": {
+    "path": "artifacts/nca-pattern/run-original/job-receipt.json",
+    "sha256": "4c507007ca7091332e41d3c2714a0308f0eb0303a1985a53187626d65f59c813"
+  },
+  "parent_protocol_sha256": "cfb3296ee781931c378080216fa2e1e5de4478d55415690e9e8c751b9273accb",
+  "follow_up_runtime_protocol_sha256": "4976736fa66756f4fdf41d7b0b132db8ff3d8ddabe4602e62751f6a36aa57b11",
+  "sole_scientific_change": {
+    "input": "seed_xy in target NPZ",
+    "from": [
+      8,
+      42
+    ],
+    "to": [
+      7,
+      41
+    ],
+    "selection": "minimum squared Euclidean pixel distance to target silhouette, row-major y,x ties"
+  },
+  "invariants": {
+    "source_files_byte_identical": [
+      {
+        "path": "engineering/nca_pattern/__init__.py",
+        "sha256": "52e5f75caf97295cf1f14b0b61f414420724ef37f58aa5c53b0320c735e33de6",
+        "bytes": 87
+      },
+      {
+        "path": "engineering/nca_pattern/evaluate.py",
+        "sha256": "5856ec109acd7cea19ca2ed5b468bf6065f30f31d7516b0edd1b9e79d3983d86",
+        "bytes": 8335
+      },
+      {
+        "path": "engineering/nca_pattern/job.py",
+        "sha256": "da2f43130a901ff8ceb8a5bca9910aaec5b5546449b2569493966c6187349d2e",
+        "bytes": 9353
+      },
+      {
+        "path": "engineering/nca_pattern/model.py",
+        "sha256": "8a278ebd201603c87cefae4e8b64137e770c1ebe731aa07b87e02646064c5b98",
+        "bytes": 9042
+      },
+      {
+        "path": "engineering/nca_pattern/target.py",
+        "sha256": "afa93a7891de5ccf58bcb6c80bc11d96d810ed61cb7c2e1437fdd64121471b0c",
+        "bytes": 4400
+      },
+      {
+        "path": "engineering/nca_pattern/train.py",
+        "sha256": "14cb74c5712955e9f0549cba161e8722a15aa45c41f5ae76e740dd647b832bae",
+        "bytes": 6680
+      }
+    ],
+    "target_arrays": {
+      "rgba": {
+        "sha256": "2f4a252110c9db7ddda1ddbfb45f73758f3755227f60c00b60fb4b58a2a037a8",
+        "shape": [
+          64,
+          64,
+          4
+        ],
+        "dtype": "float32"
+      },
+      "ray_mask": {
+        "sha256": "6fe35371e3fce47ed048e5913a96389f9f1a3f807b55d53c87a061f79de6ec28",
+        "shape": [
+          64,
+          64
+        ],
+        "dtype": "bool"
+      },
+      "silhouette": {
+        "sha256": "4f3c9f488358bbc8ce7dd4691be04c0dacda430800ab066fc1dbf15b927f2761",
+        "shape": [
+          64,
+          64
+        ],
+        "dtype": "bool"
+      }
+    },
+    "heldout_mask_sha256": "6546e8dcab6ef733d11298a9177f5a014c3a57410b714a0584481e68fcd4d4fc",
+    "training_and_evaluation": "All4original models, same initialization/pool/fire/damage seeds,2000steps,52evaluations,48design+4negatives,original thresholds and deadlines. No loss,rule,optimizer,damage,checkpoint selection or budget change."
+  },
+  "target_npz_sha256": "fd1f4774882743f1c09fb2fa2513cbca70b3128f1c58431082298adba0298488",
+  "evaluation_scope": "Previously seen evaluation scenarios reused for a one-factor comparison, not fresh heldouts or biological validation.",
+  "partial_policy": "Keep all failure/incomplete cases; no retry, threshold relaxation or replacement of parent results.",
+  "resources": {
+    "gpus": 1,
+    "cpu_threads": 2,
+    "scientific_hard_s": 2400,
+    "training_soft_deadline_s": 1800,
+    "total_soft_deadline_s": 2100,
+    "raw_output_cap_bytes": 50331648,
+    "compressed_transport_cap_bytes": 50331648,
+    "transport_budget_note": "Separate image-pull/export allowance; no increase to scientific training/evaluation budgets"
+  },
+  "builder_sha256": "8c03efb335a428f9ad05eacdd596a1045ffad5fc3dfbb6c04921e0c9ba410746"
+}
