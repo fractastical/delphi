@@ -152,9 +152,11 @@ directory runs them.
     `docs/PORTAL.md` for the commit and how to refresh it). Edit those only by re-importing.
   - `css/delphi.css`: the shared stylesheet. Design tokens, fonts and the page header come from the
     portal; every built page links it instead of carrying its own palette.
-  - `claim-graph.html`, `theorems.html`, `claims-query.html`, `problems.html`, `team.html`: built
-    from `scripts/site/templates/*.template.html` by the builders in `scripts/site/`
-    and `problems/build/build-site.mjs`. Edit the template, not the output. The same goes for the
+  - `claim-graph.html`, `theorems.html`, `claims-query.html`, `problems.html`, `team.html`,
+    `test-organism.html`: built from `scripts/site/templates/*.template.html` by the builders in
+    `scripts/site/` and `problems/build/build-site.mjs`. Edit the template, not the output. The
+    organism form (`node scripts/site/build-organism-form.mjs`) files a GitHub issue; it does not
+    add a taxon or run a test. The same goes for the
     project-overview slide deck `docs/deck/index.html` (https://delphibio.org/deck/, the header's About link), built by
     `scripts/site/build-overview-deck.mjs` with every count computed from `docs/claims.json`,
     the organism inventory and the Lean registry.

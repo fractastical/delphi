@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test an organism — delphisci</title>
+<meta name="description" content="Ask Delphi to test a species or a designed organism. The form checks the name against the inventory and opens a GitHub issue. It does not add a taxon or run a test.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<link rel="stylesheet" href="css/delphi.css">
+<style>
+.layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);gap:16px;align-items:start}
+@media(max-width:880px){.layout{grid-template-columns:1fr}}
+.fields{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field .lab{display:block}
+.hint{margin:0;font-size:12px;line-height:1.45;color:var(--ink-3)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.split3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:640px){.split,.split3{grid-template-columns:1fr}}
+input[type=text],input[type=url],select,textarea{width:100%}
+textarea{min-height:92px;resize:vertical}
+.kind{display:flex;gap:8px;flex-wrap:wrap}
+.kind label{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--grid);border-radius:8px;padding:8px 10px;background:var(--paper);cursor:pointer;font-size:13px;line-height:1.4;color:var(--ink);font-weight:500}
+.kind input{width:auto;margin-top:2px}
+.kind label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.hits{list-style:none;margin:8px 0 0;padding:0;border:1px solid var(--grid);border-radius:8px;overflow:hidden;background:var(--paper)}
+.hits li+li{border-top:1px solid var(--grid)}
+.hits button{display:flex;width:100%;justify-content:space-between;gap:12px;align-items:baseline;text-align:left;border:0;border-radius:0;background:transparent;min-height:40px;white-space:normal;font-weight:500;padding:8px 12px}
+.hits button:hover{background:var(--accent-soft)}
+.sci{font-style:italic}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.alert{color:var(--specimen);font-size:12.5px;margin:0}
+.alert:empty{display:none}
+.side{display:flex;flex-direction:column;gap:10px}
+.side .panel p:last-child{margin-bottom:0}
+.match{margin-top:8px}
+.match p{margin:4px 0 0}
+.preview{margin:8px 0 0;max-height:320px;overflow:auto;white-space:pre-wrap;font-family:var(--mono);font-size:11px;line-height:1.45;background:var(--code-bg);color:var(--code-ink);border:1px solid var(--code-line);border-radius:8px;padding:12px}
+.ready{color:var(--ok);font-size:12px;font-weight:600}
+.waiting{color:var(--ink-3);font-size:12px}
+</style></head><body>
+<!--__SITE_HEAD__-->
+<main>
+<header class="page-head"><div><div class="eyebrow accent">Claims atlas</div><h1>Test an organism</h1>
+<p class="subtitle" id="subtitle"></p></div></header>
+
+<div class="layout">
+<form class="panel" id="form" novalidate>
+  <div class="fields">
+    <fieldset class="field" style="border:0;padding:0;margin:0">
+      <legend class="lab">What are you asking to test?</legend>
+      <div class="kind">
+        <label><input type="radio" name="kind" value="taxon" checked> A species or higher taxon</label>
+        <label><input type="radio" name="kind" value="design"> A designed or fabricated organism</label>
+      </div>
+      <p class="hint" id="kind-hint">A species, genus, or higher group. The inventory is the animal taxa named in the source books, plus species the existing data tests measured.</p>
+    </fieldset>
+
+    <div class="field">
+      <label class="lab" id="name-label" for="name">Scientific name</label>
+      <input id="name" name="name" type="text" required maxlength="200" autocomplete="off" spellcheck="false" placeholder="Columba livia" aria-describedby="name-hint">
+      <p class="hint" id="name-hint">The name as you would write it. This page compares it with the inventory copied into the page. It does not look the name up in GBIF or NCBI.</p>
+      <ul class="hits" id="hits" hidden></ul>
+    </div>
+
+    <div class="split">
+      <div class="field">
+        <label class="lab" for="rank">Rank</label>
+        <select id="rank" name="rank">
+          <option value="unknown" selected>Not sure</option>
+          <option value="species">Species</option>
+          <option value="genus">Genus</option>
+          <option value="family">Family</option>
+          <option value="order">Order</option>
+          <option value="class">Class</option>
+          <option value="phylum">Phylum</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lab" for="kingdom">Kingdom</label>
+        <select id="kingdom" name="kingdom">
+          <option value="unknown" selected>Not sure</option>
+          <option value="Animalia">Animalia</option>
+          <option value="Plantae">Plantae</option>
+          <option value="Fungi">Fungi</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="lab" for="vernacular">Vernacular name</label>
+      <input id="vernacular" name="vernacular" type="text" maxlength="200" autocomplete="off" placeholder="Optional">
+    </div>
+
+    <div class="field">
+      <span class="lab">Identifiers you already have</span>
+      <p class="hint">Leave these blank unless you have looked them up. A guess is worse than an empty field. The page does not check them against those services.</p>
+      <div class="split3">
+        <input id="gbif" name="gbif" type="text" inputmode="numeric" maxlength="12" spellcheck="false" autocomplete="off" placeholder="GBIF usage key" aria-label="GBIF usage key">
+        <input id="ncbi" name="ncbi" type="text" inputmode="numeric" maxlength="12" spellcheck="false" autocomplete="off" placeholder="NCBI taxid" aria-label="NCBI taxid">
+        <input id="qid" name="qid" type="text" maxlength="16" spellcheck="false" autocomplete="off" placeholder="Wikidata QID" aria-label="Wikidata QID">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="lab" for="question">What should be tested</label>
+      <textarea id="question" name="question" required maxlength="1200" placeholder="A claim id, such as thompson1917-ch02-01, or one sentence on the question."></textarea>
+    </div>
+
+    <div class="field">
+      <span class="lab" id="data-label">A dataset, if you know one</span>
+      <div class="split">
+        <input id="dataset" name="dataset" type="text" maxlength="200" placeholder="Dataset name" aria-label="Dataset name">
+        <input id="url" name="url" type="url" maxlength="500" placeholder="https://" aria-label="Dataset URL">
+      </div>
+      <input id="measures" name="measures" type="text" maxlength="400" placeholder="What it measures" aria-label="What the dataset measures">
+      <select id="access" name="access" aria-label="How the dataset is reached">
+        <option value="">Access, if you know it</option>
+        <option value="open download">Open download</option>
+        <option value="registration">Registration</option>
+        <option value="request">Request</option>
+        <option value="blocked">Blocked</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="lab" for="why">Why this one</label>
+      <textarea id="why" name="why" maxlength="1200" placeholder="Optional. What would a test of this organism decide?"></textarea>
+    </div>
+
+    <div class="field">
+      <label class="lab" for="credit">Public name or handle</label>
+      <input id="credit" name="credit" type="text" maxlength="80" autocomplete="nickname" placeholder="Optional. No email address.">
+      <p class="hint">The issue is public. Leave this blank to appear only as the GitHub account that files it.</p>
+    </div>
+
+    <p class="alert" id="errors" role="alert"></p>
+    <div class="actions">
+      <a class="button primary" id="file" href="https://github.com/fractastical/delphi/issues/new" target="_blank" rel="noopener noreferrer">Open a GitHub issue</a>
+      <button type="button" id="copy">Copy nomination</button>
+      <span id="copied" class="hint" role="status"></span>
+    </div>
+    <noscript><p class="hint">This page checks the name in the browser. Without scripts, open an issue on <a href="https://github.com/fractastical/delphi/issues/new">GitHub</a> and include the scientific name, the question, and any dataset you already know.</p></noscript>
+  </div>
+</form>
+
+<aside class="side">
+  <section class="panel">
+    <h3>What sending does</h3>
+    <p>It opens a public issue on <a href="https://github.com/fractastical/delphi/issues/new">fractastical/delphi</a>. GitHub asks you to sign in. The issue is a request that a person can turn into a pre-registered test.</p>
+    <p>It does not add a taxon, resolve a name, download data, or run a test. A test is still written in <code>test-data/claim-tests/</code> with its pass and fail criteria before any data is fetched.</p>
+    <p id="aves-note">Class Aves is a frozen holdout exam. Filing a bird here does not open that exam.</p>
+  </section>
+  <section class="panel" aria-live="polite">
+    <h3>Inventory</h3>
+    <p class="hint" id="match-lead">Type a name to see whether it is already listed.</p>
+    <div id="match"></div>
+    <p id="send-state" class="waiting"></p>
+  </section>
+  <section class="panel">
+    <h3>Issue text</h3>
+    <p class="hint">This is what the GitHub issue will contain.</p>
+    <pre class="preview" id="preview"></pre>
+  </section>
+</aside>
+</div>
+</main>
+<!--__SITE_FOOT__-->
+<script>
+const DATA = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const comma = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const RANKS = new Set(['species','genus','family','order','class','phylum','other']);
+const TAXA = DATA.taxa.map(t => {
+  const name = norm(t.name);
+  const aka = [...new Set((t.aka || []).map(norm).filter(x => x && x !== name))];
+  return Object.assign({}, t, { _name: name, _slug: norm(String(t.slug).replace(/-/g, ' ')), _aka: aka });
+});
+
+function exacts(q) {
+  if (q.length < 2) return [];
+  return TAXA.filter(t => t._name === q || t._slug === q || t._aka.includes(q));
+}
+function similar(q, skip) {
+  if (q.length < 3) return [];
+  const skipSlug = new Set(skip.map(t => t.slug));
+  const scored = [];
+  for (const t of TAXA) {
+    if (skipSlug.has(t.slug)) continue;
+    let score = 0;
+    if (t._name.startsWith(q)) score = 1;
+    else if (t._aka.some(a => a.startsWith(q))) score = 2;
+    else if (t._name.includes(q)) score = 3;
+    else if (t._aka.some(a => a.includes(q))) score = 4;
+    else continue;
+    scored.push([score, t._name.length, t]);
+  }
+  scored.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  return scored.slice(0, 6).map(x => x[2]);
+}
+function isAves(t) {
+  return t.cls === 'Aves' || (t.rank === 'class' && t._name === 'aves');
+}
+
+$('subtitle').textContent = `The inventory copied into this page lists ${comma(DATA.count)} taxa, from ${DATA.source}, built ${DATA.built} UTC. Sending asks for a test. It does not add the organism or run one.`;
+
+function val(id) { return $(id).value.trim(); }
+function read() {
+  let qid = val('qid');
+  if (/^q\d+$/i.test(qid)) qid = 'Q' + qid.slice(1);
+  return {
+    kind: document.querySelector('input[name=kind]:checked').value,
+    name: val('name'),
+    rank: val('rank'),
+    kingdom: val('kingdom'),
+    vernacular: val('vernacular'),
+    gbif: val('gbif'),
+    ncbi: val('ncbi'),
+    qid,
+    question: val('question'),
+    dataset: val('dataset'),
+    url: val('url'),
+    measures: val('measures'),
+    access: val('access'),
+    why: val('why'),
+    credit: val('credit'),
+  };
+}
+function errors(r) {
+  const e = [];
+  if (r.name.length < 2) e.push(r.kind === 'design' ? 'Name the design.' : 'Write a scientific name.');
+  if (r.question.length < 8) e.push('Say what should be tested, as a sentence or a claim id.');
+  if (r.gbif && !/^\d{1,12}$/.test(r.gbif)) e.push('A GBIF usage key is digits only. Leave it blank if you have not looked it up.');
+  if (r.ncbi && !/^\d{1,12}$/.test(r.ncbi)) e.push('An NCBI taxid is digits only. Leave it blank if you have not looked it up.');
+  if (val('qid') && !/^Q\d{1,12}$/.test(r.qid)) e.push('A Wikidata id looks like Q10856. Leave it blank if you have not looked it up.');
+  if (r.url && !/^https?:\/\/\S+$/i.test(r.url)) e.push('A dataset link has to start with http:// or https://.');
+  if (r.credit.includes('@')) e.push('Leave out email addresses. A public name or handle is enough, and blank is fine.');
+  return e;
+}
+function lookup(r) {
+  const q = norm(r.name);
+  const exact = exacts(q);
+  const near = similar(q, exact);
+  const notes = [];
+  const say = (label, hits) => { if (hits.length) notes.push(`${label} is already on ${hits.map(t => `${t.name} (${t.slug})`).join(', ')}.`); };
+  if (/^\d+$/.test(r.gbif)) say(`GBIF ${r.gbif}`, TAXA.filter(t => String(t.gbif) === r.gbif && !exact.some(e => e.slug === t.slug)));
+  if (/^\d+$/.test(r.ncbi)) say(`NCBI ${r.ncbi}`, TAXA.filter(t => String(t.ncbi) === r.ncbi && !exact.some(e => e.slug === t.slug)));
+  if (/^Q\d+$/.test(r.qid)) say(`Wikidata ${r.qid}`, TAXA.filter(t => t.qid === r.qid && !exact.some(e => e.slug === t.slug)));
+  return { exact, near, notes };
+}
+function blank(s) { return s ? s : 'Not stated'; }
+function cell(s) { return blank(s).replace(/\|/g, '/').replace(/\s+/g, ' ').slice(0, 700); }
+function idsTyped(r) {
+  const parts = [];
+  if (r.gbif) parts.push(`GBIF ${r.gbif}`);
+  if (r.ncbi) parts.push(`NCBI ${r.ncbi}`);
+  if (r.qid) parts.push(`Wikidata ${r.qid}`);
+  return parts.length ? parts.join(', ') + '. Typed by the submitter and not checked against those services.' : 'None typed.';
+}
+function inventoryLine(found) {
+  if (!found.exact.length) return `No exact match among the ${comma(DATA.count)} taxa in ${DATA.source} as copied into this page on ${DATA.built} UTC.`;
+  return found.exact.map(t => `Exact match: ${t.name} (${t.slug}), ${t.rank || 'rank not recorded'}${t.cls ? `, class ${t.cls}` : ''}${isAves(t) ? ', frozen holdout clade Aves' : ''}. Inventory identifiers, not re-checked: ${t.gbif != null ? 'GBIF ' + t.gbif : 'no GBIF key'}; ${t.ncbi != null ? 'NCBI ' + t.ncbi : 'no NCBI taxid'}; ${t.qid || 'no Wikidata QID'}.`).join(' ');
+}
+function issueBody(r, found) {
+  const dataset = [r.dataset, r.url, r.measures, r.access].filter(Boolean).join(' — ') || 'Not stated';
+  const lines = [
+    '## Organism test request',
+    '',
+    'Filed from the website. This is a request. It does not add a taxon, resolve a name, download data, or run a test.',
+    '',
+    '| | |',
+    '| --- | --- |',
+    `| Kind | ${r.kind === 'design' ? 'Designed or fabricated organism' : 'Species or higher taxon'} |`,
+    `| Name | ${cell(r.name)} |`,
+    `| Rank | ${cell(r.rank === 'unknown' ? '' : r.rank)} |`,
+    `| Kingdom | ${cell(r.kingdom === 'unknown' ? '' : r.kingdom)} |`,
+    `| Vernacular name | ${cell(r.vernacular)} |`,
+    `| Inventory | ${cell(inventoryLine(found))} |`,
+    `| Identifiers as typed | ${cell(idsTyped(r))} |`,
+    `| What to test | ${cell(r.question)} |`,
+    `| Dataset | ${cell(dataset)} |`,
+    `| Why this one | ${cell(r.why)} |`,
+    `| Credit | ${cell(r.credit)} |`,
+    '',
+  ];
+  if (found.notes.length) lines.push(found.notes.join(' '), '');
+  if (r.kind === 'taxon' && r.kingdom !== 'unknown' && r.kingdom !== 'Animalia') {
+    lines.push('The current inventory records animals. A non-animal nomination stays a request; it is not turned into a taxon file by this form.', '');
+  }
+  if (r.kind === 'design') {
+    lines.push('A design is not a wild taxon. A test of it has to say which measurement or simulation would count, and a simulation that runs only shows that the program executed.', '');
+  }
+  if (found.exact.some(isAves)) lines.push('This name matches class Aves, the frozen holdout exam. Filing the issue does not open that exam.', '');
+  lines.push(`Inventory snapshot: ${DATA.source}, ${comma(DATA.count)} taxa, page built ${DATA.built} UTC.`);
+  return lines.join('\n');
+}
+function nomination(r, found) {
+  return {
+    kind: r.kind === 'design' ? 'designed-organism-test-request' : 'organism-test-request',
+    status: 'request',
+    name: r.name,
+    rank: r.rank === 'unknown' ? null : r.rank,
+    kingdom: r.kingdom === 'unknown' ? null : r.kingdom,
+    vernacular: r.vernacular || null,
+    identifiers_as_typed: {
+      gbif_usage_key: /^\d+$/.test(r.gbif) ? Number(r.gbif) : null,
+      ncbi_taxid: /^\d+$/.test(r.ncbi) ? Number(r.ncbi) : null,
+      wikidata_qid: /^Q\d+$/.test(r.qid) ? r.qid : null,
+    },
+    inventory: {
+      source: DATA.source,
+      built: DATA.built,
+      taxa: DATA.count,
+      match: found.exact.length ? 'exact' : 'none',
+      slugs: found.exact.map(t => t.slug),
+    },
+    question: r.question,
+    dataset: { name: r.dataset || null, url: r.url || null, measures: r.measures || null, access: r.access || null },
+    why: r.why || null,
+    credit: r.credit || null,
+    does_not: ['add a taxon record', 'resolve identifiers', 'download data', 'run a test'],
+  };
+}
+function issueUrl(r, found) {
+  const title = `${r.kind === 'design' ? 'Test design' : 'Test organism'}: ${r.name}`.slice(0, 120);
+  const url = new URL(DATA.repo + '/issues/new');
+  url.searchParams.set('title', title);
+  url.searchParams.set('body', issueBody(r, found));
+  return url.toString();
+}
+
+let tried = false;
+function paint() {
+  const r = read();
+  const found = lookup(r);
+  const problems = errors(r);
+  const design = r.kind === 'design';
+  $('kind-hint').textContent = design
+    ? 'A simulated body, a printed form, or a chimera. Name it, and say which measurement or run would count as a test. If the name is also a species, the inventory check still applies.'
+    : 'A species, genus, or higher group. The inventory is the animal taxa named in the source books, plus species the existing data tests measured.';
+  $('name-label').textContent = design ? 'Name' : 'Scientific name';
+  $('name').placeholder = design ? 'Short name of the design' : 'Columba livia';
+  $('data-label').textContent = design ? 'An artifact or dataset, if you have one' : 'A dataset, if you know one';
+
+  const hits = $('hits');
+  const rows = found.exact.length ? found.exact : found.near;
+  if (norm(r.name).length < (found.exact.length ? 2 : 3) || !rows.length) {
+    hits.hidden = true;
+    hits.innerHTML = '';
+  } else {
+    hits.hidden = false;
+    const cap = found.exact.length ? 'In the inventory' : 'Similar name';
+    hits.innerHTML = rows.map(t => `<li><button type="button" data-slug="${esc(t.slug)}"><span><span class="sci">${esc(t.name)}</span> <span class="hint">${esc(t.rank || 'rank not recorded')}</span>${isAves(t) ? ' <span class="badge">holdout</span>' : ''}</span><span class="hint">${cap}</span></button></li>`).join('');
+  }
+
+  const box = $('match');
+  if (norm(r.name).length < 2) {
+    $('match-lead').textContent = 'Type a name to see whether it is already listed.';
+    box.innerHTML = '';
+  } else if (found.exact.length) {
+    $('match-lead').textContent = found.exact.length > 1 ? 'More than one inventory record matches this name.' : 'This name is already in the inventory. A request asks for a test of it, not a second record.';
+    box.innerHTML = found.exact.map(t => `<div class="match"><p><span class="sci">${esc(t.name)}</span> · ${esc(t.slug)}</p><p class="hint">${esc(t.rank || 'rank not recorded')}${t.cls ? ' · class ' + esc(t.cls) : ''} · ${t.mentions} mention${t.mentions === 1 ? '' : 's'}</p><p class="hint">${t.gbif != null ? 'GBIF ' + esc(t.gbif) : 'no GBIF key'} · ${t.ncbi != null ? 'NCBI ' + esc(t.ncbi) : 'no NCBI taxid'} · ${t.qid ? esc(t.qid) : 'no Wikidata QID'}</p>${isAves(t) ? '<p>Class Aves is the frozen holdout. This request does not open that exam.</p>' : ''}</div>`).join('');
+  } else {
+    $('match-lead').textContent = design
+      ? 'No inventory record uses this name. A design request can still be filed.'
+      : 'No exact inventory match. A request can still be filed. Someone else resolves the name before any record is added.';
+    box.innerHTML = found.near.length ? '<p class="hint">Similar names already listed are under the field. Pick one if it is the organism you mean.</p>' : '';
+  }
+  if (found.notes.length) box.insertAdjacentHTML('beforeend', found.notes.map(n => `<p>${esc(n)}</p>`).join(''));
+
+  $('preview').textContent = issueBody(r, found);
+  $('errors').textContent = tried ? problems.join(' ') : '';
+  const ready = problems.length === 0;
+  $('send-state').className = ready ? 'ready' : 'waiting';
+  $('send-state').textContent = ready ? 'Ready to open as a GitHub issue.'
+    : (tried ? 'The issue link stays closed until the notes on the form are fixed.'
+      : 'The issue link waits until the name and the question are filled in.');
+  const href = ready ? issueUrl(r, found) : DATA.repo + '/issues/new';
+  const tooLong = ready && href.length > 7000;
+  $('file').href = tooLong ? DATA.repo + '/issues/new' : href;
+  $('file').dataset.blocked = (!ready || tooLong) ? '1' : '';
+  if (tooLong) {
+    $('send-state').className = 'waiting';
+    $('send-state').textContent = 'This text is too long for a browser link. Copy the nomination and paste it into a GitHub issue.';
+  }
+  return { r, found, problems, tooLong };
+}
+
+function applyTaxon(slug) {
+  const t = TAXA.find(x => x.slug === slug);
+  if (!t) return;
+  $('name').value = t.name;
+  if ($('rank').value === 'unknown' && RANKS.has(t.rank)) $('rank').value = t.rank;
+  if (!$('vernacular').value && t.vernacular) $('vernacular').value = t.vernacular;
+  paint();
+  $('question').focus();
+}
+
+$('form').addEventListener('input', paint);
+$('form').addEventListener('change', paint);
+$('hits').addEventListener('click', ev => {
+  const btn = ev.target.closest('button[data-slug]');
+  if (btn) applyTaxon(btn.dataset.slug);
+});
+function blockFile(ev) {
+  tried = true;
+  const state = paint();
+  if (state.problems.length || state.tooLong) {
+    if (ev) ev.preventDefault();
+    if (state.tooLong && !state.problems.length) $('errors').textContent = 'This text is too long for a browser link. Copy the nomination and paste it into a GitHub issue.';
+    (state.r.name.length < 2 ? $('name') : $('question')).focus();
+    return true;
+  }
+  return false;
+}
+$('form').addEventListener('submit', ev => {
+  ev.preventDefault();
+  if (!blockFile()) window.open($('file').href, '_blank', 'noopener');
+});
+$('file').addEventListener('click', blockFile);
+$('copy').addEventListener('click', async () => {
+  tried = true;
+  const state = paint();
+  if (state.r.credit.includes('@')) return;
+  const text = JSON.stringify(nomination(state.r, state.found), null, 2);
+  try {
+    await navigator.clipboard.writeText(text);
+    $('copied').textContent = 'Copied.';
+  } catch {
+    $('copied').textContent = 'Clipboard unavailable. The issue text is in the panel.';
+  }
+  setTimeout(() => { $('copied').textContent = ''; }, 2500);
+});
+paint();
+</script>
+</body></html>

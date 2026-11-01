@@ -7,6 +7,12 @@ it, each with the metadata and provenance the ontology's
 requires, so each can later be published as a `dcat:Dataset` nanopub and cited by claims with
 `prov:used`.
 
+Someone can ask for a species, or a designed organism, to be tested from the public form at
+`docs/test-organism.html` (https://delphibio.org/test-organism.html), rebuilt with
+`node scripts/site/build-organism-form.mjs`. Sending the form opens a GitHub issue. That issue
+is a request: it is not a taxon file, a dataset record, or a pre-registered test, and the form
+does not resolve identifiers.
+
 Layout (one directory per extraction slice so parallel agents never write the same file):
 
 ```
