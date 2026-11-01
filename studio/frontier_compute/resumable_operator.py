@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import re
 from datetime import datetime, timezone
 import json
 import os
@@ -102,6 +104,87 @@ def cancel_due(path, *, now=None, force=False, transport=request):
     }
 
 
+def collect_checkpoints(gcs, state_path, native_path, external_path, destination):
+    """Bind exact native hashes to our issued objects, then stream them off-project."""
+    state = json.loads(Path(state_path).read_text())
+    native = json.loads(Path(native_path).read_text())
+    external = json.loads(Path(external_path).read_text())
+    if native.get("coherent_only_if_listed") is not True:
+        raise ValueError("Native checkpoint manifest is not coherent")
+    if external.get("schema") != "frontier.external-checkpoints/1":
+        raise ValueError("Unsupported external checkpoint receipt")
+    slots = {}
+    for row in state["sessions"]:
+        cap = row["capability"]
+        validate(cap, allow_expired=True)
+        key = (cap["bucket"], cap["object"])
+        if key in slots:
+            raise ValueError("Duplicate issued checkpoint object")
+        slots[key] = cap
+    snapshots, receipts = native["snapshots"], external["checkpoints"]
+    if not snapshots or len(snapshots) > len(slots):
+        raise ValueError("Invalid checkpoint cardinality")
+    names = [row["file"] for row in snapshots]
+    if len(set(names)) != len(names) or set(names) != set(receipts):
+        raise ValueError("Native and uploaded checkpoint identities differ")
+    total = 0
+    validated = []
+    used = set()
+    for row in snapshots:
+        name, size, digest = row["file"], row["bytes"], row["sha256"]
+        if (Path(name).name != name or not name.endswith(".ckpt")
+                or type(size) is not int or size <= 0
+                or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)):
+            raise ValueError("Invalid native checkpoint identity")
+        receipt = receipts[name]
+        key = (receipt["bucket"], receipt["object"])
+        cap = slots.get(key)
+        if (cap is None or key in used or size > cap["max_bytes"]
+                or receipt.get("source_snapshot") != row
+                or receipt.get("sha256") != digest or receipt.get("bytes") != size
+                or receipt.get("create_only") is not True
+                or not re.fullmatch(r"[0-9]+", str(receipt.get("generation", "")))):
+            raise ValueError("Checkpoint receipt does not match issued object and native bytes")
+        total += size
+        used.add(key)
+        validated.append((row, receipt))
+    if total > 3_200_000_000:
+        raise ValueError("Checkpoint collection exceeds aggregate byte bound")
+    destination = Path(destination)
+    collected = []
+    for row, receipt in validated:
+        path = destination / row["file"]
+        digest, size = gcs.download_to_path(receipt["bucket"], receipt["object"], path,
+                                          row["bytes"], row["sha256"])
+        if digest != row["sha256"] or size != row["bytes"]:
+            raise ValueError("Independent downloaded bytes differ from native checkpoint")
+        collected.append({"file": row["file"], "bytes": size, "sha256": digest,
+                          "bucket": receipt["bucket"], "object": receipt["object"],
+                          "upload_generation": receipt["generation"],
+                          "local_path": str(path.resolve())})
+    result = {"schema": "frontier.independent-checkpoint-collection/1",
+              "observed_utc": datetime.now(timezone.utc).isoformat(),
+              "native_manifest_sha256": hashlib.sha256(Path(native_path).read_bytes()).hexdigest(),
+              "external_receipt_sha256": hashlib.sha256(Path(external_path).read_bytes()).hexdigest(),
+              "checkpoints": collected, "bytes": total,
+              "all_expected_checkpoints_collected": True,
+              "scope": "Transport and native byte identity checked; no numerical or biological acceptance inferred."}
+    path = destination / "collection-receipt.json"
+    if path.is_symlink():
+        raise ValueError("Refusing linked collection receipt")
+    fd, temp = tempfile.mkstemp(prefix=".checkpoint-receipt-", dir=destination)
+    try:
+        with os.fdopen(fd, "w") as stream:
+            json.dump(result, stream, indent=2)
+            stream.write("\n")
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp, path)
+    finally:
+        Path(temp).unlink(missing_ok=True)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -115,7 +198,17 @@ def main():
     cancel = commands.add_parser("cancel-due")
     cancel.add_argument("state", type=Path)
     cancel.add_argument("--force", action="store_true")
+    collection = commands.add_parser("collect")
+    collection.add_argument("--state", type=Path, required=True)
+    collection.add_argument("--native", type=Path, required=True)
+    collection.add_argument("--external", type=Path, required=True)
+    collection.add_argument("--destination", type=Path, required=True)
     args = parser.parse_args()
+    if args.command == "collect":
+        from frontier_compute.gcp_artifacts import GCS
+        print(json.dumps(collect_checkpoints(GCS.local(), args.state, args.native,
+                                             args.external, args.destination)))
+        return
     if args.command == "cancel-due":
         print(json.dumps(cancel_due(args.state, force=args.force)))
         return

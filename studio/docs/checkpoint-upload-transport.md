@@ -1,5 +1,9 @@
 # Bounded checkpoint transport
 
+Production uses object-scoped resumable uploads with private persisted cancellation
+and independent streamed hash verification. The earlier V4 signing attempt below
+was refused and is retained as history; no V4 capability was issued.
+
 The proposed GCS transport sends a private, short-lived V4 PUT capability for
 each exact object. It gives the scientific worker no OAuth token or private key.
 The object creator service account has no direct project roles and only
@@ -60,3 +64,19 @@ the archive retains the native manifest and external size/hash/object receipts.
 The original files remain in the job filesystem until termination. Three failed
 transport attempts remain failures; missing exports prevent a complete transport
 receipt. Every fullR2 job still reruns the same numerical and runtime gates.
+
+The operator collector now requires three matching records before downloading:
+our private issued-slot ledger, the native coherent-checkpoint manifest, and the
+worker's exact object/hash receipt. It streams each object through the existing
+bounded GCS downloader, requires the native SHA256 and size, and writes an atomic
+receipt outside the expiring lab project. No upload capability appears in that
+receipt. Missing, unissued, duplicated, malformed or mismatched checkpoints stop
+collection; a successful transfer does not imply numerical or biological validity.
+
+Run `python -m frontier_compute.resumable_upload collect --state PRIVATE_LEDGER
+--native NATIVE_MANIFEST --external EXTERNAL_RECEIPT --destination RESOLVED_LOCAL_DIR`
+with the actual returned paths. The destination must not traverse symlinks; the
+operator resolves the known artifact-storage root explicitly. Forty-one focused
+transport/collection tests passed. A real read-only45-byte collection probe matched
+its original GCS object SHA; it uses an explicit test manifest and is not evidence
+of scientific-checkpoint throughput. Large scientific transfers remain pending.
