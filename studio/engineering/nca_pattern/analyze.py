@@ -422,6 +422,8 @@ def render(root, out, summary, traces, goal, cfg):
         "-an",
         "-c:v",
         "libx264",
+        "-threads",
+        "2",
         "-pix_fmt",
         "yuv420p",
         str(out / "damage-trajectories.mp4"),
