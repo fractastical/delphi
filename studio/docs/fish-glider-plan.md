@@ -8,8 +8,12 @@ Owner of geometry and mass properties: claude05 (`work/fish-glider`).
 - **Prior props.** `artifacts/print-v3/` and `artifacts/print*/` are display props. None of them is assumed
   flightworthy, and they are left as they are.
 
-**User decisions.** Fins are printed flat (option A). Scale is 1:1. Printer, resin and wall limits are still
-open, pending root's materials research.
+**Provisional defaults, set by root (not user-confirmed).** The user asked for a printable fish with strong fins
+that can be sling-launched. Root then chose two engineering defaults under that request: fins printed flat
+(option A) and 1:1 scale. Neither the exact size nor the material is user-confirmed. *(Corrected: an earlier
+commit, `45f9cb0`, called these "user decisions"; they were root's menu choices.)* Root also set the printer to
+Form Studio 1 (assumed), with a build envelope of 200 × 125 × 235 mm (confirmed by root), and Alpha Grey resin
+(provisional). Wall limits stay parameters.
 
 ## 1. What is being built
 A printed, hollow, ballast-adjustable glider. It keeps the v3 fish's sourced fin layout and is meant to be launched
