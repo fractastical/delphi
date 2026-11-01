@@ -87,9 +87,13 @@ def metrics(state, goal, ray_mask):
     predicted = state[:, 3:4] > 0.1
     intersection = (foreground & predicted).sum().item()
     union = (foreground | predicted).sum().item()
-    mse = float(torch.mean((visible - goal) ** 2).item())
+    mse = float(torch.mean((visible.double() - goal.double()) ** 2).item())
     iou = float(intersection / union) if union else 0.0
-    ray_error = float(((state[:, :3] - goal[:, :3]) ** 2)[:, :, ray_mask].mean().item())
+    ray_error = float(
+        ((state[:, :3].double() - goal[:, :3].double()) ** 2)[:, :, ray_mask]
+        .mean()
+        .item()
+    )
     return {
         "rgba_MSE": mse,
         "silhouette_IoU": iou,
@@ -152,7 +156,10 @@ def cpu_controls():
     fresh = NCA()
     original = seed(64, xy)
     untrained = fresh(original, fire_mask=torch.ones(1, 1, 64, 64, dtype=torch.bool))
-    zero = fresh(
+    biased = NCA()
+    with torch.no_grad():
+        biased.output.bias.fill_(0.2)
+    zero = biased(
         torch.zeros_like(original), fire_mask=torch.ones(1, 1, 64, 64, dtype=torch.bool)
     )
     # Nonzero rule makes the local-dependency test nonvacuous.
