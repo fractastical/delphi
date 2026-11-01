@@ -1832,3 +1832,30 @@ def test_engineering_cell_tab_opens_cellular_and_names_its_group(browser, base):
     pg.goto(base + "#/engineering?scale=subcellular"); pg.wait_for_selector(".scalecard h3")
     assert pg.locator(".scalecard h3").text_content() == "Subcellular scale"
     assert pg.locator(".tabs7 a[aria-current=page]").text_content() == "Cell"
+
+
+def test_ecology_uncertainty_section_states_scope_and_matches_the_aggregate(browser, base):
+    import hashlib
+    eco = ROOT / "artifacts/ecology"
+    agg = json.loads((eco / "uncertainty-aggregate/summary.json").read_text())
+    want = {f["path"]: f["sha256"] for f in json.loads((eco / "uncertainty-manifest.json").read_text())["files"]}
+    for rel in ("uncertainty-aggregate/paired-sensitivity.png", "uncertainty-aggregate/summary.json", "uncertainty-initial/paired-sensitivity.png"):
+        b = (ROOT / "site/artifacts/ecology" / rel).read_bytes()
+        assert hashlib.sha256(b).hexdigest() == want[f"artifacts/ecology/{rel}"], rel
+    assert agg["scenario_count"] == agg["computed_count"] == 28 and len(agg["paired_comparisons"]) == 14
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/ecology"); pg.wait_for_selector("#eco-u img")
+        t = pg.locator("#eco-u").text_content()
+        for must in ("assumed engineering scenarios", "not biological confidence", "edge of the reused VLM domain", "Interactions between settings are not estimated", "28 scenarios, 28 computed, 28 passing"):
+            assert must in t, must
+        assert pg.locator("#eco-u tbody tr").count() == 14
+        first = agg["paired_comparisons"][0]
+        row = pg.locator("#eco-u tbody tr").first.text_content()
+        assert str(float(f"{first['positive_work_difference_J']:.4g}")) in row and str(first["seed"]) in row
+        pg.locator("#eco-u img").evaluate("i => i.decode()")
+        assert pg.locator("#eco-u img").evaluate("i => i.naturalWidth") > 100
+        assert pg.locator("#eco-u a[href$='paired-sensitivity.provenance.json']").count() >= 1
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
