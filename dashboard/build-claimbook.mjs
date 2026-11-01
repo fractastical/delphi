@@ -79,13 +79,13 @@ for (const m of modules) {
 
 // ---- find a claim's data test, ours or the collaborator's ----
 const testIndex = [];
-const ctRoot = path.join(root, 'claim-tests');
+const ctRoot = path.join(root, 'test-data', 'claim-tests');
 if (fs.existsSync(ctRoot)) {
   for (const proj of fs.readdirSync(ctRoot, { withFileTypes: true })) {
     if (!proj.isDirectory() || ['assessment', 'nanopubs'].includes(proj.name)) continue;
     for (const t of fs.readdirSync(path.join(ctRoot, proj.name), { withFileTypes: true })) {
       if (!t.isDirectory()) continue;
-      const rel = `claim-tests/${proj.name}/${t.name}`;
+      const rel = `test-data/claim-tests/${proj.name}/${t.name}`;
       const res = J(`${rel}/result.json`);
       if (!res) continue;
       testIndex.push({

@@ -103,7 +103,7 @@ altitude coupling; 2 genotype records). Everything below covers all 157.
 | `lean/nanopubs/unsigned` | 55 |
 | `organism-design/nanopubs/unsigned` | 35 |
 | `genotype/nanopubs/unsigned` | 21 |
-| `claim-tests/nanopubs/unsigned` | 15 |
+| `test-data/claim-tests/nanopubs/unsigned` | 15 |
 | `physics/nanopubs/unsigned` | 13 |
 | `holdout/nanopubs/unsigned` | 9 |
 | `swarm/nanopubs/unsigned` | 9 |
@@ -139,7 +139,7 @@ needs. The other 10 are evidence companions whose paired claim does declare one 
   *"Valid (but not trusty)"* plus *"no signature element"*.
 - **A human ORCID** (`0009-0007-4948-9192`) as creator and signer. The drafts deliberately carry none:
   the creator is the software agent until the key owner approves (team decision of 2026-10-31,
-  `claim-tests/nanopubs/DECISIONS.md`).
+  `test-data/claim-tests/nanopubs/DECISIONS.md`).
 - **They are source attestations, not findings.** One claim extracted from *On the Origin of Species*
   with its chapter and quoted sentence. No test result, no measured number, no pre-registration, no
   `delphi:EvidenceItem` of the kind the 2026-10-31 standing order requires.
@@ -289,7 +289,7 @@ the one-record-per-reading pattern `AGENTS.md` asks for. Correct as built.
 
 **G. `thompson1917-ch03-07` exists in two threads with different force.** The Lean record
 `law-thompson1917-ch03-07.trig` machine-checks "weight tends to vary as the cube of linear dimensions".
-The test record `claim-tests/.../thompson1917-ch03-07.trig` measures the exponent at **2.74 (CI 2.59–2.89)
+The test record `test-data/claim-tests/.../thompson1917-ch03-07.trig` measures the exponent at **2.74 (CI 2.59–2.89)
 for males and 2.86 for females** and calls it *supported* against a pre-registered 2.5–3.5 band. Both are
 right in their own terms — a proof about what follows from isometry, and a measurement that is not 3. They
 are not a contradiction, but a reader who sees "cube law: proved" and "cube law: supported" side by side

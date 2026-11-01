@@ -14,7 +14,7 @@ const power = rd('holdout/power-analysis.json');
 const na = rd('holdout/exam-results/not-applicable.json');
 const split = rd('holdout/split.json');
 const sums = rd('holdout/CHECKSUMS.json');
-const builders = Object.fromEntries([...new Set(power.tests.map(t => t.test))].map(id => [id, rd(`claim-tests/math-bio-theorems/${id}/result.json`)]));
+const builders = Object.fromEntries([...new Set(power.tests.map(t => t.test))].map(id => [id, rd(`test-data/claim-tests/math-bio-claims/${id}/result.json`)]));
 
 const tests = [...new Set(power.tests.map(t => t.test))];
 const row = (id, clade) => power.tests.find(t => t.test === id && t.clade === clade);

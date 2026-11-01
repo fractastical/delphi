@@ -4,13 +4,13 @@
 // dataset descriptions, the method text and the analysis.py source. Nothing about the result (measured
 // values, verdict, confidence, caveats, interpretation) is included: the assessor judges the model, not
 // the outcome, and the builder's reasoning is withheld (AGENTS.md, role A9).
-//   node claim-tests/assessment/build-inputs.mjs
+//   node test-data/claim-tests/assessment/build-inputs.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../..');
+const root = path.resolve(here, '../../..');
 const raw = JSON.parse(fs.readFileSync(path.join(root, 'docs/claims.json'), 'utf8'));
 const claims = Array.isArray(raw) ? raw : (raw.claims || Object.values(raw));
 
@@ -27,7 +27,7 @@ export const TESTS = [
 ];
 
 const inputs = TESTS.map(([project, dir]) => {
-  const tdir = path.join(root, 'claim-tests', project, dir);
+  const tdir = path.join(root, 'test-data', 'claim-tests', project, dir);
   const r = JSON.parse(fs.readFileSync(path.join(tdir, 'result.json'), 'utf8'));
   const c = claims.find(k => k.id === r.claim_id) || {};
   const datasets = (r.datasets || []).map(d => `- ${d.name}${d.version ? ` (version: ${d.version})` : ''}${d.doi ? ` doi:${d.doi}` : ''}${d.license ? `; licence: ${d.license}` : ''}. ${d.role ? 'Role: ' + d.role : ''} Files: ${(d.files || []).map(f => (f.download_url || f.member_of_tarball || '?').split('/').pop()).join(', ')}`).join('\n');

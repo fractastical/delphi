@@ -57,7 +57,7 @@ window.CONTENT = {
     { f: "Hackathon rubric, weights, prizes, schedule, judges", s: "https://scienceclawhack.ai/", v: "read today" },
     { f: "Compute and credit offers", s: "Organizers' PDF 'ScienceClaw Compute' (Drive link supplied by the team)", v: "read today, 5 image-only pages unread" },
     { f: "Claims, status, truth scores", s: "docs/claims.json in github.com/fractastical/delphi (graph built 2026-10-31 03:41)", v: "computed" },
-    { f: "Claim-test results", s: "claim-tests/*/result.json in the same repo", v: "computed" },
+    { f: "Claim-test results", s: "test-data/claim-tests/*/result.json in the same repo", v: "computed" },
     { f: "Team roster and ideas", s: "Message from the team lead in this session", v: "anecdote" },
     { f: "Agent proposal and harness critique", s: "Issue #17 in github.com/fractastical/delphi", v: "read today" },
     { f: "BioNeMo model list", s: "Issue #14 in github.com/fractastical/delphi", v: "read today, not smoke-tested" },

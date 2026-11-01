@@ -18,8 +18,8 @@ from scipy import stats
 
 from analysis import DERIVED, HERE, load
 
-ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
-THEIR_PATH = "claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json"
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))
+THEIR_PATH = "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json"
 
 
 def git(*a):

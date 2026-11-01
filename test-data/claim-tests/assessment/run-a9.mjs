@@ -6,23 +6,23 @@
 // non-Anthropic provider. It is also blinded to the builder's verdict, confidence and interpretation,
 // so it cannot anchor on the conclusion it is meant to check.
 //
-//   OPENAI_API_KEY=... node claim-tests/assessment/run-a9.mjs --tests <id>,<id> [--model gpt-5]
-// Writes claim-tests/<project>/<id>/faithfulness.json
+//   OPENAI_API_KEY=... node test-data/claim-tests/assessment/run-a9.mjs --tests <id>,<id> [--model gpt-5]
+// Writes test-data/claim-tests/<project>/<id>/faithfulness.json
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '..', '..');
+const root = path.resolve(here, '..', '..', '..');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const MODEL = arg('model', 'gpt-5');
 const only = (arg('tests', '') || '').split(',').filter(Boolean);
 
 const find = () => {
   const out = [];
-  for (const proj of fs.readdirSync(path.join(root, 'claim-tests'), { withFileTypes: true })) {
+  for (const proj of fs.readdirSync(path.join(root, 'test-data', 'claim-tests'), { withFileTypes: true })) {
     if (!proj.isDirectory() || proj.name === 'assessment' || proj.name === 'nanopubs') continue;
-    const pd = path.join(root, 'claim-tests', proj.name);
+    const pd = path.join(root, 'test-data', 'claim-tests', proj.name);
     for (const t of fs.readdirSync(pd, { withFileTypes: true })) {
       if (!t.isDirectory()) continue;
       const rp = path.join(pd, t.name, 'result.json');

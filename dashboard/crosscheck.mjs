@@ -43,8 +43,8 @@ const brief = d => d ? {
 } : null;
 
 const comparisons = both.map(k => {
-  const a = brief(show('HEAD', `claim-tests/${k}/result.json`));
-  const b = brief(show('origin/main', `claim-tests/${k}/result.json`));
+  const a = brief(show('HEAD', `test-data/claim-tests/${k}/result.json`));
+  const b = brief(show('origin/main', `test-data/claim-tests/${k}/result.json`));
   const sameDatasets = a && b && a.datasets.length && b.datasets.length
     && a.datasets.some(d => b.datasets.some(e => e.split('-')[0] === d.split('-')[0]));
   return {

@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "dashboard/public/deck/fig"
-CC = ROOT / "claim-tests/thompson-growth-form/thompson1917-ch03-07/derived/cross_check.json"
+CC = ROOT / "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/derived/cross_check.json"
 
 S1, S2, S3, S4 = "#2a78d6", "#eb6834", "#1baf7a", "#6250d6"
 INK, MUTE, GRID, SURFACE = "#14201f", "#5a6b69", "#e2e6e4", "#fcfcfb"

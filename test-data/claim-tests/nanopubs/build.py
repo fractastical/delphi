@@ -1,4 +1,4 @@
-"""Build unsigned evidence-item nanopublication drafts from claim-tests/**/result.json.
+"""Build unsigned evidence-item nanopublication drafts from test-data/claim-tests/**/result.json.
 
 One record per nanopub (AGENTS.md standing order): a delphi:EvidenceItem linked from the existing
 claim IRI with delphi:hasEvidence, carrying the status, the dataset(s) with identifier, retrieval
@@ -9,8 +9,8 @@ record labelled "partially supported" with the supported and unsupported compone
 statements (see DECISIONS.md).
 
 Usage (from the repo root):
-    python claim-tests/nanopubs/build.py              # writes unsigned/*.trig and manifest.json
-    python claim-tests/nanopubs/build.py --check JAR  # also runs `java -jar JAR check` on each file
+    python test-data/claim-tests/nanopubs/build.py              # writes unsigned/*.trig and manifest.json
+    python test-data/claim-tests/nanopubs/build.py --check JAR  # also runs `java -jar JAR check` on each file
 
 Nothing here signs or publishes anything. Every output file is an unsigned draft and says so.
 """
@@ -22,8 +22,8 @@ import re
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-TESTS = os.path.join(ROOT, "claim-tests")
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+TESTS = os.path.join(ROOT, "test-data", "claim-tests")
 OUT = os.path.join(HERE, "unsigned")
 REPO = "https://github.com/fractastical/delphisci"
 # No human ORCID is written into these drafts (hub instruction 2026-10-31): the assertion and the nanopub are
@@ -193,7 +193,7 @@ def file_at(sha, rec):
     """This test's result.json as it was at a commit, at the current or the original directory name; None if absent."""
     for name in (rec.get("dir", rec["id"]), rec["id"]):
         try:
-            return json.loads(git("show", f"{sha}:claim-tests/{rec['project']}/{name}/result.json"))
+            return json.loads(git("show", f"{sha}:test-data/claim-tests/{rec['project']}/{name}/result.json"))
         except (subprocess.CalledProcessError, ValueError):
             continue
     return None
@@ -224,8 +224,8 @@ def prereg_commits(hist, rec, current):
 def build(rec, now):
     tdir_name = rec.get("dir", rec["id"])
     tdir = os.path.join(TESTS, rec["project"], tdir_name)
-    rel_result = f"claim-tests/{rec['project']}/{tdir_name}/result.json"
-    rel_analysis = f"claim-tests/{rec['project']}/{tdir_name}/analysis.py"
+    rel_result = f"test-data/claim-tests/{rec['project']}/{tdir_name}/result.json"
+    rel_analysis = f"test-data/claim-tests/{rec['project']}/{tdir_name}/analysis.py"
     r = json.load(open(os.path.join(tdir, "result.json"), encoding="utf-8"))
     blob = json.dumps(r)
     for tok in rec["checks"]:
@@ -404,8 +404,8 @@ def build(rec, now):
     A("    npx:hasNanopubType delphi:EvidenceItem ;")
     A(f"    npx:introduces <{ev}> ;")
     A(f"    nt:wasCreatedFromProvenanceTemplate <{TEMPLATE_PROV}> ;")
-    A(f"    rdfs:comment \"UNSIGNED DRAFT prepared {now[:10]} by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json.\" ;")
-    A(f"    rdfs:comment \"No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template {TEMPLATE_EVIDENCE} (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked {TEMPLATE_CHECKED} on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template {TEMPLATE_PROV} is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31).\" .")
+    A(f"    rdfs:comment \"UNSIGNED DRAFT prepared {now[:10]} by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by test-data/claim-tests/nanopubs/build.py from result.json.\" ;")
+    A(f"    rdfs:comment \"No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template {TEMPLATE_EVIDENCE} (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked {TEMPLATE_CHECKED} on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template {TEMPLATE_PROV} is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See test-data/claim-tests/nanopubs/DECISIONS.md (2026-10-31).\" .")
     if rec["project"] == "darwin-origin":
         A("  this: delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .")
         A("  <https://w3id.org/delphi/resource/domain/darwin-origin-1859> rdfs:label \"darwin-origin-1859\" .")
@@ -455,7 +455,7 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     entries = [build(rec, now) for rec in RECORDS]
-    manifest = dict(built=now, generator="claim-tests/nanopubs/build.py", records=entries, skipped=SKIPPED, checked_with=None)
+    manifest = dict(built=now, generator="test-data/claim-tests/nanopubs/build.py", records=entries, skipped=SKIPPED, checked_with=None)
     if args.check:
         log = []
         for e in entries:

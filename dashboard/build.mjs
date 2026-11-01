@@ -19,9 +19,9 @@ const claims = graph.claims.map(c => ({
   conf: c.assessor_confidence ?? null, np: c.nanopub, registry: c.registry
 }));
 
-// Claim tests: every claim-tests/<project>/<id>/result.json
+// Claim tests: every test-data/claim-tests/<project>/<id>/result.json
 const tests = [];
-const ct = path.join(root, 'claim-tests');
+const ct = path.join(root, 'test-data', 'claim-tests');
 for (const proj of fs.readdirSync(ct, { withFileTypes: true }).filter(d => d.isDirectory())) {
   for (const t of fs.readdirSync(path.join(ct, proj.name), { withFileTypes: true }).filter(d => d.isDirectory())) {
     const f = path.join(ct, proj.name, t.name, 'result.json');

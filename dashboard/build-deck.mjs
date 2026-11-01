@@ -55,7 +55,7 @@ const countDrafts = dir => {
 };
 const recordSets = [
   ['lean', 'lean/nanopubs'], ['organism', 'organism-design/nanopubs'],
-  ['swarm', 'swarm/nanopubs'], ['claims', 'claim-tests/nanopubs'],
+  ['swarm', 'swarm/nanopubs'], ['claims', 'test-data/claim-tests/nanopubs'],
   ['genotype', 'genotype/nanopubs'], ['holdout', 'holdout/nanopubs'], ['physics', 'physics/nanopubs']
 ].map(([k, d]) => ({ thread: k, ...(countDrafts(d) || { drafts: 0 }) })).filter(r => r.drafts);
 let priorProduction = null;

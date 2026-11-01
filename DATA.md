@@ -45,7 +45,7 @@ Proxy-species data (zebrafish, medaka) are never flying-fish data; every file sa
 ## Claims, tests, open problems
 | Path | What |
 |---|---|
-| `claim-tests/` | Pre-registered claim tests. Third-party datasets are NOT committed (licences and size, e.g. a 233 MB 1000 Genomes VCF); each `data/manifest.json` records the source URL and hash so they can be re-downloaded |
+| `test-data/claim-tests/` | Pre-registered claim tests. Third-party datasets are NOT committed (licences and size, e.g. a 233 MB 1000 Genomes VCF); each `data/manifest.json` records the source URL and hash so they can be re-downloaded |
 | `holdout/` | Frozen holdout (Aves) and its leak checker |
 | `open-problems/` | 215 open problems, 80 candidate answers, their formal translations |
 | `organisms/` | Taxa and datasets mentioned in the source books |

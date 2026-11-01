@@ -2,10 +2,10 @@
 // OpenResearch literature grounding for headline claim tests (issue #16; AGENTS.md role A2 requirement).
 // Runs the official alphaXiv OpenResearch CLI (`orx discover <source> <query>`) for each claim, logs the exact
 // command, the CLI version and the UTC time of every call, and stores the returned records verbatim in
-// claim-tests/<project>/<dir>/openresearch.json. `orx discover` is a retrieval primitive with no run or
+// test-data/claim-tests/<project>/<dir>/openresearch.json. `orx discover` is a retrieval primitive with no run or
 // experiment identifier of its own; what is recorded is the real command and its real output, nothing else.
 // The `assessment` block of each file is written by hand afterwards from the returned records only.
-//   node claim-tests/openresearch/run.mjs [--orx <path to orx>] [--only <claim_id>]
+//   node test-data/claim-tests/openresearch/run.mjs [--orx <path to orx>] [--only <claim_id>]
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -13,7 +13,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../..');
+const root = path.resolve(here, '../../..');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const orx = arg('orx', path.join(os.homedir(), '.cargo', 'bin', 'orx'));
 const only = arg('only');
@@ -53,7 +53,7 @@ const isMain = process.argv[1] && import.meta.url === pathToFileURL(path.resolve
 const version = isMain ? spawnSync(orx, ['--no-telemetry', '--version'], { encoding: 'utf8' }).stdout.trim() : '';
 for (const [claim_id, spec] of Object.entries(isMain ? QUERIES : {})) {
   if (only && claim_id !== only) continue;
-  const outPath = path.join(root, 'claim-tests', spec.dir, 'openresearch.json');
+  const outPath = path.join(root, 'test-data', 'claim-tests', spec.dir, 'openresearch.json');
   const prev = fs.existsSync(outPath) ? JSON.parse(fs.readFileSync(outPath, 'utf8')) : {};
   const runs = [];
   for (const [source, query] of spec.queries) {

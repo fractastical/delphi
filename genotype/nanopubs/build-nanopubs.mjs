@@ -5,7 +5,7 @@
 //   node genotype/nanopubs/build-nanopubs.mjs           # writes genotype/nanopubs/unsigned/*.trig + manifest.json
 //   node genotype/nanopubs/build-nanopubs.mjs --check   # also runs `np check` with the jar named in NP_JAR
 // No human ORCID: the creator is the software agent until the key holder approves and signs (team decision,
-// claim-tests/nanopubs/DECISIONS.md). No assertion, provenance or pubinfo template is declared, because none
+// test-data/claim-tests/nanopubs/DECISIONS.md). No assertion, provenance or pubinfo template is declared, because none
 // of these hand-authored 2.0 records was created from one (same file, 2026-10-31).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -62,7 +62,7 @@ const PREFIXES = `@prefix this: <http://purl.org/nanopub/temp/np1/> .
 @prefix delphi: <https://w3id.org/delphi/ontology/> .
 `;
 
-// datasets used, described inline (claim-tests/nanopubs/DECISIONS.md convention) from the call log
+// datasets used, described inline (test-data/claim-tests/nanopubs/DECISIONS.md convention) from the call log
 const DS = {
   bgee: { id: 'bgee-15-2-expr-calls-zebrafish-medaka', title: 'Bgee 15.2 anatomy-level expression call files, Danio rerio and Oryzias latipes (expr_advanced)', landing: 'https://www.bgee.org/', licence: 'https://creativecommons.org/publicdomain/zero/1.0/', calls: ['bgee_expr_advanced_Danio_rerio', 'bgee_expr_advanced_Oryzias_latipes'] },
   zfin: { id: 'zfin-bulk-downloads-2026-10-31', title: 'ZFIN bulk download files: wild-type expression, clean phenotype data, fish components, features, anatomy, stages, Ensembl 1:1, aliases, phenotype environments, experiment details, feature consequences', landing: 'https://zfin.org/downloads', licence: 'https://creativecommons.org/licenses/by/4.0/', calls: ['zfin_wildtype-expression_fish', 'zfin_phenoGeneCleanData_fish', 'zfin_fish_components_fish', 'zfin_features', 'zfin_anatomy_item', 'zfin_anatomy_relationship', 'zfin_pub_to_pubmed_id_translation', 'zfin_ensembl_1_to_1', 'zfin_stage_ontology', 'zfin_aliases', 'zfin_phenotype_fish', 'zfin_pheno_environment_fish', 'zfin_experiment_details', 'zfin_features-affected-genes'] },

@@ -23,8 +23,8 @@ const disagreed = (ev?.claimAssessments || []).find(c => (c.assessments || []).l
   && new Set(c.assessments.map(a => a.verdict)).size > 1) || (ev?.claimAssessments || [])[0] || null;
 
 // ---- step 3: a claim resolved against real data ----
-const t3 = J('claim-tests/math-bio-theorems/kimura-heterozygosity/result.json');
-const a9 = J('claim-tests/math-bio-theorems/kimura-heterozygosity/faithfulness.json');
+const t3 = J('test-data/claim-tests/math-bio-claims/kimura-heterozygosity/result.json');
+const a9 = J('test-data/claim-tests/math-bio-claims/kimura-heterozygosity/faithfulness.json');
 
 // ---- step 4: the same law, recorded in Lean ----
 const leanSrc = (R('lean/Delphi/Kimura.lean') || '').split(String.fromCharCode(13)).join('');
@@ -79,8 +79,8 @@ const steps = [
       datasets: (t3.datasets || []).map(d => d.id || d.name),
       faithfulness: a9 ? { verdict: a9.verdict, assessor: a9.assessor?.model || null } : null
     } : null,
-    provenance: ['claim-tests/math-bio-theorems/kimura-heterozygosity/result.json',
-      'claim-tests/math-bio-theorems/kimura-heterozygosity/faithfulness.json']
+    provenance: ['test-data/claim-tests/math-bio-claims/kimura-heterozygosity/result.json',
+      'test-data/claim-tests/math-bio-claims/kimura-heterozygosity/faithfulness.json']
   },
   {
     n: 4, name: 'Record it in Lean',

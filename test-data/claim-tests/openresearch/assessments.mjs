@@ -2,14 +2,14 @@
 // Hand-written literature assessments for the OpenResearch runs (issue #16). Every identifier cited below is one that
 // `orx discover` returned in the corresponding openresearch.json; the script refuses to write a citation it cannot
 // find in that file's runs. Written 2026-10-31 by the claims thread after reading the returned titles and abstracts.
-//   node claim-tests/openresearch/assessments.mjs
+//   node test-data/claim-tests/openresearch/assessments.mjs
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { QUERIES } from './run.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../..');
+const root = path.resolve(here, '../../..');
 
 const A = {
   'kimura-heterozygosity': {
@@ -57,7 +57,7 @@ const A = {
 };
 
 for (const [claim_id, a] of Object.entries(A)) {
-  const f = path.join(root, 'claim-tests', QUERIES[claim_id].dir, 'openresearch.json');
+  const f = path.join(root, 'test-data', 'claim-tests', QUERIES[claim_id].dir, 'openresearch.json');
   const j = JSON.parse(fs.readFileSync(f, 'utf8'));
   const returned = new Set(j.runs.flatMap(r => r.results.map(x => String(x.id))));
   for (const c of a.citation) if (!returned.has(c)) throw new Error(`${claim_id}: citation ${c} was not returned by any run; refusing to write it`);

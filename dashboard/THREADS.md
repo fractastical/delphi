@@ -7,7 +7,7 @@ area and one sub-dashboard, and talks to the others through files first and mess
 | thread | repo area it owns | sub-dashboard it owns |
 |---|---|---|
 | `swarm` | `swarm/` | `dashboard/public/t/swarm/` |
-| `claims` | `claim-tests/` | `dashboard/public/t/claims/` |
+| `claims` | `test-data/claim-tests/` | `dashboard/public/t/claims/` |
 | `holdout` | `holdout/` (new), `organisms/` fixes | `dashboard/public/t/holdout/` |
 | `lean` | `lean/` (new) | `dashboard/public/t/lean/` |
 | `organism` | `organism-design/` (new) | `dashboard/public/t/organism/` |

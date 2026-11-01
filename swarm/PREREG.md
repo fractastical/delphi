@@ -14,7 +14,7 @@ could decide it. The plan format is `swarm/compare/plan.schema.json`; the instru
 ## Inputs (frozen)
 
 `swarm/compare/claims.json`: the 10 highest-testability claims each for Darwin (*Origin*, 1859) and Thompson
-(*On Growth and Form*, 1917) from `docs/claims.json`, excluding the 4 claims that already have a `claim-tests/` directory.
+(*On Growth and Form*, 1917) from `docs/claims.json`, excluding the 4 claims that already have a `test-data/claim-tests/` directory.
 Wolfram claims carry no testability score and are not dataset-shaped, so they are not used.
 
 ## Arms (same model, tools, prompt, schema and budget for every arm)
@@ -96,7 +96,7 @@ darwin1859-ch12-08 from experiment 1, outputs unused) to measure cost and to con
 ## What changes from experiment 1 (everything else is identical)
 
 - **Claims:** `swarm/compare/claims2.json`, 20 new claims: the next 10 by testability for Darwin and for Thompson,
-  excluding the 20 already used, claims with a `claim-tests/` directory, the two burned bird claims and anything in
+  excluding the 20 already used, claims with a `test-data/claim-tests/` directory, the two burned bird claims and anything in
   the holdout's list, and any claim whose text contains a bird word (two skipped: darwin1859-ch07-04 "nest",
   thompson1917-ch15-08 "eggs"; rule and regex in `select2.log`). `node holdout/check-leaks.mjs` reports no held-out
   taxon in the set.

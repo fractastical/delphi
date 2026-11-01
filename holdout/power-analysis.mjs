@@ -18,7 +18,7 @@ const args = process.argv.slice(2);
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
 const python = opt('--python', process.platform === 'win32' ? 'py' : 'python3');
 const CLADES = ['Aves', 'Mammalia'];
-const TESTS = { 'kimura-heterozygosity': 'claim-tests/math-bio-theorems/kimura-heterozygosity', 'hamilton-senescence': 'claim-tests/math-bio-theorems/hamilton-senescence' };
+const TESTS = { 'kimura-heterozygosity': 'test-data/claim-tests/math-bio-claims/kimura-heterozygosity', 'hamilton-senescence': 'test-data/claim-tests/math-bio-claims/hamilton-senescence' };
 
 const splitFor = c => JSON.parse(fs.readFileSync(path.join(root, c === 'Aves' ? 'holdout/split.json' : `holdout/alt/${c}/split.json`), 'utf8')).summary;
 

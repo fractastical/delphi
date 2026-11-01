@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Runs the held-out exam for one completed claim test, following holdout/EXAM.md.
 //
-//   node holdout/exam-results/run-claim-exam.mjs claim-tests/<project>/<id> [--python py]
+//   node holdout/exam-results/run-claim-exam.mjs test-data/claim-tests/<project>/<id> [--python py]
 //
 // What it does, in order: checks the frozen split, runs the leak check on the test folder, copies the
 // folder to a scratch directory (so the builder's committed derived/ files are not touched), runs
@@ -23,7 +23,7 @@ const args = process.argv.slice(2);
 const target = args.find(a => !a.startsWith('--'));
 const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
 const python = opt('--python', process.platform === 'win32' ? 'py' : 'python3');
-if (!target) { console.error('usage: run-claim-exam.mjs claim-tests/<project>/<id>'); process.exit(2); }
+if (!target) { console.error('usage: run-claim-exam.mjs test-data/claim-tests/<project>/<id>'); process.exit(2); }
 const testDir = path.resolve(root, target);
 const rel = path.relative(root, testDir).replace(/\\/g, '/');
 const [, project, id] = rel.split('/');

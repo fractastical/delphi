@@ -51,7 +51,7 @@ it is written (a second run is a second file with a suffix and a stated reason):
 ```json
 {
   "claim_id": "kimura1968-heterozygosity",
-  "builder_result": "claim-tests/math-bio-theorems/kimura-heterozygosity/result.json",
+  "builder_result": "test-data/claim-tests/math-bio-claims/kimura-heterozygosity/result.json",
   "builder_verdict": "supports",
   "builder_measured": { "value": 0.0, "unit": "", "n": 0 },
   "exam_clade": "Aves",

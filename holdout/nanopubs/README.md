@@ -68,7 +68,7 @@ because they are statements about this project's own files, which the records ca
 
 ## Modelling choices
 
-See `DECISIONS.md`. In line with the team decisions of 2026-10-31 (claim-tests/nanopubs/DECISIONS.md): no
+See `DECISIONS.md`. In line with the team decisions of 2026-10-31 (test-data/claim-tests/nanopubs/DECISIONS.md): no
 human ORCID in the drafts (creator and attribution are the assessor software agent; the key holder's ORCID is
 added at signing with `--creator`), no `nt:wasCreatedFromTemplate` (the published Delphi assertion templates
 still carry the legacy probknow namespace), and the status of each evidence item as a structured

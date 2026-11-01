@@ -143,7 +143,7 @@ Four top-level folders, plus the services that run from the repo root:
  recorded formal status (proved, partial, refuted, or not a mathematical proposition).
  - `cell-geometry/`: micrograph segmentation for Thompson's cell-packing claims.
 - `test-data/`: what claims are tested against.
- - `claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`.
+ - `test-data/claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`.
  - `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
  counts, genomes, trait databases). Merged view in `test-data/organisms/merged/`; see `test-data/organisms/README.md`.
@@ -173,7 +173,7 @@ human-readable.
 - **The dashboard is the human-readable truth.** `dashboard/` builds one static site
   (`node dashboard/build.mjs`, then deploy with `npx wrangler deploy` from `dashboard/`). Every count and
   score on it is computed from repo files, never typed by hand. If you add a result, add it to a repo
-  file the builder reads (for example a `claim-tests/**/result.json`), not to the HTML.
+  file the builder reads (for example a `test-data/claim-tests/**/result.json`), not to the HTML.
 - **Narrative context** (glossary, risks, analogies, recommendations, sources) lives in
   `dashboard/public/glossary.js` and `content.js`. Each source row states whether it was verified.
   Do not add a fact there that you did not check; mark it `not re-verified` instead.
@@ -244,9 +244,9 @@ with `A11 holdout warden`, `A12 red team` and `A13 debate` outside the chain and
 | A4 scout | 4 | data modality and candidate datasets | `claims/<id>/datasets.json` |
 | A5 inventory | 5 | one deduplicated species list, claim index map | `organisms/merged/taxa.json` |
 | A6 scale | 6 | which species have records at every scale | `organisms/scales.json` |
-| A7 formalizer | 7 | mathematical statement, per interpretation | `claim-tests/<id>/model.md` + `lean/` |
-| A8 experimenter | 8 | the pre-registered run and its evidence | `claim-tests/<id>/result.json` |
-| A9 faithfulness | 9a | is the model representative of the data | `claim-tests/<id>/faithfulness.json` |
+| A7 formalizer | 7 | mathematical statement, per interpretation | `test-data/claim-tests/<id>/model.md` + `lean/` |
+| A8 experimenter | 8 | the pre-registered run and its evidence | `test-data/claim-tests/<id>/result.json` |
+| A9 faithfulness | 9a | is the model representative of the data | `test-data/claim-tests/<id>/faithfulness.json` |
 | A10 publisher | 9b | nanopub records and their lifecycle | `*/nanopubs/**.trig` |
 | A11 holdout warden | — | the frozen exam and leak checks | `holdout/` |
 | A12 red team | — | independent recount and mutation tests | `*/verify.json` |
@@ -361,7 +361,7 @@ reading and an empirical bet under another, and conflating them is how a project
 proved biology. The current `result.json` files carry a single free-text `interpretation` field; new tests
 use the list form, and A13 ranks the readings against each other.
 
-**Owns** `claim-tests/<id>/model.md`: the claim as a mathematical statement per interpretation, variables
+**Owns** `test-data/claim-tests/<id>/model.md`: the claim as a mathematical statement per interpretation, variables
 with units, assumptions, falsifier. Lean work must compile with no `sorry`, standard axioms only, and a
 deliberately broken variant that **fails** to compile. A proof nobody tried to break is not evidence.
 **Never** states an operational claim as equivalent to a historical one. A Darwin sentence about domestic
@@ -370,7 +370,7 @@ breeds is `motivation-by-analogy` for an enzyme test, linked as motivation, neve
 ### A8 — Experimenter (step 8)
 
 **Owns** running the model against the data and recording the run as evidence.
-**Pre-registration is mandatory and comes first**: commit `claim-tests/<id>/result.json` with the hypothesis,
+**Pre-registration is mandatory and comes first**: commit `test-data/claim-tests/<id>/result.json` with the hypothesis,
 datasets, analysis, and pass and fail criteria **before downloading the data**. If the result disappoints,
 the finding is the result, not a reason to revise the criteria. A deviation is allowed only when recorded in
 a `deviations` field saying what changed and why.
@@ -397,7 +397,7 @@ it says.
 with the builder's reasoning withheld; it sees the claim, the model and the data description. This is why an
 Anthropic credential cannot assess proofs that Claude wrote, and why the Lean thread's assessment waits for a
 non-Anthropic provider rather than taking the convenient route.
-**Output** `claim-tests/<id>/faithfulness.json`: verdict, reasons, what would change it.
+**Output** `test-data/claim-tests/<id>/faithfulness.json`: verdict, reasons, what would change it.
 **Power to stop the chain**: a `not-representative` verdict means the evidence does not count, whatever the
 numbers said. Record it and leave the claim untested rather than publish a passing number from a model that
 was measuring something else.

@@ -75,13 +75,13 @@ package is "ready for 7 headline tests (needs the OpenAI key; issue #40)", so th
 
 ### A5. Two of sixteen claim tests have no evidence record
 
-`dashboard/public/data.json` carries 16 tests and `claim-tests/` holds 16 `result.json` files. 15 drafts
+`dashboard/public/data.json` carries 16 tests and `test-data/claim-tests/` holds 16 `result.json` files. 15 drafts
 exist, covering 14 distinct tests (`darwin1859-ch09-03` is correctly split into `--numeric` and
 `--qualitative`). The two with no record:
 
 | test | reason, as the thread records it |
 |---|---|
-| `math-bio-theorems/hamilton-lmc` | **Dryad blocks scripted downloads** — declared in `SKIPPED` in `claim-tests/nanopubs/build.py` and in that thread's README |
+| `math-bio-theorems/hamilton-lmc` | **Dryad blocks scripted downloads** — declared in `SKIPPED` in `test-data/claim-tests/nanopubs/build.py` and in that thread's README |
 | `math-bio-theorems/maynardsmith-war-of-attrition` | same |
 
 These are **honestly declared**, not hidden, and `AGENTS.md` A4 says a blocked test is "honest and

@@ -122,7 +122,7 @@ Structural only: it does not say the fish is real, the anatomy correct, or the o
 refutes the exact law on that interval (`not_cubeLaw_of_exponent_ne_three`). The claims thread measured
 2.74 (males) and 2.86 (females) on NHANES age-bin means, 2.76 on pooled individuals, and an earlier run
 found 2.10 at 0-2 years, 3.10 at 10-20 years and 2.41 pooled 0-19; `report.mjs` reads those from
-`claim-tests/thompson-growth-form/thompson1917-ch03-07` and the page shows them against 3. Thompson's
+`test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07` and the page shows them against 3. Thompson's
 "mainly (though not wholly)" and the test's tolerance band are outside the theorem.
 
 ## Constraints and the candidate ledger: what the theorems can rule out

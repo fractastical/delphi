@@ -60,7 +60,7 @@ def ols(xs, ys):
 
 
 # ---------------------------------------------------------------- Lewontin's paradox
-src = ROOT / "claim-tests/math-bio-theorems/kimura-heterozygosity/derived/species_table.csv"
+src = ROOT / "test-data/claim-tests/math-bio-claims/kimura-heterozygosity/derived/species_table.csv"
 if src.exists():
     xs, ys, held = [], [], []
     with src.open(encoding="utf8") as f:
@@ -107,7 +107,7 @@ if src.exists():
            "our own claim test kimura-heterozygosity, from derived/species_table.csv (Buffalo 2021 compilation; Corbett-Detig and Romiguier sources)")
 
 # ---------------------------------------------------------------- Thompson's cube law
-src2 = ROOT / "claim-tests/thompson-growth-form/thompson1917-ch03-07/derived/age_bins.csv"
+src2 = ROOT / "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/derived/age_bins.csv"
 if src2.exists():
     rows = list(csv.DictReader(src2.open(encoding="utf8")))
     cols = rows[0].keys() if rows else []

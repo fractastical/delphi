@@ -105,7 +105,7 @@ the inventory links to an organism; the other 782 claims name no organism.
 `node holdout/check-leaks.mjs` scans every top-level folder except the exam itself and its inputs (`holdout/`,
 `organisms/`, `docs/`, `dashboard/` other than the per-thread data copies under `dashboard/public/t`, `node_modules/`,
 `assets/`), including every thread's nanopub drafts (`.trig`), Lean modules and JSONL logs. Until 2026-10-31 it scanned
-only `claim-tests/`, `organism-design/` and `swarm/`, and skipped `.trig` and `.lean`; the hub's curation pass, not the
+only `test-data/claim-tests/`, `organism-design/` and `swarm/`, and skipped `.trig` and `.lean`; the hub's curation pass, not the
 checker, caught a bird-titled draft in `lean/nanopubs/`, which is what prompted the widening. Three signals: the
 scientific name, slug, NCBI taxid or GBIF key of a held-out taxon (hit); the id of a claim whose inventory organisms
 are all held out, 12 ids from `exam.json` (hit); class-level words and the 13 mixed-organism claim ids (warning).

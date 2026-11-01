@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Builds the holdout thread's Project Delphi nanopublication records as UNSIGNED DRAFT TriG files.
 // One record per nanopub (Delphi ontology v2.0, Knowledge Pixels templates where one exists).
-// Every number in a record is read from a file under holdout/ or claim-tests/ at build time.
+// Every number in a record is read from a file under holdout/ or test-data/claim-tests/ at build time.
 //
 //   node holdout/nanopubs/build-nanopubs.mjs            # writes holdout/nanopubs/unsigned/*.trig + manifest.json
 //   node holdout/nanopubs/build-nanopubs.mjs --final    # drops the "Draft:" marks (only for a signing run)
@@ -17,7 +17,7 @@ import { spawnSync, execSync } from 'node:child_process';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
 const FINAL = process.argv.includes('--final');
-// Team decision (hub, 2026-10-31, claim-tests/nanopubs/DECISIONS.md): no human ORCID in drafts. The creator is the
+// Team decision (hub, 2026-10-31, test-data/claim-tests/nanopubs/DECISIONS.md): no human ORCID in drafts. The creator is the
 // software agent until the key holder approves and signs; pass --creator <ORCID IRI> on that signing run.
 const creatorArg = process.argv.indexOf('--creator');
 const CREATOR_OVERRIDE = creatorArg >= 0 ? process.argv[creatorArg + 1] : null;
@@ -35,15 +35,15 @@ const exams = {
   'hamilton-senescence': rd('holdout/exam-results/math-bio-theorems/hamilton-senescence/result.json'),
 };
 const builders = {
-  'kimura-heterozygosity': rd('claim-tests/math-bio-theorems/kimura-heterozygosity/result.json'),
-  'hamilton-senescence': rd('claim-tests/math-bio-theorems/hamilton-senescence/result.json'),
+  'kimura-heterozygosity': rd('test-data/claim-tests/math-bio-claims/kimura-heterozygosity/result.json'),
+  'hamilton-senescence': rd('test-data/claim-tests/math-bio-claims/hamilton-senescence/result.json'),
 };
 const organism = rd('holdout/exam-results/organism-design/result.run2.json');
 const claimsManifest = rd('math-bio-theorems/nanopubs/manifest.json');
 const claimNp = id => claimsManifest.nanopubs.find(e => e.claim === `${R}claim/${id}`);
-const completedTests = fs.readdirSync(path.join(root, 'claim-tests'), { withFileTypes: true }).filter(d => d.isDirectory()).flatMap(p =>
-  fs.readdirSync(path.join(root, 'claim-tests', p.name), { withFileTypes: true }).filter(d => d.isDirectory() && fs.existsSync(path.join(root, 'claim-tests', p.name, d.name, 'result.json')))
-    .map(d => ({ project: p.name, id: d.name, status: rd(`claim-tests/${p.name}/${d.name}/result.json`).status }))).filter(t => t.status === 'complete');
+const completedTests = fs.readdirSync(path.join(root, 'test-data', 'claim-tests'), { withFileTypes: true }).filter(d => d.isDirectory()).flatMap(p =>
+  fs.readdirSync(path.join(root, 'test-data', 'claim-tests', p.name), { withFileTypes: true }).filter(d => d.isDirectory() && fs.existsSync(path.join(root, 'test-data', 'claim-tests', p.name, d.name, 'result.json')))
+    .map(d => ({ project: p.name, id: d.name, status: rd(`test-data/claim-tests/${p.name}/${d.name}/result.json`).status }))).filter(t => t.status === 'complete');
 
 // Leak check, run now so the record describes a check that ran.
 const leakRun = spawnSync(process.execPath, [path.join(root, 'holdout/check-leaks.mjs'), '--json'], { cwd: root, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
@@ -161,7 +161,7 @@ function pv(subject, local, propertyId, value, description, kind = 'integer') {
     schema:description ${lit(description)} .
 `;
 }
-// Status on the evidence item as a structured value (team convention, claim-tests/nanopubs/DECISIONS.md:
+// Status on the evidence item as a structured value (team convention, test-data/claim-tests/nanopubs/DECISIONS.md:
 // delphi:hasVerdict has domain delphi:Assessment, so evidence items carry propertyID "status").
 const statusPv = (subject, status) => `  ${iri(subject)} schema:additionalProperty sub:status .
   sub:status a schema:PropertyValue ;
@@ -247,12 +247,12 @@ sub:assertion {
     prov:wasAttributedTo ${iri(ASSESSOR)} .
   ${iri(evidence)} a delphi:EvidenceItem ;
     rdfs:label ${lit(`${id}: ${e.exam_measured.unit} = ${Number(e.exam_measured.value).toFixed(4)} (n = ${e.exam_measured.n}; inconclusive, below the pre-registered minimum)`)} ;
-    dct:description ${lit(`Measured on the frozen held-out roster (class Aves, frozen ${sums.frozen_at}, exam.json SHA-256 ${sums.outputs['exam.json'].sha256}) by running the builder's analysis.py --exam on a scratch copy of claim-tests/math-bio-theorems/${id} (analysis.py SHA-256 ${e.preconditions.analysis_sha256}; leak check exit ${e.preconditions.leak_check_exit}; split verified). Pre-registration: the builder's pass and fail criteria were committed before download (local commit 9b73128, 2026-10-31 05:55 UTC) and amended to exclude class Aves at the holdout thread's request before any data were downloaded (local commit 6f5de70, 2026-10-31 05:57:42 UTC), after the exam was frozen at ${sums.frozen_at}. The criteria are quoted verbatim on the pre-registration node this item derives from.`)} ;
+    dct:description ${lit(`Measured on the frozen held-out roster (class Aves, frozen ${sums.frozen_at}, exam.json SHA-256 ${sums.outputs['exam.json'].sha256}) by running the builder's analysis.py --exam on a scratch copy of test-data/claim-tests/math-bio-claims/${id} (analysis.py SHA-256 ${e.preconditions.analysis_sha256}; leak check exit ${e.preconditions.leak_check_exit}; split verified). Pre-registration: the builder's pass and fail criteria were committed before download (local commit 9b73128, 2026-10-31 05:55 UTC) and amended to exclude class Aves at the holdout thread's request before any data were downloaded (local commit 6f5de70, 2026-10-31 05:57:42 UTC), after the exam was frozen at ${sums.frozen_at}. The criteria are quoted verbatim on the pre-registration node this item derives from.`)} ;
     delphi:statisticalTest ${lit(t.test)} ;
     prov:wasDerivedFrom ${iri(b.datasets[0].doi ? `https://doi.org/${b.datasets[0].doi}` : b.datasets[0].landing_url)} , ${iri(b.datasets[0].landing_url)} , sub:frozen-exam , sub:preregistration ;
     rdfs:seeAlso ${iri(LIVE_DATA)} .
 ${statusPv(evidence, STATUS)}  sub:preregistration a prov:Entity, prov:Plan ;
-    dct:title ${lit(`Builder's pre-registered decision rule for ${id} (claim-tests/math-bio-theorems/${id}/result.json, fields pass_criterion and fail_criterion)`)} ;
+    dct:title ${lit(`Builder's pre-registered decision rule for ${id} (test-data/claim-tests/math-bio-claims/${id}/result.json, fields pass_criterion and fail_criterion)`)} ;
     prov:generatedAtTime ${dt('2026-10-31T05:57:42Z')} ;
     prov:value ${lit(`PASS: ${b.pass_criterion} FAIL: ${b.fail_criterion}`)} .
 ${numbers.map(([p, v, d, k], i) => pv(evidence, `m${i + 1}`, p, v, d, k)).join('')}${frozenExam(e.exam_roster_sha256)}${agentTriples}}
@@ -262,7 +262,7 @@ sub:provenance {
     prov:wasDerivedFrom ${iri(LIVE_DATA)} , ${iri(TREE)} , ${iri(np.trustyUri)} ;
     prov:wasGeneratedBy sub:exam .
   sub:exam a prov:Activity ;
-    rdfs:label ${lit(`node holdout/exam-results/run-claim-exam.mjs claim-tests/math-bio-theorems/${id} (protocol: holdout/EXAM.md; rule encoded in holdout/exam-results/rules.mjs from the builder's result.json prose)`)} ;
+    rdfs:label ${lit(`node holdout/exam-results/run-claim-exam.mjs test-data/claim-tests/math-bio-claims/${id} (protocol: holdout/EXAM.md; rule encoded in holdout/exam-results/rules.mjs from the builder's result.json prose)`)} ;
     prov:wasAssociatedWith ${iri(ASSESSOR)} ;
     prov:used sub:frozen-exam ;
     prov:endedAtTime ${dt(`${e.assessor.date}T00:00:00Z`)} .
@@ -389,7 +389,7 @@ sub:assertion {
     prov:wasDerivedFrom sub:frozen-split ;
     rdfs:seeAlso ${iri(LIVE_DATA)} .
 ${statusPv(evidence, STATUS)}${[
-    ['n_completed_claim_tests', nTests, 'completed claim tests under claim-tests/ at build time'],
+    ['n_completed_claim_tests', nTests, 'completed claim tests under test-data/claim-tests/ at build time'],
     ['n_tests_examined_on_aves', nExamined, 'tests whose data contain bird rows and that were examined on the frozen roster'],
     ['n_tests_without_bird_rows', nNA, 'completed tests with no bird rows, logged as not applicable'],
     ['n_tests_post_hoc_if_mammalia', postHoc.length, 'already-built tests that fitted on mammal rows and would be post hoc under a Mammalia holdout'],
@@ -483,7 +483,7 @@ sub:assertion {
     delphi:statisticalTest "Enumeration, no statistics" ;
     rdfs:seeAlso ${iri(LIVE_DATA)} .
 ${statusPv(evidence, STATUS)}${[
-    ['n_completed_claim_tests', nTests, 'completed claim tests under claim-tests/ at build time'],
+    ['n_completed_claim_tests', nTests, 'completed claim tests under test-data/claim-tests/ at build time'],
     ['n_tests_examined_on_aves', nEx, 'tests with bird rows, examined on the frozen roster'],
     ['n_tests_not_applicable', nNA, 'tests with no bird rows'],
     ['n_not_applicable_human_only', notApplicable.tests.filter(t => /Homo sapiens/.test(t.why_not_applicable)).length, 'of those, tests on Homo sapiens only'],

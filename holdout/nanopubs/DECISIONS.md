@@ -30,7 +30,7 @@ the records in this folder, all open to revision by the hub or Amit before anyth
 8. **Domain.** The two claim exams carry the claims' own domain
    (`delphir:domain/math-population-genetics-and-evolutionary-theory`); the method records carry a new slug
    `delphir:domain/held-out-clade-exam`, labelled with the slug as the Thompson thread did for its domain.
-9. **Attribution, aligned with the team decision of 2026-10-31 (claim-tests/nanopubs/DECISIONS.md): no human
+9. **Attribution, aligned with the team decision of 2026-10-31 (test-data/claim-tests/nanopubs/DECISIONS.md): no human
    ORCID in drafts.** `prov:wasAttributedTo` and `dct:creator` are the assessor agent
    `delphir:agent/delphisci-holdout-assessor-claude-fable-5-1` (a `prov:SoftwareAgent` that
    `delphi:usesModel` `delphir:model/claude-fable-5-1`), which built none of the work it examines; there is no

@@ -429,13 +429,13 @@ const blueprintCertificates = fs.existsSync(certDir) ? fs.readdirSync(certDir).f
 // 7b. Thompson cube-law test results (claims thread), pointed to from the record: exponents measured against 3.
 let thompsonTest = null;
 try {
-  const dir = path.join(root, 'claim-tests/thompson-growth-form/thompson1917-ch03-07');
+  const dir = path.join(root, 'test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07');
   const res = JSON.parse(fs.readFileSync(path.join(dir, 'result.json'), 'utf8'));
   const sum = JSON.parse(fs.readFileSync(path.join(dir, 'derived/summary.json'), 'utf8'));
   const cx = JSON.parse(fs.readFileSync(path.join(dir, 'derived/cross_check.json'), 'utf8'));
   const w = cx.theirs.slope_by_age_window;
   thompsonTest = {
-    source: 'claim-tests/thompson-growth-form/thompson1917-ch03-07 (result.json, derived/summary.json, derived/cross_check.json)', verdict: res.verdict, confidence: res.confidence, passCriterion: res.fail_criterion,
+    source: 'test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07 (result.json, derived/summary.json, derived/cross_check.json)', verdict: res.verdict, confidence: res.confidence, passCriterion: res.fail_criterion,
     exponents: [
       { label: 'males, age-bin means 2-19 y (this test)', b: sum.male.free_exponent_b, ci95: sum.male.b_ci95, n: sum.male.n_participants, cubicR2: sum.male.cubic_model_r2_original_scale },
       { label: 'females, age-bin means 2-19 y (this test)', b: sum.female.free_exponent_b, ci95: sum.female.b_ci95, n: sum.female.n_participants, cubicR2: sum.female.cubic_model_r2_original_scale },

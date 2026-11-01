@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds dashboard/public/t/claims/tests.json from every claim-tests/<project>/<id>/result.json plus the claim's
+// Builds dashboard/public/t/claims/tests.json from every test-data/claim-tests/<project>/<id>/result.json plus the claim's
 // label and assessor truth score from docs/claims.json. Every number on the claims sub-dashboard comes from this file.
 //   node dashboard/public/t/claims/build.mjs
 import fs from 'node:fs';
@@ -12,7 +12,7 @@ const graph = JSON.parse(fs.readFileSync(path.join(root, 'docs/claims.json'), 'u
 const byId = Object.fromEntries(graph.claims.map(c => [c.id, c]));
 
 const tests = [];
-const ct = path.join(root, 'claim-tests');
+const ct = path.join(root, 'test-data', 'claim-tests');
 for (const proj of fs.readdirSync(ct, { withFileTypes: true }).filter(d => d.isDirectory())) {
   for (const t of fs.readdirSync(path.join(ct, proj.name), { withFileTypes: true }).filter(d => d.isDirectory())) {
     const f = path.join(ct, proj.name, t.name, 'result.json');
@@ -32,7 +32,7 @@ for (const proj of fs.readdirSync(ct, { withFileTypes: true }).filter(d => d.isD
         files: (d.files || []).map(x => ({ url: x.download_url, bytes: x.byte_size ?? null, sha256: x.sha256 ?? null, retrieved_at: x.retrieved_at ?? null, obtained: x.obtained !== false && !!x.sha256 })) })),
       n_files_obtained: files.filter(x => x.sha256).length, bytes_obtained: files.reduce((s, x) => s + (x.sha256 ? (x.byte_size || 0) : 0), 0),
       agent: r.agent || null,
-      dir: `claim-tests/${proj.name}/${t.name}/`
+      dir: `test-data/claim-tests/${proj.name}/${t.name}/`
     });
   }
 }

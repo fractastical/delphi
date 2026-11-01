@@ -1,4 +1,4 @@
-# claim-tests/nanopubs — evidence-item drafts for the pre-registered claim tests
+# test-data/claim-tests/nanopubs — evidence-item drafts for the pre-registered claim tests
 
 **Everything in `unsigned/` is an unsigned draft.** Nothing here is signed or published. Target is the nanopub test registry first; production needs the ORCID key owner's explicit approval, every time.
 
@@ -6,7 +6,7 @@
 
 | path | content |
 |---|---|
-| `build.py` | Generator. Reads every `claim-tests/<project>/<id>/result.json` named in `RECORDS`, the git history of that file (pre-registration commit, amendments, results commit) and writes one TriG per record. Refuses to build if a number in its hand-written text is not in the result file, or if the first data retrieval is not after the pre-registration commit. |
+| `build.py` | Generator. Reads every `test-data/claim-tests/<project>/<id>/result.json` named in `RECORDS`, the git history of that file (pre-registration commit, amendments, results commit) and writes one TriG per record. Refuses to build if a number in its hand-written text is not in the result file, or if the first data retrieval is not after the pre-registration commit. |
 | `unsigned/*.trig` | 15 records, one `delphi:EvidenceItem` each, linked from the existing claim IRI with `delphi:hasEvidence`. |
 | `manifest.json` | Per record: claim IRI, evidence IRI, status, commits, retrieval times, `np check` result; `signed: false`, `published: false`. |
 | `check.log` | Verbose output of `java -jar nanopub.jar check -v` per file (nanopub-java 1.95.0). |
@@ -46,7 +46,7 @@ Not recorded (open tasks, no evidence item): `hamilton-lmc`, `maynardsmith-war-o
 ## Validate
 
 ```
-python claim-tests/nanopubs/build.py --check C:/Temp/nanopub/nanopub.jar
+python test-data/claim-tests/nanopubs/build.py --check C:/Temp/nanopub/nanopub.jar
 cd C:/Temp/project-delphi-ontology/pipeline && npx tsx lint.ts <repo>/claim-tests/nanopubs/unsigned
 ```
 

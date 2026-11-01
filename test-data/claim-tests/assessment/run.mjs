@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Runs the blinded A9 faithfulness prompts through a NON-Anthropic assessor and writes
-// claim-tests/<project>/<dir>/faithfulness.json (the A9 contract in AGENTS.md) plus a copy in results/.
-//   node claim-tests/assessment/run.mjs --provider openai        (needs OPENAI_API_KEY in the environment)
-//   node claim-tests/assessment/run.mjs --provider openai-codex  (OpenAI Codex CLI, its own login)
-//   node claim-tests/assessment/run.mjs --provider gemini        (needs GEMINI_API_KEY)
-//   node claim-tests/assessment/run.mjs --provider vertex        (needs gcloud auth + a billed project)
+// test-data/claim-tests/<project>/<dir>/faithfulness.json (the A9 contract in AGENTS.md) plus a copy in results/.
+//   node test-data/claim-tests/assessment/run.mjs --provider openai        (needs OPENAI_API_KEY in the environment)
+//   node test-data/claim-tests/assessment/run.mjs --provider openai-codex  (OpenAI Codex CLI, its own login)
+//   node test-data/claim-tests/assessment/run.mjs --provider gemini        (needs GEMINI_API_KEY)
+//   node test-data/claim-tests/assessment/run.mjs --provider vertex        (needs gcloud auth + a billed project)
 //   add --only <claim_id> to run one test, --model <id> to pin a model.
 // Keys never touch the repo. The builder (Claude, Anthropic) is never a valid provider here.
 import fs from 'node:fs';
@@ -14,7 +14,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(here, '../..');
+const root = path.resolve(here, '../../..');
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
 const provider = arg('provider'); if (!provider) { console.error('need --provider'); process.exit(2); }
 const only = arg('only');
@@ -88,7 +88,7 @@ for (const r of inputs) {
     const j = parseJson(a.text);
     if (!VERDICTS.has(j.verdict)) throw new Error('verdict not in rubric: ' + j.verdict);
     const rec = {
-      claim_id: r.claim_id, test_dir: `claim-tests/${r.project}/${r.dir}`, rubric: 'analysis-faithfulness/0.1.0', role: 'A9',
+      claim_id: r.claim_id, test_dir: `test-data/claim-tests/${r.project}/${r.dir}`, rubric: 'analysis-faithfulness/0.1.0', role: 'A9',
       assessor: { provider: providerName, via: provider, model: a.model, date: new Date().toISOString(), blind: true,
                   withheld: ['measured', 'verdict', 'confidence', 'caveats', 'interpretation'], seconds: +((Date.now() - t0) / 1000).toFixed(1) },
       scores: j.scores, verdict: j.verdict, reasons: j.reasons, what_would_change_it: j.what_would_change_it,

@@ -1,6 +1,6 @@
 # Genotype thread: nanopublication decisions
 
-Conventions inherited from `claim-tests/nanopubs/DECISIONS.md` and `AGENTS.md`: unsigned drafts only, no human ORCID
+Conventions inherited from `test-data/claim-tests/nanopubs/DECISIONS.md` and `AGENTS.md`: unsigned drafts only, no human ORCID
 (the creator is the software agent until the key holder approves and signs), no assertion, provenance or pubinfo
 template declared because these hand-authored Delphi 2.0 records were not created from one, datasets described
 inline, test registry before production and production only with the key owner's explicit approval.
