@@ -20,7 +20,8 @@ claude.ai or ChatGPT, add it as a custom connector with that URL.
 
 It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
 [`.github/workflows/deploy-mcp.yml`](../.github/workflows/deploy-mcp.yml) whenever `main` changes
-the server, `docs/claims.json`, `test-data/organisms/merged/*.json` or any nanopubs. To run the HTTP mode locally:
+the server, `docs/claims.json`, `test-data/organisms/merged/*.json`, any nanopubs, or the Lean laws (`lean/registry/`,
+`lean/laws.json`, `lean/constraints.json`, `lean/Delphi/`). To run the HTTP mode locally:
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
 
 Usage stats for the hosted server are in Grafana at [fly-metrics.net](https://fly-metrics.net)
@@ -35,8 +36,8 @@ arguments count in `requests_total{method="tools/call"}` but not in `tool_calls_
 `npx` and local servers send nothing anywhere.
 
 **Without cloning**: any MCP client can run it straight from GitHub. npm fetches the repo at the
-given ref and installs only the server, `docs/claims.json`, `test-data/organisms/merged/*.json` and the
-unsigned TriG files, so `local` means "the repo as of that commit".
+given ref and installs only the server, `docs/claims.json`, `test-data/organisms/merged/*.json`, the
+unsigned TriG files and the Lean law sources the `lean_*` tools read, so `local` means "the repo as of that commit".
 
 ```json
 {
@@ -46,7 +47,7 @@ unsigned TriG files, so `local` means "the repo as of that commit".
 }
 ```
 
-Pin a tag or commit (`github:fractastical/delphi#v0.2.0`) for reproducible answers; `npx` caches
+Pin a tag or commit (`github:fractastical/delphi#v0.3.0`) for reproducible answers; `npx` caches
 the package, so pass `--prefer-online` or clear `~/.npm/_npx` to pick up newer data. Claude Code:
 `claude mcp add delphisci -- npx -y github:fractastical/delphi`.
 
@@ -103,6 +104,12 @@ Use `local` while building; use `network` when citing something or checking what
 | `delphi_organisms` | Rank or filter the 782 animal taxa in [`test-data/organisms/merged`](../test-data/organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
 | `delphi_get_organism` | One taxon by key (`gbif:2495414`), slug, accepted name or vernacular: identifiers, lineage, names as written, coverage score and missing axes, every dataset record with counts/distributions/integrity, every located mention. |
 | `delphi_sparql` | Anything else. Read-only `SELECT`, `ASK`, `CONSTRUCT` or `DESCRIBE` (the last two return N-Triples); each common prefix is added unless the query declares it. |
+| `lean_laws_list` | The project's versioned Lean laws (physical and biological): `law_id`, version, kind, status, theorem, constraint ids. Filter by `kind`, `status`, `scope`, `lawset`, `text`. |
+| `lean_law_get` | One law in full: statement, the Lean source of its theorem and named hypotheses, constraint lemmas, version history, sources, non-vacuity witness, pinned commit and statement hash with a live drift flag. |
+| `lean_lawset_get` | A lawset release (`law_id`, version, content hash, pinned status), or `current`. |
+| `lean_check` | Evaluate a design (SI units) against a lawset: per-law verdicts and violations `{law_id, version, kind, status, inputs, message, binding}`. Floating point, **not a kernel check**. |
+| `lean_verify` | Re-hash pinned Lean statements; report drift, missing theorems and a stale `/api/lean/` mirror. |
+| `lean_propose` | **stdio only, never on the hosted server** (runs a Lean build): hand a new statement to `lean/registry/propose.mjs`; returns candidate / contested / rejected, never accepted. |
 
 Search, get and rank attach a `status` to each claim: `verification` (`lean`, `literature`, `partial`,
 `untested`, `refuted`) with the Lean theorem names, the `dataTest` verdict and its `result.json`,
@@ -133,6 +140,23 @@ exists. The hosted server never posts with its own credentials. CLI: `node mcp/c
 
 Forum posts are not nanopubs. A maintainer turns a proposal into a claim, or a result into a
 `test-data/claim-tests/` entry, before it is assessed or published.
+
+### Lean laws
+
+The `lean_*` tools are the same handlers as our sim-engine MCP server
+([`sim-engine/tools/lean-tools.mjs`](../sim-engine/tools/lean-tools.mjs)), reading every law through one
+loader, [`lib/lean-source.mjs`](../lib/lean-source.mjs): the registry in `lean/registry/` (one file per
+law, lawsets in `lean/registry/lawsets/`), falling back to `lean/laws.json` + `lean/constraints.json`
+if the registry is absent. Every result is the provenance envelope `{result, provenance, scope}`; read
+`scope` before using a verdict. CLI: `node mcp/cli.mjs laws --kind biological --status accepted`,
+`law <law_id>`, `lawset current`, `check design.json --lawset 1.0.0`, `verify`, `propose Law.lean --meta meta.json`
+(the same subcommands as `node sim-engine/lean-cli.mjs`). Browsers and anything without a server: the
+static mirror `GET /api/lean/{index,current}.json`, `/api/lean/laws/<law_id>.json`,
+`/api/lean/lawsets/<version>.json` on the dashboard site.
+
+A new law must be reachable through all of these; `node lean/registry/check-exposed.mjs` fails otherwise
+(pre-commit hook in `.githooks/`, CI in `.github/workflows/lean-exposed.yml`). A change under `lean/`
+redeploys the hosted server.
 
 ### How ranking works
 

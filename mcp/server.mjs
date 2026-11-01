@@ -12,11 +12,15 @@ import { observeToolCall } from "./metrics.mjs";
 import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 import { MORPHOLIB_VIEWS, REGISTRIES, RELATIONS, morpholibTool } from "./morpholib.mjs";
+import { LEAN_TOOLS } from "../sim-engine/tools/lean-tools.mjs";
 
 const TOOLS = [];
+export const VERSION = "0.3.0";
+// Hosted (HTTP) mode never offers tools that run a Lean build or write files.
+const HOSTED = !!process.env.DELPHI_HTTP_PORT;
 
 export function createServer() {
-  const server = new McpServer({ name: "delphisci", version: "0.2.0" });
+  const server = new McpServer({ name: "delphisci", version: VERSION });
   for (const [name, description, inputSchema, fn, annotations = { readOnlyHint: true }] of TOOLS) {
     server.registerTool(name, { description, inputSchema, annotations }, async (args, extra) => {
       const start = performance.now();
@@ -301,6 +305,36 @@ tool("delphi_forum_respond",
   },
   forumRespond,
   WRITE);
+
+// ── Lean laws ──────────────────────────────────────────────────────────────
+// Handlers and descriptions come from sim-engine/tools/lean-tools.mjs, which reads every law through the one
+// loader lib/lean-source.mjs (lean/registry/, or lean/laws.json + constraints.json until it exists). Results
+// are the provenance envelope { result, provenance, scope }. lean/registry/check-exposed.mjs fails if a law
+// is missing here.
+const leanT = Object.fromEntries(LEAN_TOOLS.map(t => [t.name, t]));
+const lawStatus = z.enum(["proposed", "candidate", "accepted", "contested", "retired"]);
+const leanTool = (name, shape) => tool(name, leanT[name].description, shape, args => leanT[name].handler(args));
+
+leanTool("lean_laws_list", {
+  kind: z.enum(["physical", "biological"]).optional(),
+  status: z.union([lawStatus, z.array(lawStatus)]).optional().describe("One status or a list"),
+  scope: z.string().optional().describe("Substring of the law level or scope, e.g. \"genotype\""),
+  lawset: z.string().optional().describe("Only laws in this lawset version, or \"current\""),
+  text: z.string().optional().describe("Substring of law_id, label or statement"),
+});
+leanTool("lean_law_get", { id: z.string().describe("law_id from lean_laws_list, e.g. \"kimura-substitution-rate\"") });
+leanTool("lean_lawset_get", { version: z.string().default("current").describe("Semver, or \"current\"") });
+leanTool("lean_check", {
+  design: z.record(z.string(), z.any()).optional().describe("SI-unit design: SL_m, mass_kg, finArea_m2, CLmax, airspeed_m_s, genotype_edits, ..."),
+  spec: z.record(z.string(), z.any()).optional().describe("Alias of design"),
+  lawset: z.string().default("current"),
+});
+leanTool("lean_verify", {});
+if (!HOSTED) leanTool("lean_propose", {
+  file: z.string().optional().describe("Path to a .lean file"),
+  source: z.string().optional().describe("Lean source text, if no file"),
+  meta: z.record(z.string(), z.any()).default({}).describe("law_id, kind, statement_en, hypotheses, sources (see lean/registry/README.md)"),
+});
 
 if (process.env.DELPHI_HTTP_PORT) {
   const { serveHttp } = await import("./http.mjs");
