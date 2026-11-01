@@ -285,8 +285,11 @@ def compile_assembly(root: Path, a: dict, reg=None, couplings=None, cache=None) 
 
 
 def impact(old: dict, new: dict) -> dict:
-    g = lambda a, k: (a["components"].get(k, {}).get("path"), a["components"].get(k, {}).get("sha256"))
-    changed = [k for k in sorted(set(old["components"]) | set(new["components"])) if g(old, k) != g(new, k)]
+    def pin_identity(assembly, layer):
+        pin = assembly["components"].get(layer, {})
+        return pin.get("path"), pin.get("sha256")
+
+    changed = [k for k in sorted(set(old["components"]) | set(new["components"])) if pin_identity(old, k) != pin_identity(new, k)]
     inv = [s for s in AXES if set(STAGE_LAYERS[s]) & set(changed)]
     return {"changed_layers": changed, "invalidated_stages": inv, "kept_stages": [s for s in AXES if s not in inv]}
 
