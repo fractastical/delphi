@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAzRoO6qqQAc-lnXvhIwspEYfAf2SvY5WPfDenR56ow_o>.
+@prefix sub: <https://w3id.org/np/RAzRoO6qqQAc-lnXvhIwspEYfAf2SvY5WPfDenR56ow_o/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2014-tumor-03> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In Xenopus laevis embryos, misexpressing the hyperpolarizing potassium channel Kv1.5 in a blastomere distant from the oncogene-injected blastomere reduces the incidence of induced tumor-like structures by about 35% for Xrel3 and about 29% for Gli1, indicating the suppression is not specific to one oncogene.";
+    dc:type "experimental-result";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Remote Kv1.5 hyperpolarization suppresses tumor-like structures from two oncogenes";
+    <https://w3id.org/delphi/ontology/context> "Chernet BT, Levin M, “Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range”, Oncotarget (2014), doi:10.18632/oncotarget.1935; section “RESULTS › Long-range hyperpolarization suppresses the formation of ITLS”. Scope: 16-cell-stage Xenopus laevis embryos co-injected with Xrel3 or Gli1 and Kv1.5 mRNA in separate blastomeres, scored at stage 34"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.18632/oncotarget.1935>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt#line=34,35>;
+    prov:wasQuotedFrom <https://doi.org/10.18632/oncotarget.1935>;
+    <https://schema.org/text> "Kv1.5-induced long-distance hyperpolarization was also able to significantly suppress Xrel3 and Gli1 ITLS formation by 34.9% (N=225; t-test, P<0.05) and 29.4% (N=292; t-test, P<0.05), respectively (Fig. 2C), suggesting the effect is not specific for just one type of oncogene.".
+<https://doi.org/10.18632/oncotarget.1935> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Chernet BT, Levin M. Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range. Oncotarget (2014). doi:10.18632/oncotarget.1935";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2014"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC4102810>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt#line=34,35> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2014-tumor.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4102810/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.18632/oncotarget.1935>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "0cb471523c612aad56f5f95e59d30924250a69abd9bddb491dc924107d31ac5a"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2014 claim: Remote Kv1.5 hyperpolarization suppresses tumor-like structures from two oncogenes";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2014-tumor-03>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "CIKMJ7W0iAYjxpC5Is8D4cJX6OVCzmFCv5L6vuXEAs2Nc4ueeHigMLX8b2ISzNCMIRnmJ1RyY6xeGwgWR7fdm3LSiW0fHepfnUKDwrP9jo1x96SWF5Ofl5qKf3vlMGvg7h6lTLSEKxYORYBHzNtTMLuBs7IagNTorPg4GN4KuWcIVkP4HfPIBKh6YgnMfrPk+Zxqk33SQ+qjGE9UHF2XMrTIbxZO3CuMgGs0WljOn5cLPaAlSGvOus1NSfYRb2vcY+5QlEJeju50XDxV+bVb8QWcAae/mtGnHGrA+eJzSmMxz11Y8S+lepiAjheTOvAmSGaN9soj6+2Gel1oo0n0NA=="
+}

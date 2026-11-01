@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAoCiL_jBoDub4VXrVrnR0ocwaVd5wWsrOJm3Us9A0TQ4>.
+@prefix sub: <https://w3id.org/np/RAoCiL_jBoDub4VXrVrnR0ocwaVd5wWsrOJm3Us9A0TQ4/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2023-agential-03> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "By using an architecture akin to a variational autoencoder, in which the genome is a compressed generative representation decoded by the developmental layer, evolution is kept from over-training on past conditions and is pushed to produce general-purpose problem-solving organisms that display robustness, plasticity and adaptive success in entirely novel circumstances.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "A generative, compressed genome pushes evolution toward general-purpose problem solvers";
+    <https://w3id.org/delphi/ontology/context> "Levin M, “Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology”, Cellular and molecular life sciences : CMLS (2023), doi:10.1007/s00018-023-04790-z; section “Intelligence and evolution: the impact of competency at new scales”. Scope: Evolution of multicellular organisms"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1007/s00018-023-04790-z>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt#line=33,34>;
+    prov:wasQuotedFrom <https://doi.org/10.1007/s00018-023-04790-z>;
+    <https://schema.org/text> "Second is that by using a variational autoencoder-like architecture of compression into a generative genome (Fig. 1), evolution is freed from over-training on past conditions and pushed to evolve general-purpose problem-solving machines which inevitably display robustness, plasticity, and adaptive success in entirely novel circumstances.".
+<https://doi.org/10.1007/s00018-023-04790-z> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Levin M. Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology. Cellular and molecular life sciences : CMLS (2023). doi:10.1007/s00018-023-04790-z";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2023"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Darwin's agential materials: evolutionary implications of multiscale competency in developmental biology";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10167196>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt#line=33,34> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2023-agential.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10167196/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1007/s00018-023-04790-z>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "7cb007b21f299596565787f8254edeb74dd5c062e02c02e4b266ca3cfde1c971"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2023 claim: A generative, compressed genome pushes evolution toward general-purpose problem solvers";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2023-agential-03>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "nDweSBQuOyuFT/Y2nWfMNzYz8i0L6/bolHGMg3Tz6XWSliSAc6rH2zmo9XFekyw/4p0SkfRcYV0ZaYs8t4S8/thz5XhISQYieK9Duhfec05Iil4zOCgAnfL6hQeo+GaK3D+7PF3F7ydnyz2+sjZCiwm2uU6eKXOW96upy94h0Vy/O/gHVD2xUPLsWWdHG4BWhgG942n9RSE+sj8TxMUo8yuvZ1jI+es1ANIqB44aCezyut8sVoA/tAL2Bvx7x+x2/DxFIYjLMUwZ2WSH+Ehw6LK0xHNWKF4iC3fiGNbkfEL/XIshVP+kkX/n63ecKA2IcZx+7Vu6xUZgb85BDQsmQQ=="
+}

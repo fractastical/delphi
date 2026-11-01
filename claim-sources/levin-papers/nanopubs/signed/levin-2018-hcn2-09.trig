@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAYE7yMMzBLpeqMCBcb--fiUSbcILJxbEfqMsNOgDlOeY>.
+@prefix sub: <https://w3id.org/np/RAYE7yMMzBLpeqMCBcb--fiUSbcILJxbEfqMsNOgDlOeY/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2018-hcn2-09> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In nicotine-exposed Xenopus embryos, expression of HCN2 channels enhances the neural-tube-specific hyperpolarization and restores the endogenous Vmem prepattern that nicotine otherwise suppresses, as the BETSE model predicted.";
+    dc:type "experimental-result";
+    <http://www.w3.org/2000/01/rdf-schema#label> "HCN2 expression restores the neural Vmem prepattern despite nicotine";
+    <https://w3id.org/delphi/ontology/context> "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M, “HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns”, Nature communications (2018), doi:10.1038/s41467-018-03334-5; section “Results › HCN2 corrects Vmem”. Scope: Xenopus laevis neurula-stage embryos exposed to nicotine, with or without Hcn2-WT mRNA"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s41467-018-03334-5>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=48,49>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s41467-018-03334-5>;
+    <https://schema.org/text> "As predicted, nicotine exposure suppresses the neural brain-specific Vmem pattern, while HCN2 channel expression enhances the neural Vmem pattern and restores it even in presence of the otherwise teratogenic nicotine.".
+<https://doi.org/10.1038/s41467-018-03334-5> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M. HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns. Nature communications (2018). doi:10.1038/s41467-018-03334-5";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2018"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC5843655>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=48,49> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5843655/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s41467-018-03334-5>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "3272e52259dcf1f3cc5bbcae5bee7719e59288813021949dccebc0f6fbd31425"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2018 claim: HCN2 expression restores the neural Vmem prepattern despite nicotine";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-09>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "oHgWiQDd+aDIa5BFxgT3ulhhKJ6D8z5qRwUUrJnU4VWZJ3+TeEn6TcPzS1BMhth6noYtuW7vsB7We1RZsNswuhDGs0CFVsDDEr068JByS8CB9dCk4DElMnJQ+xJ8cOFr7/PfxwusCP091vKUMOjGDIynjCTVb/BvixoQdyNVw/pUH7QHlGpOva1YQ06RlbW/p+rWUalMXYVwtKvvLKAj0QLK4aXVGQOvjJEK2LV6XUnQfNNqa+f5MhvA/rk/3A1lDrCSmWvsRHhWK9L9KlkvWsfWqE/MyYWfgClAAXavyRaILKRUH3randyc3YZ1xdIo9nLDqb7ywjXlyAcWpMgUtw=="
+}

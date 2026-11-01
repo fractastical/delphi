@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAxWHLtc97GIae_bCC6mm8PU8RUwgAvAmOeYtsEK4M2CQ>.
+@prefix sub: <https://w3id.org/np/RAxWHLtc97GIae_bCC6mm8PU8RUwgAvAmOeYtsEK4M2CQ/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-ga02-40> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Mules are sterile because the horse already tends to sterility and becomes wholly so when its generative secretion is chilled by mixing with the cold secretion of the ass.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The mule is sterile because the ass's cold seed chills the horse's";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, On the Generation of Animals (De Generatione Animalium), Book II; translated by Arthur Platt, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: Mule (horse × ass hybrid)"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=264,265>;
+    prov:wasQuotedFrom <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>;
+    <https://schema.org/text> "The horse is much the same; it tends naturally towards sterility, and to make it entirely so it is only necessary that its generative secretion should become colder; now this is what happens to it when mixed with the corresponding secretion of the ass.".
+<https://en.wikisource.org/wiki/On_the_Generation_of_Animals> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. On the Generation of Animals (De Generatione Animalium). Translated by Arthur Platt. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1912"^^xsd:gYear;
+    dc:title "On the Generation of Animals, translated by Arthur Platt";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1180637>;
+    <https://schema.org/translator> "Arthur Platt".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=264,265> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt> prov:wasDerivedFrom <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_I&oldid=3450790&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_II&oldid=3450789&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_III&oldid=3450788&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_IV&oldid=3450787&action=raw>, <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_V&oldid=3450786&action=raw>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://en.wikisource.org/wiki/On_the_Generation_of_Animals>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "23349787bbc025417e5a55b00000cc260f158f4579a9dd1213740da2bc670338"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, Generation of Animals II: The mule is sterile because the ass's cold seed chills the horse's";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ga02-40>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "Xgh5thiYJ/5JzyWXvl0qHfQScijZdr7W0PM+qwhX5kUJI2Qfv0YYZYq/gufCB9dwR5SYNMSZWwb9JvBWtEV3qjgh589ehhKu4rSxOFvX4REUE19AvDQOb1PQ2AwQ910KUjgPERl4ii19HmEW8gV3DAz8J1V7up/320vHHJV7t1FJa5PvMp16cNLfLFNd3LFTiGFK7a4viTYbxCENp/uonazdKXEjyq4GatKf7l3/f7baEOHP5EUf7O4Z2YZJUw2XZjzjMNuNa6/hwSBlkBoGDQbYraKb+IN8Mi3JTbLtx6D8AsO3RK6VflrGtVdtZ/YQ3pZAcAFD8O1pb//kqCz8XA=="
+}

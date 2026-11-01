@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAMcgGslEqjCGTYtlPQEYPQt1VneIekD6X2U0b-9QRSFA>.
+@prefix sub: <https://w3id.org/np/RAMcgGslEqjCGTYtlPQEYPQt1VneIekD6X2U0b-9QRSFA/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-ha08-34> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Of all animals of its kind the ass is least able to endure extreme cold, which is why it is not found on the shores of the Black Sea or in Scythia.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The ass tolerates cold least and is absent from Scythia";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, The History of Animals (Historia Animalium), Book VIII, Part 25; translated by D'Arcy Wentworth Thompson, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910). Scope: donkey compared with horse and mule"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.html>, sub:quote;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+<http://classics.mit.edu/Aristotle/history_anim.html> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. The History of Animals (Historia Animalium). Translated by D'Arcy Wentworth Thompson. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1910"^^xsd:gYear;
+    dc:title "The History of Animals, translated by D'Arcy Wentworth Thompson";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1620799>;
+    <https://schema.org/translator> "D'Arcy Wentworth Thompson".
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=1468,1469>;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/history_anim.html>;
+    <https://schema.org/text> "Of all animals on its of its kind it is the least capable of enduring extreme cold, which circumstance will account for the fact that the animal is not found on the shores of the Euxine, nor in Scythia.".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=1468,1469> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt> prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.mb.txt>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <http://classics.mit.edu/Aristotle/history_anim.html>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "6d79cdc7d0d2a655136a2e6469c90c021b4c82e05c345cc74ddcbd728cbfc113"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, History of Animals VIII: The ass tolerates cold least and is absent from Scythia";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ha08-34>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "ZTtlGRjlpSHMk3O2LNcqi2I9K03Sj2emVLD3TJQN5O7r9jQCQ7+Lfr2x/2t1/1KMVyO84JLxXtoGrRjmSncUSvkzj1tGbDNbrunOV0zfipYpCbykxjJZcCQeQXmFrmEltijSpb/RmADvgjfJh8Bxf+/vb7TtA282MTH148BQB/YCHT/rNThS0f0ZWz+Chbhu2iIt5EcppJ2wxUZodZj0CHdzwXMNaUlUTZ6402MUw6h559DG9su2gCrLhfWBTe2xy46jHh9jhN1Ahcj99c65SZeCZm7IzP7//ghy1LPeePVq5WEDXqBgCwHyVy959Z6sHETX9RZEHGMX6V0EGbLmNg=="
+}

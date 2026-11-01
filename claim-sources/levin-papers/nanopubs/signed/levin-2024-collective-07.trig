@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RA57QM8K8GCmlJIU45XNHlTOrgWzfWFeO8XAbhsLFI9rI>.
+@prefix sub: <https://w3id.org/np/RA57QM8K8GCmlJIU45XNHlTOrgWzfWFeO8XAbhsLFI9rI/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2024-collective-07> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "When a planarian is cut once, cells that were adjacent neighbours at the same positional-information value make a head on one side and a tail on the other, so this anatomical decision cannot be made locally: wound cells must coordinate with the rest of the fragment to learn where they are, which way they face and what structures remain.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Head-versus-tail choice at a planarian cut cannot be made locally";
+    <https://w3id.org/delphi/ontology/context> "McMillen P, Levin M, “Collective intelligence: A unifying concept for integrating biology across scales and substrates”, Communications biology (2024), doi:10.1038/s42003-024-06037-4; section “Introduction › Left/right, head/tail: random, but collective anatomical decisions”. Scope: Regenerating planarian fragments"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s42003-024-06037-4>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=45,46>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s42003-024-06037-4>;
+    <https://schema.org/text> "In other words, it is actually impossible for an anatomical decision like this to be made locally – the cells of the wound must coordinate with the remaining fragment to get information about where they are located, which way they are facing, and what other structures exist121,122, in order to make adaptive decisions about large-scale growth and form that enable regeneration of normal worms.".
+<https://doi.org/10.1038/s42003-024-06037-4> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "McMillen P, Levin M. Collective intelligence: A unifying concept for integrating biology across scales and substrates. Communications biology (2024). doi:10.1038/s42003-024-06037-4";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2024"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Collective intelligence: A unifying concept for integrating biology across scales and substrates";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10978875>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=45,46> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10978875/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s42003-024-06037-4>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "8f0e83775f3f814dbf827776d94a018c5bcdf1389e44e6be1b0678692278f8fd"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2024 claim: Head-versus-tail choice at a planarian cut cannot be made locally";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-collective-07>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "lxqyt1B0V0dvfuVJRK6SsRi/TRRnJZ1tFhKIY/RzkI76GDJvEaHW/Y4Gqx7+Ae5IYsPRem9rUQfeuCeYOJQDdiVjdkXxYcB6vMTseA6K0FYFB86lbaXhb8tEO2kZs4n8eiKfB58y5FknQUefYOm3W/dgC3279Ifbgs2FKBTD+6ZzFXPy7iQ80jiRp9/VchLq0OTd9RKDZ3kEYfIjUgs+1/PqkBlg0egyOuFzPwVb6RaVWJHELc6KtuiZ2/t888XWsDyR2NAxBTCPrdqsFcVlwEnvxzfwWVBs8opSzFet5zi0HlyX8NEmGPLtUOi2vcRsJQxihxJcBOIAPt/zHrSo0Q=="
+}

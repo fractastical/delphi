@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAPHGDZeV8nQ5z2LlAFpq5aHaRyVGBEqTyoGXcQLdVB08>.
+@prefix sub: <https://w3id.org/np/RAPHGDZeV8nQ5z2LlAFpq5aHaRyVGBEqTyoGXcQLdVB08/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2024-anthrobots-01> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "A single normal human bronchial epithelial cell from adult lung, cultured in extracellular matrix for two weeks and then transferred to a low-viscosity medium, self-constructs into a multicellular, motile spheroid (an Anthrobot) without genetic editing, scaffolds or manual sculpting.";
+    dc:type "experimental-result";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Single adult human lung cells self-construct into motile multicellular biobots";
+    <https://w3id.org/delphi/ontology/context> "Gumuskaya G, Srivastava P, Cooper BG, Lesser H, Semegran B, Garnier S, Levin M, “Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells”, Advanced science (Weinheim, Baden-Wurttemberg, Germany) (2024), doi:10.1002/advs.202303575; section “Abstract”. Scope: Normal human bronchial epithelial (NHBE) progenitor cells from adult donors, in vitro"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1002/advs.202303575>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt#line=8,9>;
+    prov:wasQuotedFrom <https://doi.org/10.1002/advs.202303575>;
+    <https://schema.org/text> "Each Anthrobot begins as a single cell, derived from the adult human lung, and self‐constructs into a multicellular motile biobot after being cultured in extra cellular matrix for 2 weeks and transferred into a minimally viscous habitat.".
+<https://doi.org/10.1002/advs.202303575> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Gumuskaya G, Srivastava P, Cooper BG, Lesser H, Semegran B, Garnier S, Levin M. Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells. Advanced science (Weinheim, Baden-Wurttemberg, Germany) (2024). doi:10.1002/advs.202303575";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2024"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10811512>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt#line=8,9> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10811512/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1002/advs.202303575>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "ba51e46dba97e1e292c405a16e688a318dc26009ea2b8fca3279582e9cd645a1"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2024 claim: Single adult human lung cells self-construct into motile multicellular biobots";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-anthrobots-01>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "Ts2qO/I/t+XBFnP55o8PClwRuOv3bnnPG9yjKlLzbzYYXV6qMi1bxSwwT/HPP3gSP8EVl3mTlox5JM3YL0Cm5fSzBmc0Nprob3DGfqLVyXKOn2e0qMyZErHVl2dZsJfJ2oniWWcuq64w+Obxa4y2sv8uCAmuZmsK80CkSL8a5n4/5v1X1nVO4yHQJWbF9FxwZvF6hucg1PDsiarKIpSkOWMoM14rPIk6k8nfAOdEePon3BUHP/+peQUT+t3TTRZrPTqTzQcojsB/cIv77wJQuxU5BtfJAqJRZXcwJW2IPvOsj/mRBULBif1HwJ8hp2OGDwQZbRMQdzC48yiwvFCGKA=="
+}
