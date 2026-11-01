@@ -381,7 +381,20 @@ def build_timeline(ins: Inputs) -> dict | None:
         usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": job_kind(j).upper(), "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
             "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
             "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
-    return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+    audits = {}
+    for key, path in (("contributors", "results/resources/agent-contributors.json"),
+                      ("models", "results/resources/bio-model-usage.json")):
+        if (ROOT / path).is_file():
+            audits[key] = {"data": ins.json(path), "path": path, "sha256": sha(path)}
+    if "contributors" in audits:
+        a = audits["contributors"]; c = a["data"]["counts"]
+        observed = datetime.datetime.fromisoformat(a["data"]["window"]["observed_utc"].replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
+        counters = [c for c in counters if c["quantity"] != "Agents"]
+        counters[:0] = [
+            {"quantity": "Contributing harnesses", "value": f"At least {c['distinct_contributing_harness_ids_supported_minimum']} distinct harness identities", "status": "partial", "note": f"Authored handoffs or reviewed identity mappings with checked artifacts, observed {observed}. A supported minimum, not a census or concurrent-worker count.", "source": a["path"]},
+            {"quantity": "Native collaborators", "value": str(c['native_contributors_supported_minimum']), "status": "partial", "note": "Separate native collaboration identities; work artifacts checked and attribution attested by the coordinator. Root is not counted again. No collective speedup is inferred.", "source": a["path"]},
+            {"quantity": "Live harness processes", "value": str(c['live_harness_processes_now']), "status": "partial", "note": f"Process snapshot at {observed}. Includes idle and authentication-blocked sessions; this is not a count of agents working.", "source": a["path"]}]
+    return {"observed_at": R["observed_at"], "usage": usage, "audits": audits, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
 

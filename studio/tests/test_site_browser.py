@@ -988,9 +988,9 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     pg.goto(base + "#/work?tab=built")
     pg.wait_for_selector("#bt-h")
     t = pg.locator("#main").text_content()
-    for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
+    for q in ("Contributing harnesses", "Native collaborators", "Live harness processes", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
-    assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
+    assert "CPU seconds are not recorded: unknown" in t and "not a census or concurrent-worker count" in t
     timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
     for counter in timeline["counters"]:
         assert counter["value"] in t
@@ -2074,3 +2074,30 @@ def test_faq_answers_are_grounded_hedged_and_linked_to_real_documents(browser, b
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_system_audit_separates_contributors_activity_and_model_receipts(browser, base):
+    snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
+    audit = snap['timeline']['audits']
+    assert audit['contributors']['data']['counts']['distinct_contributing_harness_ids_supported_minimum'] == 11
+    assert audit['contributors']['data']['counts']['native_contributors_supported_minimum'] == 3
+    assert len(audit['models']['data']['entries']) == 15
+    assert all(a['path'] in {i['path'] for i in snap['inputs']} for a in audit.values())
+    for route, width in (('#/work?tab=built', 1440), ('#/work?tab=built', 390), ('#/work?tab=resources', 390)):
+        pg = page(browser, width, 900)
+        pg.goto(base + route)
+        pg.wait_for_selector('.contributor-audit')
+        t = pg.locator('#main').inner_text()
+        assert 'At least 11 distinct harness identities' in t and 'Native collaborators' in t
+        assert 'not a count of agents working' in t
+        assert 'none in this tree' not in t
+        pg.locator('.contributor-audit > summary').click()
+        pg.locator('.model-usage-audit > summary').click()
+        assert pg.locator('.model-usage-audit tbody tr').count() == 15
+        assert 'provider completed science runner failed' in pg.locator('.model-usage-audit').inner_text()
+        assert 'No BioNeMo or BioNeMo NIM execution is established' in pg.locator('.model-usage-audit').inner_text()
+        pg.locator('.model-usage-audit tbody details > summary').first.click()
+        source = pg.locator('.model-usage-audit tbody details a').first.get_attribute('href')
+        assert audit['models']['data']['source_tree_commit'] in source
+        assert pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
+        assert not pg.errors

@@ -179,7 +179,9 @@ def verify_mapping(entries: list[dict], repo: str, window_start: float, files: d
                 head = next((l for l in f[0].decode("utf-8", "replace").splitlines() if l.strip()), "") if f else ""
                 ts_ = title_sender(head)
                 checks.append({**ev, "resolves": f is not None, "in_window": ok, "sha256": sha(f[0]) if f else None, "title_names_harness": bool(ts_ and ts_[0] == e["harness"])})
-        verified = all(c["resolves"] and c["in_window"] and c.get("title_names_harness", True) for c in checks)
+            else:
+                checks.append({**ev, "resolves": False, "in_window": False, "reason": "unsupported evidence kind"})
+        verified = bool(checks) and all(c["resolves"] and c["in_window"] and c.get("title_names_harness", True) for c in checks)
         out.append({("harness" if "harness" in e else "identity"): e.get("harness") or e["identity"], "role": e["role"], "verified": verified, "checks": checks})
     return out
 

@@ -156,6 +156,12 @@ def test_committed_mapping_entries_are_all_verified_in_the_ledger():
     assert not (set(o["role_to_harness_self_labelled"]) & set(o["role_label_conflicts"]))
 
 
+def test_mapping_requires_nonempty_supported_evidence():
+    entries = [{"harness": "claude-02", "role": "r", "evidence": []},
+               {"harness": "claude-03", "role": "r", "evidence": [{"kind": "unknown", "ref": "x"}]}]
+    assert not any(e["verified"] for e in ac.verify_mapping(entries, str(ROOT), W, {}))
+
+
 def test_native_identity_class_is_separate_verified_and_never_an_alias(tmp_path):
     import subprocess
     r = tmp_path
