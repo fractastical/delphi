@@ -1,13 +1,26 @@
 {
   "schema": "frontier.hackathon-usage/1",
-  "observed_at_utc": "2026-11-01T00:35:28.731826+00:00",
+  "observed_at_utc": "2026-11-01T00:44:14.039715Z",
   "observed_at_seattle": "2026-10-31 17:35:28 PDT",
   "provider_window_utc": [
-    "2026-11-01T00:32:35.678536+00:00",
-    "2026-11-01T00:32:37.582832+00:00"
+    "2026-11-01T00:44:12.369039+00:00",
+    "2026-11-01T00:44:14.039715+00:00"
   ],
   "scope": "Actual Delphi Frontier hackathon job records created October31,2026; own prefixes only. Shared16H100 capacity is not usage.",
   "own_jobs": [
+    {
+      "id": "aijob-e00dw01t3zcsg4az55",
+      "name": "delphi-evolve-ops-infra26-rd-ddpm-preregistered-secondary-a1",
+      "created_at": "2026-11-01T00:39:23.250505Z",
+      "state": "IMAGE_PULLING",
+      "platform": "gpu-h100-sxm",
+      "preset": "1gpu-16vcpu-200gb",
+      "requested_capacity": {
+        "gpu": 1,
+        "vcpu": 16,
+        "gb": 200
+      }
+    },
     {
       "id": "aijob-e00fb6jhvdt12fgsje",
       "name": "delphi-evolve-ops-infra25-rd-ddpm-evaluation-recovery-a1",
@@ -498,17 +511,18 @@
     }
   ],
   "own_job_state_counts": {
+    "IMAGE_PULLING": 1,
     "COMPLETED": 28,
     "FAILED": 7,
     "CANCELLED": 3
   },
   "active_allocations": {
-    "instances": 0,
+    "instances": 1,
     "running_instances": 0,
-    "pulling_instances": 0,
-    "gpus": 0,
-    "vcpus": 0,
-    "memory_gb": 0,
+    "pulling_instances": 1,
+    "gpus": 1,
+    "vcpus": 16,
+    "memory_gb": 200,
     "jobs_with_unknown_capacity": 0,
     "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
   },
@@ -1042,13 +1056,13 @@
     "interpretation": "Instant host reading, not per-agent usage."
   },
   "team_attribution": {
-    "observed_at_utc": "2026-11-01T00:32:37.582832+00:00",
-    "observed_at_seattle": "2026-10-31 17:32:37 PDT",
+    "observed_at_utc": "2026-11-01T00:44:14.039715+00:00",
+    "observed_at_seattle": "2026-10-31 17:44:14 PDT",
     "classification": "Current Frontier prefixes plus exact historical team IDs verified against preserved source records. Remaining jobs are unattributed, not asserted to belong to another team. Cancellation permissions unchanged.",
-    "listed_total": 83,
+    "listed_total": 84,
     "today_start_utc": "2026-10-31T07:00:00+00:00",
     "ownership_breakdown": {
-      "current_frontier": 38,
+      "current_frontier": 39,
       "unattributed": 30,
       "historical_team": 15
     },
@@ -1120,6 +1134,12 @@
           "kind": "gpu",
           "state": "FAILED",
           "jobs": 7
+        },
+        {
+          "group": "ours",
+          "kind": "gpu",
+          "state": "IMAGE_PULLING",
+          "jobs": 1
         }
       ],
       "today": [
@@ -1188,11 +1208,19 @@
           "kind": "gpu",
           "state": "FAILED",
           "jobs": 7
+        },
+        {
+          "group": "ours",
+          "kind": "gpu",
+          "state": "IMAGE_PULLING",
+          "jobs": 1
         }
       ]
     },
     "current_gpu_jobs": {
-      "ours": {},
+      "ours": {
+        "IMAGE_PULLING": 1
+      },
       "other_or_unattributed": {
         "RUNNING": 1
       }
@@ -1200,8 +1228,8 @@
     "owner_field_names_present": [],
     "historical_attribution_ledger": "results/resources/team-job-ownership.json",
     "request_window_utc": [
-      "2026-11-01T00:32:35.678536+00:00",
-      "2026-11-01T00:32:37.582832+00:00"
+      "2026-11-01T00:44:12.369039+00:00",
+      "2026-11-01T00:44:14.039715+00:00"
     ]
   },
   "measured_completed_container_work": {
@@ -1221,7 +1249,7 @@
     "evaluation_recovery": "COMPLETED exact weights/no training",
     "audit_complete": true,
     "receipt": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json",
-    "secondary": "frozen ready; public archive publication gate pending",
+    "secondary": "Admitted aijob-e00dw01t3zcsg4az55; IMAGE_PULLING at2026-11-01T00:44:14Z; no output yet.",
     "speedup_claim": false
   },
   "gcp": {
@@ -1252,7 +1280,7 @@
     ],
     "active_allocated_vcpus": 24,
     "instantaneous_cpu_utilization": null,
-    "state": "CFD VM03 started pinned Julia package instantiate/precompile at00:34:06Z. Genomics VM02 repaired packet start requested; original failures exported. Allocation is not CPU utilization.",
+    "state": "Prior latest allocation now superseded: VM03 failed at timing argv serialization after restart controls passed; exact one-line transport repair919f1e2 starting sameVM03. VM02 survey ended, final artifacts collecting; outcome not yet interpreted.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -1287,6 +1315,22 @@
     "failure_receipts": [
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
+    ],
+    "current_state_update_utc": "2026-11-01T00:44:37.501442+00:00",
+    "delayed_cpu_metric_source": "results/resources/gcp/cpu-utilization.json",
+    "latest_measured_cpu_points": [
+      {
+        "instance": "731385783382653564",
+        "time_utc": "2026-11-01T00:38:00Z",
+        "allocated_vcpu": 8,
+        "fraction": 0.5179616574291509
+      },
+      {
+        "instance": "8843861969326519893",
+        "time_utc": "2026-11-01T00:38:00Z",
+        "allocated_vcpu": 16,
+        "fraction": 0.08829076928671273
+      }
     ]
   },
   "measured_terminal_container_work": {
