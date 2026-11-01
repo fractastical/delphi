@@ -1,0 +1,66 @@
+{
+  "schema": "frontier.aeroelastic.fidelity-return-audit-protocol/1",
+  "status": "frozen before any fidelity-ladder return (admission 2026-10-31 22:45 PDT; no output received)",
+  "auditor": "claude-07; independent of the collector, which owns transport and return",
+  "admitted_packet_sha256": "dacec9a5963c0a1e3c6520e465eb0444cf4f32c80b72d059310442c352a8a457",
+  "fidelity_protocol_sha256": "94cbdb19529eaebf95e83df3f542b98e817f987ce1112fd8aaea2af076912f3f",
+  "original_protocol_sha256": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+  "tolerance": {
+    "absolute": 1e-10,
+    "relative": 1e-09,
+    "note": "relative to the largest stored magnitude of the compared field unless stated; exact equality is counted separately and never required"
+  },
+  "never": [
+    "rerun an arm or the batch",
+    "edit, move or delete a returned file",
+    "replace a native status, failure or domain exit",
+    "change a frozen fidelity criterion"
+  ],
+  "identity_checks": [
+    "collection manifest bytes when the collector supplies one (artifacts[].local_path/bytes/sha256)",
+    "every receipt-listed file present with its bytes and sha256; any unlisted file named",
+    "executed fidelity and physics protocol hashes equal the frozen ones",
+    "every executed source hash equals the admitted packet member",
+    "NumPy 2.5.4 / SciPy 1.17.1"
+  ],
+  "completeness": "all 45 declared identities; each is result.json, failure.json, a progress-only row (not started) or missing; native failures, domain exits, unconverged, partial, not-started arms and crashed tasks are listed verbatim as findings of their own kind",
+  "per_arm_reproduction": {
+    "every_frame": [
+      "normal load = saved panel force . n_up from panels.json fin_plane",
+      "CL from saved forces on the fixed source area"
+    ],
+    "frames_0_1_last": [
+      "lattice A,B,C,N rebuilt from the saved shape load (same code)",
+      "deflection of saved A against the source lattice vs closed-form cantilever Green's function at strip-spacing stations (not the FE response)",
+      "tip/span, max slope and max sampled deflection and the validity flag from the closed form"
+    ],
+    "arm_definitions": [
+      "one-way: frame-1 shape load equals frame-0 aero normal load",
+      "two-way: every update equals 0.5 old + 0.5 target; final shape residual recomputed by closed form; converged status only with both fixed-point tolerances met"
+    ],
+    "final_pose": "one fresh existing vlm.solve on the stored final valid geometry vs stored final forces (45 solves at most; about 3 min one thread, dominated by nine 64x16 poses at about 13.5 s)",
+    "flight": [
+      "CL_fixed, reference area, mass and dt equal the final state and protocol",
+      "AR from the deformed outline",
+      "time grid (k+1)dt, energy and drag power from saved states",
+      "range is a water-contact interpolation beyond the last saved state (it is not re-derived)",
+      "dt ratio and gate flag"
+    ],
+    "domain_exit": "a proposed-shape exit must be reproduced by the closed-form shape of the rejected target (last saved aero normal load); it is recorded with the fins outside the domain and never repaired"
+  },
+  "controls": "each lattice-controls file present, its passed flag consistent with its checks, failed checks listed; original controls passed",
+  "reproduction_of_a54f478": "the 18 recomputed main/fine arms vs packed references: status, iteration count, CL history and ranges within roundoff, exact counted separately",
+  "analysis": "paired dCL effects, triples, resolved/sign_resolved/not_resolved and decisions recomputed by a separate implementation from raw arm results and compared with summary.json statuses and decisions; summary.json absence is a finding, and recomputation still proceeds",
+  "known_runner_limits_disclosed_before_return": [
+    "fidelity.analyze cannot serialise an infinite floor or ratio (dump uses allow_nan=False); if that occurs summary.json is missing and the native failure names it, while arms are kept",
+    "fidelity.fixed_point_bound pairs residuals incorrectly for two-way histories shorter than 4 (returned a54f478 two-way arms have 13-18); the audit uses consecutive pairs as the protocol states and reports any resulting disagreement"
+  ],
+  "blocking_kinds": [
+    "identity",
+    "reproduction",
+    "analysis_disagreement",
+    "missing"
+  ],
+  "non_blocking_kinds": "native_* (failures, domain exits, incomplete, control failures, crashes) and info: these are results to report, not audit failures",
+  "scope": "Offline reproduction and consistency of returned bytes and saved states, plus an independent recomputation of the frozen diagnostics. Not a new simulation, not empirical validation, not fish performance."
+}
