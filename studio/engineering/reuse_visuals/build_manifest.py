@@ -78,7 +78,7 @@ def epithelial() -> dict:
                         + ["the doubling prediction passed one held-out test and is not a physical law"],
         "media": {k: ent(f"{EP}/media/{v}") for k, v in MEDIA.items()} | {"errata": ent(ERRATA)},
         "sources": [ent(p, download=True) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],
-        "source_commit": "origin/work/epithelial-repair edc1e10 (files copied unchanged)"}
+        "source_commit": "origin/work/epithelial-repair 46eb7ff (card and checker; remaining files as edc1e10), copied unchanged"}
 
 
 def write() -> str:
