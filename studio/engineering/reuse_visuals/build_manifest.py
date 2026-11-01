@@ -25,9 +25,18 @@ SOURCES = [CARD, f"{EP}/protocol.json", f"{EP}/protocol-r2.json", f"{EP}/results
 RENDERER = ["engineering/epithelial/render.py", "engineering/epithelial/build_model.py", "engineering/epithelial/analyze.py"]
 
 
+REMAP = {CARD: "artifacts/reuse-study-visuals/sources/epithelial-repair-card.md"}      # served by the protected static-artifact handler
+ERRATA_REQUIRED = {CARD}                                                                 # owner 09's card is offered only beside the errata note
+
+
 def ent(rel: str, download: bool = False) -> dict:
     p = ROOT / rel
-    return dict(path=rel, sha256=V.sha(p), bytes=p.stat().st_size, download=download and rel.endswith((".json", ".md", ".txt")))
+    e = dict(path=rel, sha256=V.sha(p), bytes=p.stat().st_size, download=download and rel.endswith((".json", ".md", ".txt")))
+    if rel in REMAP:
+        e["site_path"] = REMAP[rel]
+    if rel in ERRATA_REQUIRED:
+        e["errata_required"] = True
+    return e
 
 
 def epithelial() -> dict:

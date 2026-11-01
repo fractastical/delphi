@@ -21,6 +21,7 @@ SOURCE_PREFIXES = ("artifacts/voxel-actuation/", "artifacts/oxygen-diffusion-rul
 RENDERER_PREFIXES = ("engineering/reuse_visuals/", "engineering/epithelial/")
 DOWNLOAD_SUFFIXES = (".json", ".md", ".txt")                    # strict text: no csv, tarball or binary is offered as a source download
 MAX_DOWNLOAD_BYTES = 2_000_000
+SITE_SOURCE_PREFIX = MEDIA_PREFIX + "sources/"                    # where a download whose producer path the static handler would not serve is remapped
 MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json", ".md")
 MAX_MEDIA_BYTES = 20_000_000
 REQUIRED = ("id", "study", "title", "evidence_kind", "labels", "caveats", "media", "sources", "renderer")
@@ -65,9 +66,14 @@ def build(ins, out: dict, root, manifest_path: str = MANIFEST, expected_sha256: 
             if item.get("download"):
                 if not item["path"].endswith(DOWNLOAD_SUFFIXES) or len(blob) > MAX_DOWNLOAD_BYTES:
                     raise ValueError(f"download not allowed: {item['path']}")
-                staged["@" + item["path"]] = blob
+                site = item.get("site_path", item["path"])
+                if site != item["path"] and (not site.startswith(SITE_SOURCE_PREFIX) or not site.endswith(DOWNLOAD_SUFFIXES) or _safe(site, (SITE_SOURCE_PREFIX,), root) != site):
+                    raise ValueError(f"site path not allowed: {site}")
+                if item.get("errata_required") and "errata" not in v["media"]:
+                    raise ValueError(f"{item['path']} is offered only beside its errata note")
+                staged["@" + site] = blob
                 total += len(blob)
-                downloads.append({"label": PurePosixPath(item["path"]).name, "href": item["path"], "sha256": item["sha256"], "bytes": item["bytes"]})
+                downloads.append({"label": PurePosixPath(site).name, "href": site, "sha256": item["sha256"], "bytes": item["bytes"], "errata_required": bool(item.get("errata_required")), "source_path": item["path"]})
         for item in v["renderer"]:
             _verify(ins, item, RENDERER_PREFIXES, root)
         hrefs = {}

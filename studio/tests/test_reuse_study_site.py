@@ -122,3 +122,21 @@ def test_card_errata_is_offered_beside_the_uncorrected_card():
     text = (ROOT / ep["errata_href"]).read_text()
     assert ep["errata_href"].endswith("epithelial-card-errata.md")
     assert "8 pass" in text and "625 nodes are filled" in text and "geometric mean" in text
+
+
+def test_card_download_is_remapped_and_never_offered_without_errata():
+    out = {}
+    ep = next(c for c in A.build(Ins(), out, ROOT)["visuals"] if c["study"] == "epithelial-repair")
+    card = next(d for d in ep["downloads"] if d["source_path"] == "docs/epithelial-repair-card.md")
+    assert card["href"] == "artifacts/reuse-study-visuals/sources/epithelial-repair-card.md" and card["errata_required"] is True
+    assert out["@" + card["href"]] == (ROOT / "docs/epithelial-repair-card.md").read_bytes() and "@docs/epithelial-repair-card.md" not in out
+    m = json.loads((ROOT / A.MANIFEST).read_text())
+    p = "artifacts/reuse-study-visuals/bad.json"
+    mm = json.loads(json.dumps(m))
+    del mm["visuals"][1]["media"]["errata"]
+    with pytest.raises(ValueError, match="errata"):
+        A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
+    mm = json.loads(json.dumps(m))
+    next(x for x in mm["visuals"][1]["sources"] if x["path"].endswith("epithelial-repair-card.md"))["site_path"] = "docs/elsewhere.md"
+    with pytest.raises(ValueError, match="site path"):
+        A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
