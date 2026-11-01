@@ -1711,7 +1711,7 @@ def test_experimentation_page_keeps_context_states_absence_and_invents_no_observ
     assert "Plans, not results" in t and "no wet-lab observation has been made" in t and "scale Organ" in t and "pectoral-fin-field" in t and "loading" in t
     if X["planner"] is None:
         assert "No candidate intervention, readout, control or replicate unit is recorded" in t and "nothing is invented" in t
-    assert "Results ingested" in t and "0: no observation exists" in t and "proposal → ready → running → failed → completed → review" in t
+    assert "Wet-lab protocols frozen" in t and "Computational protocols frozen" in t and "0: no observation exists" in t and "Results ingested" in t and "proposal → ready → running → failed → completed → review" in t
     pg.click("a:has-text('Across scales')"); pg.wait_for_selector("#ex-br")
     assert pg.locator("section[aria-labelledby=ex-br] tbody tr").count() == 7 and "unknown bridge" in pg.locator("#main").text_content()
     assert "scale=organ" in pg.evaluate("location.hash") and "region=pectoral-fin-field" in pg.evaluate("location.hash") and "tab=cross" in pg.evaluate("location.hash")
