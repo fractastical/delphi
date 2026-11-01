@@ -195,6 +195,7 @@ def test_real_site_route_desktop_and_mobile(amap):
                 back=pg.locator(".pagehead .eyebrow a").get_attribute("href"),
                 links=pg.eval_on_selector_all(".dc-sources a", "a => a.map(x => x.href)"),
                 small_cards=pg.evaluate("[...document.querySelectorAll('.dc-card')].every(c => c.getBoundingClientRect().right <= innerWidth + 1)"))
+            out[name]["heading_levels"] = pg.evaluate("[...document.querySelectorAll('#main h1,#main h2,#main h3,#main h4')].map(h => +h.tagName[1])")
             if shots:
                 pg.screenshot(path=os.path.join(shots, f"design-control-{name}.png"), full_page=True)
             pg.close()
@@ -208,6 +209,8 @@ def test_real_site_route_desktop_and_mobile(amap):
         assert r["layers"] == 6 and r["cards"] == sum(len(lay["parameters"]) for lay in amap["layers"])
         assert r["overflow"] <= 1 and r["small_cards"], name
         assert r["back"].endswith("#/home")
+        lv = r["heading_levels"]
+        assert all(b - a <= 1 for a, b in zip(lv, lv[1:])), lv
         for bad in ("NaN", "undefined", "[object"):
             assert bad not in r["text"]
         assert "source-only" in r["text"] and "computed-here" in r["text"] and "unranked" in r["text"]

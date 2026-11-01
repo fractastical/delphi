@@ -18,7 +18,7 @@
 
   const param = (p) => { const b = p.bound; const extra = Object.entries(b).filter(([k]) => !["status", "basis"].includes(k));
     const ir = p.identifiability_ref ? Object.entries(p.identifiability_ref).map(([k, x]) => `${k.replace(/_/g, " ")} ${v(x)}`).join("; ") : "";
-    return html`<article class="dc-card" aria-label="${p.label}"><h4>${p.label}</h4>
+    return html`<article class="dc-card" aria-label="${p.label}"><h3>${p.label}</h3>
       <p class="faint small">${p.controllable ? "human-settable" : "uncontrolled context"}${p.unit ? " · " + p.unit : ""}${p.tag ? " · " + p.tag : ""}</p>
       <dl>${field("Value", html`${v(p.value)}${p.alternative ? html` <span class="faint">vs ${v(p.alternative)}</span>` : ""}`)}
       ${field("Bound", html`${chip(b.status)} ${b.basis}${extra.length ? html`<div class="faint">${extra.map(([k, x]) => `${k.replace(/_/g, " ")}: ${v(x)}`).join(" · ")}</div>` : ""}`)}
@@ -32,7 +32,7 @@
     <p class="small">${l.what_exists}</p>
     ${l.parameters.length ? html`<div class="dc-cards">${l.parameters.map(param)}</div>` : html`<p class="note warn">${l.controls_note}</p>`}
     ${l.results.length ? html`<ul class="small">${l.results.map(resultLine)}</ul>` : ""}
-    <h4 class="eh">Missing causal bridges</h4><ul class="small">${l.bridges.map((b) => html`<li><b>${b.from}</b> → <b>${b.to}</b>: ${chip(b.status)}${b.need ? html` ${v(b.need)}` : ""}</li>`)}</ul></details>`;
+    <h3 class="eh">Missing causal bridges</h3><ul class="small">${l.bridges.map((b) => html`<li><b>${b.from}</b> → <b>${b.to}</b>: ${chip(b.status)}${b.need ? html` ${v(b.need)}` : ""}</li>`)}</ul></details>`;
 
   const wp = (w, byId) => html`<li id="${pre(w.id)}"><b>${w.title}</b> <span class="faint">${w.kind} · ${w.status.replace(/-/g, " ")}</span><br><span class="small">${v(w.why)}${w.inputs.length ? html` <b>Depends on:</b> ${w.inputs.map((i) => byId[i].title).join("; ")}.` : " No unresolved predecessor declared."}</span></li>`;
 
