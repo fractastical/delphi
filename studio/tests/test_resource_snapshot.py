@@ -5,6 +5,29 @@ import pytest
 from frontier_compute.resource_snapshot import ownership_class, summarize, summarize_shared, telemetry_summary
 
 
+def test_usage_refresh_preserves_kind_and_same_window_attribution():
+    from frontier_compute.resource_snapshot import refresh_usage
+
+    snapshot = {
+        "observed_at_utc": "now", "live_state_request_window_utc": ["start", "now"],
+        "own_jobs": [
+            {"state": "RUNNING", "requested_capacity": {"gpu": 1, "vcpu": 16}},
+            {"state": "FAILED", "requested_capacity": {"vcpu": 4}},
+            {"state": "COMPLETED", "requested_capacity": {}},
+        ],
+        "current_frontier_job_count": 3, "historical_team_job_count": 2,
+        "unattributed_job_count": 4,
+    }
+    shared = {"observed_at_seattle": "local", "request_window_utc": ["start", "now"]}
+    result = refresh_usage({"model_usage": {"calls": 7}, "own_job_state_counts": {"RUNNING": 999}}, snapshot, shared)
+    assert result["own_job_state_counts"] == {"gpu": {"RUNNING": 1}, "cpu": {"FAILED": 1}, "unknown": {"COMPLETED": 1}}
+    assert result["team_attribution"]["current_frontier_jobs"] == 3
+    assert result["team_attribution"]["historical_team_jobs"] == 2
+    assert result["team_attribution"]["unattributed_jobs"] == 4
+    assert result["provider_window_utc"] == result["team_attribution"]["request_window_utc"]
+    assert result["model_usage"] == {"calls": 7}
+
+
 def test_allocation_counts_include_bioservices_without_leaking_specs():
     jobs = {"items": [
         {"metadata": {"id": "ours", "name": "bioservices-assay"},

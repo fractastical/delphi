@@ -23,6 +23,36 @@ PREFIXES = ("delphi-evolve-ops-", "bioservices-")
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "CANCELED", "STOPPED", "DELETED", "ERROR", "SUCCEEDED"}
 
 
+def own_state_counts(jobs):
+    """Stable typed counts from provider presets; missing capacity stays unknown."""
+    counts = {kind: Counter() for kind in ("gpu", "cpu", "unknown")}
+    for job in jobs:
+        capacity = job.get("requested_capacity", {})
+        kind = "gpu" if capacity.get("gpu", 0) > 0 else "cpu" if capacity.get("vcpu", 0) > 0 else "unknown"
+        counts[kind][job["state"]] += 1
+    return {kind: dict(states) for kind, states in counts.items()}
+
+
+def refresh_usage(usage, snapshot, shared):
+    """Keep website counts and attribution on the exact same provider window."""
+    result = dict(usage)
+    result.update({
+        "observed_at_utc": snapshot["observed_at_utc"],
+        "observed_at_seattle": shared["observed_at_seattle"],
+        "provider_window_utc": snapshot["live_state_request_window_utc"],
+        "own_jobs": snapshot["own_jobs"],
+        "own_job_state_counts": own_state_counts(snapshot["own_jobs"]),
+        "own_job_state_counts_scope": "Current Frontier prefix jobs only; resource kind comes from the provider preset, with absent capacity kept unknown.",
+        "team_attribution": {
+            **shared,
+            "current_frontier_jobs": snapshot["current_frontier_job_count"],
+            "historical_team_jobs": snapshot["historical_team_job_count"],
+            "unattributed_jobs": snapshot["unattributed_job_count"],
+        },
+    })
+    return result
+
+
 def telemetry_summary(label: str, path: Path) -> dict:
     """Summarize actual device samples, retaining their original time window."""
     with path.open() as stream:
@@ -227,6 +257,12 @@ def refresh(path: Path, cli: str) -> dict:
     temporary = shared_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(shared, indent=2) + "\n")
     temporary.replace(shared_path)
+    usage_path = path.parent / "hackathon-usage.json"
+    if usage_path.exists():
+        usage = refresh_usage(json.loads(usage_path.read_text()), snapshot, shared)
+        temporary = usage_path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(usage, indent=2) + "\n")
+        temporary.replace(usage_path)
     return snapshot
 
 
