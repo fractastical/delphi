@@ -17,6 +17,8 @@ def test_usage_refresh_preserves_kind_and_same_window_attribution():
         ],
         "current_frontier_job_count": 3, "historical_team_job_count": 2,
         "unattributed_job_count": 4,
+        "active_allocations": {"gpus": 1}, "current_gpu_utilization_pct": None,
+        "measured_terminal_container_work": {"gpu": {"jobs": 1, "seconds": 12.5}},
     }
     shared = {"observed_at_seattle": "local", "request_window_utc": ["start", "now"]}
     result = refresh_usage({"model_usage": {"calls": 7}, "own_job_state_counts": {"RUNNING": 999}}, snapshot, shared)
@@ -26,6 +28,9 @@ def test_usage_refresh_preserves_kind_and_same_window_attribution():
     assert result["team_attribution"]["unattributed_jobs"] == 4
     assert result["provider_window_utc"] == result["team_attribution"]["request_window_utc"]
     assert result["model_usage"] == {"calls": 7}
+    assert result["active_allocations"] == {"gpus": 1}
+    assert result["instantaneous_gpu_utilization_pct"] is None
+    assert result["measured_terminal_container_work"]["gpu"]["seconds"] == 12.5
 
 
 def test_allocation_counts_include_bioservices_without_leaking_specs():
