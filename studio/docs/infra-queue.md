@@ -159,3 +159,14 @@ At11:05pm PDT on October31, the45-arm aeroelastic packet was complete and VM04 h
 - [x] Collect all372 extended VLM solves; native extended collocation diagnostic supported, core unknown retained. Independent science audit pending.
 - [x] Preserve Voxcraft native COMPILE_FAIL:39.1s runtime,12files/92,682bytes;40device samples all0%GPU. First Boost.Asio error plus actual device-sync CUDA incompatibilities. No simulation cases, source edits or blind retry.
 - [x] Repair local collector overhead with30-second in-memory token reuse;16focused tests passed. No scientific packet changed.
+
+### 12:26am PDT November 1 — current work and completed returns
+
+- [x] Independently rehash 971 files from the 240-arm epithelial sweep. The native fixed-horizon interval criterion FAIL remains; interpretation and plot-caption corrections are under independent publication review, with no new simulation.
+- [x] Finish the 372-solve VLM diagnostic audit. Its original production solver is unchanged. The distinct corrected-collocation packet is now running on Google VM04 with 4 vCPUs; its first 20 original numerical controls all passed. The 51 paired arms and five lattice-control groups remain pending.
+- [x] Admit one bounded inverse Schnakenberg H100 job, `aijob-e00grxtt94bh26a9c0`, at 12:12:53am PDT. At 12:26:41am it was IMAGE_PULLING; zero current GPU kernel activity has been observed. Six new synthetic targets use equal 64-solver-evaluation budgets per method, with separate refinement and negative controls. This is a numerical pattern-design exercise.
+- [x] Collect and independently stream-hash three original CPU CFD restart checkpoints: 1,185,906,124 bytes. They preserve partial R1/R3/M1 states; no completed CPU case is claimed. Their arrival follows the completed 795f140 backup cutoff and needs a separate add-on.
+- [x] Refresh exact ownership: 94 Nebius records, 48 current Frontier plus 15 historical team records, 31 unattributed. One current job is pulling its image; all other records are terminal. Historical attribution does not grant cancellation rights.
+- [x] Refresh Google allocation: VM03 and VM04 RUNNING, 20 of 32 vCPUs allocated, zero active GPUs. At 12:23am, provider CPU fractions were 59.35% of 16 and 19.96% of 4, including startup/control work. These dated measurements are not instantaneous utilization. Actual provider spend remains unknown.
+- [ ] Collect and independently verify both new scientific returns; preserve failed controls and partial coverage.
+- [ ] Add later checkpoint/results bytes to an encrypted private recovery snapshot after the next stable cutoff. The d87e5d1 full add-on and 795f140 source/deploy delta are already off-host decrypted and hash-checked.
