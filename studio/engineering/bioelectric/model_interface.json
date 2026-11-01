@@ -1,0 +1,20 @@
+{
+  "schema": "frontier.bioelectric.interface/1",
+  "coupling_compatibility": "Electrical units require base current A. The existing mechanical composer supports only kg,m,s; do not register these ports through a parser that drops A. Display-only until dimensional algebra is extended and independently checked.",
+  "model_id": "hh1952_gap_chain",
+  "name": "Published HH membrane kinetics with assumed equal-area gap network (SIMULATED)",
+  "status": "implemented",
+  "engine": "independent NumPy RK4; no NEURON or BETSE execution",
+  "scope": "Squid source membrane plus chosen twelve-cell electrical network; fixed ion reservoirs",
+  "run": {"entrypoint": "engineering.bioelectric.simulate", "schema": "frontier.bioelectric.request/1", "deterministic": true},
+  "ports": [
+    {"name":"gap_conductance", "direction":"in", "kind":"dimensional", "quantity":"junction conductance per common membrane area", "unit":"mS/cm^2", "dim":{"kg":-1,"m":-4,"s":3,"A":2}, "scale":"cell", "context":"assumed equal-area chain", "regime":"ohmic coupling", "bounds":{"lo":0,"hi":2,"status":"assumed"}, "provenance":{"status":"assumed","read_level":"none","source":"design scenario; no measured fin coupling"}},
+    {"name":"voltage", "direction":"out", "kind":"dimensional", "quantity":"intracellular-minus-extracellular membrane potential", "unit":"mV", "dim":{"kg":1,"m":2,"s":-3,"A":-1}, "scale":"cell", "context":"squid membrane equations, assumed network", "regime":"HH Na/K/leak with fixed reversals", "bounds":null, "provenance":{"status":"simulated","read_level":"file","source":"10.1113/jphysiol.1952.sp004764 pp518–520, sign/offset conversion in sources.json"}}
+  ],
+  "timescale":{"kind":"dynamic","seconds":0.000025,"source":"default maximum integrator step; output horizon0.03s"},
+  "not_established":["fin cell electrophysiology", "gap junction calibration", "voltage to gene expression or tissue pattern", "tissue pattern to fin geometry or stiffness", "fin anatomy to flightworthiness"],
+  "coupling_frontier":[
+    {"from":"hh1952_gap_chain.voltage", "to":"finbeam_euler_bernoulli.flexural_rigidity", "status":"refused", "reason":"No causal, dimensional or calibrated cell-to-organ transfer; voltage cannot be used as fin stiffness"}
+  ],
+  "reference":{"source":"sources.json","exact_code_hashes":"../../artifacts/bioelectric/manifest.json#/code_sha256"}
+}

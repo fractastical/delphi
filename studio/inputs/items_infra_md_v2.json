@@ -1,0 +1,31 @@
+{
+  "run_tag": "infra15",
+  "items": [
+    {
+      "id": "collagen-md-reference-oracle",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+      "args": [
+        "inputs/warm_queue_infra_md_v2.json"
+      ],
+      "files": [
+        "engineering/molecular/entry.py",
+        "artifacts/molecular/portable-md-v2.tar.xz",
+        "artifacts/molecular/portable-md-v2.json",
+        "inputs/warm_queue_infra_md_v2.json"
+      ],
+      "env": {
+        "NVIDIA_VISIBLE_DEVICES": "all",
+        "NVIDIA_DRIVER_CAPABILITIES": "compute,utility",
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2"
+      },
+      "timeout": "45m",
+      "inner_timeout_s": 2100,
+      "max_result_bytes": 600000,
+      "priority": 1
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "frontier.aeroelastic.fidelity-runtime-control/1",
+  "what": "one existing engineering.cfd3d.vlm.solve on the analytic elliptic AR-6 wing (vlm.elliptic) at the ladder's total panel counts; NOT a fish result",
+  "environment": {
+    "python": "3.12.3",
+    "numpy": "2.5.4",
+    "scipy": "1.17.1",
+    "threads": 1,
+    "host": "shared 8-vCPU host, load average 4.4-5.1 during the measurement",
+    "scope": "systemd-run TasksMax=128 MemoryMax=4G MemorySwapMax=0 CPUQuota=100%"
+  },
+  "solve_seconds_by_total_panels": {
+    "256": 0.047,
+    "576": 0.2,
+    "1024": 1.049,
+    "1296": 1.303,
+    "4096": 13.472
+  },
+  "peak_rss_MB_at_4096_panels": 373,
+  "projection": {
+    "solves_per_context_per_lattice": {
+      "chi0.8-u20": 21,
+      "chi0.8-u16": 20,
+      "chi0.2-u20": 19
+    },
+    "basis": "rigid 1 + one-way 2 + two-way iteration count returned at a54f478; lattice controls 3 solves per lattice; Response construction, deform, validity and glide neglected (sub-second at these sizes)",
+    "single_thread_cpu_seconds_by_lattice": {
+      "main": 3.0,
+      "fine": 12.6,
+      "l32x8": 66.1,
+      "l36x9": 82.1,
+      "l64x16": 848.7
+    },
+    "total_cpu_seconds": 1012.5,
+    "critical_path_seconds_4_workers": 282.9,
+    "soft_deadline_seconds": 1000,
+    "hard_seconds": 1200,
+    "margin_note": "critical path is the largest 64x16 arm group; a worker 2x slower than this host still finishes well inside the 1000 s soft deadline; a finer two-way iteration count above 18 adds 13.5 s per extra iteration",
+    "output_bytes_estimate": "about 38 MB from returned static-state sizes (about 70 compressed bytes per panel-iteration, measured on returned 16x4 vs 24x6 chi0.8-u20 two-way); cap 50 MB; receipt flags any excess",
+    "memory_estimate": "about 0.45 GB per worker at 4096 panels, under 2 GB for 4 workers; cap 12 GiB"
+  }
+}

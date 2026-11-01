@@ -1,0 +1,29 @@
+{
+  "run_tag": "infra20",
+  "items": [
+    {
+      "id": "candidate-cpu-diagnostic",
+      "script": "engineering/cfd3d/cfd3d_launch.py",
+      "kind": "cpu",
+      "args": [
+        "artifacts/cfd3d/packet/cfd3d-diag-packet.tar.xz",
+        "6a688c39606112568291893279158c2b40fe1a492860fb920ebbea610bda6d12",
+        "engineering/cfd3d/diag_candidate.py"
+      ],
+      "files": [
+        "artifacts/cfd3d/packet/cfd3d-diag-packet.tar.xz"
+      ],
+      "image": "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+      "env": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "timeout": "15m",
+      "inner_timeout_s": 600,
+      "max_result_bytes": 1000000,
+      "priority": 1,
+      "preset": "4vcpu-16gb"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "run_tag": "infra28",
+  "items": [
+    {
+      "id": "nca-seed-placement-comparison",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+      "args": [
+        "inputs/warm_queue_infra_nca_seed.json"
+      ],
+      "files": [
+        "frontier_compute/__init__.py",
+        "frontier_compute/portable_entry.py",
+        "artifacts/nca-seed-placement/packet/source.tar.gz",
+        "artifacts/nca-seed-placement/packet/portable.json",
+        "inputs/warm_queue_infra_nca_seed.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "2",
+        "MKL_NUM_THREADS": "2",
+        "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+        "NVIDIA_TF32_OVERRIDE": "0",
+        "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "0"
+      },
+      "timeout": "75m",
+      "inner_timeout_s": 3100,
+      "max_result_bytes": 1000000,
+      "priority": 1
+    }
+  ]
+}

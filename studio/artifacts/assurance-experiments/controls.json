@@ -1,0 +1,131 @@
+{
+  "passed": true,
+  "evidence_kind": "computational_check",
+  "analytic_controls": {
+    "case0": {
+      "P_or_q": 1.0,
+      "L_m": 1.0,
+      "EI_Nm2": 1.0,
+      "tip_load_rel_residual": 1.6653345369377346e-16,
+      "uniform_rel_residual": 0.0
+    },
+    "case1": {
+      "P_or_q": 0.37,
+      "L_m": 0.15,
+      "EI_Nm2": 0.00025,
+      "tip_load_rel_residual": 1.333601230780969e-16,
+      "uniform_rel_residual": 1.481779145312188e-16
+    },
+    "case2": {
+      "P_or_q": 12.0,
+      "L_m": 2.0,
+      "EI_Nm2": 40.0,
+      "tip_load_rel_residual": 0.0,
+      "uniform_rel_residual": 1.850371707708594e-16
+    }
+  },
+  "grid_convergence": {
+    "uniform_constant_EI": {
+      "n_elements": [
+        2,
+        4,
+        8,
+        16,
+        32
+      ],
+      "profile_sup_rel_error": [
+        0.001302083333335553,
+        8.138020834180302e-05,
+        5.086263019341522e-06,
+        3.1687595014778373e-07,
+        1.9804683190091663e-08
+      ],
+      "tip_rel_error_nodal": [
+        3.5408347493189156e-15,
+        1.005140186903434e-14,
+        1.4814395709247204e-13,
+        9.872075722052705e-13,
+        1.9826618627621807e-11
+      ],
+      "observed_order_profile": [
+        3.99999999985231,
+        4.000000000573295,
+        4.00461599504533,
+        4.000004639866147
+      ],
+      "expected_order_profile": 4,
+      "note": "nodal values are exact for constant EI; the profile error is Hermite interpolation error, O(h^4)"
+    },
+    "tapered_EI_midpoint_rule": {
+      "n_elements": [
+        4,
+        8,
+        16,
+        32,
+        64
+      ],
+      "tip_rel_error": [
+        0.026878003101877112,
+        0.006610456049676518,
+        0.0016447360180723294,
+        0.00041067262013340177,
+        0.00010263558296776839
+      ],
+      "observed_order": [
+        2.02360424666852,
+        2.006893757045478,
+        2.001795378388035,
+        2.000457775960034
+      ],
+      "expected_order": 2,
+      "taper": "EI(x)=EI0*(1-0.5 x/L)^3, tip force 1 N, illustrative; reference = scipy quad unit-load integral"
+    },
+    "time_step": "not applicable: static solution, no time integration"
+  },
+  "paired_sensitivity": {
+    "rho_kg_m3": {
+      "elasticity": 1.0000000000000107,
+      "expected_from_dimensions": 1,
+      "absolute_residual": 1.0658141036401503e-14,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    },
+    "speed_m_s": {
+      "elasticity": 1.9999999999999845,
+      "expected_from_dimensions": 2,
+      "absolute_residual": 1.554312234475219e-14,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    },
+    "tributary_width_m": {
+      "elasticity": 1.0000000000000107,
+      "expected_from_dimensions": 1,
+      "absolute_residual": 1.0658141036401503e-14,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    },
+    "length_multiplier": {
+      "elasticity": 3.0000000088442986,
+      "expected_from_dimensions": 3,
+      "absolute_residual": 8.844298626797809e-09,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    },
+    "EI_Nm2": {
+      "elasticity": -1.0000000031812406,
+      "expected_from_dimensions": -1,
+      "absolute_residual": 3.181240604277491e-09,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    },
+    "CL": {
+      "elasticity": 1.0000000000000107,
+      "expected_from_dimensions": 1,
+      "absolute_residual": 1.0658141036401503e-14,
+      "scope": "paired local perturbation, holding other inputs fixed; not biological causality"
+    }
+  },
+  "zero_load_tip_over_L": 0.0,
+  "speed_law_mutant": {
+    "change": "q proportional to V instead of V squared",
+    "measured_elasticity": 1.0000000000000107,
+    "expected_baseline_elasticity": 2,
+    "detected": true
+  },
+  "empirical_accuracy": "unknown; no held-out measured specimen/model pair"
+}

@@ -1,0 +1,90 @@
+{
+  "schema": "frontier.proofs.checks/1",
+  "tested_base": "c971ff7e3c63b25acb6bb5176b2f0f986d0b4f3c",
+  "source_pins": [
+    {
+      "path": "frontier/proofs.py",
+      "sha256": "1b56a4cbe90db34b4439cfe25d15c646cec07019962e37c1217eab5231361773",
+      "bytes": 7194
+    },
+    {
+      "path": "frontier/mcp_surfaces.py",
+      "sha256": "297d59b1b6cf62abb1ba2e84de05d9cc3b6113c492df655c2f1f6b4c5f2da569",
+      "bytes": 13643
+    },
+    {
+      "path": "scripts/lean_gallery.py",
+      "sha256": "f950fac76a84232426b29cfe220963e38af8023d3bd1f06da35171b27a1d6f58",
+      "bytes": 18077
+    },
+    {
+      "path": "deploy/verify_proofs.py",
+      "sha256": "c35b853d395b498c6b9cb80876d03d536a2486ea97c15ad11f4bf2a590ed8ad5",
+      "bytes": 3668
+    },
+    {
+      "path": "docs/mcp.md",
+      "sha256": "f9a36dbe150e4c6cfbaf9c549937eed49ed63764570328bea134a4cf7f3f9775",
+      "bytes": 22941
+    },
+    {
+      "path": "tests/test_proofs.py",
+      "sha256": "bf78be3530a28379f49ef1e9c6cd54a1ab269ebe7bef857c3a71947b5d8b0853",
+      "bytes": 4587
+    },
+    {
+      "path": "tests/test_interfaces.py",
+      "sha256": "bded16a317fe2d2d5015ae6ff762551d741c473afbafa43908b2932a29c51ecf",
+      "bytes": 31287
+    },
+    {
+      "path": "tests/test_mcp_remote.py",
+      "sha256": "f934d4add84eeb8b7d4828a6ef8c5ddf2bc3f4c8ebfe76bfba90be314932d254",
+      "bytes": 32441
+    },
+    {
+      "path": "deploy/receipts/mcp-proofs-stdio.json",
+      "sha256": "c7127e4791c4636d925f26b9023c03db920dfe7b1855d7c252e3058eb30dc536",
+      "bytes": 11621
+    }
+  ],
+  "checks": [
+    {
+      "name": "fixed catalogue current/stale/mutated receipt/published source/missing/symlink/invalid-family checks",
+      "command": "python -m pytest tests/test_proofs.py -q",
+      "passed": true,
+      "tests": 9,
+      "wall_seconds_reported": 0.37
+    },
+    {
+      "name": "official MCP stdio and remote anonymous HTTP tools/auth/limits",
+      "command": "bash scripts/test_postgres.sh tests/test_interfaces.py tests/test_mcp_remote.py",
+      "passed": true,
+      "tests": 36,
+      "wall_seconds_reported": 53.25,
+      "junit_sha256": "a2e4c1e147ab4b404c81667c51acf6c260bff55a4437f5f6fad50b4407865135"
+    },
+    {
+      "name": "manual official SDK stdio source-sharing probe",
+      "command": "python deploy/verify_proofs.py --out deploy/receipts/mcp-proofs-stdio.json",
+      "passed": true,
+      "families": 3,
+      "read_tools": 18,
+      "writes": 0,
+      "compile_executed": false
+    },
+    {
+      "name": "scoped Ruff",
+      "passed": true
+    }
+  ],
+  "resource_bounds": "tests4GiB/no-swap/256tasks/600s/1CPU; probes2GiB/no-swap/128tasks/180s/1CPU",
+  "public_deployment_performed": false,
+  "biological_validation": false,
+  "dollars": null,
+  "notes": [
+    "Reuses source-matched gallery checks; fixed independently pinned receipts and original dependency allowlist, plus exact published-byte hashes.",
+    "Fixed tool is anonymous where public claim reads are anonymous. Optional source <=6000 characters per family. No filesystem path/code/formula arguments, network fetch, compiler or Store write.",
+    "Updated remote exact-toolset expectation also includes already-implemented frontier_plan_experiments; runtime now18 read tools."
+  ]
+}

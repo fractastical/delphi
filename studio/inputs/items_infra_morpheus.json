@@ -1,0 +1,29 @@
+{
+  "run_tag": "infra16",
+  "items": [
+    {
+      "id": "morpheus-full-horizon",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "cpu",
+      "preset": "4vcpu-16gb",
+      "image": "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+      "args": [
+        "inputs/warm_queue_infra_morpheus.json"
+      ],
+      "files": [
+        "frontier_compute/morpheus_entry.py",
+        "artifacts/multicell/morpheus-packet.tgz",
+        "inputs/warm_queue_infra_morpheus.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "timeout": "65m",
+      "inner_timeout_s": 3550,
+      "max_result_bytes": 600000,
+      "priority": 1
+    }
+  ]
+}

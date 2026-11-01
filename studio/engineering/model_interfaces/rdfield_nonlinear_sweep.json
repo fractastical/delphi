@@ -1,0 +1,127 @@
+{
+ "engine": "numpy Strang splitting + DCT-II diffusion + RK4",
+ "model_id": "rdfield_nonlinear_sweep",
+ "name": "Reaction-diffusion field (Schnakenberg, Brusselator): saved-state rerun",
+ "not_established": [
+  "any fin or fish tissue",
+  "SI length or time scales",
+  "that a real tissue obeys these kinetics"
+ ],
+ "ports": [
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "abstract kinetics; no organism",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensionless",
+   "name": "L_over_lambda_c",
+   "provenance": {
+    "read_level": "file",
+    "source": "sweep design",
+    "status": "assumed"
+   },
+   "quantity": "domain length / critical wavelength",
+   "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+   "scale": "tissue",
+   "unit": "1"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "abstract kinetics; no organism",
+   "dim": null,
+   "direction": "in",
+   "kind": "model_units",
+   "name": "kinetic_parameters",
+   "provenance": {
+    "read_level": "file",
+    "source": "published ranges or a stated prior",
+    "status": "assumed"
+   },
+   "quantity": "kinetic parameters",
+   "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+   "scale": "tissue",
+   "unit": "model units"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "abstract kinetics; no organism",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensionless",
+   "name": "dominant_mode",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated",
+    "status": "simulated"
+   },
+   "quantity": "dominant mode number",
+   "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+   "scale": "tissue",
+   "unit": "1"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "abstract kinetics; no organism",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensionless",
+   "name": "pattern_flag",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated",
+    "status": "simulated"
+   },
+   "quantity": "pattern / no pattern / not settled",
+   "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+   "scale": "tissue",
+   "unit": "1"
+  }
+ ],
+ "reference": {
+  "branch": "work/nca-glide",
+  "commit": "87e72f9",
+  "files": {
+   "engineering/simulation/rd/cells.json": "f74184cb56ba36e4face9978c96c2c00ae728a471183294c3f9d866eb066d6b6",
+   "engineering/simulation/rd/receipt.json": "a3af348c151336721c4f844028b0f7f585e02c34684bc8cdcc085bd0dc4048dc",
+   "engineering/simulation/rd_frames.py": "ee4ed03de805265bfbd1f7673a10b8b2d6eff2a71e0609d86a3e036796a85d12"
+  },
+  "note": "rd_frames.py is pinned-source reuse of solver A; rd/receipt.json compares two reruns with frozen rows",
+  "path": "engineering/simulation/rd/cells.json, engineering/simulation/rd/receipt.json, engineering/simulation/rd_frames.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "source_sha256": "4e73b58ad3abcf9f1c2f52ed3369b6e70954f1c2989e3a64d42ea5eb092e8809",
+  "upstream_branch": "work/rethink-nca",
+  "upstream_prereg_commit": "cb27cf24521b7eb77f784bc266d2f3f584f049ff",
+  "upstream_repo": "kganjam/delphi-evolve",
+  "upstream_results_commit": "1067cdb",
+  "upstream_rows_sha256": "a32c2bf7dd3c10162317974ae6a0ecbefa06c1c180a6886dea1bcb8ea4d4c882"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "engineering.simulation.rd_frames"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "numerical rerun of two frozen sweep cells with every saved state kept; textbook kinetics only",
+ "status": "implemented",
+ "timescale": {
+  "kind": "unknown",
+  "seconds": null,
+  "source": "tau = gamma*t is dimensionless model time, unrelated to glide seconds"
+ }
+}

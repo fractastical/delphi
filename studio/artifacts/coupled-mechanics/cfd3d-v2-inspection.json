@@ -1,0 +1,637 @@
+{
+ "code_sha256": {
+  "engineering/coupled_mechanics/cfd3d_bundle.py": "0be79e80621eb09624e8b4da1d5a3b3ce474202ce8b7890f7dcb9ff6d43e8794",
+  "engineering/coupled_mechanics/contract.py": "f76b63b6f326191dbd9bfc3f58d2248150a9c10acb87e2f6bc714908bf6ac279",
+  "engineering/coupled_mechanics/fin_geometry.py": "a47649db11bb5c10cdfec3cb7786b48fcbc01a8b4d50e0180e527cad59e675f7",
+  "engineering/coupled_mechanics/fin_patch.py": "49d053789133ee5b708f0715eff88478dc33c13b282ae803ad950f6e3e2cb323"
+ },
+ "consistency": {
+  "L_ref_m": [
+   0.230699
+  ],
+  "cases": {
+   "gpu_fish_L128_Re1000": {
+    "L_cells": 128,
+    "Re_consistent": true,
+    "Re_declared": 1000,
+    "Re_from_U_L_nu": "1000",
+    "fin_cells_matches_case": true,
+    "fin_cells_recomputed": 0.2774177608052051,
+    "fins_resolved_by_rule": false,
+    "fins_resolved_declared": false,
+    "h_equals_L_ref_over_L_cells": true,
+    "h_m": 0.0018023359375,
+    "if_water_20C_U_m_s": 0.004351991122631655,
+    "if_water_20C_q_Pa": 0.009452867521674048,
+    "medium": "none (non-dimensional); see contract for the water_20C conversion",
+    "steps": 1103,
+    "t_end_reached": 4.002355575561523
+   },
+   "gpu_fish_L128_Re200": {
+    "L_cells": 128,
+    "Re_consistent": true,
+    "Re_declared": 200,
+    "Re_from_U_L_nu": "200",
+    "fin_cells_matches_case": true,
+    "fin_cells_recomputed": 0.2774177608052051,
+    "fins_resolved_by_rule": false,
+    "fins_resolved_declared": false,
+    "h_equals_L_ref_over_L_cells": true,
+    "h_m": 0.0018023359375,
+    "if_water_20C_U_m_s": 0.0008703982245263309,
+    "if_water_20C_q_Pa": 0.00037811470086696183,
+    "medium": "none (non-dimensional); see contract for the water_20C conversion",
+    "steps": 2501,
+    "t_end_reached": 4.001532554626465
+   },
+   "gpu_fish_L192_Re1000": {
+    "L_cells": 192,
+    "Re_consistent": true,
+    "Re_declared": 1000,
+    "Re_from_U_L_nu": "1000",
+    "fin_cells_matches_case": true,
+    "fin_cells_recomputed": 0.4161266412078076,
+    "fins_resolved_by_rule": false,
+    "fins_resolved_declared": false,
+    "h_equals_L_ref_over_L_cells": true,
+    "h_m": 0.0012015572916666665,
+    "if_water_20C_U_m_s": 0.004351991122631655,
+    "if_water_20C_q_Pa": 0.009452867521674048,
+    "medium": "none (non-dimensional); see contract for the water_20C conversion",
+    "steps": 1878,
+    "t_end_reached": 4.0000386238098145
+   },
+   "gpu_fish_L64_Re200": {
+    "L_cells": 64,
+    "Re_consistent": true,
+    "Re_declared": 200,
+    "Re_from_U_L_nu": "200",
+    "fin_cells_matches_case": true,
+    "fin_cells_recomputed": 0.13870888040260254,
+    "fins_resolved_by_rule": false,
+    "fins_resolved_declared": false,
+    "h_equals_L_ref_over_L_cells": true,
+    "h_m": 0.003604671875,
+    "if_water_20C_U_m_s": 0.0008703982245263309,
+    "if_water_20C_q_Pa": 0.00037811470086696183,
+    "medium": "none (non-dimensional); see contract for the water_20C conversion",
+    "steps": 787,
+    "t_end_reached": 4.00108528137207
+   }
+  },
+  "one_L_ref_m": true,
+  "regime": "Re_L 200 and 1000 in grid units. In water at 20 C that is U 0.9-4.4 mm/s (cfd3d's own conversion; medium declared none). Not swimming, taxiing or gliding: air flight Re ~1e5 and the free surface are not simulated"
+ },
+ "contract": {
+  "attempts": [
+   {
+    "code": "WRONG_PRESSURE_UNIT",
+    "detail": "WRONG_PRESSURE_UNIT: pressure must be dimensional Pa, got unit='Cp' kind='nondimensional'; lattice or model units are never read as Pa",
+    "stage": "as delivered",
+    "verdict": "refused"
+   },
+   {
+    "code": "FRAME_MISMATCH",
+    "detail": "FRAME_MISMATCH: pressure frame 'fish3d/4a3b912e/fish-frame' != target frame 'fish3d-v3a/pectoral_L/ray0-local@72f9f5c8f253e502'",
+    "stage": "declare water_20C Pa (cfd3d's conversion; no values converted, since no stations exist)",
+    "verdict": "refused"
+   },
+   {
+    "code": "GEOMETRY_MISMATCH",
+    "detail": "GEOMETRY_MISMATCH: member id 'fish3d/4a3b912e/pectoral_L' != target 'fish3d-v3a/pectoral_L/ray0'",
+    "stage": "relabel the frame as the v3a ray-0 frame",
+    "verdict": "refused"
+   },
+   {
+    "code": "MEMBER_UNRESOLVED",
+    "detail": "MEMBER_UNRESOLVED: cells_across_member_thickness=0 < 2 (declared minimum): the field does not resolve the member, so its two face pressures are not defined",
+    "stage": "relabel the member as v3a ray 0 (candidate differs: 4a3b912e is not e8c2b666)",
+    "verdict": "refused"
+   },
+   {
+    "code": "BAD_TIME",
+    "detail": "BAD_TIME: time.kind must be static | time_mean (concurrent coupling is not supported)",
+    "stage": "declare 2 cells across the fin (the bundle has 0.277)",
+    "verdict": "refused"
+   },
+   {
+    "after_this": "STATION_COVERAGE is next. Candidate 4a3b912e has no straight ray member, so no stations along v3a ray 0 can be read from this bundle",
+    "code": "STATION_COVERAGE",
+    "detail": "STATION_COVERAGE: need >= 2 stations",
+    "stage": "declare a time mean (the samples' time is not stated)",
+    "verdict": "refused"
+   }
+  ],
+  "target": "v3a pectoral_L ray 0 (fin_patch.member_target)",
+  "verdict": "REFUSED at the first gate, and at every later gate when the earlier ones are relabelled. No fin load, ray load or flight load comes from this bundle"
+ },
+ "forces": {
+  "gpu_fish_L128_Re1000": {
+   "Cd_pressure_final_step": 0.02285498008131981,
+   "drift_last_half_window": 0.0005246246896752727,
+   "forces_json_coeffs_equal_case_otherwise": true,
+   "max_rel_diff_vs_case": 0.0,
+   "n_samples": 277,
+   "recomputed": {
+    "Cd_pressure": 0.022866622837334333,
+    "Cd_total": 0.04029441101725351,
+    "Cy_total": 0.0006923640986554835,
+    "Cz_total": 0.002908662314583894
+   },
+   "window_case_json": [
+    3.0,
+    4.002355575561523
+   ],
+   "window_field_in_forces_json": [
+    3.0,
+    4.002355575561523
+   ]
+  },
+  "gpu_fish_L128_Re200": {
+   "Cd_pressure_final_step": 0.03526927903294563,
+   "drift_last_half_window": 0.0015408217452413978,
+   "forces_json_coeffs_equal_case_otherwise": true,
+   "max_rel_diff_vs_case": 0.0,
+   "n_samples": 624,
+   "recomputed": {
+    "Cd_pressure": 0.03531790704418642,
+    "Cd_total": 0.08903028670316324,
+    "Cy_total": 0.0008144497081117991,
+    "Cz_total": 0.0065589501083685225
+   },
+   "window_case_json": [
+    3.0,
+    4.001532554626465
+   ],
+   "window_field_in_forces_json": [
+    3.0,
+    4.001532554626465
+   ]
+  },
+  "gpu_fish_L192_Re1000": {
+   "Cd_pressure_final_step": 0.017738373743163213,
+   "drift_last_half_window": 0.0003069124741480681,
+   "forces_json_coeffs_equal_case_otherwise": true,
+   "max_rel_diff_vs_case": 0.0,
+   "n_samples": 470,
+   "recomputed": {
+    "Cd_pressure": 0.017742751348525918,
+    "Cd_total": 0.036691229950733505,
+    "Cy_total": 0.00026046958863162753,
+    "Cz_total": 0.001789301074160611
+   },
+   "window_case_json": [
+    3.0,
+    4.0000386238098145
+   ],
+   "window_field_in_forces_json": [
+    3.0,
+    4.0000386238098145
+   ]
+  },
+  "gpu_fish_L64_Re200": {
+   "Cd_pressure_final_step": 0.050348661839962006,
+   "drift_last_half_window": 0.0005652810575669424,
+   "forces_json_coeffs_equal_case_otherwise": true,
+   "max_rel_diff_vs_case": 0.0,
+   "n_samples": 197,
+   "recomputed": {
+    "Cd_pressure": 0.05037324518192238,
+    "Cd_total": 0.10075012825164698,
+    "Cy_total": 0.002256867956833413,
+    "Cz_total": 0.014546285657599795
+   },
+   "window_case_json": [
+    3.0,
+    4.00108528137207
+   ],
+   "window_field_in_forces_json": [
+    3.0,
+    4.00108528137207
+   ]
+  }
+ },
+ "grid_pairs": [
+  {
+   "coarse": "gpu_fish_L64_Re200",
+   "fine": "gpu_fish_L128_Re200",
+   "note": "a pair within 10 % only permits a convergence statement under cfd3d's rule; it is not a convergence proof, and the C1 reference failure still blocks validation",
+   "refinement_ratio": 2.0,
+   "rel_diff_vs_coarse": {
+    "Cd_pressure": 0.2988756845695325,
+    "Cd_total": 0.11632582262536378,
+    "Cz_total": 0.5490979441241924
+   },
+   "rel_diff_vs_fine": {
+    "Cd_pressure": 0.4262805867544796,
+    "Cd_total": 0.13163881621047654,
+    "Cz_total": 1.2177765369857414
+   },
+   "within_cfd3d_10pct_rule": {
+    "Cd_pressure": "no",
+    "Cd_total": "no",
+    "Cz_total": "no"
+   }
+  },
+  {
+   "coarse": "gpu_fish_L128_Re1000",
+   "fine": "gpu_fish_L192_Re1000",
+   "note": "a pair within 10 % only permits a convergence statement under cfd3d's rule; it is not a convergence proof, and the C1 reference failure still blocks validation; refinement ratio 1.5, not the rule's L vs L/2",
+   "refinement_ratio": 1.5,
+   "rel_diff_vs_coarse": {
+    "Cd_pressure": 0.22407644212518654,
+    "Cd_total": 0.08942136081793517,
+    "Cz_total": 0.38483712420340416
+   },
+   "rel_diff_vs_fine": {
+    "Cd_pressure": 0.28878674948201377,
+    "Cd_total": 0.09820278773314811,
+    "Cz_total": 0.6255857421582295
+   },
+   "within_cfd3d_10pct_rule": {
+    "Cd_pressure": "no",
+    "Cd_total": "yes",
+    "Cz_total": "no"
+   }
+  }
+ ],
+ "inputs": {
+  "files_read_sha256": {
+   "cpu_platform.json": "5f14b3789406f3110578af69ed8daa208910bee13ef759f7a8ace947b7034ec1",
+   "geometry/build.json": "97145bc748f6269f77cf27c70ebda9bea0e31c94e1a05e3e790c1a3cb220d775",
+   "geometry/candidate.json": "4a3b912eb346e7036994bc549677a0f4f39d7bb978782b30367fec35f1c7b35a",
+   "geometry/components.json": "ac53d568eadb672e4cecffe1782d82b2a1a7bcf0a044967cac22a01053ed1b52",
+   "gpu_diag.json": "0a512dbde9448191636574735b00b37955fcc62e38812739ed65876032b1a23d",
+   "gpu_fish_L128_Re1000/case.json": "fb6e18ffc9e8748ca919bed54d0ff391ec1026907872bbcdeda3e4d23f1e7e9e",
+   "gpu_fish_L128_Re1000/forces.json": "9333462dd4aa571b5f0e2278d48c569f15d8934c5e7fff115d33e6d4b64048bb",
+   "gpu_fish_L128_Re1000/render/flow.mp4": "90a2424ad4fe542dd4589e03a67c962107001c2393c90f987b641710f4f00b82",
+   "gpu_fish_L128_Re1000/render/poster.png": "c40016fe4b6931bb482f7b1d2d13d10ea4b92da452ea1d2e0fb2411b9ebc42f7",
+   "gpu_fish_L128_Re1000/render/render.json": "13026d42f501e0a1eac2e8607ca505a19d5ddf44da33b10c10aa8218986b511c",
+   "gpu_fish_L128_Re1000/surface/anal.f32": "9231870580d91d1c96de388c38ff1a447b7b618860f5c5558b43e62b1f2c71d2",
+   "gpu_fish_L128_Re1000/surface/body.f32": "37dce94a01edd9539286a2c046ea1e2a14f6b93d805bce80b39d992e6a2d2551",
+   "gpu_fish_L128_Re1000/surface/caudal.f32": "d23d5fd97275de9cb9db484350423310ce16a845ada3dc970bc6ac529aa76f09",
+   "gpu_fish_L128_Re1000/surface/dorsal.f32": "3ad97bbe880130c2ca75906a5928090087a3cbeb1e57f9b1d93dd75dbc6304c0",
+   "gpu_fish_L128_Re1000/surface/eye_L.f32": "f5d9eda62d43c90e2a35139c55ef54bcdffc1010326b4e157460d707945a2e5c",
+   "gpu_fish_L128_Re1000/surface/eye_R.f32": "99c094674e32a6be3870bf5ebaa6c05f8978ca84a1142022406ae1f3066d4e21",
+   "gpu_fish_L128_Re1000/surface/operculum_L.f32": "18f1c03d7772fdfb93f202cd020cae9244af359a93415a930da178676366b3d5",
+   "gpu_fish_L128_Re1000/surface/operculum_R.f32": "00192b049da90373d9942641c6c29d3b5e7b000b72640d4a942e96a2f98801e6",
+   "gpu_fish_L128_Re1000/surface/pectoral_L.f32": "e18fde9a5cbe81ae3c0b16e082ef918de15461f51ad1a73ad6044f4db4cd3e7c",
+   "gpu_fish_L128_Re1000/surface/pectoral_R.f32": "4992e67f5a667750e531ef35a079311995b497be3223c17bb29da0e61331eb36",
+   "gpu_fish_L128_Re1000/surface/pelvic_L.f32": "34a5f28cddbf9be3ba072d8d284365775e86e275ad1ad8c93146105513c468ce",
+   "gpu_fish_L128_Re1000/surface/pelvic_R.f32": "841560311b3c4a60e79603c3bef686476d533ccc9cf4f344416a3524c56d426a",
+   "gpu_fish_L128_Re200/case.json": "09fab1ef81f221e168103ade6b32b7d96f26ddd9d476b6aceeb3386c588da0dc",
+   "gpu_fish_L128_Re200/forces.json": "92d137ce417ff60bea98ab040ef784005d381c1790f67b8ab9522b0605f7277a",
+   "gpu_fish_L192_Re1000/case.json": "b085edff7edeb16ed88bfc985e0e848a2cd457019ce655b17b399fb8f9037e5e",
+   "gpu_fish_L192_Re1000/forces.json": "b5d603ef96e5d16db6958f0b4d5c48b720c520839697f7ad42e2f230bf70ca87",
+   "gpu_fish_L192_Re1000/render/flow.mp4": "3a1d2e65b146acc48ed0471e1033bd60f743935a16663fba1e2879ca4b6b426c",
+   "gpu_fish_L192_Re1000/render/poster.png": "53360fc62f764332f762f5eec04212a6edf2b349ec43ee82ffacad0e4c77bbf7",
+   "gpu_fish_L192_Re1000/render/render.json": "b9fdde1b9e711e7a5aa2f4091af2908511c0c9b9389780777601d21eed6da958",
+   "gpu_fish_L64_Re200/case.json": "63479b3781e3404d538a9211648663d3d967a7f8b0a8cd5b8f33933371c6516e",
+   "gpu_fish_L64_Re200/forces.json": "a2ee7b38d7c74a4c4cb38e7bb2b8bdc8d7bd5233e2c3a9c34f9200ed1a28d62d",
+   "gpu_platform.json": "183a6d5497bcdd358ac05fcef3bdfc4a32456dfacb55e1c218159f15778c17cb",
+   "logs/cpu_gate.log": "4444fd9636945f8a12dc72df05afe75b5aa166707479f51ec0e5e7e7159e41ab",
+   "logs/cuda_gate.log": "0c561fff368a9846fb28d64928bb0f488c4b4005d88beff10c1a1e7df32a9612",
+   "logs/diag.log": "33902cd9d65212f2c98a2a44ae87520299c912a887ddc573c713811f8a0835b7",
+   "logs/env.log": "cf806a6945ab9a3923b6420e8507ffc96b7c0ba626a5cd77121e8590ccc0ff32",
+   "logs/fish3d_build.log": "00bde197d4e5581f827d56a0bdf94033d6b14167b6c6198d331d54692bfaf588",
+   "logs/gpu_fish_L128_Re1000.log": "38f9be2e0cfdcf02780e94b2675f2d96546a3e1061523a87399b8f0eed649927",
+   "logs/gpu_fish_L128_Re1000.render.log": "e97b92514d9575c02ba1a815020fd838762410c349e0d3a84c850fe869e7377e",
+   "logs/gpu_fish_L128_Re200.log": "aaba7361f86c61c884b558cc2e59015f2f5b3d7a9aa945b57dfef340bb1df239",
+   "logs/gpu_fish_L192_Re1000.log": "022d017eb9f397998940ca03487da1af8c982e76e6f8f50a41aaa12c1dc60231",
+   "logs/gpu_fish_L192_Re1000.render.log": "d49829c67ee37cc420c8be0fb50fcfee37076932d36fd7991828b63f3f8f9981",
+   "logs/gpu_fish_L64_Re200.log": "58a8875cd290d5411c1260a4655bcf50eafacc6d31c0033ac6c8e5ee73969da3",
+   "logs/pip.log": "750a7fb38058c847e245a9d620d94830e0d6df41ad4b6f124e6995b1f03c3f52",
+   "nvidia-smi.txt": "51249ba837d4e6ce099a92f22edd35c03dde61f74ada35053c7653f4979aecba",
+   "resolved-Manifest.toml": "4c3f5f7a842c367cf12736c72618c2e92e0a398a242c4de07ac70d628ac79c1f",
+   "status.json": "e78ea833a094ce2d713f80d897357df0fc1227c0d8a25031e6decaac2edf35c9",
+   "telemetry.csv": "37e7e921e97af9d1bd6dcf9e677ada11a76c8e4c8327d2785fb7a302c39045a1"
+  },
+  "inventory_sha256": "12e0cc228d793748c71a12d13222bc2f659d2527b53a6a167273882671f91285",
+  "n_files": 48
+ },
+ "job": "aijob-e00k0jpm34h4na3b99",
+ "lineage": {
+  "all_agree": true,
+  "checks": {
+   "candidate_json_sha256_is_the_candidate": true,
+   "components_json_names_the_candidate": true,
+   "gpu_fish_L128_Re1000: STL hashes == components.json": true,
+   "gpu_fish_L128_Re1000: case candidate": true,
+   "gpu_fish_L128_Re1000: render.json pins case.json": true,
+   "gpu_fish_L128_Re1000: status coeffs == case coeffs": true,
+   "gpu_fish_L128_Re200: STL hashes == components.json": true,
+   "gpu_fish_L128_Re200: case candidate": true,
+   "gpu_fish_L128_Re200: status coeffs == case coeffs": true,
+   "gpu_fish_L192_Re1000: STL hashes == components.json": true,
+   "gpu_fish_L192_Re1000: case candidate": true,
+   "gpu_fish_L192_Re1000: render.json pins case.json": true,
+   "gpu_fish_L192_Re1000: status coeffs == case coeffs": true,
+   "gpu_fish_L64_Re200: STL hashes == components.json": true,
+   "gpu_fish_L64_Re200: case candidate": true,
+   "gpu_fish_L64_Re200: status coeffs == case coeffs": true
+  },
+  "render_inputs_not_in_bundle": 82,
+  "render_note": "render.json pins its slice inputs by sha256, but the slices are not in the bundle, so the videos' frame lineage cannot be re-verified from it (CFD04 owns the videos)",
+  "surface_files": {
+   "gpu_fish_L128_Re1000": 12,
+   "gpu_fish_L128_Re200": 0,
+   "gpu_fish_L192_Re1000": 0,
+   "gpu_fish_L64_Re200": 0
+  },
+  "surface_note": "only gpu_fish_L128_Re1000 returned surface samples; the others carry case and forces only",
+  "transport": {
+   "archive": {
+    "bytes": 1855111,
+    "recorded_in": [
+     "manifest-infra22.json (owned[0].result)",
+     "job.log COPS_RESULT_BEGIN"
+    ],
+    "sha256": "30b9fe6143600db8c2e3e536503183704e14e7e98e61223d89021397ec7bfa98"
+   },
+   "archive_hash_recomputed": false,
+   "archive_present_here": false,
+   "job_log_records_it": true,
+   "manifest_records_it": true,
+   "manifest_sha256": "82ac2b4b19d2624e5f4530896f3fc939b622b5299b97e8ccd61dd24cde1cef8c"
+  }
+ },
+ "not_established": [
+  "any fin or ray load (fins sub-grid, resolved:false)",
+  "physical validity (C1 sphere reference FAILED)",
+  "grid convergence (pairs reported, not claimed)",
+  "dimensional pressure (medium none)",
+  "the v3a geometry (candidate 4a3b912e)",
+  "flight, taxi or free-surface regime"
+ ],
+ "packet_sha256": "5af94b3fb597839f6242501c3156eb91c317fb437bdab6efc17907433f830c5a",
+ "reference_gate": {
+  "C1_sphere_Re100": "FAIL",
+  "consequence": "no physical-validation claim from any case in this packet; platform gates reproduce model behaviour only",
+  "diagnostic_D1": "10x6x6 D domain + exit BC: |Cd| 0.839 (bias not from blockage)",
+  "evidence": "artifacts/cfd3d/controls/cpu_controls.json: |Cd| 0.875 (D16), 0.857 (D8) vs 1.092 correlation; band [0.95,1.35] frozen in 609d1cf"
+ },
+ "schema": "frontier.coupled.cfd3d-bundle-inspection/1",
+ "solver_runs_by_this_reader": 0,
+ "surface": {
+  "case": "gpu_fish_L128_Re1000",
+  "components": {
+   "anal": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     3.468003839210707e-05,
+     2.067825176984161e-06,
+     -2.2291889572590856e-06
+    ],
+    "closure_sum_nA_over_A": 8.807039838671644e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 120,
+    "unit_normals": true
+   },
+   "body": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.002674981077913168,
+     2.0765812326914452e-07,
+     0.00047234825783083853
+    ],
+    "closure_sum_nA_over_A": 3.5134773211630314e-10,
+    "offset_cells": [
+     2.0,
+     2.0
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.0,
+    "resolved_declared": true,
+    "rows": 30720,
+    "unit_normals": true
+   },
+   "caudal": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.00014603828523571084,
+     2.5878725999437595e-05,
+     0.0001347063107857807
+    ],
+    "closure_sum_nA_over_A": 1.4257951742571778e-09,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 160,
+    "unit_normals": true
+   },
+   "dorsal": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     2.4738108496007554e-05,
+     4.8749489668871844e-08,
+     6.052757631974353e-06
+    ],
+    "closure_sum_nA_over_A": 1.6403281243991888e-09,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 116,
+    "unit_normals": true
+   },
+   "eye_L": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.00011576689048992014,
+     -0.00017470851000277318,
+     -3.566109356985822e-05
+    ],
+    "closure_sum_nA_over_A": 7.159941870793002e-10,
+    "offset_cells": [
+     2.0,
+     2.0
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.0,
+    "resolved_declared": true,
+    "rows": 512,
+    "unit_normals": true
+   },
+   "eye_R": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.00011870850728113027,
+     0.0001754359154097642,
+     -3.48710412718063e-05
+    ],
+    "closure_sum_nA_over_A": 7.159942423887019e-10,
+    "offset_cells": [
+     2.0,
+     2.0
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.0,
+    "resolved_declared": true,
+    "rows": 512,
+    "unit_normals": true
+   },
+   "operculum_L": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     8.645320928248663e-05,
+     -0.00023111966214810092,
+     -0.0001005111431706969
+    ],
+    "closure_sum_nA_over_A": 7.37065393192116e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 768,
+    "unit_normals": true
+   },
+   "operculum_R": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     9.258035638905634e-05,
+     0.00026762253699333545,
+     -0.00011850232828599096
+    ],
+    "closure_sum_nA_over_A": 8.10632421806381e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 768,
+    "unit_normals": true
+   },
+   "pectoral_L": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.0008421639623285624,
+     -0.00023489313304069672,
+     0.00021006035617316437
+    ],
+    "closure_sum_nA_over_A": 2.4720356194683784e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "one_face": {
+     "area_m2": 0.0022904842224198835,
+     "jump_Cp_range": [
+      -0.03119826316833496,
+      0.040690287947654724
+     ],
+     "jump_ventral_minus_dorsal_Cp_area_mean": 0.0029811977560307013,
+     "rows": 203,
+     "status": "smeared sub-grid shell values (cfd3d's own refusal), not a fin load"
+    },
+    "resolved_declared": false,
+    "rows": 816,
+    "unit_normals": true
+   },
+   "pectoral_R": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.0008345235676760382,
+     0.0002329187856355087,
+     0.0002149466998962302
+    ],
+    "closure_sum_nA_over_A": 2.4720356194683784e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "one_face": {
+     "area_m2": 0.0022904842224198835,
+     "jump_Cp_range": [
+      -0.031857430934906006,
+      0.04258382320404053
+     ],
+     "jump_ventral_minus_dorsal_Cp_area_mean": 0.003060716931757884,
+     "rows": 203,
+     "status": "smeared sub-grid shell values (cfd3d's own refusal), not a fin load"
+    },
+    "resolved_declared": false,
+    "rows": 816,
+    "unit_normals": true
+   },
+   "pelvic_L": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.00032502429860567636,
+     -0.00017129091036071416,
+     -8.979158682587588e-05
+    ],
+    "closure_sum_nA_over_A": 8.5603413241549e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 856,
+    "unit_normals": true
+   },
+   "pelvic_R": {
+    "Cp_minus_nan_iff_closed": true,
+    "Cp_plus_finite": true,
+    "closed_face_Cp_force_coeff_Lref2": [
+     0.00032236581412528213,
+     0.00016961902370869465,
+     -0.00011477449248210978
+    ],
+    "closure_sum_nA_over_A": 8.5603413241549e-10,
+    "offset_cells": [
+     2.866000175476074,
+     2.866000175476074
+    ],
+    "offset_meets_rule": true,
+    "offset_rule_cells": 2.866,
+    "resolved_declared": false,
+    "rows": 856,
+    "unit_normals": true
+   }
+  },
+  "meaning": "the offset samples (2 cells off the body, 2.9 off the fins, outside the BDIM band) do not integrate to the solver's own pressure force, so a load integrated from them is not the solver's load, even for the resolved body",
+  "pressure_drag_from_samples": {
+   "all_components": 0.005618024116215145,
+   "all_components_over_solver_final": 0.24581181415279188,
+   "body_only": 0.002674981077913168,
+   "solver_Cd_pressure_final_step": 0.02285498008131981,
+   "solver_Cd_pressure_window": 0.022866622837334333
+  },
+  "sample_time": "not stated in case.json; forces are compared at the final step and over the window"
+ }
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "frontier.fin-assurance.protocol/1",
+  "frozen_before_outputs": true,
+  "title": "Paired fin-ray uncertainty and load-shape assay",
+  "seed": 20261031,
+  "parameter_draws": 64,
+  "predicate": {
+    "id": "linear-ray-envelope-both-load-shapes",
+    "expression": "For both uniform load q and same-total tip force q*L: abs(tip)/L <= 0.1 and max(abs(slope)) <= 0.2 rad",
+    "declared_before_runs": true,
+    "tip_over_length_limit": 0.1,
+    "slope_limit_rad": 0.2
+  },
+  "candidates": [
+    {"id": "baseline", "ray_length_m": 0.15, "EI_multiplier": 1.0, "tradeoff": "Reference declared geometry; not an observed specimen"},
+    {"id": "shorter-ray", "ray_length_m": 0.12, "EI_multiplier": 1.0, "tradeoff": "Shortening may lose lifting area; flight consequence unmodeled"},
+    {"id": "stiffer-ray", "ray_length_m": 0.15, "EI_multiplier": 2.0, "tradeoff": "Stiffness change has unknown mass, material and developmental cost"}
+  ],
+  "latents": {
+    "weather": {"law": "Uniform(0,1)", "status": "assumed", "maps": {"rho_kg_m3": "1.15+0.15*u", "speed_m_s": "6-2*u"}, "dependence": "Perfect negative rank correlation, declared stress scenario; not fitted weather data"},
+    "geometry": {"law": "Uniform(0,1)", "status": "assumed", "maps": {"length_multiplier": "0.85+0.30*u", "tributary_width_m": "0.008+0.004*u"}, "dependence": "Shared geometry latent, positive rank correlation; not measured covariance"},
+    "design_material": {"law": "Uniform(0,1)", "status": "assumed", "maps": {"EI_Nm2": "0.0003*10**u"}, "dependence": "One material draw shared across all candidates, not independent material evidence"},
+    "aerodynamics": {"law": "Uniform(0,1)", "status": "assumed", "maps": {"CL": "0.7+0.4*u"}, "dependence": "Independent latent by design; no fitted aerodynamic polar"},
+    "bluegill_context_material": {"law": "Uniform(0,1)", "status": "source_envelope_with_assumed_sampling", "maps": {"E_Pa": "1e8*10**u", "I_m4": "1e-14", "EI_Nm2": "E*I"}, "dependence": "Separate source context; never transferred to candidate design material"}
+  },
+  "context_only": {
+    "id": "bluegill-source-envelope",
+    "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2359861/",
+    "locator": "Alben, Madden & Lauder (2007), Section 3.4 after Eq.3.19",
+    "source_values": {"E_range_Pa": [100000000, 1000000000], "I_average_m4": 1e-14, "typical_ray_length_m": 0.04},
+    "source_status": "Approximate composite-modulus range and average area moment, not a per-ray dataset",
+    "declared_test_load_N_m": 0.01,
+    "load_status": "assumed illustration, not a measured load from the source",
+    "transfer": "refused: species, size, fluid regime, bilaminar mechanics and boundary/actuation differ",
+    "heldout_validation": "unknown: published Fig.7 slope1.98N/m lacks a matched per-ray geometry/EI/actuation tuple for this single-beam surrogate"
+  },
+  "numerics": {"coarse_elements": 8, "fine_elements": 32, "control_grids": [2, 4, 8, 16, 32], "profile_positions": 81, "analytic_relative_tolerance": 1e-7, "sensitivity_fraction": 0.01, "sensitivity_elasticity_tolerance": 0.001},
+  "analysis": {
+    "endpoint_unit": "1; slope rad",
+    "robustness_denominator": "64 independently drawn latent vectors per candidate; both paired load shapes must pass; meshes and load shapes are not independent trials",
+    "interval": "Wilson95 binomial interval conditional on this declared iid latent sampling distribution, not biological success or empirical uncertainty",
+    "sensitivity": "Paired plus/minus1percent parameter interventions, all other physical inputs fixed; local elasticity, not causal biology or independent-distribution importance",
+    "discrepancy": "Separate coarse/fine FEM profile difference, analytic residual and uniform/tip load-shape difference",
+    "invalid_cases": "Preserve outputs as formal linear-model extrapolations; mask them from claims of physically valid shape",
+    "candidate_decision": "Retain all three candidates; report paired robustness changes and unknown flight/material costs rather than selecting a biological winner",
+    "time_accuracy": "not applicable: static problem; variation video indexes ensemble members, not physical time"
+  },
+  "region_ids": ["pectoral-left", "pectoral-right"],
+  "region_membership": "UI annotation only; no calibrated spatial mapping to a real fish",
+  "biological_success_probability": null
+}

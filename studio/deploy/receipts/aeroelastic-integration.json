@@ -1,0 +1,29 @@
+{
+  "schema": "frontier.integration-checks/1",
+  "tested_commit": "9548acce7c34aef3d9a2334d02190eaa887fa0e4",
+  "at": "2026-10-31T19:39:55.438459-07:00",
+  "checks": [
+    {
+      "name": "aeroelastic focused tests",
+      "command": ".venv/bin/python -m pytest tests/test_aeroelastic.py -q",
+      "exit": 0,
+      "passed": 4
+    },
+    {
+      "name": "aeroelastic scoped lint",
+      "command": "ruff check engineering/aeroelastic tests/test_aeroelastic.py",
+      "exit": 0
+    },
+    {
+      "name": "aeroelastic artifact pins",
+      "scope": "all files in artifacts/aeroelastic/artifact-manifest.json; recomputed SHA256 and bytes",
+      "exit": 0,
+      "passed": 23
+    }
+  ],
+  "limits": [
+    "Coarse numerical control slice; not the full returned Google assay.",
+    "No empirical tissue or flight validation.",
+    "Independent physics review and public UI integration remain pending."
+  ]
+}

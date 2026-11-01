@@ -1,0 +1,1452 @@
+{
+ "EI_assumed_range": {
+  "max_Nm2": "1",
+  "min_Nm2": "1/1000000",
+  "n_points": 61,
+  "spacing": "log10-uniform",
+  "status": "ASSUMED_RANGE_NOT_MEASURED"
+ },
+ "EI_context_only": {
+  "bluegill_sunfish_B_range_Nm2": [
+   1e-06,
+   1e-05
+  ],
+  "source": "Alben, Madden & Lauder 2007, Section 3.4 (text read in full as HTML; PDF not obtained); order-of-magnitude, composite E x average I",
+  "warning": "different species, length, medium, boundary condition; context only, see sources_read; not a calibration of this surrogate"
+ },
+ "assumptions": [
+  "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+  "single clamped-free cantilever ray; clamped base; free tip",
+  "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+  "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+  "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+  "small-deformation validity limits are DECLARED thresholds, not derived from material"
+ ],
+ "code_files_sha256": {
+  "__init__.py": "8ff9253d5eb8e401cf2f2fbc573ad9580189531f9ee72d735d91e5194e800541",
+  "beam.py": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+  "load_bridge.py": "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11",
+  "render.py": "1ba6ba8bf7b414c820791ce14634d1c99789603ebe1a574b1077515fd45b7c66",
+  "sweep.py": "31529bac797c4563190f68b180ddd31fe9537a13535a364f5918ac4dd885c8ec"
+ },
+ "code_sha256": "9b030fb7c12d06b125f98543f2c68e35111d20c57104731236d31d32f04fe634",
+ "controls": {
+  "analytic_residuals_vs_independent_quadrature": {
+   "case0": {
+    "EI_Nm2": 1.0,
+    "L_m": 1.0,
+    "P_or_q": 1.0,
+    "tip_load_rel_residual": 1.6653345369377346e-16,
+    "uniform_rel_residual": 0.0
+   },
+   "case1": {
+    "EI_Nm2": 0.00025,
+    "L_m": 0.15,
+    "P_or_q": 0.37,
+    "tip_load_rel_residual": 1.333601230780969e-16,
+    "uniform_rel_residual": 1.481779145312188e-16
+   },
+   "case2": {
+    "EI_Nm2": 40.0,
+    "L_m": 2.0,
+    "P_or_q": 12.0,
+    "tip_load_rel_residual": 0.0,
+    "uniform_rel_residual": 1.850371707708594e-16
+   }
+  },
+  "fem_vs_analytic_max_rel_diff_over_sweep": 3.696931469425124e-09,
+  "max_rel_residual": 1.850371707708594e-16
+ },
+ "convergence": {
+  "tapered_EI_midpoint_rule": {
+   "expected_order": 2,
+   "n_elements": [
+    4,
+    8,
+    16,
+    32,
+    64
+   ],
+   "observed_order": [
+    2.02360424666852,
+    2.006893757045478,
+    2.001795378388035,
+    2.000457775960034
+   ],
+   "taper": "EI(x)=EI0*(1-0.5 x/L)^3, tip force 1 N, illustrative; reference = scipy quad unit-load integral",
+   "tip_rel_error": [
+    0.026878003101877112,
+    0.006610456049676518,
+    0.0016447360180723294,
+    0.00041067262013340177,
+    0.00010263558296776839
+   ]
+  },
+  "time_step": "not applicable: static solution, no time integration",
+  "uniform_constant_EI": {
+   "expected_order_profile": 4,
+   "n_elements": [
+    2,
+    4,
+    8,
+    16,
+    32
+   ],
+   "note": "nodal values are exact for constant EI; the profile error is Hermite interpolation error, O(h^4)",
+   "observed_order_profile": [
+    3.9999999998585722,
+    4.000000000456218,
+    4.00461599589275,
+    4.0000045908578645
+   ],
+   "profile_sup_rel_error": [
+    0.0013020833333356175,
+    8.138020834145381e-05,
+    5.086263019732453e-06,
+    3.1687594998601013e-07,
+    1.980468385274502e-08
+   ],
+   "tip_rel_error_nodal": [
+    3.759485374392064e-15,
+    1.0025294331712171e-14,
+    1.4823113761888708e-13,
+    9.873124685605825e-13,
+    1.9826451725865348e-11
+   ]
+  }
+ },
+ "critical_stiffness": {
+  "EI_crit_Nm2_exact": "1323/2048000",
+  "EI_crit_Nm2_float": 0.00064599609375,
+  "EI_crit_slope_Nm2_exact": "441/1024000",
+  "EI_crit_tip_Nm2_exact": "1323/2048000",
+  "binding_limit": "tip_over_L"
+ },
+ "evidence_kind": "simulated",
+ "inputs_sha256": "f276a86069b8577d188afadc18cd162f210f89b9dac3c86bd829f560907b79cc",
+ "load_bridge": {
+  "F_total_N": 0.02296875,
+  "L_ray_m": 0.15,
+  "consistency_diagnostic": {
+   "g_m_s2": "196133/20000",
+   "note": "Informational only: ratio p*S/(m g) is NOT repaired or enforced; it shows how far the declared CL/V is from level lift balance (the glide package's own receipt owns that analysis).",
+   "p_times_S_N_float": 5.7421875,
+   "ratio_pS_over_weight": 1.1710803383418396,
+   "weight_N_exact": "196133/40000",
+   "weight_N_float": 4.903325
+  },
+  "evidence_kind": "simulated",
+  "exact": {
+   "F_total_N": "147/6400",
+   "L_ray_m": "3/20",
+   "p_Pa": "245/16",
+   "q_line_N_per_m": "49/320",
+   "w_t_m": "1/100"
+  },
+  "geometry_flags": [],
+  "inputs": {
+   "CL": "1",
+   "CL_max_source": "design_assumption",
+   "CL_source": "flight_assumptions.CL_max",
+   "S_m2": "3/8",
+   "V_ms": "5",
+   "b_m": "3/2",
+   "m_kg": "1/2",
+   "ray_length_fraction_of_semispan": "1/5",
+   "rho_kg_m3": "49/40",
+   "rho_source": "design_assumption",
+   "tributary_width_rule": "declared tributary_width_m"
+  },
+  "load_proxy_statement": "p = q_dyn*CL is a MEAN aerodynamic lift-pressure proxy built from DECLARED rho, V, CL; it is not a measured fin pressure, and nothing here is fluid-structure interaction.",
+  "p_Pa": 15.3125,
+  "q_dyn_Pa": 15.3125,
+  "q_line_N_per_m": 0.153125,
+  "steps": [
+   {
+    "exact": "245/16",
+    "float": 15.3125,
+    "formula": "0.5*rho*V^2",
+    "name": "q_dyn",
+    "unit": "Pa"
+   },
+   {
+    "exact": "245/16",
+    "float": 15.3125,
+    "formula": "q_dyn*CL",
+    "name": "p_lift_proxy",
+    "unit": "Pa"
+   },
+   {
+    "exact": "1/100",
+    "float": 0.01,
+    "formula": "declared tributary_width_m",
+    "name": "tributary_width",
+    "unit": "m"
+   },
+   {
+    "exact": "49/320",
+    "float": 0.153125,
+    "formula": "p*w_t",
+    "name": "q_line",
+    "unit": "N/m"
+   },
+   {
+    "exact": "3/20",
+    "float": 0.15,
+    "formula": "f_ray*b/2",
+    "name": "L_ray",
+    "unit": "m"
+   },
+   {
+    "exact": "147/6400",
+    "float": 0.02296875,
+    "formula": "q_line*L_ray",
+    "name": "F_total_on_ray",
+    "unit": "N"
+   }
+  ],
+  "w_t_m": 0.01
+ },
+ "measurement_question": {
+  "analysis": "EI = P L^3 / (3 delta) from the linear slope of tip force P vs tip displacement delta.",
+  "apparatus": "Clamp the ray base (state whether both hemitrichs or one is clamped; Alben et al. 2007 Fig. 7 report ~12x stiffness difference between these, for a point force at 2/3 of the ray), load the free end with a calibrated micro-force transducer (resolution <= 1 microN) or a calibrated cantilever probe, track tip displacement optically (resolution <= 1 micrometre), keep the specimen hydrated, record force-displacement for tip/L < 0.1 (inside the linear range), and repeat with the clamp moved along the ray to get EI(x). Cross-check with micro-CT second moment of area.",
+  "decision_rule": "If measured EI >= EI_crit_Nm2 the declared load stays inside the small-deformation limit for this geometry; if EI < EI_crit_Nm2 the linear model is invalid at the declared load and a large-deformation model (or a lower load) is required.",
+  "question": "What is the effective flexural rigidity EI (N m^2) of an excised ray of the target fin, as a function of distance from its base, under the clamping condition that matches its in-fin boundary condition, and is it above or below EI_crit_Nm2 of this request?",
+  "turns": "the ASSUMED EI range in this package into measured data (>= several rays, with spread)"
+ },
+ "model_version": "finmech-eb-cantilever-linear-static/1",
+ "not_established": [
+  "biological feasibility of any fin, ray or flight design",
+  "the stiffness EI of any real fish fin ray (it is an assumed range here)",
+  "fluid-structure interaction: the load is a fixed mean pressure proxy, not coupled to deformation",
+  "fin membrane, bilaminar hemitrich shear, active muscle control, ray taper, joints or viscoelasticity",
+  "large-deformation (elastica) behaviour: results beyond the declared small-deformation limit are flagged invalid",
+  "calibration of rho, CL, tributary width or ray length (all declared, none measured)",
+  "that the glide package's candidate is flyable (owned by the glide receipt, not by this package)"
+ ],
+ "request_echo": {
+  "candidate_witness": {
+   "S": "3/8",
+   "V": "5",
+   "b": "3/2",
+   "m": "1/2"
+  },
+  "elastic": {
+   "EI_max_Nm2": "1",
+   "EI_min_Nm2": "1e-6",
+   "EI_status": "ASSUMED_RANGE_NOT_MEASURED",
+   "n_points": 61
+  },
+  "fin": {
+   "assumption_note": "ray length and tributary width are DECLARED parameters, not measurements",
+   "ray_length_fraction_of_semispan": "1/5",
+   "tributary_width_m": "1/100"
+  },
+  "n_elements": 64,
+  "validity_limits": {
+   "slope_max_rad": "1/5",
+   "tip_over_L_max": "1/10"
+  }
+ },
+ "schema": "frontier.finmech.result/1",
+ "sources_read": [
+  {
+   "not_used_for": "any numerical result, calibration or validation of this surrogate",
+   "read": "FULL TEXT (publisher text as hosted on PMC), downloaded as HTML with curl (https://pmc.ncbi.nlm.nih.gov/articles/PMC2359861/, HTTP 200, 213,488 bytes, sha256 3ee6a0ea892638fb4a23336f815d236e2293021c504ebaa960dc00dccd9b7854) and text-extracted with python -I (70,538 characters). Not a summarising tool. The PDF was NOT obtained (PMC served a proof-of-work page; royalsocietypublishing.org and Europe PMC returned HTTP 403), so the HTML has no page numbers: citations below are by section, equation and figure.",
+   "ref": "Alben S, Madden PG, Lauder GV (2007) The mechanics of active fin-shape control in ray-finned fishes. J R Soc Interface 4(13):243-256, doi:10.1098/rsif.2006.0181 (PMC2359861)",
+   "used_for": [
+    "context-only EI scale, Section 3.4 'Physical scalings' (text after eq. 3.19): 'using three-point bending tests ... the composite Young's modulus ... E ~ 1e8-1e9 N m^-2, with the average area moment of inertia I ~ 1e-6 cm^4. Hence, the measured B = EI ~ 1e-6-1e-5 J m' (J m = N m^2; 1e-6 cm^4 = 1e-14 m^4, so E*I = 1e-6 to 1e-5 N m^2, consistent). Species: bluegill sunfish (Lepomis macrochirus); 24 rays from six fish, maximum ray length 40.3 +/- 0.8 mm; rays tested submerged in water within 48 h; the scaling estimate uses L = 4 cm for a typical ray. It is an order-of-magnitude product of a composite E and an average I (area moments from a microCT scan of one fin, Section 2), NOT a per-ray or per-position measurement and not tabulated; no table or figure reports B. The paper's own scaling argument (eq. 3.19) gave B ~ 1e-6 J m, lower than measured.",
+    "boundary-condition sensitivity, Section 5.2 and Figure 7 caption: ray clamped at the base, vertical point force at about two-thirds of the way from base to tip; with both hemitrich bases clamped the force-displacement slope is 1.98 N m^-1, 'about 12 times the value when one hemitrich is free'. This is a stiffness (N/m) at a point load, not an EI.",
+    "the paper's model is a BILAMINAR elastica with intraray shear (Section 3), not a single Euler-Bernoulli beam; this package's single-beam EI is an effective-stiffness proxy"
+   ]
+  },
+  {
+   "read": "first ~100,000 of ~135,811 characters via summarising fetch tool: governing equation, cantilever point-load curve, small-deflection assumptions. Uniform-load formula NOT confirmed from it; verified by independent integration in tests. Textbook primary references it cites (Timoshenko; Gere) were NOT read.",
+   "ref": "Wikipedia, 'Euler-Bernoulli beam theory' (secondary source)",
+   "used_for": [
+    "beam equation d2/dx2(EI d2w/dx2)=q; w=F(3Lx^2-x^3)/(6EI) for tip load"
+   ]
+  }
+ ],
+ "sweep": {
+  "EI_mid_for_convergence_Nm2": 0.001,
+  "n_invalid_uniform": 29,
+  "n_points": 61,
+  "n_valid_uniform": 32,
+  "rows": [
+   {
+    "EI_Nm2": 1e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 25.839843749999996,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 258.3984376609158,
+     "tip_m": 25.83984377107313,
+     "tip_over_L": 172.26562514048754,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 9.689941406250002,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 86.1328125627817,
+     "tip_m": 9.689941414462165,
+     "tip_over_L": 64.59960942974777,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.2589254117941661e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 20.525317471488773,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 205.25317391604756,
+     "tip_m": 20.52531740386312,
+     "tip_over_L": 136.83544935908748,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 7.696994051808292,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 68.417724601831,
+     "tip_m": 7.696994026093759,
+     "tip_over_L": 51.31329350729173,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.584893192461114e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 16.30383919428311,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 163.03839208334895,
+     "tip_m": 16.303839210093376,
+     "tip_over_L": 108.69226140062251,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 6.113939697856168,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 54.346130703186745,
+     "tip_m": 6.113939704104978,
+     "tip_over_L": 40.75959802736652,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.9952623149688787e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 12.950599806423465,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 129.50599797660246,
+     "tip_m": 12.950599800330355,
+     "tip_over_L": 86.33733200220237,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 4.856474927408801,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 43.168665989115325,
+     "tip_m": 4.856474925183144,
+     "tip_over_L": 32.37649950122096,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 2.5118864315095823e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 10.287027082856959,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 102.87027080356008,
+     "tip_m": 10.287027079936369,
+     "tip_over_L": 68.58018053290913,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 3.857635156071361,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 34.29009026633451,
+     "tip_m": 3.8576351549272934,
+     "tip_over_L": 25.71756769951529,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 3.162277660168379e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 8.171276063286651,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 81.71276078559364,
+     "tip_m": 8.17127607441597,
+     "tip_over_L": 54.4751738294398,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 3.064228523732495,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 27.237586934394844,
+     "tip_m": 3.06422852784628,
+     "tip_over_L": 20.428190185641867,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 3.981071705534969e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 6.490675290795267,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 64.9067528629132,
+     "tip_m": 6.490675287582156,
+     "tip_over_L": 43.27116858388104,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 2.434003234048226,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 21.63558428555939,
+     "tip_m": 2.4340032328392907,
+     "tip_over_L": 16.226688218928604,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 5.011872336272725e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 5.1557266459059115,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 51.55726650138311,
+     "tip_m": 5.155726650226219,
+     "tip_over_L": 34.37151100150813,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 1.9333974922147168,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 17.18575550293393,
+     "tip_m": 1.9333974939201566,
+     "tip_over_L": 12.889316626134377,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 6.30957344480193e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 4.095339245363387,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 40.953392577574654,
+     "tip_m": 4.095339255110093,
+     "tip_over_L": 27.302261700733954,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 1.5357522170112703,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 13.651130864432,
+     "tip_m": 1.5357522206709069,
+     "tip_over_L": 10.238348137806046,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 7.943282347242822e-06,
+    "tip_equivalent": {
+     "analytic_tip_m": 3.253043593366566,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 32.530436081772905,
+     "tip_m": 3.2530436051825804,
+     "tip_over_L": 21.68695736788387,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 1.2198913475124624,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 10.84347870075703,
+     "tip_m": 1.2198913520223171,
+     "tip_over_L": 8.132609013482115,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 2.5839843749999996,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 25.83984378152424,
+     "tip_m": 2.5839843778763556,
+     "tip_over_L": 17.226562519175705,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.968994140625,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 8.613281262013682,
+     "tip_m": 0.9689941417274144,
+     "tip_over_L": 6.4599609448494295,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.2589254117941661e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 2.0525317471488775,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 20.525317492000784,
+     "tip_m": 2.0525317492212625,
+     "tip_over_L": 13.683544994808416,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.7696994051808291,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 6.84177249847171,
+     "tip_m": 0.7696994059891459,
+     "tip_over_L": 5.131329373260972,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.584893192461114e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 1.6303839194283112,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 16.303839181222397,
+     "tip_m": 1.63038391860041,
+     "tip_over_L": 10.869226124002735,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.6113939697856168,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 5.434613059985897,
+     "tip_m": 0.6113939694942925,
+     "tip_over_L": 4.0759597966286165,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 1.9952623149688786e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 1.2950599806423466,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 12.950599802512537,
+     "tip_m": 1.2950599803885323,
+     "tip_over_L": 8.633733202590216,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.4856474927408801,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 4.316866600771259,
+     "tip_m": 0.4856474926558767,
+     "tip_over_L": 3.2376499510391783,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 2.5118864315095822e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 1.028702708285696,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 10.287027083655845,
+     "tip_m": 1.0287027083360447,
+     "tip_over_L": 6.858018055573631,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.38576351560713606,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 3.429009027965622,
+     "tip_m": 0.38576351563166283,
+     "tip_over_L": 2.5717567708777525,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 3.1622776601683795e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.817127606328665,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 8.171276055099783,
+     "tip_m": 0.8171276053641603,
+     "tip_over_L": 5.4475173690944025,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.30642285237324945,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 2.7237586844886703,
+     "tip_m": 0.3064228519889443,
+     "tip_over_L": 2.0428190132596287,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 3.9810717055349695e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.6490675290795267,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 6.490675290121874,
+     "tip_m": 0.6490675289853952,
+     "tip_over_L": 4.327116859902635,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.24340032340482257,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 2.163558430016149,
+     "tip_m": 0.24340032336996417,
+     "tip_over_L": 1.6226688224664279,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 5.011872336272725e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.515572664590591,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 5.155726657892483,
+     "tip_m": 0.5155726656211005,
+     "tip_over_L": 3.43715110414067,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.19333974922147168,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.7185755531977838,
+     "tip_m": 0.19333974961529496,
+     "tip_over_L": 1.2889316641019664,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 6.309573444801929e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.4095339245363387,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 4.095339241697881,
+     "tip_m": 0.4095339242542184,
+     "tip_over_L": 2.7302261616947896,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.15357522170112703,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.365113080398513,
+     "tip_m": 0.15357522159468887,
+     "tip_over_L": 1.0238348106312591,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 7.943282347242822e-05,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.3253043593366565,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 3.2530435953201775,
+     "tip_m": 0.32530435950561104,
+     "tip_over_L": 2.168695730037407,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.12198913475124623,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.0843478651787837,
+     "tip_m": 0.12198913481378187,
+     "tip_over_L": 0.8132608987585459,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0001,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.25839843749999997,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 2.583984373517742,
+     "tip_m": 0.25839843735233675,
+     "tip_over_L": 1.7226562490155783,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.09689941406250001,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.8613281244109423,
+     "tip_m": 0.09689941400367072,
+     "tip_over_L": 0.6459960933578048,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.00012589254117941674,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.20525317471488755,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 2.0525317465416344,
+     "tip_m": 0.20525317469611598,
+     "tip_over_L": 1.3683544979741067,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.07696994051808284,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.6841772488475423,
+     "tip_m": 0.07696994051411594,
+     "tip_over_L": 0.513132936760773,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.00015848931924611142,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.1630383919428311,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.6303839204822206,
+     "tip_m": 0.16303839207138204,
+     "tip_over_L": 1.0869226138092136,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.061139396978561675,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.5434613068918013,
+     "tip_m": 0.06113939702921101,
+     "tip_over_L": 0.4075959801947401,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0001995262314968881,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.12950599806423452,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.2950599810627326,
+     "tip_m": 0.12950599810904256,
+     "tip_over_L": 0.8633733207269505,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.04856474927408795,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.43168666039425774,
+     "tip_m": 0.04856474929320493,
+     "tip_over_L": 0.3237649952880329,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0002511886431509582,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.1028702708285696,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 1.028702707774732,
+     "tip_m": 0.102870270787623,
+     "tip_over_L": 0.68580180525082,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.03857635156071361,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.3429009025643619,
+     "tip_m": 0.03857635154479418,
+     "tip_over_L": 0.25717567696529453,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.00031622776601683794,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0817127606328665,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.8171276053791189,
+     "tip_m": 0.08171276054739982,
+     "tip_over_L": 0.5447517369826654,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.030642285237324946,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.2723758684073201,
+     "tip_m": 0.030642285204092942,
+     "tip_over_L": 0.20428190136061963,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.00039810717055349735,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0649067529079526,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.6490675294342785,
+     "tip_m": 0.06490675295116557,
+     "tip_over_L": 0.43271168634110385,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.02434003234048223,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.21635584317274703,
+     "tip_m": 0.024340032358220774,
+     "tip_over_L": 0.1622668823881385,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0005011872336272725,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.05155726645905911,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.5155726651554394,
+     "tip_m": 0.051557266510546755,
+     "tip_over_L": 0.3437151100703117,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.019333974922147168,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.17185755508113978,
+     "tip_m": 0.019333974941989455,
+     "tip_over_L": 0.12889316627992972,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0006309573444801936,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.04095339245363382,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.4095339252842499,
+     "tip_m": 0.040953392516288586,
+     "tip_over_L": 0.27302261677525724,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.015357522170112686,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.1365113084634913,
+     "tip_m": 0.015357522194104585,
+     "tip_over_L": 0.10238348129403058,
+     "valid": false
+    }
+   },
+   {
+    "EI_Nm2": 0.0007943282347242822,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.032530435933665655,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.32530435929558643,
+     "tip_m": 0.03253043593220079,
+     "tip_over_L": 0.21686957288133862,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.012198913475124624,
+     "flag": "OK",
+     "max_slope_rad": 0.10843478643341604,
+     "tip_m": 0.012198913474940053,
+     "tip_over_L": 0.08132608983293368,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.001,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.025839843749999997,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.25839843772042564,
+     "tip_m": 0.02583984376876196,
+     "tip_over_L": 0.17226562512507976,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.009689941406250001,
+     "flag": "OK",
+     "max_slope_rad": 0.08613281258436506,
+     "tip_m": 0.009689941413432246,
+     "tip_over_L": 0.06459960942288163,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.0012589254117941675,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.020525317471488752,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.20525317477813196,
+     "tip_m": 0.020525317473769,
+     "tip_over_L": 0.1368354498251267,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.007696994051808283,
+     "flag": "OK",
+     "max_slope_rad": 0.06841772492824115,
+     "tip_m": 0.007696994052570019,
+     "tip_over_L": 0.05131329368380013,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.001584893192461114,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.01630383919428311,
+     "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+     "max_slope_rad": 0.1630383918569942,
+     "tip_m": 0.016303839187356766,
+     "tip_over_L": 0.10869226124904512,
+     "valid": false
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0061139396978561675,
+     "flag": "OK",
+     "max_slope_rad": 0.054346130614202535,
+     "tip_m": 0.00611393969514908,
+     "tip_over_L": 0.04075959796766054,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.0019952623149688807,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.012950599806423452,
+     "flag": "OK",
+     "max_slope_rad": 0.12950599798530746,
+     "tip_m": 0.012950599800577365,
+     "tip_over_L": 0.0863373320038491,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.004856474927408796,
+     "flag": "OK",
+     "max_slope_rad": 0.04316866599307771,
+     "tip_m": 0.004856474925366604,
+     "tip_over_L": 0.03237649950244403,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.002511886431509582,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.010287027082856962,
+     "flag": "OK",
+     "max_slope_rad": 0.10287027038846104,
+     "tip_m": 0.010287027047686711,
+     "tip_over_L": 0.06858018031791141,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.003857635156071361,
+     "flag": "OK",
+     "max_slope_rad": 0.034290090109359996,
+     "tip_m": 0.003857635142721153,
+     "tip_over_L": 0.02571756761814102,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.0031622776601683794,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.008171276063286652,
+     "flag": "OK",
+     "max_slope_rad": 0.08171276054642967,
+     "tip_m": 0.008171276053025747,
+     "tip_over_L": 0.05447517368683832,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.003064228523732495,
+     "flag": "OK",
+     "max_slope_rad": 0.0272375868429325,
+     "tip_m": 0.003064228519643186,
+     "tip_over_L": 0.020428190130954576,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.003981071705534973,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.006490675290795261,
+     "flag": "OK",
+     "max_slope_rad": 0.06490675285898422,
+     "tip_m": 0.006490675286154172,
+     "tip_over_L": 0.04327116857436115,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.002434003234048223,
+     "flag": "OK",
+     "max_slope_rad": 0.021635584283585068,
+     "tip_m": 0.002434003232228407,
+     "tip_over_L": 0.01622668821485605,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.005011872336272725,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0051557266459059115,
+     "flag": "OK",
+     "max_slope_rad": 0.051557266583374305,
+     "tip_m": 0.005155726655202389,
+     "tip_over_L": 0.0343715110346826,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.001933397492214717,
+     "flag": "OK",
+     "max_slope_rad": 0.01718575553335964,
+     "tip_m": 0.0019333974957476752,
+     "tip_over_L": 0.012889316638317836,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.006309573444801936,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.004095339245363382,
+     "flag": "OK",
+     "max_slope_rad": 0.04095339246319535,
+     "tip_m": 0.00409533924658814,
+     "tip_over_L": 0.027302261643920932,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0015357522170112686,
+     "flag": "OK",
+     "max_slope_rad": 0.01365113082170377,
+     "tip_m": 0.0015357522174949492,
+     "tip_over_L": 0.010238348116632994,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.00794328234724282,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.003253043593366566,
+     "flag": "OK",
+     "max_slope_rad": 0.032530435980564196,
+     "tip_m": 0.003253043596588073,
+     "tip_over_L": 0.021686957310587153,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0012198913475124625,
+     "flag": "OK",
+     "max_slope_rad": 0.010843478662078368,
+     "tip_m": 0.001219891348714003,
+     "tip_over_L": 0.008132608991426687,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.01,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.002583984375,
+     "flag": "OK",
+     "max_slope_rad": 0.025839843785426114,
+     "tip_m": 0.002583984378229315,
+     "tip_over_L": 0.01722656252152877,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0009689941406250001,
+     "flag": "OK",
+     "max_slope_rad": 0.00861328126376585,
+     "tip_m": 0.0009689941418838085,
+     "tip_over_L": 0.006459960945892056,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.012589254117941687,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.002052531747148873,
+     "flag": "OK",
+     "max_slope_rad": 0.02052531748244849,
+     "tip_m": 0.002052531748256748,
+     "tip_over_L": 0.01368354498837832,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0007696994051808276,
+     "flag": "OK",
+     "max_slope_rad": 0.006841772494707028,
+     "tip_m": 0.0007696994056076728,
+     "tip_over_L": 0.005131329370717819,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.01584893192461114,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.001630383919428311,
+     "flag": "OK",
+     "max_slope_rad": 0.016303839187300648,
+     "tip_m": 0.0016303839189316398,
+     "tip_over_L": 0.010869226126210932,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0006113939697856167,
+     "flag": "OK",
+     "max_slope_rad": 0.005434613062150518,
+     "tip_m": 0.0006113939696038331,
+     "tip_over_L": 0.004075959797358888,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.01995262314968879,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0012950599806423465,
+     "flag": "OK",
+     "max_slope_rad": 0.012950599816926311,
+     "tip_m": 0.0012950599815581042,
+     "tip_over_L": 0.008633733210387361,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.00048564749274088,
+     "flag": "OK",
+     "max_slope_rad": 0.004316866606146451,
+     "tip_m": 0.0004856474930916841,
+     "tip_over_L": 0.003237649953944561,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.025118864315095822,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0010287027082856962,
+     "flag": "OK",
+     "max_slope_rad": 0.010287027058726604,
+     "tip_m": 0.0010287027064757868,
+     "tip_over_L": 0.006858018043171912,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0003857635156071361,
+     "flag": "OK",
+     "max_slope_rad": 0.0034290090185833968,
+     "tip_m": 0.0003857635149294385,
+     "tip_over_L": 0.0025717567661962567,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.03162277660168379,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0008171276063286652,
+     "flag": "OK",
+     "max_slope_rad": 0.008171276052766732,
+     "tip_m": 0.0008171276055190147,
+     "tip_over_L": 0.005447517370126765,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0003064228523732495,
+     "flag": "OK",
+     "max_slope_rad": 0.002723758683861895,
+     "tip_m": 0.00030642285207501313,
+     "tip_over_L": 0.002042819013833421,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.039810717055349776,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0006490675290795253,
+     "flag": "OK",
+     "max_slope_rad": 0.0064906752983305465,
+     "tip_m": 0.0006490675296703324,
+     "tip_over_L": 0.0043271168644688825,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.00024340032340482205,
+     "flag": "OK",
+     "max_slope_rad": 0.0021635584332273835,
+     "tip_m": 0.0002434003236393509,
+     "tip_over_L": 0.0016226688242623394,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.05011872336272725,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0005155726645905911,
+     "flag": "OK",
+     "max_slope_rad": 0.005155726638275016,
+     "tip_m": 0.0005155726637917725,
+     "tip_over_L": 0.00343715109194515,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0001933397492214717,
+     "flag": "OK",
+     "max_slope_rad": 0.001718575545644664,
+     "tip_m": 0.00019333974890824385,
+     "tip_over_L": 0.0012889316593882923,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.06309573444801943,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.00040953392453633774,
+     "flag": "OK",
+     "max_slope_rad": 0.004095339248973125,
+     "tip_m": 0.0004095339249506136,
+     "tip_over_L": 0.0027302261663374244,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.0001535752217011267,
+     "flag": "OK",
+     "max_slope_rad": 0.0013651130831702411,
+     "tip_m": 0.00015357522186012067,
+     "tip_over_L": 0.0010238348124008046,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.07943282347242822,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.00032530435933665657,
+     "flag": "OK",
+     "max_slope_rad": 0.0032530435972157306,
+     "tip_m": 0.00032530435963942534,
+     "tip_over_L": 0.0021686957309295023,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 0.00012198913475124623,
+     "flag": "OK",
+     "max_slope_rad": 0.0010843478659473393,
+     "tip_m": 0.000121989134868848,
+     "tip_over_L": 0.0008132608991256534,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.1,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.00025839843749999995,
+     "flag": "OK",
+     "max_slope_rad": 0.0025839843773287283,
+     "tip_m": 0.00025839843765641124,
+     "tip_over_L": 0.0017226562510427416,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 9.689941406250001e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.000861328125855232,
+     "tip_m": 9.689941411967358e-05,
+     "tip_over_L": 0.0006459960941311572,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.12589254117941687,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0002052531747148873,
+     "flag": "OK",
+     "max_slope_rad": 0.0020525317469003977,
+     "tip_m": 0.00020525317466379484,
+     "tip_over_L": 0.0013683544977586323,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 7.696994051808275e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0006841772489456786,
+     "tip_m": 7.696994049741431e-05,
+     "tip_over_L": 0.0005131329366494287,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.15848931924611143,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0001630383919428311,
+     "flag": "OK",
+     "max_slope_rad": 0.001630383922007179,
+     "tip_m": 0.00016303839218439356,
+     "tip_over_L": 0.0010869226145626238,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 6.113939697856168e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0005434613074801729,
+     "tip_m": 6.11393970728077e-05,
+     "tip_over_L": 0.0004075959804853847,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.19952623149688828,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0001295059980642344,
+     "flag": "OK",
+     "max_slope_rad": 0.0012950599818806277,
+     "tip_m": 0.00012950599819471393,
+     "tip_over_L": 0.0008633733212980929,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 4.856474927408791e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0004316866607118142,
+     "tip_m": 4.8564749326559824e-05,
+     "tip_over_L": 0.0003237649955103988,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.25118864315095824,
+    "tip_equivalent": {
+     "analytic_tip_m": 0.0001028702708285696,
+     "flag": "OK",
+     "max_slope_rad": 0.0010287027065524331,
+     "tip_m": 0.00010287027071607655,
+     "tip_over_L": 0.0006858018047738437,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 3.85763515607136e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00034290090213004177,
+     "tip_m": 3.857635152051092e-05,
+     "tip_over_L": 0.00025717567680340613,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.31622776601683794,
+    "tip_equivalent": {
+     "analytic_tip_m": 8.171276063286651e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0008171276063683301,
+     "tip_m": 8.171276063958382e-05,
+     "tip_over_L": 0.0005447517375972255,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 3.0642285237324946e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0002723758687979486,
+     "tip_m": 3.064228524061957e-05,
+     "tip_over_L": 0.0002042819016041305,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.39810717055349776,
+    "tip_equivalent": {
+     "analytic_tip_m": 6.490675290795254e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0006490675296587227,
+     "tip_m": 6.490675294366459e-05,
+     "tip_over_L": 0.00043271168629109726,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 2.4340032340482205e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00021635584323346124,
+     "tip_m": 2.4340032352870292e-05,
+     "tip_over_L": 0.00016226688235246862,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.5011872336272725,
+    "tip_equivalent": {
+     "analytic_tip_m": 5.155726645905911e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0005155726643099033,
+     "tip_m": 5.155726644547288e-05,
+     "tip_over_L": 0.00034371510963648584,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 1.933397492214717e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0001718575547667508,
+     "tip_m": 1.9333974917983226e-05,
+     "tip_over_L": 0.00012889316611988818,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.6309573444801942,
+    "tip_equivalent": {
+     "analytic_tip_m": 4.095339245363378e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.0004095339255118551,
+     "tip_m": 4.0953392534064734e-05,
+     "tip_over_L": 0.0002730226168937649,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 1.535752217011267e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00013651130855063515,
+     "tip_m": 1.5357522200960122e-05,
+     "tip_over_L": 0.00010238348133973416,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 0.7943282347242822,
+    "tip_equivalent": {
+     "analytic_tip_m": 3.253043593366565e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00032530435944477847,
+     "tip_m": 3.2530435944542274e-05,
+     "tip_over_L": 0.00021686957296361518,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 1.2198913475124624e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00010843478648706998,
+     "tip_m": 1.219891347928807e-05,
+     "tip_over_L": 8.132608986192048e-05,
+     "valid": true
+    }
+   },
+   {
+    "EI_Nm2": 1.0,
+    "tip_equivalent": {
+     "analytic_tip_m": 2.5839843749999997e-05,
+     "flag": "OK",
+     "max_slope_rad": 0.00025839843722443305,
+     "tip_m": 2.5839843727890754e-05,
+     "tip_over_L": 0.00017226562485260502,
+     "valid": true
+    },
+    "uniform": {
+     "analytic_tip_m": 9.68994140625e-06,
+     "flag": "OK",
+     "max_slope_rad": 8.613281239641152e-05,
+     "tip_m": 9.689941397949042e-06,
+     "tip_over_L": 6.459960931966029e-05,
+     "valid": true
+    }
+   }
+  ]
+ },
+ "units": {
+  "EI": "N m^2",
+  "L": "m",
+  "p": "Pa",
+  "q_line": "N/m",
+  "slope": "rad",
+  "tip": "m"
+ },
+ "validity": {
+  "any_invalid": true,
+  "fraction_of_assumed_range_valid_uniform": 0.5245901639344263,
+  "policy": "FLAG: every row carries valid/flag; invalid rows are reported, not hidden; beam.require_valid()/solve_checked(strict=True) raise SmallDeformationViolation"
+ },
+ "verdict": "ok"
+}

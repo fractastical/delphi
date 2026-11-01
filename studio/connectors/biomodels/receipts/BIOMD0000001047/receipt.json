@@ -1,0 +1,198 @@
+{
+ "all_checks_passed": true,
+ "checks": {
+  "baseline_stays_symmetric": true,
+  "concentrations_non_negative": true,
+  "engine_converges_with_tolerance": true,
+  "engine_matches_independent_lsoda": true,
+  "evaluator_matches_engine_rates": true,
+  "mutated_evaluator_is_rejected": true,
+  "patterned_state_is_fixed_point": true,
+  "published_run_breaks_symmetry": true,
+  "rk4_order_near_4": true,
+  "symmetric_fixed_point_unstable": true
+ },
+ "controls": {
+  "baseline_max_asymmetry": 4.674871600940378e-13,
+  "derivative_check": {
+   "max_abs_diff": 0.0,
+   "seed": 20261031,
+   "states_checked": 7
+  },
+  "derivative_check_mutated_h3": {
+   "max_abs_diff": 0.3756157009817557,
+   "seed": 20261031,
+   "states_checked": 7
+  },
+  "engine_vs_lsoda_max_abs_diff": {
+   "as_published": 3.5193996605897837e-09,
+   "no_notch_feedback_b0": 4.752466198354455e-10,
+   "symmetric_baseline": 2.0402214362391646e-09
+  },
+  "patterned_state_max_abs_rate": 2.7611246622427643e-12,
+  "rk4_observed_orders": [
+   4.085621969134031,
+   4.041404941095867
+  ],
+  "rk4_step_halving": [
+   {
+    "h": 0.1,
+    "max_abs_diff_vs_lsoda": 1.0334556660440697e-06,
+    "steps": 600
+   },
+   {
+    "h": 0.05,
+    "max_abs_diff_vs_lsoda": 6.086912895941765e-08,
+    "steps": 1200
+   },
+   {
+    "h": 0.025,
+    "max_abs_diff_vs_lsoda": 3.696689510057638e-09,
+    "steps": 2400
+   }
+  ],
+  "symmetric_fixed_point": [
+   0.07398929891977975,
+   0.07398929891977975,
+   0.35377207315472253,
+   0.35377207315472253
+  ],
+  "symmetric_jacobian_real_eigenvalues": [
+   -2.547144435028336,
+   -1.0000000000287557,
+   -1.0000000000287557,
+   0.5471444349708227
+  ],
+  "tolerance_convergence": [
+   {
+    "max_abs_diff_vs_finest": 4.35997462544524e-06,
+    "rtol": 1e-06
+   },
+   {
+    "max_abs_diff_vs_finest": 1.256702032437218e-07,
+    "rtol": 1e-08
+   },
+   {
+    "max_abs_diff_vs_finest": 3.1411612200216155e-09,
+    "rtol": 1e-10
+   }
+  ]
+ },
+ "engine": {
+  "atol": 1e-14,
+  "integrator": "cvode",
+  "name": "libroadrunner",
+  "rtol": 1e-10,
+  "version": "2.10.0"
+ },
+ "evidence_kind": "simulation of a published model under its own parameters (not an observation; not a validation of the paper)",
+ "limits": [
+  "The independent evaluator reads the same SBML file: it checks the engine and the evaluation, not fidelity to the paper.",
+  "The paper's full text was not read; parameter provenance (measured/fitted/assumed) is unknown from the file.",
+  "Units: none are referenced by any quantity; the model is non-dimensional as stored.",
+  "The b=0 run is an added counterfactual, not a result from the source.",
+  "receipt.json cannot hash itself, so it is absent from output_sha256; run.git_head names the code commit, and the receipt is committed after it.",
+  "Versions recorded here (engine, numpy, scipy, python) are those of the producing environment; the SBML bytes were fetched from BioModels and are not stored in this repository."
+ ],
+ "model": {
+  "bytes": 43277,
+  "id": "Collier1996___Delta_Notch_intercellular_signalling_and_lateral_inhibition",
+  "sbml": "L2V4",
+  "sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2"
+ },
+ "numpy": "2.4.4",
+ "output_sha256": {
+  "model_inventory.json": "e865c0c5f4243812c323f7ab7855d63f7601f4bf9eb40d4f7a6e637d2183829e",
+  "trajectory_as_published.csv": "18d72480c7856d0d8b162e940be66b7afc439001bd09510ef4c69ae984a9ed72",
+  "trajectory_no_notch_feedback_b0.csv": "373d6783e5e9b1de7ffd9ef17b7735b0e8a677b6545db4a8e9e09801249a740f",
+  "trajectory_symmetric_baseline.csv": "2079523158221f313eea181e3a6ab5fd41260434daf54ccbeeae3b8274ee0d75"
+ },
+ "python": "3.13.12",
+ "run": {
+  "code_sha256": "46954f4ae0e77732db9eadd303b3acb1edd5ca3925dd036cbb132e556df34b6b",
+  "command": "python -m connectors.biomodels replay BIOMD0000001047 --dest <abs-path-withheld> --out connectors/biomodels/receipts/BIOMD0000001047",
+  "elapsed_s": 3.66,
+  "finished_utc": "2026-10-31T19:03:55+00:00",
+  "git_dirty": false,
+  "git_head": "f80b368172c92357831fc3309f9ef398e99b222a",
+  "hardware": {
+   "cpu_count": 8,
+   "gpu": null,
+   "machine": "x86_64",
+   "threads_requested": 1
+  }
+ },
+ "scenarios": {
+  "as_published": {
+   "description": "initial conditions exactly as stored in the file (cell 2 starts 1% below cell 1)",
+   "final_state": {
+    "delta1": 0.9898979485531872,
+    "delta2": 0.010102051443399112,
+    "notch1": 0.010102051443711457,
+    "notch2": 0.9898979485562907
+   },
+   "max_abs_delta1_minus_delta2": 0.97979589713113,
+   "min_concentration": 0.010102051441580778,
+   "overrides": {},
+   "trajectory_file": "trajectory_as_published.csv"
+  },
+  "no_notch_feedback_b0": {
+   "description": "counterfactual, not in the source: b=0 removes inhibition of Delta by Notch",
+   "final_state": {
+    "delta1": 1.0,
+    "delta2": 1.000000000018499,
+    "notch1": 0.9900990098888999,
+    "notch2": 0.9900990099011733
+   },
+   "max_abs_delta1_minus_delta2": 0.009999999999985021,
+   "min_concentration": 0.99,
+   "overrides": {
+    "b": 0.0
+   },
+   "trajectory_file": "trajectory_no_notch_feedback_b0.csv"
+  },
+  "symmetric_baseline": {
+   "description": "cell 2 initial conditions set equal to cell 1 (no perturbation); reference for symmetry breaking",
+   "final_state": {
+    "delta1": 0.07398929891959935,
+    "delta2": 0.07398929891913186,
+    "notch1": 0.35377207315768217,
+    "notch2": 0.3537720731595494
+   },
+   "max_abs_delta1_minus_delta2": 4.674871600940378e-13,
+   "min_concentration": 0.05298234456371911,
+   "overrides": {
+    "delta2": 0.999999999999985,
+    "notch2": 0.999999999999987
+   },
+   "trajectory_file": "trajectory_symmetric_baseline.csv"
+  }
+ },
+ "scipy": "1.17.1",
+ "source": {
+  "accession": "BIOMD0000001047",
+  "declared_sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+  "declared_size_bytes": 43277,
+  "file_name": "delta_notch.xml",
+  "format": "SBML L2V4",
+  "licence": {
+   "claim_read_on": "2026-10-31",
+   "claim_source": "https://www.biomodels.org/faq (section 'Licence')",
+   "note": "The FAQ states all models are under the CC0 Public Domain Dedication and points at the terms of use. https://www.biomodels.org/terms-of-use redirected to a login form on 2026-10-31, so the terms themselves were not read, and no model's own metadata carries a licence field. The CC0 statement is BioModels' claim about its models, not a reading of the terms.",
+   "per_model_licence_in_metadata": false,
+   "spdx_claimed": "CC0-1.0",
+   "terms_page_read": false
+  },
+  "retrieved_at": "2026-10-31T19:03:51+00:00",
+  "revision": 3,
+  "sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+  "size_bytes": 43277,
+  "source_url": "https://www.biomodels.org/model/download/BIOMD0000001047?filename=delta_notch.xml"
+ },
+ "supported_subset_check": "passed",
+ "time_horizon": {
+  "note": "chosen for this replay; the SBML file declares no simulation settings and no time unit",
+  "points": 601,
+  "t_end": 60.0
+ }
+}

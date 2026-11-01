@@ -1,0 +1,961 @@
+[
+  {
+    "tool": "frontier_capabilities",
+    "started_at_utc": "2026-10-31T23:52:56.703607+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.765330+00:00",
+    "arguments": {},
+    "response": {
+      "manifest_version": "frontier-mcp-capabilities-0.3",
+      "server": "Delphi Frontier MCP",
+      "record_schema": "frontier-record-0.1",
+      "review_policy": "frontier-independent-review-0.1",
+      "namespace": "delphi-frontier",
+      "mode": "write_enabled",
+      "principal": {
+        "actor": "fin-reuse-worker",
+        "operator": "native-mechanobio-agent",
+        "roles": [
+          "contributor"
+        ],
+        "namespaces": [
+          "delphi-frontier"
+        ],
+        "daily_write_limit": 30
+      },
+      "transport": "streamable-http (stateless, JSON responses); one POST per request at the exact path /mcp",
+      "anonymous_reads": true,
+      "credentials": "Public reads need no credential. Per request: `Authorization: Bearer <your operator credential>` header ONLY. Never a query string, tool argument or resource; never returned. Each request is authenticated and acts as its own principal; the server holds no shared token. A credential that fails verification is refused, never treated as anonymous. Every write tool needs a valid bearer.",
+      "tools": [
+        {
+          "name": "frontier_search",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Search public records: GIN full-text plus literal text, exact version/id/source pins, kind/status/source/scope/context filters, bounded pages (max 50). Lexical only, no embeddings; relevance is not truth."
+        },
+        {
+          "name": "frontier_get",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Retrieve one exact public version and its separate node-local review status."
+        },
+        {
+          "name": "frontier_neighborhood",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Read up to 50 typed edges at depth one, including review/dispute relationships."
+        },
+        {
+          "name": "frontier_events",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Read an append-only public event page; consumers deduplicate event versions."
+        },
+        {
+          "name": "frontier_artifacts",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Find public artifact declarations with evidence, action, context and review links. Does not fetch or verify bytes."
+        },
+        {
+          "name": "frontier_discover",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Search with cached hybrid vectors when available; otherwise explicitly fall back to lexical search, without provider calls."
+        },
+        {
+          "name": "frontier_graph",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Read a bounded public graph view around an exact version, or an overview; returns typed edges and truncation counts."
+        },
+        {
+          "name": "frontier_catalogue",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Return measured public-catalogue counts, unknown categories, and the report's record cap."
+        },
+        {
+          "name": "frontier_project_inspect",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Inspect one exact Project version and its pinned members; newer heads are reported, never substituted."
+        },
+        {
+          "name": "frontier_design_context",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Read bounded exact-version Project/member annotations with explicit pagination; challenges and replies never settle or resolve the design."
+        },
+        {
+          "name": "frontier_artifact_inspect",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Inspect matching Evidence declarations and check for matching bytes in this release's guarded public artifacts tree."
+        },
+        {
+          "name": "frontier_simulate",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Run one bounded allowlisted bioelectric or mechanobiology preview; returns an ephemeral SimulationResult, never accepted Evidence."
+        },
+        {
+          "name": "frontier_engineer",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Run the existing bounded engineering-constraint solver; returns an ephemeral scoped calculation, not a biological finding."
+        },
+        {
+          "name": "frontier_formalize",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Run the bounded exact-expression/Lean proposal service; the result is not a persisted formal Evidence record."
+        },
+        {
+          "name": "frontier_belief",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Run the bounded finite-scenario belief solver; consequences are conditional on declared inputs and remain uncalibrated."
+        },
+        {
+          "name": "frontier_capabilities",
+          "kind": "read",
+          "requires_role": null,
+          "summary": "Manifest of this server: mode, configured principal (never the credential), exact tools, limits and what is deliberately unavailable."
+        },
+        {
+          "name": "frontier_propose",
+          "kind": "write",
+          "requires_role": "contributor",
+          "summary": "Propose a record version as the configured principal. The result is 'proposed', never accepted; Events are emitted by the store only."
+        },
+        {
+          "name": "frontier_lease",
+          "kind": "write",
+          "requires_role": "contributor",
+          "summary": "Atomically lease one 'ready' (or expired) Action version for 1..600 seconds. Returns lease_id for later transitions."
+        },
+        {
+          "name": "frontier_transition",
+          "kind": "write",
+          "requires_role": "contributor (ready: coordinator)",
+          "summary": "Move an Action through the execution lifecycle (ready, running, submitted, blocked, cancelled, failed). Acceptance is not reachable here."
+        }
+      ],
+      "not_available": [
+        "review / accept / dispute: independent reviewers act through HTTP POST /v1/reviews with their own operator credential",
+        "import_bundle, provision, initialize (operator-only)",
+        "cloud or durable job execution, arbitrary code, network fetch, publication, and external model inference",
+        "the fixed local calculation tools are bounded previews only; they do not create or accept Actions or Evidence",
+        "proposed Actions are stored as proposed; a worker must use the existing authorized lease/transition flow and record real outputs separately"
+      ],
+      "record_kinds": [
+        "Problem",
+        "Claim",
+        "Evidence",
+        "Assessment",
+        "Action",
+        "Actor",
+        "ResourceOffer",
+        "Interest",
+        "Event",
+        "Project",
+        "Annotation"
+      ],
+      "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
+      "payload_extensions": [
+        "Claim.origin",
+        "Problem.approach/scales/context_tags",
+        "Action.inputs",
+        "Action.proposal",
+        "Action.proposal.plan_steps",
+        "Evidence.relation/produced_by/artifacts"
+      ],
+      "limits": {
+        "max_record_bytes": 65536,
+        "max_bundle_records": 100,
+        "search_page_max": 50,
+        "lease_seconds": [
+          1,
+          600
+        ]
+      },
+      "search": {
+        "engine": "PostgreSQL full-text (simple dictionary, GIN-indexed) plus literal substring fallback; lexical only, no embeddings, no hybrid; relevance is not truth",
+        "filters": [
+          "kind|kinds",
+          "status",
+          "source (URI prefix)",
+          "scope",
+          "context",
+          "include_history"
+        ],
+        "exact_pins": [
+          "version",
+          "record id",
+          "source URI"
+        ],
+        "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"
+      },
+      "transition_states_via_mcp": [
+        "ready (coordinator only)",
+        "running",
+        "submitted",
+        "blocked",
+        "cancelled",
+        "failed"
+      ],
+      "lease_id_note": "A lease_id is a bearer capability for that lease: keep it inside the leasing agent's session. It is not logged by this server.",
+      "write_semantics": "Writes return the store's response verbatim: records start 'proposed'; MCP cannot make anything 'accepted'."
+    }
+  },
+  {
+    "tool": "frontier_get",
+    "started_at_utc": "2026-10-31T23:52:56.782348+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.814115+00:00",
+    "arguments": {
+      "target": {
+        "namespace": "node-a",
+        "kind": "Claim",
+        "id": "eng-finmech-claim-ei-crit",
+        "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+      }
+    },
+    "response": {
+      "record": {
+        "id": "eng-finmech-claim-ei-crit",
+        "kind": "Claim",
+        "issuer": "importer",
+        "payload": {
+          "title": "Declared-load critical bending stiffness of a single clamped-free ray (linear small-deformation surrogate)",
+          "origin": "derived",
+          "source": {
+            "uri": null,
+            "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Claim statement is the producer's critical_stiffness field.",
+            "license": null,
+            "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json",
+            "content_sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+            "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+            "content_available": false
+          },
+          "context": "Producer-derived number from exact rational arithmetic on DECLARED inputs (rho, V, CL, tributary width, ray length, validity thresholds). It is a threshold of the surrogate, not a property of any fish. Decision rule stated by the producer: If measured EI >= EI_crit_Nm2 the declared load stays inside the small-deformation limit for this geometry; if EI < EI_crit_Nm2 the linear model is invalid at the declared load and a large-deformation model (or a lower load) is required.",
+          "statement": "For the producer's declared request (canonical sha256 f276a86069b8577d...), in a linear static Euler-Bernoulli cantilever with a uniform line load from a declared lift-pressure proxy, the bending stiffness below which the declared small-deformation limits are exceeded is EI_crit = 1323/2048000 N m^2 (binding limit: tip_over_L).",
+          "assumptions": [
+            "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+            "single clamped-free cantilever ray; clamped base; free tip",
+            "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+            "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+            "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+            "small-deformation validity limits are DECLARED thresholds, not derived from material"
+          ],
+          "limitations": [
+            "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+            "The request is labelled by its producer: DECLARED ILLUSTRATION: not produced by the dx-guilds solver; numbers are test values, not a design claim. Its numbers are test values, not a design claim.",
+            "EI is an ASSUMED log-spaced range (1/1000000 to 1 N m^2), not a measurement of any fin ray.",
+            "Producer states it does not establish: biological feasibility of any fin, ray or flight design",
+            "Producer states it does not establish: the stiffness EI of any real fish fin ray (it is an assumed range here)",
+            "Producer states it does not establish: fluid-structure interaction: the load is a fixed mean pressure proxy, not coupled to deformation",
+            "Producer states it does not establish: fin membrane, bilaminar hemitrich shear, active muscle control, ray taper, joints or viscoelasticity",
+            "Producer states it does not establish: large-deformation (elastica) behaviour: results beyond the declared small-deformation limit are flagged invalid",
+            "Producer states it does not establish: calibration of rho, CL, tributary width or ray length (all declared, none measured)",
+            "Producer states it does not establish: that the glide package's candidate is flyable (owned by the glide receipt, not by this package)"
+          ],
+          "prior_review": {
+            "status": "none: not reviewed by anyone"
+          },
+          "source_record_version": null
+        },
+        "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+        "namespace": "node-a",
+        "created_at": "2026-10-31T19:32:00+00:00",
+        "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+        "visibility": "public",
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1"
+      },
+      "local_review": {
+        "status": "imported_unreviewed",
+        "policy_version": "frontier-independent-review-0.1"
+      },
+      "is_head": true,
+      "action": null
+    }
+  },
+  {
+    "tool": "frontier_get",
+    "started_at_utc": "2026-10-31T23:52:56.815152+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.834587+00:00",
+    "arguments": {
+      "target": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-below-threshold-v1",
+        "version": "9ed4e9f08391b1d9d78c7ed860ed92632cb0e8a761ad82286dfbbaeab465d4de"
+      }
+    },
+    "response": {
+      "record": {
+        "id": "agent-fin-reuse-below-threshold-v1",
+        "kind": "Action",
+        "issuer": "fin-reuse-worker",
+        "payload": {
+          "title": "Exact-Claim consumed before calculation: below-threshold illustrative ray stiffness candidate",
+          "inputs": [
+            {
+              "id": "eng-finmech-claim-ei-crit",
+              "kind": "Claim",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+              "namespace": "node-a"
+            }
+          ],
+          "target": {
+            "id": "eng-finmech-claim-ei-crit",
+            "kind": "Claim",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "namespace": "node-a"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "tradeoff": "Changes original Claim context and requires another protocol",
+                "description": "Reduce the fixed load rather than increase EI"
+              }
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "selection_basis": "manual",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "expected_information": "Does this lower-stiffness candidate violate the declared small-deformation domain?"
+          },
+          "cache_key": {
+            "code": "e5c19f4145fa5b51bd385f091744eb1d0b7a0e4797dddd8c08c0d52131680c6f",
+            "input": "d49d9115f581ef700dfd8b1de5b4bfbd886069ad5b0c75f5c4e939837f54e353",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "parameters": "42383d288a409faca45f7fd8938faa43771a863fcd502f87c647968a9fefdd5f",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ]
+        },
+        "version": "9ed4e9f08391b1d9d78c7ed860ed92632cb0e8a761ad82286dfbbaeab465d4de",
+        "namespace": "delphi-frontier",
+        "created_at": "2026-10-31T23:49:20.772774+00:00",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1"
+      },
+      "local_review": {
+        "status": "proposed",
+        "policy_version": "frontier-independent-review-0.1"
+      },
+      "is_head": true,
+      "action": {
+        "state": "ready",
+        "lease_until": null
+      }
+    }
+  },
+  {
+    "tool": "frontier_propose",
+    "started_at_utc": "2026-10-31T23:52:56.836980+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.880760+00:00",
+    "arguments": {
+      "draft": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-below-threshold-v1",
+        "issuer": "fin-reuse-worker",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": "9ed4e9f08391b1d9d78c7ed860ed92632cb0e8a761ad82286dfbbaeab465d4de",
+        "payload": {
+          "target": {
+            "namespace": "node-a",
+            "kind": "Claim",
+            "id": "eng-finmech-claim-ei-crit",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+          },
+          "inputs": [
+            {
+              "namespace": "node-a",
+              "kind": "Claim",
+              "id": "eng-finmech-claim-ei-crit",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+            }
+          ],
+          "title": "Exact-Claim consumed before calculation: below-threshold illustrative ray stiffness candidate",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ],
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "cache_key": {
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "input": "c1ff79d584a09b4c81eb409abedc7d98140c7e8443577bc6a74bc022afee54a4",
+            "code": "git:78aa13a06dbb3d9c0d64eee72ffb7b8968419902; files:180b0cb4450828de83e6050abd41d19e3fa8133e66593673c889991eb68b22db",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "parameters": "0cf05c2ee4893f8077d6703537ab7cd26818d69833913a2ba8303fa5a919cff3",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "description": "Reduce the fixed load rather than increase EI",
+                "tradeoff": "Changes original Claim context and requires another protocol"
+              }
+            ],
+            "expected_information": "Does this lower-stiffness candidate violate the declared small-deformation domain?",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "selection_basis": "manual",
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ]
+          }
+        }
+      },
+      "idempotency_key": "fin-ray-claim-reuse-20261031-v1-propose-78aa13a06dbb-below-threshold"
+    },
+    "response": {
+      "record": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-below-threshold-v1",
+        "issuer": "fin-reuse-worker",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": "9ed4e9f08391b1d9d78c7ed860ed92632cb0e8a761ad82286dfbbaeab465d4de",
+        "payload": {
+          "target": {
+            "namespace": "node-a",
+            "kind": "Claim",
+            "id": "eng-finmech-claim-ei-crit",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+          },
+          "inputs": [
+            {
+              "namespace": "node-a",
+              "kind": "Claim",
+              "id": "eng-finmech-claim-ei-crit",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+            }
+          ],
+          "title": "Exact-Claim consumed before calculation: below-threshold illustrative ray stiffness candidate",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ],
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "cache_key": {
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "input": "c1ff79d584a09b4c81eb409abedc7d98140c7e8443577bc6a74bc022afee54a4",
+            "code": "git:78aa13a06dbb3d9c0d64eee72ffb7b8968419902; files:180b0cb4450828de83e6050abd41d19e3fa8133e66593673c889991eb68b22db",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "parameters": "0cf05c2ee4893f8077d6703537ab7cd26818d69833913a2ba8303fa5a919cff3",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "description": "Reduce the fixed load rather than increase EI",
+                "tradeoff": "Changes original Claim context and requires another protocol"
+              }
+            ],
+            "expected_information": "Does this lower-stiffness candidate violate the declared small-deformation domain?",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "selection_basis": "manual",
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ]
+          }
+        },
+        "schema_version": "frontier-record-0.1",
+        "created_at": "2026-10-31T23:52:56.856737+00:00",
+        "version": "0ed92cdd83a6052f68d012be91a722017c0e21677faefba26d8301b44bb4d5f2"
+      },
+      "local_status": "proposed",
+      "artifact_bytes_verified": false
+    }
+  },
+  {
+    "tool": "frontier_get",
+    "started_at_utc": "2026-10-31T23:52:56.882658+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.914878+00:00",
+    "arguments": {
+      "target": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-above-threshold-v1",
+        "version": "c2a7208b182bf5a48738ffc9dcbd5a0003648631137b76d59291efb33794c816"
+      }
+    },
+    "response": {
+      "record": {
+        "id": "agent-fin-reuse-above-threshold-v1",
+        "kind": "Action",
+        "issuer": "fin-reuse-worker",
+        "payload": {
+          "title": "Exact-Claim consumed before calculation: above-threshold illustrative ray stiffness candidate",
+          "inputs": [
+            {
+              "id": "eng-finmech-claim-ei-crit",
+              "kind": "Claim",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+              "namespace": "node-a"
+            }
+          ],
+          "target": {
+            "id": "eng-finmech-claim-ei-crit",
+            "kind": "Claim",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "namespace": "node-a"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "tradeoff": "Changes original Claim context and requires another protocol",
+                "description": "Reduce the fixed load rather than increase EI"
+              }
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "selection_basis": "manual",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "expected_information": "Does this stiffer candidate remain inside the declared small-deformation domain?"
+          },
+          "cache_key": {
+            "code": "e5c19f4145fa5b51bd385f091744eb1d0b7a0e4797dddd8c08c0d52131680c6f",
+            "input": "d49d9115f581ef700dfd8b1de5b4bfbd886069ad5b0c75f5c4e939837f54e353",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "parameters": "9c5d997fa8253862878d9595d1a89c01a9e18a7b6763d34778af8257f3d9b7f9",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ]
+        },
+        "version": "c2a7208b182bf5a48738ffc9dcbd5a0003648631137b76d59291efb33794c816",
+        "namespace": "delphi-frontier",
+        "created_at": "2026-10-31T23:49:20.830709+00:00",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1"
+      },
+      "local_review": {
+        "status": "proposed",
+        "policy_version": "frontier-independent-review-0.1"
+      },
+      "is_head": true,
+      "action": {
+        "state": "ready",
+        "lease_until": null
+      }
+    }
+  },
+  {
+    "tool": "frontier_propose",
+    "started_at_utc": "2026-10-31T23:52:56.917003+00:00",
+    "finished_at_utc": "2026-10-31T23:52:56.955423+00:00",
+    "arguments": {
+      "draft": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-above-threshold-v1",
+        "issuer": "fin-reuse-worker",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": "c2a7208b182bf5a48738ffc9dcbd5a0003648631137b76d59291efb33794c816",
+        "payload": {
+          "target": {
+            "namespace": "node-a",
+            "kind": "Claim",
+            "id": "eng-finmech-claim-ei-crit",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+          },
+          "inputs": [
+            {
+              "namespace": "node-a",
+              "kind": "Claim",
+              "id": "eng-finmech-claim-ei-crit",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+            }
+          ],
+          "title": "Exact-Claim consumed before calculation: above-threshold illustrative ray stiffness candidate",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ],
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "cache_key": {
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "input": "c1ff79d584a09b4c81eb409abedc7d98140c7e8443577bc6a74bc022afee54a4",
+            "code": "git:78aa13a06dbb3d9c0d64eee72ffb7b8968419902; files:180b0cb4450828de83e6050abd41d19e3fa8133e66593673c889991eb68b22db",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "parameters": "2abb23de439bfac44a03bf2c502c20090656d65f8588106f27aaaaf11e4fe7a0",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "description": "Reduce the fixed load rather than increase EI",
+                "tradeoff": "Changes original Claim context and requires another protocol"
+              }
+            ],
+            "expected_information": "Does this stiffer candidate remain inside the declared small-deformation domain?",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "selection_basis": "manual",
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ]
+          }
+        }
+      },
+      "idempotency_key": "fin-ray-claim-reuse-20261031-v1-propose-78aa13a06dbb-above-threshold"
+    },
+    "response": {
+      "record": {
+        "namespace": "delphi-frontier",
+        "kind": "Action",
+        "id": "agent-fin-reuse-above-threshold-v1",
+        "issuer": "fin-reuse-worker",
+        "source_uri": "urn:frontier:claim-reuse:fin-ray-claim-reuse-20261031-v1",
+        "visibility": "public",
+        "predecessor": "c2a7208b182bf5a48738ffc9dcbd5a0003648631137b76d59291efb33794c816",
+        "payload": {
+          "target": {
+            "namespace": "node-a",
+            "kind": "Claim",
+            "id": "eng-finmech-claim-ei-crit",
+            "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+          },
+          "inputs": [
+            {
+              "namespace": "node-a",
+              "kind": "Claim",
+              "id": "eng-finmech-claim-ei-crit",
+              "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+            }
+          ],
+          "title": "Exact-Claim consumed before calculation: above-threshold illustrative ray stiffness candidate",
+          "acceptance_criteria": [
+            "Exact source Claim and historical request pins verified before compute",
+            "Fixed quadrature/null/mutant/FEM controls pass or failures retained",
+            "Actual derived stiffness and invalid/valid model-domain outcome preserved",
+            "Output hashes and exact Action producer recorded; independent review required"
+          ],
+          "required_capabilities": [
+            "bounded local CPU",
+            "Python with NumPy and SciPy",
+            "official MCP contributor client"
+          ],
+          "cost_stop_bounds": "One CPU/thread,4GiB,128tasks,600s whole process; no cloud/GPU/network solver. Stop on pin mismatch or numerical-control failure; invalid candidate remains visible.",
+          "cache_key": {
+            "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+            "input": "c1ff79d584a09b4c81eb409abedc7d98140c7e8443577bc6a74bc022afee54a4",
+            "code": "git:78aa13a06dbb3d9c0d64eee72ffb7b8968419902; files:180b0cb4450828de83e6050abd41d19e3fa8133e66593673c889991eb68b22db",
+            "model": "existing static Euler-Bernoulli beam and declared load bridge",
+            "environment": "7a8ea828a057020e6968ca677be7ea107c8df84eb052d0f03e7955ec609a02dd",
+            "parameters": "2abb23de439bfac44a03bf2c502c20090656d65f8588106f27aaaaf11e4fe7a0",
+            "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+            "acceptance_policy": "frontier-independent-review-0.1"
+          },
+          "proposal": {
+            "intent": "simulation",
+            "method": "Before each numerical run fetch exact Claim via official MCP, verify Record digest/ref, parse EI_crit rational from statement, verify original result/request scope, multiply parsed value by case margin to construct actual solver EI. No hardcoded fallback stiffness. Reuse installed beam adapter.",
+            "assumptions": [
+              "Original declared illustration context only; critical stiffness Claim remains unreviewed",
+              "Selected EI is an assumed design parameter, not measured ray stiffness"
+            ],
+            "alternatives": [
+              {
+                "label": "lower-load",
+                "description": "Reduce the fixed load rather than increase EI",
+                "tradeoff": "Changes original Claim context and requires another protocol"
+              }
+            ],
+            "expected_information": "Does this stiffer candidate remain inside the declared small-deformation domain?",
+            "decision_context": "Keep or reject a stiffness candidate within the stated linear-model domain; no fish feasibility decision",
+            "expected_outputs": [
+              "Effective input binding, beam profile, result/control and provenance receipts"
+            ],
+            "controls": [
+              "Existing beam.control_residuals versus independent quadrature",
+              "Zero load yields zero displacement",
+              "Wrong uniform-law L^3 mutant rejected by quadrature control",
+              "Missing/altered Claim ref or source context fails before solve",
+              "Mutating parsed critical value changes derived candidate EI; full scope gate rejects inconsistency"
+            ],
+            "analysis_plan": "Compare16/32/64element profiles with existing analytic solution; preserve every model-domain flag and fixed control outcome.",
+            "outcomes": [
+              {
+                "label": "inside-domain",
+                "criterion": "Declared validity thresholds satisfied",
+                "decision_consequence": "Retain as illustrative linear-model candidate only"
+              },
+              {
+                "label": "outside-domain",
+                "criterion": "Declared validity threshold exceeded",
+                "decision_consequence": "Reject this linear-model candidate; do not interpret invalid deformation biologically"
+              },
+              {
+                "label": "unknown",
+                "criterion": "Pin or numerical check fails",
+                "decision_consequence": "Keep blocker; no acceptance claim"
+              }
+            ],
+            "selection_basis": "manual",
+            "selection_rationale": "Two predeclared stiffness margins from the same consumed exact Claim; no utility/agency comparison",
+            "limitations": [
+              "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+              "Shared source/model/conditions; no biological calibration or independent samples"
+            ]
+          }
+        },
+        "schema_version": "frontier-record-0.1",
+        "created_at": "2026-10-31T23:52:56.937852+00:00",
+        "version": "6753217293d3cea5f972bd3d2b4fe7402487ca86b6b9ffc3b3c329edae85115f"
+      },
+      "local_status": "proposed",
+      "artifact_bytes_verified": false
+    }
+  }
+]

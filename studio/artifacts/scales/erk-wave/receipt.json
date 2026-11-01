@@ -1,0 +1,471 @@
+{
+ "code_sha256": "914772932665a952361524e80e1b13298067711f5e54bb8aaf7d255f1d811549",
+ "controls": {
+  "D_quarter": {
+   "expect": "trigger-wave scaling v ~ (D/tau)^(1/2) (Hayden 2021): D/4 -> speed x0.5; band 0.4-0.6",
+   "pass": true,
+   "speed_ratio": 0.4900141349645403,
+   "speed_um_per_h": 5.608108108108108
+  },
+  "no_source": {
+   "area_ratio": 1.0,
+   "expect": "no Erk anywhere, no growth",
+   "max_E": 0.0,
+   "pass": true
+  },
+  "pf_sign_mutant": {
+   "cells_reached_fraction": 0.0,
+   "expect": "alpha3 -> -alpha3 (Erk suppresses its activator): no propagating wave",
+   "max_E_outside_source": 0.002939956495538354,
+   "pass": true,
+   "rim_arrivals": []
+  },
+  "step_halved": {
+   "expect": "dt 0.01 -> 0.005 h changes speed and source period by < 5%",
+   "pass": true,
+   "period_rel": 0.0,
+   "speed_rel": 0.00045085662759261153
+  },
+  "synchronous": {
+   "area_ratio": 2.054307816262441,
+   "expect": "De Simone 2021 MEASURED that daily tissue-wide synchronous Erk activation (fgf20a, fgf3) impairs scale growth. Here: activator set to 1 over the whole disc every 24 h, source off.",
+   "note": "Reported, not gated. The growth law grows each cell for a fixed window after each of its own Erk peaks, so it cannot tell a wave from a synchronous pulse at equal pulse count; the measured impairment is outside what this layer models.",
+   "pass": null,
+   "peaks_per_cell_max": 5,
+   "reproduces_measured_impairment": false,
+   "standard_area_ratio": 1.5495364730837151
+  }
+ },
+ "controls_pass": true,
+ "evidence_kind": "SimulationResult (not an observation; not a microscope image)",
+ "files": {
+  "erk_growth.gif": {
+   "bytes": 772270,
+   "sha256": "762338c38b7e780b29b2bd25b08e65fff2f7f40f9228977c57a3915b0f962d61"
+  },
+  "erk_growth.mp4": {
+   "bytes": 192192,
+   "sha256": "b10d8fb873dd80040c464651868c3631124e87115bbea17d1b4b2994661708e8"
+  },
+  "poster.png": {
+   "bytes": 106097,
+   "sha256": "38e5534f315e1cebf127e06ef0094f28b97bb93f706744ecd7894a46636287d4"
+  },
+  "states.npz": {
+   "bytes": 6075564,
+   "sha256": "ea8f41f8abd7dd6469905016a796b944fde3b614446bffc894a33612ae2455fe"
+  }
+ },
+ "growth_coupling": {
+  "assumed": {
+   "form": "exponential: d ln(a)/dt = 0.006 per h while t - t_last_peak <= 24 h, compounding",
+   "note": "not tuned: the area results are those of the assumed exponential form",
+   "per_window_factor_exponential": 1.1548841085249137,
+   "per_window_factor_if_linear": 1.1440000000000001,
+   "status": "ASSUMED (form and window are ours)",
+   "window_h": 24.0
+  },
+  "measured": {
+   "ci68_per_h": 0.002,
+   "n": "89 cells, 3 scales",
+   "quantity": "linear slope of normalised cell area after the Erk peak, d(a/a_peak)/dt",
+   "source": "De Simone 2021 Extended Data Fig. 7b",
+   "value_per_h": 0.006
+  }
+ },
+ "measured_comparison": {
+  "fall_peak_10_h": {
+   "band": [
+    2.5,
+    10.0
+   ],
+   "in_band": true,
+   "measured_source": "De Simone 2021: 'inactivation time of ~5 hours'",
+   "simulated": 7.29
+  },
+  "first_crossing_h": {
+   "band": [
+    24.0,
+    72.0
+   ],
+   "in_band": true,
+   "measured_source": "De Simone 2021: 'one wave traverses the entire scale in about 2 days'",
+   "simulated": 56.0
+  },
+  "front_fwhm_um": {
+   "band": [
+    50.0,
+    100.0
+   ],
+   "in_band": true,
+   "measured_source": "De Simone 2021: 'a traveling front 50-100 um wide'",
+   "simulated": 65.0
+  },
+  "rise_10_90_h": {
+   "band": [
+    1.5,
+    6.0
+   ],
+   "in_band": false,
+   "measured_source": "De Simone 2021: 'activation time of ~3 hours' (single-cell tracks)",
+   "simulated": 1.16
+  },
+  "source_period_h": {
+   "band": [
+    12.0,
+    48.0
+   ],
+   "in_band": true,
+   "measured_source": "Hayden 2021: wave generation starts at ~1 wave per day",
+   "simulated": 28.0
+  },
+  "wave_speed_um_per_h": {
+   "band": [
+    5.0,
+    20.0
+   ],
+   "in_band": true,
+   "measured_source": "De Simone 2021: 'Erk waves travel at a speed in the order of 10 um/h'",
+   "simulated": 11.444788441692475
+  }
+ },
+ "measured_comparison_all_in_band": false,
+ "measured_comparison_misses": [
+  "rise_10_90_h"
+ ],
+ "media": {
+  "caption": [
+   "SIMULATED Erk activity on one regenerating zebrafish scale (520 um radius). Model: Hayden et al. 2021, Table 1 parameters.",
+   "Growth ASSUMED exponential (d ln a/dt = 0.006/h for an assumed 24 h after each Erk peak); measured: linear slope 0.006/h (De Simone 2021 ED7b).",
+   "Rendering of model state in reference (material) coordinates, not a microscope image. Transfer to flying-fish scales unknown."
+  ],
+  "checks": {
+   "frames_match": true,
+   "within_size_limits": true
+  },
+  "gif": {
+   "bytes": 772270,
+   "file": "erk_growth.gif",
+   "sha256": "762338c38b7e780b29b2bd25b08e65fff2f7f40f9228977c57a3915b0f962d61"
+  },
+  "limits": {
+   "gif_max_bytes": 6000000,
+   "mp4_max_bytes": 4000000,
+   "poster_max_bytes": 400000
+  },
+  "poster": "poster.png",
+  "poster_sha256": "38e5534f315e1cebf127e06ef0094f28b97bb93f706744ecd7894a46636287d4",
+  "poster_sim_time_h": 40.0,
+  "settings": {
+   "E_cmap": "viridis",
+   "E_range": [
+    0.0,
+    0.8
+   ],
+   "dpi": 100,
+   "fps": 12,
+   "gif": {
+    "colors": 96,
+    "frame_step": 3,
+    "height_px": 360,
+    "width_px": 640
+   },
+   "growth_cmap": "cividis",
+   "height_px": 540,
+   "mp4": {
+    "codec": "libx264",
+    "crf": 24,
+    "pix_fmt": "yuv420p",
+    "preset": "slow",
+    "threads": 1
+   },
+   "poster_frame_h": 40.0,
+   "width_px": 960
+  },
+  "video": {
+   "bytes": 192192,
+   "codec": "h264",
+   "file": "erk_growth.mp4",
+   "fps": 12,
+   "height": 540,
+   "n_frames": 121,
+   "sha256": "b10d8fb873dd80040c464651868c3631124e87115bbea17d1b4b2994661708e8",
+   "sim_hours_per_frame": 1.0,
+   "width": 960
+  }
+ },
+ "model": "Hayden 2021 Erk trigger-wave reaction-diffusion + wave-gated hypertrophic growth (one scale)",
+ "not_claimed": [
+  "that a flying fish's scales use these kinetics or parameters (all are zebrafish, regenerating scale)",
+  "ontogenetic (first-time) scale development: De Simone 2021 show Erk rings in developing juvenile scales, but the parameters are fitted to regeneration",
+  "any microscope image: every picture is a rendering of simulated state",
+  "absolute concentrations (E_T unknown)",
+  "growth feedback on waves, scale mineralisation, scale shape beyond a disc, or overlap/imbrication",
+  "living or bioprinted fish feasibility; resin props in artifacts/print are display objects"
+ ],
+ "parameters": [
+  {
+   "meaning": "maximal Erk activation rate",
+   "name": "alpha1",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 12.6
+  },
+  {
+   "meaning": "Erk activation AC50",
+   "name": "beta",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "1 (per total Erk)",
+   "value": 0.35
+  },
+  {
+   "meaning": "inhibitor-dependent Erk inactivation",
+   "name": "gamma1",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 15.4
+  },
+  {
+   "meaning": "autonomous Erk inactivation",
+   "name": "gamma_e",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 0.14
+  },
+  {
+   "meaning": "activator deposition in the source (0 elsewhere)",
+   "name": "alpha2_source",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 0.112
+  },
+  {
+   "meaning": "Erk-dependent activator production",
+   "name": "alpha3",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 3.9
+  },
+  {
+   "meaning": "activator degradation",
+   "name": "gamma2",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 11.8
+  },
+  {
+   "meaning": "activator diffusion constant (0.157 um^2/s); De Simone 2021 independently estimate D ~ 0.1 um^2/s from v and tau",
+   "name": "D",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "um^2/h",
+   "value": 566.0
+  },
+  {
+   "meaning": "inhibitor timescale",
+   "name": "gamma3",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "h^-1",
+   "value": 0.14
+  },
+  {
+   "meaning": "inhibitor Erk-dependent production",
+   "name": "alpha4",
+   "source": "Hayden 2021 Table 1 (also the authors' MATLAB, github.com/lhaydene26/Hayden_modelingErkWaves2021 @ b868d87, GPL-3.0, read not copied)",
+   "status": "fitted-in-source",
+   "unit": "1",
+   "value": 0.5
+  },
+  {
+   "meaning": "scale disc radius in the standard simulation",
+   "name": "scale_radius_um",
+   "source": "Hayden 2021 Methods; De Simone 2021 Methods ('a disk 520 um in radius')",
+   "status": "from-source",
+   "unit": "um",
+   "value": 520.0
+  },
+  {
+   "meaning": "source region radius",
+   "name": "source_radius_um",
+   "source": "Hayden 2021 Methods ('small off-center circle with a radius of 40 um')",
+   "status": "from-source",
+   "unit": "um",
+   "value": 40.0
+  },
+  {
+   "meaning": "source centre offset toward the anterior margin",
+   "name": "source_offset_um",
+   "source": "De Simone 2021 locate the source 'between the centre and the anterior margin'; the 150 um value is ours",
+   "status": "assumed",
+   "unit": "um",
+   "value": 150.0
+  },
+  {
+   "meaning": "grid spacing",
+   "name": "dx_um",
+   "source": "Hayden 2021 Methods",
+   "status": "from-source",
+   "unit": "um",
+   "value": 5.0
+  },
+  {
+   "meaning": "time step",
+   "name": "dt_h",
+   "source": "Hayden 2021 Methods (their code uses 0.005; the step-halving control compares)",
+   "status": "from-source",
+   "unit": "h",
+   "value": 0.01
+  },
+  {
+   "meaning": "MEASURED linear slope of normalised osteoblast area after the Erk peak, d(a/a_peak)/dt (+/-0.002, 68% CI; n=89 cells, 3 scales); before the peak -0.002 +/- 0.002",
+   "name": "growth.measured_linear_slope_per_h",
+   "source": "De Simone 2021 Extended Data Fig. 7b (caption of the figure titled 'Erk activity is required for tissue expansion during zebrafish scale hypertrophy')",
+   "status": "measured",
+   "unit": "h^-1",
+   "value": 0.006
+  },
+  {
+   "meaning": "log-area growth rate used by the code: d ln(a)/dt during the window after each Erk peak (exponential, compounding)",
+   "name": "growth.rate_after_peak_per_h",
+   "source": "coupling form is ours; its value is taken from growth.measured_linear_slope_per_h",
+   "status": "assumed",
+   "unit": "h^-1",
+   "value": 0.006
+  },
+  {
+   "meaning": "how long a cell grows after each Erk peak",
+   "name": "growth.window_h",
+   "source": "not stated in the text read; chosen as ~one inter-wave interval",
+   "status": "assumed",
+   "unit": "h",
+   "value": 24.0
+  },
+  {
+   "meaning": "Erk level that scores a peak",
+   "name": "growth.peak_threshold",
+   "source": "Hayden 2021 Methods (event scored at prominence > 0.2)",
+   "status": "from-source",
+   "unit": "1",
+   "value": 0.2
+  },
+  {
+   "meaning": "total Erk concentration (sets absolute units)",
+   "name": "E_T",
+   "source": "Hayden 2021: 'We lack experimental data on this parameter' (0.1-1 uM in other cell types)",
+   "status": "unknown",
+   "unit": "uM",
+   "value": null
+  }
+ ],
+ "run": {
+  "geometry": {
+   "domain_um": 1090.0,
+   "dt_h": 0.01,
+   "dx_um": 5.0,
+   "scale_radius_um": 520.0,
+   "source_offset_um": 150.0,
+   "source_radius_um": 40.0
+  },
+  "growth": {
+   "peak_threshold": 0.2,
+   "rate_after_peak_per_h": 0.006,
+   "window_h": 24.0
+  },
+  "hours": 120.0,
+  "mode": "standard",
+  "params": {
+   "D": 566.0,
+   "alpha1": 12.6,
+   "alpha2_source": 0.112,
+   "alpha3": 3.9,
+   "alpha4": 0.5,
+   "beta": 0.35,
+   "gamma1": 15.4,
+   "gamma2": 11.8,
+   "gamma3": 0.14,
+   "gamma_e": 0.14
+  },
+  "save_every_h": 1.0,
+  "sync_period_h": 24.0,
+  "sync_pulse_A": 1.0
+ },
+ "schema": "frontier.scales.receipt/1",
+ "sources": [
+  {
+   "citation": "Hayden LD, Poss KD, De Simone A, Di Talia S. Mathematical modeling of Erk activity waves in regenerating zebrafish scales. Biophys J 2021;120(19):4287-4297.",
+   "doi": "10.1016/j.bpj.2021.05.004",
+   "id": "hayden2021",
+   "pmcid": "PMC8516634",
+   "pmid": "34022234",
+   "read_level": "full-text",
+   "read_via": "pmc.ncbi.nlm.nih.gov/articles/PMC8516634 HTML (equations, Table 1, Methods)",
+   "used_for": "equations, parameters, geometry, numerical scheme"
+  },
+  {
+   "citation": "De Simone A, Evanitsky MN, Hayden L, et al. Control of osteoblast regeneration by a train of Erk activity waves. Nature 2021;590(7844):129-133.",
+   "doi": "10.1038/s41586-020-03085-8",
+   "id": "desimone2021",
+   "pmcid": "PMC7864885",
+   "pmid": "33408418",
+   "read_level": "full-text",
+   "read_via": "NCBI BioC PMC OA (author manuscript text and figure captions; Supplementary Methods not read)",
+   "used_for": "measured wave speed, crossing time, front width, activation/inactivation times, measured linear growth slope after the Erk peak (Ext. Data Fig. 7b), synchronous-activation result"
+  },
+  {
+   "citation": "Cooper RL, Thiery AP, Fletcher AG, et al. An ancient Turing-like patterning mechanism regulates skin denticle development in sharks. Sci Adv 2018;4(11):eaau5484.",
+   "doi": "10.1126/sciadv.aau5484",
+   "id": "cooper2018",
+   "pmcid": "PMC6221541",
+   "pmid": "30417097",
+   "read_level": "abstract",
+   "used_for": "NOT YET USED: planned only for an abstract scale-placement pattern on the body surface (shark denticles; transfer to teleost scales unknown)"
+  }
+ ],
+ "summary": {
+  "area_final_um2": 1316796.0948265411,
+  "area_initial_um2": 849800.0,
+  "area_ratio": 1.5495364730837151,
+  "cells_reached_fraction": 1.0,
+  "disc_area_check_rel": 0.0003688656767208107,
+  "effective_radius_final_um": 647.4173422696495,
+  "front_fwhm_um_median": 65.0,
+  "max_E_outside_source": 0.7923681139945984,
+  "mode": "standard",
+  "peaks_per_cell_max": 5,
+  "pulse_shape": {
+   "at_um": 250.0,
+   "fall_peak_10_h": 7.29,
+   "peak_E": 0.789404034614563,
+   "rise_10_90_h": 1.16
+  },
+  "rim_arrival_times_h": [
+   60.0,
+   91.0,
+   120.0
+  ],
+  "source_peak_times_h": [
+   4.0,
+   31.0,
+   59.0,
+   87.0,
+   115.0
+  ],
+  "wave_speed": {
+   "n_points": 18,
+   "speed_um_per_h": 11.444788441692475,
+   "t_range_h": [
+    16.0,
+    33.0
+   ]
+  }
+ },
+ "wall_s": 180.5
+}

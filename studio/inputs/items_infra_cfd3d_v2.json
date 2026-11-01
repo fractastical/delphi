@@ -1,0 +1,29 @@
+{
+  "run_tag": "infra22",
+  "items": [
+    {
+      "id": "cfd3d-geometry-dispatch-repair",
+      "script": "engineering/cfd3d/cfd3d_launch.py",
+      "kind": "gpu",
+      "args": [
+        "artifacts/cfd3d/packet/cfd3d-packet.tar.xz",
+        "5af94b3fb597839f6242501c3156eb91c317fb437bdab6efc17907433f830c5a"
+      ],
+      "files": [
+        "artifacts/cfd3d/packet/cfd3d-packet.tar.xz"
+      ],
+      "image": "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+      "env": {
+        "NVIDIA_VISIBLE_DEVICES": "all",
+        "NVIDIA_DRIVER_CAPABILITIES": "compute,utility",
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      },
+      "timeout": "70m",
+      "inner_timeout_s": 3600,
+      "max_result_bytes": 16000000,
+      "priority": 1
+    }
+  ]
+}

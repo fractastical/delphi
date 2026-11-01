@@ -1,0 +1,169 @@
+# BioModels connector
+
+Bounded, read-only access to BioModels plus one real replay. Everything here is a *connector and
+simulation* component: discovered, retrieved and replayed are separate receipts (SPEC-005).
+
+## Model chosen
+
+**BIOMD0000001047, Collier 1996, "Delta Notch intercellular signalling and lateral inhibition"**
+(curated, SBML L2V4, BioModels revision 3). Two cells, four state variables (`delta1/2`,
+`notch1/2`), non-dimensionalised ODEs. Source paper: Collier JR, Monk NA, Maini PK, Lewis JH,
+*J Theor Biol* 1996, PubMed 9015458. File sha256
+`da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2` (43,277 bytes), equal to the hash
+BioModels' own metadata declares.
+
+Why this one: developmental patterning by cell-cell signalling, curated, tiny, and executable with
+an established solver. Not chosen for flying fish; see "Applicability".
+
+## What was read, and how deeply
+
+| Source | Read level |
+| --- | --- |
+| BioModels model metadata JSON for BIOMD0000001047 | full-text |
+| `delta_notch.xml` | full-text: parsed completely; compartments, species, parameters, rules, initial assignments, reactions, unit definitions and annotations are in `receipts/*/model_inventory.json` |
+| BioModels FAQ (`/faq`), Licence section | full-text of that section |
+| BioModels terms of use | could-not-access: redirects to a login form |
+| Collier 1996 paper | abstract only, via the BioModels `synopsis`; full text not read |
+
+## Licence
+
+BioModels' FAQ states all models are under CC0. The terms page it points to was not readable, and no
+model metadata carries a licence field, so this is BioModels' claim, not a reading of the terms.
+`client.LICENCE` records exactly that. The SBML bytes are not committed here; the connector
+re-fetches them and refuses any file whose size and sha256 differ from BioModels' declaration.
+
+## Interface
+
+Run from the repository root (or any directory that contains the `connectors/` package) with the pinned versions in
+`requirements.txt` installed; nothing refers to this checkout's location:
+
+```
+cd "$(git rev-parse --show-toplevel)"          # or the directory holding connectors/
+export PYTHONPATH="$PWD"
+python3 -m connectors.biomodels search "lateral inhibition" --limit 5
+python3 -m connectors.biomodels metadata BIOMD0000001047
+python3 -m connectors.biomodels fetch BIOMD0000001047 --dest "$(mktemp -d)"
+python3 -m connectors.biomodels replay BIOMD0000001047 --dest "$(mktemp -d)" --out "$(mktemp -d)"
+```
+
+`--out` may be any empty directory; the committed receipt lives in `receipts/BIOMD0000001047/`. To check a replay, compare the new
+`receipt.json`'s `output_sha256` and `run.code_sha256` with the committed receipt's. A live-gated test
+(`BIOMODELS_LIVE=1`) does this from a copy of the package in a different directory.
+
+Exit 0 = done and every control passed, 1 = replay ran and a control failed, 2 = refused (reason on stderr as JSON).
+
+Python: `BioModelsClient.search / metadata / fetch`, `inspect_sbml(bytes) -> Model`,
+`replay_collier1996(bytes, pinned_sha256, out_dir)`.
+
+* Hosts are allow-listed (`www.biomodels.org`, `biomodels.org`, `www.ebi.ac.uk`), https only, redirects
+  re-checked; 1 request/s; JSON capped at 2 MB, models at 5 MB; limit capped at 25.
+* `search` uses BioModels' own index. On 2026-10-31 that index answered HTTP 200 with
+  `matches: -1` and no models for every query (including an exact accession) for a stretch of the
+  session; a later call returned results. A `-1` total is reported as `primary_status: degraded`
+  and the EBI Search BioModels domain is used instead, labelled as the source. It is never read
+  as zero results.
+* A PyPI `libroadrunner` wheel names `libpython3.13.so.1.0` without a path; `load_engine` preloads
+  the running interpreter's own libpython once. If that fails the replay reports not-run; no
+  substitute engine exists.
+
+## Fail-closed SBML subset
+
+Supported: L2/L3 core, concentration-based species, parameters, function definitions, assignment
+rules, initial assignments, kinetic laws over `ci cn plus minus times divide power`.
+Refused by name: events, algebraic/rate rules, constraints, delay/time/rateOf csymbols,
+stoichiometryMath, boundary/constant/amount species, required packages, DOCTYPE/ENTITY, any other
+MathML operator, undefined symbols. `tests/test_biomodels.py` has a case per refusal and a
+positive control.
+
+## Replay
+
+Engine: libroadrunner 2.10.0 (CVODE, rtol 1e-10, atol 1e-14), single thread, 0 to 60 at 601 points.
+The horizon is mine; the file declares no simulation settings. Three scenarios: the file's own
+initial conditions (cell 2 starts 1% below cell 1); an unperturbed symmetric baseline; and a
+`b = 0` counterfactual that is **not in the source**.
+
+Controls (values in `receipt.json`, asserted in `tests/test_biomodels_replay.py`):
+tolerance convergence; independent scipy LSODA and fixed-step RK4 (observed order about 4.1) over right-hand sides
+evaluated from the parsed SBML; a derivative cross-check of that evaluator against roadrunner's
+rates with a mutated evaluator (`h = 3`) that must be rejected; patterned end state is a fixed point;
+the symmetric fixed point has a positive Jacobian eigenvalue.
+
+Limit: the independent evaluator reads the same file, so these check the engine, not the file's
+fidelity to the paper.
+
+Result: as published, the cells end in opposite states (delta1 ~0.990, delta2 ~0.010; notch the
+reverse); the baseline stays symmetric because its symmetric fixed point is unstable and exact
+symmetry is preserved; with `b = 0` no pattern forms. This is a simulation of a published model.
+It is not an observation, and it does not validate the paper.
+
+## Quantities, units, provenance
+
+* Units: no compartment, species or parameter references a unit. The file defines unitDefinitions
+  for the SBML L2 defaults (second, mole, litre, metre) that apply by omission. The model is
+  non-dimensional; no SI quantity is asserted and no time scale is known.
+* Initial conditions (from the file): delta1 = notch1 = 0.999999999999985/0.999999999999987,
+  delta2 = notch2 = 0.99. Parameters: a 0.01, b 100, h 2, k 2, mu 1, rho 1 (four are re-set through
+  initialAssignments).
+* Organism: the file annotates NCBI taxonomy id 7215 (name not resolved here) and tissue/cell
+  identifier BTO:0006223; UniProt P10041 (Delta) and P07207 (Notch) are annotated as `isVersionOf`.
+* Whether each parameter was measured, fitted or assumed: unknown from the file; paper not read.
+
+## Applicability to flying-fish development (proposed, not established)
+
+This is not a flying-fish model, and nothing here says Delta-Notch lateral inhibition operates in
+any tissue relevant to flying-fish flight morphology. A cross-species analogy would be a *proposed*
+coupling, needing at least:
+
+1. A named flying-fish trait and tissue where lateral inhibition is claimed, with evidence.
+2. Notch and Delta orthologs identified in a flying-fish genome and their expression in that tissue.
+3. A mapping from the dimensionless variables and time to measurable quantities and a real time scale.
+4. A cell-neighbourhood geometry; this model has exactly two cells.
+5. Parameter values (or ranges) for the target, with source and uncertainty; none transfer from the file.
+6. An independent check that the pattern, not just the equations, appears in a proxy or target tissue.
+
+## Dependency pins
+
+`requirements.txt`: libroadrunner 2.10.0, numpy 2.4.4, scipy 1.17.1 (pytest 9.0.2 for tests); Python 3.13.12.
+The receipt records the engine, numpy, scipy and Python versions it ran with. Root's `pyproject.toml` does not declare them.
+
+## Frontier mapping (proposed drafts; no root schema changed)
+
+`mapping/BIOMD0000001047.mapping.json`, built by `python -m connectors.biomodels.frontier_mapping` (a test fails if the committed file is stale).
+It holds 7 records validated against `frontier.models`, 4 edges, artifacts with sha256, and a `separation` block:
+
+* **source assertions** (paper/curators, abstract-level): two Claims and a `source_assessment` Evidence;
+* **simulation** (this connector): the model-behaviour Claim, the replay Action, and the simulated Evidence;
+* **unknown**: flying-fish applicability, as a `recorded` Problem with `status: unknown`, not as a Claim;
+* `observed_evidence` is empty on purpose.
+
+Links use the root's typed fields: `Action.inputs` pins the source Claim whose model was replayed (identity, not numerical
+consumption); `Evidence.produced_by` pins the replay Action; `Evidence.relation` is `supports` for the simulation and `context_only`
+for the source assessment; `Evidence.artifacts` are typed `ArtifactRef`s, digest and locator only. Edges in the mapping come from
+`frontier.models.references`. The raw SBML is referenced by sha256 and BioModels' own URL and is not committed or redistributed.
+
+## OpenResearch capture
+
+`orx/capture.py` reads one local `orx` run through the corpus session's read-only adapter (delphi-frontier branch
+`work/corpus-adapters`, not modified) and writes `orx/orx_facts.json` and `orx/evidence_draft.json`. The run was a second
+execution of the same code from an orx snapshot; its four outputs and code hash equal the committed receipt's. It is a repeat by
+the same author, not independent replication, and orx did not record the environment, seeds or the network input.
+
+## Simulation video (`render.py`, `video/`)
+
+```
+cd "$(git rev-parse --show-toplevel)"; export PYTHONPATH="$PWD"
+python3 -m connectors.biomodels.render --receipt-dir connectors/biomodels/receipts/BIOMD0000001047 --out-dir "$(mktemp -d)"
+```
+
+Renders `delta_notch_replay.mp4` (1280x720, 24 fps, 16 s, about 0.3 MB, H.264), `delta_notch_replay_poster.png` and
+`delta_notch_replay_manifest.json` from the three replay CSVs only. Each CSV is checked against the receipt's sha256 first; a
+mismatch is refused. Top row: Delta and Notch of both cells against model time. Bottom row: each cell's (Notch, Delta) phase portrait.
+Columns: as published, unperturbed baseline, and the `b = 0` counterfactual (added here, not in the source).
+
+* Time mapping: frames 0-335 sweep model time 0 to 60 linearly by showing the nearest CSV row (no interpolation); 48 hold frames repeat the last row.
+  Most change happens before model time 30, so the second half of the video is the settled state.
+* Captions on every frame: simulation, not an observation; non-dimensional model time and concentrations; two abstract cells, not tissue, not a fin, no cell shape modelled or observed.
+* Manifest: input CSV and model hashes, replay and render code hashes, fps and time mapping, dimensions, ffmpeg/matplotlib/numpy versions, video and poster hashes, and a raw-frame hash.
+* Determinism, measured: two full renders gave byte-identical MP4 and poster files and equal raw-frame hashes on one machine and one ffmpeg build (6.1.1). The MP4 hash is not promised across ffmpeg builds; the raw-frame hash depends only on the drawing.
+* `encode_mp4`, `file_record`, `probe` and `ffmpeg_version` know nothing about this model and can be reused by another renderer.
+* Caveat: the video does not show what cells look like. It plots two numbers per cell. Do not describe it as cell differentiation or morphology.

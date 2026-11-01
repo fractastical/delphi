@@ -1,0 +1,304 @@
+{
+  "bidirectional": {
+    "forward": "sequence/regulatory -> expression -> growth -> EI -> deflection margin. Only the last arrow has a computed model here; every earlier arrow is a proposed, uncalibrated interface.",
+    "forward_hypothesis_discrimination": {
+      "assumed_noise": "independent ln-reading SD 0.2 per section (ASSUMED, the R1 scale)",
+      "hypotheses": [
+        "H-uniform: distributed load q",
+        "H-tip: same total force at the tip"
+      ],
+      "outputs": "separation d' = |difference of mean statistic| / SD, and replicates for d' >= 2 (needs independent specimens; repeats on one specimen share discrepancy)",
+      "statistic": "ln[w(x=L)/w(x=0.5L)] read from saved FEM profiles (parameter-free: EI and q cancel)"
+    },
+    "inverse": "target observable -> candidate set. Executed only for the mechanical layer: the screen ranks a finite (length, EI multiplier) grid against the target 'both load shapes inside the linear envelope'. Inversion to sequence is NOT attempted: no calibrated map exists, so no full-genome or regulatory-element inversion is claimed."
+  },
+  "candidates": {
+    "EI_multiplier": [
+      1.0,
+      1.5,
+      2.0,
+      3.0,
+      4.0
+    ],
+    "note": "Full 6 x 5 grid; the three recorded assurance candidates (0.15/1, 0.12/1, 0.15/2) are positive controls inside it.",
+    "ray_length_m": [
+      0.09,
+      0.1,
+      0.12,
+      0.135,
+      0.15,
+      0.17
+    ]
+  },
+  "controls": [
+    "C1: analytic screen reproduces the recorded pass flag on all 192 recorded (candidate, draw) trials (expect 0 mismatches)",
+    "C2: zero-load candidate (q=0) passes every draw; infinite-load (q x 1e6) passes none",
+    "C3: mutant law (tip = qL^2/EI, wrong exponent) must change at least one recorded flag, else C1 cannot detect that fault",
+    "C4: a readout with zero sensitivity to the target gives zero variance reduction"
+  ],
+  "finalist_rule": "Highest FEM pass fraction among survivors; ties go to the smaller EI multiplier, then the longer ray. A declared tie-break, not a biological winner.",
+  "inputs": {
+    "assurance_protocol": "engineering/assurance_experiments/protocol.json",
+    "draw_count": 64,
+    "draws_file": "artifacts/assurance-experiments/all-simulations.json",
+    "draws_sha256": "70b66639062baa0add858b4468c2aef8594f6b3b64fce76bc41770858eba618d",
+    "latent_laws": "assumed, from the assurance protocol; not fitted to any fin"
+  },
+  "instruments": [
+    {
+      "acceptance": "max |w_saved - w_analytic|/L <= 1e-4",
+      "blocked_on": null,
+      "calibration_context": "no empirical calibration was performed (none is applicable to a saved simulated field); the instrument model is NOT calibrated to any biological system; context = the saved draw's assumed latents",
+      "forward_noise_model": "y = w_saved(x)/L, deterministic; no noise sampled",
+      "id": "V1-saved-deflection-section",
+      "kind": "virtual_simulation_readout",
+      "observable": "w(x)/L at fixed sections of a saved FEM profile",
+      "reference_control": "closed-form analytic deflection of the same inputs; coarse/fine FEM difference stored with each case",
+      "sampling_cross_section": "x/L in {0.25,0.5,0.75,1.0}; one beam, one load shape per saved case",
+      "status": "simulation_derived",
+      "uncertainty": "numerical discretisation only (stored grid difference); no biological uncertainty",
+      "unit": "1 (m/m)"
+    },
+    {
+      "acceptance": "analytic_tip_relative_error <= 1e-7 (assurance protocol tolerance)",
+      "blocked_on": null,
+      "calibration_context": "no empirical calibration performed; instrument model not calibrated to biology; saved draw context",
+      "forward_noise_model": "y = saved summary value, deterministic",
+      "id": "V2-saved-tip-and-slope",
+      "kind": "virtual_simulation_readout",
+      "observable": "tip/L and max slope of a saved case",
+      "reference_control": "the assurance predicate's analytic residual field",
+      "sampling_cross_section": "tip station and max over saved stations",
+      "status": "simulation_derived",
+      "uncertainty": "numerical only",
+      "unit": "1; rad"
+    },
+    {
+      "acceptance": "reference beam EI recovered within 2 SD of the declared noise",
+      "blocked_on": "no specimen, clamp or load-cell data",
+      "calibration_context": "needs clamp compliance and load-cell calibration; ex vivo",
+      "forward_noise_model": "ln y = -ln EI + 3 ln L + e, e~N(0, 0.04) ASSUMED",
+      "id": "R1-ray-bending",
+      "kind": "physical_measurement_proposal",
+      "observable": "excised-ray clamped bending compliance",
+      "reference_control": "known-stiffness reference beam in the same clamp",
+      "sampling_cross_section": "clamp-to-tip, one load level per read",
+      "status": "proposal_needs_calibration",
+      "uncertainty": "assumed noise only; no fish data",
+      "unit": "ln(m/N) offset removed"
+    },
+    {
+      "acceptance": "rigid control within imaging resolution",
+      "blocked_on": "no flow-tank or imaging data",
+      "calibration_context": "needs flow-speed and imaging scale calibration; in vivo",
+      "forward_noise_model": "ln y = lnq + 3 ln L - ln EI + e + d, e~N(0,0.04), d~N(0,0.09) shared by repeats on one fish; ASSUMED",
+      "id": "R2-inflow-tip",
+      "kind": "physical_measurement_proposal",
+      "observable": "ray tip deflection/L in flow",
+      "reference_control": "rigid-plate control in the same flow (expect zero deflection)",
+      "sampling_cross_section": "tip, target flow speed",
+      "status": "proposal_needs_calibration",
+      "uncertainty": "assumed",
+      "unit": "1"
+    },
+    {
+      "acceptance": "zero-flow reading consistent with 0",
+      "blocked_on": "no sensor data",
+      "calibration_context": "needs pressure/force sensor calibration",
+      "forward_noise_model": "ln y = ln q + e, e~N(0,0.09) ASSUMED",
+      "id": "R3-load",
+      "kind": "physical_measurement_proposal",
+      "observable": "distributed load at the ray",
+      "reference_control": "zero-flow reading",
+      "sampling_cross_section": "along the ray",
+      "status": "proposal_needs_calibration",
+      "uncertainty": "assumed",
+      "unit": "N/m"
+    },
+    {
+      "acceptance": "gauge within resolution",
+      "blocked_on": "no imaging data",
+      "calibration_context": "needs scale-bar calibration",
+      "forward_noise_model": "ln y = ln L + e, e~N(0,0.0025) ASSUMED",
+      "id": "R4-length",
+      "kind": "physical_measurement_proposal",
+      "observable": "ray length",
+      "reference_control": "gauge block",
+      "sampling_cross_section": "base to tip",
+      "status": "proposal_needs_calibration",
+      "uncertainty": "assumed",
+      "unit": "m"
+    },
+    {
+      "acceptance": "not definable until the mapping is calibrated",
+      "blocked_on": "native mechanobio sequence-evidence ledger; no expression calibration",
+      "calibration_context": "needs matched cell state and reporter calibration",
+      "forward_noise_model": "undefined: no calibrated mapping from sequence to expression",
+      "id": "P1-reporter-expression",
+      "kind": "sequence_expression_proposal",
+      "observable": "enhancer/promoter reporter output",
+      "reference_control": "empty-vector and known-enhancer controls",
+      "sampling_cross_section": "per construct, per cell state",
+      "status": "proposed_uncalibrated",
+      "uncertainty": "unknown",
+      "unit": "relative units"
+    },
+    {
+      "acceptance": "not definable until the coupling is calibrated",
+      "blocked_on": "unresolved expression->growth->EI bridges in the design-control map",
+      "calibration_context": "needs staged imaging and density calibration",
+      "forward_noise_model": "undefined: expression->growth->EI coupling unresolved",
+      "id": "P2-growth-to-EI",
+      "kind": "cell_growth_proposal",
+      "observable": "ray segment growth and mineral density vs stage",
+      "reference_control": "untreated sibling",
+      "sampling_cross_section": "per ray segment, per stage",
+      "status": "proposed_uncalibrated",
+      "uncertainty": "unknown",
+      "unit": "m; kg/m^3"
+    }
+  ],
+  "interfaces": "See interface-map.json: sequence/regulatory and cell/growth tests are PROPOSALS blocked on calibration; only the material/fin row has a numerical execution here.",
+  "measurement": {
+    "baseline": "equal-budget naive plan: all budget on in-flow tip deflection replicates (R2 x2), the most direct-looking readout",
+    "budget": 6.0,
+    "budget_unit": "assumed_readout_cost_unit (not dollars)",
+    "decision": "Whether the finalist stays inside the declared linear regime (margin > 0) at the target load: keep the linear model, or stop and use a nonlinear/larger-deformation model.",
+    "decision_exercise": "Model-based exercise, not an observed error rate. True margin = m0 + theta.target where m0 is the FINALIST's actual log margin ln(0.3) - (ln q + 3 ln L - ln EI) at the sample mean of the recorded draws, and theta ~ N(0, prior). Each plan decides by the sign of the posterior-mean margin; no-measurement decides by sign(m0). Reports sign-misclassification probability; seed 20261101, 20000 draws. The earlier centered (m0 = 0) version is superseded.",
+    "max_replicates_per_readout": 3,
+    "objective": "expected reduction of target posterior variance, divided by cost; ties by information nats",
+    "parameters": [
+      "ln_EI",
+      "ln_q",
+      "ln_L"
+    ],
+    "prior": "sample covariance of ln EI, ln q, ln L over the 64 recorded draws (an assumed latent law, not biological variability)",
+    "readouts": [
+      {
+        "context": "ex vivo, clamping may differ from in vivo",
+        "cost": 2.0,
+        "definition": "excised-ray clamped bending compliance under a KNOWN applied load; ln(delta/F) offset removed",
+        "id": "R1-ray-bending",
+        "independent_noise_variance": 0.04,
+        "sensitivity": [
+          -1.0,
+          0.0,
+          3.0
+        ],
+        "shared_discrepancy_variance": 0.0,
+        "unit_replicate": "one ray from one fish (biological replicate = fish)"
+      },
+      {
+        "context": "in vivo/in flow; the shared term is an ASSUMED load-shape and 3D model discrepancy common to repeats on one specimen",
+        "cost": 3.0,
+        "definition": "tip deflection / L of the ray in flow at the target speed",
+        "id": "R2-inflow-tip",
+        "independent_noise_variance": 0.04,
+        "sensitivity": [
+          -1.0,
+          1.0,
+          3.0
+        ],
+        "shared_discrepancy_variance": 0.09,
+        "unit_replicate": "one fish; repeated flows on one fish are technical repeats"
+      },
+      {
+        "context": "in flow",
+        "cost": 2.0,
+        "definition": "independent distributed-load estimate (pressure or force) at the ray",
+        "id": "R3-load",
+        "independent_noise_variance": 0.09,
+        "sensitivity": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "shared_discrepancy_variance": 0.0,
+        "unit_replicate": "one flow condition"
+      },
+      {
+        "context": "any",
+        "cost": 0.5,
+        "definition": "caliper length of the ray",
+        "id": "R4-length",
+        "independent_noise_variance": 0.0025,
+        "sensitivity": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "shared_discrepancy_variance": 0.0,
+        "unit_replicate": "one ray"
+      }
+    ],
+    "sensitivity_grid": {
+      "cost_scale_per_readout": [
+        0.5,
+        1.0,
+        2.0
+      ],
+      "dependence": "Nominal model: repeats of R1, R3 and R4 are treated as independent (OPTIMISTIC for repeats on one ray or setup); only R2 carries a shared discrepancy. A dependence sensitivity gives every readout a shared term equal to its independent variance and reports the best plan again.",
+      "noise_scale_per_readout": [
+        0.5,
+        1.0,
+        2.0
+      ],
+      "note": "every combination of per-readout scales (3^8 = 6561). The FULL replicate-count grid (max_replicates_per_readout) is enumerated once, so plans that a price cut makes affordable are considered; a discounted-cost case (all prices x0.5) must show at least one newly feasible plan considered. Noise scale multiplies independent and shared variance. Baseline-not-beaten is counted only over scenarios in which the baseline is affordable; baseline-ineligible scenarios are reported separately."
+    },
+    "target": "ln_margin = ln(0.3) - (ln_q + 3 ln_L - ln_EI), the finalist's log distance to the linear-validity limit; deviations from the draw-sample mean (prior mean 0)"
+  },
+  "pass_predicate": "Both uniform and same-total tip load: tip/L <= 0.1 and max slope <= 0.2 rad (assurance predicate)",
+  "question": "Which cheap screens remove which ray candidates, and which single measurement plan most reduces uncertainty in the finalist's linear-validity margin per declared cost?",
+  "refine": "Survivors of S1-S4 are re-run through the 8- and 32-element FEM for both load shapes on all 64 draws. Analytic/FEM agreement is numerical consistency, not empirical validation. Disagreements are retained.",
+  "schema": "frontier.crossscale-doe.protocol/1",
+  "screens": [
+    {
+      "basis": "ASSUMED lift-area proxy; flight consequence of shortening is unmodeled",
+      "id": "S1-functional-length",
+      "kind": "declared_constraint",
+      "rule": "reject if ray_length_m < 0.12"
+    },
+    {
+      "basis": "ASSUMED fabrication/mass cap; stiffness cost is unknown",
+      "id": "S2-material-cap",
+      "kind": "declared_constraint",
+      "rule": "reject if EI_multiplier > 3.0"
+    },
+    {
+      "basis": "Closed form q L^3/EI <= 0.3 (point-load tip is the binding case); exact agreement with recorded flags is checked as a control",
+      "id": "S3-robustness",
+      "kind": "cheap_analytic_screen",
+      "rule": "reject if analytic pass fraction over the 64 draws < 0.5"
+    },
+    {
+      "basis": "dominance on (robustness, length, stiffness cost)",
+      "id": "S4-pareto",
+      "kind": "dominance",
+      "rule": "reject if another S1-S3 survivor has pass fraction >= and length >= and EI_multiplier <=, with one strict"
+    }
+  ],
+  "seed": 20261101,
+  "stop_criteria": [
+    "Stop if any control fails (the run refuses to select).",
+    "A physical measurement plan needs executing-lab constraints, replicates per fish, and exact context refs; none are supplied here.",
+    "Stop acquiring when posterior SD of the margin falls below 0.1 (assumed) or the budget is spent."
+  ],
+  "title": "Finite fin-ray candidate screen and next-measurement selection",
+  "virtual_validation": {
+    "acceptance": "max |w_saved - w_analytic| / L <= 1e-4 at every section, every draw",
+    "controls": [
+      "V-C1: a unit-mislabelled instrument (reads w in m but is compared as w/L) must fail acceptance",
+      "V-C2: a section off the saved grid is refused rather than interpolated silently"
+    ],
+    "forward_model": "the virtual instrument reads the saved field at the section; it applies NO sampled noise and creates no response rows. The noise model is declared for planning only.",
+    "reference": "closed-form Euler-Bernoulli deflection of the same inputs (beam.w_uniform / beam.w_point_load)",
+    "sections_x_over_L": [
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "source": "saved FEM w/L profiles in all-simulations.json (81 stations) for the three recorded candidates, both load shapes, all 64 draws",
+    "status": "simulation_derived: agreement of two numerical solutions, not empirical validation"
+  }
+}

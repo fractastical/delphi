@@ -1,0 +1,244 @@
+{
+  "schema": "frontier.aeroelastic.fidelity-protocol/1",
+  "status": "frozen-before-ladder-results",
+  "base_commit": "a54f47806328f71527bfa0cc223d4c41b7f48956",
+  "question": "Are the strongest static-feedback effects returned at a54f478 (paired fixed-area CL and rigidized-descent range differences among rigid, one-way frozen-load and two-way feedback arms) resolved with respect to the VLM lattice, and, given that, which conditional contexts justify higher-fidelity analysis?",
+  "evidence_kind": "computed numerical-resolution diagnostic of an assumed equivalent-fin bending scaffold; not fish performance, not empirical validation",
+  "physics_unchanged": {
+    "statement": "Every arm runs engineering.aeroelastic.run.solve_arm unchanged with the original protocol.json (EI, alpha, rho, speeds, mass, CD0, e, height, dt, gates, underrelaxation, iteration budget). Only the VLM lattice varies, through solve_arm's existing grid_override argument. No twist model, no new stiffness, no inferred genomic or tissue values; EI remains the assumed design scaffold.",
+    "original_protocol": {
+      "path": "artifacts/aeroelastic/protocol.json",
+      "sha256": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+      "bytes": 9658
+    }
+  },
+  "selected_contexts": [
+    {
+      "compliance": 0.8,
+      "speed_m_s": 20.0,
+      "why": "largest returned effects (one-way minus rigid dCL -0.00587 main / -0.00590 fine; feedback increment +9.0e-5) and nearest the declared 0.1 tip/span domain limit (one-way pectoral 0.0985 main / 0.0990 fine)"
+    },
+    {
+      "compliance": 0.8,
+      "speed_m_s": 16.0,
+      "why": "largest effects well inside the domain (one-way minus rigid dCL -0.00360; feedback +3.1e-5; tip/span 0.063)"
+    },
+    {
+      "compliance": 0.2,
+      "speed_m_s": 20.0,
+      "why": "nominal reference context shared with the control slice and the joint-uncertainty nominal row (dCL -0.00134; feedback +3.8e-6)"
+    }
+  ],
+  "excluded_contexts": "chi0.05 (both speeds) and chi0.2-u16: smaller effects of the same sign; not consequential for the decision below. Their returned results stand unchanged.",
+  "arms": [
+    "rigid",
+    "one-way-frozen-load",
+    "two-way-static-feedback"
+  ],
+  "lattices": {
+    "main": {
+      "span": 16,
+      "chord": 4,
+      "path": "original production mesh label (grid_override=None); same-job reproduction of a54f478"
+    },
+    "fine": {
+      "span": 24,
+      "chord": 6,
+      "path": "original production mesh label (grid_override=None); same-job reproduction of a54f478"
+    },
+    "l32x8": {
+      "span": 32,
+      "chord": 8,
+      "path": "grid_override"
+    },
+    "l36x9": {
+      "span": 36,
+      "chord": 9,
+      "path": "grid_override"
+    },
+    "l64x16": {
+      "span": 64,
+      "chord": 16,
+      "path": "grid_override"
+    }
+  },
+  "refinement_scope": "Span and chord panel counts per fin are refined together at fixed 4:1; spanwise cosine spacing and chordwise uniform spacing are the existing vlm.lattice rules. Span and chord errors are not separated. The upstream source lattice (48x16) is not on this ladder.",
+  "triples": {
+    "T2": {
+      "lattices": [
+        "main",
+        "l32x8",
+        "l64x16"
+      ],
+      "ratio": 2.0,
+      "role": "primary"
+    },
+    "T1.5": {
+      "lattices": [
+        "main",
+        "fine",
+        "l36x9"
+      ],
+      "ratio": 1.5,
+      "role": "independent second estimate sharing only the coarsest level"
+    }
+  },
+  "references": [
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-main-rigid/result.json",
+      "sha256": "da76a669ae37cde951eddab2169ae3e56f0459a86c7d1ad11eb3f55f91276893",
+      "bytes": 9191
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-main-one-way-frozen-load/result.json",
+      "sha256": "75453d1831e411d29ebf7ce545a14c4715cec98ec141c2898dab295ec70a4f29",
+      "bytes": 15108
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-main-two-way-static-feedback/result.json",
+      "sha256": "d6191e5f7d28c3bb91685a7401b46fb9e4584e2f61438440d39f7b5a4f454791",
+      "bytes": 108863
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-fine-rigid/result.json",
+      "sha256": "6429853d16b407092b7365597bb333bc14c19fe7b2e4d46a7bd1b28133e70b10",
+      "bytes": 9156
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-fine-one-way-frozen-load/result.json",
+      "sha256": "825e35b363c0c43b8093cc21aff1d2b1e9d1b18a22e0046d18f8aa2b86bce506",
+      "bytes": 15069
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u20-fine-two-way-static-feedback/result.json",
+      "sha256": "e573cfe6d6526f00f57dc5bdc2cff7eba1c93c35596f38f4df6ce29157abb57e",
+      "bytes": 108895
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-main-rigid/result.json",
+      "sha256": "d68cbee1687836292b3fad372a0a0645bd8c6074cb1a7f8841aaec9f7cbb98e6",
+      "bytes": 9232
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-main-one-way-frozen-load/result.json",
+      "sha256": "997eb38622fabcaa0fc072e0f33eb13c36e1c9b1982db0894440a6f9bab262d4",
+      "bytes": 15140
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-main-two-way-static-feedback/result.json",
+      "sha256": "b88bb00d75c070e1f8336b4d9abcd815cf57ae8cb1f55a3bc35cbda6100b558e",
+      "bytes": 103114
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-fine-rigid/result.json",
+      "sha256": "a49c969d34fb5cadf98b67c0c406003bcafbbb8516eec597f80a3fe19b5b2630",
+      "bytes": 9167
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-fine-one-way-frozen-load/result.json",
+      "sha256": "82647da5e197de37d1d4c84eb03399a0b73df3fc808a591b218f2192fe380293",
+      "bytes": 15050
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.8-u16-fine-two-way-static-feedback/result.json",
+      "sha256": "2eff215a311c470f836d43330284f8e83115576ff37d5b13cbc5e22bcdd23f2a",
+      "bytes": 103112
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-main-rigid/result.json",
+      "sha256": "c94b8be012cf2429a6aa6caeca2aa2c10d92ee127d341e1fa6213f864a02f0ec",
+      "bytes": 9189
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-main-one-way-frozen-load/result.json",
+      "sha256": "a13e357a92c703f15938d397ea84d8707233dd4c1ec21673e7225f4d2956b6d1",
+      "bytes": 15101
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-main-two-way-static-feedback/result.json",
+      "sha256": "88c0b0687f284c0816a90c52f98d57ad9d2916b36b760f9d73c037eddad39683",
+      "bytes": 97329
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-fine-rigid/result.json",
+      "sha256": "3b40dd3ee549ef4002646dd75bdb3dc03b7698719bca96dc2641dff927c9adc9",
+      "bytes": 9154
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-fine-one-way-frozen-load/result.json",
+      "sha256": "d4d761d7aeb3258dd86787fb7b761ac7e076e2e1d6f67d931659c56f051f9772",
+      "bytes": 15123
+    },
+    {
+      "path": "artifacts/aeroelastic/production/chi0.2-u20-fine-two-way-static-feedback/result.json",
+      "sha256": "b0dd8d6d08028eabdc83de841207616f42a8c2dfa447105e8d41ae24e53b74ed",
+      "bytes": 97420
+    }
+  ],
+  "reference_scope": "Returned a54f478 production result.json files for the 18 selected main/fine arms, packed byte-for-byte; the packet recomputes these arms and compares, it never replaces them.",
+  "effects": {
+    "dCL_one_way_minus_rigid": "final CL_on_fixed_source_area(one-way) - same-lattice rigid",
+    "dCL_two_way_minus_one_way": "two-way minus one-way, same lattice",
+    "dCL_two_way_minus_rigid": "two-way minus rigid, same lattice",
+    "dRange_one_way_minus_rigid_m": "flight.main.range_m difference, same lattice",
+    "dRange_two_way_minus_one_way_m": "same",
+    "dRange_two_way_minus_rigid_m": "same",
+    "tip_over_L_two_way_pectoral": "final two-way shape_validity tip_over_L, pectoral_L",
+    "tip_over_L_two_way_pelvic": "final two-way shape_validity tip_over_L, pelvic_L",
+    "CL_rigid": "rigid CL (absolute reference quantity, reported, not a decision input)"
+  },
+  "diagnostic": {
+    "per_triple": "e21 = E_medium - E_coarse, e32 = E_fine - E_medium, R = e32/e21. monotone if 0<R<1; oscillatory if -1<R<0; divergent if |R|>=1; roundoff_insensitive if |e21| and |e32| <= 1e-10 abs + 1e-9 rel. Monotone only: p = ln(1/R)/ln(r), E_ext = E_fine + e32/(r^p - 1), GCI_abs = 1.25|e32|/(r^p - 1), GCI_rel = GCI_abs/|E_fine| (Roache three-grid, Fs 1.25).",
+    "numerical_floors": "fixed-point: for a two-way arm, rho = max of the last three shape-residual ratios; if rho<1, CL error bound = |CL_change_last| rho/(1-rho), else infinite; one-way and rigid are 0. dt: |range_main - range_half| per arm. A paired effect's floor is the sum over its two arms, at the finest lattice. For range effects the floor adds, per arm, |range_main| x (CL fixed-point bound / CL). For tip/span the floor is the shape residual rho/(1-rho).",
+    "resolved": "all of: both triples monotone; p in [0.5, 4] in both; GCI_rel(T2) <= 0.10; |E_ext(T2) - E_ext(T1.5)| <= GCI_abs(T2) + GCI_abs(T1.5); same sign on all five lattices; |E_l64x16| >= 10 x its numerical floor",
+    "sign_resolved": "not resolved, but same sign on all five lattices, |E_l64x16| >= 10 x floor and |E_l64x16| >= 3 x |E_l64x16 - E_l32x8|",
+    "not_resolved": "anything else, with the failing condition named",
+    "not_assessable": "any of the 15 arms of a context invalid, failed, partial, not started or a domain exit at any lattice; its status is reported, nothing is substituted; the five-lattice values that do exist are still tabulated descriptively"
+  },
+  "decision": {
+    "scope": "Decides only whether a context of this bending-only, torsion-rigid, fixed-alpha scaffold is retained as a CONDITIONAL candidate for higher-fidelity analysis (for example torsion-compliant structure or unsteady coupling). It does not claim real fish performance, a trimmed-flight result or tissue properties.",
+    "retain_bending": "dCL_one_way_minus_rigid resolved AND |E_ext(T2)| / |CL_rigid reference| >= 0.01, where the reference is CL_rigid_ext(T2) when that triple is monotone or roundoff-insensitive, else the l64x16 rigid CL (1% decision precision does not need more)",
+    "reject_bending": "dCL_one_way_minus_rigid resolved AND that relative magnitude < 0.01",
+    "two_way_needed": "dCL_two_way_minus_one_way resolved AND |E_ext| >= 0.10 x |dCL_one_way_minus_rigid ext|",
+    "one_way_sufficient": "dCL_two_way_minus_one_way resolved or sign_resolved AND (|E_ext| if resolved, else |E_l64x16| + |E_l64x16 - E_l32x8|) < 0.10 x |dCL_one_way_minus_rigid ext|",
+    "undetermined": "any other outcome; the context is NOT promoted, and the remedy is a finer or separated (span/chord) ladder, never a looser rule",
+    "threshold_basis": "1% CL is a declared consequence convention: in the returned descent proxy d ln(range)/d ln(CL) is about 1 at 20 m/s, so 1% CL is about 0.3 m of range, far above the dt (<1e-6 relative) and fixed-point floors. The 10% feedback ratio is likewise a convention. Neither is physics."
+  },
+  "expectations_from_two_returned_meshes": "Recorded before results, NOT criteria: retain_bending at chi0.8-u20 (-2.34%) and chi0.8-u16 (-1.44%), reject_bending at chi0.2-u20 (-0.53%); one_way_sufficient in all three (feedback increments 1.5%, 0.9%, 0.28% of the one-way effect). chi0.8-u20 may become not_assessable if tip/span crosses 0.1 on finer lattices (0.0985 main to 0.0990 fine).",
+  "controls": {
+    "original": "engineering.aeroelastic.controls.run unchanged (20 checks incl. upstream VLM V1-V6); must pass before any arm",
+    "same_job_reproduction": "main and fine arms recomputed and compared with the packed references: status, iteration count, every iteration CL, final tip/span, flight main/half range; exact equality and fixed-roundoff (abs 1e-10, rel 1e-9) reported separately",
+    "per_lattice": "on each of the five lattices at 20 m/s rigid load: zero-load panel positions (A, B, C) bitwise exact, zero-load normals within 1e-12 (deform renormalises them), and CL difference <= 1e-12; stiff limit (EI x 1e6, compliance 0.8 EI) CL difference <= 1e-6 and tip/span <= 1e-6; original ledger identities (bookkeeping only)",
+    "independent_transfer": {
+      "stations": "panel span stations recomputed from the lattice strip spacing (0.5(ue_i+ue_i+1) - lower) equal Response.stations to 1e-12 m",
+      "axis": "n_up recomputed from panels.json fin_plane (e_w x e_u, +z) equals the setup axis to 1e-12 and is orthogonal to e_u to 1e-12; every lattice normal has positive n_up component",
+      "beam_equilibrium": "root moment and shear recovered from the superposed beam displacement at two points inboard of every load (EI w = M0 x^2/2 - V0 x^3/6) equal sum(s_ind (F.n_ref)) and sum(F.n_ref) to 1e-8 relative",
+      "upstream_force": "rigid fin normal force within 3% of the upstream 48x16 vlm.json reference normal force (cross-artifact scale check)",
+      "thin_airfoil_bound": "rigid CL/alpha <= 2 pi",
+      "mutations": "each must make its own check fail: Response rebuilt with stations scaled by 0.8 (stations, beam_equilibrium); setup axis swapped to e_w (axis, beam_equilibrium); unit rho=1,V=1 forces (upstream_force); doubled forces (thin_airfoil_bound, upstream_force); the original zeroed-entry ledger mutation",
+      "upstream_force_basis": "returned a54f478 rigid arms sit 1.0-1.7% from the reference on main and fine (read before freezing)"
+    },
+    "fixed_point_and_dt": "a-posteriori fixed-point bound from each two-way iteration history; existing main/half dt range comparison in every arm"
+  },
+  "failure_policy": "All failed, unconverged, partial, not-started and domain-exit arms are saved with their native status. No case, threshold or lattice is added, removed or changed after results. Returned a54f478 passes and failures are never replaced.",
+  "resources": {
+    "CPU_vCPU": 4,
+    "workers": 4,
+    "threads_per_worker": 1,
+    "hard_seconds": 1200,
+    "soft_no_new_work_seconds": 1000,
+    "tree_memory_GiB": 12,
+    "tasks": 128,
+    "output_cap_bytes": 50000000,
+    "GPU": 0
+  },
+  "measured_runtime_control": "filled in packet.json from the local elliptic-wing timing; not a fish result",
+  "exit_code": "nonzero when a task crashed, a lattice control failed or is missing, an arm is missing, partial or not started, the output cap is exceeded, or setup fails; every result is kept either way",
+  "amendments": [
+    {
+      "before_any_ladder_result": true,
+      "what": "zero-load control split into bitwise panel positions and normals within 1e-12",
+      "why": "the local packet preflight (main lattice only, a reproduction of returned arms) failed the first form: deform renormalises N, so a zero load changes normals at roundoff; the original controls.py compares A, B, C only. No arm, lattice, effect, diagnostic or decision rule changed."
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ecology trajectory viewer fixture</title>
+<link rel="stylesheet" href="/site/css/ecology-viewer.css">
+<style>body{margin:0;padding:16px;background:#f6f1e7}</style></head>
+<body><main><div id="v"></div></main>
+<script type="module">
+import { mountEcologyViewer } from "/site/js/ecology-viewer.js";
+const q = new URLSearchParams(location.search);
+window.__v = mountEcologyViewer(document.getElementById("v"), {
+  cases: JSON.parse(q.get("cases") || "[]"), meshUrl: "/artifacts/fish3d/fish3d-v3a-fan/fish.glb", lazy: q.get("lazy") === "1" });
+</script></body></html>

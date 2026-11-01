@@ -1,0 +1,872 @@
+# Frontier execution board
+
+Coordinator: codex-03. Updated November 1, 2026, 12:54am PDT.
+Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
+GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
+Every status distinguishes implementation, integration, publication and biological validation.
+
+## Current checkpoint — November 1, 2026, 12:54am PDT
+
+- [x] Integrated the independently reviewed 240-arm epithelial followup with
+  source-bound intervals, the original frozen FAIL and corrected figure counts.
+  The later experiment remains distinct from the earlier 36-run movies. Cell
+  centres and volumes were returned; lattice frames for tissue-shape movies were
+  not. Source corrections retain the numerical result and per-arm counterexamples.
+- [x] Integrated a fifth recorded Lean family, scaled-threshold-intervals:
+  two generic implications, two parameterized recorded-bound instances, two
+  nonempty-premise checks and four rational counterexamples. Four false variants
+  were rejected. Exact source/witness changes withhold the family from the gallery
+  and MCP; Lean does not prove the simulation, data extraction or biological use.
+- [x] Corrected the System receipt pin after 11 controller manifests and 47
+  returned files matched. This restores dated mixed-outcome receipts, including
+  failed/cancelling outcomes; spend remains unknown, not zero.
+- [x] Integrated independently recovered d87/795 study backups and later CPU
+  checkpoints. The current source/static delta and 3,960-version database have
+  file/source checks and isolated PG replay. The earlier separate-host web/MCP
+  service drill used an older cutoff; a new full service drill remains open.
+- [x] Inverse-pattern H100 batch and corrected-collocation Google batch returned
+  exact files and command exit 0. Scientific owner reviews remain separate; a
+  returned batch is not acceptance. At 12:39am PDT all 94 Nebius records were
+  terminal (63 attributed to this team); Google VM03 alone retained 16 vCPU.
+- [x] Published 98a8fa6 after 108 focused integration checks. Public checks
+  covered eight web responses, both study pages at desktop/mobile, source/media
+  hashes, 11 dated mixed-outcome compute receipts and all five MCP proof sources.
+  Receipt: deploy/receipts/interval-sweep-live.json. No database writes.
+- [ ] Owner02 produced the validation cycle at 8877fdc; root review requires
+  actual-path unit/context refusal, source-derived control counts and honest
+  same-code dependence before integration. Recorded mechanical inputs remain
+  assumed; missing biological interfaces and sequence function remain blocked.
+- [ ] Owner06 produced System Operations at 1793304; root review requires
+  deterministic build provenance, current receipt-shape handling and collapsed
+  detail tables before integration. Native resource agent audits current routes.
+- [ ] Infra caught a false pass in the proposed horizon analyzer: time-1000 logs
+  were reported as time-8000 observations. Owner09 must reject truncated returns
+  and pass frozen controls before dispatch. Owner14 prepares a separately frozen
+  matched-budget one- versus multi-initial-condition GPU comparison.
+- [ ] Native mechanobio prepares source-bound graph records for the epithelial
+  followup, retaining the local pass and the non-dispatchable horizon Action.
+  Root owns credentialed imports. Infra captures the 98a8fa6 additive backup.
+- [ ] Delivery audit is recorded in docs/audits/completion-gap-audit-2026-11-01.md.
+  Broader acceptance remains open; do not infer biological validation or a measured
+  multi-agent advantage from the scoped checks or review corrections.
+
+## Previous checkpoint — November 1, 2026, 12:16am PDT
+
+- [x] Published `795f140` after scientific release `d87e5d1`: both secondary
+  studies have actual recordings, exact downloads, shared oxygen proofs and
+  related versioned records. Flying Fish remains the sole featured project.
+  Root's exact-parent 102 focused checks and four UI checks are separate runs;
+  public checks covered eight web responses, both studies at desktop/mobile,
+  navigation and all four MCP proof sources. Receipt:
+  `deploy/receipts/reuse-studies-live.json`. No biological validation inferred.
+- [x] Current study briefs and recordings now appear before detailed metrics;
+  original stored proposals remain accessible as historical provenance.
+- [x] Integrated completed 240-arm epithelial transport/completeness receipt:
+  all arms completed; native scaling analysis returned FAIL. Owner09's revised
+  fixed-horizon interpretation at `3c65c17` awaits independent mechanobio review
+  and page integration; no spatial frames were returned. Earlier 36-run videos
+  and their local held-out comparison remain distinct.
+- [x] Integrated extended VLM diagnostic receipt (372 solves) and exact Voxcraft
+  compile failure. The latter ran no simulation cases and all 40 GPU telemetry
+  samples were zero. A failed compilation is not GPU scientific work.
+- [ ] New six-target inverse Schnakenberg experiment admitted on one H100 at
+  12:12:53am PDT: `aijob-e00grxtt94bh26a9c0`. Last admission state provisioning;
+  actual device activity and outcomes pending. Equal solver budgets, same-job
+  CUDA parity, fixed controls and independent numerical checks are required.
+- [ ] Owner07 prepares the separately pinned paired collocation/fidelity study;
+  root awaits exact returned evidence before changing fish assurance. No blind
+  refinement or biological flight claim.
+- [ ] Native infra completed the d87 second-host 7,601-file restore at
+  12:10:54am PDT; final receipt integration and the small 795 source/static delta
+  remain pending. Broader fresh-host service recovery has separate prior evidence.
+- [ ] Independent delivery-gap audit in progress against GOAL/specs/current
+  runtime. Preserve unchecked acceptance until direct evidence supports closure.
+
+## Previous checkpoint — October 31, 2026, 11:56pm PDT
+
+- [x] Two secondary projects preserve the Flying Fish flagship. Existing public
+  release `33bc598` has their exact stored Project proposals. The next release
+  is being checked with actual voxel and paired epithelial recordings, source
+  downloads, contextual oxygen proofs and current genotype evidence.
+- [x] Imported and anonymously read back 12 exact records: 3 contextual Claims,
+  7 source/formal/numerical Evidence records and 2 open Problems. All remain
+  imported_unreviewed; zero forks; Project member updates were not applied.
+  Receipts: `projects/reuse-studies/study-records/import/`.
+- [x] Four fixed Lean families are current in the generated gallery/MCP. Oxygen
+  contributes 2 parametric equivalences and 4 boundary/limit identities, with
+  4 rejected controls for 2 wrong coefficients. It does not prove a PDE model's
+  biological applicability; formal use has D>0, a>0 and C0>=0.
+- [x] Independent reviews `130b3f4`, `6298621`, `ff76b7f` preserve scope and
+  failures. Epithelial 36-run / 1,476-frame audit yields 7 pass, 3 fail, G6 descriptive,
+  G1b incomplete,G8 unevaluable. Matching 756 frames agree; unpaired 720 frames
+  provide no agreement evidence. The 22.04% control is condition-specific.
+- [x] Genotype's missing manifest download fixed at `b74b9f0`; 13 finite files
+  now expose exact bytes. Reviewer reported 172 checks without findings on its
+  scratch snapshot; public-host verification remains part of this release.
+- [x] Root found and fixed mobile overflow in the new oxygen equations; both
+  study pages now pass desktop/mobile playback, hashes and rendered-math checks.
+- [ ] Finish exact-commit release checks, public read/playback/MCP verification,
+  and the additive private backup at this new database/source cutoff.
+- [ ] Google has 28/32 allocated vCPU at the 11:45pm snapshot. VLM extended
+  diagnostic returned 372 solves; owner audit pending. Epithelial 240-arm sweep
+  is active. Nebius one-H100 compatibility job is IMAGE_PULLING at11:54pm;
+  8.45GiB image and prior14.5–15.6min starts explain plausible delay, but no
+  kernel/device utilization has been observed. Infra owns dispatch/collection.
+
+- [x] Infrastructure reports the H100 probe reached CPU compilation and failed
+  after 39.1 seconds. Forty telemetry samples recorded zero GPU utilization;
+  no simulation cases ran. Exact logs are retained for the owner audit.
+
+## Previous checkpoint — October 31, 2026, 11:34pm PDT
+
+- [x] Release `33bc598` is live: two exact-version, unreviewed Project records
+  and source-specific pages for tissue microcarrier and epithelial repair.
+  Flying Fish remains the sole featured project. Root checked 26 public Project
+  checks, 8 web checks and 39 MCP checks; no biological acceptance was inferred.
+- [x] Four normal-speed films remain live, with the earlier editions preserved.
+  The previous release's 103 media checks are dated evidence, not repeated here.
+- [x] Genotype/sequence/compiler/DOE surface integrated at `506f97a`: 36 sequence
+  artifacts, 44 contextual entries, five unknown biological interfaces and eight
+  uncalibrated instrument contracts. Root ran 40 focused integration checks.
+  Public deployment of this surface is pending the next integration release.
+- [x] Voxelyze CPU outputs integrated with independent review `130b3f4`:
+  24 simulation records (including one animation repeat), 11 analytic records,
+  seven replayed controls and 241×45 saved voxel centres. E still fails its frozen
+  bound; spatial convergence is unresolved. The toy is 50×30×30 mm, not tissue.
+- [ ] Publish source-checked voxel recordings, corrected epithelial studies and
+  the oxygen proof family on the two project pages. Owner06 publishes media;
+  resource_scaling owns the Lean/MCP adapter. Root owns integration and release.
+  Epithelial reviewer found gate-count, threshold-bracket and volume-accounting
+  reporting errors;09/06 must preserve raw results and correct their readings.
+- [x] Oxygen sphere/slab rule: six parametric/boundary theorems compiled, two
+  corrupted coefficient variants rejected, 22 numerical checks passed (owner
+  receipt `3b9d215`). This is a conditional transport bound; project-specific
+  uptake, diffusivity and supplied concentration remain unknown.
+- [ ] Integrate the audited 45-arm aeroelastic fidelity ladder and actual plots/
+  state recording. No effect magnitude converged; all three design decisions
+  remain undetermined. The posthoc rigid-solver diagnosis does not justify
+  blindly running a finer ladder.04 owns a bounded scheme diagnosis.
+- [x] Infra captured encrypted off-host backups with actual sb03 restoration:
+  561 files rehashed, plus a final additive DB cut with 3,936 versions and 1,976
+  events. All18 tables matched a scratch restore. Joined public-safe recovery
+  index is `results/resources/backup-recovery-four-film-20261101.json`.
+- [ ] Capture later genotype/proof/study outputs after the next release. The
+  existing backup covers its declared cutoff, not future changes.
+- [x] One bounded missing-only regulatory recovery ran on Google CPU at
+  11:25–11:27pm PDT. Infra rehashed all9 returned files;106 of165 missing windows
+  recovered, exit3 partial_data. Owner10's immutable-union audit is pending;
+  arithmetic totals are not treated as a checked merged dataset.
+- [ ] Voxcraft H100 compatibility/control probe remains unadmitted while15 fixes
+  return packaging. No running GPU job or GPU saturation is claimed. Infra is
+  the sole dispatcher; unrelated shared jobs remain untouched.
+- [ ] Add the retrospective review-correction trace to System/About, keeping
+  self-corrections distinct from separate-agent review. It cannot establish a
+  collective capability advantage without a controlled comparison.
+
+## Previous checkpoint — October 31, 2026, 11:04pm PDT
+
+- [x] Published immutable release `ac95c4c`: four new normal-speed films (Delphi
+  and science, each 60/120 seconds), all older cuts preserved; actual Lean source
+  viewer/MCP, print-v4 download/review links, observed-data update and audited
+  System counts. Root ran 33 focused checks. Public verification: 103 media/hash/
+  playback/captions/seek/fullscreen checks, 8 web and 39 MCP checks; proof catalog
+  has three fixed families with optional source hashes matched. Receipts are in
+  `/data/artifacts/delphi-evolve-rethink/deploy/four-film-*.json`.
+- [x] Independent print-v4 review is integrated: smooth props pass the stated
+  sampled file checks. Relief texture is ungated and may not print as drawn;
+  the home-page cards state this. No manufactured, weighed or flown object.
+- [x] Integrated clean sequence ledger `e187efb`, compiler `1a084328`, corrected
+  DOE `4d9628f` and independent review `b02b51a`. Root82 focused tests passed.
+  36 sequence artifacts/44 contextual entries, five unresolved biological
+  interfaces, zero endorsed genomes. Compiler surface adapter is assigned02;
+  new artifact source is integrated, public surface is not yet updated.
+- [x] SPEC-017/013 documentary registration imported four exact records and
+  anonymous store readback matched all four as imported_unreviewed. They are
+  documentary inputs, not biological claims or executed experiments.
+- [ ] Additional project UI `f4508e8` integrated; independent review requested
+  source-specific wording/control fixes from06. Tissue-microcarrier and
+  epithelial-repair remain secondary proposed research studies; Flying Fish
+  stays the sole flagship. Live Project import waits for reviewed final drafts.
+- [ ] Xenobot15 has actual local Voxelyze trajectories and a failed grid/parity
+  control, pending full handoff. Epithelial09 is preflighting Morpheus. Native
+  resource_scaling is checking sourced oxygen sphere/slab bounds in Lean.
+- [ ] Infra reports the45-arm Google assay returned210 files,41,826,885 bytes,
+  science exit0. All18 earlier arms reproduced; no27 effect comparison met
+  magnitude-convergence criteria, so three design decisions stay undetermined.
+  Independent07 numerical review pending. Earlier10:46pm snapshot had no active
+  Nebius GPU jobs; no later GPU admission is asserted here.
+- [ ] Native infra owns additive encrypted off-host backup of release `ac95c4c`
+  and current database. Earlier snapshots remain unchanged. Ongoing new project
+  and scientific work will need a later additive capture.
+
+## Previous checkpoint — October 31, 2026, 10:21pm PDT
+
+- [ ] Added two secondary reuse studies without changing the Flying Fish hero:
+  tissue microcarrier (claude15 source/simulation packet) and epithelial repair
+  (claude09 source/mechanics packet). Claude06 owns typed project drafts and
+  project-specific pages. Root owns import/integration/publication; infrastructure
+  remains the sole cloud dispatcher. No new biological result is asserted.
+- [ ] Added Xenobot/ICDO simulator discovery and runnable-packet work, assigned
+  to existing claude15. Extend the existing simulation roadmap, prioritize
+  Voxcraft/Voxelyze actuation-to-mechanics controls, and send exact bounded
+  packets to the infrastructure dispatcher. Compatibility and execution remain
+  pending; upstream animations are not new simulation results.
+- [x] Added SPEC-017 self-validation: frozen candidate contracts, separate
+  assurance dimensions, meaningful negative controls, forward/inverse consistency
+  boundaries, validation slices/cuts, virtual instruments and adaptive next
+  actions. Linked compiler and experimentation specs. This records requirements;
+  implementation acceptance remains open and assigned to the existing owners.
+- [x] Integrated actual Lean source/receipt viewer and a read-only MCP proof
+  catalog for three fixed families. Sources/dependencies/published bytes are
+  checked; stale or missing proof records are withheld. Compiler execution is
+  recorded, not rerun by the read tool. Root ran focused proof/browser checks;
+  public deployment is pending this checkpoint.
+- [x] Corrected observed-data update imported six exact unreviewed records and
+  verified anonymous MCP/HTTP readback. 109 source specimen rows, 82 blocked
+  folds; adding data worsened held-out log10 RMSE from 0.047089 to 0.066057.
+  A transitive catalog-group bug was fixed; original outputs retained and
+  corrected scientific values match on this dataset. Gallery/source files and
+  organ-scale view integrated; root11 focused checks passed.
+- [x] Audited historical participant floor is 23: 11 supported harnesses,
+  4 native children and 8 scoped nested Claude children. 12 recorded subagents.
+  Separate native API snapshot at 10:07:30pm PDT had 1 root + 3 running children;
+  global active-worker total unknown. Four System/browser checks passed.
+- [x] Two new print-v4 display forms integrated with exact STL hashes, mass
+  assumptions, previews, laws and lineage. Four publication/browser checks
+  passed. Independent dense-wall review had an OOM-killed attempt; smaller
+  chunks under the same cap are running. No new print or flight validation.
+- [x] Private stable backup restored 17,486 files / 3.707 GB off host. New 3,924-version
+  DB add-on includes all 6 observed records, 18 table counts checked. Separate
+  website/MCP recovery drill passed on the earlier source/dump. New print/video
+  files require an additive capture after freezing; raw missing inputs remain
+  explicitly inventoried.
+- [ ] Four NEW normal-voice films in production: Lean/science 60s + 120s and
+  Delphi-portal 60s + 120s. Planned MiniMax English_Graceful_Lady, speech-02-hd at 1.0,
+  no atempo acceleration. Earlier films and superseded faster edits preserved.
+  Lean is the foundation; compiler outputs are intended DNA/build/validation
+  plans; virtual instruments and efficient testing appear in the validation
+  flow. Native resource_scaling owns media; root owns one canonical publication.
+- [ ] New overnight swarm: native mechanobio_sim owns exact zebrafish sequence,
+  regulatory-context and functional-evidence ledger; claude02 extends compiler
+  dependency/invalidation graph; claude14 owns finite candidate screening,
+  prospective experimental design and virtual-instrument contracts. Unknown
+  sequence-to-expression-to-growth bridges remain explicit. Native infra owns
+  provider queue and source/model execution, respecting prior provider stops.
+- [ ] Infra's 10:17:17pm PDT observation: 92 shared Nebius jobs, 61 team-attributed
+  (46 current + 15 historical), 31 unattributed, zero active/pulling/queued GPU
+  jobs. GCP 32 CPU quota / 16 used and 1 GPU quota / 0 used; L4 VM terminated after capacity
+  failures. CPU VM03 remains running. Actual resource saturation is not claimed.
+  Coupled owner 07 is preparing an additional-resolution packet with controls.
+- [ ] Complete independent print review, finish normal-speed videos, publish
+  source-matched canonical release, verify public media and MCP, and take the
+  final immutable add-on backup. All broad GOAL acceptance remains tracked.
+
+## Previous checkpoint — October 31, 2026, 9:22pm PDT
+
+- [x] Published `d589efb`: design-control map with six layers, NCA
+  curriculum repair/persistence tradeoff, and recovered eight-condition BETSE
+  sensitivity. Actual source and media downloads are linked from the cards.
+ 19 integrated checks, 43 public route/media checks, 8 web and 39 MCP checks
+  passed; release history scan covered 20 commits with zero credential findings.
+  Receipt: `deploy/receipts/design-control-live.json`.
+- [x] Root rehashed all 475 curriculum files (22,454,674 bytes). Baseline 45/96
+  versus curriculum 44/96 remains an aggregate null/negative comparison;
+  targeted prefix repair improves while persistence declines. BETSE rendering
+  failed on the worker; displayed media reconstructs the eight returned arrays.
+- [ ] New user request: add a few improved fish STL models. Existing print owner
+  claude-05 is producing additional source-conditioned printable variants;
+  claude-13 independently reviews exact files. Root owns home-page downloads
+  and publication. Preserve old revisions and failed r4 mass/catch-wall checks.
+- [ ] Scientific audit is committed. Native workers own two next steps: real
+  specimen-data updates with species-blocked internal validation, and a bounded
+  paired mechanical uncertainty/resolution assay. Neither result is claimed yet.
+- [ ] Follow-up encrypted snapshot is stored and separate-host application
+  recovery is running. Recovery tooling includes a disappearing-file failure
+  guard. Await actual remote-service result and final receipt before closing
+  the backup requirement; preserve all earlier snapshots.
+
+## Previous checkpoint — October 31, 2026, 9:05pm PDT
+
+- [x] Corrected 90-second film is public at release 8a1f091 and is the default
+  About → Demo videos selection. Earlier 60/120 cuts remain unchanged. Root
+  ran 7 focused publication/browser checks; all 44 public media/playback checks,
+ 8 web and 39 MCP checks passed. The three independent review blockers are
+  closed. Exact receipts and review: deploy/receipts/demo90-live.json and
+  deploy/receipts/demo90-critic-review.md.
+- [x] Same release includes the second table-layout pass: small-screen labelled
+  rows, sticky first columns for matrices, visible scrolling cues, and corrected
+  heading/menu checks. Five focused table/accessibility/navigation checks passed.
+- [x] First private recovery snapshot was restored on sb03: 14,677 files,
+ 3,099,904,825 logical bytes; the restore tool authenticated/decrypted and checked
+  every file. Root separately restored both raw and sanitized dumps into fresh
+  PostgreSQL, matched all 18 table counts, preserved 3912 scientific envelopes,
+  and ran application health/catalog checks. Root also SSH-hashed the actual
+  off-host sanitized dump and matched it to the independently tested local dump.
+- [ ] Follow-up backup must include this final video, newer source refs and NCA
+  return. Inventory remote-only raw inputs explicitly; do not call missing raw
+  genome archives backed up merely because retrieval receipts were captured.
+- [ ] Ready for integration: NCA curriculum ed44c808 (89/192 overall; baseline
+ 45/96 versus curriculum 44/96, targeted repair gains with persistence loss),
+  design-control UI e284906, and recovery tooling 9a13a83. Native resource worker
+  is exposing recovered BETSE sensitivity as a canonical simulation card.
+- [ ] Goal remains active; no viable engineered organism or aggregate swarm
+  advantage is established by these computations.
+
+## Previous checkpoint — October 31, 2026, 8:50pm PDT
+
+- [x] Team crest and short team clip are public at release 5d88ed4. Five focused
+  browser/build checks passed; deployment passed eight public web and 39 public
+  MCP checks. Root checked 1440/390 layouts and all three served media hashes.
+  Receipt: deploy/receipts/team-media-live.json.
+- [ ] New 90-second candidate encoded and decoded at 90.000 seconds. Independent
+  review found three source/frame mismatches: an unrelated Blueprint passage
+  labelled as genomic retrieval, a stale receipts screen contradicting GPU use,
+  and an unavailable subsystem beneath the control demonstration. The video
+  owner is replacing these frames and retaining the superseded candidate. It
+  is not published. Earlier 60/120-second cuts remain available.
+- [ ] Infra created a transactional raw database dump and a sanitized restore
+  copy. Off-host key decryption and a private S3 fixture round trip were checked.
+  Full archive upload and independent root restore remain unfinished.
+
+## Previous checkpoint — October 31, 2026, 8:23pm PDT
+
+- [x] Publication follow-up: print/FAQ/usage release 9d5a3d0 passed 8 public
+  web, 39 public MCP and 6 live route/viewport checks. Subsequent release 7d72793
+  adds About → MCP for agents with endpoint/config copy controls and the fin-ray
+  calculation card; 8 web and 39 MCP checks passed. Receipts are under
+  deploy/receipts/{print-audit,mcp-menu}-live.json.
+- [ ] New user backup requirement: native infra owns a private off-host recovery
+  snapshot and reusable restore tooling. Existing AWS private backup bucket is
+  accessible using the instance identity; public-access/key handling and content
+  selection are being checked. No completed off-host Frontier backup or restore
+  is claimed yet. Google lab storage must not be the sole durable copy.
+- [ ] New 90-second film remains unexported at this checkpoint. Original narration
+  exceeded the scene budget; an explicit editorial timing revision applies
+  pitch-preserving atempo 1.30 and retimes scenes while preserving spoken text.
+  Old 60/120 cuts remain byte-identical. Publish only after actual export checks.
+
+
+- [x] Exact-file law and check index covers 123 STLs, 19 GLBs and one ZIP.
+  Root independently recomputed r4 dry mass 20.334592 g, ballasted 26.071823 g,
+  both failing the 13.545088 g own-area scenario. The new viewer separates
+  part from nominal assembly, keeps withdrawn files and display-only scope,
+  and links equations, sources, pinned receipts and failed checks. Fourteen
+  focused index/publication tests and browser checks passed; publication pending.
+- [x] System now distinguishes 11 contributing harness identities from 3 native
+  collaborators and 31 live processes at the 8:09pm PDT observation. Live is
+  not working. Twenty-four contributor tests and four browser/build checks pass.
+  Fifteen scoped model-use records cite 84 file hashes checked at an exact
+  source tree. BioNeMo/NIM usage and total spend remain unestablished.
+- [x] Integrated the production aeroelastic comparison and NCA cards, readable
+  assembly checks, About FAQ and their focused checks. Scientific limits and
+  failed outcomes are retained; not yet published at this checkpoint.
+- [ ] Three H100 jobs admitted: NCA curriculum, full CFD R2 and R1/M1/R3 controls.
+  At 8:19pm PDT, two were IMAGE_PULLING and one PROVISIONING; kernel use was
+  not yet measured. Google had 16 vCPU allocated and 9.51 busy vCPUs in the
+  8:14pm sample. Provider listing: 46 current Frontier jobs, 15 exact historical
+  team jobs, 30 unattributed. Shared jobs are not cancelled or claimed as ours.
+- [ ] The 90-second script and real goal-entry capture are frozen. Eight MiniMax
+  narration calls completed with English_Graceful_Lady at 1.15x; timing and
+  rendering underway. Old 60/120-second videos remain intact and live.
+- [ ] Design-control map is authored at ac65800; independent review and real-site
+  integration pending. Per-ray constitutive computation is authored at c24fc44;
+  source discrepancy and missing SI/species/whole-fin bridges stay explicit.
+- [ ] Goal remains active. More simulations are not biological validation, and
+  the controlled swarm comparison still does not establish collective advantage.
+
+## Previous checkpoint — October 31, 2026, 7:58pm PDT
+
+- [x] Shared table formatting is live at `fb52a75`: labelled cards for the build
+  report on small screens, readable wrapping elsewhere, and an ecology CSS
+  collision removed from all evidence badges. Root ran 7 focused page tests,
+  3 ecology interaction tests and 20 desktop/phone checks (340 short badges),
+  then 8 deployed web and 39 MCP public checks. Receipt:
+  `deploy/receipts/shared-table-live.json`.
+- [x] Compiler corrections and NCA seed-placement results are integrated. The
+  compiler's 19 checks pass; NCA design probes improved from 0/48 to 32/48,
+  with reused evaluation cases and left-half erasure still 0/12. These are
+  computational results, not biological regeneration or held-out generalization.
+- [ ] User STL review: r4 dry mesh-derived mass 20.33 g, nominal ballasted mass
+  26.07 g, versus 13.545 g under its own fin-area/8 m/s/CL=0.5 scenario. The
+  frozen 10.5 g legacy threshold also fails. Print author and independent reviewer
+  are creating exact-file law/check lineage; root owns the public viewer and links.
+  Display props are separate; no flight or measured printed mass is established.
+- [ ] Agent-contributor and bio-model usage ledgers are in progress. Count distinct
+  contributing harnesses, current active processes and completed worker runs
+  separately; enumerate actual provider receipts rather than available models.
+- [ ] Infra reports a new H100 CFD job admitted at 7:52:53pm PDT, image-pulling
+  at 7:55:16pm PDT. Google CFD/BETSE workers have 20 vCPU allocated; measured
+  7:52pm utilization was about 9.36 and 0.88 busy CPUs respectively. Allocation
+  is not utilization. Fresh telemetry and the next frozen NCA packet are pending.
+- [ ] Full aeroelastic production output and simulation cards await integration.
+  Broader scientific, observed-experiment and independent site-audit gaps remain.
+
+## Previous checkpoint — October 31, 2026, 7:42pm PDT
+
+- [x] Both public demo MP4 links returned HTTP 200 with the expected byte sizes;
+  the deployed app includes the Demo videos menu entry. The preceding user-facing
+  turn was a status check, not a new delivery; integration work resumes here.
+- [x] Integrated the coarse aeroelastic control slice and its actual-state movie.
+  Root ran four focused tests and scoped Ruff, and recomputed all 23 manifest
+  hashes and byte sizes. The source uses existing beam, VLM and glide solvers;
+  static iterations are distinct from flight time. No biological calibration.
+- [ ] Google aeroelastic worker exited zero; final export and independent
+  numerical audit remain pending. A process exit is not scientific acceptance.
+- [ ] Assembly compiler review found cache keys that omit actual pinned bytes,
+  and two stages that read default paths instead of exact assembly pins. Claude-14
+  is correcting these before integration; missing inputs must return typed blocks.
+- [ ] Claude-02 owns the coupling card and three-assembly comparison/history UI.
+  Shared genetic proposals must stay distinct from the varying geometries;
+  v3b's failed lattice comparison must remain visible. No aggregate success badge.
+- [ ] Native mechanics/infra collect the NCA and aeroelastic results; native
+  resources prepares the bounded BETSE comparison. The broader goal remains active.
+
+Local integration receipt: `deploy/receipts/aeroelastic-integration.json`.
+Public release remains `c3fd602` until the next tested feature batch is deployed.
+
+## Previous checkpoint — October 31, 2026, 7:28pm PDT
+
+- [x] Release `c3fd602` is live. About → Demo videos serves both exact-length
+  1080p MiniMax-narrated cuts, captions, transcripts and downloadable MP4s. The
+  responsive page defaults to one minute and links both cuts; fullscreen works.
+  Root ran 9 focused publication/navigation/layout tests and 30 public media and
+  browser checks, plus 8 public web and 39 public MCP checks. Full audio/video
+  decoding passed for both cuts. These checks do not validate biological designs.
+- [x] Independent sampled-frame review cleared the wrong-page and wrong-scene
+  findings after a second export. Source crops and small original figure text
+  remain presentation limits. The frozen script, source hashes, both output
+  revisions and MiniMax receipts are preserved. No new narration was synthesized
+  for the corrected shots.
+- [x] Studio's scale selector now starts near the top: sticky on desktop, compact
+  on phones. The selected scale leads with equations, parameters and simulations;
+  project-wide review and assurance panels follow. Deep links remain supported.
+- [x] Canonical morphoswarm.ai and www redirect to Frontier with path/query kept.
+  Root checked HTTP 308 and the destination's HTTP 200. studio.morphoswarm.ai
+  serves the protected old site (HTTP 401 without credentials), with no redirect.
+  Infra reports unchanged Orchestra configuration and IP restrictions.
+- [ ] Native infra reports the seed-placement NCA follow-up is training on H100;
+  evaluation remains pending. The original run's 0/48 design success is retained.
+  A second H100 job is preparing controlled CFD calibration. Google VM03 remains
+  the active 16-vCPU CFD worker; further L4 admissions encountered stockouts.
+- [ ] More simulations are being prepared with separate owners: native mechanics
+  couples assumed fin stiffness to deformed aerodynamic geometry; native resources
+  prepares controlled BETSE dose/junction comparisons; Claude-11 owns metabolic
+  oxygen/medium constraints and the 23-genome interpretation. No invented
+  voltage-to-growth or molecular-to-fin transfer is treated as established.
+- [ ] Compiler/layer lineage, independent R4 catch-wall review and the broader
+  scientific integration remain unfinished. More compute is not itself a result.
+
+Public playback evidence: `deploy/receipts/demo-videos-live.json`. The first
+browser verifier attempt used an in-page string evaluation blocked by the site's
+CSP; that attempt did not complete. The verifier was repaired to read state via
+the browser protocol, then all 30 checks ran successfully. Site CSP stayed intact.
+
+## Previous checkpoint — October 31, 2026, 6:37pm PDT
+
+- [x] Release `e246a51` is live: ecology saved-state viewer, prospective
+  Experimentation comparison, recorded DDPM visuals with failed strict audit,
+  and current dated resource receipts. Root ran 18 focused browser/resource
+  tests, 39 live public MCP checks and 8 public web checks. No scientific writes.
+- [x] Public MCP now executes the bounded prospective experiment planner:
+  the live check reproduced deflection-only rank 1 versus mixed readouts rank 2,
+  without observations, persistence, lab execution or cloud submission.
+- [x] Corrected R4 print ZIP remains downloadable from Home, with fit/balance
+  limits. No flight or catch-wall safety validation has been established.
+- [x] MiniMax narration synthesized from the revision-2 frozen storyboard:
+  109.152 seconds of speech for the 120-second cut and 54.648 for the 60-second
+  cut. Natural speed 1.0; unchanged segments reused by exact text hash.
+- [ ] Native resource_scaling: edit both videos from actual media and current
+  live captures; verify durations, captions, source hashes and decoded output.
+  Claude-06: capture actual interfaces. Claude-02: public demo gallery. Root:
+  independent review, guarded artifact publication and public playback checks.
+- [ ] Native mechanobio_sim/infra_director report 26 of 28 ecology scenario pairs
+  returned with numerical gates passing; two were never started at the deadline.
+  Missing-only continuation is separate. These returned analyses await integration.
+- [ ] Google L4 calibrated CPU/CUDA parity and restart controls passed, but the
+  three-hour run admission failed its measured timing budget; no R2 scientific
+  run started under that admission. A separately declared overnight run is being
+  prepared. Nebius NCA H100 was admitted but still pulling its image at the latest
+  provider observation; no training result is claimed.
+- [ ] Compiler/layer lineage, 23-genome interpretation, independent R4 catch-wall
+  review and inverse-pattern learning remain active. The broad goal is unfinished.
+
+## Previous checkpoint — October 31, 2026, 6:11pm PDT
+
+- [x] Site/MCP release `5e27158` is live. Root ran 22 focused browser/blueprint
+  checks (85 deselected), then 8 deployed public-read checks and 37 MCP checks.
+  Desktop/mobile downloads were inspected: 49 links, no viewport overflow;
+  the headless browser used the labelled static-render fallback for the fish.
+- [x] Home now has a direct v3a scale-relief STL link and an expandable catalog
+  of print editions, stands and candidate GLBs next to the main viewer.
+  Manifest digests are checked before publication. The public repository is
+  `kganjam/delphi-frontier`; all new implementation stays there.
+- [x] Genetic blueprints, 19 regulatory actors, 47 claim-use rows, source links,
+  regulatory map, claim-reuse example and local OpenResearch provenance are live.
+  Root checked cached source digests/excerpt presence, not biological truth.
+- [x] Prospective experimental-design planner integrated from `cc12164`; root
+  ran its 10 focused tests. Its frozen comparison has no observations: mixed
+  load/deflection is identifiable under declared assumptions; repeated deflection
+  alone is not. This is model-based planning, not an empirical posterior.
+- [ ] Claude-02: contextual Experimentation UI; native resource_scaling: bounded
+  read-only MCP planner. Claude-14: pinned biodesign compiler and layer lineage.
+- [ ] Print priority: selected the larger-fin r3-daane geometry for a fit/balance
+  prototype. Independent review found right-fin STL chirality wrong in r1;
+  root reproduced it in r3. Claude-05 is producing additive r4-daane-printfix;
+  claude-13 reviews it. Corrected r4 bundle `bd2fcf3` is now shared for fit/balance only; root checked its public ZIP, six STL pins and nominal chirality. R3 body geometry is compatible. Catch-wall concern remains unresolved; launch is not cleared.
+  No printed mass, flight, catch-load survival or biological buildability claimed.
+- [ ] Native ecology canonical simulations/media `335648d` and packet `08e5b77`
+  await root integration; claude-10 builds the actual-state viewer. Native
+  mechanobio_sim is preparing a separate inverse-pattern NCA training protocol.
+- [ ] Infrastructure tip `56a1ed5` plus telemetry `5d37bca` awaits integration.
+  Secondary H100 evaluation completed; strict metric audit FAIL is retained:
+  zero-amplitude relative metrics are undefined and float32 rounding fails the
+  frozen float64 tolerance. Generated fields are finite; no blanket pass.
+- [x] Infra reports actual Google allocations: 16 vCPU CFD, 4 vCPU ecology,
+  4 vCPU plus one L4 for GPU calibration. L4 setup/controls are ongoing; physical
+  stock failures in two other zones were retained. At the delayed 6:05pm PDT
+  metric, CFD used 59.60% of its allocation and ecology 96.87% of its allocation.
+  These are host measurements, not completed-case counts or biological results.
+- [x] The Google 23-genome run completed with 23 archive MD5 checks. Claude-11
+  interprets the locus results; source coverage gaps are not gene-loss claims.
+- [ ] Integrate and publish corrected print bundle, ecology viewer, experimental
+  planner/UI, genomic result interpretation and actual diffusion visuals; preserve
+  failed simulations, unresolved connections, and independent review findings.
+
+## Previous checkpoint — October 31, 5:34pm PDT
+
+- [x] Site and MCP release `d531330` deployed: 13 website and 37 MCP checks
+  passed. Transient contributor credentials and exact-version discussion/history
+  are live. Root browser checks passed; separate route critique continues.
+- [x] Fixed public static-asset throttling in the Frontier nginx configuration
+  (`d3c8890`): API routes retain request limits; static JS no longer shares that
+  limit. Config validation passed; only the Frontier vhost changed, with Orchestra
+  hashes unchanged. Independent fresh-browser confirmation remains pending.
+- [x] Exact-Claim reuse and independent review readback integrated. Both resulting
+  Evidence records are disputed; scoped numerical reproduction does not establish
+  biological relevance or independent experimental replication.
+- [x] OpenResearch actually ran a Turing calculation and BioModels replay. The
+  local-run adapter records provenance/hashes; this is not cloud orchestration.
+  Root recomputed all four current BioModels output hashes on this checkpoint.
+- [x] Regulatory literature/cell-program map integrated. Native metadata audit
+  has 128 retrieved records; root integration is pending. Sequencing matrices
+  were not fetched; assembly and biological-replicate mismatches stay explicit.
+- [x] Define two controlled behavior/ecology comparisons in SPEC-011 and genetic
+  implementation blueprints in SPEC-012, including enhancer/promoter compatibility,
+  delivery, integration and autonomous-chromosome feasibility as separate questions.
+- [ ] Native mechanobio_sim: real MuJoCo gliding and local collective escape,
+  controls before sweeps. Claude-10: viewer of actual saved trajectories.
+- [ ] Claude-14: source-backed genetic blueprint package. Claude-02: readable
+  Studio implementation view and regulatory map, linked to source/evidence/gaps.
+- [ ] Claude-05: first reinforced printable glider revision; claude-07 dynamics;
+  claude-13 independent review. Requirements calculations integrated and 14 root
+  tests passed. No new assembled print, launch or measured glide is claimed yet.
+- [x] Infrastructure reports exact-weight DDPM evaluation recovery COMPLETED;
+  strict audit complete, no nonfinite results. It did not retrain the model.
+  Reported generation timing is slower than its same-GPU solver comparison.
+  Root review/integration of the returned artifacts remains pending.
+- [ ] Infrastructure: exact-W1 secondary evaluation, repaired GCP genomics retry,
+  and replacement CFD VM using Python 3.12 for the nested archive extraction.
+  Both initial CPU VMs stopped at software gates; no completed CFD case or full
+  genome survey resulted. Failed outputs were exported and independently hashed.
+- [x] Infrastructure's 5:32:37pm PDT provider read: 83 Nebius jobs, 53 ours
+  (42 completed, 8 failed, 3 cancelled), 30 unattributed. Zero active/queued ours
+  at that instant; one unattributed job running. Recovery telemetry separately
+  reports 85.64% mean GPU utilization during its measured window, not now.
+
+The owner table below retains earlier assignments as history; the current work
+is governed by the checkpoint above. No unmeasured spend, activity or biological
+success probability is inferred from resource reservations or completed software.
+
+| Priority | Deliverable | Owner | Status / next acceptance |
+| --- | --- | --- | --- |
+| P0 | Public site and separate database | codex-03 | Live at frontier.morphoswarm.ai; PG16 port5471; public reads, credentialed writes; Orchestra still IP/token protected |
+| P0 | Studio, readable claims, graph and semantic search | claude-02 + codex-03 | Public Studio release deployed; exact-pin/browser checks and13 deployed checks passed; independent critique recheck underway |
+| P0 | Live vector index | dx-submit | 2444 public record/artifact documents embedded,49 Gemini requests; pgvector index live; ten-minute bounded refresh installed; API integration tested |
+| P0 | Generic Project and anchored Annotation | guilds completed; codex-03 integrates | Migration applied after backup; old-version/hash tests passed; live project import and authenticated annotation UI pending |
+| P0 | Remote public-read/authenticated-write MCP | native mechanobio worker + codex-03 | Published https://frontier.morphoswarm.ai/mcp; 19 tools, 35 official SDK production checks passed at 3:45pm PDT; public reads, credentialed writes; receipt deploy/receipts/about-mcp-live-check.json |
+| P0 | Interactive simulation widgets | native bioelectric worker + site | Actual HH and motor-clutch subprocess previews,35 adapter/HTTP tests; public UI deployed and actual browser preview checked |
+| P0 | Regional assurance, interface matrix, equation registry | native bioelectric worker | SPEC-008; real receipt aggregation underway; unknown empirical accuracy stays unknown |
+| P0 | Adaptive candidate comparison and simulation accuracy | native mechanobio worker | Frozen three-fin-candidate assay with shared parameter draws, grid/model discrepancy, sensitivity and actual rendered outputs |
+| P0 | Complete citations and bidirectional lineage | dx-corpus + codex-03 | Source→Claim→Equation/Model→Action→Evidence/Artifact→Project/region; import remaining bundles and audit missing links |
+| P0 | Independent browser critique | dx-critic-r1 | Initial desktop/mobile audit complete; five major findings; source-download and table fixes integrated; recheck new deployed release |
+| P0 | Goal/resource/progress surface | native resource_scaling + codex-03 | Current provider inventory and blockers being committed; no inferred spend or invented GPU utilization |
+| P1 | Solver and meaningful Lean checks | integrated guilds/critic | Constraint solver and parameterized proofs with failing mutants executed; arithmetic/model scope only |
+| P1 | BioModels, glide, fin mechanics, RD videos | integrated workers | Four videos live; corrected common-launch glide and six print forms integrated; no calibrated organism validation |
+| P1 | Bioelectric and mechanobiology models | native workers | 49 HH parameter runs,600 motor-clutch/SLS runs, real videos and controls integrated; cell/tissue-to-fin transfer unknown |
+| P1 | Genomic/tissue/cell data | claude-11 + corpus | Source retrievals,22 gene rows,24 draft records, source cards and plots integrated; import remains distinct from validation |
+| P1 | Delphi live ingestion and MorphoLib/MorphoEval | claude-04 / claude-06 | Refresh source inventories and import bounded provenance-preserving bundles; 1,190 canonical Delphi claims and 73 MorphoLib records imported_unreviewed |
+| P1 | Autoformalization | dx-market-r1 | Reassigned from authentication-blocked director; actual LLM proposal plus bounded checker, translation assumptions explicit |
+| P1 | Fish scale formation and geometry | claude-05 | New source-grounded growth/pattern model assigned after six printable forms/turntables; distinguish abstract pattern from tissue validation |
+| P1 | Full lifecycle and living-bioprint equations | claude-11 | Development/growth/maintenance/function and transport/viability/material constraints; sourced slice assigned, full living fish not established |
+| P1 | Foundation-model assays and OpenResearch | claude-12 + GPUops | Evo2 arm B running at2:32pm; Scientific AI probes include maintenance failures; actual OpenResearch local analysis imported |
+| P1 | Claim reuse, attention and epistemic action | market completed; root integrates | Actual pinned-input reuse receipt includes null result; exact-rational belief solver live; no measured swarm/scaling advantage |
+| P1 | Prior-art differentiation and pitch | claude-15 | Revision assigned around organism design exposing knowledge gaps, regional assurance and reusable evidence |
+| P1 | Print props and manufacturing | claude-05 | Six meshes and geometry checks; turntables ready; physical printing, printer/resin selection and living bioprinting unverified |
+| P2 | Apex redirect and old Studio preservation | codex-03 | Only after new-site acceptance; studio.morphoswarm.ai retained; apex unchanged |
+
+## Current integration checkpoint — October 31, 3:32PM PDT
+
+This section supersedes the earlier resource snapshots below; their timestamps remain as history.
+
+- [x] About overview, people/agents, docs and inspirations, plus Generative Biology research thesis implemented. Primary prior art includes physics-informed diffusion, GenCFD and biological cellular-Potts diffusion surrogates; novelty is an integration hypothesis. Root browser checks exercised five routes at desktop/mobile, all six equation controls, document drawer and About menu; screenshots inspected. Publication pending the shared release.
+- [x] Actual mesh viewer, wider Home, sourced anatomy framing and System build/usage narrative integrated. Independent critique still requires final checks for Frontier table width, phone Knowledge filter width, navigation and raw JSON presentation.
+- [x] H100 OpenMM run recovered: three 100 ps trajectories, 101 saved frames each; CPU/CUDA numerical checks and output hashes recorded. Actual-state render and descriptive ensemble integrated. No equilibration, biological accuracy or fin modulus claimed.
+- [x] BETSE generic tissue run, Morpheus partial local run, Kcnj13 hosted OpenFold prediction and associated media integrated. New Morpheus CPU full-horizon run is recovered by infrastructure; scientific analysis/curation still pending.
+- [x] Controlled 3D WaterLily GPU job admitted at 3:27:22pm PDT, one H100. Provider read at 3:27:58pm showed PROVISIONING. Frozen numerical checks precede candidate cases; no completed GPU/physical validation claimed yet.
+- [ ] User-requested actual conditional diffusion pilot: dx-market-r1 owns frozen RD solver data, parameter/seed holdouts, small DDPM training, baseline evaluation and claim/equation provenance. Infrastructure owns one-H100 dispatch; packet preparation underway. No trained result yet.
+- [ ] Anatomy/appearance improvement: claude05 owns additive v3 fish with biological fin outlines, rays/membranes, scales and explicitly assumed pigmentation; claude10/site own interactive presentation. Same geometry must be reused for physical comparisons.
+- [ ] Publish warmstart-v3.tar.xz (exact SHA in molecular manifest), then infrastructure can dispatch the frozen MD continuation after higher-priority RD/3D packets.
+- [ ] Controlled collective-capability pilot: resource_scaling preregisters three matched-budget evidence-synthesis arms using primary public papers, 27 bounded model calls. No collective improvement or scaling law established yet.
+- [ ] Public repository: source/history and current tree scans completed and classified, public-web hardening integrated. Final updated scan, regression checks, main-branch landing and visibility change remain. Current repository still private. No active account credential identified by the scoped scans; expired public Figshare download URLs were removed from current receipts.
+- [ ] Final release: regenerate snapshot, test combined exact commit, deploy web + design-context MCP, verify public reads/authenticated writes and media. Current live release remains c804b317b2afe3e6d180141de134e03606c2e910.
+
+System reporting must use dated actual hackathon receipts: available shared capacity is not our utilization; completed jobs are not current GPU occupancy; missing total tokens/spend stay unknown. Public pages should make meaningful results and limitations easy to inspect without self-awarded judging scores or earlier in-house-project marketing history.
+
+## Deadline release queue
+
+- [x] Dedicated infrastructure lead assigned: native infra_director owns the ready queue, dispatch coordination, dated provider snapshots and useful utilization. GPUops and bioservices retain their current jobs; no duplicate dispatch.
+- [x] Knowledge bottleneck measured: the client waited for 27 catalogue requests (~7.3 MB) before rendering. Backend hydration separately opens one connection per result. These are measured causes, not an assumed overload.
+- [x] Site branch ba436d1 implements cursor infinite scroll, abort/retry/loading/end states and accessible Load more; 43 browser tests reported by its author. Root integration/deployment pending.
+- [x] Deployed branch puts the fish above Frontier questions and adds the six-model printable selector to both Home and Frontier. STL downloads were individually fetched and digest checked on the live site; printer preparation remains unverified.
+- [x] MCP branch b97f88c adds nine bounded discovery/project/artifact/calculation tools; author reports 34 official SDK tests. Root integration/deployment pending. Existing public endpoint passed 12 root production checks at 2:07pm PDT.
+- [x] Deployed exact release c804b317b2afe3e6d180141de134e03606c2e910. Root 43 browser checks and scratch runtime checks passed; public web 8 checks and expanded MCP 33 checks passed (18 tools, actual bounded calculations). Native performance read: first 50 claims 322.7 ms, one 274089-byte request; previous 26 requests / 7.09 MB and~10.14 s. These are single captured samples, not latency guarantees.
+- [x] Implement exact-version project/subsystem challenges: contract/API/MCP plus web GET context are integrated at a77d35b; 88 focused tests passed. Four source-context challenges were submitted as proposed Annotations and anonymously read back through exact Project context. Receipt: imports/2026-10-31-design-challenges-receipt.json. These are authored critiques, not independent reviews or accepted conclusions.
+- [x] Deploy the design-context API and readable project discussion together. The About release exposes 19 MCP tools, including exact-version design context. Four proposed challenges remain authored critiques rather than independent reviews. Production readback is recorded in deploy/receipts/about-mcp-live-check.json.
+- [ ] Publish the prepared wind-tunnel, data-derived controls, scale-growth, lifecycle, behavior and assurance surfaces after checking lineage and numerical limits.
+- [ ] Finish corpus imports for new genomics, behavior, lifecycle, assurance and render evidence; audit all Project pins and remaining artifact gaps.
+- [ ] Complete independent Playwright review of every route and major interaction on the new public release.
+
+## Current resource evidence
+
+### Latest checkpoint: October 31, 3:50pm PDT
+
+- [x] The About release is live, including the generative-model roadmap, team and documentation routes, actual GLB viewer, simulation media and System build evidence. Exact release SHA and check provenance are in deploy/receipts/about-release-checks.json. At 3:45pm PDT, 13 public web checks and 35 official MCP SDK checks passed; the latter discovered 19 tools. These checks do not establish biological validity or resolve every usability finding.
+- [x] Imported five immutable multiscale bundles: 39 records (9 Claims, 14 Actions and 16 Evidence) covering geometry, scale growth, behavior, lifecycle and BETSE. Exact-version readback found all 39 imported_unreviewed, no forks and no readback problems. Actions remain proposed; importing them did not launch work. Receipts and frozen plans are under imports/2026-10-31-multiscale/. Three lineage warnings remain: a geometry output, a check certificate and a comparison log do not use the generic output role. Existing Project pins were preserved.
+- [x] Infrastructure's 3:50:19pm PDT provider snapshot lists 80 shared jobs: 35 confirmed ours and 45 other/unattributed. Ours: 24 completed, 5 failed, 3 cancelled, 2 running and 1 pulling an image. Other/unattributed: 32 completed, 10 failed, 2 cancelled and 1 running. Ownership is determined from our recorded IDs/prefixes; the provider returned no owner fields. This is a job census, not measured GPU saturation.
+- [ ] Current useful GPU work: conditional molecular-dynamics continuation and repaired 3D flow job running; reaction-diffusion DDPM job pulling its image. Setup and numerical controls precede kernels. Collect actual results before claiming training, scientific success or utilization.
+- [ ] Critical independent browser findings still need closure: Frontier table width, mobile Knowledge overflow, mobile navigation access, and large raw System detail expansion. Recheck each fix on the published release.
+- [x] Completed the final credential review and incremental scan, merged PR7, and made kganjam/delphi-frontier public at 4:06pm PDT. Anonymous metadata and current README reads passed; public read access does not grant write access. The review scope and retained classifications are in docs/security-review.md.
+
+Earlier snapshots below retain their original observation times and are superseded for current-state reporting by this checkpoint.
+
+Infrastructure lead's provider read at 2:51:49pm PDT: dt/4 RUNNING; perturbation and angle-of-attack jobs IMAGE_PULLING; cylinder STARTING. Molecular dynamics was created at 2:55:36pm PDT. Five jobs are in the infrastructure pipeline; this is not five occupied GPUs. The separate hosted OpenFold2 operation reported QUEUED at 2:56:54pm PDT. Prior telemetry retains its own time window.
+
+| Job / operation | Purpose | Latest reported state |
+| --- | --- | --- |
+| aijob-e00h6cqxa1c7cwts6y | Frozen 81-case timestep check | RUNNING at 2:51:49pm PDT |
+| aijob-e00cqbmnzwmvms8ayr | 357 missing perturbations plus 48 fixed repeats | IMAGE_PULLING at 2:51:49pm PDT |
+| aijob-e00saz7cewggkp50d2 | Recover actual flow fields; N1 angles 0/4/12 degrees on two grids | IMAGE_PULLING at 2:51:49pm PDT |
+| aijob-e00vga5krqxr3xxc94 | Three-grid/timestep cylinder reference assay | STARTING at 2:51:49pm PDT |
+| aijob-e00a3q798jsc6fdbas | OpenMM explicit-solvent collagen, CUDA parity then three 100 ps trajectories | CREATED at 2:55:36pm PDT; not yet a completed trajectory |
+| op-5ba1d104dbbcd293 | Hosted OpenFold2, exact unmodified BAF03613.1/Q0KIZ7-matching Kcnj13 sequence | QUEUED at 2:56:54pm PDT; not counted as our H100 allocation |
+
+P9 wind-tunnel completed at 2:40:36pm PDT. Infrastructure lead recovered numeric controls: CPU/CUDA coefficient difference 1.49e-13; drag refinement differences 1.922% and 0.794%. Its 35-sample telemetry window had mean 71.54% and maximum 88% GPU utilization. The field archive exceeded an old 3 MB recovery cap and was discarded; the truncation remains a finding and the next packet reruns recovery with a larger bounded cap. These are low-Re 2D numerical results, not measured flight performance.
+
+## Executable multiscale queue
+
+Every run must retain exact inputs, model/code versions, units, parameter provenance, numerical controls, actual saved states, artifacts and limits. Cross-scale compatibility is not biological calibration. The existing coupling contract remains normative.
+
+| Scale / question | Owner | Active work and next gate |
+| --- | --- | --- |
+| Molecules: collagen structure and fluctuations | native mechanobio_sim + infra_director | Actual 10,491-atom CPU setup trajectory and force/NVE controls delivered at 5a4b6fa. GPU job above must pass same-job CPU/CUDA parity; actual-state video and source/model matrix follow. A short peptide trajectory does not estimate fin stiffness. |
+| Protein structure: sourced ion channel | native resource_scaling | One hosted OpenFold2 operation above; exact 362-aa source sequence, RefSeq discrepancy retained. Single-sequence monomer omits membrane/tetramer/ligands; structure does not establish conductance. |
+| Cell/tissue voltage: electrodiffusion | dx-market-r1 | BETSE baseline ran; K-permeability, gap-junction and half-step controls underway. Generic tissue, not calibrated fish tissue. |
+| Metabolism: oxygen and biomass feasibility | claude-11 | Zebrafish-GEM/COBRApy actual solves. Unrestricted uptake allowed energy-rich compounds and is retained as a failed physiological assumption; explicit assumed nutrient medium being checked. Steady-state flux is not organism growth. |
+| Growth: intracellular dynamics to tissue | claude-06 | Morpheus ODE to cell division to cytokine PDE feedback, source model plus disabled-feedback controls. Generic multiscale example; fish correspondence unknown. |
+| Geometry/flow: 3D Navier–Stokes | claude-04 | WaterLily/mesh-body feasibility and reference controls before exact fish geometry. Actual units, mesh resolution and Reynolds-number limits required. |
+| Flow to fin deformation | claude-07 | New coupling adapter: pressure to traction to ray load, conservation and analytic controls. Await a dimensioned compatible flow artifact; lattice units or 2D projections cannot silently become whole-fin pressure. |
+| Scale formation and fish geometry | claude-05 | Corrected scale-model labels integrated; model mismatch retained. Biological-scale mesh 994aac4 awaits integration; additive corrected print v2 task dispatched, old files preserved. |
+| UI and independent critique | claude-02 / dx-critic-r1 | Design discussion and simulation cards; all remaining public routes/major interactions assigned for audit against exact deployed SHA. |
+
+Next valuable couplings are the actual Morpheus closed loop and pressure-to-fin mechanics. Additional generic parameter sweeps do not substitute for either. FEBio multiphasic/growth and PhysiCell intracellular ODE models are sourced candidates for later work; no execution is claimed.
+
+- [x] Canonical Delphi import: all 1,190 Claims in the latest fetched catalogue are present, imported_unreviewed. Root independently queried that count. This does not establish scientific acceptance or future upstream completeness.
+- [x] Corpus recovery reports 1,543 imported_unreviewed records, zero forks, all 13 Project members pinned and 73 MorphoLib records imported; exact receipts c324e10/7ac62ae/b58006c. Two MorphoLib models have no remediation Problem, so the correct total is 73, not 75.
+- [x] Gemini embedding receipt: 2,444 public record/artifact documents, 49 requests, zero failures at the earlier refresh; ten-minute bounded refresh installed. This is not a current corpus-wide count.
+- [x] Fresh Gemini inference succeeded at 2:05pm PDT. Google identity is working; Compute activation remains blocked by UREQ_TOS_NOT_ACCEPTED. No Google VM was created.
+- [x] Local bioelectric 49-run atlas, mechanobiology 600-run sweep, fin ensemble and behavior controller produced actual artifacts. Actual OpenResearch local analysis was imported; it was not GPU inference.
+- [x] Nebius 4-vCPU batch was rejected because shared CPU quota was full. No job was created by that attempt.
+- [ ] Maintain prepared useful batches on warm GPU allocations; current image pulls have taken 6–17 minutes. Never create filler load to report occupancy.
+- [ ] Obtain actual provider billing totals; unavailable spend remains unknown, not zero.
+
+## Integration acceptance and next work
+
+- [x] Persistent software MCP round trip recorded in imports/2026-10-31-mcp-roundtrip-receipt.json; not a biological result.
+- [x] Public access/security checks recorded under deploy/receipts; no change to Orchestra controls.
+- [x] Web/discovery/graph/search/mechanistic integration:162 targeted tests passed.
+- [x] Interactive preview:35 targeted tests passed; private writes remain credentialed.
+- [x] Project migration/store checks passed; circular snapshot dependency fixed,12 project tests and build check passed.
+- [ ] Finish new combined integration run: one old graph fixture used Project as an unknown kind; now updated to FutureRecord because Project became real. Re-run that criterion.
+- [ ] Commit/rebuild current site snapshot, run public scratch browser, publish ONE exact SHA, verify live, send independent critic the release.
+- [x] Deploy remote MCP at /mcp using the same release; public reads and invalid/anonymous write rejection checked. Typed authenticated proposal/lease flow exercised in isolated SDK tests; shared contributor identity checked against production without a scientific write.
+- [ ] Import genomic/simulation/render/geometry bundles and a repinned Project; link locally hosted media by actual digest.
+- [ ] Ship equation/assurance registry, candidate comparison, regional overlay and open-question/action links.
+- [ ] Ship bounded scale-growth and lifecycle/bioprint constraint slice with explicit missing mechanisms.
+- [ ] Audit every displayed scientific artifact for source, producer, parameters, usage and lineage; retain unresolved gaps as findings.
+- [ ] Reconcile all SPEC-007/008 acceptance, complete reviewed pitch and 24-hour queue; land validated task work on main.
+
+## Resource and collaboration rules
+
+One writer per worktree; commits pushed after validation. Use bounded process trees: TasksMax128, MemoryMax4G, MemorySwapMax0, RuntimeMaxSec600 unless a justified job has separate bounds. Local numerical threads<=2. One GPU/job, previously authorized team ceiling10, yield to shared demand; never cancel other teams' jobs. No token/reset grants consumed.
+
+Workers report atomically under /data/artifacts/delphi-evolve-rethink/messages. Never inject messages into the user codex-03 pane. Authentication-blocked MCP and autoformalization work was reassigned and preserved. Communication files do not substitute for a tested commit or a provider receipt.
+
+## Remaining proof obligations
+
+No calibrated whole-fish probability, biological manufacturing feasibility, real flight result, independent biological review, measured claim-reuse benefit or collective-intelligence scaling law has been established. Actual zero/null/inconclusive results stay visible. The platform must make those gaps actionable while showing the checked computational work.
+
+## Public-source and geometry integration checkpoint
+
+- [x] Three sourced ray-fan fish candidates and additive corrected print forms integrated. Root ran81 focused geometry/print checks.
+- [x] Full-horizon tissue analysis, metabolic solves, pressure-transfer refusals, diffusion controls and resource receipts integrated; root ran117 focused checks.
+- [x] Viewer review identified and repaired small-mesh picking precedence, transformed-distance errors and missing destruction on candidate/navigation changes. Source materials and exact geometry hashes are preserved.
+- [x] Root ran19 targeted combined Home/About/mobile/table/error browser checks;50 unrelated cases were deselected. New geometry is not biological validation.
+- [x] Published the selectable ray-fan candidates, critical browser fixes and public-repository labels in release `c1ad527e7c1a0cc1494def66fae3e12db6ef5f92`. Public website 13 checks and MCP 35 checks passed at 4:14:54pm PDT; receipts are in deploy/receipts/rayfan-*.json. Independent critique of this exact release remains in progress.
+- [x] Integrate returned 1 ns molecular branches with all three frozen-window outcomes and the four-case 3D flow bundle. Primary diffusion training is tracked separately below.
+- [x] Commit the matched-budget synthesis comparison as a ceiling/null result; all arms 16/16 does not establish collective advantage. Website exposure remains part of the next release.
+
+## Resource attribution correction — October 31, 4:13PM PDT
+
+The live shared-project listing contained 82 job records. 52 were attributable to
+our team: 37 current Frontier/BioServices jobs plus 15 earlier Delphi/setup jobs.
+The remaining 30 were unattributed to us; provider metadata does not identify
+each other team. Earlier prefix-only totals missed our historical jobs.
+
+| Status | Our team | Other/unattributed |
+| --- | ---: | ---: |
+| RUNNING | 2 | 1 |
+| IMAGE_PULLING | 1 | 0 |
+| COMPLETED | 39 | 18 |
+| FAILED | 7 | 9 |
+| CANCELLED | 3 | 2 |
+
+Our running jobs were 3D CFD and the precision-controlled reaction-diffusion
+DDPM; the training-only discretization audit was pulling. Each requested one
+H100. These are allocation states, not measured GPU utilization. Attribution
+was checked against the prior Delphi job manifest, compute receipts and the
+recorded setup test. The infrastructure owner is correcting the public counter;
+this does not widen cancellation permissions.
+
+## Returned multiscale evidence and contribution checkpoint
+
+- [x] Integrated the returned 3D flow fields, two actual-field videos and twelve
+  surface-pressure arrays. Independent coupling inspection retains failed physical
+  reference, unresolved fins, geometry/frame/unit mismatch and pressure-force
+  closure findings. No whole-fish flight or transferred fin load is claimed.
+- [x] Integrated v3 isolated-fin VLM comparisons. The v3b lattice does not converge;
+  its lift is not accepted. v3a/v3c results remain inviscid attached-flow scenarios.
+- [x] Integrated the versioned per-station tributary-width contract, exact geometry
+  pins and analytic force/moment controls. Unknown stiffness remains unknown.
+- [x] Integrated the zebrafish metabolic network and sweep animation, with the
+  diagnosed internal oxygen source and assumed-medium limitation visible.
+- [x] Root ran 139 targeted CFD, coupling, fin, metabolism and resource tests;
+  independently checked 57 returned input/output/producer hashes. Exact tested
+  commit and scope are in deploy/receipts/multiscale-returned-integration.json.
+- [x] Integrated the independent requirements audit and deployed-site critique.
+  Their timestamps and incomplete requirements remain explicit.
+- [x] Fixed cached MCP text-preview paths and ran all 37 media tests. Added a
+  bearer-only contributor identity endpoint; four targeted real-HTTP tests passed.
+  Browser sessions still grant no persistent write authority.
+- [x] Committed a conditional 24-hour queue with owners, admission and stop gates
+  in results/infra/queue.json. Actual spend remains unavailable.
+- [x] Publish the integrated artifacts, bounded text preview and identity endpoint
+  together with the gallery/mobile fixes in one exact release.
+- [ ] Connect persisted exact-version project discussion to the Studio contribution
+  interface, using an explicit contributor credential held only in memory.
+- [x] Imported 37 new curated records with zero forks and exact readback; submitted
+  Project version 1177c609 with 22 members, retaining all 13 original members and
+  four challenges on the previous version. Records remain unreviewed/proposed.
+- [x] Recompute the site snapshot and expose prior-version Project discussion.
+- [ ] Demonstrate two actual computations consuming one exact existing Claim and
+  a separate review of their evidence. The current public-head reuse count is zero.
+- [ ] Collect the live primary diffusion job; run the preregistered secondary
+  evaluation only after its checkpoint, completeness audit and transport gates pass.
+
+The fresh provider receipt at 4:33pm PDT records 52 team jobs (41 completed,
+7 failed, 3 cancelled, 1 running) and 30 unmatched jobs. One team GPU job was
+running; no team job was queued or pulling. These are job states, not device
+utilization. Current hosted release is still c1ad527 until the release receipt
+records otherwise.
+
+## Published integration and resource handoff — October 31, 4:54pm PDT
+
+- [x] Published release `52cda98` and restarted the MCP on that immutable release.
+  Actual public verification passed 13 website checks and 37 MCP checks. Two
+  additional HTTP checks exercised contributor identity: anonymous access refused,
+  authenticated identity correct with no-store and no credential in the response.
+- [x] Published both v3 printable display props and stands, prior-version Project
+  challenges, formalization and gallery updates, and the full-horizon Morpheus
+  chart with its actual declared video/poster hashes. Root recomputed eight
+  Morpheus input/code/output hashes; this was not a new simulation or rendering.
+- [x] Retrieved the public diffusion recovery archive: HTTP 200, 5,007,988 bytes,
+  SHA256 `4c43b04106469764c1d24450a29c1e200914e3b7952c417bb62508fd52862a5d`.
+  The original 1,800-second primary job FAILED after returning a 30,000-step
+  checkpoint. No held-out evaluation or generated examples were returned.
+- [ ] Run one separately frozen evaluation-only recovery from the exact returned
+  weights; preserve the original failure and original scientific criteria.
+  Public transport is ready; infrastructure owns the remaining execution gates.
+- [ ] Complete and independently review the two exact-Claim fin computations.
+  Original proposals were made ready but superseded before leasing or calculation
+  to strengthen their cache identity. Revised heads `0ed92cdd` and `67532172` are
+  ready; both consume the existing exact Claim `4998ef85`. Numerical results and
+  review remain subsequent evidence, not implied by authorization.
+- [ ] Complete Studio contribution UI integration. The transient bearer adapter
+  and isolated-Store browser tests exist. Pagination and cross-namespace member
+  anchoring fixes are in progress; no browser session gains write authority.
+- [ ] Recheck the released routes with the separate browser critic. The site
+  owner's broad run observed one viewer reset pixel mismatch among 102 checks;
+  an isolated rerun passed. The viewer owner is investigating this timing issue.
+- [ ] Use newly available GCP CPU capacity for ready scientific jobs. The user
+  reports Compute API and billing enabled on `scienceclaw26bos-3016`, global
+  CPU quota 32, GPU quota 0. Infrastructure confirmed the active lab account and
+  is checking existing allocations before creating workers. Requesting a GPU
+  quota increase does not imply that one has been granted.
+- [ ] Export every GCP result before the account's user-reported deletion on
+  Sunday night, November 1. Each job needs explicit input/output hashes, bounded
+  resources, a collection path and cleanup ownership.
+
+The fresh 4:49pm PDT provider listing contained 52 attributable team jobs:
+41 completed, 8 failed, 3 cancelled, none running or queued. The 30 unattributed
+jobs included one running job. These are dated job states, not current device
+utilization. Infrastructure is the sole cloud dispatcher; no other team's jobs
+are touched. Exact release and live-check receipts are under `deploy/receipts/`.
+
+## Added user requirement — launchable printed fish
+
+- [x] Define SPEC-010 with required slingshot launch, a distinct manufactured
+  glider, actual mass/center-of-mass inputs, release dynamics and physical-test
+  acceptance. Existing display props remain distinct.
+- [ ] Build the lightweight fish-derived assembly (claude-05) and integrate
+  stability, launch-load and trajectory sweeps (claude-07, aero controls04).
+- [x] Record sourced Form Studio material cards and exact manufacturing
+  conditions; geometry/dynamics binding remains in progress and printer/resin availability remains an optional user
+  clarification while provisional scenarios proceed.
+- [ ] Publish linked launchable-model files, simulation artifacts and assembly/
+  physical-test instructions. No flight demonstration has occurred.
+
+## Integration checkpoint — October 31, 5:11pm PDT
+
+- [x] Integrated two actual exact-Claim computations and the separate reviewer
+  findings. Root checked 56 artifact hashes/sizes, eight frozen code hashes and
+  both saved read→input-binding→solver→Evidence sequences; six focused tests
+  passed. Receipt: `deploy/receipts/claim-reuse-root-check.json`. This is input
+  reuse, not evidence of collective advantage or biological validity. Reviewer
+  reported both Evidence records disputed despite correct scoped mathematics;
+  empirical relevance and independent non-computational replication are absent.
+- [x] Add strong-fin and revision-history acceptance to SPEC-010. Printed fins,
+  1:1 scale and Alpha Grey are coordinator defaults, not confirmed user choices.
+- [ ] Geometry05: first reinforced lightweight print assembly; dynamics07:
+  quantify launch loads, trim and mass feasibility. Preliminary analytic wing
+  loading indicates 15–20 g may require more than the provisional 4–8 m/s launch
+  speeds. Retain this constraint rather than promising flight from appearance.
+- [ ] Site02: contribute through transient bearer credentials and show design
+  lineage. Root is reviewing the integration; deployed release remains 52cda98.
+- [ ] Separate browser critic06 replaces the previous critic's revoked-login
+  blocker. Review each route and major interaction against the exact release.
+- [ ] Research worker: map primary Evo2 cell-specific regulatory results and
+  zebrafish fin cell/epigenetic datasets to explicit missing biological bridges.
+  This literature/data work does not resume provider-stopped sequence work.
+- [ ] Infrastructure reports GCP one-GPU quota approved; no VM allocation implied.
+  CPU packet admission and durable collection remain in progress. Nebius recovery
+  job `aijob-e00fb6jhvdt12fgsje` was image-pulling at the last report; no new
+  evaluation result is claimed. Export GCP artifacts before account deletion.

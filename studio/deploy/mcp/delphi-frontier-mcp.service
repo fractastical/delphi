@@ -1,0 +1,23 @@
+# USER unit; install only after root review. No shared operator credential.
+[Unit]
+Description=MorphoSwarm Frontier remote MCP (loopback 8972)
+After=delphi-frontier-postgres.service
+Requires=delphi-frontier-postgres.service
+
+[Service]
+Type=simple
+WorkingDirectory=/data/services/delphi-frontier/app
+Environment="FRONTIER_DSN=host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app"
+Environment=OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+# No EnvironmentFile: each write authenticates the calling operator's header.
+ExecStart=/data/services/delphi-frontier/venv/bin/python -m frontier mcp --namespace delphi-frontier --schema public --transport http --mcp-port 8972 --public-host frontier.morphoswarm.ai --public-read --allow-write
+Restart=on-failure
+RestartSec=3
+MemoryMax=1G
+MemorySwapMax=0
+TasksMax=64
+NoNewPrivileges=yes
+UMask=0077
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,1 @@
+REJECTED DRAFT RENDER: component STL units were incorrectly assumedmm; biological body collapsed. Retained as rendering failure. Do not publish/use as scientific geometry. Simulation used correct panelm and body bbox_mm-to-m. Corrected render in render-v2-corrected.

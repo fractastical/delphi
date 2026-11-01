@@ -1,0 +1,9 @@
+# Actual returned diffusion-model samples
+
+These visuals were rendered from `examples.npz` returned by evaluation-only recovery job `aijob-e00fb6jhvdt12fgsje`. The original training job timed out after returning the trained checkpoint; that original full-run failure remains recorded. Recovery used the exact checkpoint without retraining. The strict completeness audit passed all 160 ensemble conditions plus the 600 parameter and 300 seed holdout runs.
+
+- `solver-versus-generated-u.png` and `solver-versus-generated-v.png` show all six display conditions selected by the frozen evaluator, at model time τ=200. Each line is an eight-sample mean; shading is the full eight-sample range, not a confidence interval. Axis ranges differ between panels. Solver and generated ensembles are independent, so their individual fields are not paired.
+- `recorded-reverse-diffusion.gif` shows all twenty saved denoising states (steps 190, 180, …, 0) for four generated samples at condition 1450. These are standardized model values and generation steps, not physical evolution or biological measurements. The final-state PNG is a poster.
+- `manifest.json` binds every output to the exact source bytes. The renderer neither runs inference nor synthesizes replacement data.
+
+The frozen approximate amplitude-Wasserstein metric has a median 0.0257001 for DDPM versus 0.0909837 for nearest5, across 160 conditions. This is an interpolated-quantile approximation; the separately preregistered exact metric and amplitude stratification are still pending. Near-uniform mode statistics are not evidence for pattern selection. Sampling 1024 fields takes about 45.04 s versus 3.94 s for the same-GPU direct solver here: no speedup claim. This is a generic one-dimensional Schnakenberg solver surrogate, not calibrated fish-development biology.

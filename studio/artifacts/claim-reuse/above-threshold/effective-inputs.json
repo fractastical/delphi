@@ -1,0 +1,100 @@
+{
+  "claim_ref": {
+    "namespace": "node-a",
+    "kind": "Claim",
+    "id": "eng-finmech-claim-ei-crit",
+    "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+  },
+  "claim_critical_EI_exact": "1323/2048000",
+  "margin_exact": "11/10",
+  "solver_EI_Nm2_exact": "14553/20480000",
+  "q_line_N_per_m_exact": "49/320",
+  "L_m_exact": "3/20",
+  "load_derivation": {
+    "evidence_kind": "simulated",
+    "load_proxy_statement": "p = q_dyn*CL is a MEAN aerodynamic lift-pressure proxy built from DECLARED rho, V, CL; it is not a measured fin pressure, and nothing here is fluid-structure interaction.",
+    "inputs": {
+      "m_kg": "1/2",
+      "S_m2": "3/8",
+      "b_m": "3/2",
+      "V_ms": "5",
+      "rho_kg_m3": "49/40",
+      "rho_source": "design_assumption",
+      "CL": "1",
+      "CL_source": "flight_assumptions.CL_max",
+      "CL_max_source": "design_assumption",
+      "ray_length_fraction_of_semispan": "1/5",
+      "tributary_width_rule": "declared tributary_width_m"
+    },
+    "steps": [
+      {
+        "name": "q_dyn",
+        "formula": "0.5*rho*V^2",
+        "exact": "245/16",
+        "float": 15.3125,
+        "unit": "Pa"
+      },
+      {
+        "name": "p_lift_proxy",
+        "formula": "q_dyn*CL",
+        "exact": "245/16",
+        "float": 15.3125,
+        "unit": "Pa"
+      },
+      {
+        "name": "tributary_width",
+        "formula": "declared tributary_width_m",
+        "exact": "1/100",
+        "float": 0.01,
+        "unit": "m"
+      },
+      {
+        "name": "q_line",
+        "formula": "p*w_t",
+        "exact": "49/320",
+        "float": 0.153125,
+        "unit": "N/m"
+      },
+      {
+        "name": "L_ray",
+        "formula": "f_ray*b/2",
+        "exact": "3/20",
+        "float": 0.15,
+        "unit": "m"
+      },
+      {
+        "name": "F_total_on_ray",
+        "formula": "q_line*L_ray",
+        "exact": "147/6400",
+        "float": 0.02296875,
+        "unit": "N"
+      }
+    ],
+    "q_dyn_Pa": 15.3125,
+    "p_Pa": 15.3125,
+    "w_t_m": 0.01,
+    "q_line_N_per_m": 0.153125,
+    "L_ray_m": 0.15,
+    "F_total_N": 0.02296875,
+    "exact": {
+      "q_line_N_per_m": "49/320",
+      "L_ray_m": "3/20",
+      "F_total_N": "147/6400",
+      "p_Pa": "245/16",
+      "w_t_m": "1/100"
+    },
+    "consistency_diagnostic": {
+      "weight_N_exact": "196133/40000",
+      "weight_N_float": 4.903325,
+      "g_m_s2": "196133/20000",
+      "p_times_S_N_float": 5.7421875,
+      "ratio_pS_over_weight": 1.1710803383418396,
+      "note": "Informational only: ratio p*S/(m g) is NOT repaired or enforced; it shows how far the declared CL/V is from level lift balance (the glide package's own receipt owns that analysis)."
+    },
+    "geometry_flags": []
+  },
+  "tip_over_L_limit_exact": "1/10",
+  "slope_limit_rad_exact": "1/5",
+  "scope": "Two illustrative mathematical stiffness candidates under one already published exact Claim context; not measured fish biology, collective benefit or biological validation.",
+  "bound_before_solver_at_utc": "2026-10-31T23:55:59.045823+00:00"
+}

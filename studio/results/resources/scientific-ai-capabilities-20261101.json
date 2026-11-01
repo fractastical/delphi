@@ -1,0 +1,675 @@
+{
+  "schema": "frontier.scientific-ai-capability-discovery/1",
+  "observed_utc": "2026-11-01T05:43:04.056484+00:00",
+  "endpoint": "https://forge.nebius.cloud/mcp",
+  "authenticated": true,
+  "server": {
+    "name": "Nebius Scientific AI",
+    "title": null,
+    "version": "0.1.0",
+    "websiteUrl": null,
+    "icons": null
+  },
+  "model_inference_calls": 0,
+  "tools": [
+    {
+      "name": "get_operation",
+      "description": "Poll the native Serverless operation ID returned by submission.\n\n        This never submits, reconnects or replays work. The same ID identifies\n        the job in Scientific AI and the Serverless console.\n        Includes measured scientific progress such as completed ns and ns/day,\n        separately from acknowledged checkpointed work. Missing/stale values\n        are explicit; GPU, instance and runtime placement details stay private.\n        "
+    },
+    {
+      "name": "get_operation_result",
+      "description": "Read a completed native operation's verified result and artifacts.\n\n        Use the same operation ID returned by submission, not another alias.\n        "
+    },
+    {
+      "name": "cancel_operation",
+      "description": "Request native cancellation; a request is not GPU settlement."
+    },
+    {
+      "name": "start_isaac_interactive_session",
+      "description": "Start one GUI/teleoperation session from an owned Isaac project artifact.\n\n        Upload the project first; never put archive bytes or credentials here.\n        A session ID is an admission, not proof of rendered frames. Open the\n        browser handoff and authenticate the same owner. Reconnect uses this\n        session ID and preserves its original deadline; never resubmit science\n        after a lost acknowledgement or interrupted browser connection.\n        "
+    },
+    {
+      "name": "get_isaac_interactive_session",
+      "description": "Read the same native session and separately observed media readiness."
+    },
+    {
+      "name": "attach_isaac_interactive_session",
+      "description": "Get a same-owner browser handoff; never create or renew a native session."
+    },
+    {
+      "name": "stop_isaac_interactive_session",
+      "description": "Request native cancellation; output drain and resource release are separate."
+    },
+    {
+      "name": "get_isaac_interactive_result",
+      "description": "Read verified recording and receipt artifacts without restarting simulation."
+    },
+    {
+      "name": "list_models",
+      "description": "Discover caller-authorized Apps; discovery is not a runtime-readiness claim."
+    },
+    {
+      "name": "list_scientific_models",
+      "description": "List the caller's available scientific Apps and exact runtime/schema capabilities."
+    },
+    {
+      "name": "get_tool_catalog_revision",
+      "description": "Return this caller's exact visible tool-schema revision; refetch tools/list on change."
+    },
+    {
+      "name": "get_model_schema",
+      "description": "Get the selected App's exact native fields, artifact transport and execution limits."
+    },
+    {
+      "name": "submit_gromacs_workflow",
+      "description": "Run native GROMACS preparation, molecular dynamics and analysis on one GPU.\n\n        Supply an immutable gromacs-inputs gzip-tar artifact manifest and typed\n        native command steps. The supplied scientific protocol is not rewritten.\n        Returns an operation ID, NOT finished simulation output. Identical retries\n        must reuse idempotency_key. Native checkpoints survive GPU replacement.\n        This migration pilot accepts one job per call; make separate calls for replicas.\n        "
+    },
+    {
+      "name": "submit_gromacs_mpi_workflow",
+      "description": "Run one native multi-GPU GROMACS workflow on a configured MPI shape.\n\n        Upload an immutable gromacs-inputs gzip-tar manifest, or the exact\n        continuation_files map of retained native files. The selected node/GPU\n        shape must match the App schema's configured capabilities. Returns a\n        durable operation ID, not completed simulation output. Reuse the same\n        idempotency_key after a lost response; poll get_operation and\n        retrieve get_operation_result. Native .cpt recovery is not GPU snapshotting.\n        "
+    },
+    {
+      "name": "submit_scientific_run",
+      "description": "Submit one native scientific job or staged graph using its exact App contract."
+    },
+    {
+      "name": "submit_amber_workflow",
+      "description": "Run one AMBER workflow with unchanged native scientific input files and stages. Upload an immutable amber-inputs gzip-tar bundle in a scientific artifact manifest. Returns a durable operation ID, not finished scientific output. Reuse idempotency_key on retries. Poll get_operation and retrieve get_operation_result. Native checkpoint continuation is engine-specific, not a GPU snapshot. No multi-job fan-out, MPI or multi-node execution in this seam."
+    },
+    {
+      "name": "submit_namd_workflow",
+      "description": "Run one NAMD workflow with unchanged native scientific input files and stages. Upload an immutable namd-inputs gzip-tar bundle in a scientific artifact manifest. Returns a durable operation ID, not finished scientific output. Reuse idempotency_key on retries. Poll get_operation and retrieve get_operation_result. Native checkpoint continuation is engine-specific, not a GPU snapshot. No multi-job fan-out, MPI or multi-node execution in this seam."
+    },
+    {
+      "name": "submit_lammps_workflow",
+      "description": "Run one LAMMPS workflow with unchanged native scientific input files and stages. Upload an immutable lammps-inputs gzip-tar bundle in a scientific artifact manifest. Returns a durable operation ID, not finished scientific output. Reuse idempotency_key on retries. Poll get_operation and retrieve get_operation_result. Native checkpoint continuation is engine-specific, not a GPU snapshot. No multi-job fan-out, MPI or multi-node execution in this seam."
+    },
+    {
+      "name": "submit_openmm_workflow",
+      "description": "Run one OPENMM workflow with unchanged native scientific input files and stages. Upload an immutable openmm-inputs gzip-tar bundle in a scientific artifact manifest. Returns a durable operation ID, not finished scientific output. Reuse idempotency_key on retries. Poll get_operation and retrieve get_operation_result. Native checkpoint continuation is engine-specific, not a GPU snapshot. No multi-job fan-out, MPI or multi-node execution in this seam."
+    },
+    {
+      "name": "submit_esmfold2",
+      "description": "Submit an ESMFold2 single-sequence or precomputed-MSA protein structure prediction. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_esmfold2_fast",
+      "description": "Submit a single-sequence ESMFold2-Fast protein structure prediction; MSA inputs are rejected. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_protenix_v2",
+      "description": "Submit a Protenix v2 biomolecular complex structure prediction on the offline no-MSA lane. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_rfdiffusion",
+      "description": "Submit a bounded RFdiffusion backbone or motif-scaffolding run. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_mosaic",
+      "description": "Submit a bounded Mosaic binder-design campaign. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_proteina_complexa",
+      "description": "Submit a bounded asynchronous Proteina-Complexa binder design run. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_alphafold3",
+      "description": "Submit a deployment-authorized AlphaFold 3 structure prediction from a raw fold input. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_boltzgen",
+      "description": "Submit a bounded asynchronous BoltzGen design campaign. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_openfold3_openbind",
+      "description": "Submit an OpenFold3 complex structure prediction; an independent backend that never satisfies an alphafold3 request. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_cosmos3_lerobot_augmentation",
+      "description": "NVIDIA Cosmos3-Nano robotics augmentation for LeRobot v3: transfer/V2V, numeric actions preserved; physical fidelity unproven. Clips16\u2013400 frames; bundles\u22645GiB. Download output_manifest public artifact UUIDs, not logical worker labels. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_isaac_healthcare",
+      "description": "Inspect, validate, simulate and replay Isaac for Healthcare workflows, train/evaluate/export policies and prepare datasets with their installed backends. Select a bundled workflow or supply a project containing custom scenes, tasks, workflows, assets and configurations. Preserve workflow-selected modes and physics. Return recordings, observed task outcomes and source provenance; a valid simulation may report task_complete=false. Simulation does not establish clinical validity. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_rfd4_proteina",
+      "description": "Generate protein designs from an annotated CIF with public RFD4-Proteina; no oracle validation. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_bioemu2",
+      "description": "Predict biomolecular structures, sample conformations or propagate model dynamics with BioEmu2. Returns raw CIF/XTC and physicality reports; not classical MD or affinity prediction. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_esm2_650m",
+      "description": "Score protein sequences or mutations with pinned ESM-2. Returns natural-log model scores, not calibrated affinity, stability ddG or clinical effects. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_esm2_3b",
+      "description": "Score protein sequences or mutations with pinned ESM-2. Returns natural-log model scores, not calibrated affinity, stability ddG or clinical effects. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_stab_ddg",
+      "description": "Predict mutation-induced binding energy changes from a wild-type PDB. Returns kcal/mol and Monte Carlo sampling error, not experimental affinity. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_holoscan_endoscopy",
+      "description": "Run the Holoscan CAMMA recurrent tool-tracking graph on recorded video; returns seven tool probabilities, locations, masks and optional annotated video. Research workflow, not clinical diagnosis or live device control. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_monai_spleen_ct",
+      "description": "Segment the spleen in one 3D CT NIfTI volume with a pinned MONAI bundle. Returns the segmentation in original geometry and label/provenance metadata. Research use. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "app_95943840d2b14a65b5cdaa4717b2cdc3",
+      "description": "Submit a Protenix v2 biomolecular complex structure prediction on the offline no-MSA lane. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration."
+    },
+    {
+      "name": "submit_scvi_scanvi",
+      "description": "Train scVI/scANVI or map query AnnData into a matching saved reference.\n\n        Upload immutable raw-count H5AD as anndata and, for map-query, a trusted\n        native reference.tar.gz as reference. Parameters preserve native counts,\n        gene selection, training budgets, annotation and visualization choices.\n        Returns a durable operation ID, not embeddings: poll the same ID and\n        retrieve hash-verified artifacts. Reuse idempotency_key after response loss.\n        Routine uses one GPU/128 GiB; Atlas/256 GiB is unavailable on this fleet.\n        Native Lightning checkpoints include optimizer, loops and RNG, not GPU snapshots.\n        Successful execution does not establish biological accuracy or convergence.\n        "
+    },
+    {
+      "name": "acknowledge_operation",
+      "description": "Purge a terminal operation's stored inference request/response payload.\n\n        Save required results first. This is destructive, not a status poll:\n        inference result tools return410 afterwards. Separately published\n        scientific artifacts and native checkpoints are not deleted.\n        "
+    },
+    {
+      "name": "get_scientific_checkpoints",
+      "description": "Inspect the latest acknowledged native checkpoint; local-only files are not durable."
+    },
+    {
+      "name": "resume_scientific_run",
+      "description": "Resume this owner-held scientific job from its last committed native checkpoint.\n\n        MD/scVI returns a new operation ID; a staged App retains its graph ID and\n        continues only the bound failed member. Cancelled graphs cannot resume.\n        The original immutable engine/runtime profile\n        remains authoritative. Native continuation guarantees differ by engine;\n        this is not bitwise or GPU process-state restoration. Reuse the same key\n        on retries. Use only an originally approved GPU class.\n        "
+    },
+    {
+      "name": "retry_scientific_delivery",
+      "description": "Retry delivery of completed scientific files using CPU only, without rerunning MD.\n\n        Use after a completed calculation could not upload its final outputs.\n        Poll the SAME operation ID. Only the model's fixed transfer command is\n        permitted; failed scientific computation cannot be promoted to success.\n        Reuse idempotency_key on network retries. Serverless bounds retries and\n        cancellation. Unconfigured deployments return a capability error.\n        "
+    },
+    {
+      "name": "begin_scientific_artifact_upload",
+      "description": "Reserve an immutable input. Transfer bytes using returned HTTPS URL, then finalize."
+    },
+    {
+      "name": "finalize_scientific_artifact_upload",
+      "description": "Verify exact input bytes/checksum and obtain the immutable reference for a manifest."
+    },
+    {
+      "name": "multipart_scientific_artifact_upload",
+      "description": "Start or resume a large owner-scoped artifact upload without inline bytes.\n\n        Use the reservation's upload_id. Start returns its durable multipart ID;\n        list discovers transferred parts, parts issues short-lived bounded PUT\n        handles, complete assembles S3's actual part ETags, and abort cancels only\n        that upload. Keep the same IDs after disconnect or response loss. Complete\n        is not finalization: call finalize_scientific_artifact_upload to verify the\n        entire reserved SHA-256. Do not send inference bearer keys to object URLs.\n        "
+    },
+    {
+      "name": "get_scientific_artifact",
+      "description": "Get metadata and an authenticated download path; never return raw trajectory bytes."
+    },
+    {
+      "name": "download_scientific_artifact",
+      "description": "Get an exact artifact's short-lived GET handle; no bearer header is needed at that URL.\n\n        The handle expires within 60 seconds. Do not log or share it. Revocation\n        after issuance can take until expiry; no raw file bytes enter MCP.\n        "
+    },
+    {
+      "name": "lookup_mdprecheck",
+      "description": "Look up an earlier mdprecheck for the same immutable inputs/options without running it.\n\n        If found, the completed result and report references are returned directly. A scientific fail/warn\n        remains a completed check, not permission to repeat it or modify inputs.\n        "
+    },
+    {
+      "name": "genmol_generate",
+      "description": "Generate de-novo molecules using a SAFE mask-token minimum, not heavy-atom bounds; returns generated SMILES and property scores. De-novo mask [*{minimum-maximum}], with 1 <= minimum <= maximum <= 512. The adapter passes floor((minimum + maximum) / 2) as upstream min_add_len, a minimum number of SAFE mask tokens; [*{10-20}] therefore reports minimum_mask_tokens=15. Upstream samples token length from its empirical distribution above that minimum. Neither endpoint is a heavy-atom bound, and maximum is not a maximum token or molecular-size limit. Measure and filter heavy-atom counts on returned SMILES separately if required. Range order and finite numeric strings are checked by the runtime.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_admet_ai_native",
+      "description": "Screen small molecules with ADMET-AI: 41 learned ADMET/assay endpoints plus 11 calculated descriptors and alerts. Returns per-molecule scores with endpoint units and species; not a human-safety verdict. Supply exactly one of smiles, molecules, csv or sdf. Batch records retain caller IDs and row errors; up to 1000 molecules per operation. File inputs can use immutable tenant artifact references. No salt stripping or tautomer replacement is added. Unknown endpoint names are errors. Use small-molecule structures, not protein sequences; review applicability and assay definitions. Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_altumage_native",
+      "description": "Predict methylation-based chronological age from the full CpG panel; returns age by sample ID. Methylation-based chronological-age prediction, not clinical PhenoAge. Requires the entire canonical 20,318-CpG panel. Generate a full synthetic example with models/aging/fixtures.py methylation_payload and the pinned model preprocessing assets; a shortened CpG example is not a valid request.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "boltz2_predict_native",
+      "description": "Predict proteins from chains and supplied A3M; returns mmCIF structures and confidence scores. Portable protein-only Boltz2, not the full NVIDIA NIM contract. Supply A3M explicitly. No ligands, affinity prediction, templates, seed or online MSA search.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "diffusion_samples": {
+            "default": 1,
+            "description": "Number of diffusion predictions generated by this request.",
+            "maximum": 8,
+            "minimum": 1,
+            "title": "Diffusion Samples",
+            "type": "integer"
+          },
+          "output_format": {
+            "const": "mmcif",
+            "default": "mmcif",
+            "description": "Structure serialization produced by this runtime.",
+            "title": "Output Format",
+            "type": "string"
+          },
+          "polymers": {
+            "description": "Protein chains with caller-supplied A3M alignments. This runtime does not accept ligands.",
+            "items": {
+              "$ref": "#/$defs/Polymer"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Polymers",
+            "type": "array"
+          },
+          "recycling_steps": {
+            "default": 3,
+            "description": "Number of model recycling iterations.",
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Recycling Steps",
+            "type": "integer"
+          },
+          "sampling_steps": {
+            "default": 200,
+            "description": "Number of diffusion sampling steps.",
+            "maximum": 500,
+            "minimum": 1,
+            "title": "Sampling Steps",
+            "type": "integer"
+          },
+          "output_prefix": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "description": "Directory in your assigned bucket for automatic result.json, artifacts and manifest.json delivery. Defaults to runs/<model-id>; the operation ID is appended. Never sent to the model."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 200,
+            "description": "Reuse this key with identical inputs after a lost response."
+          },
+          "wait_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "description": "Wait at most this many seconds; otherwise poll the returned operation ID."
+          }
+        },
+        "required": [
+          "polymers"
+        ],
+        "type": "object",
+        "$defs": {
+          "A3M": {
+            "additionalProperties": false,
+            "properties": {
+              "alignment": {
+                "anyOf": [
+                  {
+                    "maxLength": 33554432,
+                    "minLength": 3,
+                    "title": "Alignment",
+                    "type": "string"
+                  },
+                  {
+                    "additionalProperties": false,
+                    "description": "Tenant-owned artifact reference. Upload and finalize the bytes before submitting this model call.",
+                    "properties": {
+                      "artifact_id": {
+                        "description": "Caller-owned immutable artifact UUID returned after upload finalization.",
+                        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                        "type": "string"
+                      },
+                      "compression": {
+                        "const": "none",
+                        "default": "none",
+                        "description": "Artifact input must be stored without transport compression."
+                      },
+                      "media_type": {
+                        "description": "Media type of the uploaded bytes.",
+                        "enum": [
+                          "text/x-a3m",
+                          "text/plain"
+                        ],
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "description": "SHA-256 of the exact uploaded bytes.",
+                        "pattern": "^[0-9a-f]{64}$",
+                        "type": "string"
+                      },
+                      "size_bytes": {
+                        "description": "Exact uploaded byte count.",
+                        "minimum": 0,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "artifact_id",
+                      "sha256",
+                      "size_bytes",
+                      "media_type",
+                      "compression"
+                    ],
+                    "type": "object"
+                  }
+                ],
+                "description": "Model input Prefer an artifact reference for nontrivial files so clients never serialize file bytes through an LLM.",
+                "x-fs2-artifact-materialization": "utf-8",
+                "x-fs2-artifact-max-bytes": 16777216,
+                "x-fs2-artifact-media-types": [
+                  "text/x-a3m",
+                  "text/plain"
+                ]
+              },
+              "format": {
+                "const": "a3m",
+                "default": "a3m",
+                "description": "Alignment serialization format.",
+                "title": "Format",
+                "type": "string"
+              },
+              "rank": {
+                "default": 0,
+                "description": "Accepted for compatibility but NOT consumed by the current Boltz2 adapter.",
+                "minimum": 0,
+                "title": "Rank",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "alignment"
+            ],
+            "title": "A3M",
+            "type": "object"
+          },
+          "MSA": {
+            "additionalProperties": false,
+            "properties": {
+              "msa_search": {
+                "$ref": "#/$defs/MSASearch",
+                "description": "Required nesting for the supplied alignment; this name does not trigger an MSA search."
+              }
+            },
+            "required": [
+              "msa_search"
+            ],
+            "title": "MSA",
+            "type": "object"
+          },
+          "MSASearch": {
+            "additionalProperties": false,
+            "properties": {
+              "a3m": {
+                "$ref": "#/$defs/A3M",
+                "description": "A3M alignment object."
+              }
+            },
+            "required": [
+              "a3m"
+            ],
+            "title": "MSASearch",
+            "type": "object"
+          },
+          "Polymer": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "description": "Caller-chosen protein chain identifier.",
+                "maxLength": 8,
+                "minLength": 1,
+                "pattern": "^[A-Za-z0-9]+$",
+                "title": "Id",
+                "type": "string"
+              },
+              "molecule_type": {
+                "const": "protein",
+                "description": "The portable Boltz2 endpoint supports proteins only.",
+                "title": "Molecule Type",
+                "type": "string"
+              },
+              "msa": {
+                "$ref": "#/$defs/MSA",
+                "description": "Caller-supplied alignment. This endpoint does not perform online MSA search."
+              },
+              "sequence": {
+                "description": "Amino-acid sequence; see this field's alphabet and length constraints.",
+                "maxLength": 2048,
+                "minLength": 6,
+                "pattern": "^[acdefghiklmnpqrstvwyACDEFGHIKLMNPQRSTVWY\\s]+$",
+                "title": "Sequence",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "molecule_type",
+              "sequence",
+              "msa"
+            ],
+            "title": "Polymer",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "description": "Predict proteins from chains and supplied A3M; returns mmCIF structures and confidence scores. Portable protein-only Boltz2, not the full NVIDIA NIM contract. Supply A3M explicitly. No ligands, affinity prediction, templates, seed or online MSA search.",
+        "title": "PredictRequest"
+      }
+    },
+    {
+      "name": "segment_cells_native",
+      "description": "Segment a bounded 2D microscopy image with Cellpose CPSAM v2; returns a labeled PNG mask, object count and per-object pixel areas. Bounded 2D instance segmentation. The runtime rejects images above 4 megapixels.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_ctoxpred2_native",
+      "description": "Screen small molecules for hERG, Nav1.5 and Cav1.2 ion-channel inhibition with CToxPred2. Returns channel-specific model scores and labels, not clinical cardiotoxicity or arrhythmia risk. Supply exactly one of smiles, molecules, csv or sdf. Batch records retain caller IDs and row errors; up to 1000 molecules per operation. File inputs can use immutable tenant artifact references. No salt stripping or tautomer replacement is added. Unknown endpoint names are errors. Use small-molecule structures, not protein sequences; review applicability and assay definitions. Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_diffdock_native",
+      "description": "Dock a SMILES ligand into a receptor PDB; returns ranked poses and docking confidence. DiffDock v1.1 portable adapter; receptor PDB plus inline ligand SMILES.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "molmim_run_native",
+      "description": "Run bounded CMA-ES/QED search from a SMILES molecule; returns distinct changed molecules or explicit GENERATION_EXHAUSTED when the requested count is not found. Property improvement is not guaranteed. The search uses exactly particles * iterations model decodes and never silently expands this budget. num_molecules must not exceed that product; the runtime enforces this cross-field constraint. Finite-search exhaustion is not proof of chemical infeasibility. QED is a descriptor, not efficacy.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "algorithm": {
+            "const": "CMA-ES",
+            "default": "CMA-ES",
+            "description": "Actual adaptive CMA-ES with the requested fixed population and iterations.",
+            "title": "Algorithm",
+            "type": "string"
+          },
+          "iterations": {
+            "default": 1,
+            "description": "Requested CMA-ES ask/tell updates; no automatic increase on exhaustion.",
+            "maximum": 16,
+            "minimum": 1,
+            "title": "Iterations",
+            "type": "integer"
+          },
+          "min_similarity": {
+            "default": 0.3,
+            "description": "Hard final-output Morgan/Tanimoto similarity cutoff. It is also used in the soft CMA-ES objective; the hard output filter is stricter than upstream's soft-only score.",
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Min Similarity",
+            "type": "number"
+          },
+          "minimize": {
+            "default": false,
+            "description": "Guide search toward lower QED and sort ascending; improvement over the starting molecule is not guaranteed.",
+            "title": "Minimize",
+            "type": "boolean"
+          },
+          "num_molecules": {
+            "default": 1,
+            "description": "Requested number of molecules.",
+            "maximum": 16,
+            "minimum": 1,
+            "title": "Num Molecules",
+            "type": "integer"
+          },
+          "particles": {
+            "default": 2,
+            "description": "CMA-ES population size, at least two; part of the exact decode budget.",
+            "maximum": 32,
+            "minimum": 2,
+            "title": "Particles",
+            "type": "integer"
+          },
+          "property_name": {
+            "const": "QED",
+            "default": "QED",
+            "description": "The hosted MolMIM optimizer targets QED only.",
+            "title": "Property Name",
+            "type": "string"
+          },
+          "radius": {
+            "default": 1,
+            "description": "Multiplier of the initial CMA-ES sigma 0.75; not a guaranteed chemical-distance radius.",
+            "exclusiveMinimum": 0,
+            "maximum": 10,
+            "title": "Radius",
+            "type": "number"
+          },
+          "smi": {
+            "description": "Starting molecule as a valid SMILES string.",
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Smi",
+            "type": "string"
+          },
+          "output_prefix": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "description": "Directory in your assigned bucket for automatic result.json, artifacts and manifest.json delivery. Defaults to runs/<model-id>; the operation ID is appended. Never sent to the model."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 200,
+            "description": "Reuse this key with identical inputs after a lost response."
+          },
+          "wait_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "description": "Wait at most this many seconds; otherwise poll the returned operation ID."
+          }
+        },
+        "required": [
+          "smi"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Run bounded CMA-ES/QED search from a SMILES molecule; returns distinct changed molecules or explicit GENERATION_EXHAUSTED when the requested count is not found. Property improvement is not guaranteed. The search uses exactly particles * iterations model decodes and never silently expands this budget. num_molecules must not exceed that product; the runtime enforces this cross-field constraint. Finite-search exhaustion is not proof of chemical infeasibility. QED is a descriptor, not efficacy.",
+        "title": "GenerateRequest"
+      }
+    },
+    {
+      "name": "msa_search_native",
+      "description": "Search the pinned local PDB70 database for a protein sequence; returns A3M alignments. Local MMseqs2 search against the pinned PDB70_220313 database. Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_openfold2_native",
+      "description": "Predict a protein from its sequence; returns ranked structure and confidence values. Portable OpenFold2 with a single-sequence dummy MSA. No external MSA, template or relaxation fields.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files.",
+      "inputSchema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "properties": {
+          "input_id": {
+            "description": "Caller-chosen input identifier.",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$",
+            "type": "string"
+          },
+          "relax_prediction": {
+            "const": false,
+            "default": false,
+            "description": "Relaxation is not supported by this runtime."
+          },
+          "selected_models": {
+            "const": [
+              1
+            ],
+            "default": [
+              1
+            ],
+            "description": "Exactly parameter set 1: model_3_ptm / finetuning_no_templ_ptm_1."
+          },
+          "sequence": {
+            "description": "Single canonical uppercase protein sequence.",
+            "maxLength": 1024,
+            "minLength": 1,
+            "pattern": "^[ACDEFGHIKLMNPQRSTVWY]+$",
+            "type": "string"
+          },
+          "output_prefix": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "description": "Directory in your assigned bucket for automatic result.json, artifacts and manifest.json delivery. Defaults to runs/<model-id>; the operation ID is appended. Never sent to the model."
+          },
+          "idempotency_key": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 200,
+            "description": "Reuse this key with identical inputs after a lost response."
+          },
+          "wait_seconds": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 30,
+            "description": "Wait at most this many seconds; otherwise poll the returned operation ID."
+          }
+        },
+        "required": [
+          "input_id",
+          "sequence",
+          "selected_models",
+          "relax_prediction"
+        ],
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Predict a protein from its sequence; returns ranked structure and confidence values. Portable OpenFold2 with a single-sequence dummy MSA. No external MSA, template or relaxation fields."
+      }
+    },
+    {
+      "name": "infer_openfold3_native",
+      "description": "Predict a protein assembly from chains and optional supplied A3M; returns CIF structure results. OpenFold3 Preview2, fixed seed 42 and one sample; no template or online MSA search.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_phenoage_native",
+      "description": "Calculate clinical phenotypic age from age and nine blood biomarkers; returns results by sample ID. Clinical PhenoAge from age plus nine blood biomarkers, not DNA-methylation PhenoAge. Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_proteinmpnn_native",
+      "description": "Design sequences compatible with a protein backbone PDB; returns sampled sequences and scores. ProteinMPNN v_48_020 portable adapter. Chain existence and PDB structure are checked by the runtime.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "segment_track_media_native",
+      "description": "Segment a bounded image automatically or from point/box prompts, or track prompted objects through MP4 video; returns masks, metadata and a colorful overlay in a ZIP artifact. SAM 2.1 Hiera Large segmentation. Images are at most 2,073,600 pixels; videos are at most 320 frames. The output ZIP contains manifest.json, masks and an overlay image or MP4.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "run_mdprecheck",
+      "description": "Check GROMACS geometry, topology, sequence, chemistry, environment and run parameters. Optional CPU grompp/energy/minimization/stability probes. Produces a verdict, JSON findings and HTML report; never changes inputs. A completed check may report fail or warn. No finding is proof of scientific validity.  Synchronous result only; no durable async or idempotency. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_diar_streaming_sortformer_4spk_v2_1_native",
+      "description": "Attribute up to four speakers in a complete uploaded recording. Labels are arrival order, not identified people. This optional model is not required for bot-to-bot sessions. Only file mode is available through this tool; live speech is not exposed by this gateway.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_magpie_tts_multilingual_357m_native",
+      "description": "Generate complete WAV audio using one of five named Magpie v2607 voices. Large output is returned through a tenant-owned artifact handle. Use /v1/voice/synthesize for incremental audio. Only file mode is available through this tool; live speech is not exposed by this gateway.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_nemotron_speech_en_0_6b_native",
+      "description": "Transcribe a complete uploaded recording. Upload and finalize audio first; no local path, URL, base64, or file bytes belong in MCP arguments. Large recordings use the returned durable operation. Only file mode is available through this tool; live speech is not exposed by this gateway.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_nemotron_speech_multilingual_0_6b_native",
+      "description": "Transcribe a complete uploaded recording. Upload and finalize audio first; no local path, URL, base64, or file bytes belong in MCP arguments. Large recordings use the returned durable operation. Only file mode is available through this tool; live speech is not exposed by this gateway.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    },
+    {
+      "name": "infer_parakeet_realtime_eou_120m_v1_native",
+      "description": "Transcribe a complete uploaded English recording with actual model EOU markers. For partials during recording use /v1/voice/stream. Only file mode is available through this tool; live speech is not exposed by this gateway.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files."
+    }
+  ],
+  "full_catalog_receipt": {
+    "private_local_path": "/data/artifacts/delphi-evolve-rethink/resource-discovery/scientific-ai-catalog-20261101T0543.json",
+    "bytes": 672689,
+    "sha256": "7dd8c51321626b3156cd0395c1f3a10b0c633aa9967ab93f13e8f883d5385a02"
+  }
+}

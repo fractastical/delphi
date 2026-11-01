@@ -1,0 +1,100 @@
+{
+  "schema": "frontier.model.interface/1",
+  "model_id": "collagen_mimetic_md",
+  "name": "Collagen-mimetic atomistic MD (computed)",
+  "engine": "OpenMM8.4 CPU and H100 CUDA mixed precision",
+  "status": "implemented",
+  "reference": {
+    "repo": "kganjam/delphi-frontier",
+    "branch": "work/multiscale-md",
+    "commit": "31e6c23",
+    "path": "artifacts/molecular/protocol-reference-oracle.json,engineering/molecular/run.py",
+    "files": {
+      "artifacts/molecular/protocol-reference-oracle.json": "945cd8f81926a234c2ff9f817784e70e38754c10eecba83385d2d4e434409da6",
+      "engineering/molecular/run.py": "f8f7cc34306bd92c8ddbde32a57b7b6d16a40b8810c97783874e9adb12d47a0d"
+    },
+    "source_sha256": "9bc3ddebc05fb28ce3ea84418057d3622972e84809ce2fa39360a9524b95476e"
+  },
+  "ports": [
+    {
+      "name": "terminal_CA_distance",
+      "direction": "out",
+      "quantity": "molecular chain terminal separation",
+      "kind": "dimensional",
+      "unit": "nm",
+      "dim": {
+        "kg": 0,
+        "m": 1,
+        "s": 0
+      },
+      "scale": "molecular",
+      "regime": "300K target; CUDA 10ps preliminary thermalization +100ps production per seed; no equilibrium claim",
+      "context": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
+      "provenance": {
+        "source": "Actual saved OpenMM CPU/CUDA trajectory metrics, exact source and input pins",
+        "status": "simulated",
+        "read_level": "file"
+      },
+      "bounds": null,
+      "caveat": "Three actual chain lengths, not a contour length or material modulus"
+    },
+    {
+      "name": "CA_RMSD",
+      "direction": "out",
+      "quantity": "C-alpha least-squares RMSD from production start",
+      "kind": "dimensional",
+      "unit": "nm",
+      "dim": {
+        "kg": 0,
+        "m": 1,
+        "s": 0
+      },
+      "scale": "molecular",
+      "regime": "300K target; CUDA 10ps preliminary thermalization +100ps production per seed; no equilibrium claim",
+      "context": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
+      "provenance": {
+        "source": "Actual saved OpenMM CPU/CUDA trajectory metrics, exact source and input pins",
+        "status": "simulated",
+        "read_level": "file"
+      },
+      "bounds": null,
+      "caveat": "Rigid aligned; not an experimental accuracy measure"
+    }
+  ],
+  "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "1000ps sampled production duration is not a physical relaxation-time estimate; original100ps ports and conditional900ps extension data are explicitly distinguished in run"
+  },
+  "run": {
+    "receipt": "artifacts/molecular/cuda-v2/production/receipt.json",
+    "protocol": "artifacts/molecular/protocol-reference-oracle.json",
+    "controls": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+    "CPU_CUDA_parity": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+    "seed_variation": "artifacts/molecular/cuda-analysis/ensemble.json",
+    "measured_biological_data": null,
+    "conditional_continuation": {
+      "receipt": "artifacts/molecular/cuda-v3/production/receipt.json",
+      "protocol": "artifacts/molecular/continuation-protocol.json",
+      "protocol_commit": "03ec8bc",
+      "code_commit": "999f30185713b729a682c4dbcb2953f15ff5e405",
+      "code_path": "engineering/molecular/continuation.py",
+      "code_sha256": "78ba3ec932239493edbe2608b5d8bef5819fa19c026c1d0024eb01aec1af592f",
+      "analysis": "artifacts/molecular/continuation-analysis/summary.json",
+      "analysis_sha256": "dccb9f38cde850ed1f0b733ad2f8512703f1c4c65c2c0f8ea3138e1df19f1364",
+      "video": "artifacts/molecular/continuation-render/trajectory.mp4",
+      "status": "three recorded-state branches extended to global1000ps; fresh declared thermostat RNG; no new independent biological samples; window diagnostic false,false,true"
+    }
+  },
+  "scope": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
+  "not_established": [
+    "native fish collagen sequence",
+    "equilibrated conformational ensemble",
+    "force-field empirical accuracy",
+    "molecular stiffness",
+    "fibril assembly/crosslinking",
+    "tissue Young modulus",
+    "fin bending stiffness",
+    "fish function"
+  ]
+}
