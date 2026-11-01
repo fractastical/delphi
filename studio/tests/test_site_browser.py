@@ -1855,14 +1855,15 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
         pg.close()
 
 
-def test_demo_page_with_the_published_snapshot_defaults_to_the_one_minute_cut(browser, base):
+def test_demo_page_defaults_to_latest_published_cut_and_preserves_old_downloads(browser, base):
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     cuts = {c["id"]: c for c in (snap.get("demo_videos") or {}).get("cuts", [])}
     if "frontier-60s" not in cuts:
         return
     pg = page(browser, 1280, 900)
     pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-    assert pg.locator("#demo-video source").get_attribute("src") == cuts["frontier-60s"]["href"]
+    expected = cuts.get("frontier-90s") or cuts["frontier-60s"]
+    assert pg.locator("#demo-video source").get_attribute("src") == expected["href"]
     assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
 
 
@@ -2101,3 +2102,23 @@ def test_system_audit_separates_contributors_activity_and_model_receipts(browser
         assert audit['models']['data']['source_tree_commit'] in source
         assert pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         assert not pg.errors
+
+
+def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(browser, base):
+    snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
+    old = snap['demo_videos']['cuts']
+    assert {c['id'] for c in old} >= {'frontier-60s', 'frontier-120s'}
+    latest = dict(old[0], id='frontier-90s', title='New narrated tour', duration_s=90)
+    snap['demo_videos']['cuts'] = [c for c in old if c['id'] != 'frontier-90s'] + [latest]
+    for width in (1440, 390):
+        pg = page(browser, width, 900)
+        pg.route('**/data/snapshot.json', lambda r: r.fulfill(json=snap))
+        pg.goto(base + '#/demo')
+        pg.wait_for_selector('.democut[aria-current=page]')
+        assert pg.locator('.democut[aria-current=page] b').inner_text() == '90 seconds'
+        assert 'new 90-second tour' in pg.locator('.demohead').inner_text()
+        assert pg.locator('.demodl li').count() == 3
+        pg.locator('.democut[href$="frontier-60s"]').click()
+        pg.wait_for_selector('.democut[aria-current=page]:has-text("1 minute")')
+        assert pg.locator('#demo-video source').get_attribute('src') == next(c['href'] for c in old if c['id'] == 'frontier-60s')
+        assert _overflow(pg) <= 0 and not pg.errors

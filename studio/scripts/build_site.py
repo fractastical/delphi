@@ -724,8 +724,23 @@ def print_laws(ins: Inputs, out: dict, downloads: dict) -> dict | None:
 
 
 def demo_videos(ins: Inputs, out: dict) -> dict | None:
+    """Preserve earlier cuts while admitting an additive, completely pinned edit."""
+    result = {"cuts": [], "refused": [], "limits": []}
+    present = False
+    for directory, expected in (("artifacts/demo-video", {"frontier-60s": 60, "frontier-120s": 120}),
+                                ("artifacts/demo-video-90", {"frontier-90s": 90})):
+        manifest = _demo_manifest(ins, out, directory, expected)
+        if manifest is None:
+            continue
+        present = True
+        result["cuts"].extend(manifest["cuts"])
+        result["refused"].extend(manifest["refused"])
+        result["limits"].extend(x for x in manifest["limits"] if x not in result["limits"])
+    return result if present else None
+
+
+def _demo_manifest(ins: Inputs, out: dict, directory: str, expected_cuts: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
-    directory = "artifacts/demo-video"
     manifest_path = f"{directory}/manifest.json"
     if not (ROOT / manifest_path).is_file():
         return None
@@ -735,7 +750,7 @@ def demo_videos(ins: Inputs, out: dict) -> dict | None:
         return result
     required = {"video": {".mp4"}, "poster": {".png", ".jpg"}, "captions": {".vtt"}, "transcript": {".txt"}}
     for cut in manifest.get("cuts", []):
-        expected = {"frontier-60s": 60, "frontier-120s": 120}.get(cut.get("id"))
+        expected = expected_cuts.get(cut.get("id"))
         if expected is None or not isinstance(cut.get("duration_s"), (int, float)) or abs(cut["duration_s"] - expected) > 0.25:
             result["refused"].append({"id": cut.get("id"), "reason": "unexpected cut or duration"})
             continue
