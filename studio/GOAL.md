@@ -72,6 +72,8 @@ about a proposed action.
 - [x] Run solver controls and a scoped Lean check with a failing mutant.
 - [x] Run a bounded simulation, numerical controls and uncertainty analysis.
 - [x] Produce an inspectable candidate geometry and downloadable print artifact.
+- [ ] Add improved printable fish revisions with source lineage, exact-file laws,
+  mass/topology/wall checks, independent review and home-page downloads.
 - [x] Connect evidence adapters, source indexes and nanopublication draft export.
 - [x] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.

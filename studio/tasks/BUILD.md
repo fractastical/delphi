@@ -1,11 +1,35 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 9:05pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 9:22pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 9:05pm PDT
+## Current checkpoint — October 31, 2026, 9:22pm PDT
+
+- [x] Published `d589efb`: design-control map with six layers, NCA
+  curriculum repair/persistence tradeoff, and recovered eight-condition BETSE
+  sensitivity. Actual source and media downloads are linked from the cards.
+ 19 integrated checks, 43 public route/media checks, 8 web and 39 MCP checks
+  passed; release history scan covered 20 commits with zero credential findings.
+  Receipt: `deploy/receipts/design-control-live.json`.
+- [x] Root rehashed all 475 curriculum files (22,454,674 bytes). Baseline 45/96
+  versus curriculum 44/96 remains an aggregate null/negative comparison;
+  targeted prefix repair improves while persistence declines. BETSE rendering
+  failed on the worker; displayed media reconstructs the eight returned arrays.
+- [ ] New user request: add a few improved fish STL models. Existing print owner
+  claude-05 is producing additional source-conditioned printable variants;
+  claude-13 independently reviews exact files. Root owns home-page downloads
+  and publication. Preserve old revisions and failed r4 mass/catch-wall checks.
+- [ ] Scientific audit is committed. Native workers own two next steps: real
+  specimen-data updates with species-blocked internal validation, and a bounded
+  paired mechanical uncertainty/resolution assay. Neither result is claimed yet.
+- [ ] Follow-up encrypted snapshot is stored and separate-host application
+  recovery is running. Recovery tooling includes a disappearing-file failure
+  guard. Await actual remote-service result and final receipt before closing
+  the backup requirement; preserve all earlier snapshots.
+
+## Previous checkpoint — October 31, 2026, 9:05pm PDT
 
 - [x] Corrected 90-second film is public at release 8a1f091 and is the default
   About → Demo videos selection. Earlier 60/120 cuts remain unchanged. Root
