@@ -23,7 +23,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
             raise ValueError("Demo check failed: " + name)
 
     def fetch(path, limit=16_000_000, headers=None):
-        if not path.startswith("artifacts/demo-video/") or ".." in Path(path).parts:
+        if not path.startswith(("artifacts/demo-video/", "artifacts/demo-video-90/")) or ".." in Path(path).parts:
             raise ValueError("Media path outside demo subtree")
         with urlopen(Request(base + "/" + path, headers=headers or {}), timeout=30) as response:
             data = response.read(limit + 1)
@@ -31,17 +31,23 @@ def verify(base: str, capture: Path | None = None) -> dict:
                 raise ValueError("Response exceeds media limit")
             return response.status, dict(response.headers.items()), data
 
-    status, _, raw = fetch("artifacts/demo-video/manifest.json")
-    manifest = json.loads(raw)
-    check("complete public manifest", status == 200 and manifest["status"] == "complete")
-    cuts = {cut["id"]: cut for cut in manifest["cuts"]}
-    check("both requested cuts present", set(cuts) == {"frontier-60s", "frontier-120s"})
+    cuts, directories, manifests = {}, {}, {}
+    for directory, expected in (("artifacts/demo-video", {"frontier-60s", "frontier-120s"}),
+                                ("artifacts/demo-video-90", {"frontier-90s"})):
+        status, _, raw = fetch(directory + "/manifest.json")
+        manifest = json.loads(raw)
+        check(directory + " complete public manifest", status == 200 and manifest["status"] == "complete")
+        entries = manifest["cuts"]
+        check(directory + " requested cuts present", len(entries) == len(expected) and {c["id"] for c in entries} == expected)
+        manifests[directory] = hashlib.sha256(raw).hexdigest()
+        for cut in entries:
+            cuts[cut["id"]], directories[cut["id"]] = cut, directory
     for name, cut in cuts.items():
-        expected_duration = 60 if name == "frontier-60s" else 120
+        expected_duration = {"frontier-60s": 60, "frontier-90s": 90, "frontier-120s": 120}[name]
         check(name + " declared duration", abs(cut["duration_s"] - expected_duration) <= 0.25)
         for role in ("video", "poster", "captions", "transcript"):
             pin = cut["files"][role]
-            path = "artifacts/demo-video/" + pin["path"]
+            path = directories[name] + "/" + pin["path"]
             limit = 64_000_000 if role == "video" else 16_000_000
             status, headers, data = fetch(path, limit)
             headers = {key.lower(): value for key, value in headers.items()}
@@ -72,7 +78,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
             raise TimeoutError("Browser state did not become true: " + expression)
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
-        for name in ("frontier-60s", "frontier-120s"):
+        for name in ("frontier-90s", "frontier-60s", "frontier-120s"):
             page.goto(base + "/#/demo?cut=" + name, wait_until="domcontentloaded")
             page.wait_for_selector("#demo-video")
             wait_js("document.querySelector('#demo-video').readyState >= 2")
@@ -90,7 +96,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
             check(name + " fullscreen entered", page.evaluate("document.fullscreenElement.id === 'demo-stage'"))
             page.evaluate("document.exitFullscreen()")
             wait_js("document.fullscreenElement === null")
-            check(name + " both cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == 2)
+            check(name + " all three cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == len(cuts))
             if capture:
                 capture.mkdir(parents=True, exist_ok=True)
                 page.screenshot(path=str(capture / (name + ".png")))
@@ -98,7 +104,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
         page.set_viewport_size({"width": 390, "height": 844})
         page.goto(base + "/#/demo", wait_until="domcontentloaded")
         page.wait_for_selector("#demo-video")
-        check("mobile defaults to one-minute cut", page.locator("#demo-video source").get_attribute("src").endswith("frontier-60s.mp4"))
+        check("mobile defaults to new 90-second cut", page.locator("#demo-video source").get_attribute("src").endswith("frontier-90s.mp4"))
         check("mobile has no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
         page.locator(".aboutmenu summary").click()
         check("About exposes Demo videos", page.locator(".aboutmenu a[href$='#/demo']").inner_text() == "Demo videos")
@@ -107,7 +113,8 @@ def verify(base: str, capture: Path | None = None) -> dict:
         check("no page errors", not errors)
         browser.close()
     return {"schema": "frontier.demo-video.live-check/1", "checked_at": datetime.now(timezone.utc).isoformat(),
-            "base": base, "manifest_sha256": hashlib.sha256(raw).hexdigest(), "checks": checks,
+            "base": base, "manifest_sha256": manifests["artifacts/demo-video"],
+            "manifest_hashes": manifests, "checks": checks,
             "playback": playback, "scientific_records_written": 0,
             "scope": "Exact public media bytes, delivery and browser decoding/playback; not biological validation."}
 
