@@ -630,6 +630,44 @@ def openresearch_exemplars(ins: Inputs) -> dict | None:
     return {"exemplars": ex, "scope": "OpenResearch is a local recorder of which code was run. It is not a cloud dispatcher and none of these runs used a remote backend. A completed run is evidence that this code at this commit exited 0 and printed this, not that the science is right.", "report": "OpenResearch integration note (corpus session, single reader, not independently reviewed)"}
 
 
+def experimentation_block(ins: Inputs) -> dict | None:
+    """SPEC-013's bridge table (parsed from the spec, not retyped) and the planner's artifacts when they exist. Measurement categories are not experiments run; no observation is invented."""
+    sp = "specs/SPEC-013-adaptive-experimentation.md"
+    if not (ROOT / sp).exists():
+        return None
+    t = ins.text(sp); rows = []; grab = False
+    for line in t.splitlines():
+        if line.startswith("| Bridge |"):
+            grab = True; continue
+        if grab:
+            if not line.startswith("|"):
+                break
+            if set(line.replace("|", "").strip()) <= set("- "):
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) >= 2:
+                rows.append({"bridge": c[0], "measure": c[1]})
+    states = re.search(r"Protocol hash, ([^\n]+?) states and lineage", t)
+    out = {"spec": sp, "bridges": rows, "states_text": states.group(1) if states else None, "planner": None}
+    for d in ("artifacts/experimental-design", "engineering/experimental_design/artifacts/experimental-design"):
+        base = ROOT / d
+        if base.is_dir():
+            files = sorted(f for f in base.rglob("*") if f.is_file() and f.suffix in (".json", ".md"))
+            listing = []
+            for f in files[:40]:
+                rel = f.relative_to(ROOT).as_posix(); b = ins.read(rel)
+                schema = None
+                if f.suffix == ".json":
+                    try:
+                        schema = json.loads(b).get("schema")
+                    except Exception:
+                        schema = None
+                listing.append({"path": rel, "sha256": digest_bytes(b), "bytes": len(b), "schema": schema})
+            out["planner"] = {"dir": d, "files": listing}
+            break
+    return out
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -1140,6 +1178,7 @@ def build() -> dict[str, bytes]:
     claim_reuse = claim_reuse_block(ins)
     gen_bp = genetic_blueprints(ins)
     orx_ex = openresearch_exemplars(ins)
+    experimentation = experimentation_block(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1180,6 +1219,7 @@ def build() -> dict[str, bytes]:
         "claim_reuse": claim_reuse,
         "genetic_blueprints": gen_bp,
         "openresearch": orx_ex,
+        "experimentation": experimentation,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
