@@ -597,6 +597,16 @@ def claim_reuse_block(ins: Inputs) -> dict | None:
             "audit": f"{d}/audit.json", "audit_sha256": ins.seen[f"{d}/audit.json"]["sha256"], "review_readback": rv}
 
 
+def genetic_blueprints(ins: Inputs) -> dict | None:
+    """Genetic implementation blueprints (SPEC-012): source-backed PROPOSED designs in zebrafish, copied as written. No sequence, effector or coefficient is added; unknowns stay as the package states them."""
+    d = "artifacts/genetic-blueprints"
+    if not (ROOT / d / "blueprints.json").exists():
+        return None
+    B = json.loads(ins.read(f"{d}/blueprints.json")); S = json.loads(ins.read(f"{d}/sources.json")) if (ROOT / d / "sources.json").exists() else {}
+    return {"status": B["status"], "species_scope": B["species_scope"], "date": B["date"], "designs": B["designs"], "comparison": B["comparison"], "global_causal_gaps": B["global_causal_gaps"], "not_done": B["not_done"],
+            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -1104,6 +1114,7 @@ def build() -> dict[str, bytes]:
     fish_hist = fish_history(ins)
     reg_map = regulatory_map(ins)
     claim_reuse = claim_reuse_block(ins)
+    gen_bp = genetic_blueprints(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1141,6 +1152,7 @@ def build() -> dict[str, bytes]:
         "fish_history": fish_hist,
         "regulatory_map": reg_map,
         "claim_reuse": claim_reuse,
+        "genetic_blueprints": gen_bp,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

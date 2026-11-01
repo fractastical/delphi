@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1507,3 +1507,28 @@ def test_claim_reuse_page_shows_the_dispute_and_claims_no_benefit(browser, base)
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
     assert pg.locator(".subnav a:has-text('Claim reuse and dispute')").count() == 1
+
+
+def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequence(browser, base):
+    G = json.loads((ROOT / "site/data/snapshot.json").read_text())["genetic_blueprints"]
+    src = json.loads((ROOT / "artifacts/genetic-blueprints/blueprints.json").read_text())
+    assert [d["id"] for d in G["designs"]] == [d["id"] for d in src["designs"]] and len(G["designs"]) == 4
+    pg = page(browser)
+    pg.goto(base + "#/blueprints"); pg.wait_for_selector(".bpdesign")
+    t = pg.locator("#main").text_content()
+    assert pg.locator(".bpdesign").count() == 4 and pg.locator(".bpconstruct").count() == 4 and pg.locator(".bpconstruct .bpblock").count() == 16
+    assert pg.locator(".bpdesign").first.locator(".bpstep").count() == 8
+    assert "proposed, not executed" in t or "proposed design, NOT executed" in t
+    assert pg.locator("mark.unk").count() >= 20, "unknowns must be conspicuous"
+    assert "No DNA sequence, effector, coefficient or result is given" in t and "flying-fish transfer: unknown; not claimed" in t
+    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4 and "not declared" in pg.locator("section[aria-labelledby=bp-eq]").text_content()
+    assert "A BAC" not in t or "autonomous" in t
+    import re
+    assert not re.search(r"\\b[ACGT]{20,}\\b", t), "no DNA sequence may appear"
+    assert pg.locator("section[aria-labelledby=bp-cmp] tbody tr").count() == 5 and "Not a ranking" in t
+    pg.click("a[data-cite]:visible >> nth=0")
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/blueprints"); pg2.wait_for_selector(".bpdesign")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Genetic blueprints')").count() == 1
