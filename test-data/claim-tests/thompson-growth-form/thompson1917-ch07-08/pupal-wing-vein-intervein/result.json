@@ -1,0 +1,27 @@
+{
+  "claim_id": "thompson1917-ch07-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-08",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If hexagons become irregular or elongated where growth adds directional traction, then in the late pupal wing (about 30-32 h APF) the cells of the longitudinal veins L3 and L4, which Etournay et al. 2016 showed undergo convergent extension and differ in shape from their neighbours, must be less often six-sided and more elongated than the cells of the adjoining inter-vein regions L2-L3, L3-L4 and L4-L5, within the same wing and frame.",
+  "pass_criterion": "Pre-registered. In each of WT_1, WT_2, WT_3, take the user-drawn frame-200 ROI polygons (Segmentation/UserFrameRoi.txt: distL3, distL4, distInterL2-L3, distInterL3-L4, distInterL4-L5) and assign each interior cell at frame 200 (and each frame from the last 2 h, by tracking the same cell ids and, for cells that divided, their descendants) to vein or inter-vein by the polygon containing its centre. Per wing, over the last 2 h: f6 and mean elongation magnitude for vein cells and for inter-vein cells. Supported if in at least two of three wings f6(inter-vein) - f6(vein) >= 0.05 and vein cells have the higher mean elongation (the premise that the vein is under directional traction). If vein cells are not more elongated, the premise fails and the force clause is not tested in that wing (counted as neither).",
+  "fail_criterion": "Pre-registered. Refuted if in at least two of three wings vein cells are more elongated but f6(inter-vein) - f6(vein) <= 0, i.e. directional traction does not reduce hexagons. Differences in (0, 0.05) or wings split are 'mixed'. Inconclusive (underpowered) if fewer than 100 vein cells per frame are available. Diagnostic: the same comparison in the first 2 h (before veins are morphologically distinct), where no difference is expected; and area CV in vein versus inter-vein cells, to check that the size clause is not what separates them.",
+  "planned_datasets": [
+    "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing"
+  ],
+  "test_contract": {
+    "expected_observation": "Within one tissue at one time, the region under directional traction (vein, more elongated cells) has a lower six-sided fraction than the adjoining regions under more isotropic conditions (inter-vein), by at least 0.05.",
+    "disconfirming_observation": "Vein cells are more elongated but at least as often six-sided as inter-vein cells.",
+    "admissible_datasets": "Expert-segmented, tracked epithelia with author-defined regions of known different mechanical state and a per-cell shape tensor; not produced by a segmenter shown in this repo to round junctions.",
+    "inference_method": "Per wing, last 2 h: f6 and mean elongation per region class (vein vs inter-vein); difference thresholds as above, majority of wings; early-window comparison as the within-wing control."
+  },
+  "interpretation": "Thompson's second condition, 'uniform forces', had only a weak within-disc test (elongation deciles in the wing-disc-timelapse run). The pupal wing offers author-defined regions that differ in mechanical history: Etournay et al. 2016 (eLife 5:e14334) showed convergent extension in veins and shape differences between vein and inter-vein cells in exactly these ROIs. Vein identity is used as the proxy for directional traction and cell elongation as the check that the proxy holds. The region polygons are drawn by the dataset authors at frame 200; earlier frames are assigned through TissueMiner cell ids and lineage. Data are already on disk from the pupal-wing-timelapse run of ch07-09; no vein/inter-vein statistics had been computed before this pre-registration.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "data_kind": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "local-agent", "model": "claude-fable-5.1", "run": "cursor local session, hexagon follow-up", "date": "2026-11-01" }
+}

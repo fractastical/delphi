@@ -1,0 +1,28 @@
+{
+  "claim_id": "thompson1917-ch07-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-10",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If close-packed cells of varying size are hexagonal on average, with the larger ones having more and the smaller ones fewer than six sides, then in expert-segmented epithelia the mean neighbour number of interior cells is 6 and neighbour number increases monotonically with cell area (Lewis 1928's relation, mean area linear in polygon class), in proliferating and in post-mitotic tissue alike.",
+  "pass_criterion": "Pre-registered. In each of the five wing-disc movies (Dye et al., every 10th frame) and the three pupal wings (Etournay et al. 2015, every 10th frame), for interior cells: mean neighbour number; Spearman rho between area and neighbour number; and, for polygon classes 4 to 8 with at least 50 cells, the mean area relative to the frame median per class. Supported if in at least seven of the eight tissues the mean neighbour number lies in [5.85, 6.15], rho(area, n) >= 0.3, and the class means increase strictly from 4 through 8 sides. Diagnostic (Lewis's law proper): the least-squares slope of mean relative area against n over classes 4-8 and the R^2 of the linear fit; Lewis's original form predicts area proportional to (n - 2), i.e. a positive intercept-free fit in (n - 2).",
+  "fail_criterion": "Pre-registered. Refuted if in at least four tissues rho(area, n) < 0.1 or the class means are not monotone (larger cells do not have more sides), or if the mean neighbour number falls outside [5.7, 6.3] in four or more tissues. Otherwise 'mixed'. The mean-neighbour-number part is forced by Euler's formula for three-way-vertex tilings and is reported as a check, not as evidence; the informative part is the size-sides relation, which Euler does not force.",
+  "planned_datasets": [
+    "zenodo-22760592-dye-2026-drosophila-wing-disc-timelapse-tissueminer",
+    "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing"
+  ],
+  "test_contract": {
+    "expected_observation": "Interior cells average six neighbours and neighbour number rises monotonically with cell area, the mean area of n-sided cells increasing from 4 through 8 sides.",
+    "disconfirming_observation": "Cell area is unrelated to neighbour number (rho < 0.1) or the relation is not monotone, so size variation is not what makes some cells have fewer and some more than six sides.",
+    "admissible_datasets": "Public expert-corrected segmentations of confluent epithelia with per-cell area and neighbour relations, >= 1,000 cells per frame, not segmented by a method shown in this repo to round junctions; the claim's own example (coral corallites) is not required since the claim is about close-packed cells of varying size in general.",
+    "inference_method": "Per tissue: mean neighbour number, Spearman rho(area, n), monotonicity of class mean areas for 4-8 sides, slope and R^2 of area against n; verdict by count of tissues meeting all conditions."
+  },
+  "interpretation": "The first run of this claim (top-level result.json, Cellpose on five tissue images) confirmed the mean of six and noted that Euler forces it. Thompson's sentence has a second part, that where sizes vary irregularly 'some have fewer and some more than six sides', which he attributes to size: the bigger corallites take more neighbours. That is Lewis's law (F. T. Lewis 1928, Anat Rec 38:341, cucumber epidermis), and it is not forced by topology: a tiling can have varying areas with sides independent of area. This run tests that second part on 2.5 million expert-segmented cell-frames from two developmental states. Data are on disk from the ch07-09 runs; area-by-polygon-class statistics had not been computed before this pre-registration (the ch07-09 run reported only a pooled Spearman rho between relative area and n, 0.43-0.51 in the discs and 0.29-0.32 in the wings, which this run will re-derive per frame and extend to class means).",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "data_kind": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "local-agent", "model": "claude-fable-5.1", "run": "cursor local session, hexagon follow-up", "date": "2026-11-01" }
+}
