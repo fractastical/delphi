@@ -7,7 +7,9 @@ The Delphi website. Two parts live side by side here:
   (also live at <https://kavitakoolkarni-bio.github.io/delphi-portal/>), commit `ad8e85e`
   (the portal repo's `main` as of 2026-11-01): `index.html`, `platform.html`, `data/` (1,256 files),
   `.nojekyll`. That import matches the portal tree byte for byte. Edit these in the portal repo and
-  copy them over; don't restyle them here.
+  copy them over; don't restyle them here. One local link is added in `index.html`'s header,
+  next to About and Blog: **Test an organism** points at `test-organism.html`. A portal re-import
+  will drop it, so put that link back after copying.
 
 GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The
 homepage `index.html` is `Delphi_Product_Platform.html` from
