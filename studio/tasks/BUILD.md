@@ -1,11 +1,38 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 8:50pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 9:05pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 8:50pm PDT
+## Current checkpoint — October 31, 2026, 9:05pm PDT
+
+- [x] Corrected 90-second film is public at release 8a1f091 and is the default
+  About → Demo videos selection. Earlier 60/120 cuts remain unchanged. Root
+  ran 7 focused publication/browser checks; all 44 public media/playback checks,
+ 8 web and 39 MCP checks passed. The three independent review blockers are
+  closed. Exact receipts and review: deploy/receipts/demo90-live.json and
+  deploy/receipts/demo90-critic-review.md.
+- [x] Same release includes the second table-layout pass: small-screen labelled
+  rows, sticky first columns for matrices, visible scrolling cues, and corrected
+  heading/menu checks. Five focused table/accessibility/navigation checks passed.
+- [x] First private recovery snapshot was restored on sb03: 14,677 files,
+ 3,099,904,825 logical bytes; the restore tool authenticated/decrypted and checked
+  every file. Root separately restored both raw and sanitized dumps into fresh
+  PostgreSQL, matched all 18 table counts, preserved 3912 scientific envelopes,
+  and ran application health/catalog checks. Root also SSH-hashed the actual
+  off-host sanitized dump and matched it to the independently tested local dump.
+- [ ] Follow-up backup must include this final video, newer source refs and NCA
+  return. Inventory remote-only raw inputs explicitly; do not call missing raw
+  genome archives backed up merely because retrieval receipts were captured.
+- [ ] Ready for integration: NCA curriculum ed44c808 (89/192 overall; baseline
+ 45/96 versus curriculum 44/96, targeted repair gains with persistence loss),
+  design-control UI e284906, and recovery tooling 9a13a83. Native resource worker
+  is exposing recovered BETSE sensitivity as a canonical simulation card.
+- [ ] Goal remains active; no viable engineered organism or aggregate swarm
+  advantage is established by these computations.
+
+## Previous checkpoint — October 31, 2026, 8:50pm PDT
 
 - [x] Team crest and short team clip are public at release 5d88ed4. Five focused
   browser/build checks passed; deployment passed eight public web and 39 public

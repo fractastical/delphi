@@ -61,6 +61,8 @@ about a proposed action.
 - [x] Deliver 60-second and 120-second narrated demo videos with MiniMax voice,
   real interface captures and recorded simulation footage; preserve source and
   validation limits, and map the story to the judging rubric (SPEC-016).
+- [x] Publish the additive 90-second MiniMax narrated cut, preserve older cuts,
+  and check actual public playback, downloads, captions and fullscreen.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.
