@@ -456,9 +456,12 @@ would do is an open question, not a settled one.
 240/240 arm directories exit 0; **0 non-finite or unparseable values in 1 442 280 logger
 rows**; the solver's own receipt hashes to the pinned `3d9a6e5a…f0f94d5ad`.
 
-**No movie from this return, and none is claimed.** The packet deletes TIFF frames by design
-and the return contains **0** of them, so there are no spatial states to render. Logs alone
-cannot justify a spatial movie. The §9 movies remain the local 36-arm runs only.
+**No new tissue-shape movie from this return, and none is claimed.** The packet deletes the
+`TiffPlotter` lattice frames by design and the return contains **0** of them, so there are **no
+lattice frames defining cell shapes or the wound boundary** and no tissue-shape movie can be
+made from it. The loggers **do** carry per-cell centre coordinates and volumes, so this return
+is not free of spatial information — what is missing is the shape data a movie would need. The
+§9 movies are the local 36-arm runs and are unchanged.
 
 ![Measured closure-threshold brackets for every gap, J and seed, against the predicted proportionality and the frozen tolerance band](../artifacts/epithelial/figures/threshold-brackets-light.png)
 

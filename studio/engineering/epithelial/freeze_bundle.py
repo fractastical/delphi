@@ -83,10 +83,10 @@ def main() -> None:
             service=dict(finished_utc="2026-11-01T06:48:19Z", wall_s=346.040, cpu_s=2627.156,
                          host="owned 8 vCPU VM02", start_pdt="2026-10-31 23:41:51",
                          operation="operation-1793515311260-65f315306e508-9bfa6bf9-e56f22cd"),
-            spatial_states=0,
-            movie_possible=False,
-            movie_note="the packet deletes TIFF frames by design, so no spatial movie can be "
-                       "rendered from this return; logs alone cannot justify one"),
+            lattice_frames=0,
+            logger_carries_cell_centres_and_volumes=True,
+            tissue_shape_movie_possible=False,
+            movie_note="the packet deletes the TiffPlotter lattice frames by design, so this return has no lattice frames defining cell shapes or the wound boundary and no new tissue-shape movie can be made from it. The loggers DO carry per-cell centre coordinates and volumes, so the return is not free of spatial information. The earlier 36-run movies are unchanged."),
 
         local_native_runs=dict(
             path=a.native_runs, arms=36, read_only=True,
