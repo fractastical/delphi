@@ -1,0 +1,33 @@
+{
+  "claim_id": "darwin1859-ch12-12",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:43:10Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.88,
+  "variables": {
+    "claim_asserts": "It is an almost universal rule that the endemic productions of islands are related to those of the nearest continent, or of other near islands, even where the island's climate resembles a more distant region.",
+    "test_measures": "For 2,918 WCVP island-endemic plants in 12 groups, near_related is true when more than half of the non-island tips in the smallest Open Tree clade that contains the endemic and at least one outside tip are native to a pre-set nearest TDWG level-1 continent or the island's own level-2 region. Pooled share s_near = 0.294; 9/12 groups have s_near < 0.5 and 0/12 have s_near >= 0.6. Refutes if pooled s < 0.5 or a majority of groups are below 0.5.",
+    "match": "different"
+  },
+  "modality": {
+    "appropriate": false,
+    "note": "Ranges plus a phylogeny are the right kind of data for 'related to'. The Open Tree genus subtrees used here do not supply nearest relatives for most endemics: median n_outside_relatives is 80, and only 10.7% of scored endemics have a single outside species. Unsampled species sit in genus polytomies, so the majority rule scores where the genus lives."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The script assumes the smallest clade with one outside tip is the nearest relative. groups.csv shows s_near tracking control_congeners_near, the share of all outside congeners native to the near source: Galápagos 0.537 versus 0.525, Juan Fernández 0.333 versus 0.306, Bermuda 0.273 versus 0.282, Hawaii 0.068 versus 0.116. Darwin's rule is about the allies of the endemic, not about whether most of the genus is continental."
+  },
+  "scope": {
+    "claim_scope": "Endemic plants and animals of oceanic islands, related to the nearest continent or other near islands; the climatic contrast (Galápagos with America, Cape Verde with Africa) is part of the statement.",
+    "test_scope": "Vascular plants only, in 12 pre-registered groups, on genus trees (island-endemic genera are not scored). 'Near islands' is the island's own TDWG level-2 region. The climatic contrast is not modelled. Those limits are stated, but the verdict statistic is still genus-wide composition.",
+    "narrower": true
+  },
+  "reasons": [
+    "The refutation is pooled s_near = 0.294 on 2,918 endemics. That share is the fraction of endemics for which a majority of a large outside clade is 'near'. With a median clade of 80 tips, this is not the native region of the nearest relative.",
+    "The same files contain the variable the claim asks for, and it is excluded from the verdict. post_hoc_single_outside_relative (n = 313, not pre-registered) has pooled s_near 0.633, with Galápagos 0.90 (n = 10), Canaries 0.831 (n = 77), Cape Verde 1.0 (n = 5) and Mascarenes 0.912 (n = 57). The pre-registered rule would not have produced this refutation on that subset.",
+    "Plants-only and the twelve groups would have been a narrower scope of the same claim. They are not what makes the measurement unrepresentative. The measured variable for the bulk of the data is a different one, and interpretation describes the intended reading ('closest non-island relatives') without stating that the operational statistic collapses to genus geography."
+  ],
+  "what_would_change_it": "Score only endemics whose nearest outside clade is a single resolved species, or a small resolved clade, on a species-level tree, and apply the 'almost universal' thresholds (pooled >= 0.75 and s_A >= 0.6 in 75% of groups) to that share. The post-hoc block already computes the single-species share and would have to drive the verdict. Plants-only would then be faithful-with-narrower-scope.",
+  "files_read": ["result.json", "analysis.py", "derived/groups.csv", "derived/summary.json"]
+}

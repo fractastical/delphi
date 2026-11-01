@@ -31,6 +31,11 @@ const DOCS = [
   "claim-sources/darwin-origin/assessment/INSTRUCTIONS.md",
   "claim-sources/darwin-origin/assessment/rubric.json",
   "scripts/exec/runs/latest.json", "scripts/exec/overrides.json",
+  "test-data/agent-comparison/SUMMARY.md",
+  "test-data/agent-comparison/four-arm/PREREG.md",
+  "test-data/agent-comparison/four-arm/DEVIATIONS.md",
+  "scripts/release/agent-comparison/aristotle-ha06/RESULTS.md",
+  "problems/README.md",
 ];
 for (const p of DOCS) {
   if (!existsSync(join(REPO, p))) { console.warn(`missing ${p}`); continue; }

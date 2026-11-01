@@ -1,0 +1,99 @@
+{
+  "claim_id": "thompson1917-ch14-02",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:12:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "calibrated images of sunflower capitula in which both parastichy families can be traced",
+    "parastichy (clockwise / anticlockwise) counts per head",
+    "local crossing angle between the two families, at several radii, per head (to be measured from images or from seed coordinates)",
+    "enough heads from more than one cultivar or species to say how often crossing is near 90 degrees"
+  ],
+  "datasets": [
+    {
+      "id": "turing-s-sunflowers-dryad-f9k77",
+      "name": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Swinton & Ochu 2016)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.f9k77/download",
+      "doi": "10.5061/dryad.f9k77",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:10:30Z", "method": "GET Dryad API /datasets/doi:10.5061/dryad.f9k77 and /versions/818/files (not downloaded: 314,851,153 bytes in total); doi.org resolves 200 to datadryad.org", "http_status": 200, "bytes": 314851153 },
+      "variables_present": [
+        "annotated sunflower seed-head images (zip 314,590,945 bytes, 'Annotated seedhead images 20160205.zip')",
+        "clockwise/anticlockwise parastichy counts per head (abstract: 657 sunflowers; 768 parastichy numbers in the most reliable subset)",
+        "spreadsheets 'MSF007_SunflowerData_20151020_anonymised.xlsx' (108,344 bytes) and 'JS annotations for MSF007_Countdata.xlsx' (53,848 bytes); R/Sweave source MOSIpaperPE.Rnw"
+      ],
+      "variables_missing": [
+        "no crossing-angle table; angles would have to be measured from the images (zip contents and per-image calibration not inspected because of the 1 MB limit)",
+        "Helianthus annuus only (citizen-science heads, mostly cultivated), not other capitula"
+      ],
+      "scope": "657 sunflower heads from a UK citizen-science experiment; one species",
+      "evidence": "Dryad API: storageSize 314851153, 4 files listed with sizes above, license https://spdx.org/licenses/CC0-1.0.html, publicationDate 2016-04-19, abstract states 657 sunflowers and 768 parastichy numbers, primary article doi 10.1098/rsos.160091",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-helianthus-annuus-images",
+      "name": "GBIF occurrence records of Helianthus annuus with still images",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Helianthus%20annuus&mediaType=StillImage",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:10:34Z", "method": "GET occurrence/search?scientificName=Helianthus annuus&mediaType=StillImage&limit=0", "http_status": 200 },
+      "variables_present": ["40,546 occurrence records of Helianthus annuus with a still image attached (count field)"],
+      "variables_missing": ["no per-image check that a mature capitulum is visible face-on or calibrated; no parastichy counts or angles; mixed sources and licences per record"],
+      "scope": "Global occurrence records, images of whole plants, flowers and sheets",
+      "evidence": "API returned count 40546 for the query above",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-helianthus-annuus-images",
+      "name": "iDigBio specimen records of Helianthus annuus with images",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq=%7B%22scientificname%22:%22helianthus%20annuus%22,%22hasImage%22:true%7D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:10:35Z", "method": "GET search/records with scientificname=helianthus annuus and hasImage=true, limit=1", "http_status": 200 },
+      "variables_present": ["5,850 specimen records of Helianthus annuus with images (itemCount)"],
+      "variables_missing": ["pressed herbarium sheets flatten the capitulum, so face-on seed arrangement is not expected to be preserved; no counts or angles"],
+      "scope": "US-centred museum and herbarium records",
+      "evidence": "API returned itemCount 5850",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository, search API)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=phyllotaxis",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:10:36Z", "method": "GET Dryad search API 'phyllotaxis' (13 hits) and 'sunflower phyllotaxis' (6 hits)", "http_status": 200 },
+      "variables_present": ["the only capitulum-parastichy dataset among the 13 hits is doi:10.5061/dryad.f9k77 (listed above); the others are leaf venation, phylogenetics and unrelated sunflower scoring sets"],
+      "variables_missing": ["no second head-level phyllotaxis dataset found"],
+      "scope": "Repository-wide search",
+      "evidence": "total 13 for 'phyllotaxis' (titles include 'The arrangement of lateral veins along the midvein of leaves...', 'Generalized hidden Markov models...'); total 6 for 'sunflower phyllotaxis' (f9k77 plus five UC Davis sunflower scoring sets)",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "sunflower phyllotaxis", "url": "https://datadryad.org/api/v2/search?q=sunflower%20phyllotaxis", "hits": 6, "note": "f9k77 plus five UC Davis sunflower scoring datasets (ovary, timelapse, consensus, pollinator, organ kinetics) that are not about seed spirals" },
+    { "source": "Dryad", "query": "phyllotaxis", "url": "https://datadryad.org/api/v2/search?q=phyllotaxis", "hits": 13, "note": "only f9k77 is about capitulum spirals" },
+    { "source": "DataCite", "query": "phyllotaxis parastichy", "url": "https://api.datacite.org/dois?query=phyllotaxis%20parastichy&page%5Bsize%5D=8", "hits": 41, "note": "first 8 are Zenodo theory write-ups ('E8 Intelligence' series), no image or measurement tables seen" },
+    { "source": "GBIF", "query": "Helianthus annuus with StillImage", "url": "https://api.gbif.org/v1/occurrence/search?scientificName=Helianthus%20annuus&mediaType=StillImage&limit=0", "hits": 40546, "note": "image records exist, not curated for seed spirals" },
+    { "source": "iDigBio", "query": "helianthus annuus hasImage", "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22scientificname%22:%22helianthus%20annuus%22,%22hasImage%22:true%7D&limit=1", "hits": 5850, "note": "herbarium sheets" }
+  ],
+  "status": "partial",
+  "summary": "One open repository dataset covers the subject directly: the Dryad 'Turing's Sunflowers' release (CC0, 657 annotated sunflower heads with parastichy counts and annotated images). It has counts but no tabulated crossing angles, so angles would have to be measured from the 315 MB image archive. GBIF and iDigBio hold tens of thousands of Helianthus annuus images but are not curated for face-on seed heads, and nothing covers other capitula.",
+  "next_step": "Download the Dryad image zip outside the scouting budget, check what the annotations encode (seed centres or spiral lines), and pre-register an angle-extraction rule and a threshold for 'near 90 degrees' before measuring.",
+  "obstacles_confirmed": [
+    "Only Helianthus annuus (one species, mostly cultivated) has an open annotated head set.",
+    "No repository table of intersection angles; they must be derived from images."
+  ]
+}

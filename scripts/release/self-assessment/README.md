@@ -13,6 +13,7 @@ rubric ([scienceclawhack.ai](https://scienceclawhack.ai/)), published as nanopub
 | `raw/<assessor>.json` | Each assessor's output, untouched. |
 | `assessments.json`, `SUMMARY.md` | Merged by `build/merge.mjs`: validation against the rubric and pack hash, weighted totals, mean and spread, each assessor's ranked fixes. |
 | `nanopubs/` | `rubric-unsigned/`, `assessments-unsigned/` from `build/generate.mjs`; `*-signed/` and `manifest.jsonl` from `build/publish.mjs`. |
+| `rounds/<n>-<commit>/` | Earlier rounds, archived whole (`evidence/`, `raw/`, `assessments.json`, `SUMMARY.md`). `merge.mjs` reports the change since the latest archived round. Before a new round: `mkdir rounds/<n>-<commit> && git mv evidence raw assessments.json SUMMARY.md rounds/<n>-<commit>/`. |
 
 ## Run
 

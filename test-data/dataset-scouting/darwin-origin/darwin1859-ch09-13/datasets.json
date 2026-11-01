@@ -1,0 +1,173 @@
+{
+  "claim_id": "darwin1859-ch09-13",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "radiometrically calibrated ages of eon/era boundaries (Archean, Proterozoic, Cambrian base, Phanerozoic)",
+    "dated pre-Cambrian fossil or biomarker occurrences",
+    "a diversity or abundance indicator for pre-Silurian life"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount; GET intervals/list.json?scale=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated fossil occurrences by interval (Ediacaran, Proterozoic, Archean)",
+        "interval table with Phanerozoic base age"
+      ],
+      "variables_missing": [
+        "biomarker records",
+        "abundance measure for 'swarmed with living creatures'"
+      ],
+      "scope": "Occurrence counts as returned by occs/list.json?interval=<name>&limit=1&rowcount: Ediacaran 2207, Proterozoic 3954, Archean 26",
+      "evidence": "occs/list.json?interval=Ediacaran records_found 2207 (first record eag 635, lag 538.8); interval=Proterozoic 3954 (first record Siphonophycus typicum, Tonian); interval=Archean 26 (first record Chroococcales indet., Paleoarchean). intervals/list.json?scale=1 returned Phanerozoic eag 538.8 (ref:87596). Whether the Proterozoic count includes the Ediacaran records was not checked. A further query with base_name=Life returned 3325 records and I did not interpret it.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "international-commission-on-stratigraphy",
+      "name": "International Commission on Stratigraphy (chart and GSSP list)",
+      "landing_url": "https://stratigraphy.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:28:45Z",
+        "method": "GET https://stratigraphy.org/ and https://stratigraphy.org/chart",
+        "http_status": 200
+      },
+      "variables_present": [
+        "official geologic time scale (viewer)"
+      ],
+      "variables_missing": [
+        "a machine-readable table was not found on the pages I fetched (chart is a JavaScript app)"
+      ],
+      "scope": "Global chronostratigraphic scale",
+      "evidence": "Landing page HTTP 200 (6452 bytes) listing /chart, /gssps, /correlations; /chart redirected to /chart/ and returned HTTP 200 with a Nuxt JS app shell (1256 bytes). No data file was fetched.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "macrostrat",
+      "name": "Macrostrat API v2",
+      "landing_url": "https://macrostrat.org/",
+      "access_url": "https://macrostrat.org/api/v2/defs/intervals?timescale_id=11&format=json",
+      "doi": null,
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:40Z",
+        "method": "GET landing; GET api/v2/defs/intervals?timescale_id=11; GET api/v2/stats?all",
+        "http_status": 200,
+        "bytes": 56456
+      },
+      "variables_present": [
+        "eon/era interval ages (international intervals timescale)",
+        "rock packages and units with ages, including a 'North American Ediacaran' project"
+      ],
+      "variables_missing": [
+        "fossil abundance",
+        "biomarkers"
+      ],
+      "scope": "Rock record, strongest in North America; stats?all gives per-project counts, e.g. North American Ediacaran: 218 columns, 648 packages, 1372 units, 11044 measurements",
+      "evidence": "defs/intervals (timescale 11) returned (b_age, t_age in Ma): Phanerozoic 538.8-0; Proterozoic 2500-538.8; Neoproterozoic 1000-538.8; Archean 4031-2500. API root and /meta state 'CC-BY 4.0'. stats?all returned the per-project table including 'North American Ediacaran'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-max-size-of-life-223",
+      "name": "Data from: Two-phase increase in the maximum size of life over 3.5 billion years (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.223",
+      "access_url": null,
+      "doi": "10.5061/dryad.223",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.223 and its version files list",
+        "http_status": 200,
+        "bytes": 81408
+      },
+      "variables_present": [
+        "period-level compilation of the largest known fossils from about 3.5 Ga (per abstract)"
+      ],
+      "variables_missing": [
+        "abundance",
+        "occurrence-level data"
+      ],
+      "scope": "Period-level maximum body size across the history of life",
+      "evidence": "Dryad API HTTP 200; publicationDate 2008-11-01; abstract: period-level compilation of the largest known fossil organisms. Files listed by the API: Supplementary Dataset FINAL 3.xls (81408 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "Precambrian fossil record compilation",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Precambrian%20fossil%20record%20compilation",
+      "hits": 1,
+      "note": "one hit: 10.5061/dryad.223 (maximum size of life)"
+    },
+    {
+      "source": "Dryad",
+      "query": "Proterozoic microfossil occurrences database",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Proterozoic%20microfossil%20occurrences%20database",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "Precambrian microfossil database occurrences",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Precambrian%20microfossil%20database%20occurrences",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Precambrian Proterozoic microfossil database compilation stromatolite",
+      "url": "https://zenodo.org/api/records?size=5&q=Precambrian%20Proterozoic%20microfossil%20database%20compilation%20stromatolite",
+      "hits": 122663,
+      "note": "full-text noise; two Dryad single-formation microfossil datasets surfaced (10.5061/dryad.9ghx3fffd, 10.5061/dryad.fn2z34tqx) and were not examined"
+    },
+    {
+      "source": "PBDB",
+      "query": "occs/list.json?interval=Ediacaran|Proterozoic|Archean",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?interval=Proterozoic&limit=1&rowcount",
+      "hits": 3954,
+      "note": "Ediacaran 2207, Archean 26"
+    }
+  ],
+  "status": "partial",
+  "summary": "The duration side is covered: Macrostrat's international-intervals table gives eon boundaries (Phanerozoic base 538.8 Ma, Proterozoic 2500-538.8, Archean 4031-2500 as stored there) and PBDB's interval table has the same Phanerozoic base. The life side is thin: PBDB returns 2207 Ediacaran, 3954 Proterozoic and 26 Archean occurrence records, and no repository found holds biomarker records or any abundance measure matching 'swarmed'.",
+  "next_step": "Pre-register the duration comparison on the Macrostrat/ICS boundary ages (aligning 'lowest Silurian' to the Cambrian base) and treat presence of life as the PBDB Precambrian occurrences; biomarkers and molecular-clock ages would need separate compilation.",
+  "obstacles_confirmed": [
+    "'Swarmed' has no abundance field in any dataset checked.",
+    "ICS chart is a JS app; no downloadable table was found on the fetched pages.",
+    "Pre-Cambrian occurrence counts are small relative to Phanerozoic."
+  ]
+}

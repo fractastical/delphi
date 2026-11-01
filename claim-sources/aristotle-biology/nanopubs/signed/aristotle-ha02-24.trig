@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAyt8Sav5aKTc-60btjxCJ-YzyTMXyNxCvGJAaTyyeAOc>.
+@prefix sub: <https://w3id.org/np/RAyt8Sav5aKTc-60btjxCJ-YzyTMXyNxCvGJAaTyyeAOc/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-ha02-24> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Horned quadrupeds that lack a full set of teeth in both jaws have a stomach of four chambers, and these are the animals that chew the cud.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Horned animals lacking upper front teeth have four stomachs and ruminate";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, The History of Animals (Historia Animalium), Book II, Part 17; translated by D'Arcy Wentworth Thompson, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910). Scope: Horned ruminants (cattle, sheep, goats, deer)"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.html>, sub:quote;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+<http://classics.mit.edu/Aristotle/history_anim.html> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. The History of Animals (Historia Animalium). Translated by D'Arcy Wentworth Thompson. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. IV (1910).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1910"^^xsd:gYear;
+    dc:title "The History of Animals, translated by D'Arcy Wentworth Thompson";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1620799>;
+    <https://schema.org/translator> "D'Arcy Wentworth Thompson".
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=331,332>;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/history_anim.html>;
+    <https://schema.org/text> "such of the horned animals as are not equally furnished with teeth in both jaws are furnished with four such chambers. These animals, by the way, are those that are said to chew the cud.".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt#line=331,332> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ha.txt> prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/history_anim.mb.txt>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <http://classics.mit.edu/Aristotle/history_anim.html>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "6d79cdc7d0d2a655136a2e6469c90c021b4c82e05c345cc74ddcbd728cbfc113"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, History of Animals II: Horned animals lacking upper front teeth have four stomachs and ruminate";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ha02-24>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "pXzalgB9I0GoCG0+HWfOQn8w2pHvEDDGFYBk4t2AWFqaS35H/WkBhom5fq6AvabOy7SMWbGCLOgU34cYKlMONJ5bOCzNbBUcgmzEhfZj5MA5+w37W98AOv8Pv1lKkKh+RbBKneHlyBJ18elO2T67OYyUqJIurj6tRGoiFReLCiwy+GwV6Sq/AcjHFednCY9CWEonGJ5vtOxXAEHsu/sxRcJkPlyE5AY+7sfICHq4PJL4UYrYUjMghpPH10ir4MuEzmS73i4fJ/KA7w/9QreEPHIUbtg7JyUm44/4vfB/w90gTjiz+YglXqES6uvlj2WtYaFP8tK78AXQr4XQORwiBA=="
+}

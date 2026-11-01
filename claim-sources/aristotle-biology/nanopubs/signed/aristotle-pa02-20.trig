@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAWgGdj0LVFsJEJMeekBVYIFCWD3fXl6xulGoR1l-hv5Q>.
+@prefix sub: <https://w3id.org/np/RAWgGdj0LVFsJEJMeekBVYIFCWD3fXl6xulGoR1l-hv5Q/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-pa02-20> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In all crustaceans and testaceans the fleshy substance is within and the hard earthy matter is outside, and the shell both holds the soft parts together and keeps in their scanty natural heat.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Crustaceans and testaceans have their hard supporting part outside";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, On the Parts of Animals (De Partibus Animalium), Book II, Part 8; translated by William Ogle, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: crustaceans (crabs, spiny lobsters) and testaceans (shelled molluscs such as oysters)"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.html>, sub:quote;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+<http://classics.mit.edu/Aristotle/parts_animals.html> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. On the Parts of Animals (De Partibus Animalium). Translated by William Ogle. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1912"^^xsd:gYear;
+    dc:title "On the Parts of Animals, translated by William Ogle";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1180725>;
+    <https://schema.org/translator> "William Ogle".
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=130,131>;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/parts_animals.html>;
+    <https://schema.org/text> "For in all these animals the fleshy substance is within, and the earthy matter, which holds the soft parts together and keeps them from injury, is on the outside. For the shell not only enables the soft parts to hold together, but also, as the animal is bloodless and so has but little natural warmth, surrounds it".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=130,131> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt> prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.mb.txt>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <http://classics.mit.edu/Aristotle/parts_animals.html>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "b8e00550b055dc101ac363fe2ef8b33f0ee4a302d947b24269dac4df85024bcc"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, Parts of Animals II: Crustaceans and testaceans have their hard supporting part outside";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-pa02-20>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "HyltT35P5KzrSHuJfr/2zj/7K12fsa2qd+Gjp8uORNgnhVXz3b19erN8PRBPKeBq6R8LA3ubQPofAaI0IgwavKQ/4nVWQjwIIxfdZrfFpy1Ffc5OBczRnrWFeFqvzgQtyUNACO4zotx7OoYtYV9xIc5KpyXutlK2eimk8KESIDGToAErQ+g+lq/GygB6oCU11EPst1BkY/oYDxIqFZ38DkQV12HiV9mxb7CbOUOVU14hC/XHViwAHf7iivklqniCa7ghwDkzzrNjCcLim+rDBNm8mz58jb93CViWDGK1czfDpNSehJXJjcffL3QdNMxMApyOdnGBNuoqBKr1ZCEmuA=="
+}

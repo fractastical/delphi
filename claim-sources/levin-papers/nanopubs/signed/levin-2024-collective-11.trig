@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAm3h4br4sNL61UWKdNGIbcxcCNNajiWnHtBtWIsKzUSU>.
+@prefix sub: <https://w3id.org/np/RAm3h4br4sNL61UWKdNGIbcxcCNNajiWnHtBtWIsKzUSU/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2024-collective-11> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The vertebrate segmentation clock depends on collectivity: presomitic mesoderm cells do not oscillate when cultured individually but resume oscillating when cultured together, wild-type cells grafted into non-cycling mutant fish express her1 without cycling, and cells grafted into tissue at a different clock phase synchronize to their neighbours' phase.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The segmentation clock needs a cell collective to oscillate and entrains grafted cells";
+    <https://w3id.org/delphi/ontology/context> "McMillen P, Levin M, “Collective intelligence: A unifying concept for integrating biology across scales and substrates”, Communications biology (2024), doi:10.1038/s42003-024-06037-4; section “Introduction › Segmentation intelligence is collective”. Scope: Vertebrate presomitic mesoderm (zebrafish, chick, mouse)"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s42003-024-06037-4>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=76,77>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s42003-024-06037-4>;
+    <https://schema.org/text> "Similarly, pre-somitic mesoderm cells do not oscillate when cultured independently, but will resume oscillating when cultured collectively169.".
+<https://doi.org/10.1038/s42003-024-06037-4> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "McMillen P, Levin M. Collective intelligence: A unifying concept for integrating biology across scales and substrates. Communications biology (2024). doi:10.1038/s42003-024-06037-4";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2024"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Collective intelligence: A unifying concept for integrating biology across scales and substrates";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10978875>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=76,77> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10978875/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s42003-024-06037-4>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "8f0e83775f3f814dbf827776d94a018c5bcdf1389e44e6be1b0678692278f8fd"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2024 claim: The segmentation clock needs a cell collective to oscillate and entrains grafted cells";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-collective-11>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "Z2sLCxE/GLXiY9uCcAU2OiiOxFTChqb0hRENIb/x0+Pl4oyKvxiROqNBDYlBvOJLbDFkmBz6bMUqaT7/DtrlVRc1XNPI9T2N3FFGuADkZ+jNiYSmSmcOZeK3syqn4eP4N6mUDpLXS7sC688JOI1HSDAiOzkQS9SG2efg6a5MGEYSGhVCC6h5DkuI5TUY0esCQ6iFiccD/PPE6iX27INsWsK/MYjksj/2ydIDScOEBMXiXgQWSkuo37BndkqH/dPR2taqHs8ztpiFChKStk8YVWSpatT13luaIrjZsiq1IaULdmzzb2EoPM16Fjz5NYamsl6S/MYQoEEupw62Zorzfw=="
+}

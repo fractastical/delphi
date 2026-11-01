@@ -1,0 +1,42 @@
+{
+  "claim_id": "levin-2022-tame-19",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful-with-narrower-scope",
+  "confidence": 0.96,
+  "variables": {
+    "claim_asserts": "Genes involved in morphogenesis overlap significantly and specifically with genes involved in learning or memory, beyond known shared signaling machinery.",
+    "test_measures": "Overlap of mouse experimental-GO gene sets for GO:0009653 and GO:0007611 after channel, gap-junction, and neurotransmission exclusions, including Fisher, annotation-depth-stratified, and size-matched-control odds ratios.",
+    "match": "exact"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "Experimental GO annotations in a curated animal gene set are an appropriate bioinformatics modality for the prediction's explicit gene-category overlap."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "GO descendant propagation operationalizes the named categories directly, experimental evidence codes limit inferred overlap, and annotation-depth stratification addresses study-intensity confounding relevant to the claim's specificity."
+  },
+  "scope": {
+    "claim_scope": "Gene sets across animals, including overlap and appearances of memory genes in cancer, regeneration, and embryogenesis studies.",
+    "test_scope": "Mouse genes with experimental GO biological-process annotations; tests the morphogenesis-learning/memory overlap only.",
+    "narrower": true
+  },
+  "reasons": [
+    "The test directly compares the named variables: 191 learning-or-memory genes, 1,833 morphogenesis genes, and 69 overlapping genes in a 10,243-gene universe.",
+    "It implements 'beyond' shared machinery by excluding 612 genes annotated to ion channels, gap junctions, or neurotransmission; the crude odds ratio remains 2.6573.",
+    "The refutation criterion addresses 'specific': the Mantel-Haenszel odds ratio by annotation-depth decile is 0.9365 and the overlap is only at the 64.53rd percentile of 327 size-matched control terms.",
+    "The interpretation explicitly discloses both narrowings: mouse rather than animals generally, and omission of the prediction about cancer, regeneration, and embryogenesis screens."
+  ],
+  "what_would_change_it": "Replicate the same experimental-annotation and annotation-depth-controlled analysis across multiple animal species, and separately test enrichment of memory genes in cancer, regeneration, and embryogenesis genetic studies.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/measured.json"
+  ]
+}

@@ -31,13 +31,16 @@ for (const f of readdirSync(join(HERE, "raw")).filter(f => f.endsWith(".json")).
   const hvi = r.highest_value_improvement;
   if (hvi) {
     let gain = 0;
-    for (const [k, v] of Object.entries(hvi.expected_score_deltas ?? {})) {
+    for (const [k, raw] of Object.entries(hvi.expected_score_deltas ?? {})) {
+      const v = typeof raw === "string" && /^[+-]?\d+$/.test(raw.trim()) ? Number(raw) : raw; // INSTRUCTIONS shows "+N"
       const d = dims.find(x => x.id === k);
       if (!d) throw new Error(`${id}: highest_value_improvement names unknown criterion ${k}`);
       if (!Number.isInteger(v)) throw new Error(`${id}: delta for ${k} is not an integer`);
       if (r.scores[k] + v > 10 || r.scores[k] + v < 0) throw new Error(`${id}: ${k} ${r.scores[k]}${v >= 0 ? "+" : ""}${v} leaves 0..10`);
+      hvi.expected_score_deltas[k] = v;
       gain += d.weight * v * 10;
     }
+    hvi.bonus_delta = Number(hvi.bonus_delta) || 0;
     hvi.computed_total_gain = Math.round(gain * 10) / 10;
     if (Math.abs(hvi.computed_total_gain - Number(hvi.expected_total_gain)) > 0.6) console.warn(`${id}: stated gain ${hvi.expected_total_gain} vs computed ${hvi.computed_total_gain}; using computed`);
   }
@@ -75,6 +78,25 @@ const prows = dims.map(d => [d.label, d.weight * 100, ...out.map(a => fmt(a.scor
 prows.push(["**Total**", 100, ...out.map(a => `**${fmt(a.weighted_total)}**`), `**${fmt(stats.weighted_total.mean)}**`]);
 md += [phead, phead.map(() => "---"), ...prows].map(r => `| ${r.join(" | ")} |`).join("\n") + "\n\n";
 md += `Assessor confidence in own scoring: ${out.map(a => `${assessors[a.assessor].modelLabel} ${a.confidence}`).join(", ")}.\n\n`;
+
+// Earlier rounds, archived under rounds/<n>-<commit>/ with their own assessments.json.
+const ROUNDS = join(HERE, "rounds");
+if (existsSync(ROUNDS)) {
+  const rounds = readdirSync(ROUNDS).filter(d => existsSync(join(ROUNDS, d, "assessments.json"))).sort()
+    .map(d => ({ dir: d, ...JSON.parse(readFileSync(join(ROUNDS, d, "assessments.json"), "utf8")) }));
+  if (rounds.length) {
+    const prev = rounds[rounds.length - 1];
+    const delta = (a, b) => { const x = Math.round((a - b) * 10) / 10; return x > 0 ? `+${x}` : `${x}`; };
+    md += `## Change since the previous round\n\n`;
+    md += `Round ${rounds.length} was commit \`${prev.commit.slice(0, 8)}\` ([rounds/${prev.dir}/SUMMARY.md](rounds/${prev.dir}/SUMMARY.md)); this is round ${rounds.length + 1}. Same rubric, same assessors, fresh blind contexts. Means per criterion:\n\n`;
+    md += `| Criterion | Weight | Round ${rounds.length} | Round ${rounds.length + 1} | Change |\n|---|---|---:|---:|---:|\n`;
+    for (const d of dims) md += `| ${d.label} | ${d.weight * 100}% | ${fmt(prev.stats[d.id].mean)} | ${fmt(stats[d.id].mean)} | ${delta(stats[d.id].mean, prev.stats[d.id].mean)} |\n`;
+    md += `| **Weighted total** | 100% | **${fmt(prev.stats.weighted_total.mean)}** | **${fmt(stats.weighted_total.mean)}** | **${delta(stats.weighted_total.mean, prev.stats.weighted_total.mean)}** |\n`;
+    md += `| Collaboration bonus | +10 | ${fmt(prev.stats.bonus.mean)} | ${fmt(stats.bonus.mean)} | ${delta(stats.bonus.mean, prev.stats.bonus.mean)} |\n\n`;
+    md += `Per assessor, weighted total: ${out.map(a => { const p = prev.assessments.find(x => x.assessor === a.assessor); return `${assessors[a.assessor].modelLabel} ${p ? `${fmt(p.weighted_total)} → ` : ""}${fmt(a.weighted_total)}`; }).join("; ")}.\n\n`;
+    if (rounds.length > 1) md += `All rounds: ${rounds.map((r, i) => `round ${i + 1} \`${r.commit.slice(0, 8)}\` ${fmt(r.stats.weighted_total.mean)}`).join(", ")}, round ${rounds.length + 1} ${fmt(stats.weighted_total.mean)}.\n\n`;
+  }
+}
 if (out.some(a => a.highest_value_improvement)) {
   md += `## The one improvement each assessor would make first\n\n`;
   md += `Each assessor was asked for the single change with the largest expected gain in the weighted total per hour of effort, achievable before the deadline, with deltas on its own scores. Gains are recomputed from the deltas and the weights.\n\n`;
@@ -104,7 +126,7 @@ for (const a of out) md += `- **${assessors[a.assessor].modelLabel}**: ${a.compa
 md += `\n## Summaries\n\n`;
 for (const a of out) md += `**${assessors[a.assessor].modelLabel}** (${fmt(a.weighted_total)} + ${a.bonus}): ${a.summary}\n\n`;
 md += `## Top fixes, as ranked by each assessor\n\n`;
-for (const a of out) { md += `**${assessors[a.assessor].modelLabel}**\n\n`; (a.top_three_fixes ?? []).forEach((x, i) => md += `${i + 1}. ${x}\n`); md += "\n"; }
+for (const a of out) { md += `**${assessors[a.assessor].modelLabel}**\n\n`; (a.top_three_fixes ?? []).forEach((x, i) => md += `${i + 1}. ${String(x).replace(/^\d+\.\s*/, "")}\n`); md += "\n"; }
 md += `## Per-criterion justifications and gaps\n\n`;
 for (const d of [...dims, { id: "collaboration-bonus", label: rubric.bonus.label }]) {
   md += `### ${d.label}\n\n`;

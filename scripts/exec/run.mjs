@@ -19,6 +19,8 @@ const RUNS = join(HERE, "runs");
 const LOGS = join(RUNS, "logs");
 const STD_AXIOMS = new Set(["propext", "Classical.choice", "Quot.sound"]);
 const WALL_CLOCK = /(^|[._])(seconds|secs|elapsed|runtime|duration|wall_?time|timing)s?($|[._[])/i;
+// Sizes of fetched files change with upstream re-exports and HTTP metadata; they are provenance, not measurement.
+const FETCH_METADATA = /(^|[._\]])(byte_size|bytes|size_bytes|content_length|n_bytes)$/i;
 const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow", "openpyxl", "pdfplumber"];
 
 const args = process.argv.slice(2);
@@ -107,7 +109,7 @@ function compare(before, after, ignore) {
   const mismatches = [];
   let compared = 0;
   for (const [k, v] of a) {
-    if (!b.has(k) || WALL_CLOCK.test(k) || ignore?.test(k)) continue;
+    if (!b.has(k) || WALL_CLOCK.test(k) || FETCH_METADATA.test(k) || ignore?.test(k)) continue;
     compared++;
     const w = b.get(k);
     const same = typeof v === "number" && typeof w === "number" ? Math.abs(v - w) <= opt.atol + opt.rtol * Math.abs(v) : v === w;

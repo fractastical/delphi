@@ -1,0 +1,96 @@
+{
+  "claim_id": "thompson1917-ch09-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:19:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "georeferenced occurrence records of living radiolarians (species, latitude/longitude, sample id)",
+    "sample-level species lists or counts (local richness and dominance) from sediment or plankton samples",
+    "fossil first/last occurrences of radiolarian genera and families through the Phanerozoic, including the Cambrian",
+    "taxonomic validation (synonymy) and sampling-effort covariates"
+  ],
+  "datasets": [
+    {
+      "id": "obis-radiolaria",
+      "name": "OBIS occurrence records for Radiolaria",
+      "landing_url": "https://obis.org/",
+      "access_url": "https://api.obis.org/v3/occurrence?scientificname=Radiolaria",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:15:44Z", "method": "GET OBIS v3 occurrence?scientificname=Radiolaria&size=0 (total) and /checklist?scientificname=Radiolaria&size=1 (total taxa)", "http_status": 200 },
+      "variables_present": [
+        "724,395 occurrence records under Radiolaria (total field)",
+        "checklist of 512 taxa under Radiolaria; the largest is Spumellaria with 112,239 records"
+      ],
+      "variables_missing": [
+        "checklist entries mix ranks (orders, families, species); how many are valid species, and per-sample species lists were not checked",
+        "sampling effort and sample identity must be taken from record fields (not inspected)"
+      ],
+      "scope": "Living and sediment-sample marine records contributed to OBIS (per-record basis not inspected)",
+      "evidence": "occurrence total 724395; checklist total 512, first entry Spumellaria with 112239 records",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology-database-radiolaria",
+      "name": "Paleobiology Database: Radiolaria and Polycystina fossil occurrences",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Radiolaria",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:15:51Z", "method": "GET PBDB data1.2 occs/list with rowcount for base_name=Radiolaria, base_name=Polycystina, and Radiolaria with min_ma=485,max_ma=541", "http_status": 200 },
+      "variables_present": [
+        "13,020 fossil occurrences under Radiolaria",
+        "10,708 under Polycystina",
+        "103 Radiolaria occurrences dated 485-541 Ma (Cambrian interval, by the API's age filter)",
+        "collection-level location and age fields in the occurrence output"
+      ],
+      "variables_missing": [
+        "contributor-driven, uneven coverage; taxonomic identity of Cambrian records was not inspected",
+        "not designed for sample-level richness and evenness"
+      ],
+      "scope": "Fossil occurrences, entered by PBDB contributors",
+      "evidence": "records_found 13020, 10708 and 103 respectively",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-10063218-neptune-nsb-archive",
+      "name": "Archive of Neptune (NSB) database backups (Renaudie, 2023-06-05 state)",
+      "landing_url": "https://zenodo.org/records/10063218",
+      "access_url": "https://zenodo.org/api/records/10063218",
+      "doi": "10.5281/zenodo.10063218",
+      "license": "CC-BY-4.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:15:46Z", "method": "GET Zenodo records API (metadata only)", "http_status": 200 },
+      "variables_present": [
+        "PostgreSQL dump (nsb_postgresql.zip, 64,287,782 bytes), SQLite version (nsb_sqlite.zip, 20,928,606 bytes) and denormalized tables (denormalized_tables.zip, 33,409,172 bytes) of the Neptune Sandbox Berlin database of deep-sea microfossil occurrences"
+      ],
+      "variables_missing": [
+        "radiolarian record counts, species counts and age range were not extracted (files not downloaded)",
+        "deep-sea drilling only, so Cenozoic-weighted; Cambrian coverage not expected from this source (not tested)"
+      ],
+      "scope": "Neptune database snapshot; microfossil groups incl. radiolarians per the claim's assessors",
+      "evidence": "record title 'Archive of Neptune (NSB) database backups', 3 files with sizes above, license id cc-by-4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "OBIS", "query": "occurrence scientificname=Radiolaria", "url": "https://api.obis.org/v3/occurrence?scientificname=Radiolaria&size=0", "hits": 724395, "note": "total occurrences" },
+    { "source": "OBIS", "query": "checklist scientificname=Radiolaria", "url": "https://api.obis.org/v3/checklist?scientificname=Radiolaria&size=1", "hits": 512, "note": "taxa of mixed rank" },
+    { "source": "PBDB", "query": "occs base_name=Radiolaria", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Radiolaria&limit=1&rowcount", "hits": 13020, "note": "fossil occurrences" },
+    { "source": "PBDB", "query": "occs base_name=Radiolaria 485-541 Ma", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Radiolaria&max_ma=541&min_ma=485&limit=1&rowcount", "hits": 103, "note": "Cambrian-dated occurrences by API age filter" },
+    { "source": "PBDB", "query": "occs base_name=Polycystina", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Polycystina&limit=1&rowcount", "hits": 10708, "note": "Polycystina subset" },
+    { "source": "Zenodo", "query": "record 10063218 (Neptune archive)", "url": "https://zenodo.org/api/records/10063218", "hits": 1, "note": "3 files, CC BY 4.0" }
+  ],
+  "status": "partial",
+  "summary": "Georeferenced radiolarian occurrences are open at scale: OBIS holds 724,395 records (512 taxa in its checklist) and PBDB 13,020 fossil occurrences (103 dated to the Cambrian interval), and the Neptune database is archived on Zenodo (CC BY, PostgreSQL/SQLite dumps). That covers range, local richness and stratigraphic-span variables in principle, but sample-level tables, taxonomic validation and sampling-effort controls were not checked, and Cambrian-to-Recent identity of families needs taxonomic work that none of the sources supplies.",
+  "next_step": "Download the Neptune SQLite and an OBIS radiolarian extract in a separate step, filter to valid species, and pre-register range-size, local-richness and dominance metrics with a sampling-effort control before testing.",
+  "obstacles_confirmed": [
+    "Sampling effort and synonymy are uncontrolled in raw occurrence tables.",
+    "Neptune is Cenozoic-weighted by design; Palaeozoic radiolarian coverage rests on PBDB's 13,020 records."
+  ]
+}

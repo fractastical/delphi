@@ -1,0 +1,234 @@
+{
+  "claim_id": "darwin1859-ch06-17",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "homologous structural (anatomical) character states per taxon within a class",
+    "independent molecular sequences or tree for the same taxa",
+    "habit / ecological guild per taxon, to compare against genealogy"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:28:45Z",
+        "method": "GET https://morphobank.org/ and https://www.morphobank.org/ (urllib UA); GET /index.php/Projects/ProjectOverview; curl default UA on both hosts",
+        "http_status": 403,
+        "note": "All requests returned HTTP 403 'The request could not be satisfied' (CloudFront error page, 919 bytes); curl default UA also 403 on both hosts"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "anything retrievable by script"
+      ],
+      "scope": "could not be inspected",
+      "evidence": "HTTP 403 on https://morphobank.org/, https://www.morphobank.org/ and a project-overview path, with two different user agents. Content could not be inspected; no project list or matrix was seen.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree opentree16.1, taxonomy OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://files.opentreeoflife.org/synthesis/opentree16.1/opentree16.1_tree.tgz",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:01Z",
+        "method": "GET landing; POST https://api.opentreeoflife.org/v3/tree_of_life/about and /v3/taxonomy/about; HEAD access_url",
+        "http_status": 200,
+        "bytes": 41608973
+      },
+      "variables_present": [
+        "synthetic phylogeny and taxonomy for taxa across all classes"
+      ],
+      "variables_missing": [
+        "homologous structural character matrices",
+        "habit / ecology per taxon"
+      ],
+      "scope": "Synthetic tree of 2,385,875 tips from 1,931 source studies / 2,064 source trees (synth_id opentree16.1, taxonomy_version 3.7draft3, created 2025-12-20); root 'cellular organisms'. The tree summary I fetched does not split source trees by data type (molecular vs morphological).",
+      "evidence": "POST /v3/tree_of_life/about returned HTTP 200 with num_tips 2385875, num_source_studies 1931, num_source_trees 2064, synth_id opentree16.1. POST /v3/taxonomy/about returned ott3.7draft3. HEAD of opentree16.1_tree.tgz returned 200 with Content-Length 41608973 (not downloaded; over 1 MB). POST /v3/tnrs/match_names, /v3/tree_of_life/mrca and /v3/tree_of_life/node_info returned 200 JSON.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank / nuccore (via Entrez E-utilities)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=nuccore",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET landing; GET esearch.fcgi db=nuccore term=Mammalia[Organism] retmax=0; esearch db=nuccore Insecta[Organism] AND cytochrome oxidase subunit I[Title]; esearch db=taxonomy genus[Rank]",
+        "http_status": 200
+      },
+      "variables_present": [
+        "molecular sequences for taxa across classes (e.g. Mammalia 92,326,294 nuccore records)"
+      ],
+      "variables_missing": [
+        "structural character matrices",
+        "habit / ecology"
+      ],
+      "scope": "All organisms; sequences only, no pre-built trees",
+      "evidence": "Landing page HTTP 200. esearch (retmax=0) for Mammalia[Organism] in nuccore returned count 92326294; Insecta[Organism] AND 'cytochrome oxidase subunit I'[Title] returned count 264281 (Insecta alone 45339269, the title term alone 621034 in the translation stack); esearch db=taxonomy genus[Rank] returned count 133688. One further esearch was rate-limited (HTTP 429, limit 3 requests/s) and not retried.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-primate-fossils-matrix-4g42q",
+      "name": "Data from: Phylogeny, palaeontology, and primates: do incomplete fossils bias the tree of life? (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.4g42q",
+      "access_url": null,
+      "doi": "10.5061/dryad.4g42q",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4g42q and its version files list",
+        "http_status": 200,
+        "bytes": 9664366
+      },
+      "variables_present": [
+        "morphological character matrix (S2_morph.nex) for primates",
+        "combined matrix file (S1_combined.nex)"
+      ],
+      "variables_missing": [
+        "habit / ecology per taxon",
+        "classes other than Mammalia"
+      ],
+      "scope": "One mammalian order (primates, living and fossil)",
+      "evidence": "Dryad API returned HTTP 200; publicationDate 2014-09-23; abstract: 'we compiled a phylogenetic matrix for primates'. Files listed by the API: figS1.ai (1321217 B), FigS2-Qaccuracy.ai (1299514 B), S1_combined.nex (6925849 B), S2_morph.nex (91674 B), tableS1_taxonNumbers.xls (26112 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-mammal-anatomical-characters-qj552",
+      "name": "Data from: Assessment of available anatomical characters for linking living mammals to fossil taxa in phylogenetic analyses (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.qj552",
+      "access_url": null,
+      "doi": "10.5061/dryad.qj552",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.qj552 and its version files list",
+        "http_status": 200,
+        "bytes": 1403718
+      },
+      "variables_present": [
+        "morphological and molecular matrices for mammals (per abstract; zip contents not opened)"
+      ],
+      "variables_missing": [
+        "habit / ecology per taxon",
+        "classes other than Mammalia"
+      ],
+      "scope": "Mammals (living and fossil)",
+      "evidence": "Dryad API HTTP 200; abstract states the total-evidence method combines molecular data for living taxa and morphological data for living and fossil taxa. Zip is 1.4 MB, not opened. Files listed by the API: Matrices.zip (1403349 B), README_for_Matrices.txt (369 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-pontederiaceae-congruence-116",
+      "name": "Data from: Phylogenetic Congruence and Discordance Among One Morphological and Three Molecular Data Sets from Pontederiaceae (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.116",
+      "access_url": null,
+      "doi": "10.5061/dryad.116",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.116 and its version files list",
+        "http_status": 200,
+        "bytes": 6784
+      },
+      "variables_present": [
+        "one morphological data set and three chloroplast data sources for one family (per abstract)"
+      ],
+      "variables_missing": [
+        "scale beyond a single plant family",
+        "habit / ecology per taxon"
+      ],
+      "scope": "One plant family, Pontederiaceae",
+      "evidence": "Dryad API HTTP 200; publicationDate 2008-03-24; deposited files are 3-4 KB appendices. Files listed by the API: grahamapp1.html (3008 B), grahamapp2.txt (3776 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "morphological matrix molecular phylogeny congruence total evidence",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=morphological%20matrix%20molecular%20phylogeny%20congruence%20total%20evidence",
+      "hits": 1,
+      "note": "one hit: 10.5061/dryad.ff2p0 (bursts of lineage and phenotypic diversification), not examined"
+    },
+    {
+      "source": "DataCite",
+      "query": "homology characters tree congruence molecular morphological vertebrate matrix",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=homology%20characters%20tree%20congruence%20molecular%20morphological%20vertebrate%20matrix",
+      "hits": null,
+      "note": "HTTP 200 but my script could not parse the response, so no count was recorded"
+    },
+    {
+      "source": "Dryad",
+      "query": "morphological character matrix molecular phylogeny combined",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=morphological%20character%20matrix%20molecular%20phylogeny%20combined",
+      "hits": 6,
+      "note": "relevant: 10.5061/dryad.4g42q, 10.5061/dryad.qj552"
+    },
+    {
+      "source": "Dryad",
+      "query": "morphology molecular tree congruence",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=morphology%20molecular%20tree%20congruence",
+      "hits": 18,
+      "note": "relevant: 10.5061/dryad.116 (Pontederiaceae); others single-group studies"
+    },
+    {
+      "source": "Zenodo",
+      "query": "morphological character matrix molecular phylogeny congruence",
+      "url": "https://zenodo.org/api/records?size=5&q=morphological%20character%20matrix%20molecular%20phylogeny%20congruence",
+      "hits": 439243,
+      "note": "full-text noise; mostly figures and papers; surfaces the same Dryad records"
+    },
+    {
+      "source": "Zenodo",
+      "query": "phenomic morphological characters nexus matrix molecular tree",
+      "url": "https://zenodo.org/api/records?size=5&q=phenomic%20morphological%20characters%20nexus%20matrix%20molecular%20tree",
+      "hits": 497289,
+      "note": "full-text noise"
+    }
+  ],
+  "status": "partial",
+  "summary": "Molecular sequences (GenBank) and a molecular-led synthetic tree (Open Tree of Life) exist for all classes, but the structural character matrices the claim needs sit in MorphoBank, which returned HTTP 403 to every scripted request. Matched morphology-plus-molecules matrices are open on Dryad but only for single groups (primates, mammals, one plant family), and none carries habit or ecology per taxon.",
+  "next_step": "Get MorphoBank matrices by browser or contact the curators; pick two or three classes with a deposited morphology matrix and published molecular tree (primates 10.5061/dryad.4g42q is one); take habit classes from a separate trait table; pre-register tree-to-tree congruence (e.g. Robinson-Foulds) against an ecology-grouping null.",
+  "obstacles_confirmed": [
+    "MorphoBank is not scriptable (HTTP 403 on both hosts).",
+    "Open matched morphology and molecular data found only for single clades, not across classes.",
+    "Circularity between character matrices and classification is not removable by data choice."
+  ]
+}

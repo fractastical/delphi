@@ -1,0 +1,43 @@
+{
+  "claim_id": "levin-2015-place-06",
+  "assessor": {
+    "model": "GPT-5.6 Sol",
+    "provider": "OpenAI",
+    "role": "A9 faithfulness"
+  },
+  "assessed_at": "2026-11-01T05:34:00Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.98,
+  "variables": {
+    "claim_asserts": "Bisected and replicated halves of the paper's active-inference embryo simulation regenerate the complete target after slight dedifferentiation.",
+    "test_measures": "Target-assignment RMS, correctly typed cells, and identity-probability dips in an independent gradient-descent reimplementation of the model.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": false,
+    "note": "A simulation replication is appropriate in principle, but this test replaces the published spm_ADEM generalized-filter solver with Euler gradient flow lacking generalized-motion terms."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "Solver dynamics determine whether each half reaches the target basin; result.json explicitly states that spm_ADEM can follow a different path through the free-energy landscape."
+  },
+  "scope": {
+    "claim_scope": "The eight-cell active-inference morphogenesis simulation and its bisection procedure.",
+    "test_scope": "A numpy reimplementation with a different integrator, tested over 20 numpy seeds under two initial spreads and optional process noise.",
+    "narrower": true
+  },
+  "reasons": [
+    "The assembly variables are relevant: regeneration requires RMS position error below half the smallest target spacing and at least 7/8 correctly typed cells, while dedifferentiation is a dip in mean_max_p.",
+    "The decisive 3/20 and 6/20 both-halves-regenerated counts come from gradient flow, not the published spm_ADEM generalized filtering used for the claimed simulation result.",
+    "The omitted embedding-order-2 and local-linearisation dynamics are not a sampling restriction; they define a different numerical dynamical system capable of reaching different morphologies.",
+    "All conditions reproduce the dedifferentiation dip in 20/20 runs, so only the solver-dependent regeneration component produces the refutation."
+  ],
+  "what_would_change_it": "Run the published DEM_morphogenesis bisection path with spm_ADEM in MATLAB or a validated numerically equivalent implementation, using the source initial conditions and reporting the same RMS/type outcomes across seeds.",
+  "files_read": [
+    "result.json",
+    "analysis.py",
+    "derived/runs.json",
+    "derived/summary.json"
+  ]
+}

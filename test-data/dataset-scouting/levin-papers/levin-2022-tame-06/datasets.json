@@ -1,0 +1,72 @@
+{
+  "claim_id": "levin-2022-tame-06",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "executable biological gene-regulatory / pathway network models (ODE or Boolean) with nodes, edges and parameters",
+    "stimulus-pairing protocol and memory/learning scoring code (conditioned vs unconditioned stimulus, pattern completion, generalization)",
+    "control networks (unpaired stimulus, shuffled or random-parameter networks)"
+  ],
+  "datasets": [
+    {
+      "id": "biomodels",
+      "name": "BioModels (EMBL-EBI)",
+      "landing_url": "https://www.biomodels.org/",
+      "access_url": "https://www.ebi.ac.uk/biomodels/search?query=*&numResults=1&format=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:13:00Z", "method": "GET search API (format=json, numResults=1) and HEAD landing page", "http_status": 200 },
+      "variables_present": ["executable biological ODE/network models (SBML) with parameters"],
+      "variables_missing": ["stimulus-pairing / learning scoring code", "random-network controls"],
+      "scope": "API reports 3217 matches for query '*'; 47 for 'gene regulatory network'; 144 for 'ordinary differential equation model AND transcription'. Which of these were used in the cited memory screens was not checked.",
+      "evidence": "Search API returned JSON with a 'matches' field (3217 for '*'). Landing page https://www.ebi.ac.uk/biomodels/ redirected to https://www.biomodels.org/ with 200. A query with quoted phrase and %22 returned HTTP 400; unquoted queries worked.",
+      "verdict": "partial"
+    },
+    {
+      "id": "cell-collective",
+      "name": "Cell Collective",
+      "landing_url": "https://cellcollective.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:30Z", "method": "HEAD landing page; GET guessed API path https://research.cellcollective.org/api/model (returned 404)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["model count and per-model Boolean rules not verified", "learning scoring code"],
+      "scope": "Landing page reachable; I could not find a documented open API and did not verify model counts or download terms.",
+      "evidence": "HEAD https://cellcollective.org/ returned 200. The guessed API path returned 404 'Cannot GET /api/model'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "grn-ode",
+      "name": "GRN_ODE (Biswas, Clawson, Levin 2022 code)",
+      "landing_url": "https://github.com/wesleypclawson/GRN_ODE",
+      "access_url": "https://api.github.com/repos/wesleypclawson/GRN_ODE/contents/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:40Z", "method": "GET GitHub API repo metadata, contents listing and README", "http_status": 200 },
+      "variables_present": ["ODE memory-evaluation and pairing scripts (MATLAB)", "ODE_New.mat (175,993 bytes) stored in repo", "scripts for randomised ODE expressions"],
+      "variables_missing": ["Boolean-network memory-screen code (not in this repo)", "an explicit open license", "documentation: README says code is kept 'temporarily as it is refactored'"],
+      "scope": "Repository size 266 KB, last pushed 2022-11-23. Listing includes MEMORY_EVALUATOR_ODE_SLURM1.m, Pairing_ODE.m, Test_Pairing_Memory.m, Randomize_ODE_Expressions.m, ODE_New.mat.",
+      "evidence": "GitHub API returned repository metadata (license: null) and a contents listing of MATLAB scripts and .mat files; README says 'code used by Biswas in the 2022 paper on biological networks'. Repo content was not executed.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "BioModels search", "query": "*", "url": "https://www.ebi.ac.uk/biomodels/search?query=*&numResults=1&format=json", "hits": 3217, "note": "total models in the service" },
+    { "source": "BioModels search", "query": "gene regulatory network", "url": "https://www.ebi.ac.uk/biomodels/search?query=gene+regulatory+network&numResults=1&format=json", "hits": 47, "note": "unquoted query; the %22-quoted version returned HTTP 400" },
+    { "source": "BioModels search", "query": "ordinary differential equation model AND transcription", "url": "https://www.ebi.ac.uk/biomodels/search?query=ordinary+differential+equation+model+AND+transcription&numResults=1&format=json", "hits": 144, "note": "count only, not inspected" },
+    { "source": "GitHub repository search", "query": "gene regulatory network memory Levin associative learning ODE", "url": "https://api.github.com/search/repositories?q=gene+regulatory+network+memory+Levin+associative+learning+ODE&per_page=5", "hits": 0, "note": "no other repositories with the Boolean memory screen code found" },
+    { "source": "Zenodo", "query": "Biswas Levin gene regulatory network memory", "url": "https://zenodo.org/api/records?q=%22Biswas%22%20%22Levin%22%20gene%20regulatory%20network%20memory&size=3", "hits": 352936, "note": "query matched loosely; top hits irrelevant (a generic GRN repo, a 2012 IJCNN paper)" }
+  ],
+  "status": "partial",
+  "summary": "Executable biological models are public (BioModels, 3,217 records), and the Levin lab's ODE memory-screen scripts are on GitHub (GRN_ODE, no license, MATLAB). I did not find the Boolean-network memory-screen code anywhere public, and Cell Collective model counts were not verified.",
+  "next_step": "Choose the exact BioModels IDs used in the ODE screen from the GRN_ODE scripts, pre-register the pairing/unpaired/shuffled protocol, and decide whether Boolean models from Cell Collective need re-implementing.",
+  "obstacles_confirmed": [
+    "Boolean memory-screen code was not found in a public repository (GRN_ODE covers the ODE screen only).",
+    "GRN_ODE has no license and a README saying it is temporary."
+  ]
+}

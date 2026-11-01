@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAYaWp85XI_sOmVNZ7WtqOhIV49DrVfMgTnR93MluWD4I>.
+@prefix sub: <https://w3id.org/np/RAYaWp85XI_sOmVNZ7WtqOhIV49DrVfMgTnR93MluWD4I/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2018-hcn2-15> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Nicotine reduces or mispatterns expression of the forebrain/midbrain transcription factors otx2 and xbf1 in Xenopus embryos, and Hcn2-WT mRNA injection restores their normal expression, linking HCN2-mediated repair to the known genetic cascade of brain patterning.";
+    dc:type "experimental-result";
+    <http://www.w3.org/2000/01/rdf-schema#label> "HCN2 rescue corrects otx2 and xbf1 expression after nicotine";
+    <https://w3id.org/delphi/ontology/context> "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M, “HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns”, Nature communications (2018), doi:10.1038/s41467-018-03334-5; section “Results › HCN2 restores marker expression in nicotine-treated embryos”. Scope: Xenopus laevis embryos at stage 25, nicotine-exposed from stage 10, with or without Hcn2-WT mRNA"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s41467-018-03334-5>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=68,69>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s41467-018-03334-5>;
+    <https://schema.org/text> "Thus, HCN2 channel rescue of nicotine-induced defects includes correction of otx2 and xbf1, connecting HCN2-mediated repair of brain to the known molecular-genetic cascade of brain patterning factors.".
+<https://doi.org/10.1038/s41467-018-03334-5> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M. HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns. Nature communications (2018). doi:10.1038/s41467-018-03334-5";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2018"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC5843655>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=68,69> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5843655/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s41467-018-03334-5>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "3272e52259dcf1f3cc5bbcae5bee7719e59288813021949dccebc0f6fbd31425"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2018 claim: HCN2 rescue corrects otx2 and xbf1 expression after nicotine";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-15>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "DUw7BhjGnpr+lLfKiYPTrAWiuKLW/llGHgmdc6jgbasZB5FBySfdAR0h4rbfS6yOVQmLj/8PpweqnGIGlWxFbIOAdYl9i/ECN82TwjbcFcITz8zP9+wtkmkJGTBjfz+c9jTar0LlHSGv8iL9ipyJ3nxrk8/8R4+C2AiLhL8A8xlmo3YSvs1dm7QH/mVJBzowj5z9T+G9YigK+/PeO5CeDAMp4Kj2KZqpwRqfNCVmvf0aZd3MNIbwIw2prUEFTwpd8PvYbbzYrIidWHW6EvFkysu1khY8JYvJ9jc0nZvXtNwZBkcDANEg67Z41yM51aizCIKyJGITWJO+vhpav/5TrA=="
+}

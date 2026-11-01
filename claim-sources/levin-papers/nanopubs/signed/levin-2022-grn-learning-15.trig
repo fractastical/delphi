@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAHsF1j2tKQlvRpA2ItKsIDHf28OR8DXXwdWlhxsYEpSI>.
+@prefix sub: <https://w3id.org/np/RAHsF1j2tKQlvRpA2ItKsIDHf28OR8DXXwdWlhxsYEpSI/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-15> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Because random ODE networks rarely show habituation in more than 30% of stimulus–response pairs while biological pathway models differ from that distribution, pharmacoresistance (habituation) may be a form of network adaptation more prevalent in networks shaped by evolutionary pressure, not due to network properties alone.";
+    dc:type "historical-inference";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Pharmacoresistance may be an evolved form of network adaptation";
+    <https://w3id.org/delphi/ontology/context> "Biswas S, Clawson W, Levin M, “Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions”, International journal of molecular sciences (2022), doi:10.3390/ijms24010285; section “2. Results › 2.7. Making and Breaking Pharmacoresistance”. Scope: BioModels pathway models versus 500 random gene-circuit models"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.3390/ijms24010285>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt#line=60,61>;
+    prov:wasQuotedFrom <https://doi.org/10.3390/ijms24010285>;
+    <https://schema.org/text> "This would hint that pharmacoresistance may be a form of network adaptation, which would indeed be more prevalent in a biological network shaped by evolutionary pressure.".
+<https://doi.org/10.3390/ijms24010285> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Biswas S, Clawson W, Levin M. Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions. International journal of molecular sciences (2022). doi:10.3390/ijms24010285";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2022"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC9820177>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt#line=60,61> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9820177/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.3390/ijms24010285>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2022 claim: Pharmacoresistance may be an evolved form of network adaptation";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-15>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "ghxLInGlcZxLtNpnILgDfCzThJT5t/BmFK6OohTwgYRAboQJpTqBDomL2J4IuALKqGkbWx0qx0AXbzdQyatRbQtJz2BLiRSzlV9Sdt/XV/2QZGL6zwz9yFH1/eqsgCov9gGLsTlWuZTKKPaSkXkljmn8K+29hU/yQlctym/RayfKDu0h8wfUZMHkefG6Ddg8Qix9rdyCkvzTeGVWBpjFGA9hNPhY2s21YEaWtPc7X7ZVY7O+Q1JK8z3onh/N2x5aFUj4V3xFNvvmUMdwoWR3R82DBXx+fKdq9Lrk5emLZT/fkuTQ+azp7MD4FG6aqvanrZKDUV8VyACpT8bQThtT7A=="
+}

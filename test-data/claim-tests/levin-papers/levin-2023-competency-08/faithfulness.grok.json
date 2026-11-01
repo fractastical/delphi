@@ -1,0 +1,33 @@
+{
+  "claim_id": "levin-2023-competency-08",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:44:08Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful",
+  "confidence": 0.7,
+  "variables": {
+    "claim_asserts": "With an evolvable competency gene, the correlation between genotypic and phenotypic fitness, across the individuals in the population, falls to zero within about 20 generations, and selection then cannot pick the best structural genes.",
+    "test_measures": "Each generation, the Pearson correlation r across the 100 individuals between genotypic and phenotypic fitness, averaged over 30 repeats. Pass requires mean r at generation 1 ≥ 0.5 and mean r over generations 21–40 and over 41–1000 both ≤ 0.1. Fail if either later window has mean r ≥ 0.3.",
+    "match": "exact"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "The data are runs of the evolvable-competency 1D embryo model the claim is about (30 repeats, 1000 generations, seeds independent of the sibling competency-07 test). The simulator is imported from that sibling; this directory defines the correlation, the windows, and the authors' binned statistic as a secondary check."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "Pearson r across individuals is the correlation the sentence is about: the quote ties the drop to individuals who succeed because of developmental competency, and interpretation quotes the paper's 'for all individuals in these populations'. Generations with constant phenotypic fitness (156 of 30,000) are excluded because r is undefined; that does not create the plateau. The authors' binned correlation of repeat-mean best genotypic and best phenotypic fitness, with undefined values set to 0, is reported and correctly kept out of the verdict: best phenotypic fitness is 1.0 from early on, so that correlation is undefined and the zeros are the fill-in, not a population correlation."
+  },
+  "scope": {
+    "claim_scope": "In silico 1D artificial embryos with an evolvable competency gene.",
+    "test_scope": "The same model, 30 repeats of 1000 generations. The verdict uses the across-individual correlation only; the selection differential on genotypic fitness is descriptive and does not enter the rule.",
+    "narrower": false
+  },
+  "reasons": [
+    "The decisive series is mean_r_across_individuals: 0.9974 at generation 1, 0.3398 at generation 3, 0.3038 at generation 20, then a plateau. mean_r_gen21_40 = 0.3107 and mean_r_gen41_1000 = 0.2972 (SD across repeats 0.0138). first_gen_mean_r_le_0.1 is null. The claim's standard is that this correlation dropped to 0 within about 20 generations. A residual near 0.3 for the rest of the run is not zero. The fail line ≥ 0.3 is the tester's number and the 21–40 window is what crosses it (0.2972 would have been mixed), but both windows are the same plateau, and neither is the author's zero.",
+    "authors_binned_correlation is 0.9957 in the first 10-generation bin and 0.0 in every later bin, which is the reported 'dropped to 0'. mean_best_phenotypic_fitness_41_1000 = 1.0, so the within-bin correlation of the best-fitness curves is undefined and the code's fill-in is 0. That statistic is not the correlation between the two fitnesses of the individuals. Leaving it out of the verdict matches the claim as stated.",
+    "The 'so' clause, that evolving competency disrupts selection on structural genes, is not the pass/fail rule. The reported selection differential falls from 0.01838 (generations 1–10) to 0.00154 (41–1000), and mean best genotypic fitness stays 0.5308 while phenotypic best stays 1.0. That check is the same conclusion, measured separately, and the verdict itself is the correlation the quote states."
+  ],
+  "what_would_change_it": "If the paper's stated correlation were the binned correlation of the best genotypic and best phenotypic curves, rather than the correlation across individuals, this r would be a different variable and the verdict would be not-representative. A fail line that treated a stable 0.3 as 'about zero' would also miss the author's standard.",
+  "files_read": ["result.json", "analysis.py", "derived/measured.json", "derived/correlation_curves.json"]
+}

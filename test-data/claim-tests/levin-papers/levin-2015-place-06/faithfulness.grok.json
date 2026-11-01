@@ -1,0 +1,33 @@
+{
+  "claim_id": "levin-2015-place-06",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:44:08Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "not-representative",
+  "confidence": 0.8,
+  "variables": {
+    "claim_asserts": "In the paper's active-inference morphogenesis simulation, cutting the partially differentiated embryo in two and replicating each half's cells produces a slight dedifferentiation and then regeneration of the complete head–body–tail target by each half.",
+    "test_measures": "Under Euler gradient flow of a non-generalised free energy, the count of 20 seeds in which both halves, after a split at step 8 and 32 further steps, meet an imported assembly rule (RMS position error under the best assignment < 0.5 times the smallest target spacing, and at least 7 of 8 cells correctly typed), plus whether mean max identity probability dips in the first 8 post-split steps.",
+    "match": "different"
+  },
+  "modality": {
+    "appropriate": false,
+    "note": "The claim is one reported trajectory of the published solver. The test never runs spm_ADEM. interpretation says the generalised filter (embedding order 2, local linearisation) is not re-implemented; each bin integrates the gradient of the Laplace free energy for one time unit with 200 Euler sub-steps, and free energy omits the generalised-motion terms. The generative model (8-cell target L = 2, precisions, the SPLIT duplication at step 8) is the right model. The vector field that moves the cells is not the one that produced the example."
+  },
+  "assumptions": {
+    "compatible": false,
+    "note": "The paper's example assumes the active-inference update implemented by spm_ADEM. Gradient descent on a stripped free energy can follow another path through the same landscape; the test's own caveat says that, and says the result does not show the published MATLAB run is wrong. A 16-of-20 seed frequency is also not the standard of a single illustrated bisection."
+  },
+  "scope": {
+    "claim_scope": "The active-inference morphogenesis simulation in the paper, analogous to planarian or regulative-embryo bisection: one described intervention and its regeneration.",
+    "test_scope": "Twenty numpy seeds, two initial-expectation spreads (randn/8 and log precision −4), deterministic gradient flow plus a later process-noise sensitivity, scored by the levin-2015-place-01 assembly cutoffs. The planarian analogy is not tested.",
+    "narrower": false
+  },
+  "reasons": [
+    "The refutation is both_halves_regenerated = 3/20 for code_randn_over_8 and 6/20 for paper_log_precision_minus4 (3/20 and 7/20 with process noise), below the pre-registered fail line of 10/20. The pass line is 16/20. Those frequencies, and the RMS < 0.5 plus ≥ 7/8 types rule, are the tester's standard. The quote is about 'this example', and the test records that the paper reports a single bisection run. Dedifferentiation, the other half of the statement, holds in runs_with_dedifferentiation_dip = 20/20 under every condition, so the claim's 'slight dedifferentiation' is what this integrator does show.",
+    "Failing halves are described as mis-assembled (often 6/8 correct types, RMS about 0.6–0.8), not as a collapse, and under the paper's initialisation the median RMS is 0.406 (upper) and 0.446 (lower), near the 0.5 cutoff. The binary fail is the joint multi-seed rule, not a demonstration that the published figure failed to reach the target.",
+    "Because the integrator is a different computation from the one the author ran, a low regeneration count here does not measure the simulation result the claim reports. interpretation describes the substitution accurately and does not limit the verdict to gradient-flow dynamics; the verdict is still 'refutes' for the claim."
+  ],
+  "what_would_change_it": "Run the SPLIT branch of DEM_morphogenesis.m under spm_ADEM, the solver the paper used, and score regeneration by the head–body–tail morphology that paper's example treats as complete, on the initialisation that example used. A failure of that run would be faithful. Restricting the written verdict to gradient-flow trajectories, and saying so in interpretation, would be faithful-with-narrower-scope for those trajectories only.",
+  "files_read": ["result.json", "analysis.py", "derived/summary.json", "derived/runs.json"]
+}

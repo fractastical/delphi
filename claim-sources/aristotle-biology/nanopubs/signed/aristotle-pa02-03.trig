@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RA-CsiGt218KC2WB9Raf1GLUruiSDr2ueSBDUISaZFnKw>.
+@prefix sub: <https://w3id.org/np/RA-CsiGt218KC2WB9Raf1GLUruiSDr2ueSBDUISaZFnKw/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/aristotle-pa02-03> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The thicker and hotter an animal's blood, the more it conduces to strength; the thinner and colder, the better suited it is to sensation and intelligence; those with hot, thin and clear blood are best for both courage and intelligence.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Thick hot blood gives strength; thin cool blood gives sensation and intelligence";
+    <https://w3id.org/delphi/ontology/context> "Aristotle, On the Parts of Animals (De Partibus Animalium), Book II, Part 2; translated by William Ogle, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: animals with blood, and by analogy bloodless animals"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.html>, sub:quote;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Aristotle biology claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+<http://classics.mit.edu/Aristotle/parts_animals.html> a <https://schema.org/Book>;
+    dc:bibliographicCitation "Aristotle. On the Parts of Animals (De Partibus Animalium). Translated by William Ogle. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912).";
+    dc:creator <http://www.wikidata.org/entity/Q868>;
+    dc:date "1912"^^xsd:gYear;
+    dc:title "On the Parts of Animals, translated by William Ogle";
+    <https://schema.org/translationOfWork> <http://www.wikidata.org/entity/Q1180725>;
+    <https://schema.org/translator> "William Ogle".
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=82,83>;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/parts_animals.html>;
+    <https://schema.org/text> "As regards the results of such differences, the thicker and the hotter blood is, the more conducive is it to strength, while in proportion to its thinness and its coldness is its suitability for sensation and intelligence.".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=82,83> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt> prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.mb.txt>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <http://classics.mit.edu/Aristotle/parts_animals.html>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "b8e00550b055dc101ac363fe2ef8b33f0ee4a302d947b24269dac4df85024bcc"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Aristotle, Parts of Animals II: Thick hot blood gives strength; thin cool blood gives sensation and intelligence";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-pa02-03>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/aristotle-biology>.
+<https://w3id.org/delphi/resource/domain/aristotle-biology> <http://www.w3.org/2000/01/rdf-schema#label> "aristotle-biology".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "De8fUMOeJ5Vfn78vNyvJ3KRgw3lsqHMz0fsp6cQFpM2DOxOnD97V3BajUpPTJ3Kya85wb+bWTeKHBRQnaMNJcbl1xXiHAjhzRus+HvnUvmVTgeUwVZ7Qv4Dnjsa4kB29CuqEStvDZZot0bHCIJReqBxVEpLaBt6EZ6zfKZvme69/Hpoxket/3C4pvHKxqA9NL3/xC/+6ijkDoWMeEMYKd7FCEoZFdVlE3M0/e6nGCCEzeo5equro9XfTi76hqFPRIRCDwKsWTU1maPk1A2eUQlAbjcdCE6NlbDXXlgFtGHkzqwPmfMa3aBGjIoqk7VjyYblb5Q5V1aGpor8gB3u8eg=="
+}
