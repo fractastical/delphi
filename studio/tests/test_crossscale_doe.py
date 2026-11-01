@@ -1,6 +1,5 @@
 import hashlib
 import json
-from pathlib import Path
 
 import pytest
 
@@ -24,6 +23,7 @@ def test_protocol_is_the_builder_output_and_run_used_it():
     protocol = json.loads(cs.PROTOCOL.read_text())
     assert protocol == cs.build_protocol()
     assert _j("result.json")["protocol_sha256"] == cs.sha256_json(protocol)
+    assert _j("manifest.json")["code_sha256"] == {f: hashlib.sha256((cs.ROOT / f).read_bytes()).hexdigest() for f in cs.CODE_FILES}
 
 
 def test_analytic_screen_reproduces_recorded_anchor_counts_and_mutant_differs():
@@ -70,6 +70,8 @@ def test_virtual_validation_accepts_and_unit_mislabel_fails():
     v = _j("result.json")["virtual_validation"]
     assert v["accepted"] and v["response_rows_created"] == 0
     assert v["control_unit_mislabel"]["rejected_by_acceptance"]
+    og = v["control_off_grid_refused"]
+    assert og["executed"] and og["refused"] and og["error_type"] == "ValueError" and "off the saved grid" in og["message"]
     doc = json.loads(cs.SIMS.read_text())
     bad = json.loads(cs.PROTOCOL.read_text())
     bad["virtual_validation"]["sections_x_over_L"] = [0.2512]
@@ -88,3 +90,83 @@ def test_no_empirical_claims():
     r = _j("result.json")
     assert r["empirical_validation"] == "none" and r["biological_success_probability"] is None and r["measurement_rows"] == []
     assert all(row["status"] != "executed" for row in _j("interface-map.json")["rows"])
+
+
+def test_discounted_cost_case_considers_plans_the_nominal_budget_excluded():
+    m = _j("result.json")["measurement"]
+    d = m["discounted_cost_case"]
+    assert d["newly_feasible_plans_considered"] > 0 and d["best_at_discount_is_newly_feasible"]
+    assert d["best_variance_reduction_at_discount"] > d["best_variance_reduction_nominal_budget"]
+    assert m["sensitivity"]["plans_in_full_grid"] == 255
+    # the omitted plan from the superseded run: R1x3+R2x2 costs 12 nominal, 6 at half price
+    assert "R1x3+R2x2" in m["sensitivity"]["plans_ranked_first_at_budget"]
+
+
+def test_baseline_counts_separate_comparable_and_ineligible_scenarios():
+    s = _j("result.json")["measurement"]["sensitivity"]
+    assert s["baseline_comparable_scenarios"] + s["baseline_ineligible_scenarios"] == s["scenarios"]
+    assert s["baseline_ineligible_scenarios"] > 0
+    assert s["baseline_not_beaten_among_comparable"] <= s["baseline_comparable_scenarios"]
+
+
+def test_decision_exercise_uses_actual_finalist_offset_not_a_centered_sign():
+    r = _j("result.json")
+    de = r["measurement"]["decision_exercise"]
+    assert de["finalist_margin_offset_m0"] > 0
+    assert de["sign_misclassification"]["no_measurement"] < 0.2  # superseded centered value was 0.50
+    assert de["recorded_pass_fraction_finalist"] == 63 / 64
+    old = json.loads((OUT / "superseded/v2-run-11b5c30/result.json").read_text())
+    assert old["measurement"]["misclassification_probability_of_sign_of_margin"]["no_measurement"] > 0.45
+
+
+def test_dependence_assumptions_are_declared_and_sensitivity_reported():
+    protocol = json.loads(cs.PROTOCOL.read_text())
+    assert "OPTIMISTIC" in protocol["measurement"]["sensitivity_grid"]["dependence"]
+    dep = _j("result.json")["measurement"]["dependence_sensitivity"]
+    assert dep["best_plan"] and dep["baseline_variance_reduction_under_dependence"] > 0
+
+
+def test_superseded_outputs_are_preserved_with_hashes():
+    sup = json.loads((OUT / "superseded/SUPERSEDED.json").read_text())
+    for group in ("v2_run", "v1_runs"):
+        files = sup[group]["sha256"] if group == "v2_run" else sup[group]["regenerated_sha256"]
+        base = "v2-run-11b5c30" if group == "v2_run" else "v1-regenerated-4bf5481"
+        for name, digest in files.items():
+            assert hashlib.sha256((OUT / "superseded" / base / name).read_bytes()).hexdigest() == digest
+    assert "IRRECOVERABLE" in sup["v1_runs"]["status"]
+
+
+@pytest.mark.parametrize("mutate,expect", [
+    (lambda c: c.pop("replicate unit"), "replicate unit"),
+    (lambda c: c.update(evidence_type="measured"), "evidence_type"),
+    (lambda c: c.update(blocked_on=None), "name what blocks"),
+])
+def test_contract_validator_rejects_mutated_physical_proposal(mutate, expect):
+    contracts = {c["instrument id and version"]: c for c in _j("instrument-contracts.json")["contracts"]}
+    good = contracts["R1-ray-bending@1"]
+    assert cs.validate_contract(good) == []
+    bad = json.loads(json.dumps(good))
+    mutate(bad)
+    assert any(expect in p for p in cs.validate_contract(bad))
+
+
+def test_contract_validator_rejects_calibrated_looking_virtual_and_promoted_sequence_instruments():
+    contracts = {c["instrument id and version"]: c for c in _j("instrument-contracts.json")["contracts"]}
+    v = json.loads(json.dumps(contracts["V1-saved-deflection-section@1"]))
+    assert cs.validate_contract(v) == [] and "NOT calibrated" in v["calibration_context"]
+    v["calibration_context"] = "none needed"
+    assert any("not calibrated to biology" in p for p in cs.validate_contract(v))
+    p1 = json.loads(json.dumps(contracts["P1-reporter-expression@1"]))
+    assert cs.validate_contract(p1) == []
+    p1["status"] = "simulation_derived"
+    assert cs.validate_contract(p1)
+    q = json.loads(json.dumps(contracts["P2-growth-to-EI@1"]))
+    q["status"], q["evidence_type"] = "proposal_needs_calibration", "proposed"
+    assert any("proposed_uncalibrated" in p for p in cs.validate_contract(q))
+
+
+def test_contract_file_carries_compiler_fields_and_slot_pointers():
+    doc = _j("instrument-contracts.json")
+    assert doc["compiler_required_fields"] == cs.COMPILER_FIELDS
+    assert {c["proposed_compiler_slot"]["interface"] for c in doc["contracts"]} == {"I1", "I2", "I3", "I4"}
+    assert all(f in c for c in doc["contracts"] for f in cs.COMPILER_FIELDS)
