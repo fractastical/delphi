@@ -1791,23 +1791,45 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     mp4 = "artifacts/simulations/windtunnel-2d/windtunnel.mp4"; poster = "artifacts/simulations/windtunnel-2d/poster.png"
     snap["demo_videos"] = {"cuts": [
-        {"id": "frontier-60s", "title": "60-second tour", "duration_s": 60.0, "href": mp4, "poster_href": poster, "subtitles_href": None, "manifest_href": "data/snapshot.json"},
-        {"id": "frontier-120s", "title": "2-minute tour & more", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "transcript_href": "data/snapshot.json", "title_note": "x", "manifest_href": "data/snapshot.json"}],
+        {"id": "frontier-120s", "title": "Long tour & more", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "transcript_href": "data/snapshot.json", "manifest_href": "data/snapshot.json"},
+        {"id": "frontier-60s", "title": "Short tour", "duration_s": 60.0, "href": mp4, "poster_href": poster, "subtitles_href": None, "manifest_href": "data/snapshot.json"}],
         "limits": ["The video describes the site; it adds no evidence."]}
     for w in (1280, 400):
         pg = page(browser, w, 900)
         pg.route("**/data/snapshot.json", lambda r: r.fulfill(json=snap))
         pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-        assert "2-minute tour & more" in pg.locator(".demotabs").text_content() and "&amp;" not in pg.locator(".demotabs").text_content() and pg.locator(".demotabs a").count() == 2 and pg.locator(".demotabs a[aria-current=page]").text_content().startswith("60-second")
+        # no cut parameter: the compact 60 s cut plays, and the CTA offers the long one
+        assert pg.locator(".democut[aria-current=page]").text_content().startswith("1 minute") and pg.locator("#demo-switch").text_content() == "Watch the full 2-minute tour"
+        assert "cut=frontier-120s" in pg.locator("#demo-switch").get_attribute("href")
         assert pg.locator("#demo-video").get_attribute("controls") is not None and pg.locator("#demo-video").get_attribute("poster") == poster
-        assert pg.locator("a[download][href$='windtunnel.mp4']").count() == 1 and pg.locator("a:has-text('Provenance (JSON)')").count() == 1
+        assert [pg.locator(".demostory li b").nth(i).text_content() for i in range(4)] == ["Goal", "Multiscale evidence", "Next experiment", "Reusable agent work"]
+        # both cuts are linked, and both have downloads
+        assert pg.locator(".democut").count() == 2 and pg.locator(".demodl li a[download][href$='windtunnel.mp4']").count() == 2
         assert "burned into the video" in pg.locator("figcaption").text_content() and "No separate caption track" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
-        assert "adds no evidence" in pg.locator("#main").text_content()
-        pg.click(".demotabs a:has-text('2-minute')"); pg.wait_for_selector(".demotabs a[aria-current=page]:has-text('2-minute')")
-        assert pg.locator("a:has-text('Transcript (TXT)')").count() == 1 and pg.locator("a:has-text('Captions (VTT)')").count() == 1 and "optional English caption track" in pg.locator("figcaption").text_content() and pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
+        assert "Long tour & more" in pg.locator(".demotabs").text_content() and "&amp;" not in pg.locator(".demotabs").text_content()
+        assert pg.locator("#demo-fs").is_visible() and "Fullscreen" in pg.locator("#demo-fs").get_attribute("aria-label")
+        pg.click(".democut:has-text('2 minutes')"); pg.wait_for_selector(".democut[aria-current=page]:has-text('2 minutes')")
+        assert pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
+        assert pg.locator("#demo-switch").text_content() == "Watch the 1-minute version"
+        assert pg.locator("a:has-text('Transcript (TXT)')").count() == 1 and pg.locator("a:has-text('Captions (VTT)')").count() == 1
+        pg.locator(".demolimits summary").click(); assert "adds no evidence" in pg.locator(".demolimits").text_content()
+        box = pg.locator("#demo-video").bounding_box()
+        assert box["width"] <= w and (w < 900 or box["width"] >= 640)
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_demo_page_with_the_published_snapshot_defaults_to_the_one_minute_cut(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    cuts = {c["id"]: c for c in (snap.get("demo_videos") or {}).get("cuts", [])}
+    if "frontier-60s" not in cuts:
+        return
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
+    assert pg.locator("#demo-video source").get_attribute("src") == cuts["frontier-60s"]["href"]
+    assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
+
 
 
 def test_no_page_prints_markup_or_object_placeholders(browser, base):
