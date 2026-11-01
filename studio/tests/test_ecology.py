@@ -20,3 +20,15 @@ def test_lift_is_orthogonal_and_drag_dissipative_with_mutation():
     assert abs(np.dot(lift, velocity)) < 1e-12
     assert np.dot(drag, velocity) < 0
     assert np.dot(-drag, velocity) > 0
+
+
+def test_biological_component_stl_uses_metres_not_print_millimetres():
+    import json
+    import trimesh
+    from engineering.ecology.model import GEOM
+
+    mesh = trimesh.load(GEOM / "components/body.stl", process=False)
+    metadata = json.loads((GEOM / "components.json").read_text())
+    bounds_m = np.asarray(metadata["components"]["body"]["check"]["bbox_mm"]) * 0.001
+    assert np.allclose(mesh.bounds, bounds_m, atol=1e-8)
+    assert 0.15 < np.ptp(mesh.bounds[:, 0]) < 0.17

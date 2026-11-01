@@ -134,6 +134,11 @@ def render(run, out, school=False):
     trajectories = [
         json.loads((run / name / "trajectory.json").read_text()) for name in names
     ]
+    summary = json.loads((run / "summary.json").read_text())
+    numeric_pass = all(
+        summary[name]["discrepancy"]["passes_frozen_discrepancy_bounds"]
+        for name in names
+    )
     parts_data = parts(trajectories[0]["geometry"]["cg_from_nose_m"])
     maxtime = max(x["frames"][-1]["time_s"] for x in trajectories)
     # Each video sample selects one actual saved state; no state interpolation.
@@ -154,6 +159,30 @@ def render(run, out, school=False):
     out.mkdir(parents=True, exist_ok=True)
     video = out / ("school.mp4" if school else "glide.mp4")
     poster = video.with_suffix(".png")
+    fig.suptitle(
+        "Actual v3a geometry • "
+        + (
+            "Local airborne escape proxy"
+            if school
+            else "Passive vs bounded fin feedback"
+        )
+        + (
+            "\nTimestep discrepancy passed on common saved states"
+            if numeric_pass
+            else "\nRETAINED FAILED TIMESTEP CHECK — interpret as diagnostic"
+        ),
+        color="white",
+        fontsize=13,
+        y=0.98,
+    )
+    fig.text(
+        0.5,
+        0.018,
+        "MuJoCo rigid bodies + reduced VLM forces | assumed mass/control | not CFD or biological validation | tracking actual states",
+        ha="center",
+        color="#a5b7cb",
+        fontsize=8,
+    )
     with writer.saving(fig, str(video), 100):
         for index, t in enumerate(times):
             for k, (ax, plot, trajectory, name) in enumerate(
@@ -227,25 +256,6 @@ def render(run, out, school=False):
                     color="#f3b64e",
                     fontsize=8,
                 )
-            fig.suptitle(
-                "Actual v3a geometry • "
-                + (
-                    "Local airborne escape proxy"
-                    if school
-                    else "Passive vs bounded fin feedback"
-                ),
-                color="white",
-                fontsize=16,
-                y=0.98,
-            )
-            fig.text(
-                0.5,
-                0.018,
-                "MuJoCo rigid bodies + reduced VLM-derived forces | assumed mass/control | not CFD or biological validation | camera tracks actual states",
-                ha="center",
-                color="#a5b7cb",
-                fontsize=8,
-            )
             writer.grab_frame()
             if index == len(times) - 1:
                 fig.savefig(poster, dpi=100, facecolor=fig.get_facecolor())
