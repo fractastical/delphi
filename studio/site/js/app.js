@@ -21,9 +21,10 @@
 
   const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"]];
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
-  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief"]);       // reached from a project; they highlight Studio
+  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
   let snap = null; let lastView = null; let opener = null;
+  document.addEventListener("click", (e) => { const am = document.querySelector(".aboutmenu details"); if (am && am.open && !am.contains(e.target)) am.open = false; }, true);   // one listener for the life of the page
 
   function header(route) {
     const s = DF.api.state; const live = s.mode === "live";
@@ -43,6 +44,13 @@
     if (!snap) return;
     hdr.innerHTML = header(route).toString();
     if (DF.attachSearch) DF.attachSearch();
+    const am = hdr.querySelector(".aboutmenu details");
+    if (am) {                                          // native <details> menu: expose its state, close on Escape (focus returns to the button) and on an outside click or Tab away
+      const sm = am.querySelector("summary"), ul = am.querySelector("ul"); ul.id = "aboutlist"; sm.setAttribute("aria-controls", "aboutlist"); sm.setAttribute("aria-expanded", "false"); sm.setAttribute("aria-haspopup", "true");
+      am.addEventListener("toggle", () => sm.setAttribute("aria-expanded", am.open ? "true" : "false"));
+      am.addEventListener("keydown", (e) => { if (e.key === "Escape" && am.open) { e.preventDefault(); am.open = false; sm.focus(); } });
+      am.addEventListener("focusout", (e) => { if (am.open && e.relatedTarget && !am.contains(e.relatedTarget)) am.open = false; });
+    }
     document.getElementById("gs").addEventListener("submit", (e) => { e.preventDefault(); const q = document.getElementById("gq").value.trim(); DF.go(DF.href("/search", { q, tab: "catalog" })); });
     const fn = DF.views[route.view];
     const y = lastView === route.view ? window.scrollY : 0;

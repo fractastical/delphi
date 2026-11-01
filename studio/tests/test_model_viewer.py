@@ -329,7 +329,8 @@ def test_lazy_mount_does_not_fetch_the_glb_until_visible(page, server):
 
 
 SYN = "/synthetic/"
-SYN_VARIANTS = json.dumps([{"id": "a", "glb": "fish-a.glb", "appearance": "appearance-a.json", "poster": "poster.png", "video": None},
+MD = {"components": "components.json"}       # the synthetic dir holds only this metadata file
+SYN_VARIANTS = json.dumps([{"id": "a", "glb": "fish-a.glb", "appearance": "appearance-a.json", "poster": "poster.png", "video": None, "metadata": MD},
                            {"id": "b", "glb": "fish-b.glb", "appearance": "appearance-b.json", "poster": "poster.png", "video": None}])
 
 
@@ -382,13 +383,13 @@ def test_variants_switch_with_labels_hash_and_stable_view(page, server):
 
 
 def test_variant_hash_mismatch_falls_back_not_verified(page, server):
-    bad = json.dumps([{"id": "b", "glb": "fish-b.glb", "appearance": "wrong.json", "poster": "poster.png", "video": None}])
+    bad = json.dumps([{"id": "b", "glb": "fish-b.glb", "appearance": "wrong.json", "poster": "poster.png", "video": None, "metadata": MD}])
     st = _open_syn(page, server, bad)
     assert st["mode"] == "fallback" and "sha256" in st["reason"] and "wrong.json" in st["reason"]
 
 
 def test_no_recorded_hash_is_not_reported_as_verified(page, server):
-    one = json.dumps([{"id": "a", "glb": "fish-a.glb", "poster": "poster.png", "video": None}])
+    one = json.dumps([{"id": "a", "glb": "fish-a.glb", "poster": "poster.png", "video": None, "metadata": MD}])
     st = _open_syn(page, server, one)
     assert st["mode"] == "interactive" and st["hashChecked"] is None
     assert "hash not recorded" in page.locator(".mv-status").inner_text()
@@ -476,7 +477,7 @@ def test_fast_pick_agrees_with_threes_raycaster_over_a_grid(page, server):
 @pytest.mark.parametrize("heavy", [0, 1000000])      # 0 forces the triangle-bounds path, 1e6 the Raycaster path
 def test_pick_distance_is_world_distance_under_nonuniform_scaled_overlapping_nodes(page, server, heavy):
     from urllib.parse import quote
-    v = json.dumps([{"id": "nu", "glb": "fish-nu.glb", "poster": "poster.png", "video": None}])
+    v = json.dumps([{"id": "nu", "glb": "fish-nu.glb", "poster": "poster.png", "video": None, "metadata": {}}])
     page.goto(f"{server}/?lazy=0&heavy={heavy}&base={SYN}&variants={quote(v)}")
     st = page.evaluate("window.__v.ready.then(() => window.__v.state())")
     assert st["mode"] == "interactive" and sorted(st["names"]) == ["plate", "slab"], st
@@ -492,3 +493,101 @@ def test_pick_distance_is_world_distance_under_nonuniform_scaled_overlapping_nod
     want = "bounds" if heavy == 0 else "raycaster"                 # the size threshold really selects the path
     for n in ("plate", "slab"):
         assert page.evaluate("n => window.__v.componentInfo(n).pickPaths", n) == [want], (n, heavy)
+
+
+# ---- metadata dispatch: no probing of files a variant's schema does not declare -------------------------------
+
+def _site_tree(tmp, v3root):
+    """The per-candidate file sets claude-02's builder copies (scripts/build_site.py): N1 gets fish.glb,
+    components.json, render/{render.json,poster.png,turntable.mp4}; each v3 candidate gets its adult GLB,
+    appearance JSON, preview PNG, components.json, build.json and candidate.json.  Symlinks, no copies."""
+    out = {}
+    n1 = tmp / "fish3d-N1-cypselurus-baseline"
+    (n1 / "render").mkdir(parents=True)
+    for rel in ("fish.glb", "components.json", "render/render.json", "render/poster.png", "render/turntable.mp4"):
+        (n1 / rel).symlink_to(ART / rel)
+    out[n1.name] = []
+    for cid in ("fish3d-v3a-fan", "fish3d-v3b-glide-pose", "fish3d-v3c-daane-length"):
+        src, dst = v3root / cid, tmp / cid
+        dst.mkdir()
+        for rel in ("fish-adult-fao.glb", "appearance-adult-fao.json", "preview-adult-fao.png", "components.json", "build.json", "candidate.json"):
+            (dst / rel).symlink_to(src / rel)
+        out[cid] = [{"id": "adult-fao", "glb": "fish-adult-fao.glb", "appearance": "appearance-adult-fao.json",
+                     "poster": "preview-adult-fao.png", "video": None}]
+    return out
+
+
+def _v3_root():
+    if os.environ.get("MV_V3_ROOT"):
+        return Path(os.environ["MV_V3_ROOT"])
+    r = ROOT / "artifacts/fish3d"
+    return r if (r / "fish3d-v3c-daane-length/appearance-adult-fao.json").exists() else None
+
+
+@pytest.fixture
+def site_server(server):
+    v3 = _v3_root()
+    if v3 is None:
+        pytest.skip("needs the three v3 candidates: set MV_V3_ROOT or merge work/fish3d-v3")
+    from functools import partial as _p
+    with tempfile.TemporaryDirectory() as d:
+        d = Path(d)
+        (d / "site").symlink_to(ROOT / "site")
+        (d / "index.html").symlink_to(ROOT / "tests/fixtures/model_viewer/index.html")
+        (d / "artifacts").mkdir()
+        cands = _site_tree(d / "artifacts", v3)
+        srv = ThreadingHTTPServer(("127.0.0.1", 0), _p(_Quiet, directory=str(d)))
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        yield f"http://127.0.0.1:{srv.server_address[1]}", cands
+        srv.shutdown()
+
+
+def test_selecting_all_four_known_candidates_makes_no_404_requests(page, site_server):
+    from urllib.parse import quote
+    url, cands = site_server
+    bad = []
+    page.on("response", lambda r: bad.append((r.status, r.url)) if r.status >= 400 else None)
+    page.on("console", lambda m: bad.append(("console", m.text)) if m.type == "error" else None)
+    assert len(cands) == 4
+    for cid, variants in cands.items():
+        q = f"?lazy=0&base=/artifacts/{cid}/" + (f"&variants={quote(json.dumps(variants))}" if variants else "")
+        page.goto(url + "/" + q)
+        st = page.evaluate("window.__v.ready.then(() => window.__v.state())")
+        assert st["mode"] == "interactive", (cid, st["reason"])
+        assert st["hashChecked"] is True, (cid, st["hashSource"])
+        assert st["hashSource"] == ("render/render.json" if not variants else "appearance-adult-fao.json"), (cid, st["hashSource"])
+        assert len(st["names"]) == 13
+    assert bad == [], bad
+
+
+def test_the_404_detector_sees_a_declared_missing_metadata_file(page, site_server):
+    """Negative control for the test above: a variant that declares a file the builder did not copy must
+    produce a 404 AND fail loudly naming it, so a silent pass above is not the detector being blind."""
+    from urllib.parse import quote
+    url, cands = site_server
+    cid = "fish3d-v3a-fan"
+    v = dict(cands[cid][0], metadata={"components": "components.json", "render": "render/render.json"})
+    seen = []
+    page.on("response", lambda r: seen.append((r.status, r.url)) if r.status >= 400 else None)
+    page.goto(f"{url}/?lazy=0&base=/artifacts/{cid}/&variants={quote(json.dumps([v]))}")
+    st = page.evaluate("window.__v.ready.then(() => window.__v.state())")
+    assert any(s == 404 and u.endswith("render/render.json") for s, u in seen), seen
+    assert st["mode"] == "fallback" and "render/render.json: HTTP 404" in st["reason"]
+
+
+def test_declared_required_assets_that_are_bad_still_error(page, server):
+    from urllib.parse import quote
+    def run(v):
+        page.goto(f"{server}/?lazy=0&base={SYN}&variants={quote(json.dumps([v]))}")
+        return page.evaluate("window.__v.ready.then(() => window.__v.state())")
+    base_v = {"id": "a", "glb": "fish-a.glb", "poster": "poster.png", "video": None, "metadata": MD}
+    ok = run(dict(base_v, appearance="appearance-a.json"))
+    assert ok["mode"] == "interactive" and ok["hashChecked"] is True
+    st = run(dict(base_v, appearance="no-such-appearance.json"))
+    assert st["mode"] == "fallback" and "no-such-appearance.json: HTTP 404" in st["reason"]
+    st = run(dict(base_v, metadata={"components": "no-such-components.json"}))
+    assert st["mode"] == "fallback" and "no-such-components.json: HTTP 404" in st["reason"]
+    st = run(dict(base_v, glb="no-such.glb"))
+    assert st["mode"] == "fallback" and "no-such.glb: HTTP 404" in st["reason"]
+    st = run(dict(base_v, appearance="wrong.json", glb="fish-b.glb"))      # hash mismatch message is preserved
+    assert st["mode"] == "fallback" and "does not match wrong.json" in st["reason"]

@@ -208,3 +208,22 @@ main p,main li{max-width:100ch}main .lede{max-width:80ch}
 
 /* runtime graph: labels sit below the circles on the cream canvas, so they are always dark (the centre label was white on cream) */
 .gsvg .g-node .g-label,.gsvg .g-node.goal .g-label{fill:var(--ink)}
+
+/* edge labels with no free spot appear only for the hovered, focused or selected edge */
+.g-hid{display:none}.g-edge:hover .g-hid,.g-edge:focus .g-hid,.g-edge.sel .g-hid{display:inline}
+
+/* narrow screens: question tables become stacked cards, so no column is cut off */
+@media (max-width:700px){
+  .qtable,.qtable thead,.qtable tbody,.qtable tr,.qtable td{display:block;width:100%;box-sizing:border-box}
+  .qtable{min-width:0}.qtable td:nth-child(2){min-width:0}
+  .qtable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .qtable tr{border:1px solid var(--line);border-radius:8px;margin:0 0 10px;padding:6px 8px;background:#fff}
+  .qtable td{border:0;padding:3px 0;max-width:none;min-width:0}
+  .qtable td:first-child{min-width:0;max-width:none;font-weight:700}
+  .qtable td[data-label]:not(:first-child):not(:nth-child(2))::before{content:attr(data-label) ": ";font:600 .72rem var(--sans);color:var(--dim)}
+  .qtable td .qlink{-webkit-line-clamp:6}
+}
+
+/* simulation gallery navigation: jump list, lazy cards */
+.sjump{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:8px 0 0;padding:0}.sjump li{margin:0}.simcard{content-visibility:auto;contain-intrinsic-size:auto 900px}
+.printv3{margin-top:10px}.printv3 select{max-width:100%}.printv3 .v3links{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}

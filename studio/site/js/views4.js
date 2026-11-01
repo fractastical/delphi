@@ -39,6 +39,8 @@
       <p class="small faint">Provider COMPLETED means the container ended, not that a scientific check passed. Failed jobs stay failed.</p>
       <h3>Controller outcomes for recent GPU tasks</h3>
       <ul class="small">${T.usage.controller.map((e) => html`<li>${U.pill(e.status, e.status === "failed" ? "no" : "st-unk")} <b>${e.task}</b>: container wall ${e.wall_s === null ? "not recorded" : e.wall_s + " s"}, return code ${e.rc === null ? "not recorded" : e.rc}. <code>${e.path}</code> ${U.sha(e.sha256)}</li>`)}</ul>
+      ${snap.recovery_inputs ? html`<h3>Failed primary diffusion-model training run, retained</h3><p class="small">${U.pill("primary run: " + snap.recovery_inputs.primary_full_run_status.toLowerCase(), "no")} The run hit its time limit. A checkpoint after ${snap.recovery_inputs.training_steps.toLocaleString("en")} training steps was returned and is hash-checked; <b>no evaluation and no generated examples exist</b>, so training and evaluation are not complete. ${snap.recovery_inputs.status}.</p>
+        <p class="small">${snap.recovery_inputs.published ? html`Recovery inputs (the checkpoint and its control files, ${(snap.recovery_inputs.bytes / 1e6).toFixed(1)} MB): <a href="${snap.recovery_inputs.href}" download>primary-runtime-inputs.tar.xz</a> · sha256 ${U.sha(snap.recovery_inputs.sha256)}` : html`The recovery archive did not match its declared digest, so it is not published.`} Next step, as recorded: ${snap.recovery_inputs.next_admission}.</p>` : ""}
       <p class="small"><b>External tools credited:</b> ${T.usage.credit.join(", ")}. These are not authored in the event window.</p>
       <ul class="small">${T.usage.limitations.map((x) => html`<li>${x}</li>`)}</ul>` : ""}
       <h3>Providers and jobs</h3>
