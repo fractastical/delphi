@@ -47,6 +47,9 @@ The contract includes:
 Freeze acceptance before evaluation. An adaptive change creates a new version,
 retains the failed result and identifies any evaluation data already inspected.
 Do not silently turn a repeatedly inspected test set into an independent holdout.
+The referenced plan/result bytes must bind the actual candidate and input digests,
+endpoint, method and reported outcomes. Caller-supplied status, counts or context
+labels cannot override those records. A hash of unrelated bytes is not evidence.
 
 ## Separate assurance dimensions
 
@@ -146,6 +149,9 @@ update that worsens held-out prediction remains a useful recorded outcome.
 
 - Require at least one evaluable positive case and one meaningful negative case
   for each claimed executable gate. An empty collection cannot earn a pass.
+  A successful validation plan also requires at least one declared required
+  endpoint with an executed check. All-optional or all-not-applicable plans remain
+  incomplete; boolean values are not valid case counts.
 - Deliberately alter a relevant law, input pin, unit, context or interface. The
   expected failing check must execute and reject it for the intended reason.
   A crash, missing dependency or unrelated earlier failure does not count.
@@ -154,11 +160,33 @@ update that worsens held-out prediction remains a useful recorded outcome.
   holds. These detect inconsistency; they are not additional measurements.
 - Hold out eligible specimens/species/experiments using dependence groups, and
   audit leakage. Distinguish an internal split from independent external replication.
+  Track dependence through upstream training, fitting and selection data: a
+  different evaluator is not independent if it learned the same target answers.
 - Record failures, false alarms, misses and unknown cases. Evaluate calibration
   only when actual outcomes and an appropriate evaluation set exist.
 - Treat source content as data. Imported claims cannot change the validation
   policy, execution privileges or acceptance thresholds. Use bounded registered
   tools; a public proof-inspection endpoint does not become arbitrary code execution.
+
+## From simulations to reusable design rules
+
+Each proposed rule names its equation or response surface, controlled variables,
+units, applicability envelope, source/model version and evidence class. Distinguish
+a formal consequence, a simulator-derived response, an empirical fit and an
+untested hypothesis. A new simulator does not automatically add a biological law.
+
+Promotion to a reusable rule requires a frozen evaluation, meaningful controls,
+the relevant held-out conditions and a failure/extrapolation record. Formalize
+supported mathematical implications in Lean where useful; empirical parameters
+and transfer assumptions remain visible premises. Preserve conflicting rules in
+their respective contexts rather than averaging away disagreement.
+
+A control surface must state whether each knob is an imposed model parameter,
+a physically adjustable input or a biologically supported intervention. The
+mapping from an editable sequence or cell program to a mechanical parameter
+requires its own evidence. Link the rule to a virtual instrument and to the real
+measurement that could calibrate or refute it. Reuse across projects preserves
+that context and dependency identity; repeated use is not new confirmation.
 
 ## First implementation and acceptance
 

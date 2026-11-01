@@ -7,6 +7,11 @@ Every status distinguishes implementation, integration, publication and biologic
 
 ## Current checkpoint — October 31, 2026, 10:21pm PDT
 
+- [ ] Added Xenobot/ICDO simulator discovery and runnable-packet work, assigned
+  to existing claude15. Extend the existing simulation roadmap, prioritize
+  Voxcraft/Voxelyze actuation-to-mechanics controls, and send exact bounded
+  packets to the infrastructure dispatcher. Compatibility and execution remain
+  pending; upstream animations are not new simulation results.
 - [x] Added SPEC-017 self-validation: frozen candidate contracts, separate
   assurance dimensions, meaningful negative controls, forward/inverse consistency
   boundaries, validation slices/cuts, virtual instruments and adaptive next

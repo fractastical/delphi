@@ -58,6 +58,10 @@ about a proposed action.
 
 ## Delivery checklist
 
+- [ ] Research Xenobot/ICDO and additional multiscale simulators, publish a
+  primary-source capability/compatibility catalog, and execute bounded useful
+  comparisons with controls, trajectories and explicit biological-transfer gaps.
+  Convert supported results into contextual reusable rules and design controls.
 - [ ] Implement the self-validation loop in SPEC-017: falsifiable candidate
   contracts, validator controls, cross-scale validation slices, virtual instruments
   and evidence-directed next actions; preserve the separation between internal
