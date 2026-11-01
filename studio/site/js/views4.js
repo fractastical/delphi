@@ -174,7 +174,7 @@
   function receipts(snap, S) {
     return { html: html`<section class="panel"><h2>What has been measured ${MEAS}</h2><p class="note small">Each row is a receipt present in this tree, with its hash and what it covers. A receipt covers only what it says; none of these is a biological validation.</p>
       <div class="tablewrap"><table><thead><tr><th>What</th><th>Result</th><th>Receipt</th><th>Covers</th></tr></thead><tbody>${S.measured.map((m) => html`<tr><td>${m.what}</td><td>${m.result}</td><td><code>${m.receipt}</code><br>${U.sha(m.sha256)}</td><td>${m.covers}</td></tr>`)}</tbody></table></div>
-      ${S.measured.length ? "" : U.empty("No receipt is present in this tree.")}<p class="small faint">Not here because no receipt exists in this tree: mesh or geometry validation, controlled reuse measurements, executed claim reuse, GPU runs.</p></section>` };
+      ${S.measured.length ? "" : U.empty("No receipt is listed in this summary.")}<p class="small faint">This table is a selected summary. <a href="${DF.href("/work", {tab: "built"})}">How it was built</a> and <a href="${DF.href("/work", {tab: "resources"})}">Resources</a> contain the dated compute and model-use records; <a href="${DF.href("/reuse")}">Claim reuse</a> shows executed reuse and independent review.</p></section>` };
   }
 
   /* /api/counts as received: scalars with their units, nested groups collapsed, and every note or basis string kept right next to the numbers it qualifies. */
