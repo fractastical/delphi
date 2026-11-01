@@ -1023,7 +1023,7 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     pg.goto(base + "#/work?tab=built")
     pg.wait_for_selector("#bt-h")
     t = pg.locator("#main").text_content()
-    for q in ("Contributing harnesses", "Native collaborators", "Live harness processes", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
+    for q in ("Recorded participants", "Recorded subagents", "Native running snapshot", "Contributing harnesses", "Native collaborators", "Live harness processes", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
     assert "CPU seconds are not recorded: unknown" in t and "not a census or concurrent-worker count" in t
     timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
@@ -2170,6 +2170,8 @@ def test_system_audit_separates_contributors_activity_and_model_receipts(browser
         pg.wait_for_selector('.contributor-audit')
         t = pg.locator('#main').inner_text()
         assert 'At least 11 distinct harness identities' in t and 'Native collaborators' in t
+        assert 'At least 23' in t and 'Recorded subagents' in t and '4 native + 8 nested Claude' in t
+        assert '1 coordinator + 3 children' in t and '22:07:30 PDT' in t
         assert 'not a count of agents working' in t
         assert 'none in this tree' not in t
         pg.locator('.contributor-audit > summary').click()

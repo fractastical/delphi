@@ -344,10 +344,10 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "GPU seconds", "value": f"{tel_s:.0f} s inside {len(R['historical_gpu_telemetry'])} sampled telemetry windows", "status": "partial", "note": "Sampled windows only, a lower bound on measured time. Total GPU seconds across all jobs: unknown.", "source": ri},
         {"quantity": "CPU jobs and usage", "value": "No CPU counter is recorded", "status": "unknown", "note": "One Nebius CPU worker request was refused (ResourceExhausted); local CPU runs are not metered here.", "source": "results/resources/provider-outcome.json"},
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
+    def pdt(iso):
+        return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
     usage = None
     if U:
-        def pdt(iso):
-            return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
         def job_kind(job):
             platform = job.get("platform", "")
             return "gpu" if platform.startswith("gpu-") else "cpu" if platform.startswith("cpu-") else "unknown"
@@ -395,6 +395,27 @@ def build_timeline(ins: Inputs) -> dict | None:
             {"quantity": "Contributing harnesses", "value": f"At least {c['distinct_contributing_harness_ids_supported_minimum']} distinct harness identities", "status": "partial", "note": f"Authored handoffs or reviewed identity mappings with checked artifacts, observed {observed}. A supported minimum, not a census or concurrent-worker count.", "source": a["path"]},
             {"quantity": "Native collaborators", "value": str(c['native_contributors_supported_minimum']), "status": "partial", "note": "Separate native collaboration identities; work artifacts checked and attribution attested by the coordinator. Root is not counted again. No collective speedup is inferred.", "source": a["path"]},
             {"quantity": "Live harness processes", "value": str(c['live_harness_processes_now']), "status": "partial", "note": f"Process snapshot at {observed}. Includes idle and authentication-blocked sessions; this is not a count of agents working.", "source": a["path"]}]
+        participation = a["data"].get("participation")
+        if participation:
+            source = "results/resources/agent-participation.json"
+            raw = ins.read(source)
+            if digest_bytes(raw) != participation["source_sha256"]:
+                raise ValueError("Participant receipt changed; refuse stale counts")
+            native = participation["recorded_native_children"]
+            nested = participation["recorded_nested_claude_children"]
+            floor = participation["supported_harnesses"] + native + nested
+            if floor != participation["recorded_participant_floor"]:
+                raise ValueError("Participant classes do not reproduce the recorded floor")
+            cutoff = pdt(participation["window"]["observed_utc"])
+            live = participation["live_native_api"]
+            for counter in counters:
+                if counter["quantity"] == "Native collaborators":
+                    counter.update(value=str(native), note=f"Historical native children, including retired sessions; transcript evidence through {cutoff}. Artifact-backed identities below are a subset. Not a count of running workers.", source=source)
+            counters[:0] = [
+                {"quantity": "Recorded participants", "value": f"At least {floor}", "status": "partial", "note": f"{participation['supported_harnesses']} harnesses + {native} native children + {nested} nested Claude children. Historical supported floor through {cutoff}; root counted once. Not completed scientific tasks.", "source": source},
+                {"quantity": "Recorded subagents", "value": str(native + nested), "status": "partial", "note": f"{native} native + {nested} nested Claude child identities; shared with the participant total, not additional participants. Global current activity is unknown.", "source": source},
+                {"quantity": "Native running snapshot", "value": str(live['running_roots'] + live['running_children']), "status": "actual", "note": f"{live['running_roots']} coordinator + {live['running_children']} children at {pdt(live['observed_utc'])}. API running state, not CPU or model utilization; other harnesses not covered.", "source": source}]
+
     return {"observed_at": R["observed_at"], "usage": usage, "audits": audits, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
