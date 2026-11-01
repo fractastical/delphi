@@ -38,7 +38,7 @@ export function loadClaims() {
   const projects = readdirSync(join(ROOT, "claim-sources")).map(d => `claim-sources/${d}`);
   for (const dir of projects.filter(d => existsSync(join(ROOT, d, "lean/reports")))) {
     for (const f of ls(join(ROOT, dir, "lean/reports"), /\.json$/)) {
-      const module = `${dir}/lean/${readJson(join(ROOT, dir, "lean/reports", f))[0]?.lean_declaration?.split(".")[0] ?? "Lean"}/${f.replace(/\.json$/, ".lean")}`;
+      const module = `${dir}/lean/${readJson(join(ROOT, dir, "lean/reports", f)).find(r => r.lean_declaration)?.lean_declaration.split(".")[0] ?? "Lean"}/${f.replace(/\.json$/, ".lean")}`;
       for (const r of readJson(join(ROOT, dir, "lean/reports", f))) {
         if (r.status === "not-formalized" && r.reason) leanDeclined[r.claim_id] = r.reason;
         if (r.status !== "formalized" || !r.lean_theorems?.length) continue;
@@ -131,27 +131,37 @@ export function loadClaims() {
       return p ? { work: p.title, year: p.year, doi: p.doi, section: `${p.authors.split(",")[0]} ${p.year}, ${p.title}${c.section ? ` › ${c.section}` : ""}` } : {};
     } });
 
-  // Mathematical-biology key claims: formal status as recorded in key-claims.json. Being in this
+  // Aristotle: three works in one project; the year is the conventional dating (c. 350 BCE) as a negative number.
+  const ARISTOTLE = "claim-sources/aristotle-biology";
+  const aristotleWorks = existsSync(join(ROOT, ARISTOTLE, "inputs/sources.json")) ? readJson(join(ROOT, ARISTOTLE, "inputs/sources.json")).works : [];
+  const aristotleWork = Object.fromEntries(aristotleWorks.map(w => [w.key, w]));
+  addBook({ dir: ARISTOTLE, thinker: "Aristotle", year: -350, idPrefix: "aristotle", chapterOf: () => "", titles: {},
+    perClaim: c => {
+      const w = aristotleWork[c.work];
+      return w ? { work: w.title, section: `${w.title}, Book ${c.book}${c.section ? `, ${c.section}` : ""}` } : {};
+    } });
+
+  // Key-claim projects (claim-sources/<project>/claims/key-claims.json: math-bio-claims,
+  // plant-hygromorph-mechanics): formal status as recorded in each claim's context. Being in such a
   // project does not make a claim a theorem; only a recorded proof (or a Lean report) does.
-  const MATH = join(ROOT, "claim-sources/math-bio-claims");
-  const keyClaims = readJson(join(MATH, "claims/key-claims.json")).claims;
-  const mathManifest = readJson(join(MATH, "nanopubs/manifest.json")).nanopubs;
   const formalStatus = c => {
     const fs = (c.context.match(/Formal status:\s*([^]*)$/) || [, ""])[1].toLowerCase();
     if (/refuted as stated|largely abandoned/.test(fs)) return "refuted";
     if (/not a mathematical|framework rather than/.test(fs) || c.kind !== "model-theorem") return "untested";
-    if (/not in general|is open|conjectur/.test(fs)) return "partial";
+    if (/^partial|not in general|is open|conjectur/.test(fs)) return "partial";
     return "proved";
   };
-  for (const c of keyClaims) {
-    const m = mathManifest.find(n => n.claim.endsWith(`/${c.id}`));
+  const keyClaimProjects = projects.filter(d => existsSync(join(ROOT, d, "claims/key-claims.json")));
+  for (const dir of keyClaimProjects) for (const c of readJson(join(ROOT, dir, "claims/key-claims.json")).claims) {
+    const manifestFile = join(ROOT, dir, "nanopubs/manifest.json");
+    const m = existsSync(manifestFile) ? readJson(manifestFile).nanopubs.find(n => n.claim.endsWith(`/${c.id}`)) : null;
     const fsText = (c.context.match(/Formal status:\s*([^]*)$/) || [, ""])[1];
     const l = lean[c.id] ?? null, status = l ? "proved" : formalStatus(c);
     claims.push({
       id: c.id, label: c.label, text: c.statement, notation: c.notation, context: c.context, test: c.proposed_test, kind: c.kind,
       thinker: c.thinker, year: c.paper.year, work: c.paper.title, section: `${c.paper.title} (${c.paper.year})`,
       doi: c.paper.doi, seeAlso: c.see_also ?? [], status, proof: l ? "lean" : status === "proved" ? "literature" : null, lean: l,
-      statusNote: fsText ? `Formal status recorded in key-claims.json: ${fsText}` : "",
+      statusNote: fsText ? `Formal status recorded in ${dir}/claims/key-claims.json: ${fsText}` : "",
       draft: false, assess: [], resolvability: null, confidence: null,
       uri: m?.trustyUri ?? null, registry: m?.productionRegistry ? "production" : m?.trustyUri ? "test" : null,
     });

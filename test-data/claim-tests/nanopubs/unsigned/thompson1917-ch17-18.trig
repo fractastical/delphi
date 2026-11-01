@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-18--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch17-18: refutes, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "Among related teleost species (same family), relative body depth (depth/length) and relative body width (width/length) vary inversely, so that the length-weight coefficient k = W/L^3, a proxy for volume at a given length, varies less across species than either relative transverse dimension." ;
+    delphi:passCriterion "Pre-registered. Species means from FishShapes v1 specimens (standard length SL, maximum body depth BD, maximum fish width FW, mass M; specimens with all four > 0). Variables per species: d = ln(BD/SL), w = ln(FW/SL), k = ln(M/SL^3). Families with >= 5 species are kept and each variable is centred on its family mean. (A) Spearman rho between family-centred d and w is < 0 with one-sided p < 0.05. (B) the SD of family-centred k is smaller than the SDs of family-centred d and of family-centred w. SUPPORTS if A and B both hold." ;
+    delphi:failCriterion "Pre-registered. REFUTES if the Spearman rho between family-centred d and w is >= 0 AND the SD of family-centred k is >= the smaller of the SDs of family-centred d and w. Any other outcome is MIXED. Fewer than 20 qualifying families or 200 species: inconclusive (underpowered)." ;
+    delphi:expectedObservation "Within fish families, species that are relatively deeper are relatively narrower (negative family-centred correlation of ln(depth/SL) and ln(width/SL)), and ln(mass/SL^3) varies less than either." ;
+    delphi:disconfirmingObservation "Relative depth and width covary positively or not at all within families, and mass/SL^3 varies at least as much as the less variable of the two transverse dimensions." ;
+    delphi:admissibleDatasets "Measurements of standard length, maximum body depth, maximum body width and mass taken on the same fish specimens, across many species in many families, by a source independent of Thompson; species identified to FishBase taxonomy; public licence." ;
+    delphi:inferenceMethod "Species means, family-centring for families with >= 5 species, Spearman correlation of centred ln depth ratio vs ln width ratio (one-sided test for negative), and comparison of the SDs of centred ln k vs centred ln depth and width ratios, against the pre-registered thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py downloads the Dryad version zip, verifies the specimen CSV against Dryad's SHA-256 digest, keeps the 16,377 specimens with positive mass, SL, depth and width, and takes geometric species means (6,091 species). For the 5,670 species in the 195 families with >= 5 species it computes d = ln(depth/SL), w = ln(width/SL) and k = ln(mass/SL^3), centres each on its family mean, and computes the Spearman correlation of centred d and w and the SDs of centred d, w and k. Per-family correlations and SDs are written to derived/families.csv; the plaice/haddock ratios are reported separately." ;
+    rdfs:comment "Measured: 0.5274 Spearman rho between family-centred ln(body depth/SL) and ln(body width/SL) across teleost species (n = 5670, one-sided p (rho<0) = 1; 195 families with >= 5 species). Interpretation: Thompson's 'expansion in one transverse dimension compensated by compression in the other' is read as negative covariation of depth and width at a given length among related fishes; 'related' is operationalized as the same family (FishBase family names used in FishShapes). Length is standard length; 'thickness' is maximum fish width; 'volume at a given length' is mass/SL^3 (Thompson's k uses weight, so mass is the direct quantity). Family-centring removes between-family differences so that the comparison is among related species, as Thompson's haddock/plaice and shark/skate examples are. Because ln k is approximately d + w + ln(density x shape factor), condition B can hold only if d and w covary negatively; it is the 'volume less affected than the linear dimensions' clause. Secondary, reported but not part of the verdict: Thompson's named pair, plaice (Pleuronectes platessa) vs haddock (Melanogrammus aeglefinus), if both are in the data: depth ratio expected ~2, width ratio ~0.5, k ratio ~1. Note they are in different orders, so this pair is not 'related' by the family criterion." ;
+    delphi:evidenceAgainst "Within families, relatively deep species are also relatively wide, not narrower: the family-centred correlation is +0.53, positive in 90% of the 195 families (median +0.56). As a result ln k varies more (SD 0.35) than ln depth/SL (0.22) or ln width/SL (0.18), the opposite of Thompson's 'volume less affected than the linear dimensions'." ;
+    delphi:evidenceAgainst "Both ratios are divided by standard length, so overall elongation (slender vs stocky species) makes them covary positively. The pre-registered test follows Thompson's own framing ('at a given length'), but it does not isolate depth-width compensation at fixed cross-sectional area; an analysis that removes elongation (e.g. using depth/width directly or a cross-section measure) was not pre-registered and was not run." ;
+    delphi:evidenceAgainst "Thompson's named pair is partly borne out: plaice is 2.09 times as deep relative to length as haddock (expected ~2) and 0.64 times as wide (expected ~0.5, inside the pre-registered 0.35-0.7 band), but its k is 1.44 times haddock's, outside the pre-registered 0.8-1.25 'nearly equal' band. This pair is descriptive only and not part of the verdict." ;
+    delphi:evidenceAgainst "Specimens are preserved museum fish; mass and width can change with fixation and ethanol storage, and specimens were chosen as adult-sized, not at matched length. These add noise to k but are unlikely to reverse the sign of a +0.53 correlation across 5,670 species." ;
+    delphi:evidenceAgainst "Species means rest on 1-3 specimens; intraspecific variation and measurement error inflate all three SDs, and k (three measurements combined) gets the most." ;
+    delphi:evidenceAgainst "preregistered_at is the time of the pre-registration commit (78fafafa); the committed pre-registration carried an estimated time (21:40Z) written before committing. The data were first downloaded after that commit; criteria are unchanged." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-18--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-18/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-18--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: FishShapes v1: functionally relevant measurements of teleost shape and size on three dimensions (Price et al. 2022)" ;
+    dct:description "standard length, maximum body depth, maximum fish width and mass of 16,523 museum specimens (Smithsonian NMNH), 1-3 per species" ;
+    delphi:hasChecksum "sha256:c190a553be92d7985b6ead2dee503273b10601ea77b1b4293820234b80798bf6" ;
+    prov:atLocation <https://datadryad.org/api/v2/versions/183047/download> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.vt4b8gtvf> ;
+    dct:license "CC0 1.0 (Dryad); the README asks users to cite Price et al. 2022, Ecology 103:e3829" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch17-18> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-18--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-18/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.411Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch17-18: refutes, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-18--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

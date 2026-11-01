@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Mechanistic-pathway convergence in INDRA" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    dct:description "Move beyond gene lists by constructing evidence-weighted INDRA subnetworks connecting curated morphogenesis phenotypes and learning phenotypes. Compare shared causal intermediates and signed paths to degree-preserving, evidence-count-matched network rewires; require statement-level provenance and hold out papers mentioning both domains." ;
+
+    delphi:proposedTest "Mechanistic convergence requires at least twofold excess shared intermediates with empirical P below 0.001 and replication after removing all ion-channel genes; null-level paths refute broad convergence." ;
+    delphi:context "Fails if: The result is driven by fewer than five hubs or by statements from cross-domain review papers." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Ground phenotype-associated genes and retain statements with primary evidence. 2. Remove cross-domain papers to prevent literature leakage. 3. Compute shared intermediates, signed-path enrichment and pathway conductance. 4. Run 10000 constrained rewires preserving node degree and statement evidence bins." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: INDRA literature coverage and causal direction are uneven across developmental systems." ;
+    skos:note "Tool: indra-cogex" ;
+    skos:note "Tool: network-statistics" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to morphogenesis-cognition-gene-overlap, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.847Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to morphogenesis-cognition-gene-overlap: Mechanistic-pathway convergence in INDRA" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

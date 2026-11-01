@@ -1,0 +1,99 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-11--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch04-11: supports, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "The first 1,000,000 decimal and the first 1,000,000 hexadecimal digits of pi after the point show no statistically significant regularity under a fixed battery of frequency, block, poker, gap, serial-correlation, spectral and compression tests, i.e. they are indistinguishable from i.i.d. uniform digits by these tests." ;
+    delphi:passCriterion "Pre-registered. For each base b in {10, 16}, on N = 1,000,000 digits after the point, compute 10 p-values: (1) digit frequency chi-square (b - 1 df); (2) non-overlapping pair chi-square (b^2 - 1 df); (3) non-overlapping triple chi-square (b^3 - 1 df); (4) poker test on non-overlapping 5-digit hands by number of distinct digits (probabilities b!/(b-r)! S(5, r) / b^5; categories with expected count < 5 merged into the next); (5) gap test for digit 0 (gap lengths 0..3b-1 and >= 3b against the geometric law with p = 1/b); (6-8) serial correlation at lags 1, 2, 3 (z = r sqrt(N - lag), two-sided normal); (9) maximum periodogram ordinate of the centred digits over the N/2 Fourier frequencies (p = 1 - (1 - exp(-max I / mean I))^(N/2)); (10) lzma (preset 9 extreme) size of the digit string (one byte per digit) compared with 20 strings of N uniform random digits from numpy PCG64 (seed 20261031): two-sided normal p of z = (size - mean) / sd. 20 p-values in total. 'supports' if no p-value is below 1e-4 and at most 2 are below 0.01 (under the null, P(>= 3 of 20 below 0.01) is about 0.1 %). Data validity: the published decimal digits must agree with digits computed independently by analysis.py (Chudnovsky series, exact integer arithmetic) at all 1,000,000 positions, and with the OEIS A000796 b-file; the computed hexadecimal digits must agree with the OEIS A062964 b-file. Any disagreement makes the verdict 'inconclusive' with reason 'other'." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if any p-value is below 1e-6 or 4 or more p-values are below 0.01. Otherwise, if neither the pass nor the refute condition holds (exactly 3 below 0.01, or a minimum p in [1e-6, 1e-4)), 'mixed'." ;
+    delphi:expectedObservation "All 20 p-values from the fixed battery on 10^6 decimal and 10^6 hexadecimal digits of pi are consistent with uniform i.i.d. digits: none below 1e-4 and at most 2 below 0.01." ;
+    delphi:disconfirmingObservation "A p-value below 1e-6, or 4 or more of the 20 below 0.01, i.e. a detectable regularity in the digits." ;
+    delphi:admissibleDatasets "Digits of pi from a published digit file whose every digit is checked against an independent exact computation and against an independent tabulation (OEIS); random references from a seeded standard PRNG. Digits must start right after the point and be contiguous." ;
+    delphi:inferenceMethod "Ten classical randomness tests per base (chi-square frequency, pair, triple, poker, gap; serial correlation lags 1-3; maximum periodogram; lzma size against 20 PRNG references), p-values counted against the pre-registered thresholds at alpha = 0.01 with the binomial multiplicity rule above." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py computes pi to 1,000,020 digits in base 10 and in base 16 by the Chudnovsky series with exact integer binary splitting (28 s), downloads the published 1,000,000-digit decimal file and the OEIS b-files and compares them digit by digit with the computation, then runs the pre-registered ten-test battery in each base on the first 10^6 digits after the point: chi-square tests of digit, non-overlapping pair and triple frequencies, a 5-digit poker test, a gap test for digit 0, serial correlations at lags 1-3, a maximum-periodogram test and an lzma size comparison with 20 PRNG digit strings. The 20 p-values are counted against the pre-registered thresholds." ;
+    rdfs:comment "Measured: [object Object] p-values of the pre-registered battery (minimum: maximum-periodogram test, base 16) (n = 2000000, deterministic digits; p-values are the tests' own (asymptotic chi-square / normal approximations); the lzma p-value depends on the 20-sample PRNG reference). Interpretation: 'For practical purposes completely random' is read as: a standard battery of statistical tests of the kind used to vet random number generators finds no significant regularity. The claim's scope is 'any base'; bases 10 and 16 are tested (base 2 is tested separately in wolfram2002-ch10-15). Wolfram refers to 'all computed digits' (then about 2 x 10^11); this test examines only the first 10^6 digits in each base, so it can refute the claim (a regularity in a prefix would be a regularity) but supports it only for that prefix and that battery. Normality of pi is an open problem and is not what is tested. The published digit file is used for the decimal tests; the independent computation serves to validate it, and supplies the hexadecimal digits." ;
+    delphi:evidenceAgainst "The pass condition holds with a wide margin: no p-value below 0.01 (smallest 0.080, the base-16 maximum-periodogram test), and lzma compresses pi's digits to within 0.2 and 0.8 standard deviations of uniform random digit strings in base 10 and base 16. The published file agrees with the independent computation at all 10^6 positions and both OEIS b-files agree at 19,999 positions." ;
+    delphi:evidenceAgainst "Only the first 10^6 digits in each of two bases were tested, against roughly 2 x 10^11 digits computed when Wolfram wrote and about 10^14 today; the result supports the claim for this prefix and battery and says nothing about normality, which remains unproved." ;
+    delphi:evidenceAgainst "No positive control (a known non-random digit sequence) was pre-registered for this battery; the same chi-square, serial and compression tests readily reject structured sequences (see e.g. the Champernowne results in wolfram2002-ch10-14), but their power against subtle regularities in pi was not measured here." ;
+    delphi:evidenceAgainst "Chi-square and normal p-values are asymptotic; every cell has expected count >= 5 (smallest: hexadecimal triples, about 81)." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-4>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-5> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-11/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Pi to 1,000,000 decimal places (Pi-Search page, angio.net)" ;
+    dct:description "the decimal digits tested (downloaded to data/, not committed)" ;
+    delphi:hasChecksum "sha256:b50ea720602439dcb8a56265b75fadfa4d0a0fbd46d9705693dde14b8a053fb0" ;
+    prov:atLocation <https://www.angio.net/pi/digits/pi1000000.txt> ;
+    prov:wasDerivedFrom <https://www.angio.net/pi/> ;
+    dct:license "unstated (mathematical constant)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: First 1,000,000 decimal and 1,000,000 hexadecimal digits of pi computed by analysis.py (Chudnovsky series, binary splitting, exact integer arithmetic, 20 guard digits)" ;
+    dct:description "independent validation of the published decimal digits; source of the hexadecimal digits tested" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A000796, decimal expansion of pi, b-file (20,000 terms)" ;
+    dct:description "independent tabulation cross-check of decimal digits" ;
+    delphi:hasChecksum "sha256:f8772370d624d403f056e3e3d4aadb15fec135d5075b5506053eb86460f4e20b" ;
+    prov:atLocation <https://oeis.org/A000796/b000796.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A000796> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-4> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A062964, hexadecimal expansion of pi, b-file (20,000 terms)" ;
+    dct:description "independent tabulation cross-check of hexadecimal digits" ;
+    delphi:hasChecksum "sha256:d8e7bd8854beb2ff7d845d98bc6d3c663402f42db1d92701cb875dd5bd60bd8e" ;
+    prov:atLocation <https://oeis.org/A062964/b062964.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A062964> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-11--claim-test--dataset-5> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: 20 strings of 1,000,000 uniform random digits per base, numpy PCG64 seed 20261031 (generated by analysis.py)" ;
+    dct:description "reference distribution of lzma compressed size" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch04-11> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-11--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-11/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.416Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch04-11: supports, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-11--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

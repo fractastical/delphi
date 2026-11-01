@@ -1,0 +1,83 @@
+{
+  "claim_id": "thompson1917-ch05-06",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "cell shape / sphericity per cell over time for naked amoeboid cells (time-lapse)",
+    "activity state per cell: motility (speed), feeding, or metabolic activity, labelled independently of shape",
+    "encystment status / timing per cell",
+    "cortical tension or its spatial uniformity (e.g., micropipette, AFM or cortex-marker intensity)"
+  ],
+  "datasets": [
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL) – amoeboid cell records, e.g. CIL:812 and CIL:7325–7328 (Dictyostelium discoideum)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images/812",
+      "doi": "10.6075/j0kp81fw",
+      "license": "CC0-1.0 (CIL:812 per DataCite rightsList)",
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T01:05:00Z", "method": "GET site keyword search ?k=amoeba (200 but empty 0-byte body); DataCite query '\"Cell Image Library\" AND (Amoeba OR amoeboid OR Dictyostelium)'; GET DataCite record 10.6075/j0kp81fw; GET images/812", "http_status": 200 },
+      "variables_present": ["time-series micrographs of amoeboid Dictyostelium cells with membrane and actin markers (CIL:812: 'time series stack shows an amoeba (Dictyostelium discoideum) trying very hard to ingest a yeast cell', GFP-PLCdelta2 membrane marker, mRFP-LimEdelta actin marker)", "amoeboid shape during an active (phagocytic) phase"],
+      "variables_missing": ["resting / encysted cells of the same lineage", "a classified survey of active vs resting cells", "cortical tension"],
+      "scope": "34 DataCite records for CIL amoeboid/Dictyostelium images; individual anecdotal image series, mostly Dictyostelium, one Ascaris sperm",
+      "evidence": "DataCite total 34; first hits CIL:812, CIL:7325, CIL:7326, CIL:7327, CIL:7328 'Dictyostelium discoideum, cell by organism, eukaryotic cell, amoeboid cell'. CIL:812 landing 200, CC0. The CIL site search returned an empty page so the archive-wide count could not be read.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=amoeba%20OR%20Dictyostelium%20OR%20Acanthamoeba&collection=bioimages",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:05:00Z", "method": "GET BioStudies search API: 'amoeba OR Dictyostelium OR Acanthamoeba' and 'encystment OR encystation OR cyst amoeba' in collection bioimages", "http_status": 200 },
+      "variables_present": [
+        "S-BIAD901 'Adaptive Pathfinding by Nucleokinesis during Amoeboid Migration' (amoeboid-migrating cells, time-lapse)",
+        "S-BIAD3674 'ChemoTrack: single-cell migration trajectories to precisely defined chemotactic signals' (1,467 files, released 2026-06-27)",
+        "S-BIAD598 SEM images of protists with taxonomic annotations (Tara Oceans Marquesas, 1,075 files, released 2022-12-25)",
+        "S-BIAD3379 Acanthamoeba castellanii mitochondrial proteome imaging"
+      ],
+      "variables_missing": ["encystment time-lapse of naked amoebae (no dataset found; 'cyst' hits are MDCK cysts and germ-cell cysts)", "cortical tension", "shape-independent rest/activity labels for free-living amoebae"],
+      "scope": "3 hits for amoeba/Dictyostelium/Acanthamoeba; 27 for encystment-related terms, almost all false positives (MDCK cysts, germline cysts)",
+      "evidence": "Search totals 3 and 27 with titles as listed. S-BIAD901 and S-BIAD3674 concern migrating (active) cells, mostly animal cells in confinement/chemotaxis; S-BIAD598 is fixed SEM of marine protists (static shapes, no activity state).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=organism&value=Dictyostelium%20discoideum",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:06:00Z", "method": "GET searchengine image search organism=Dictyostelium discoideum", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["any Dictyostelium images"],
+      "scope": "IDR-wide",
+      "evidence": "results list empty (0) for organism = Dictyostelium discoideum.",
+      "verdict": "not-found",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "\"Cell Image Library\" AND (Amoeba OR amoeboid OR Dictyostelium)", "url": "https://api.datacite.org/dois?query=%22Cell%20Image%20Library%22%20AND%20(Amoeba%20OR%20amoeboid%20OR%20Dictyostelium)&page[size]=6", "hits": 34, "note": "CIL:812, CIL:7325–7328 Dictyostelium amoeboid cells; CIL:44001 Ascaris sperm" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "amoeba OR Dictyostelium OR Acanthamoeba", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=amoeba%20OR%20Dictyostelium%20OR%20Acanthamoeba&collection=bioimages", "hits": 3, "note": "S-BIAD3379, S-BIAD901, S-BIAD3674" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "encystment OR encystation OR cyst amoeba", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=encystment%20OR%20encystation%20OR%20cyst%20amoeba&collection=bioimages", "hits": 27, "note": "mostly MDCK/germline cysts; S-BIAD598 protist SEM collection is the one protist dataset" },
+    { "source": "IDR search engine", "query": "organism = Dictyostelium discoideum", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=organism&value=Dictyostelium%20discoideum", "hits": 0, "note": "" },
+    { "source": "Zenodo", "query": "(Amoeba OR Dictyostelium) (shape OR morphology) (time-lapse OR tracking), type dataset", "url": "https://zenodo.org/api/records?q=(Amoeba%20OR%20Dictyostelium)%20(shape%20OR%20morphology)%20(time-lapse%20OR%20tracking)&type=dataset&size=6", "hits": 38125, "note": "loose; top hits are Dictyostelium social-evolution datasets (fruiting body morphology 14827139, dormant amoeba predation 4754252), not single-cell shape/activity time series" },
+    { "source": "Dryad", "query": "amoeba cell shape motility encystment", "url": "https://datadryad.org/api/v2/search?q=amoeba%20cell%20shape%20motility%20encystment", "hits": 0, "note": "" }
+  ],
+  "status": "partial",
+  "summary": "Open images of active amoeboid cells exist (Cell Image Library Dictyostelium time series such as CIL:812, CC0; BioImage Archive migration datasets S-BIAD901 and S-BIAD3674), and S-BIAD598 gives 1,075 fixed SEM images of protists with taxonomy, but no dataset pairs cell shape with an independent activity/rest label or follows naked amoebae through encystment, and none records cortical tension. The active-phase side is illustrated; the resting/encysting side and the tension variable are missing.",
+  "next_step": "Record or locate time-lapse of a free-living amoeba (e.g., Acanthamoeba) through starvation-induced encystment with speed and sphericity per frame; add cortical-tension measurements from the literature as a separate variable.",
+  "obstacles_confirmed": [
+    "Cell state labels and tension measurements are rarely both present.",
+    "Images are anecdotal relative to a survey of naked cells.",
+    "Activity and 'rest' are often inferred from the shape being explained."
+  ]
+}

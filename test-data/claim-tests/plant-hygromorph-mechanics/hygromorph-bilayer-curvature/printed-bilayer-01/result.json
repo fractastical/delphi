@@ -1,0 +1,23 @@
+{
+  "claim_id": "hygromorph-bilayer-curvature",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/hygromorph-bilayer-curvature",
+  "project": "plant-hygromorph-mechanics",
+  "status": "preregistered",
+  "data_kind": "physical",
+  "hypothesis": "If the Timoshenko bilayer law holds for a fabricated hydrogel bilayer, the change in curvature of a 3 mm wide, 30 mm long printed strip between the reference state (30 % relative humidity, 23 C) and equilibrium in water, predicted from independently measured layer thicknesses h1 and h2, moduli E1 and E2 and free swelling strains eps1 and eps2 of single-layer strips as kappa = 6(1+m)^2 / (h [3(1+m)^2 + (1+mn)(m^2 + 1/(mn))]) (eps1 - eps2) with m = h1/h2 and n = E1/E2, equals the measured change in curvature of the same bilayers; and the time to reach 1 - 1/e of the final curvature change scales as the square of the total thickness.",
+  "pass_criterion": "Pre-registered (claim supported). For each of the two resin pairs, r = log10(kappa_pred / kappa_meas) is computed per strip from the committed prediction. Supported if, for each pair, the predicted and measured curvature changes have the same sign in at least 90 % of the strips, the median |r| over its 15 mismatch strips is at most 0.18 (within a factor of 1.5), and no thickness group has median |r| above 0.48. Controls: the zero-mismatch strips have |kappa| at most 0.1 of the predicted |kappa| for the mismatch strips of the same geometry, and the flipped-order strips reverse sign. Response time: for each pair, the slope of log t63 on log total thickness has a 95 % confidence interval that contains 2 and has half-width at most 0.4.",
+  "fail_criterion": "Pre-registered (claim refuted). For either pair, the median |r| over its mismatch strips exceeds 0.48 (off by more than a factor of 3), or the measured and predicted signs disagree in more than 25 % of the strips; or the 95 % confidence interval of the t63 slope for either pair excludes 2 and has half-width at most 0.4. A median |r| between 0.18 and 0.48 in either pair, with the controls passing, is 'mixed'. If the controls fail (zero-mismatch strips curve by more than 0.1 of the predicted mismatch curvature, or flipped strips do not reverse sign), the fabrication is asymmetric and the verdict is 'inconclusive' with reason 'other'. If the propagated uncertainty on the prediction exceeds a factor of 1.5, or a pair cannot be fabricated with layer-thickness error under 20 micrometres, the verdict is 'inconclusive' with reason 'underpowered'.",
+  "planned_datasets": [
+    "printed-bilayer-01 specimens (this work): 45 bilayer strips and at least 10 single-layer strips"
+  ],
+  "test_contract": {
+    "expected_observation": "Printed bilayers curve by the amount the Timoshenko formula gives from independently measured thicknesses, moduli and swelling strains; the curvature has the sign of the more-swelling layer on the convex side; zero-mismatch strips do not curve; and the response time grows as thickness squared.",
+    "disconfirming_observation": "Measured curvature off by more than a factor of 3 from the committed prediction, or of opposite sign, or a t63-versus-thickness slope whose confidence interval excludes 2, with the controls behaving as required.",
+    "admissible_datasets": "Specimens fabricated for this test, with inputs (E, eps, thickness) measured on separate single-layer strips of the same resin batch and curing protocol, before the bilayer curvature is measured. Resin pairs and geometry are fixed before printing. Measurement of the bilayer curvature is blind to the prediction.",
+    "inference_method": "Prediction from measured inputs by model.py (Monte Carlo over the stated measurement standard deviations), committed before the curvature measurement; per-strip r = log10(kappa_pred/kappa_meas); per-pair medians and sign agreement; log-log regression of t63 on total thickness with a 95 % confidence interval on the slope; thresholds as stated."
+  },
+  "interpretation": "The claim is stated for hygroscopic strain. Immersion in water is a step change in boundary water content and gives the same diffusion problem, so it is used as the stimulus for the printed hydrogels; this is a physical analogue, not a humidity step in air. The reference state is 30 % relative humidity rather than a fully dry state, because crosslinked hydrogels are damaged by drying.",
+  "design_stage_note": "design-sweep.json uses assumed ranges for modulus ratio and swelling mismatch, listed in model.py, only to size the specimens. No result is scored from them.",
+  "created": "2026-11-01",
+  "agent": { "kind": "local-agent", "model": "claude-sonnet-5-5", "run": "biomaterials design session", "date": "2026-11-01" }
+}

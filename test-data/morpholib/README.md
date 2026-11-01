@@ -31,3 +31,11 @@ rejected; shared topic or vocabulary is not enough.
 `node scripts/site/build-claim-graph.mjs` attaches the links to each claim as `morpholib` in
 `docs/claims.json` and fails if a link names a claim that no longer exists. Over MCP, the claim
 tools return them in `status.morpholib`, and `delphi_graph` takes `morpholib: "tests" | "models" | "any"`.
+
+`python3 scripts/site/morpholib-thumbs.py` fetches each linked model's committed animation from
+morpholib's `docs/media/` at the pinned commit, takes its final frame and writes a small JPEG to
+`docs/thumbs/<morpholib-id>.jpg`, with `docs/thumbs/index.json` recording the source file and
+frame. The claim graph shows it as the picture on the claim's card (black frame: the model tests
+the claim; grey: it models the mechanism), and `docs/claims.json` carries it as `thumbnail`. Run
+it after changing `links.json` or its pinned commit; models with no media are listed under
+`no_media` in the index.

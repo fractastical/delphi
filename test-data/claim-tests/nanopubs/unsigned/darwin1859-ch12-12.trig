@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-12--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-12: refutes, confidence 0.3" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.3"^^xsd:double ;
+    delphi:hypothesis "For endemic vascular plants of oceanic islands, the nearest relatives outside the island group on an independent synthetic phylogeny are, in a large majority of cases, native to the nearest continent or to the island group's own neighbouring islands." ;
+    delphi:passCriterion "Pre-registered: endemics of island group A = WCVP accepted non-hybrid species whose non-doubtful native records (introduced = 0) all lie in A. For each genus containing such an endemic, all WCVP accepted species are matched exactly to Open Tree (TNRS, context 'Land plants') and the induced subtree of the synthetic tree is fetched. For a focal endemic, the outside relatives O are the non-A tips of the smallest clade containing the focal tip and >= 1 non-A tip. The focal endemic is 'near-related' if more than half of O have a native record in A's pre-registered near source S_A (the TDWG level-1 continent nearest to A, plus A's own TDWG level-2 region, i.e. other near islands). s_A = fraction near-related. Island groups with < 10 focal endemics are dropped. SUPPORTS ('almost universal rule') if pooled s >= 0.75 AND s_A >= 0.6 in at least 75% of remaining island groups." ;
+    delphi:failCriterion "Pre-registered: REFUTES if pooled s < 0.5 or if s_A < 0.5 in a majority of remaining island groups. Any other outcome is MIXED. Fewer than 5 island groups remaining: inconclusive (underpowered). WCVP or Open Tree unreachable: inconclusive (data-unavailable). As a descriptive control, the fraction of all non-A congeners native to S_A is reported for each island group." ;
+    delphi:expectedObservation "In a large majority of island endemics, the nearest relatives outside the island group are native to the nearest continent or the island group's own region." ;
+    delphi:disconfirmingObservation "Nearest outside relatives of island endemics are mostly native to more distant regions." ;
+    delphi:admissibleDatasets "An expert checklist coding native ranges on a fixed regional scheme and a phylogeny estimated independently of Darwin's argument; open access; island groups with at least 10 scorable endemics." ;
+    delphi:inferenceMethod "Per endemic, majority rule on native regions of the outside relatives in the smallest clade on the Open Tree genus subtree; share near-related per island group compared with fixed thresholds (pooled >= 0.75 and >= 0.6 in 75% of groups for support; pooled < 0.5 or majority of groups < 0.5 for refutation)." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Island endemics were WCVP accepted species whose native records all fall in one of the 12 pre-registered island groups (3,928 species in 871 genera). All accepted species of those genera were matched exactly to Open Tree and the induced subtree of the synthetic tree was fetched per genus (783 trees). For each endemic in a genus tree that has species outside the island group (2,918 endemics), the outside relatives were the non-island tips of the smallest clade containing the endemic and at least one outside species; the endemic was near-related if more than half of them are native to the nearest continent (TDWG level 1) or the island group's own level-2 region. Shares per island group and pooled were compared with the pre-registered thresholds; the share of all outside congeners native to the near source is reported as a control, and the subset whose nearest outside clade is a single species is reported as a post-hoc check." ;
+    rdfs:comment "Measured: 0.294 pooled fraction of island endemics whose nearest outside relatives (smallest clade on the Open Tree genus subtree) are mostly native to the nearest continent or the island group's own region (n = 12, island groups with s >= 0.6: 0/12; with s < 0.5: 9/12; endemics scored: 2918). Interpretation: 'Related to those of the nearest continent, or of other near islands' is read as: the closest non-island relatives (sister clade on the genus tree) are native to the nearest continent, with near islands meaning the TDWG level-2 region the island group belongs to. Nearest continents (TDWG level 1) are fixed in advance by great-circle proximity: Galápagos 8 (Southern America), Juan Fernández 8, Cape Verde 2 (Africa), Canaries 2, Madeira 2, Azores 1 (Europe), Hawaii 7 (Northern America), Bermuda 7, Mascarenes (MAU+REU+ROD) 2, Seychelles 2, Tristan da Cunha 2, Fiji 5 (Australasia). Darwin's own contrast with climatically similar distant regions (assessors' suggestion) is not modelled; the test asks only whether the nearest continent dominates. Plants only; genus-level trees, so endemics of island-endemic genera are not scored." ;
+    delphi:evidenceAgainst "The pre-registered criterion is met for refutation (pooled near-related share 0.29; 9 of 12 island groups below 0.5, none at or above 0.6), but this mostly reflects the resolution of the synthetic tree rather than biogeography: the median nearest outside clade contains 80 species, because species absent from every input phylogeny are placed as unresolved members of their genus, so the majority rule then scores the geographic spread of the whole genus. In most groups the near-related share barely exceeds the share of all outside congeners native to the near source (e.g. Galápagos 0.54 vs 0.53; Juan Fernández 0.33 vs 0.31), i.e. the test has little power beyond genus membership." ;
+    delphi:evidenceAgainst "Post hoc (not pre-registered): among the 313 endemics whose nearest outside relative is a single resolved species, 63% are near-related, and Darwin's rule holds well for the Canaries (0.83, n = 77), Galápagos (0.90, n = 10), Mascarenes (0.91, n = 57), Madeira (0.73, n = 22) and Juan Fernández (0.67, n = 12), but fails for Hawaii (0.23, n = 74) and Fiji (0.43, n = 35), whose floras derive largely from Malesia, Australasia and the Pacific rather than from the nearest continent. This post-hoc pattern does not change the verdict but suggests the claim holds for Atlantic and Indian Ocean islands near continents and fails for remote Pacific archipelagos." ;
+    delphi:evidenceAgainst "'Near islands' was operationalised as the island group's own TDWG level-2 region; for Hawaii and Fiji this excludes other Pacific archipelagos that Darwin might count as near islands, which makes these groups harder to pass." ;
+    delphi:evidenceAgainst "Darwin's specific contrast (Galápagos with America rather than with climatically similar Cape Verde, and vice versa) was not modelled; the test only asks whether the nearest continent dominates." ;
+    delphi:evidenceAgainst "Plants only; genus-level trees, so endemics of island-endemic genera (e.g. many Hawaiian lobeliads) were not scored." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-12--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-12--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-12/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-12--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv" ;
+    dct:description "island endemics and the native TDWG level-1/2/3 ranges of their congeners" ;
+    delphi:hasChecksum "sha256:d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa" ;
+    prov:atLocation <https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip> ;
+    prov:wasDerivedFrom <https://sftp.kew.org/pub/data-repositories/WCVP/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-12--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Open Tree of Life synthetic tree opentree16.1 via the v3 API: tnrs/match_names (context Land plants, exact) and tree_of_life/induced_subtree" ;
+    dct:description "genus subtrees of the synthetic tree for 783 genera containing island endemics (106,722 species matched)" ;
+    delphi:hasChecksum "sha256:06f9604d279a566dc2a841f328478a9ababbddbf7cd675cd267803d1db2426bd" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tnrs/match_names> ;
+    delphi:hasChecksum "sha256:ea1cbd57255f12e334924696aceae00e0e179d947c71571cc7f8d47079ef580d" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree> ;
+    prov:wasDerivedFrom <https://tree.opentreeoflife.org/> ;
+    dct:license "CC0 (Open Tree synthesis products)" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-12> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-12--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/darwin-origin/darwin1859-ch12-12/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.394Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-12: refutes, confidence 0.3" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-12--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

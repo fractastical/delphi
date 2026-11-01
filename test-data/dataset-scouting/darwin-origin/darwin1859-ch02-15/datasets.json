@@ -1,0 +1,197 @@
+{
+  "claim_id": "darwin1859-ch02-15",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "species count per genus at successive time slices (fossil genus richness through time, or dated phylogenies)",
+    "geographic occupancy / range size (dominance proxy) per species or genus",
+    "descendant species counts and their ranges, i.e. dated phylogeny with range data"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-occurrences-and-genera",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:17Z",
+        "method": "GET occs/list.json?base_name=Mammalia&limit=1&rowcount; taxa/list.json?base_name=Animalia&rank=genus&limit=1&rowcount; occs ... &show=env,class,time",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil occurrences with taxon name, rank, early/late age (eag, lag, interval names)",
+        "genus-rank taxon records"
+      ],
+      "variables_missing": [
+        "abundance",
+        "range polygons/occupancy (coordinates were not queried in this check)",
+        "phylogenetic descent links between genera"
+      ],
+      "scope": "Fossil animals and others; collection-level sampling",
+      "evidence": "occs for base_name=Mammalia: records_found 128307; taxa/list rank=genus base_name=Animalia: records_found 91043; occurrence records carry fields tna, rnk, eag, lag, oei, cll, phl.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "paleobiology-database-occurrence-counts-2026-10-31"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life synthetic tree and taxonomy (OTT 3.7)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:14Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about and /taxonomy/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic species-level topology of all life (taxonomy-grafted)",
+        "taxonomy for genus membership of tips"
+      ],
+      "variables_missing": [
+        "synthetic tree is a supertree without branch lengths in a form suited to rates; no dated, rate-ready tree"
+      ],
+      "scope": "All life",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_trees 2064, num_source_studies 1931, date_created 2025-12-20; taxonomy/about returned version ott3.7draft3.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "open-tree-of-life-taxonomy-tnrs-2026-10-31"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence and species indices",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://api.gbif.org/v1/occurrence/search?limit=0 and /species/search?rank=GENUS&limit=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "georeferenced occurrence records of extant (and fossil-specimen) taxa",
+        "taxonomic backbone (genus and species names)"
+      ],
+      "variables_missing": [
+        "no trait, abundance-through-time, mating-system or sequence-origin variables"
+      ],
+      "scope": "Global, all taxa",
+      "evidence": "occurrence/search?limit=0 returned count 3887469368; basisOfRecord=FOSSIL_SPECIMEN returned count 10258418; species/search?rank=GENUS returned count 4225471 (name usages across checklists, not unique accepted genera).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "map-of-life",
+      "name": "Map of Life",
+      "landing_url": "https://mol.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:15Z",
+        "method": "GET https://mol.org/ (landing)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no open bulk download or API was found in this check"
+      ],
+      "scope": "Global range maps (per landing page)",
+      "evidence": "Landing page returned 200 (426,658 bytes of HTML); no data endpoint was fetched, so no variable could be confirmed.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree 5",
+      "landing_url": "https://timetree.org/",
+      "access_url": "https://timetree.org/api/pairwise/8795/8797",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:43:16Z",
+        "method": "GET landing; GET https://timetree.org/api/pairwise/8795/8797",
+        "http_status": 200
+      },
+      "variables_present": [
+        "published molecular divergence times between species pairs/taxa (median ages, CI)"
+      ],
+      "variables_missing": [
+        "no bulk table of all genera or tip rates found in this check; clade-wide use needs many pairwise calls"
+      ],
+      "scope": "All taxa with published molecular dating",
+      "evidence": "Pairwise API returned a CSV with columns taxon_a_id, taxon_b_id, scientific_name_a, scientific_name_b, all_total, precomputed_age, precomputed_ci_low, precomputed_ci_high, adjusted_age (example row Rhea pennata vs Rhea americana, 11.44 Ma).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "timetree-5-pairwise-2026-10-31"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB",
+      "query": "genus taxon count, Animalia",
+      "url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Animalia&rank=genus&limit=1&rowcount",
+      "hits": 91043,
+      "note": "genus records"
+    },
+    {
+      "source": "PBDB",
+      "query": "Mammalia occurrences",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mammalia&limit=1&rowcount",
+      "hits": 128307,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "genus size diversification species richness phylogeny",
+      "url": "https://datadryad.org/api/v2/search?q=genus%20size%20diversification%20species%20richness%20phylogeny",
+      "hits": 4,
+      "note": "single-clade studies (Pheidole ants, Lachemilla, Phintella spiders, Transcontinental dispersal); none a cross-taxon genus-size time series"
+    },
+    {
+      "source": "DataCite",
+      "query": "genus size through time fossil diversification dominance",
+      "url": "https://api.datacite.org/dois?query=genus+size+through+time+fossil+diversification+dominance&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 3,
+      "note": "not relevant (bryozoan zooid size, leaf venation)"
+    },
+    {
+      "source": "Open Tree of Life",
+      "query": "tree_of_life/about",
+      "url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "hits": null,
+      "note": "num_tips 2385875"
+    }
+  ],
+  "status": "partial",
+  "summary": "The Paleobiology Database holds genus-level fossil occurrences with stratigraphic ages (the only source here covering richness through time), while living range and descendant data sit in separate resources (GBIF, Open Tree, TimeTree) that are not joined; a dominance measure and ancestor-to-descendant range links are not provided by any of them.",
+  "next_step": "Define a dominance proxy (e.g. number of occupied equal-area cells from PBDB collection coordinates) for one well-sampled clade, pull its genus time series from PBDB, and pre-register the t to t+1 growth test.",
+  "obstacles_confirmed": [
+    "Dominance has no single cross-taxon measure.",
+    "Abundance and dominance of ancestors are barely preserved, so descendant dominance is proxied by living range."
+  ]
+}

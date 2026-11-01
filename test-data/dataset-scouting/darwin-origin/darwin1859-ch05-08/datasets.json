@@ -1,0 +1,225 @@
+{
+  "claim_id": "darwin1859-ch05-08",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T03:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-09"
+  },
+  "variables_needed": [
+    "paired measurements of homologous parts (left/right or fore/hind) on the same individuals",
+    "matched measurements of non-homologous parts on the same individuals",
+    "genetic or developmental covariance estimates (optional second layer)"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://www.morphosource.org/api/media?q=Cervidae&per_page=1 and ?q=Mammalia&per_page=1 (and landing earlier)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D media of vertebrate specimens (CT, surface scans)"
+      ],
+      "variables_missing": [
+        "no measurements; paired/homologous structures would have to be landmarked from the meshes"
+      ],
+      "scope": "Museum specimen media, taxon-patchy",
+      "evidence": "API q=Cervidae returned an empty media list; q=Mammalia returned total_count 5 with per_page=1 (first record: Bettongia ogilbyi sylvatica holotype skull, Photogrammetry). Public API search returned few records for these terms.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "avonet-figshare-v7",
+      "name": "AVONET: morphological, ecological and geographical data for all birds",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "access_url": "https://api.figshare.com/v2/articles/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "license": "CC BY 4.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:44:37Z",
+        "method": "GET https://api.figshare.com/v2/articles/16586228",
+        "http_status": 200,
+        "bytes": 21524673
+      },
+      "variables_present": [
+        "eleven continuous morphological traits for 90020 individuals of 11009 species (raw data in Supplementary dataset 1)"
+      ],
+      "variables_missing": [
+        "trait names were not read (xlsx is 21.5 MB, not downloaded), so fore/hind-limb pairing is unconfirmed",
+        "no bilateral (left/right) measurements stated"
+      ],
+      "scope": "All extant birds",
+      "evidence": "Figshare API: description 'Raw morphological measurements are available from 90020 individuals of 11009 extant bird species'; license CC BY 4.0; file AVONET Supplementary dataset 1.xlsx 21524673 bytes.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-v7"
+    },
+    {
+      "id": "dryad-marsupial-forelimb-integration",
+      "name": "Data from: Developmental constraints do not influence long-term phenotypic evolution of marsupial forelimbs as revealed by interspecific disparity and integration patterns",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.900ng75",
+      "access_url": null,
+      "doi": "10.5061/dryad.900ng75",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:46:46Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.900ng75",
+        "http_status": 200,
+        "bytes": 4209959
+      },
+      "variables_present": [
+        "forelimb morphology across marsupial and placental species with integration (covariation) patterns (per title/abstract)"
+      ],
+      "variables_missing": [
+        "interspecific, not within-species covariance",
+        "forelimb elements, not paired with hindlimb in what was read"
+      ],
+      "scope": "Marsupials and placentals",
+      "evidence": "API: publicationDate 2020-05-14, storageSize 4209959; title and abstract as quoted in variables.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-comparing-g-multi-population",
+      "name": "Data from: Comparing G: multivariate analysis of genetic variation in multiple populations",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.g860v",
+      "access_url": null,
+      "doi": "10.5061/dryad.g860v",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T03:29:10Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi:10.5061/dryad.g860v",
+        "http_status": 200,
+        "bytes": 5158500
+      },
+      "variables_present": [
+        "additive genetic covariance matrices across populations (per abstract)"
+      ],
+      "variables_missing": [
+        "which traits are homologous pairs not inspected"
+      ],
+      "scope": "Multiple populations",
+      "evidence": "API: license CC0-1.0, storageSize 5158500, publicationDate 2013-02-06.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "flybase",
+      "name": "FlyBase",
+      "landing_url": "https://flybase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:46:31Z",
+        "method": "GET https://flybase.org/",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no phenotypic or genetic correlation tables among segmental homologs found at the landing page"
+      ],
+      "scope": "Drosophila genes, alleles, phenotypes",
+      "evidence": "Landing page returned 200 (217422 bytes); no correlation dataset was located.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (general portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:29:11Z",
+        "method": "GET https://datadryad.org/ (landing) and search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset; individual Dryad datasets are listed separately where relevant"
+      ],
+      "scope": "Repository portal",
+      "evidence": "Landing page returned 200; the Dryad search API (/api/v2/search) answered every query in search_log with a total count, so it is a search surface, not a single table.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "fluctuating asymmetry bilateral traits covariance serial homologs",
+      "url": "https://datadryad.org/api/v2/search?q=fluctuating%20asymmetry%20bilateral%20traits%20covariance%20serial%20homologs",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "Dryad",
+      "query": "forelimb hindlimb integration geometric morphometrics mammals",
+      "url": "https://datadryad.org/api/v2/search?q=forelimb%20hindlimb%20integration%20geometric%20morphometrics%20mammals",
+      "hits": 1,
+      "note": "marsupial forelimb integration"
+    },
+    {
+      "source": "Dryad",
+      "query": "genetic correlation wing leg traits quantitative genetics Drosophila",
+      "url": "https://datadryad.org/api/v2/search?q=genetic%20correlation%20wing%20leg%20traits%20quantitative%20genetics%20Drosophila",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "fluctuating asymmetry serial homologs covariation (dataset type)",
+      "url": "https://api.datacite.org/dois?query=fluctuating+asymmetry+serial+homologs+covariation&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "phenotypic integration bilateral serial homologs covariance (dataset type)",
+      "url": "https://api.datacite.org/dois?query=phenotypic+integration+bilateral+serial+homologs+covariance&page%5Bsize%5D=2&resource-type-id=dataset",
+      "hits": 0,
+      "note": null
+    },
+    {
+      "source": "MorphoSource",
+      "query": "API media search Mammalia and Cervidae",
+      "url": "https://www.morphosource.org/api/media?q=Mammalia&per_page=1",
+      "hits": 5,
+      "note": "total_count 5 for Mammalia; empty for Cervidae"
+    }
+  ],
+  "status": "gap",
+  "summary": "No repository dataset was found that gives paired homologous measurements (bilateral or fore/hind) with matched non-homologous measurements per individual; AVONET holds individual-level bird measurements whose trait columns were not opened, and the Dryad marsupial forelimb dataset covers interspecific integration within one limb.",
+  "next_step": "Open the AVONET raw sheet to see whether wing and tarsus-type measurements are paired per individual; otherwise measure left/right and fore/hind elements from MorphoSource meshes for a pre-registered species list.",
+  "obstacles_confirmed": [
+    "Within-species covariance matrices are published piecemeal, not as a global download.",
+    "Measuring existing scans at comparative scale is months of work.",
+    "Public morphology repositories often lack pedigrees needed for genetic covariance."
+  ]
+}

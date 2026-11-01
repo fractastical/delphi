@@ -1,0 +1,243 @@
+{
+  "claim_id": "thompson1917-ch07-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-08",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If hexagons become irregular or elongated where growth adds directional traction, then in the late pupal wing (about 30-32 h APF) the cells of the longitudinal veins L3 and L4, which Etournay et al. 2016 showed undergo convergent extension and differ in shape from their neighbours, must be less often six-sided and more elongated than the cells of the adjoining inter-vein regions L2-L3, L3-L4 and L4-L5, within the same wing and frame.",
+  "pass_criterion": "Pre-registered. In each of WT_1, WT_2, WT_3, take the user-drawn frame-200 ROI polygons (Segmentation/UserFrameRoi.txt: distL3, distL4, distInterL2-L3, distInterL3-L4, distInterL4-L5) and assign each interior cell at frame 200 (and each frame from the last 2 h, by tracking the same cell ids and, for cells that divided, their descendants) to vein or inter-vein by the polygon containing its centre. Per wing, over the last 2 h: f6 and mean elongation magnitude for vein cells and for inter-vein cells. Supported if in at least two of three wings f6(inter-vein) - f6(vein) >= 0.05 and vein cells have the higher mean elongation (the premise that the vein is under directional traction). If vein cells are not more elongated, the premise fails and the force clause is not tested in that wing (counted as neither).",
+  "fail_criterion": "Pre-registered. Refuted if in at least two of three wings vein cells are more elongated but f6(inter-vein) - f6(vein) <= 0, i.e. directional traction does not reduce hexagons. Differences in (0, 0.05) or wings split are 'mixed'. Inconclusive (underpowered) if fewer than 100 vein cells per frame are available. Diagnostic: the same comparison in the first 2 h (before veins are morphologically distinct), where no difference is expected; and area CV in vein versus inter-vein cells, to check that the size clause is not what separates them.",
+  "planned_datasets": [
+    "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing"
+  ],
+  "test_contract": {
+    "expected_observation": "Within one tissue at one time, the region under directional traction (vein, more elongated cells) has a lower six-sided fraction than the adjoining regions under more isotropic conditions (inter-vein), by at least 0.05.",
+    "disconfirming_observation": "Vein cells are more elongated but at least as often six-sided as inter-vein cells.",
+    "admissible_datasets": "Expert-segmented, tracked epithelia with author-defined regions of known different mechanical state and a per-cell shape tensor; not produced by a segmenter shown in this repo to round junctions.",
+    "inference_method": "Per wing, last 2 h: f6 and mean elongation per region class (vein vs inter-vein); difference thresholds as above, majority of wings; early-window comparison as the within-wing control."
+  },
+  "interpretation": "Thompson's second condition, 'uniform forces', had only a weak within-disc test (elongation deciles in the wing-disc-timelapse run). The pupal wing offers author-defined regions that differ in mechanical history: Etournay et al. 2016 (eLife 5:e14334) showed convergent extension in veins and shape differences between vein and inter-vein cells in exactly these ROIs. Vein identity is used as the proxy for directional traction and cell elongation as the check that the proxy holds. The region polygons are drawn by the dataset authors at frame 200; earlier frames are assigned through TissueMiner cell ids and lineage. Data are already on disk from the pupal-wing-timelapse run of ch07-09; no vein/inter-vein statistics had been computed before this pre-registration.",
+  "datasets": [
+    {
+      "id": "mpi-cbg-tissueminer-wt1-wt2-wt3-etournay-2015-pupal-wing",
+      "name": "TissueMiner example datasets WT_1, WT_2, WT_3: the three wild-type E-cadherin-GFP Drosophila pupal wing time-lapses of Etournay et al. 2015 (eLife 4:e07090), as TissueMiner SQLite databases with the authors' frame-200 region-of-interest polygons (Etournay et al. 2016, eLife 5:e14334)",
+      "landing_url": "https://github.com/mpicbg-scicomp/tissue_miner#datasets",
+      "doi": "10.7554/eLife.14334",
+      "version": "databases dated 2016-01-10 inside the archives",
+      "license": "not stated for the data files; TissueMiner repository BSD-licensed (MPI-CBG), archives offered for public download",
+      "files": [
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_1.tar.gz",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "byte_size": 814414597,
+          "sha256": "994779314e39a906b9e171c7f2da0b12cacd94708bb09d6a70236ca62cec53ae",
+          "role": "WT_1: tar.gz with example_data/WT_1/WT_1.sqlite and Segmentation/UserFrameRoi.txt"
+        },
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_2.tar.gz",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "byte_size": 814341054,
+          "sha256": "119d0facc43b480a7673ef4b8e0405368cccca28fc9456ed0a8767d77c4792dd",
+          "role": "WT_2: tar.gz with example_data/WT_2/WT_2.sqlite and Segmentation/UserFrameRoi.txt"
+        },
+        {
+          "download_url": "http://bds.mpi-cbg.de/tissue_miner/WT_3.tar.gz",
+          "retrieved_at": "2026-11-01T03:59:38Z",
+          "byte_size": 581521619,
+          "sha256": "db5de2a3b6a1547eac5a19227c90cd7408de4b54db6a8992847963996faa8df8",
+          "role": "WT_3: tar.gz with example_data/WT_3/WT_3.sqlite and Segmentation/UserFrameRoi.txt"
+        }
+      ],
+      "role": "three wild-type pupal wings, about 16-33 h APF; author-drawn ROI polygons for veins L3, L4 and inter-veins L2-L3, L3-L4, L4-L5 at frame 200"
+    }
+  ],
+  "method": "Interior cells (no bond with the margin cell) were listed per frame with neighbour number, area and elongation magnitude sqrt(elong_xx^2+elong_xy^2) from the TissueMiner cells table. Each cell at frame 200 was assigned to vein (distL3, distL4) or inter-vein (distInterL2-L3, L3-L4, L4-L5) by the author-drawn polygon containing its centre (1,644-1,787 cells per wing, 19-33 conflicts dropped); earlier frames were assigned by cell id, and mother cells by their daughters' region through cell_histories when the daughters agreed. Per wing, for the last 2 h and the first 2 h: f6, mean neighbour number, mean elongation and area CV of vein and inter-vein cells, the difference f6(inter) - f6(vein), and whether vein cells were the more elongated.",
+  "measured": {
+    "value": -0.0685,
+    "unit": "median over wings of f6(inter-vein) - f6(vein) in the last 2 h (negative = vein cells more often hexagonal)",
+    "n": 83859,
+    "uncertainty": "per wing -0.010, -0.086, -0.069; first 2 h median -0.023",
+    "extra": {
+      "per_wing": [
+        {
+          "wing": "WT_1",
+          "roi_frame": 200,
+          "cells_assigned_at_roi_frame": 1787,
+          "conflicts": 33,
+          "last_2h": {
+            "vein": {
+              "cells": 3082,
+              "cell_frames_per_frame": 134.0,
+              "f6": 0.7524,
+              "mean_n": 5.997,
+              "sd_n": 0.51,
+              "mean_elong": 0.1918,
+              "area_cv": 0.244
+            },
+            "inter": {
+              "cells": 24415,
+              "cell_frames_per_frame": 1061.5,
+              "f6": 0.7421,
+              "mean_n": 5.996,
+              "sd_n": 0.514,
+              "mean_elong": 0.1246,
+              "area_cv": 0.3
+            },
+            "f6_inter_minus_vein": -0.0103,
+            "vein_more_elongated": true,
+            "elong_ratio_vein_over_inter": 1.54
+          },
+          "first_2h": {
+            "vein": {
+              "cells": 962,
+              "cell_frames_per_frame": 37.0,
+              "f6": 0.4782,
+              "mean_n": 6.043,
+              "sd_n": 0.848,
+              "mean_elong": 0.1616,
+              "area_cv": 0.317
+            },
+            "inter": {
+              "cells": 8828,
+              "cell_frames_per_frame": 339.5,
+              "f6": 0.4972,
+              "mean_n": 5.991,
+              "sd_n": 0.851,
+              "mean_elong": 0.167,
+              "area_cv": 0.459
+            },
+            "f6_inter_minus_vein": 0.019,
+            "vein_more_elongated": false,
+            "elong_ratio_vein_over_inter": 0.968
+          }
+        },
+        {
+          "wing": "WT_2",
+          "roi_frame": 200,
+          "cells_assigned_at_roi_frame": 1705,
+          "conflicts": 30,
+          "last_2h": {
+            "vein": {
+              "cells": 3800,
+              "cell_frames_per_frame": 152.0,
+              "f6": 0.8416,
+              "mean_n": 5.97,
+              "sd_n": 0.397,
+              "mean_elong": 0.1895,
+              "area_cv": 0.253
+            },
+            "inter": {
+              "cells": 25715,
+              "cell_frames_per_frame": 1028.6,
+              "f6": 0.7554,
+              "mean_n": 6.006,
+              "sd_n": 0.505,
+              "mean_elong": 0.1186,
+              "area_cv": 0.306
+            },
+            "f6_inter_minus_vein": -0.0862,
+            "vein_more_elongated": true,
+            "elong_ratio_vein_over_inter": 1.598
+          },
+          "first_2h": {
+            "vein": {
+              "cells": 1788,
+              "cell_frames_per_frame": 68.8,
+              "f6": 0.476,
+              "mean_n": 5.987,
+              "sd_n": 0.881,
+              "mean_elong": 0.1471,
+              "area_cv": 0.365
+            },
+            "inter": {
+              "cells": 10598,
+              "cell_frames_per_frame": 407.6,
+              "f6": 0.4532,
+              "mean_n": 5.968,
+              "sd_n": 0.86,
+              "mean_elong": 0.1807,
+              "area_cv": 0.469
+            },
+            "f6_inter_minus_vein": -0.0228,
+            "vein_more_elongated": false,
+            "elong_ratio_vein_over_inter": 0.814
+          }
+        },
+        {
+          "wing": "WT_3",
+          "roi_frame": 200,
+          "cells_assigned_at_roi_frame": 1644,
+          "conflicts": 19,
+          "last_2h": {
+            "vein": {
+              "cells": 4272,
+              "cell_frames_per_frame": 170.9,
+              "f6": 0.831,
+              "mean_n": 5.977,
+              "sd_n": 0.417,
+              "mean_elong": 0.1991,
+              "area_cv": 0.25
+            },
+            "inter": {
+              "cells": 22575,
+              "cell_frames_per_frame": 903.0,
+              "f6": 0.7625,
+              "mean_n": 6.003,
+              "sd_n": 0.488,
+              "mean_elong": 0.1108,
+              "area_cv": 0.27
+            },
+            "f6_inter_minus_vein": -0.0685,
+            "vein_more_elongated": true,
+            "elong_ratio_vein_over_inter": 1.798
+          },
+          "first_2h": {
+            "vein": {
+              "cells": 1968,
+              "cell_frames_per_frame": 78.7,
+              "f6": 0.4553,
+              "mean_n": 5.956,
+              "sd_n": 0.892,
+              "mean_elong": 0.1437,
+              "area_cv": 0.409
+            },
+            "inter": {
+              "cells": 9707,
+              "cell_frames_per_frame": 388.3,
+              "f6": 0.4256,
+              "mean_n": 5.974,
+              "sd_n": 0.929,
+              "mean_elong": 0.1819,
+              "area_cv": 0.466
+            },
+            "f6_inter_minus_vein": -0.0297,
+            "vein_more_elongated": false,
+            "elong_ratio_vein_over_inter": 0.79
+          }
+        }
+      ],
+      "verdict_counts": {
+        "wings_supports": 0,
+        "wings_refutes": 3,
+        "wings_premise_fails": 0,
+        "wings_vein_cells_per_frame_lt_100": 0
+      },
+      "median_f6_inter_minus_vein_first_2h": -0.0228
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.6,
+  "caveats": [
+    "Pre-registered refutation criterion met in 3 of 3 wings: in the last 2 h vein cells are 1.5-1.8 times more elongated than inter-vein cells (premise holds) yet are at least as often six-sided: f6 0.75/0.84/0.83 in veins against 0.74/0.76/0.76 in inter-veins (difference -0.01 to -0.09). In the first 2 h, before veins are distinct, vein cells are not more elongated (ratio 0.8-1.0) and f6 differs by -0.03 to +0.02, as expected for the control window.",
+    "Thompson's sentence says hexagons under directional traction become 'irregular or elongated'. This run operationalised 'irregular' as a lower six-sided fraction and finds the opposite; the 'elongated' half is literally what the data show: convergent extension stretches vein cells without breaking six-fold topology, and the stretched cells are if anything better ordered (SD of neighbour number 0.40-0.51 in veins against 0.49-0.51; area CV 0.24-0.25 against 0.27-0.31). Readers who take the disjunction at face value will count this as confirming the 'elongated' arm; the pre-registered reading, that traction disrupts hexagonal packing, is refuted.",
+    "Part of the vein advantage may be the size clause rather than the force clause: vein cells have lower area CV, which the top-level RPE run associates with more hexagons. The two conditions are confounded here in the direction opposite to Thompson's expectation for traction.",
+    "Region membership is defined at frame 200 by the authors' polygons and propagated backwards by cell identity and lineage; cells that moved across a boundary over 17 h keep their final label. Vein ROIs cover 134-171 interior cells per frame in the last 2 h (above the 100 pre-registered minimum) and 37-79 in the first 2 h, so the early control is less powered.",
+    "Historical claim, one tissue, one lab; the within-disc elongation-decile result (wing-disc-timelapse run) went the other way (weakly fewer hexagons where cells are more elongated), so the force clause is unsettled across the two tissue states rather than refuted outright. Data were on disk before pre-registration (commit fa08361f); no vein/inter-vein statistic had been computed before it."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor local session, hexagon follow-up",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "claim_id": "thompson1917-ch03-11",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:46:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "adult body mass per species (at least human, rabbit, guinea pig; ideally many mammals)",
+    "a fitted postnatal growth-rate parameter per species (e.g. von Bertalanffy or Gompertz rate constant)",
+    "duration of growth per species (age at growth cessation, proxied by age at maturity)",
+    "birth/neonate mass per species (to anchor the growth curve)"
+  ],
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database (build 15)",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "access_url": "https://genomics.senescence.info/species/dataset.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:40:00Z", "method": "HEAD landing_url (301 -> 200); HEAD and GET dataset.zip (200, application/zip, 169150 bytes), parsed anage_data.txt", "http_status": 200, "bytes": 169150 },
+      "variables_present": [
+        "Adult weight (g)",
+        "Growth rate (1/days) (fitted postnatal growth constant) for 559 species, 250 of them Mammalia",
+        "Female maturity (days) and Male maturity (days) as growth-duration proxies",
+        "Birth weight (g), Weaning weight (g), Weaning (days)",
+        "Maximum longevity (yrs)"
+      ],
+      "variables_missing": ["age at growth cessation as such (only maturity ages)", "full growth trajectories (one parameter per species, no time series)"],
+      "scope": "4,646 species rows; all three named species present: Homo sapiens (adult 62035 g, growth rate 0.0005/d, female maturity 4745 d), Oryctolagus cuniculus (1800 g, 0.0228/d, 730 d), Cavia porcellus (728 g, 0.0106/d, 66 d)",
+      "evidence": "Zip contains anage_data.txt and release.html; header columns include 'Adult weight (g)', 'Growth rate (1/days)', 'Female maturity (days)', 'Male maturity (days)', 'Birth weight (g)', 'Weaning weight (g)', 'Maximum longevity (yrs)'; 559 rows have a non-empty growth rate.",
+      "verdict": "holds",
+      "reuses_organism_dataset": "anage-build-15"
+    },
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection of DEB parameters",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/AmPdata/AmPdata.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:43:00Z", "method": "HEAD landing_url (200); GET entries_web/<species>/<species>_res.html for Oryctolagus_cuniculus, Cavia_porcellus, Homo_sapiens (all 200); GET Cavia_porcellus_stat.html (200 but body undecodable/compressed, 2062 bytes); HEAD AmPdata.zip (200, 23302091 bytes)", "http_status": 200, "bytes": 23302091 },
+      "variables_present": ["species entries exist for all three named species (HTTP 200)", "a bulk data zip (AmPdata.zip, 23.3 MB) is downloadable"],
+      "variables_missing": ["growth-rate, maturity-age and ultimate-weight fields could not be confirmed from the responses received (statistics page body was not readable; zip not downloaded, over 1 MB)"],
+      "scope": "Collection of DEB model parameters and implied traits across animal species; coverage count not confirmed",
+      "evidence": "Three species pages returned 200; AmPdata.zip HEAD returned application/zip, content-length 23302091. Parameter names were not visible in the fetched HTML.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pantheria-1-0-wr05",
+      "name": "PanTHERIA 1.0 (WR05 taxonomy, Aug 2008)",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "access_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:41:00Z", "method": "HEAD landing_url (200); HEAD access_url (200, text/plain, 2359096 bytes); GET first 1500 bytes for header", "http_status": 200, "bytes": 2359096 },
+      "variables_present": [
+        "5-1_AdultBodyMass_g", "5-3_NeonateBodyMass_g", "5-4_WeaningBodyMass_g", "25-1_WeaningAge_d", "23-1_SexualMaturityAge_d", "9-1_GestationLen_d", "3-1_AgeatFirstBirth_d"
+      ],
+      "variables_missing": ["no fitted growth-rate constant (a crude rate can be derived from neonate/weaning mass and weaning age)", "no age at growth cessation"],
+      "scope": "Extant mammals (Wilson & Reeder 2005 taxonomy); row count not read",
+      "evidence": "Header line of the tab-delimited file lists the columns above (positions 7, 24, 34, 33, 28, 16, 11).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pantheria-1-0-wr05"
+    },
+    {
+      "id": "who-child-growth-standards",
+      "name": "WHO Child Growth Standards",
+      "landing_url": "https://www.who.int/tools/child-growth-standards",
+      "access_url": "https://www.who.int/tools/child-growth-standards/standards/weight-for-age",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:43:00Z", "method": "HEAD landing_url (200); HEAD standards/weight-for-age (200)", "http_status": 200, "bytes": null },
+      "variables_present": ["human weight-for-age and length/height-for-age reference curves 0-5 years (per page title; tables not downloaded)"],
+      "variables_missing": ["any non-human species", "growth to adult size (standards stop at 5 years; WHO 2007 reference extends to 19)"],
+      "scope": "Homo sapiens only; one of the three named species",
+      "evidence": "Both pages returned HTTP 200; content not parsed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "mammal growth curves body mass age species von Bertalanffy (resource-type dataset)", "url": "https://api.datacite.org/dois?query=mammal%20growth%20curves%20body%20mass%20age%20species%20von%20Bertalanffy&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "mammal growth curves body mass", "url": "https://api.datacite.org/dois?query=mammal%20growth%20curves%20body%20mass&page%5Bsize%5D=8", "hits": 7, "note": "Galapagos sea lion pup growth (10.5061/dryad.zs7h44jr0, 10.5061/dryad.b8gtht7rx); no multi-species compilation" },
+    { "source": "Dryad", "query": "mammal postnatal growth curves body mass age", "url": "https://datadryad.org/api/v2/search?q=mammal%20postnatal%20growth%20curves%20body%20mass%20age&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "growth curve mammals body mass age", "url": "https://datadryad.org/api/v2/search?q=growth%20curve%20mammals%20body%20mass%20age&per_page=8", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "title:(growth curves mammals)", "url": "https://zenodo.org/api/records?q=title%3A%28growth%20curves%20mammals%29&size=6", "hits": 38221, "note": "fuzzy; top hits are bacterial growth curves and software, nothing on mammal body growth" }
+  ],
+  "status": "data-ready",
+  "summary": "AnAge (build 15, 169 KB zip) carries, per species, adult weight, a fitted postnatal growth-rate constant (559 species, 250 mammals) and ages at maturity, and has rows for human, rabbit and guinea pig, so rate and duration proxies can be compared directly; PanTHERIA adds neonate/weaning masses and ages for mammals. No repository holds complete multi-species growth trajectories; Add-my-Pet likely does via DEB parameters but its fields were not confirmed.",
+  "next_step": "Pre-register the three-species contrast and a mammal-wide decomposition on AnAge 'Growth rate (1/days)' x maturity age vs adult weight; optionally download AmPdata.zip (23 MB) to confirm r_B / a_p / W_wi fields for a second rate-duration source.",
+  "obstacles_confirmed": [
+    "Databases contain endpoints more often than complete growth trajectories: AnAge and PanTHERIA give one growth constant or a few mass-age points per species, not curves.",
+    "Duration of growth is only proxied by age at sexual maturity in the compiled databases."
+  ]
+}

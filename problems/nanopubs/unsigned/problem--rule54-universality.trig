@@ -1,0 +1,72 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/rule54-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Is Rule 54 computationally universal?" ;
+    dct:description "Is elementary cellular automaton Rule 54 capable of universal computation, as Wolfram conjectures, or can a bound on its information transmission rule it out?" ;
+
+    skos:historyNote "Known state: Open since 2002. Martínez, Adamatzky and McIntosh catalogued Rule 54's gliders and collisions and built logic gates in 2006, but no complete emulation of a universal system exists. Wolfram's search of 100 million initial conditions (wolfram2002-ch11-21) found only repetitive and nested structures." ;
+    dct:subject "mathematics" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: A construction (glider-based or otherwise) emulating a known universal system, with the collision table verified by exhaustive simulation and formalized in Lean 4, or" ;
+    skos:scopeNote "Resolved when: A proof that Rule 54 cannot be universal (for example a regularity or transmission bound on all configurations)." ;
+    skos:scopeNote "Refuted if: Partial results only (new gates without a complete emulation) leave the problem open." ;
+    skos:note "Data access: None needed." ;
+    skos:note "Requires: cellular-automaton-simulation" ;
+    skos:note "Requires: glider-collision-search" ;
+    skos:note "Requires: lean4" ;
+
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-21> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-19> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-20> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.chaos.2005.05.013> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1016/j.chaos.2005.05.013> dct:title "Phenomenology of glider collisions in cellular automaton Rule 54 and associated logical gates" ;
+    dct:bibliographicCitation "Martínez, Adamatzky and McIntosh 2006, Phenomenology of glider collisions in cellular automaton Rule 54" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.840Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Is Rule 54 computationally universal?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/rule54-universality> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

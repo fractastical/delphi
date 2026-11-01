@@ -1,0 +1,98 @@
+{
+  "claim_id": "thompson1917-ch02-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "cortical (pial) surface area and cortical or brain mass/volume per species across a wide body-size range of mammals",
+    "a folding index (gyrification, exposed vs total surface) per species",
+    "intestinal mucosal surface area (with villi/folds) and body or gut mass per species, across sizes",
+    "spiral-valve surface area and body mass in sharks (optional third organ)",
+    "body mass per species"
+  ],
+  "datasets": [
+    {
+      "id": "allen-brain-atlas",
+      "name": "Allen Brain Map (Allen Institute brain-map.org API)",
+      "landing_url": "https://portal.brain-map.org/",
+      "access_url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::Product,rma::options%5Bnum_rows$eq100%5D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T01:00:00Z", "method": "HEAD landing_url (301 -> 200); GET RMA API model::Product (200, total_rows 64)", "http_status": 200, "bytes": null },
+      "variables_present": ["reference atlases and imaging data products for mouse (42 products), human (17) and non-human primate (5) brains from which cortical surface can be reconstructed"],
+      "variables_missing": ["no tabulated cortical surface area or folding index per species", "three species only; no body-size series"],
+      "scope": "64 data products; species counts Mouse 42, Human 17, NHP 5",
+      "evidence": "RMA query JSON: success true, total_rows 64; species field counts as listed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "comparative-mammalian-brain-collections",
+      "name": "Comparative Mammalian Brain Collections (brainmuseum.org)",
+      "landing_url": "http://brainmuseum.org/",
+      "access_url": "http://brainmuseum.org/specimens/index.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T01:01:00Z", "method": "HEAD landing_url (200); GET specimens/index.html (200, 45160 bytes HTML, 93 links)", "http_status": 200, "bytes": 45160 },
+      "variables_present": ["photographs and stained section images of whole brains for many mammalian orders (page lists orders such as Rodentia; taxonomy follows Wilson & Reeder 2005)"],
+      "variables_missing": ["no delivered surface-area or gyrification measurements", "no body mass table", "images only, HTML site without API"],
+      "scope": "Many mammal species across orders; count not parsed",
+      "evidence": "Specimen index page text: 'List of Specimens | Explore Collections | Brain Sections | Brain Evolution ...'; order listing visible (e.g. Rodentia).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=brain%20endocast&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T01:01:00Z", "method": "GET API media q='brain endocast' (200, total_count 404)", "http_status": 200, "bytes": null },
+      "variables_present": ["404 media records matching 'brain endocast': 3D endocasts from which exposed-surface folding can be measured in some taxa"],
+      "variables_missing": ["endocasts capture external brain surface only; no cortical thickness or total pial area", "no gut or spiral-valve scans surfaced", "no tabulated measurements"],
+      "scope": "Vertebrate 3D scans; endocast-rich",
+      "evidence": "API response pages.total_count 404 for q=brain endocast.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-universality-human-cortical-folding-s8",
+      "name": "Supplementary Dataset S8 for 'Universality in human cortical folding in health and disease' (Wang et al. 2016, PNAS)",
+      "landing_url": "https://zenodo.org/records/61348",
+      "access_url": "https://zenodo.org/api/records/61348",
+      "doi": "10.5281/zenodo.61348",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:07:00Z", "method": "GET Zenodo record API", "http_status": 200, "bytes": 337920 },
+      "variables_present": ["per-subject total cortical surface area, exposed area and thickness (FreeSurfer-derived, per description) for humans: the surface-vs-volume folding variables within one species"],
+      "variables_missing": ["single species (human)", "no gut data"],
+      "scope": "Homo sapiens, health and disease cohorts; one 338 KB xls",
+      "evidence": "Zenodo metadata: title as given, license cc-by-4.0, publication_date 2016-09-01, file SupplDataS8.xls 337920 bytes; description refers to data extracted from FreeSurfer subjects. Companion: 10.5281/zenodo.2595060 (lobe-wise scaling, 2.3 MB zip).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Allen Brain Map RMA API", "query": "model::Product (all data products)", "url": "https://api.brain-map.org/api/v2/data/query.json?criteria=model::Product,rma::options%5Bnum_rows$eq100%5D", "hits": 64, "note": "Mouse 42, Human 17, NHP 5" },
+    { "source": "MorphoSource API", "query": "media q=brain endocast", "url": "https://www.morphosource.org/api/media?q=brain%20endocast&per_page=1", "hits": 404, "note": null },
+    { "source": "Dryad", "query": "cortical surface area gyrification mammals brain mass", "url": "https://datadryad.org/api/v2/search?q=cortical%20surface%20area%20gyrification%20mammals%20brain%20mass&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "gyrification index mammals", "url": "https://datadryad.org/api/v2/search?q=gyrification%20index%20mammals&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "intestinal surface area scaling vertebrates", "url": "https://datadryad.org/api/v2/search?q=intestinal%20surface%20area%20scaling%20vertebrates&per_page=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "intestinal surface area body mass species villi scaling", "url": "https://api.datacite.org/dois?query=intestinal%20surface%20area%20body%20mass%20species%20villi%20scaling&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "\"cortical surface area\" mammals species (dataset)", "url": "https://api.datacite.org/dois?query=%22cortical%20surface%20area%22%20mammals%20species&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "mammalian cortical folding surface area thickness species", "url": "https://api.datacite.org/dois?query=mammalian%20cortical%20folding%20surface%20area%20thickness%20species&page%5Bsize%5D=8", "hits": 4, "note": "only a human-cortex preprint (10.48550/arxiv.2103.14061) is relevant; the comparative Mota & Herculano-Houzel 2015 table is not deposited as a dataset" },
+    { "source": "Zenodo", "query": "title:(cortical folding) OR title:(gyrification) mammals (dataset)", "url": "https://zenodo.org/api/records?q=title%3A%28cortical%20folding%29%20OR%20title%3A%28gyrification%29%20mammals&type=dataset&size=8", "hits": 3346, "note": "human-only folding datasets: 10.5281/zenodo.61348, 10.5281/zenodo.2595060, 10.5281/zenodo.7132610 (ABIDE local GI), 10.5281/zenodo.19692916 (HCP)" }
+  ],
+  "status": "partial",
+  "summary": "Brain-side data are abundant but narrow: Allen (mouse, human, NHP), 404 endocast media on MorphoSource and brainmuseum.org section images give material to measure folding, and Zenodo holds human cortical surface/thickness tables (10.5281/zenodo.61348, CC BY 4.0), but no cross-species table of cortical surface area vs brain or body mass was found in any repository. For gut mucosal surface area and the shark spiral valve, every search returned zero datasets.",
+  "next_step": "Compile the comparative cortical surface/thickness/volume table from the literature (Mota & Herculano-Houzel 2015 supplement and sources cited there) and a vertebrate intestinal surface-area compilation (Chivers & Hladik-type data) with body masses, deposit them, then pre-register a surface-to-mass scaling test per organ.",
+  "obstacles_confirmed": [
+    "Surface area is rarely annotated directly: repositories hold images and scans, not surface measurements.",
+    "Brain-image archives are dominated by a few model species rather than a body-size series: Allen is mouse/human/NHP only.",
+    "Gut and brain surface areas are scattered by species and by measurement method: no gut surface dataset was found at all."
+  ]
+}

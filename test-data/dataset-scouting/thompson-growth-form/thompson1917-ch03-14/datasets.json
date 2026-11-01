@@ -1,0 +1,108 @@
+{
+  "claim_id": "thompson1917-ch03-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:50:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "size or mass of the same individuals (or a dense cross-section) at closely spaced ages spanning birth or puberty (humans)",
+    "independently dated epoch per individual or cohort (gestational age at birth, age at menarche/peak height velocity, date of metamorphosis)",
+    "size or mass series through metamorphosis in insects and amphibians",
+    "sampling interval fine enough to resolve a change of slope around the epoch"
+  ],
+  "datasets": [
+    {
+      "id": "add-my-pet",
+      "name": "Add-my-Pet (AmP) collection",
+      "landing_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/",
+      "access_url": "https://bio.vu.nl/thb/deb/deblab/add_my_pet/species_list.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:44:00Z", "method": "HEAD landing_url; GET species_list.html and grep for Rana_temporaria|Manduca|Xenopus_laevis (6 matches); GET entries_web/Xenopus_laevis/Xenopus_laevis_res.html", "http_status": 200, "bytes": 3339 },
+      "variables_present": ["per-species age-length / age-weight series digitised from literature (univariate tL, tW data) including metamorphosing species (Xenopus laevis entry present); metamorphosis age as a DEB zero-variate datum for some entries"],
+      "variables_missing": ["individual-level longitudinal series", "human birth/puberty series at fine resolution", "epoch dating independent of the growth curve for most entries"],
+      "scope": "Thousands of animal species, one literature series each; amphibians and insects present but sparse",
+      "evidence": "Landing 200; species list contains Xenopus_laevis and other metamorphosing taxa; the Xenopus results page returned 200 (3,339 bytes). Raw series live in per-species mydata_*.m files (not fetched).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies BioImages collection)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=metamorphosis&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:44:00Z", "method": "HEAD landing_url; GET BioStudies search API query=metamorphosis", "http_status": 200 },
+      "variables_present": ["8 hits for 'metamorphosis'; one is a tubeworm bacteria-induced metamorphosis imaging study (S-BIAD3538), the rest are unrelated EMPIAR cryo-EM entries"],
+      "variables_missing": ["growth (mass or size) time series through metamorphosis", "human growth data"],
+      "scope": "Imaging repository; no growth-curve tables",
+      "evidence": "totalHits 8; no dataset is a size-through-metamorphosis series.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "nhanes",
+      "name": "CDC NHANES body measures and CDC growth-chart reference tables",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "access_url": "https://www.cdc.gov/growthcharts/data/zscore/statage.csv",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:44:00Z", "method": "HEAD landing_url (both assessor URLs, 200 in the ch03-16 check); GET statage.csv first 3 lines", "http_status": 200 },
+      "variables_present": ["cross-sectional stature and weight by age in months (NHANES BMX files); smoothed LMS stature-for-age reference from 24 to 240 months (statage.csv columns Sex,Agemos,L,M,S,P3…P97)"],
+      "variables_missing": ["longitudinal individual series (NHANES is cross-sectional, so individual velocity peaks are averaged out)", "pubertal timing per individual (NHANES has some Tanner-stage/menarche items in questionnaire files, not checked here)", "prenatal and birth-transition data", "non-human species"],
+      "scope": "US humans 0–80+ y (survey); 2–20 y (growth charts)",
+      "evidence": "statage.csv returned 200 with the LMS header shown above; it is a smoothed reference, not raw longitudinal data.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-hqbzkh1md-manduca-feeding-growth",
+      "name": "Data for: Predicting age and mass at maturity from feeding behavior and diet in M. sexta (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.hqbzkh1md",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.hqbzkh1md",
+      "doi": "10.5061/dryad.hqbzkh1md",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:47:00Z", "method": "GET Dryad dataset API", "http_status": 200, "bytes": 52543 },
+      "variables_present": ["Manduca sexta larval growth and age/mass at maturity under diet treatments (lab experiment, storageSize 52,543 bytes)"],
+      "variables_missing": ["growth through pupation/eclosion to adult (series end at larval maturity per the abstract)", "amphibians, humans"],
+      "scope": "One insect species, laboratory",
+      "evidence": "Dryad API returned title and abstract ('impacts of resource quality and feeding behavior on insect life history traits'); exact columns not inspected.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cran-fda-berkeley-growth",
+      "name": "Berkeley Growth Study heights (R package fda, dataset 'growth')",
+      "landing_url": "https://cran.r-project.org/web/packages/fda/index.html",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:47:00Z", "method": "HEAD CRAN package page", "http_status": 200, "note": "the package page was reached; the 'growth' dataset (longitudinal heights of children at 31 ages from 1 to 18 y) was not downloaded or inspected in this session, so its dimensions are stated from package documentation knowledge, not from a fetched response" },
+      "variables_present": ["longitudinal stature of individual children through puberty (per package documentation)"],
+      "variables_missing": ["mass", "independent puberty timing", "birth transition", "non-human species"],
+      "scope": "Small human cohort (tens of children), USA, 1930s–40s",
+      "evidence": "CRAN page 200; dataset contents not verified by fetch.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive (BioStudies API)", "query": "metamorphosis", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=metamorphosis&pageSize=5", "hits": 8, "note": "no growth series" },
+    { "source": "Zenodo", "query": "title:(growth AND metamorphosis AND mass)", "url": "https://zenodo.org/api/records?q=title%3A%28growth%20AND%20metamorphosis%20AND%20mass%29&size=5", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "tadpole mass metamorphosis", "url": "https://datadryad.org/api/v2/search?q=tadpole%20mass%20metamorphosis&per_page=5", "hits": 4, "note": "all four are parasite/predator experiments with endpoint mass at metamorphosis, not growth series" },
+    { "source": "Dryad", "query": "longitudinal height puberty", "url": "https://datadryad.org/api/v2/search?q=longitudinal%20height%20puberty&per_page=5", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "Manduca sexta larval growth mass", "url": "https://api.datacite.org/dois?query=Manduca+sexta+larval+growth+mass&page[size]=5", "hits": 12, "note": "three Dryad datasets; 10.5061/dryad.hqbzkh1md is the one with growth to maturity" }
+  ],
+  "status": "partial",
+  "summary": "Human stature by age is open but cross-sectional (NHANES, CDC growth charts); individual longitudinal series through puberty exist only in small classical cohorts (Berkeley Growth Study via the R fda package, not verified here). For metamorphosis, Add-my-Pet holds literature age-size series for some amphibians and insects and Dryad has lab Manduca growth data, but no repository dataset carries a size series across the metamorphic transition with independently dated epochs for several species.",
+  "next_step": "Assemble a small multi-species table: AmP tL/tW series for 3–5 metamorphosing species with their recorded metamorphosis ages, plus one longitudinal human height cohort with peak-height-velocity age; then pre-register a segmented-regression test.",
+  "obstacles_confirmed": [
+    "Comparable longitudinal mass or size series are sparse outside model species.",
+    "Metamorphic growth series are not gathered as a single designed dataset."
+  ]
+}

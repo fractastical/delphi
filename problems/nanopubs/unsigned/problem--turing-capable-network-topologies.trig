@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> a delphi:Concept, schema:Question ;
+    rdfs:label "Classify the network topologies that admit diffusion-driven instability" ;
+    dct:description "For reaction networks of n species with m diffusing, which interaction sign-patterns (topologies) admit a Turing instability for some parameters, and is it true that for n >= 3 almost all topologies with at least one feedback loop do?" ;
+
+    skos:historyNote "Known state: Turing (1952) settled n = 2 (activator-inhibitor or substrate-depletion sign patterns, with the inhibitor diffusing faster). Marcon et al. (2016) and Scholes et al. (2019) enumerated 2- and 3-node topologies numerically and found many that pattern without differential diffusivity, but there is no proof characterizing the Turing-capable set for general n, and the genericity conjecture is numerical only. turing-ddi has formal status partial in the repo." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-A" ;
+    skos:scopeNote "Resolved when: A theorem, machine-checked in Lean 4 or at least rigorously proved, giving necessary and sufficient sign-pattern conditions for the existence of parameters producing a Turing instability for n = 3, and" ;
+    skos:scopeNote "Resolved when: An exhaustive, reproducible enumeration for n = 3 and n = 4 against which the theorem is checked." ;
+    skos:scopeNote "Refuted if: A 3-node topology that the enumeration finds Turing-capable but the theorem excludes, or vice versa." ;
+    skos:note "Data access: None needed; verification against published topology atlases (Marcon 2016, Scholes 2019) which are open access." ;
+    skos:note "Requires: linear-algebra" ;
+    skos:note "Requires: sign-pattern-matrices" ;
+    skos:note "Requires: enumeration" ;
+    skos:note "Requires: lean4" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: developmental" ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-ddi> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-wavelength> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-morphogen-hypothesis> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rstb.1952.0012> ;
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.14022> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.cels.2019.07.007> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1098/rstb.1952.0012> dct:title "The chemical basis of morphogenesis" ;
+    dct:bibliographicCitation "Turing 1952, The chemical basis of morphogenesis" .
+  <https://doi.org/10.7554/eLife.14022> dct:title "High-throughput mathematical analysis identifies Turing networks for patterning with equally diffusing signals" ;
+    dct:bibliographicCitation "Marcon et al. 2016, High-throughput mathematical analysis identifies Turing networks for patterning with equally diffusing signals" .
+  <https://doi.org/10.1016/j.cels.2019.07.007> dct:title "A Comprehensive Network Atlas Reveals That Turing Patterns Are Common but Not Robust" ;
+    dct:bibliographicCitation "Scholes et al. 2019, A comprehensive network atlas reveals that Turing patterns are common but not robust" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.840Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Classify the network topologies that admit diffusion-driven instability" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

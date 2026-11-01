@@ -1,0 +1,108 @@
+{
+  "claim_id": "thompson1917-ch02-15",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T03:00:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-2/thompson-ch01-05" },
+  "variables_needed": [
+    "3D cell (or blastomere) volume before and after division, from segmented time-lapse microscopy",
+    "3D cell surface area for the same cells before and after division",
+    "total embryo volume across early cleavage stages (to check volume is conserved while surface grows)",
+    "independent energetic or tension measurement (to address the energy-balance clause)"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI BioStudies)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cell%20division%20volume%20segmentation&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T02:50:00Z", "method": "GET BioStudies search API (three queries) and studies/S-BIAD865/info", "http_status": 200, "bytes": null },
+      "variables_present": ["raw 3D/4D microscopy of dividing cells and embryos from which volume and surface can be segmented (e.g. S-BIAD865 time-lapse cell division screen, OME-NGFF, released 2023; S-BIAD1474 chick embryo time-lapse)"],
+      "variables_missing": ["pre-computed per-cell volume and surface area", "a dedicated cleaving-egg (Xenopus / sea urchin / zebrafish) light-sheet study surfaced in the first result pages"],
+      "scope": "Archive-wide; 'cell division volume segmentation' 2254 hits, 'embryo cleavage light-sheet' 206 hits, 'cleavage embryo membrane segmentation' 921 hits",
+      "evidence": "Search API returned totalHits 2254 / 206 / 921; S-BIAD865 info returned ftp link ftp://ftp.ebi.ac.uk/biostudies/fire/S-BIAD/865/S-BIAD865 and released 1693267200000.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bionumbers",
+      "name": "BioNumbers",
+      "landing_url": "https://bionumbers.hms.harvard.edu/",
+      "access_url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&trm=surface+area+volume+ratio+cell",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T02:50:00Z", "method": "HEAD landing (302 to search.aspx); GET search page", "http_status": 200, "bytes": null },
+      "variables_present": ["curated point values of cell surface area/volume ratios (search hits include 'Red cell surface area/volume r…', 'Surface area to volume ratio o…', 'Polyploid cell diameter, surfa…')"],
+      "variables_missing": ["paired before/after-division measurements of the same cell", "cleavage-stage embryo series"],
+      "scope": "Isolated literature values, not time series",
+      "evidence": "Landing returned 302 to /search.aspx; the search page (200) listed several surface-area/volume entries by title; no result count parsed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T02:50:00Z", "method": "HEAD landing_url", "http_status": 200, "bytes": null, "note": "Other scouts report no working search endpoint; not queried further." },
+      "variables_present": [],
+      "variables_missing": ["no programmatic way to locate division time-lapse sets with 3D geometry"],
+      "scope": "Portal reachable; content not enumerable",
+      "evidence": "HEAD 200 on landing page only.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=500",
+      "doi": null,
+      "license": "CC BY 4.0 (IDR default; not verified per study)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T02:55:00Z", "method": "GET IDR OMERO JSON API project list; searchengine image query", "http_status": 200, "bytes": null },
+      "variables_present": ["whole-embryo light-sheet time-lapse projects suitable for cell segmentation: idr0068-shah-zebrafishlightsheet (project 2152), idr0044-mcdole-tardislightsheet mouse embryo (502), idr0099 beetle, idr0118 fly, idr0159 insect light-sheet"],
+      "variables_missing": ["pre-computed cell surface area/volume tables", "an early-cleavage (2–64 cell) egg dataset confirmed in the listing"],
+      "scope": "147 public projects; light-sheet embryo projects listed above",
+      "evidence": "api/v0/m/projects returned 147 projects; names containing 'lightsheet' include idr0068 (zebrafish), idr0044 (mouse TARDIS), idr0099, idr0118, idr0146, idr0159. The searchengine 'all' resource returned an error; image search by Organism returned 200 with an empty results list.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-t06q9-okie-surface-area-scaling",
+      "name": "Data from: General models for the spectra of surface area scaling strategies of cells and organisms (Okie, Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.t06q9",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.t06q9",
+      "doi": "10.5061/dryad.t06q9",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T02:57:00Z", "method": "GET Dryad API dataset record", "http_status": 200, "bytes": 19303 },
+      "variables_present": ["compiled cell surface areas and volumes across cell types (static scaling data)"],
+      "variables_missing": ["before/after division pairs", "embryo cleavage series"],
+      "scope": "Small compiled table (19,303 bytes), cross-species scaling rather than division events",
+      "evidence": "API record: title, CC0, storageSize 19303, abstract on surface-area-to-volume scaling of cells and organisms.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioImage Archive", "query": "embryo cleavage light-sheet", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=embryo%20cleavage%20light-sheet&pageSize=5", "hits": 206, "note": "Top hits were SELMA3D challenge and chick gastrulation; not cleavage-stage eggs." },
+    { "source": "BioImage Archive", "query": "cell division volume segmentation", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=cell%20division%20volume%20segmentation&pageSize=5", "hits": 2254, "note": "S-BIAD865 (genome-wide time-lapse cell division screen, OME-NGFF) is 2D HeLa imaging, not 3D geometry." },
+    { "source": "IDR", "query": "project list filtered for embryo/division/light-sheet", "url": "https://idr.openmicroscopy.org/api/v0/m/projects/?limit=500", "hits": 147, "note": "Light-sheet embryo projects: idr0068, idr0044, idr0099, idr0118, idr0146, idr0159." },
+    { "source": "Dryad", "query": "cell volume division", "url": "https://datadryad.org/api/v2/search?q=cell%20volume%20division&per_page=8", "hits": 9, "note": "dryad.r4n35 (growth homeostasis, division decoupled from biomass growth) is the only mechanistic hit; none give 3D surface areas." },
+    { "source": "Zenodo", "query": "embryo cleavage \"cell volume\" \"surface area\" segmentation", "url": "https://zenodo.org/api/records?q=embryo%20cleavage%20%22cell%20volume%22%20%22surface%20area%22%20segmentation&size=5", "hits": 36848, "note": "Loose match; surfaced the Okie Dryad compilation (dryad.t06q9); otherwise clinical IVF reports and figures." }
+  ],
+  "status": "partial",
+  "summary": "Raw 4D microscopy from which blastomere volume and surface can be segmented is abundant (IDR light-sheet embryo projects such as idr0068 zebrafish and idr0044 mouse; BioImage Archive division time-lapse sets), but no repository dataset was found that already tabulates per-cell surface area and volume before and after division or through egg cleavage; BioNumbers and the Okie Dryad table give only static surface/volume values. The energy-balance clause has no dataset at all.",
+  "next_step": "Pick one cleavage-stage light-sheet dataset (e.g. an early zebrafish or ascidian embryo in IDR/BIA), segment membranes to get per-blastomere volume and surface for 2–64 cells, and pre-register the surface-increase-at-constant-volume and ratio-restoration test; treat the energetic clause as outside the test.",
+  "obstacles_confirmed": [
+    "Segmentation resolution limits true membrane surface estimates (only raw images are archived, no surface tables).",
+    "Geometry alone cannot identify surface-energy balance as the cause of division."
+  ]
+}

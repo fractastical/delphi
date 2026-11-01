@@ -1,0 +1,111 @@
+{
+  "claim_id": "thompson1917-ch03-23",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "length (or mass) at age for plaice and haddock with sampling date at sub-annual (quarterly or finer) resolution",
+    "age (otolith) per fish, or repeated length of the same individuals",
+    "human stature (or mass) measured on the same individuals at sub-annual intervals through childhood and adolescence",
+    "calendar date / season of each measurement"
+  ],
+  "datasets": [
+    {
+      "id": "datras",
+      "name": "ICES DATRAS (Database of Trawl Surveys) – CA (age-length) records",
+      "landing_url": "https://datras.ices.dk/",
+      "access_url": "https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2022&quarter=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:00:00Z", "method": "HEAD landing_url; GET getSurveyList; GET getCAdata NS-IBTS 2022 Q3 (XML, 37.5 MB – larger than intended; counted tags then deleted)", "http_status": 200, "bytes": 37529180 },
+      "variables_present": ["length class and age per sampled fish", "survey, year and quarter (haul date is in the HH table)", "species code (Aphia ID)", "individual weight and maturity where recorded"],
+      "variables_missing": ["repeated measures on the same individual (surveys are cross-sectional)", "human data"],
+      "scope": "North Sea IBTS and other surveys (survey list includes BITS, BTS, BTS-GSA17, BTS-VIII, Can-Mar, …); NS-IBTS 2022 Q3 CA file contains 32,362 <Age> records, of which 3,185 for plaice (SpecCode 127143) and 5,633 for haddock (SpecCode 126437). NS-IBTS runs in Q1 and Q3 each year, giving two seasonal points per year.",
+      "evidence": "getSurveyList returned XML ArrayOfCls_Datras_SurveyList. getCAdata?survey=NS-IBTS&year=2022&quarter=3 returned 200, 37,529,180 bytes XML; grep counted 32,362 <Age> elements, 3,185 SpecCode 127143 (Pleuronectes platessa) and 5,633 SpecCode 126437 (Melanogrammus aeglefinus). Open web service, no key needed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase – PopGrowth table (von Bertalanffy parameters)",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://www.fishbase.se/PopDyn/PopGrowthList.php?ID=1341&GenusName=Pleuronectes&SpeciesName=platessa&fc=440",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:03:00Z", "method": "HEAD landing_url; GET species summary page; GET PopGrowthList HTML; GET fishbase.ropensci.org API (connection failed, status 000)", "http_status": 200 },
+      "variables_present": ["fitted growth parameters (Loo, K, t0) per population for plaice", "no raw length-at-age or seasonal increments"],
+      "variables_missing": ["sub-annual length-at-age observations", "seasonal amplitude of growth", "human data"],
+      "scope": "Species-level growth parameter table; the plaice PopGrowthList page contains ~30 table rows (24 mentions of Pleuronectes)",
+      "evidence": "Summary page Pleuronectes-platessa.html 200; PopGrowthList.php page 200 with 30 <tr> rows. The ropensci FishBase API host (fishbase.ropensci.org) did not respond (curl status 000). Fitted von Bertalanffy parameters are annual-scale and cannot show within-year oscillation.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "international-council-for-the-exploration-of-the-sea-data-centre",
+      "name": "ICES Data Centre portals",
+      "landing_url": "https://www.ices.dk/data/data-portals/Pages/default.aspx",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:00:00Z", "method": "HEAD -L landing_url", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Portal page linking to DATRAS and other ICES databases; the data themselves are the DATRAS record above",
+      "evidence": "Landing page 200. It is a portal index, not a dataset; DATRAS is the relevant holding.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "berkeley-growth-study-fda-growth",
+      "name": "Berkeley Growth Study heights (R package fda, dataset `growth`)",
+      "landing_url": "https://rdrr.io/cran/fda/man/growth.html",
+      "access_url": "https://cran.r-project.org/package=fda",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:08:00Z", "method": "GET rdrr.io man page; HEAD CRAN package page", "http_status": 200 },
+      "variables_present": ["stature of the same children at 31 ages from 1 to 18 years (longitudinal)"],
+      "variables_missing": ["calendar date / season of each measurement (only age is given)", "measurements at sub-annual intervals through adolescence (annual after age 8)", "fish data"],
+      "scope": "39 boys and 54 girls, 31 ages from 1 to 18 (denser in infancy, annual later)",
+      "evidence": "Man page: 'Berkeley Growth Study data', '39 boys and 54 girls from age 1 to 18', 'hgtm: 39 boys at 31 ages', 'hgtf: 54 girls at 31 ages', 'age: 31 giving the ages at which the heights were measured'. No measurement dates, so season cannot be assigned.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-7017440-north-sea-plaice-ssd-model",
+      "name": "An evolutionary explanation of female-biased sexual size dimorphism in North Sea plaice (Zenodo 7017440 / Dryad vx0k6djs8)",
+      "landing_url": "https://zenodo.org/records/7017440",
+      "access_url": "https://zenodo.org/api/records/7017440",
+      "doi": "10.5061/dryad.vx0k6djs8",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:06:00Z", "method": "GET Zenodo record API; Dryad search", "http_status": 200, "bytes": 18256498 },
+      "variables_present": ["simulated individual-based model output for plaice (Plaice.csv, 18.3 MB)"],
+      "variables_missing": ["observed seasonal length-at-age"],
+      "scope": "Eco-genetic model output, not field measurements",
+      "evidence": "Description: 'Using a quantitative, individual-based, eco-genetic model parameterized for North Sea plaice…'. Single file Plaice.csv 18,256,498 bytes. Model output, so not usable as empirical seasonal growth data.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "seasonal growth plaice otolith", "url": "https://datadryad.org/api/v2/search?q=seasonal%20growth%20plaice%20otolith", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "seasonal variation height growth children longitudinal", "url": "https://datadryad.org/api/v2/search?q=seasonal%20variation%20height%20growth%20children%20longitudinal", "hits": 0, "note": "" },
+    { "source": "Dryad", "query": "Pleuronectes platessa growth", "url": "https://datadryad.org/api/v2/search?q=Pleuronectes%20platessa%20growth", "hits": 1, "note": "dryad.vx0k6djs8, model output (see dataset entry)" },
+    { "source": "DataCite", "query": "seasonal growth children height longitudinal (datasets)", "url": "https://api.datacite.org/dois?query=seasonal%20growth%20children%20height%20longitudinal&resource-type-id=dataset&page[size]=8", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "(seasonal OR season) AND (height OR stature) AND growth AND children (datasets)", "url": "https://api.datacite.org/dois?query=(seasonal%20OR%20season)%20AND%20(height%20OR%20stature)%20AND%20growth%20AND%20children&resource-type-id=dataset&page[size]=8", "hits": 11, "note": "Health Survey for England series (UKDA, cross-sectional, registration required) and Tsimane' panel (ICPSR); none longitudinal at sub-annual resolution" },
+    { "source": "Zenodo", "query": "\"seasonal growth\" (plaice OR haddock), type dataset", "url": "https://zenodo.org/api/records?q=%22seasonal%20growth%22%20(plaice%20OR%20haddock)&type=dataset&size=8", "hits": 107, "note": "mostly HADDOCK (docking software) false positives; 7017440 plaice model output; 23605600 'Plaice Recruitment (Annual)'" },
+    { "source": "OBIS", "query": "Pleuronectes platessa occurrences", "url": "https://api.obis.org/v3/occurrence?scientificname=Pleuronectes%20platessa&size=0", "hits": 622189, "note": "occurrence records; OBIS does not carry length-at-age" }
+  ],
+  "status": "partial",
+  "summary": "The fish half is covered cross-sectionally: ICES DATRAS serves open age–length records for plaice and haddock by survey, year and quarter (e.g., NS-IBTS 2022 Q3: 3,185 plaice and 5,633 haddock aged fish), which gives two seasonal points per year (Q1/Q3) but not the same individuals. The human half has only the Berkeley Growth Study (93 children, 31 ages 1–18) openly available, which lacks measurement dates and is annual after age 8. No open dataset gives the same individuals measured several times a year across adolescence with calendar dates.",
+  "next_step": "Pre-register a DATRAS test on Q1-vs-Q3 length-at-age increments by cohort for plaice and haddock (needs the HH table for haul dates); for humans, locate a dated longitudinal series (e.g., school-measurement archives) or treat the human part as a gap.",
+  "obstacles_confirmed": [
+    "Cross-sectional fish surveys do not track the same individuals.",
+    "Open human longitudinal records with fine seasonal resolution are limited.",
+    "Open human series rarely repeat the same individuals at half-year intervals across adolescence."
+  ]
+}

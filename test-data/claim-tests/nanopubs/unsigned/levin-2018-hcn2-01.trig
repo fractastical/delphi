@@ -1,0 +1,85 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2018-hcn2-01--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2018-hcn2-01: supports, confidence 0.55" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.55"^^xsd:double ;
+    delphi:hypothesis "In published embryo-level counts, Xenopus laevis embryos exposed to 0.1 mg/mL nicotine (stages 10-35) show major brain morphology defects at stage 45 at a much higher rate (about 55%) than untreated controls (about 6%)." ;
+    delphi:passCriterion "Pre-registered: from published counts (affected / scored tadpoles) for nicotine-exposed and control embryos under the claim's protocol, (a) the incidence of major brain defects is >= 40% with nicotine and <= 15% in controls, and (b) the difference is significant by a two-sided Fisher exact test at p < 0.001. If only percentages and group sizes are published, counts are reconstructed as round(percentage x n) and this is stated." ;
+    delphi:failCriterion "Pre-registered: nicotine incidence minus control incidence < 10 percentage points, or Fisher p >= 0.05. Outcomes in between (significant but outside the magnitude bands in (a)) are pre-registered as 'mixed'. If no counts or group sizes for both groups can be obtained from a public source, the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:expectedObservation "Published counts give >= 40% major brain defects with 0.1 mg/mL nicotine and <= 15% in controls, Fisher p < 0.001." ;
+    delphi:disconfirmingObservation "A difference of less than 10 percentage points between nicotine and controls, or Fisher p >= 0.05." ;
+    delphi:admissibleDatasets "Public embryo-level or group-level counts (scored n and affected n, or percentage and n) of stage-45 Xenopus brain morphology after nicotine exposure in the claim's dose and window; the source paper's own data are admissible but not independent; other labs' counts are preferred where they exist." ;
+    delphi:inferenceMethod "Incidence per group from counts; two-sided Fisher exact test of nicotine vs control; apply the magnitude bands and p thresholds." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "analysis.py downloads the Pai et al. 2018 full text and the Tung et al. 2024 Source Data, checks that the quoted incidence sentences and the figure-legend group sizes occur verbatim in the full text, and reconstructs counts as round(percentage x 153), 153 = 3 experiments x 51 embryos being the smallest total consistent with 'N > 50 embryos per treatment group for each of those experiments'. It runs a two-sided Fisher exact test for Fig. 1d (primary) and Fig. 5f (repeat within the paper) and reports the smallest per-group N at which p < 0.001 would still hold. Tung et al. per-replicate nicotine defect percentages by group size are summarized as context." ;
+    rdfs:comment "Measured: 55,6 percent of stage-45 tadpoles with major brain defects, nicotine vs control (Pai et al. 2018 Fig. 1d, as reported) (n = 306, counts reconstructed at the legend's lower bound N = 153 per group; Fisher p = 3.62e-22). Interpretation: 'Major brain morphology defects' follows the paper's scoring (absent nostrils, forebrain or midbrain, or misformed hindbrain at stage 45). The test checks that the published counts support the stated incidence contrast; with only the source paper's data available it is an audit of the reported numbers, not an independent replication, and is labelled as such. Mortality differences, clutch structure and blinding cannot be assessed from aggregate counts. The claim's mechanistic context (nicotine acting through disruption of the brain bioelectric prepattern) is not tested." ;
+    delphi:evidenceAgainst "Not independent: the only admissible counts are the source paper's own, and only as rounded percentages ('~55%', '~6%') with a lower bound on group size. The test confirms that the reported numbers, taken at face value, meet the pre-registered contrast with a wide margin (p < 0.001 would hold with as few as 21 embryos per group); it cannot check scoring, blinding or mortality." ;
+    delphi:evidenceAgainst "Fisher's test treats embryos as independent. The paper's own analysis used n = 3 experiments (t-test, p < 0.01), and clutch effects could make the embryo-level p far too small; the effect size (about nine-fold) is the more robust quantity." ;
+    delphi:evidenceAgainst "Within the paper the contrast repeats (Fig. 5f: ~60% vs ~7%), but that is the same lab and protocol." ;
+    delphi:evidenceAgainst "Context from a later Levin-lab study (Tung et al. 2024, same dose, stages 11-35): the nicotine-induced brain-defect rate depends strongly on how many embryos are reared together, from 96.7% in groups of 10 to 46.9% at 50, 22% at 100 and 10.1% at 125. Nicotine reliably causes brain malformations, but 'about 55%' is a property of the rearing conditions, not a fixed teratogenic rate. Those values are normalized to untreated controls and so do not test the 6% control rate." ;
+    delphi:evidenceAgainst "Pai et al. state that individual-level data are available from the corresponding author on request; no embryo-level table is deposited, and the supplementary PDF contains only model notes." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2018-hcn2-01--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2018-hcn2-01--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2018-hcn2-01/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2018-hcn2-01--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Pai et al. 2018, HCN2 rescues brain defects by enforcing endogenous voltage pre-patterns, Nat Commun 9:998 (full text XML, PMC5843655)" ;
+    dct:description "reported incidences (~55% vs ~6%, Fig. 1d; ~60% vs ~7%, Fig. 5f) and group sizes (3 experiments, N > 50 embryos per group each); the supplementary PDF contains model notes only and no counts" ;
+    delphi:hasChecksum "sha256:594ed874796705b2e9ac9df0e7fcf8e797d85f36a5222b7cca503f1d2c6b0b0b" ;
+    prov:atLocation <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5843655/fullTextXML> ;
+    prov:wasDerivedFrom <https://doi.org/10.1038/s41467-018-03334-5> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2018-hcn2-01--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Tung et al. 2024, Embryos assist morphogenesis of others through calcium and ATP signaling mechanisms in collective teratogen resistance, Nat Commun, Source Data file" ;
+    dct:description "context only: per-replicate percent of nicotine-induced brain defects (0.1 mg/mL, stages 11-35) at rearing group sizes 10-125 (Fig. 2d) and 100 (Fig. 3d); normalized to untreated controls, so no control incidence and not usable for the pre-registered contrast" ;
+    delphi:hasChecksum "sha256:a849a1167be0db404704b4fb2b412e5e13f3001e2405dc32546600768afc0ee7" ;
+    prov:atLocation <https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-44522-2/MediaObjects/41467_2023_44522_MOESM9_ESM.xlsx> ;
+    prov:wasDerivedFrom <https://doi.org/10.1038/s41467-023-44522-2> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-01> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2018-hcn2-01--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2018-hcn2-01/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.398Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2018-hcn2-01: supports, confidence 0.55" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2018-hcn2-01--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

@@ -1,0 +1,99 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2015-place-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2015-place-06: refutes, confidence 0.55" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.55"^^xsd:double ;
+    delphi:hypothesis "In the paper's eight-cell active-inference model, if morphogenesis is run for 8 steps, the embryo is cut into a head half and a tail half, each half's cells are replicated (keeping location and partial differentiation) and each half is integrated separately for 32 more steps, then both halves regenerate the full head-body-tail target, after a transient dedifferentiation." ;
+    delphi:passCriterion "Pre-registered, over 20 random seeds: after the split and 32 further steps, both halves meet the assembly criterion of levin-2015-place-01 (RMS position error under best one-to-one assignment < 0.5 x smallest target spacing, and >= 7/8 cells correctly typed) in at least 16 of 20 runs; and dedifferentiation is seen, i.e. in the majority of runs, for at least one half, mean max identity probability falls below its value at the split during the first 8 post-split steps." ;
+    delphi:failCriterion "Pre-registered: fewer than 10 of 20 runs have both halves meeting the assembly criterion. Between 10 and 15 is 'mixed'; full regeneration without any measured dedifferentiation dip is reported as supporting the regeneration part and not the dedifferentiation part ('mixed' if the dip criterion fails)." ;
+    delphi:expectedObservation "Both replicated halves of a bisected step-8 embryo converge to the complete 8-cell target (positions and types) in most seeded runs, with a transient fall in identity certainty after the cut." ;
+    delphi:disconfirmingObservation "One or both halves stay truncated (e.g. only head or only tail types), collapse, or fail to redifferentiate in most runs." ;
+    delphi:admissibleDatasets "The paper's generative model and the bisection procedure as described in the paper and implemented in the public SPM file (split along the body axis, replicate cells of each half, continue integration). MATLAB is unavailable, so an independent Python re-implementation of the model and a gradient-descent free-energy integrator is used; how replicated cells are separated (e.g. small perturbation) follows the SPM file where it specifies one." ;
+    delphi:inferenceMethod "Count of runs in which both halves pass the levin-2015-place-01 assembly criterion, against 16 (pass) and 10 (fail) of 20; fraction of runs with a post-split dip in mean max identity probability." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py runs 20 seeds per initial-expectation spread, deterministic plus a process-noise copy. Each run goes 8 steps, is split into upper and lower halves, each half's cells are duplicated, and each half runs 32 further steps. It scores whether both halves reach the target (RMS < 0.5 under the best assignment and at least 7/8 correct types), whether identity certainty dips after the cut, and the final separation of duplicated pairs." ;
+    rdfs:comment "Measured: 3 runs of 20 in which both halves regenerated the full target (file initialisation randn/8) (n = 20). Interpretation: MATLAB is unavailable, so the test uses an independent numpy re-implementation (levin-2015-place-01/morphogenesis.py) of DEM_morphogenesis.m. Re-implemented exactly from the file: the 8-cell target (matrix T for L = 2; four cell types coded by signals 1-4), sensations of position (the exogenous linear gradient), intrinsic signal and extracellular signal (monoexponential decay, k = 1, scaled by the sensitivity ramp 1 - exp(-2t) with t = iY/32 as set by spm_ADEM), softmax identity expectations, model sensory precision exp(3), prior precision exp(-2) on identities, action precision exp(2) with action restricted to each cell's own sensations, and initial action equal to the t = 0 prediction (all cells near the centroid). Not re-implemented: spm_ADEM's generalised filter (embedding order 2, local-linearisation update). Instead each of the 32 bins integrates the gradient flow of the Laplace free energy for one time unit (dt = 1, 200 Euler sub-steps; 400 and 800 sub-steps give identical results to 3 decimals). Free energy is spm_ADEM's -J (E'iS E/2 - logdet(qu.c) - logdet(iS)/2) without generalised-motion terms, so only its changes are comparable to the paper's. The paper says initial expectations had 'a log precision of minus four' (sd = e^2 = 7.4), but the file uses randn(n,n)/8 (log precision about +4.2), which matches the paper's 'small random expectations' and 'undifferentiated'. The rule fixed before any baseline run was to run both and call the claim supported only if both pass, and mixed if they disagree. Assessor note checked: the current SPM file's header comment says 16 cells, but its default target (L = 2) has exactly 8 cells, the paper's head-body-tail form, identical in SPM12 r7679 and current main. SPLIT = 0, so the bisection path is off by default, as noted. The bisection follows the SPLIT branch of the file: at step 8, sort cells by actual position on the body axis and keep the 4 with largest x (upper, the tail-side cells, which must regenerate a head) or smallest x (lower, the head-side cells). Duplicate their identity expectations, positions and signals, add randn/512 jitter to action, and call the 32-bin solver again from those states. As in the file, the sensitivity ramp restarts at t = 1/32. 'Regenerates the complete target' uses the levin-2015-place-01 assembly criterion. 'Slight dedifferentiation' means mean max identity probability dips below its value at the split during the first 8 post-split steps." ;
+    delphi:evidenceAgainst "Independent re-implementation, not the published MATLAB solver. spm_ADEM's generalised filtering in generalised coordinates can follow a different path through the same free-energy landscape. Nothing was run in MATLAB or Octave." ;
+    delphi:evidenceAgainst "After seeing the deterministic results, a disclosed sensitivity condition added the SPM generative process's sensory noise (precision exp(16)), which the pre-registered re-implementation omits. It did not change any count by more than one run." ;
+    delphi:evidenceAgainst "Seeds are numpy default_rng(0..19). The paper reports one run with MATLAB rng('default'), which cannot be matched outside MATLAB." ;
+    delphi:evidenceAgainst "Cell types use the file's encoding (T values 2, 1, 4, 3 from left to right along the body axis). The paper's head/body/tail labels map onto these four signal codes." ;
+    delphi:evidenceAgainst "Dedifferentiation reproduces in every run (20/20 under both initialisations), but full regeneration of both halves does not: 3/20 runs with the file's initialisation and 6/20 with the paper's (7/20 with process noise). Each half regenerates on its own in only 5-11 of 20 runs. Failing halves end with separated cells (duplicate pairs 0.6-0.8 apart) in a wrong arrangement, typically with 6/8 correct types and RMS error about 0.6-0.8. That is a mis-assembled form, not a collapse." ;
+    delphi:evidenceAgainst "The paper reports a single bisection run that regenerates. This result says that outcome is not robust across seeds in a faithful re-implementation of the model. It does not show that the published MATLAB run is wrong. spm_ADEM's generalised filter could make regeneration more reliable than gradient flow does, so the refutation is limited to the model under gradient-descent integration, hence the low confidence." ;
+    delphi:evidenceAgainst "The planarian and regulative-embryo analogy in the claim's scope is not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-4> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2015-place-06/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: SPM12 DEM toolbox: DEM_morphogenesis.m (r7679, 2019-10-24)" ;
+    dct:description "generative model, generative process, precisions, target morphology (L = 2), initial conditions and SPLIT procedure re-implemented in Python" ;
+    delphi:hasChecksum "sha256:f84c63411b092a939fe65a37ea192562a49694da4085aaac6667032a6477c8c5" ;
+    prov:atLocation <https://raw.githubusercontent.com/spm/spm12/main/toolbox/DEM/DEM_morphogenesis.m> ;
+    prov:wasDerivedFrom <https://github.com/spm/spm12> ;
+    dct:license "GPL-2.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: SPM (current main): DEM_morphogenesis.m" ;
+    dct:description "check that the current file has the same target, defaults and model (it differs from SPM12 only in comments and punctuation)" ;
+    delphi:hasChecksum "sha256:38e731d2890584b95b01bbd9c4e8b7e9c7d37d52b5b10bbd3ec06fb35b8ec895" ;
+    prov:atLocation <https://raw.githubusercontent.com/spm/spm/main/toolbox/DEM/DEM_morphogenesis.m> ;
+    prov:wasDerivedFrom <https://github.com/spm/spm> ;
+    dct:license "GPL-2.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: SPM12 spm_ADEM.m" ;
+    dct:description "integration conventions: time variable t = iY/nY, dt = 1 per bin, action precision G(1).U, free-energy objective J" ;
+    delphi:hasChecksum "sha256:3e0ff256e46463ca8108d6df623fcc355c5498d499f11ad93882ab3c1c51a70e" ;
+    prov:atLocation <https://raw.githubusercontent.com/spm/spm12/main/spm_ADEM.m> ;
+    prov:wasDerivedFrom <https://github.com/spm/spm12> ;
+    dct:license "GPL-2.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2015-place-06--claim-test--dataset-4> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Friston, Levin, Sengupta & Pezzulo 2015, Knowing one's place (J R Soc Interface)" ;
+    dct:description "claim text and model description (repo copy claim-sources/levin-papers/inputs/2015-place.txt)" ;
+    prov:wasDerivedFrom <https://doi.org/10.1098/rsif.2014.1383> ;
+    dct:license "CC BY" .
+  <https://w3id.org/delphi/resource/claim/levin-2015-place-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2015-place-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2015-place-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.398Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2015-place-06: refutes, confidence 0.55" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2015-place-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

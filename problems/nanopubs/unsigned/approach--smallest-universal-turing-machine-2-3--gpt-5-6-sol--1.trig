@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Search for periodic-background tag-system compilers" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    dct:description "Treat an eventually periodic tape as left period, finite defect and right period. Enumerate periods up to 12 and defects up to 40 cells, then use symbolic execution and counterexample-guided synthesis to seek macro-configurations representing tag symbols and clock phases. Require compositional transitions, not isolated long transients, and certify candidates by exact simulation." ;
+
+    delphi:proposedTest "A periodic-background compiler with exact certificates for both tag productions, erasure, appending and clock restoration, followed by a Lean simulation theorem." ;
+    delphi:context "Fails if: No closed macro-transition set survives adversarial compositions of 10,000 random tag steps despite exhaustive periods and defect bounds; this falsifies the searched compiler family, not universality." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Implement the six-entry machine and symmetry-reduced eventually periodic configurations. 2. Mine recurring spacetime motifs and infer finite-state macro-boundaries. 3. Synthesize encodings of a cyclic tag system with bounded phase jitter. 4. For any candidate, prove finite transition certificates and formulate an induction invariant in Lean." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: No completeness theorem says universality must use a short periodic background or local tag encoding." ;
+    skos:note "Tool: turing-machine-enumeration" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to smallest-universal-turing-machine-2-3, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.843Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to smallest-universal-turing-machine-2-3: Search for periodic-background tag-system compilers" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,112 @@
+{
+  "claim_id": "thompson1917-ch02-08",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:50:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "wingspan (or wing length) and estimated body mass of Carboniferous giant dragonflies (Meganisoptera) and Jurassic pterosaurs, per specimen or species",
+    "mechanical flight limits at a given air density (wing loading, power margins) for those morphologies",
+    "independent reconstructions of total atmospheric pressure or density in the Carboniferous and Jurassic",
+    "atmospheric CO2 (Thompson's named mechanism) and O2 (the rival explanation) through the same intervals"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database (PBDB) occurrences and specimen measurements",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/specs/measurements.json?base_name=Meganeuridae&rowcount&limit=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:40:00Z", "method": "HEAD landing_url; GET occs/list base_name=Meganisoptera (97 records); occs/list base_name=Pterosauria interval=Jurassic (345); specs/measurements base_name=Meganeuridae (110 measurement records, e.g. length 330, 300); specs/measurements base_name=Pterosauria (1 record)", "http_status": 200 },
+      "variables_present": ["97 Meganisoptera occurrences; 345 Jurassic pterosaur occurrences with age and locality", "110 linear measurements for Meganeuridae specimens (type 'length', values such as 330 and 300, unit not shown in the compact response)"],
+      "variables_missing": ["body mass", "wingspan explicitly labelled for most records", "pterosaur measurements (only 1 record in PBDB specs)", "any atmospheric variable"],
+      "scope": "Fossil occurrences world-wide; measurements sparse and insect-biased",
+      "evidence": "API JSON records_found counts as listed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Pterosauria&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:44:00Z", "method": "GET api/media q=Pterosauria (4), q=Meganeura (0)", "http_status": 200 },
+      "variables_present": ["4 pterosaur media (3D scans of individual elements)"],
+      "variables_missing": ["whole-skeleton wingspan reconstructions", "giant dragonflies (0 hits)", "body mass", "atmosphere"],
+      "scope": "A handful of pterosaur bones",
+      "evidence": "total_count 4 and 0 from the API.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "noaa-world-data-service-for-paleoclimatology",
+      "name": "NOAA NCEI World Data Service for Paleoclimatology",
+      "landing_url": "https://www.ncei.noaa.gov/products/paleoclimatology",
+      "access_url": "https://www.ncei.noaa.gov/access/paleo-search/study/search.json?searchText=Carboniferous&limit=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:46:00Z", "method": "HEAD landing_url; GET paleo-search API searchText=Carboniferous (3 studies, incl. 2505 GEOCARB III Phanerozoic CO2 model) and searchText='atmospheric pressure' (5 studies, all Quaternary ice-core records)", "http_status": 200 },
+      "variables_present": ["GEOCARB III modelled atmospheric CO2 over Phanerozoic time (study 2505, CLIMATE FORCING)", "ice-core total air content (study 15599, GRIP 40 kyr), i.e. pressure-related data only for the Quaternary"],
+      "variables_missing": ["Carboniferous or Jurassic total atmospheric pressure/density", "fossil morphology"],
+      "scope": "Mostly Quaternary; Phanerozoic only via GEOCARB model output",
+      "evidence": "Search API JSON as above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleo-co2",
+      "name": "Paleo-CO2 project data archive (Zenodo mirror)",
+      "landing_url": "https://www.paleo-co2.org/",
+      "access_url": "https://zenodo.org/api/records/22998082",
+      "doi": "10.5281/zenodo.22998082",
+      "license": "cc-by-4.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:44:00Z", "method": "HEAD landing_url (200); GET Zenodo record 22998082 ('Paleo-CO2 Data Archive', file 'archive September 2026.zip' 21,067,191 bytes)", "http_status": 200, "bytes": 21067191 },
+      "variables_present": ["compiled proxy CO2 estimates (phytoplankton, boron, stomata, leaf gas exchange, liverworts, plant carbon isotopes, paleosols, nahcolite) across the Phanerozoic, CC BY 4.0"],
+      "variables_missing": ["total atmospheric pressure or density (CO2 mixing ratio only)", "O2", "fossil morphology"],
+      "scope": "Phanerozoic CO2; Carboniferous and Jurassic covered by paleosol/stomatal proxies in the compilation (counts per interval not extracted)",
+      "evidence": "Zenodo metadata description quoted above.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-n0310-pterosaur-body-size",
+      "name": "Data from: Competition and constraint drove Cope's rule in the evolution of giant flying reptiles (Benson et al.), Dryad",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.n0310",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.n0310",
+      "doi": "10.5061/dryad.n0310",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:47:00Z", "method": "GET Dryad dataset API", "http_status": 200, "bytes": 25432 },
+      "variables_present": ["pterosaur body-size proxies (wingspan-related measurements) by species with stratigraphic age, Triassic–Cretaceous (abstract: 'wingspans of more than 10 m'; 25,432 bytes)"],
+      "variables_missing": ["body mass (derived, if present, from allometry)", "insects", "atmospheric variables"],
+      "scope": "Pterosauria clade-wide",
+      "evidence": "Dryad API title/abstract; columns not inspected.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB API", "query": "Meganisoptera occurrences; Pterosauria Jurassic occurrences; Meganeuridae and Pterosauria specimen measurements", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Meganisoptera&rowcount", "hits": 97, "note": "pterosaur Jurassic 345; measurements 110 (Meganeuridae) and 1 (Pterosauria)" },
+    { "source": "Zenodo", "query": "\"Paleo-CO2\" OR \"paleo CO2 proxy\" (type=dataset)", "url": "https://zenodo.org/api/records?q=%22Paleo-CO2%22%20OR%20%22paleo%20CO2%20proxy%22&type=dataset&size=5", "hits": 3, "note": "10.5281/zenodo.22998082 archive; 10.5281/zenodo.14537923 Cenozoic product" },
+    { "source": "NOAA paleo-search API", "query": "Carboniferous; atmospheric pressure", "url": "https://www.ncei.noaa.gov/access/paleo-search/study/search.json?searchText=atmospheric%20pressure&limit=5", "hits": 5, "note": "all Quaternary ice cores; 'Carboniferous' gave 3 incl. GEOCARB III" },
+    { "source": "MorphoSource API", "query": "Pterosauria; Meganeura", "url": "https://www.morphosource.org/api/media?q=Pterosauria&per_page=1", "hits": 4, "note": "Meganeura 0" },
+    { "source": "Dryad", "query": "pterosaur wingspan body mass", "url": "https://datadryad.org/api/v2/search?q=pterosaur%20wingspan%20body%20mass&per_page=5", "hits": 0, "note": "multi-word query returned 0" },
+    { "source": "Dryad", "query": "pterosaur", "url": "https://datadryad.org/api/v2/search?q=pterosaur&per_page=6", "hits": 15, "note": "10.5061/dryad.n0310 body-size compilation; 10.5061/dryad.td570 preservation bias" },
+    { "source": "DataCite", "query": "insect gigantism wingspan oxygen Carboniferous", "url": "https://api.datacite.org/dois?query=insect+gigantism+wingspan+oxygen+Carboniferous&page[size]=5", "hits": 0, "note": "" },
+    { "source": "DataCite", "query": "Clapham Karr insect wing length Phanerozoic", "url": "https://api.datacite.org/dois?query=Clapham+Karr+insect+wing+length+Phanerozoic&page[size]=3", "hits": 0, "note": "the Clapham & Karr 2012 PNAS insect wing-length compilation is a paper supplement, not a DOI'd dataset" }
+  ],
+  "status": "partial",
+  "summary": "Fossil size data exist for both groups (PBDB: 97 Meganisoptera occurrences and 110 meganeurid measurements; Dryad n0310 pterosaur size compilation), and Phanerozoic CO2 is compiled openly (Paleo-CO2 archive, GEOCARB in NOAA). The variable the explanation actually needs, total atmospheric density/pressure in the Carboniferous and Jurassic, has no proxy dataset in these archives (NOAA 'atmospheric pressure' hits are Quaternary ice cores), and paired wingspan–body-mass tables for the giant insects are in paper supplements rather than repositories.",
+  "next_step": "Compile wingspan and mass estimates for Meganeuridae and Jurassic pterosaurs from PBDB measurements plus literature supplements (Clapham & Karr 2012; Witton 2008 pterosaur masses), pair with Paleo-CO2 and published O2 curves, and treat total pressure as a modelled parameter with stated bounds rather than a dataset.",
+  "obstacles_confirmed": [
+    "Ancient total atmospheric pressure is poorly constrained (no repository proxy dataset found).",
+    "Carbon dioxide concentration is not total air density or pressure, which is what the flight calculation uses.",
+    "Many specimens lack paired wingspan and body mass."
+  ]
+}

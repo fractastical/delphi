@@ -1,0 +1,100 @@
+{
+  "claim_id": "thompson1917-ch03-28",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:02:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "growth rate or final body size under a hormone/iodine perturbation vs matched controls",
+    "at least two linear body-part measures per individual (e.g. body length, tibia length) to form proportions",
+    "treatment identity and dose, or the gene disrupted",
+    "species and developmental stage"
+  ],
+  "datasets": [
+    {
+      "id": "impc-genotype-phenotype",
+      "name": "International Mouse Phenotyping Consortium (IMPC) genotype-phenotype associations (Solr API)",
+      "landing_url": "https://www.mousephenotype.org/",
+      "access_url": "https://www.ebi.ac.uk/mi/impc/solr/genotype-phenotype/select?q=marker_symbol:(Gh%20OR%20Ghr%20OR%20Tshr%20OR%20Thra%20OR%20Thrb%20OR%20Pou1f1%20OR%20Prop1)&rows=0&wt=json&facet=true&facet.field=mp_term_name",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T22:58:00Z", "method": "HEAD landing_url; GET Solr genotype-phenotype core with facets on mp_term_name and parameter_name", "http_status": 200 },
+      "variables_present": [
+        "body length (390 associations), tibia length (333), body weight, lean/fat/BMC per body weight across the whole core (67,350 associations)",
+        "gene disrupted (knockout line) vs wild-type controls",
+        "for Gh/Ghr/Tshr/Thra/Thrb/Pou1f1/Prop1: 143 associations incl. 'decreased body length' (5), 'decreased lean body mass' (4), bone mineral content (8)"
+      ],
+      "variables_missing": [
+        "external dosing (iodine, hormone injection) — IMPC is a knockout panel",
+        "non-mouse taxa (tadpoles, birds)",
+        "growth-rate time series (IMPC reports fixed-age phenotypes)"
+      ],
+      "scope": "Mouse knockout lines only; adult or juvenile fixed-age measurements",
+      "evidence": "Solr numFound=67350 for q=*:*; parameter_name facet includes 'Body length' 390, 'Tibia length' 333, 'Body Weight' 215, 'Lean/Body weight' 548. Endocrine-gene query numFound=143 with mp terms 'decreased body length', 'decreased bone mineral content', etc. Raw measurements are downloadable per parameter via the IMPC experiment core (not fetched).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (repository portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=thyroid%20hormone%20growth%20body%20proportions",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T22:59:00Z", "method": "HEAD landing_url; GET /api/v2/search with two queries", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no Dryad dataset located that pairs a hormone/iodine treatment with body-proportion measurements"],
+      "scope": "General repository, not a dataset",
+      "evidence": "Search 'thyroid hormone tadpole growth allometry' total=0; search 'thyroid hormone growth body proportions' total=0. Zenodo's index surfaced Dryad 10.5061/dryad.5x69p8d11 (thyroid hormone, Xenopus tadpole brain DNA methylation) which is molecular, not morphometric.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gene-expression-omnibus",
+      "name": "Gene Expression Omnibus (GEO)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T22:58:00Z", "method": "HEAD landing_url", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["body size", "body-part proportions", "growth rate"],
+      "scope": "Expression-profile archive; sample metadata records treatment but not morphometrics",
+      "evidence": "Landing page 200. GEO stores expression matrices and sample characteristics; no morphometric series is part of the archive schema.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/mapr/api/gene/?value=Thra",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T22:59:00Z", "method": "HEAD landing_url (302 to /webclient/); GET mapr gene API for Thra", "http_status": 302, "note": "landing redirects to the webclient; the mapr query also returned a 302 HTML page rather than JSON" },
+      "variables_present": [],
+      "variables_missing": ["whole-organism growth rate", "body proportions under hormone treatment"],
+      "scope": "Cell- and tissue-level imaging studies; no whole-animal hormone-perturbation growth study identified",
+      "evidence": "HEAD -> 302 https://idr.openmicroscopy.org/webclient/?experimenter=-1. mapr/api/gene/?value=Thra returned a 302 Found HTML stub, no study list.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "IMPC Solr", "query": "marker_symbol:(Gh OR Ghr OR Tshr OR Thra OR Thrb OR Pou1f1 OR Prop1), facet mp_term_name", "url": "https://www.ebi.ac.uk/mi/impc/solr/genotype-phenotype/select?q=marker_symbol:(Gh%20OR%20Ghr%20OR%20Tshr%20OR%20Thra%20OR%20Thrb%20OR%20Pou1f1%20OR%20Prop1)&rows=0&wt=json&facet=true&facet.field=mp_term_name&facet.limit=15", "hits": 143, "note": "top terms hyperactivity 38, decreased body length 5, decreased lean body mass 4, bone mineral content 8" },
+    { "source": "IMPC Solr", "query": "*:* facet parameter_name", "url": "https://www.ebi.ac.uk/mi/impc/solr/genotype-phenotype/select?q=*:*&rows=0&wt=json&facet=true&facet.field=parameter_name&facet.limit=200", "hits": 67350, "note": "Body length 390, Tibia length 333, Body Weight 215, Lean/Body weight 548" },
+    { "source": "Dryad", "query": "thyroid hormone tadpole growth allometry", "url": "https://datadryad.org/api/v2/search?q=thyroid%20hormone%20tadpole%20growth%20allometry&per_page=5", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "thyroid hormone growth body proportions", "url": "https://datadryad.org/api/v2/search?q=thyroid%20hormone%20growth%20body%20proportions&per_page=6", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "\"thyroid hormone\" tadpole morphometric, type=dataset", "url": "https://zenodo.org/api/records?q=%22thyroid%20hormone%22%20tadpole%20morphometric&type=dataset&size=5", "hits": 2735, "note": "loose matching; top hits are 10.5061/dryad.5x69p8d11 (tadpole brain methylation) and 10.5061/dryad.23835 (tadpole morphology vs predator regime, no hormone treatment); nothing pairing hormone dose with proportions" }
+  ],
+  "status": "partial",
+  "summary": "IMPC's genotype-phenotype API holds body length, tibia length and body weight for knockout lines including growth-hormone and thyroid-pathway genes (143 associations for seven endocrine genes), so size and one proportion (tibia/body length) are testable in mice; no repository dataset was found that pairs external hormone or iodine dosing with body-proportion measurements in tadpoles, birds or other taxa.",
+  "next_step": "Pull IMPC experiment-core raw measurements (body length, tibia length, body weight) for Ghr, Tshr, Thra/Thrb, Pou1f1, Prop1 lines and controls; separately compile tadpole thyroid-hormone/thyroxine dose-response morphometrics from paper supplements.",
+  "obstacles_confirmed": [
+    "The open screen is a mouse knockout panel, so tadpoles, birds and external doses such as iodine are outside it.",
+    "Phenotype measurements and treatment doses are heterogeneous."
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "claim_id": "thompson1917-ch05-04",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:18:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-1/thompson-ch01-05" },
+  "variables_needed": [
+    "time-resolved curvature or outline of a pseudopod tip, bleb or protoplasmic drop as it rounds off (amoeboid cells)",
+    "the same rounding dynamics with actomyosin contractility inhibited (e.g. blebbistatin, myosin II null) vs control",
+    "a measured cortical/surface tension (micropipette, AFM, optical trap) under each condition",
+    "ATP/energy dependence of the rounding (optional)"
+  ],
+  "datasets": [
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:10:00Z", "method": "HEAD landing_url (200, earlier this session); GET /images?k=amoeba (200 but 0 bytes); GET /pages/search?q=amoeba and /images/search?searchtext=Amoeba (both 404)", "http_status": 200, "bytes": 0 },
+      "variables_present": [],
+      "variables_missing": ["no search or API response with content was obtained, so neither amoeba images nor any perturbation or tension data can be confirmed"],
+      "scope": "Static reference images by design; even if amoeba images exist they would lack perturbation conditions and tension values",
+      "evidence": "Landing 200; search endpoints 404 or empty body.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies bioimages collection)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Dictyostelium%20OR%20amoeba%20blebbistatin%20cortical%20tension%20pseudopod&collection=bioimages&pageSize=8",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:11:00Z", "method": "GET BioStudies search API (two queries) and GET /api/v1/studies/S-BIAD2611", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "S-BIAD2611 'The membrane-to-cortex distance regulates mDia1 activity to control cortical mechanics' (CC BY 4.0): imaging of cortical mechanics in animal cells",
+        "S-BIAD901 'Adaptive pathfinding by nucleokinesis during amoeboid migration' and S-BIAD3674 ChemoTrack: amoeboid-cell migration movies (Dictyostelium hits: 2)",
+        "S-BIAD1167 cortical pulling at mitotic entry"
+      ],
+      "variables_missing": ["no study pairs pseudopod/bleb rounding with contractility inhibition and a tension measurement", "tension values, if any, live in the papers rather than the image metadata"],
+      "scope": "Query totalHits 72 (fuzzy); 'Dictyostelium discoideum' totalHits 2",
+      "evidence": "Accessions returned: S-BIAD1167, S-BIAD901, S-BIAD2611, S-BIAD2101, S-BIAD725, S-BIAD3450, S-BIAD3996, S-BIAD3674; study record S-BIAD2611 description begins 'The shape of animal cells is controlled by their surface, which comprises the cell cortex...', License CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/all/searchvalues/?value=blebbistatin",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:12:00Z", "method": "GET searchengine project search Organism=Dictyostelium discoideum (200, 0 results); GET searchvalues value=blebbistatin (200)", "http_status": 200, "bytes": null },
+      "variables_present": [
+        "images annotated with Compound Name = blebbistatin (438 images), (-)-blebbistatin (14), blebbistatin-(+/-) (14): contractility-inhibited cells in compound screens"
+      ],
+      "variables_missing": ["no amoeboid organism (0 Dictyostelium projects)", "no pseudopod or bleb rounding time series", "no tension measurements"],
+      "scope": "Mammalian cell screens; blebbistatin as a screen compound, not as a rounding experiment",
+      "evidence": "searchvalues JSON: Compound Name 'blebbistatin' 438 images, '(-)-blebbistatin' 14, 'blebbistatin-(+/-)' 14.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioStudies (bioimages collection)", "query": "Dictyostelium OR amoeba blebbistatin cortical tension pseudopod", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Dictyostelium%20OR%20amoeba%20blebbistatin%20cortical%20tension%20pseudopod&collection=bioimages&pageSize=8", "hits": 72, "note": "S-BIAD2611 cortical mechanics; S-BIAD901, S-BIAD3674 amoeboid migration" },
+    { "source": "BioStudies (bioimages collection)", "query": "Dictyostelium discoideum", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Dictyostelium%20discoideum&collection=bioimages&pageSize=8", "hits": 2, "note": null },
+    { "source": "IDR search engine", "query": "project Organism = Dictyostelium discoideum", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/project/search/?key=Organism&value=Dictyostelium%20discoideum", "hits": 0, "note": null },
+    { "source": "IDR search engine", "query": "searchvalues value=blebbistatin", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/all/searchvalues/?value=blebbistatin", "hits": 438, "note": "image count annotated with Compound Name blebbistatin" },
+    { "source": "Zenodo", "query": "(Dictyostelium OR amoeba) AND (\"cortical tension\" OR \"surface tension\" OR micropipette)", "url": "https://zenodo.org/api/records?q=%28Dictyostelium%20OR%20amoeba%29%20AND%20%28%22cortical%20tension%22%20OR%20%22surface%20tension%22%20OR%20micropipette%29&size=8", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "cell cortical tension measurements blebbistatin (dataset)", "url": "https://zenodo.org/api/records?q=cell%20cortical%20tension%20measurements%20blebbistatin&type=dataset&size=8", "hits": 46344, "note": "fuzzy; only 10.5061/dryad.40494 (blebbistatin on hydroid stolon tip pulsations) and 10.5061/dryad.3j9kd51mm (actin cortex partitioning) are near the topic" },
+    { "source": "DataCite", "query": "cortical tension bleb retraction blebbistatin micropipette", "url": "https://api.datacite.org/dois?query=cortical%20tension%20bleb%20retraction%20blebbistatin%20micropipette&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "DataCite", "query": "cortical tension blebbistatin (dataset)", "url": "https://api.datacite.org/dois?query=cortical%20tension%20blebbistatin&resource-type-id=dataset&page%5Bsize%5D=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "cortical tension cell rounding blebbistatin", "url": "https://datadryad.org/api/v2/search?q=cortical%20tension%20cell%20rounding%20blebbistatin&per_page=8", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "Dictyostelium cortical tension", "url": "https://datadryad.org/api/v2/search?q=Dictyostelium%20cortical%20tension&per_page=8", "hits": 0, "note": null }
+  ],
+  "status": "gap",
+  "summary": "No public dataset found that records rounding dynamics of pseudopod tips or protoplasmic drops together with contractility inhibition and a tension measurement. Image archives offer adjacent material: IDR has 438 images of blebbistatin-treated mammalian cells from compound screens, BIA has one cortical-mechanics study (S-BIAD2611, CC BY 4.0) and two Dictyostelium migration datasets; the Cell Image Library could not be queried. Repository searches for cortical-tension data in amoebae returned zero datasets.",
+  "next_step": "Compile from the literature the cortical-tension and bleb-retraction measurements for Dictyostelium and mammalian cells under myosin-II inhibition (micropipette-aspiration papers) into one table with raw values, or request the data behind S-BIAD2611; then pre-register a test comparing rounding time constants with capillary-relaxation predictions under inhibited vs active contractility.",
+  "obstacles_confirmed": [
+    "Direct tension measurements are uncommon: no repository hit for amoeboid cortical tension.",
+    "Tension values are in papers more often than in the image archives: the only mechanics study found (S-BIAD2611) exposes images, not tabulated tensions.",
+    "Cell Image Library has no queryable search endpoint from our checks (404/empty)."
+  ]
+}

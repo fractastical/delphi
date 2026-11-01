@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Held-out shell occupancy mechanism tournament" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Measure Raup W, D and T from at least 1000 openly digitized adult shells spanning 100 genera with MorphoEval. Fit three preregistered occupancy models: developmental covariance from mantle growth, finite-element failure and stability thresholds, and a phylogenetic diffusion model. Hold out entire families to distinguish interpolation from mechanism." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--gpt-5-6-sol--1#n_genera> ;
+    delphi:proposedTest "A mechanism wins if its held-out log score exceeds phylogenetic diffusion by at least 20 and predicts at least 80% of occupied voxels while falsely allowing under 20% of robustly empty voxels." ;
+    delphi:context "Fails if: Parameter ICC below 0.9 or no model improves family-held-out prediction over phylogenetic diffusion." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Blindly validate automated parameters against 100 manual measurements with ICC above 0.9. 2. Specify feasible regions for each mechanistic model before inspecting occupancy. 3. Fit models to 80% of families and predict voxel occupancy in held-out families. 4. Compare proper scoring rules and map false-positive empty regions." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: A sufficiently large consistently oriented set of open 3D shell meshes." ;
+    skos:note "Tool: morpholib" ;
+    skos:note "Tool: morphometrics" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--gpt-5-6-sol--1#n_genera> a schema:PropertyValue ;
+    schema:propertyID "n_genera" ;
+    schema:value 100 ;
+    schema:description "genera the approach proposes to use, as stated in its description (a planned sample size, not a measurement)" .
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.845Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Held-out shell occupancy mechanism tournament" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

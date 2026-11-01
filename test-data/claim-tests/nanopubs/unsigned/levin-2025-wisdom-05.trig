@@ -1,0 +1,85 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2025-wisdom-05--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2025-wisdom-05: inconclusive, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "In the public RNA-seq of planarians whose heads regenerated adapted to barium chloride (GEO GSE98084), only a handful of genes are differentially expressed between barium-adapted heads and control heads, i.e. a small fraction of the expressed transcriptome." ;
+    delphi:passCriterion "Pre-registered: with the deposited per-sample expression values, comparing barium-adapted head samples with untreated control head samples (Welch t-test on log2(CPM+1) per gene, genes with mean CPM >= 1 in either group, Benjamini-Hochberg FDR), the number of genes with FDR < 0.05 and |log2 fold change| >= 1 is <= 20, and is <= 0.2% of the tested genes." ;
+    delphi:failCriterion "Pre-registered: >= 100 genes meet FDR < 0.05 and |log2 fold change| >= 1 in that comparison. Counts of 21-99 are pre-registered as 'mixed'. If either group has fewer than two replicate samples, or no per-sample quantification can be obtained or computed from the deposit, the verdict is 'inconclusive' (underpowered or data-unavailable)." ;
+    delphi:expectedObservation "At most 20 genes (and at most 0.2% of tested genes) pass FDR < 0.05 and |log2FC| >= 1 between barium-adapted and control planarian heads." ;
+    delphi:disconfirmingObservation "100 or more genes pass that threshold, i.e. a broad transcriptional programme rather than a handful of genes." ;
+    delphi:admissibleDatasets "Public RNA-seq of planarian heads regenerated under barium chloride with untreated controls, at least two replicates per group, with per-sample counts or normalized expression in the deposit or recomputable from it. The deposit of the original study (Emmons-Bell et al., the claim's ref [66]) is the only known such dataset; it is not independent of the claim's source lab, but the reanalysis is independent of the authors' pipeline." ;
+    delphi:inferenceMethod "Per-gene Welch t-test on log2(CPM+1) (or log2(normalized value+1) if only normalized values are deposited), Benjamini-Hochberg FDR across genes expressed at mean >= 1 in either group; count genes with FDR < 0.05 and |log2FC| >= 1; <= 20 supports, >= 100 refutes, otherwise mixed." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py downloads the three GSE98084 supplementary workbooks and the series SOFT record; xlsx.py reads them with the standard library. analysis.py joins the two per-replicate FPKM files on transcript id (15,475 transcripts), keeps 15,446 with mean FPKM >= 1 in either group, and runs a Welch t-test on log2(FPKM+1), control (n = 2) vs BaCl2-adapted (n = 2), with Benjamini-Hochberg FDR, counting FDR < 0.05 and |log2FC| >= 1. As context it also counts transcripts with q < 0.05 and |log2FC| >= 1 in the authors' pooled and per-replicate Cuffdiff tables, and transcripts that change two-fold in the same direction in both replicate pairs." ;
+    rdfs:comment "Measured: 0 transcripts with BH FDR < 0.05 and |log2FC| >= 1, BaCl2-adapted vs control heads (Welch t on log2(FPKM+1), 2 vs 2) (n = 15446, 2 replicates per group; Welch t-test has ~1-2 degrees of freedom and very low power). Interpretation: Only the transcriptomic clause is tested: 'just a handful of genes up- and down-regulated' is mapped to the count of genes passing FDR < 0.05 and a two-fold change between barium-adapted and control heads, with 'handful' fixed in advance at <= 20 (the threshold proposed in the dataset-resolvability assessment). Head degeneration, complete adaptation and the claim that cells solved an unselected problem are not variables in the expression data and are not tested. The same finding is stated in levin-2023-agential-15 (Darwin's agential materials, 2023); this single test covers both claim ids and is filed under levin-2025-wisdom-05. If the deposit has additional groups (e.g. acute barium exposure before adaptation), their comparison with controls is reported as context only and does not enter the verdict. A t-test on few replicates has limited power, so the number of genes with |log2FC| >= 1 at nominal p < 0.01 is also reported as a sensitivity measure, not part of the verdict." ;
+    delphi:evidenceAgainst "Deviation from the pre-registered rule, stated openly: the rule as written returns 'supports' (0 transcripts pass, <= 20), but the comparison could not have returned anything else. With two replicates per group the smallest FDR attainable across 15,446 transcripts was 0.11, so no transcript could reach FDR < 0.05 whatever the biology. A verdict that the data could not have contradicted is not evidence for the claim, so it is reported as inconclusive (underpowered). The pre-registration anticipated underpowering only for fewer than two replicates; it should have required a minimum attainable FDR." ;
+    delphi:evidenceAgainst "The deposited data point away from 'a handful': the authors' own pooled Cuffdiff table lists 314 transcripts at q < 0.05 and >= 2-fold change (109 up, 205 down), above the pre-registered refute threshold of 100, and 1,981 transcripts change >= 2-fold in the same direction in both control/BaCl2 replicate pairs. Cuffdiff's pooled q-values model within-condition variance from only two libraries and were not the pre-registered statistic, so they do not enter the verdict, but they show that 'a handful' depends on the threshold. Counting Cuffdiff calls per replicate pair gives 4 and 18, which is near 'a handful'." ;
+    delphi:evidenceAgainst "The series summary itself describes 'a number of ion translocators' and pathway-level enrichments of ~2-3-fold, which is closer to a moderate programme than to a handful of genes." ;
+    delphi:evidenceAgainst "Not independent: GSE98084 is the Levin lab's own deposit for the study the claim cites (ref [66]). The reanalysis is independent of the authors' pipeline but not of their samples." ;
+    delphi:evidenceAgainst "Units are Cufflinks transcripts (TCONS ids) on a D. japonica assembly, not collapsed genes; the deposited files appear pre-filtered to expressed transcripts (15,446 of 15,475 have mean FPKM >= 1). FPKM rather than counts was used, as pre-registered for deposits with only normalized values." ;
+    delphi:evidenceAgainst "Only the expression clause is tested. Head degeneration, complete adaptation and the 'no evolved barium response' interpretation are not addressed. This test also covers levin-2023-agential-15, which states the same finding." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2025-wisdom-05--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2025-wisdom-05/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2025-wisdom-05--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GEO GSE98084: Regenerative adaptation to electrochemical perturbation in planaria (Dugesia japonica heads, 2 control, 2 BaCl2-adapted; Emmons-Bell, Durant, Martyniuk, Morokuma, Levin)" ;
+    dct:description "per-replicate FPKM of control and BaCl2-adapted heads (replicate files) and the authors' pooled Cuffdiff differential-expression table (All_Data)" ;
+    delphi:hasChecksum "sha256:9e76e86ea491103e871b3ef3c25bdf287d6cdccbba42aa232a1d03bd0542706e" ;
+    prov:atLocation <https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98084/suppl/GSE98084_All_Data_BaCl2.xlsx> ;
+    delphi:hasChecksum "sha256:c557e6730de1d3dc39e2d77e3a2caf66f8938c650e66bdedff94054ec8f1395e" ;
+    prov:atLocation <https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98084/suppl/GSE98084_FPKM_Replicate_1.xlsx> ;
+    delphi:hasChecksum "sha256:4f0b558f2284141a7e0d4c7cbab2e73bde204e1b59b3473f472dee0cfc18b5ea" ;
+    prov:atLocation <https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98084/suppl/GSE98084_FPKM_Replicate_2.xlsx> ;
+    delphi:hasChecksum "sha256:788a0b8d9a9ddcf1a616840b75a4de53ffc9b0bd4071c6850bec6deac6e8a4c5" ;
+    prov:atLocation <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98084&targ=all&form=text&view=brief> ;
+    prov:wasDerivedFrom <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98084> ;
+    dct:license "NCBI GEO public data" .
+  <https://w3id.org/delphi/resource/claim/levin-2025-wisdom-05> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2025-wisdom-05--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2025-wisdom-05/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local subagent)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.400Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2025-wisdom-05: inconclusive, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2025-wisdom-05--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

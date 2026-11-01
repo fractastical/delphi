@@ -24,6 +24,12 @@ for (const c of claims) {
   c.truthBy = truth[c.key] ?? [];
   c.truth = c.truthBy.length ? Math.round(1000 * c.truthBy.reduce((s, x) => s + x.p, 0) / c.truthBy.length) / 1000 : null;
 }
+// Snapshot of the MorphoEval simulation that tests or models the claim (scripts/site/morpholib-thumbs.py).
+const THUMBS = existsSync(join(HERE, "thumbs/index.json")) ? JSON.parse(readFileSync(join(HERE, "thumbs/index.json"), "utf8")).thumbs : {};
+for (const c of claims) {
+  const m = [...c.morpholib].sort((a, b) => (a.relation === "tests" ? 0 : 1) - (b.relation === "tests" ? 0 : 1)).find(m => THUMBS[m.id]);
+  c.thumb = m ? { src: THUMBS[m.id].file, morpholib: m.id, relation: m.relation, media: THUMBS[m.id].media, source: THUMBS[m.id].source, frame: THUMBS[m.id].frame + 1, frames: THUMBS[m.id].frames } : null;
+}
 const built = new Date().toISOString().slice(0, 16).replace("T", " ");
 const count = f => claims.filter(f).length;
 const DATA = { claims, built };
@@ -49,6 +55,7 @@ const rows = claims.map(c => ({ id: c.id, key: c.key, label: c.label, statement:
   evidence: c.evidence, evidence_kind: c.evidenceKind, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, data_kind: c.dataTest.dataKind, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions } : null,
   morpholib: c.morpholib.map(m => ({ id: m.id, relation: m.relation, note: m.note, label: m.label, organism: m.organism, verdict: m.verdict,
     score: m.score, thompson_verdict: m.thompsonVerdict, nanopub: m.nanopub, registry: m.registry, report: m.report })),
+  thumbnail: c.thumb ? { file: `docs/${c.thumb.src}`, morpholib: c.thumb.morpholib, source: c.thumb.source } : null,
   testability: c.resolvability ?? null, truth: c.truth,
   truth_by: c.truthBy.map(x => ({ assessor: x.who, p_true: x.p })), assessor_confidence: c.confidence ?? null,
   nanopub: c.uri || null, registry: c.registry || null, draft: !!c.draft }));

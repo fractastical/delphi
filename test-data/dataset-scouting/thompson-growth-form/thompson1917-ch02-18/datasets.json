@@ -1,0 +1,94 @@
+{
+  "claim_id": "thompson1917-ch02-18",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:12:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-6/thompson-ch01-05" },
+  "variables_needed": [
+    "cell diameter / length / width of the smallest free-living and host-dependent prokaryotes",
+    "genome size per organism",
+    "protein or ribosome count per cell (molecular inventory)",
+    "free-living vs host-dependent lifestyle per organism"
+  ],
+  "datasets": [
+    {
+      "id": "bacdive-api",
+      "name": "BacDive (DSMZ) bacterial metadatabase, REST API",
+      "landing_url": "https://bacdive.dsmz.de/",
+      "access_url": "https://api.bacdive.dsmz.de/fetch/1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:06:00Z", "method": "HEAD landing_url; GET api /fetch/1, /fetch/8611, /fetch/7161 and /taxon/Mycoplasma (no auth header sent)", "http_status": 200 },
+      "variables_present": [
+        "strain-level records with a 'Morphology' section (cell length, cell width, cell shape where recorded)",
+        "'Sequence information' and 'Genome-based predictions' sections per strain",
+        "NCBI tax id per strain"
+      ],
+      "variables_missing": [
+        "cell dimensions are sparse: Morphology was empty ({}) for BacDive 1 (Acetobacter aceti) and 8611 (Mycoplasma mycoides subsp. capri PG3) and held only colony data for 7161",
+        "protein/ribosome counts per cell",
+        "uncultured ultramicrobacteria (CPR/DPANN) which are not in a culture-collection database"
+      ],
+      "scope": "Landing page states >100,000 strains; cultured Bacteria and Archaea only; /taxon/Mycoplasma returned 69 strain ids",
+      "evidence": "API responses were JSON with sections General, Name and taxonomic classification, Morphology, Culture and growth conditions, Physiology and metabolism, Isolation..., Sequence information, Genome-based predictions. Morphology empty for the two Mollicutes/Acetobacter records fetched, so cell-dimension coverage of the smallest cells needs an advanced-search export (the advsearch HTML page returned 200, 344 KB, count not parseable).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bionumbers",
+      "name": "BioNumbers (Harvard) curated biological numbers",
+      "landing_url": "https://bionumbers.hms.harvard.edu/",
+      "access_url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&trm=smallest%20bacterium&org=",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:06:00Z", "method": "HEAD landing_url (redirects to /search.aspx); GET search page 'smallest bacterium' (21 KB HTML)", "http_status": 200 },
+      "variables_present": [
+        "BNID 110072 'Smallest cell diameter, bacteria 0.2-0.3 µm' (Schulz & Jørgensen)",
+        "BNID 108333 'Genome size among the smallest known for a free-living cell, Mycoplasma pneumoniae 816 kb'",
+        "BNID 101579 volume of Staphylococcus aureus 1.76 µm^3; BNID 117320 mass of an individual bacterium 600-700 ag"
+      ],
+      "variables_missing": [
+        "a per-organism table (BioNumbers holds single literature-derived numbers, not a species-level dataset)",
+        "lifestyle (free-living vs host-dependent) as a field"
+      ],
+      "scope": "Curated single values with BNIDs and citations; useful for ribosome/protein size and packing-floor constants",
+      "evidence": "Search result HTML listed rows Property/Organism/Value/Units/ID: 'Smallest cell diameter | bacteria | 0.2 - 0.3 μm | 110072', 'Genome size ... Mycoplasma pneumoniae | 816 kb | 108333', 'Volume of bacterium | Staphylococcus aureus | 1.76 µm^3 | 101579'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-datasets-genome-api",
+      "name": "NCBI Datasets genome reports (v2 API)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/datasets/genome/",
+      "access_url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/2097/dataset_report?filters.reference_only=true&page_size=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:06:00Z", "method": "HEAD landing_url; GET dataset_report for taxon 2097 (Mycoplasma genitalium) and taxon 2 (Bacteria, complete genomes)", "http_status": 200 },
+      "variables_present": [
+        "genome assembly length per organism (assembly_stats.total_sequence_length), e.g. GCF_040556925.1 Mycoplasmoides genitalium 580,076 bp",
+        "organism name and tax id per assembly"
+      ],
+      "variables_missing": ["cell dimensions", "protein counts per cell", "lifestyle"],
+      "scope": "169,434 complete bacterial genome assemblies (taxon 2, assembly_level=complete_genome); archaea and uncultured MAGs also present under other taxa",
+      "evidence": "JSON report for taxon 2097: accession GCF_040556925.1, organism_name 'Mycoplasmoides genitalium', total_sequence_length 580076, total_count 1. Taxon 2 complete genomes: total_count 169434.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "ultrasmall bacteria cell volume", "url": "https://api.datacite.org/dois?query=ultrasmall%20bacteria%20cell%20volume&page%5Bsize%5D=5", "hits": 1, "note": "the one hit (10.5281/zenodo.13799) is about nanoprobes, irrelevant" },
+    { "source": "Zenodo", "query": "\"cell size\" bacteria archaea \"cell volume\" database, type=dataset", "url": "https://zenodo.org/api/records?q=%22cell%20size%22%20bacteria%20archaea%20%22cell%20volume%22%20database&type=dataset&size=5", "hits": 27150, "note": "loose matching; top five are metagenome classifier databases (GOTTCHA, CLARK, kraken...), none a cell-size table" },
+    { "source": "BacDive API", "query": "/taxon/Mycoplasma", "url": "https://api.bacdive.dsmz.de/taxon/Mycoplasma", "hits": 69, "note": "returns strain ids; individual fetches showed empty Morphology for 8611" },
+    { "source": "NCBI Datasets", "query": "genome/taxon/2 complete_genome", "url": "https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/2/dataset_report?filters.assembly_level=complete_genome&page_size=1", "hits": 169434, "note": null },
+    { "source": "BioNumbers", "query": "smallest bacterium", "url": "https://bionumbers.hms.harvard.edu/search.aspx?task=searchbytrmorg&trm=smallest%20bacterium&org=", "hits": null, "note": "HTML result table; at least 8 rows visible incl. BNID 110072 smallest cell diameter 0.2-0.3 µm" }
+  ],
+  "status": "partial",
+  "summary": "Genome sizes are fully covered by the NCBI Datasets API (169,434 complete bacterial genomes; M. genitalium 580 kb), BioNumbers gives cited constants for the smallest cell diameter (0.2-0.3 µm) and molecular sizes, and BacDive exposes a per-strain Morphology section via an unauthenticated API, but cell dimensions were empty in the Mollicutes records sampled and no repository table of cell volume vs genome size for ultrasmall or CPR/DPANN organisms was found.",
+  "next_step": "Export BacDive advanced search on cell_length/cell_width for all strains and join to NCBI genome lengths by tax id; add CPR/DPANN cell-volume measurements from cryo-TEM papers (e.g. Luef et al. 2015) by hand, since they are not in any repository found.",
+  "obstacles_confirmed": [
+    "Culture collections miss many of the smallest uncultured cells.",
+    "Dependence on hosts blurs the definition of organism and minimum autonomous machinery."
+  ]
+}

@@ -14,13 +14,16 @@ Don't grep TriG files or hand-write SPARQL first. Use the `delphisci` MCP server
 3. `delphi_rank_claims` with an assessment type, e.g. `dataset-resolvability/0.1.0`.
 4. `delphi_graph` for thinker/year/status views and model truth scores (from `docs/claims.json`).
 5. `delphi_organisms` / `delphi_get_organism` for the animal taxa, their vendored datasets and the
-   per-taxon dataset-coverage ranking (genome, bioelectric, traits, fossils, …).
+ per-taxon dataset-coverage ranking (genome, bioelectric, traits, fossils, …).
+6. `delphi_morpholib` for the MorphoEval audits in [morpholib](https://github.com/fractastical/morpholib)
+ and which claims they test on specimens or model (`test-data/morpholib/links.json`); `view: "live"`
+ checks what is published now.
 6. `delphi_claim_tests` for tests against data: counts by verdict and data kind, one claim's full
    `result.json`, pre-registered tests, and `view: "candidates"` for untested claims ranked by
    testability (what to test next).
 
 Without MCP, the same queries are available as
-`node mcp/cli.mjs <overview|search|claim|rank|graph|tests|organisms|organism|sparql>`.
+`node mcp/cli.mjs <overview|search|claim|rank|graph|tests|morpholib|organisms|organism|sparql>`.
 Outside the repo, `npx -y github:fractastical/delphi` runs the same server.
 
 Default `source` is `local` (repo files, including unpublished drafts). Pass `source: "network"`
@@ -115,8 +118,8 @@ assigned in exactly two cases:
 
 - `proof: "lean"`: a `formalized` entry in some `<project>/lean/reports/*.json`, meaning the Lean 4
   module compiled with no `sorry` and only Lean's standard axioms (`claim-sources/thompson-growth-form/lean/INSTRUCTIONS.md`);
-- `proof: "literature"`: the formal status recorded in `claim-sources/math-bio-claims/claims/key-claims.json`
-  says the result is proved.
+- `proof: "literature"`: the formal status recorded in a `claim-sources/<project>/claims/key-claims.json`
+  (`math-bio-claims`, `plant-hygromorph-mechanics`) says the result is proved.
 
 Everything else is a claim, however its author phrased it and whatever directory it lives in. The
 21 claims in `claim-sources/math-bio-claims/` are a selection of claims *about* results by mathematical
@@ -128,7 +131,7 @@ what the assessments and `test-data/claim-tests/` are for.
 
 ## Layout
 
-Four top-level folders, plus the services that run from the repo root:
+Five top-level folders, plus the services that run from the repo root:
 
 - `claim-sources/`: where claims come from. One project per source, each self-contained with
  `inputs/`, `extraction/`, `claims.json`, `assessment/`, `build/` and `nanopubs/`.
@@ -141,13 +144,26 @@ Four top-level folders, plus the services that run from the repo root:
  Europe PMC by `build/fetch.py`. One project, many works: each claim carries its `paper` key.
  - `math-bio-claims/`: key claims of five mathematical-biology thinkers, with LaTeX math and a
  recorded formal status (proved, partial, refuted, or not a mathematical proposition).
+ - `plant-hygromorph-mechanics/`: same schema; five claims on pine cone, awn, seed-pod and flytrap
+ mechanics (Timoshenko bilayer curvature, diffusive response time, antisymmetric twist, snap
+ threshold) and Marom et al.'s category of stimulus–response systems. Lean modules live in the
+ Thompson Lake project (`thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean`); see its README.
  - `cell-geometry/`: micrograph segmentation for Thompson's cell-packing claims.
 - `test-data/`: what claims are tested against.
  - `test-data/claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`.
+ - `dataset-scouting/<project>/<claim-id>/datasets.json`: where the data to test an untested claim
+ are. A swarm of scouts checks the datasets the assessors named against the live source and
+ searches for more, following `test-data/dataset-scouting/INSTRUCTIONS.md`; `build-queue.mjs`
+ makes the slices, `merge.mjs` writes `COVERAGE.md`, and `delphi_claim_tests view: "candidates"`
+ shows each candidate's scouting status (`scouted: "data-ready"`, `sort: "data"`). Scouts
+ describe data; they never run the test.
  - `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
  counts, genomes, trait databases). Merged view in `test-data/organisms/merged/`; see `test-data/organisms/README.md`.
  - `truth/`: blinded batches and model truth scores feeding the claim graph.
+ - `agent-comparison/`: the measured collective-vs-single-agent comparison (four arms, two pre-registered
+ 20-claim experiments, every plan and verifier record); `SUMMARY.md` and `four-arm.json` are built by
+ `node test-data/agent-comparison/build.mjs` from the imported run data in `four-arm/`.
 - `scripts/`: repo-wide tooling.
  - `exec/`: executable claims. `npm run claims:manifest` collects every claim with a Lean proof
  (`<project>/lean/reports`) or a data test (`test-data/claim-tests/`) into `scripts/exec/manifest.json`;
@@ -155,11 +171,18 @@ Four top-level folders, plus the services that run from the repo root:
  reports each as reproduced, drifted, failed, unverified or skipped (`scripts/exec/runs/latest.json`).
  Files a test writes are restored unless `--update`. Special cases go in `scripts/exec/overrides.json`.
  - `release/`: `npm run status`, where every record stands. `site/`: builds `docs/` from the repo.
+- `problems/`: the problem graph. Twenty genuinely hard open problems in biology and mathematics
+ the swarm could attack (`problems.json`, each linked to the claims it bears on), the approaches
+ proposed blind by agents from four model providers (`approaches/<model>.json`), and both as
+ nanopubs (`delphir:problem/<id>`, `delphir:approach/<problem>--<model>--<n>`). Browse
+ `docs/problems.html`; see [problems/README.md](problems/README.md). An approach is a plan, not
+ a result: it counts only when run and logged as a claim test or a Lean proof.
 - `plugins/`: integrations with external parties: `nebius/` (Nebius Scientific AI MCP client),
  `fittest/`, and `agent/` (Discord, Moltbook and The Colony).
 - Root services: `mcp/` (the `delphisci` MCP server), `forum/` (Science Claw forum, a Moltbook-style
  board where agents post what they have made, ask for collaborators and report tests tagged with
- claim ids; `npm run forum` then read `http://localhost:8787/skill.md`, see [forum/README.md](forum/README.md)),
+ claim ids; deployed at `https://science-claw-forum.fly.dev` (agents read `/skill.md`), `npm run forum` runs it
+ locally, see [forum/README.md](forum/README.md)),
  `docs/` (claim graph site, built output) and `chats/` (transcripts of past agent sessions).
 
 Publishing signs with the operator's ORCID key and cannot be undone; ask before publishing to production.

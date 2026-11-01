@@ -1,0 +1,76 @@
+{
+  "claim_id": "thompson1917-ch03-03",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T00:15:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "time-lapse images of the blastoderm/epiblast through neural-fold and amniotic-fold formation",
+    "local tissue growth or areal expansion rate (cell tracking, proliferation maps) across the sheet",
+    "location and time of fold initiation",
+    "independent measure of active bending/contractility (e.g. apical myosin) to separate from growth"
+  ],
+  "datasets": [
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource — time-lapse light-sheet embryo studies (idr0068 zebrafish germ layers, idr0051 tailbud)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/2152/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T00:09:00Z", "method": "searchengine project search Study Type contains 'time-lapse imaging'; GET project 552 and 2152 metadata", "http_status": 200, "bytes": null },
+      "variables_present": ["time-lapse 3D images of vertebrate embryos from which local deformation can be tracked (idr0068: all three germ layers in zebrafish, 4–18 hpf; idr0051: tailbud from 18-somite stage, one frame per 2 min)"],
+      "variables_missing": ["amniotic folds (zebrafish have none)", "precomputed growth/strain maps", "contractility readout"],
+      "scope": "29 time-lapse projects in IDR; two cover vertebrate embryos through neurulation-era stages, none an amniote blastoderm",
+      "evidence": "Project search size=29; project 2152 'idr0068-shah-zebrafishlightsheet/experimentA': 'Light-sheet imaging of all three germ layers during early zebrafish development (4 - 18 hpf)'; project 552 'idr0051-fulton-tailbudlightsheet': 'Lightsheet imaging of tailbud from 18 somite stage with one frame per 2 minutes'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-s-biad1474",
+      "name": "BioImage Archive S-BIAD1474: Time-Lapse Imaging of Early Chick Embryo Development ex ovo",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD1474",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1474",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:11:00Z", "method": "HEAD bioimage-archive landing (200); BioStudies search API; GET study JSON", "http_status": 200, "bytes": null },
+      "variables_present": ["bright-field time-lapse of whole chick embryos in EC culture at 3-, 4- and 6-min intervals, with an Excel table of HH stage / somite number per video", "neural-fold and early amnion stages are within the HH range of early chick culture"],
+      "variables_missing": ["cell-resolution tracking for growth maps (bright-field, whole-embryo)", "contractility readout"],
+      "scope": "Gallus gallus; whole-embryo bright-field movies",
+      "evidence": "Study JSON: Title 'Time-Lapse Imaging of Early Chick Embryo Development ex ovo', License CC BY 4.0, Organism Gallus gallus, Imaging method bright-field microscopy, 'Live-imaging of developing chicken embryo in EC culture with 3-min temporal resolution; Accompanying Excel file details video information on HH stage/somite number'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive-s-biad553",
+      "name": "BioImage Archive S-BIAD553: Reconstruction of alternative gastrulation modes in the chick embryo (light-sheet surface movies, tissue flows)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD553",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD553",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T00:12:00Z", "method": "BioStudies search API then GET study JSON", "http_status": 200, "bytes": null },
+      "variables_present": ["light-sheet movies of the chick epiblast surface at cellular resolution (tissue flows, individual cell behaviours)", "confocal pMLC2 (active myosin) and SNAI2 images under chemical treatments"],
+      "variables_missing": ["neural-fold and amniotic-fold stages (gastrulation-stage study)", "precomputed growth maps"],
+      "scope": "Chick gastrulation (primitive-streak stages), treated and control embryos",
+      "evidence": "Study JSON Description: '1) Light-sheet movies of the surface of chick embryos treated with different chemicals at cellular resolution. Ideal to study individual cell behaviours and tissue flows in epithelial tissues. 2) Confocal images of SNAI2 and pMLC2 of chick embryos treated with different chemicals.'",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "IDR searchengine", "query": "project Study Type contains 'time-lapse imaging'", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/project/search/?key=Study%20Type&value=time-lapse%20imaging&operator=contains", "hits": 29, "note": "embryo light-sheet studies: idr0051, idr0068, idr0099 beetle, idr0118 fly, idr0146 heart, idr0159 insect" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "neural tube closure light-sheet embryo", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=neural+tube+closure+light-sheet+embryo&collection=bioimages&pageSize=5", "hits": 323, "note": "top hits not neurulation (monkey gastruloids, zebrafish neural activity, cochlea)" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "chick embryo blastoderm live imaging", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=chick+embryo+blastoderm+live+imaging&collection=bioimages&pageSize=5", "hits": 1174, "note": "S-BIAD1474 and S-BIAD553 relevant" },
+    { "source": "BioImage Archive (BioStudies API)", "query": "neurulation OR \"neural fold\" OR \"neural tube closure\"", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=neurulation+OR+%22neural+fold%22+OR+%22neural+tube+closure%22&collection=bioimages&pageSize=6", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "\"neural tube\" (strain OR \"tissue flow\" OR \"growth rate\") embryo, type=dataset", "url": "https://zenodo.org/api/records?q=%22neural+tube%22+%28strain+OR+%22tissue+flow%22+OR+%22growth+rate%22%29+embryo&size=5&type=dataset", "hits": 7980, "note": "first page: gastruloid imaging, mouse embryo culture; no strain-map dataset" }
+  ],
+  "status": "partial",
+  "summary": "Open time-lapse embryo imaging exists at the right stages: chick ex ovo bright-field movies with HH staging (S-BIAD1474, CC BY 4.0), chick epiblast light-sheet movies with pMLC2 confocal (S-BIAD553, gastrulation only), and zebrafish whole-embryo light-sheet 4–18 hpf (IDR idr0068). None ships local growth/strain maps, and no archive holds amniotic-fold imaging or a dataset pairing proliferation maps with fold sites; those would have to be derived from the movies.",
+  "next_step": "Pre-register a test that tracks areal expansion of the chick epiblast from S-BIAD1474 movies (HH6–HH10) and relates it to neural-fold position; use S-BIAD553 pMLC2 images as the contractility control.",
+  "obstacles_confirmed": [
+    "Amniotic-fold coverage is less abundant than neural-fold imaging (none found).",
+    "Strain and proliferation maps are in individual studies, not in a general embryo archive."
+  ]
+}

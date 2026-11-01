@@ -20,8 +20,15 @@ SENSES = ("touch", "temperature", "taste", "hearing")
 SAME_FOLD, MARGIN, MIN_PLDDT = 0.50, 0.10, 50.0
 
 
-def load(acc):
-    st = gemmi.read_structure(str(HERE / "data" / "structures" / acc / "prediction.0.0.cif"))
+def tags(acc):
+    """Structure directories for a protein: itself, or its windows if it was folded in pieces."""
+    root = HERE / "data" / "structures"
+    whole = root / acc / "prediction.0.0.cif"
+    return [acc] if whole.exists() else sorted(p.parent.name for p in root.glob(f"{acc}_w*/prediction.0.0.cif"))
+
+
+def load(tag):
+    st = gemmi.read_structure(str(HERE / "data" / "structures" / tag / "prediction.0.0.cif"))
     ca = [(r, r.find_atom("CA", "*")) for r in st[0][0]]
     ca = [(r, a) for r, a in ca if a]
     coords = np.array([[a.pos.x, a.pos.y, a.pos.z] for _, a in ca])
@@ -32,16 +39,25 @@ def load(acc):
 
 
 def main():
-    structs = {acc: load(acc) for g in PANEL.values() for acc in g}
+    accs = [acc for g in PANEL.values() for acc in g]
+    missing = [a for a in accs if not tags(a)]
+    if missing:
+        raise SystemExit(f"no structure yet for {missing}; run nebius_run.py")
+    structs = {t: load(t) for a in accs for t in tags(a)}
     bacterial = list(PANEL["bacterial"])
-    others = [a for g, accs in PANEL.items() if g != "bacterial" for a in accs]
+    others = [a for g, accs_ in PANEL.items() if g != "bacterial" for a in accs_]
     tm = {}
     for a in others:
         for b in bacterial:
-            r = tm_align(structs[a][0], structs[b][0], structs[a][1], structs[b][1])
-            tm[(a, b)] = {"tm_norm_bacterial": round(float(r.tm_norm_chain2), 4),
-                          "tm_norm_animal": round(float(r.tm_norm_chain1), 4), "rmsd": round(float(r.rmsd), 2)}
-    plddt = {acc: round(s[2], 1) for acc, s in structs.items()}
+            best = None
+            for t in tags(a):
+                r = tm_align(structs[t][0], structs[b][0], structs[t][1], structs[b][1])
+                row = {"tm_norm_bacterial": round(float(r.tm_norm_chain2), 4),
+                       "tm_norm_animal": round(float(r.tm_norm_chain1), 4), "rmsd": round(float(r.rmsd), 2), "piece": t}
+                if best is None or row["tm_norm_bacterial"] > best["tm_norm_bacterial"]:
+                    best = row
+            tm[(a, b)] = best
+    plddt = {a: round(float(np.mean([structs[t][2] for t in tags(a)])), 1) for a in accs}
     name = {acc: n for g in PANEL.values() for acc, n in g.items()}
 
     glut1 = {b: tm[("P11166", b)]["tm_norm_bacterial"] for b in bacterial}

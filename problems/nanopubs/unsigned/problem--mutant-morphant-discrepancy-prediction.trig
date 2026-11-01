@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" ;
+    dct:description "Can a rule be learned and validated that predicts, from a gene's sequence, paralog structure and network position, whether its zebrafish CRISPR mutant will lack the phenotype its morpholino knockdown shows (transcriptional adaptation / genetic compensation)?" ;
+
+    skos:historyNote "Known state: Kok et al. (2015) found most morphant phenotypes absent in mutants; Rossi et al. (2015) showed genetic compensation; El-Brolosy et al. (2019) identified the mechanism as transcriptional adaptation triggered by mutant mRNA decay and upregulating sequence-similar genes. Which genes compensate is not predictable in advance. Already a Frontier Problem." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-C" ;
+    skos:scopeNote "Resolved when: A pre-registered classifier using ZFIN mutant and morphant phenotype records as labels and INDRA CoGEx paralog, NMD-pathway and network features as predictors, with held-out accuracy and the chance baseline stated in advance." ;
+    skos:scopeNote "Resolved when: A ranked list of untested genes with predicted compensation, so the prediction can be checked by future experiments." ;
+    skos:scopeNote "Refuted if: Held-out accuracy at the baseline refutes the predictability claim with present features." ;
+    skos:note "Data access: ZFIN (open), INDRA CoGEx (public MCP), Ensembl paralog tables (open)." ;
+    skos:note "Requires: indra-cogex" ;
+    skos:note "Requires: zfin" ;
+    skos:note "Requires: machine-learning" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: molecular" ;
+    skos:note "Scale: developmental" ;
+    skos:note "Also recorded as a Delphi Frontier Problem: Zebrafish mutant morphant discrepancy attribution" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.devcel.2014.11.018> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14580> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1064-z> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1016/j.devcel.2014.11.018> dct:title "Reverse Genetic Screening Reveals Poor Correlation between Morpholino-Induced and Mutant Phenotypes in Zebrafish" ;
+    dct:bibliographicCitation "Kok et al. 2015, Reverse genetic screening reveals poor correlation between morpholino-induced and mutant phenotypes in zebrafish" .
+  <https://doi.org/10.1038/nature14580> dct:title "Genetic compensation induced by deleterious mutations but not gene knockdowns" ;
+    dct:bibliographicCitation "Rossi et al. 2015, Genetic compensation induced by deleterious mutations but not gene knockdowns" .
+  <https://doi.org/10.1038/s41586-019-1064-z> dct:title "Genetic compensation triggered by mutant mRNA degradation" ;
+    dct:bibliographicCitation "El-Brolosy et al. 2019, Genetic compensation triggered by mutant mRNA degradation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.841Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Predict which genes show mutant-morphant discrepancies" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

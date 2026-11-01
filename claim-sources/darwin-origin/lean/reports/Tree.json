@@ -1,0 +1,76 @@
+[
+  {
+    "claim_id": "darwin1859-ch02-15",
+    "status": "formalized",
+    "label": "Larger genera tend to grow larger and dominant forms more dominant",
+    "notation": "\\mathbb{E}[n(t)] = n_0 e^{\\lambda t};\\ \\mathbb{E}[n(t)] - n_0 = n_0(e^{\\lambda t} - 1);\\ \\frac{\\mathbb{E}[n_1(t)]}{\\mathbb{E}[n_2(t)]} = \\frac{n_1}{n_2};\\quad n_1 > n_2,\\ \\lambda > 0 \\Rightarrow (n_1 - n_2)e^{\\lambda t} \\text{ strictly increasing in } t",
+    "lean_declaration": "DarwinLaws.Tree.expectedGenusSize",
+    "lean_theorems": [
+      "DarwinLaws.Tree.expectedGain_proportional",
+      "DarwinLaws.Tree.expectedGenusSize_ratio",
+      "DarwinLaws.Tree.expectedGenusSize_gap_strictMono"
+    ],
+    "assumptions": "Yule's pure-birth process (1925, built for this very claim): every species in every genus gives rise to new species at the same constant rate λ > 0, with no extinction; only expected sizes n₀ e^{λt} are treated, not the stochastic process.",
+    "scope_note": "Model-dependent (Yule pure birth, expectations only). Proves that the expected gain of a genus is proportional to its size, that two genera with the same rate keep a constant ratio of expected sizes, and that the absolute gap between a larger and a smaller genus grows strictly with time. It does not prove 'dominant forms become more dominant' in any sense beyond this absolute gap: the ratio is constant, so no relative advantage accrues, and Darwin's mechanism (dominant species vary more and their varieties become species) is replaced by a uniform rate that gives large genera no per-species edge. With extinction or rate heterogeneity (ch02-09) large genera can shrink. The data test for this claim is pending; the truth score is low (0.4), which is consistent with the theorem proving less than the claim says."
+  },
+  {
+    "claim_id": "darwin1859-ch02-08",
+    "status": "not-formalized",
+    "label": "Species of larger genera more often present varieties",
+    "notation": "\\text{varieties per species higher in large genera (empirical)}",
+    "reason": "Darwin's statement is about the proportion of species that vary and the mean number of varieties per varying species. In the constant-rate pure-birth model used for darwin1859-ch02-15 every species produces varieties at the same rate, so the per-species proportion is the same in large and small genera; only the absolute number scales with genus size (DarwinLaws.Tree.expectedGain_proportional). A model in which the per-species rate rises with genus size would assume the claim. It is a tabulation result (Darwin's own tables), left to data."
+  },
+  {
+    "claim_id": "darwin1859-ch02-09",
+    "status": "not-formalized",
+    "label": "Small genera often grow large while large genera peak, decline and vanish",
+    "notation": "\\text{(no formal core in a pure-birth model)}",
+    "reason": "A historical pattern that requires extinction and rate heterogeneity: the pure-birth (Yule) model of darwin1859-ch02-15 has no extinction and so no decline, and 'often' is a frequency statement over clades. The discrete rise-and-fall lemma DarwinLaws.Succession.gradual_rise_and_fall assumes the rise and decline rather than deriving them."
+  },
+  {
+    "claim_id": "darwin1859-ch04-24",
+    "status": "formalized",
+    "label": "Extinct species are often intermediate between living groups",
+    "notation": "d(x,y) = d(x,a) + d(a,y),\\ a = \\mathrm{lca}(x,y),\\ d \\ge 0 \\Rightarrow d(x,a) \\le d(x,y) \\wedge d(a,y) \\le d(x,y)",
+    "lean_declaration": "DarwinLaws.Tree.PathAdditive",
+    "lean_theorems": [
+      "DarwinLaws.Tree.ancestor_between"
+    ],
+    "assumptions": "Character distance between forms is a nonnegative path-additive (tree) metric: the distance between two forms equals the sum of their distances to their last common ancestor. 'Intermediate in character' is read as metric betweenness of that ancestor.",
+    "scope_note": "Model-dependent (tree metric) and mathematically slight: given additivity and nonnegativity the conclusion is immediate. Proves that the common ancestor of two living groups is no farther from either than they are from each other. It does not prove that extinct species in general are such ancestors (most are side branches), that character change is additive along lineages (convergence and reversal break this), or the 'often' in Darwin's wording, which is the empirical content and is left to data."
+  },
+  {
+    "claim_id": "darwin1859-ch13-01",
+    "status": "formalized",
+    "label": "Descent with divergence and extinction produces groups subordinate to groups",
+    "notation": "\\text{TreeLike}:\\ u \\le w \\wedge v \\le w \\Rightarrow u \\le v \\vee v \\le u;\\quad C(v) = \\{w : v \\le w\\};\\quad \\text{TreeLike} \\iff \\forall u v,\\ C(u) \\cap C(v) = \\varnothing \\vee C(u) \\subseteq C(v) \\vee C(v) \\subseteq C(u)",
+    "lean_declaration": "DarwinLaws.Tree.TreeLike",
+    "lean_theorems": [
+      "DarwinLaws.Tree.clade_laminar",
+      "DarwinLaws.Tree.clades_containing_chain",
+      "DarwinLaws.Tree.treeLike_of_laminar"
+    ],
+    "assumptions": "Descent is a partial order on forms (u ≤ w means u is an ancestor of w or w itself) in which the ancestors of any form are totally ordered: each form has a single line of ancestry, no hybrid origin between distinct lineages. Groups are clades, the set of all descendants of a founder.",
+    "scope_note": "Proves that tree-like descent makes every pair of clades disjoint or nested (groups subordinate to groups), that the clades containing a form are a chain, and conversely that laminarity forces tree-likeness. This is the mathematical core of Darwin's explanation and is not model-dependent beyond the tree assumption. What it does not cover: 'divergence' and 'extinction' play no role (nesting holds with or without them; Darwin invokes them to explain the gaps between groups, which are not formalized), classifications are not proved to be clades (that naturalists' groups coincide with clades is the empirical claim of ch13-02), and reticulate descent (hybridisation, horizontal transfer) violates the hypothesis."
+  },
+  {
+    "claim_id": "darwin1859-ch13-02",
+    "status": "not-formalized",
+    "label": "The Natural System expresses propinquity of descent",
+    "notation": "\\text{(conceptual)}",
+    "reason": "A claim about what naturalists' classifications track; it identifies the 'something more' of the Natural System with genealogy. Formally one would have to show that a classification built from resemblances recovers clades, which depends on how characters evolve and is the subject of phylogenetic-inference theory, not of anything in the module. DarwinLaws.Tree.clade_laminar gives the nesting that descent produces, not that resemblance-based groups are clades."
+  },
+  {
+    "claim_id": "darwin1859-ch13-06",
+    "status": "formalized",
+    "label": "Varieties form nested groups for the same reason species do",
+    "notation": "\\text{TreeLike}(\\alpha) \\Rightarrow \\forall u v,\\ C(u) \\cap C(v) = \\varnothing \\vee C(u) \\subseteq C(v) \\vee C(v) \\subseteq C(u),\\ \\text{for any type } \\alpha \\text{ of forms}",
+    "lean_declaration": "DarwinLaws.Tree.TreeLike",
+    "lean_theorems": [
+      "DarwinLaws.Tree.clade_laminar",
+      "DarwinLaws.Tree.clades_containing_chain"
+    ],
+    "assumptions": "The same as darwin1859-ch13-01 with the forms taken to be varieties and sub-varieties under a species: descent is a partial order with a single line of ancestry for each form.",
+    "scope_note": "The only mathematical content of 'for the same reason' is that the nesting theorem is stated for an arbitrary partially ordered type of forms and so applies to varieties exactly as to species; no separate proof is needed and none is given. It does not prove that domestic or natural varieties actually fall into nested groups (Darwin's observation), nor that their descent is tree-like: domestic breeds are often of hybrid origin, which breaks the hypothesis, and 'various degrees of modification' is not represented. Counts as a theorem only in this derivative sense."
+  }
+]

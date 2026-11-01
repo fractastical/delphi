@@ -1,0 +1,129 @@
+{
+  "claim_id": "thompson1917-ch02-04",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T01:05:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-5/thompson-ch01-05" },
+  "variables_needed": [
+    "maximum adult body mass (or length) per species across mammals and fishes",
+    "life-habit code per species: fully aquatic / marine vs terrestrial (proxy for buoyant support)",
+    "limb-bone dimensions (length, midshaft diameter / robustness) per species for aquatic and terrestrial mammals",
+    "body density or neutral-buoyancy status (not expected in any archive)"
+  ],
+  "datasets": [
+    {
+      "id": "phylacine",
+      "name": "PHYLACINE 1.2: The Phylogenetic Atlas of Mammal Macroecology (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.bp26v20",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.bp26v20",
+      "doi": "10.5061/dryad.bp26v20",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T00:56:00Z", "method": "HEAD https://doi.org/10.5061/dryad.bp26v20 (302 to Dryad landing, then 200); GET Dryad dataset JSON", "http_status": 200 },
+      "variables_present": [
+        "mammal trait table with body mass and life habit (terrestrial / marine / freshwater / aerial) for all late-Quaternary mammal species, plus phylogeny and range data; storageSize 252,605,672 bytes"
+      ],
+      "variables_missing": [
+        "no skeletal / limb-bone measurements; no body density",
+        "the trait columns were not downloaded (dataset >1 MB); description of columns comes from the abstract and the queue's role text, not from the file header"
+      ],
+      "scope": "All extant and recently extinct mammals",
+      "evidence": "Dryad JSON: title 'Data from: PHYLACINE 1.2: The Phylogenetic Atlas of Mammal Macroecology', license https://spdx.org/licenses/CC0-1.0.html, storageSize 252605672, versionNumber 1",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase (species summary pages)",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://www.fishbase.se/summary/Rhincodon-typus.html",
+      "doi": null,
+      "license": "CC BY-NC 3.0 (as recorded in the vendored organisms record)",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:57:00Z", "method": "HEAD landing_url (200); GET one species summary page (200, 'Max length : 1,700 cm TL male/unsexed'); GET https://fishbase.ropensci.org/species (no response, connection failed)", "http_status": 200 },
+      "variables_present": [
+        "maximum length (and often maximum weight) per fish species, with habitat and depth range, on >30,000 species summary pages; length–weight relationships already vendored as fishbase-length-weight-2026"
+      ],
+      "variables_missing": [
+        "fishes only (all aquatic), so FishBase alone cannot contrast aquatic with terrestrial maxima; no skeletal robustness; no body density"
+      ],
+      "scope": "All fishes",
+      "evidence": "Rhincodon typus summary page contains 'Max length : 1,700 cm TL male/unsexed'; the ropensci API mirror did not respond (curl exit without HTTP code)",
+      "verdict": "partial",
+      "reuses_organism_dataset": "fishbase-2026-10"
+    },
+    {
+      "id": "obis",
+      "name": "OBIS (Ocean Biodiversity Information System) API",
+      "landing_url": "https://obis.org/",
+      "access_url": "https://api.obis.org/v3/statistics",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T00:57:00Z", "method": "HEAD landing_url (200); GET /v3/statistics (200); GET /v3/occurrence?scientificname=Balaenoptera musculus&size=0 (200, total 24327)", "http_status": 200 },
+      "variables_present": [
+        "245,030,035 marine occurrence records for 168,316 species from 7,345 datasets; 24,327 blue-whale occurrences"
+      ],
+      "variables_missing": [
+        "occurrences carry no body size or skeletal data; MeasurementOrFact extension not checked for size"
+      ],
+      "scope": "Global marine occurrences",
+      "evidence": "{\"records\":245030035,\"species\":168316,\"taxa\":200615,\"datasets\":7345}; Balaenoptera musculus total 24327",
+      "verdict": "rejected",
+      "reuses_organism_dataset": "obis-occurrences-cetacea-2026-10-31"
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource (Duke) 3D specimen media API",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=whale&per_page=2",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T01:00:00Z", "method": "HEAD landing_url (200); GET /api/physical-objects?q=Balaenoptera (200, 0 objects); GET /api/media?q=Balaenoptera humerus (200, total_count 0); GET /api/media?q=whale (200, total_count 37, e.g. media 000005369 'Whole, Fluid Preserved Specimen [CTImageSeries]'); GET /api/media?taxonomy_gbif=Cetacea (200, total_count 209875, which appears to be the unfiltered archive total)", "http_status": 200 },
+      "variables_present": [
+        "CT image series and meshes of whole specimens and bones; vendored per-taxon records exist for Phoca vitulina, Lutra lutra, Bos taurus, Giraffa camelopardalis among others"
+      ],
+      "variables_missing": [
+        "free-text search found no Balaenoptera limb elements; large-whale limb bones would have to be located via other taxonomy terms",
+        "bone robustness must be measured from the scans; no derived measurement table"
+      ],
+      "scope": "Mostly small to medium vertebrates; large cetaceans poorly represented by free-text search",
+      "evidence": "total_count 0 for 'Balaenoptera humerus', 37 for 'whale'; physical_objects [] for Balaenoptera",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-phoca-vitulina-validated-2026-10-31"
+    },
+    {
+      "id": "pantheria-1-0-wr05",
+      "name": "PanTHERIA 1.0 (Jones et al. 2009) mammal trait database",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T01:01:00Z", "method": "not re-fetched; cited from the vendored organisms record pantheria-1-0-wr05 in test-data/organisms/merged/datasets.json", "http_status": null, "note": "already vendored with provenance by the organisms project; not re-checked within this claim's request budget" },
+      "variables_present": [
+        "adult body mass per mammal species (AdultBodyMass_g) with habitat/terrestriality fields"
+      ],
+      "variables_missing": [
+        "no explicit marine/aquatic life-habit code as fine as PHYLACINE; no skeletal data"
+      ],
+      "scope": "~5,400 mammal species",
+      "evidence": "record id pantheria-1-0-wr05 present in the merged organisms dataset list",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pantheria-1-0-wr05"
+    }
+  ],
+  "search_log": [
+    { "source": "OBIS API", "query": "statistics; occurrence scientificname=Balaenoptera musculus", "url": "https://api.obis.org/v3/occurrence?scientificname=Balaenoptera%20musculus&size=0", "hits": 24327, "note": "occurrence counts only" },
+    { "source": "MorphoSource API", "query": "media q=whale; q=Balaenoptera humerus; physical-objects q=Balaenoptera", "url": "https://www.morphosource.org/api/media?q=whale&per_page=2", "hits": 37, "note": "0 for the two Balaenoptera queries" },
+    { "source": "FishBase", "query": "species summary Rhincodon typus; ropensci API", "url": "https://www.fishbase.se/summary/Rhincodon-typus.html", "hits": 1, "note": "summary page gives Max length; fishbase.ropensci.org unreachable" },
+    { "source": "organisms vendored datasets (local file test-data/organisms/merged/datasets.json)", "query": "ids matching fishbase|phylacine|pantheria|obis|morphosource|cetacea", "url": "https://github.com/fractastical/delphi/tree/main/test-data/organisms/merged", "hits": 186, "note": "fishbase-2026-10, fishbase-length-weight-2026, pantheria-1-0-wr05, obis-occurrences-cetacea-2026-10-31, gbif-occurrences-cetacea-2026-10-31, pbdb-occurrences-cetacea-2026-10-31, ncbi-genomes-cetacea-2026-10-31, many morphosource per-taxon records; no PHYLACINE record" }
+  ],
+  "status": "partial",
+  "summary": "Maximum body mass with a marine/terrestrial life-habit code for all mammals is openly available (PHYLACINE 1.2, CC0, 253 MB on Dryad; PanTHERIA already vendored) and maximum fish lengths are on FishBase, so the comparative size-maxima half of the operationalizations has data; limb-bone robustness for large whales versus terrestrial mammals is not in a measurement table and MorphoSource free-text search found no Balaenoptera limb scans; nothing records body density or tests 'indefinite' growth.",
+  "next_step": "Download the PHYLACINE trait CSV, confirm the life-habit columns, and pre-register the comparison of mass maxima by life habit; for skeletal scaling, compile long-bone dimensions from the comparative anatomy literature or locate cetacean humeri in MorphoSource by taxon id rather than free text.",
+  "obstacles_confirmed": [
+    "Neutral buoyancy is not measured; life-habit codes are only a coarse proxy.",
+    "Indefinite growth is an unobservable limiting assertion."
+  ]
+}

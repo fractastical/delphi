@@ -18,17 +18,17 @@ sub:Head {
 
 sub:assertion {
   <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-04--claim-test> a delphi:Assessment ;
-    rdfs:label "Claim test of thompson1917-ch07-04: mixed, confidence 0.35" ;
+    rdfs:label "Claim test of thompson1917-ch07-04: mixed, confidence 0.6" ;
     delphi:assessmentType "claim-test/0.1.0" ;
     delphi:hasVerdict "mixed" ;
-    delphi:hasConfidence "0.35"^^xsd:double ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
     delphi:hypothesis "If tissue cell walls meet three at a time at 120 degrees regardless of cell size, junction angles in real tissues cluster near 120 degrees more tightly than in a random partition of the plane, T-shaped junctions are rare, four cells do not meet at one point, and angle deviation does not depend on cell size." ;
     delphi:passCriterion "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test. A tissue conforms if its junction-angle SD and its fraction of T-like junctions (largest angle >= 160 deg) are both below the random-Voronoi control. Supports if every usable tissue conforms; mixed if some do and some do not; refutes if none do." ;
     delphi:failCriterion "Refutes if no tissue has both an angle SD and a T-junction fraction below the random-Voronoi control." ;
     delphi:expectedObservation "In planar sections of a cellular tissue, the three angles at each three-way wall junction cluster near 120 degrees: junction-angle SD and T-junction fraction are both below those of a random Voronoi tiling of the same cell count." ;
     delphi:disconfirmingObservation "Junction angles in a tissue are as dispersed as, or more dispersed than, a random Voronoi tiling, or T-junctions (one angle near 180 degrees) are the majority, as in cell-file tissues such as grass epidermis." ;
     delphi:admissibleDatasets "Public micrographs of planar (one-cell-thick or surface) tissue with resolvable cell walls, segmentable to label images; not drawings or diagrams; not images used to illustrate the claim in the source; licence permitting reuse. Segmenter output must be calibrated against synthetic tilings with known junction statistics (see revisions)." ;
-    delphi:inferenceMethod "Cellpose-SAM segmentation, three-way junction extraction from the label image, angle SD and T-junction fraction per tissue, compared with a perfect hexagonal lattice and a random Voronoi control; pass if both statistics fall below the random control, with segmenter bias measured on synthetic tilings and subtracted from the margin." ;
+    delphi:inferenceMethod "Cellpose-SAM segmentation, three-way junction extraction from the label image, angle SD and T-junction fraction per tissue, compared with a perfect hexagonal lattice and a random Voronoi control; pass if both statistics fall below the random control, with segmenter bias measured on synthetic tilings and subtracted from the margin. Planned ridge-based re-measurement (no learned boundary model): fit a straight line to each wall ridge in an annulus starting several blur widths from the vertex and take angles between fitted lines; validate on the synthetic tilings first and sweep the inner annulus radius, reporting the radius at which the brick-wall T fraction plateaus as the measurement floor (cautions from nanoswarm, Moltbook, 2026-10-31)." ;
     delphi:preregistered false ;
     delphi:dataKind "biological" ;
     dct:description "Cells in each image were segmented with Cellpose CPSAM v2 on the Nebius Scientific AI Platform (claim-sources/cell-geometry/segment.py; operation IDs and model checksum in claim-sources/cell-geometry/results/<image>/cellpose.json). claim-sources/cell-geometry/analyze.py closes inter-cell gaps, finds points where three or more cells meet, estimates each wall's direction from wall pixels 0.08-0.25 median cell diameters from the junction, counts neighbours of cells fully surrounded by segmented cells, and runs the same measurement on three synthetic tilings (hexagonal lattice, brick wall, random Voronoi) as calibration." ;
@@ -41,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "The Drosophila eye image is an SEM of a curved surface; projection distorts its angles." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-4>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-5> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json> .
   <https://w3id.org/delphi/resource/evidence/thompson1917-ch07-04--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Morphology of human corneal endothelium in situ.jpg (Wikimedia Commons)" ;
     dct:description "Homo sapiens, corneal endothelium (alizarin red, in situ)" ;
@@ -81,9 +81,9 @@ sub:assertion {
     rdfs:label "Revision 1 of the thompson1917-ch07-04 claim test (2026-10-31)" ;
     dct:description "Segmenter-bias null (claim-sources/cell-geometry/segmenter_bias.py, results/segmenter-bias/): the same CPSAM v2 checkpoint turns a brick-wall tiling with 100% T-junctions into 3-16% T-junctions and compresses angle SD from 40.5 to 25-26 degrees; a grass-like cell-file tiling goes from 100% to 48-59% T; random Voronoi goes from 14% to 28-31% of junctions within 15 degrees of 120. Cell counts were exact, so the bias is in boundary shape. The measured 0-3% T fractions in the four conforming tissues are below the segmenter floor for a tissue that truly has 100% T-junctions, and grass (49%) matches the segmented cell-file tiling, so its true T fraction is probably near 100%." ;
     prov:startedAtTime "2026-10-31"^^xsd:date ;
-    prov:used <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/claim-sources/cell-geometry/results/segmenter-bias/summary.json> ;
+    prov:used <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/claim-sources/cell-geometry/results/segmenter-bias/summary.json> ;
     delphi:evidenceAgainst "Before: 4 of 5 tissues conform (confidence 0.6). After: 4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter (confidence 0.35)." ;
-    prov:wasInformedBy <https://w3id.org/delphi/resource/agent/moltbook-vina>, <https://w3id.org/delphi/resource/agent/moltbook-hivefound> .
+    prov:wasInformedBy <https://w3id.org/delphi/resource/agent/moltbook-vina>, <https://w3id.org/delphi/resource/agent/moltbook-hivefound>, <https://w3id.org/delphi/resource/agent/moltbook-nanoswarm> .
   <https://w3id.org/delphi/resource/agent/moltbook-vina> a prov:Agent ;
     foaf:name "vina" ;
     rdfs:comment "asked for a null in which the junction statistics are run on segmenter output for synthetic masks with known non-hexagonal packing" ;
@@ -92,19 +92,30 @@ sub:assertion {
     foaf:name "hivefound" ;
     rdfs:comment "proposed that every claim carry a disconfirming observation, admissible dataset constraints and inference method as separate fields" ;
     rdfs:seeAlso <https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#a55aa7a0-cf2b-442b-b58a-8ff6018d4165> .
+  <https://w3id.org/delphi/resource/agent/moltbook-nanoswarm> a prov:Agent ;
+    foaf:name "nanoswarm" ;
+    rdfs:comment "warned that blur alone curves ridges toward Y near a vertex; proposed annulus line-fitting and validating the ridge pipeline on synthetic tilings with an annulus-radius sweep before real tissues" ;
+    rdfs:seeAlso <https://www.moltbook.com/post/9ff17185-86a8-42ec-9337-aa8951185f64#64213952-fb39-4933-a8cb-5eca6f46c28f> .
   <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-04--claim-test> prov:qualifiedRevision <https://w3id.org/delphi/resource/activity/thompson1917-ch07-04--claim-test--revision-1> ;
-    dct:contributor <https://w3id.org/delphi/resource/agent/moltbook-vina>, <https://w3id.org/delphi/resource/agent/moltbook-hivefound> .
+    dct:contributor <https://w3id.org/delphi/resource/agent/moltbook-vina>, <https://w3id.org/delphi/resource/agent/moltbook-hivefound>, <https://w3id.org/delphi/resource/agent/moltbook-nanoswarm> .
+  <https://w3id.org/delphi/resource/activity/thompson1917-ch07-04--claim-test--revision-2> a prov:Activity ;
+    rdfs:label "Revision 2 of the thompson1917-ch07-04 claim test (2026-11-01)" ;
+    dct:description "Independent, non-Cellpose evidence from the two TissueMiner datasets used for thompson1917-ch07-09 (Dye et al. wing disc, Zenodo 22760592; Etournay et al. 2015 pupal wing WT_1-3), segmented with TissueAnalyzer and manually corrected. Three-way vertices: 98.4-98.8% in five proliferating discs, 99.7% in three pupal wings, so the 'by threes' half of the claim is well supported. Angles at interior three-way junctions (straight chords between vertices): SD 24-28 degrees in the dividing discs with 16-21% of junctions having all three angles within 15 degrees of 120, close to the random-Voronoi control (14%); in the pupal wings SD falls from 21 degrees to 15 degrees and the near-120 fraction rises from 24-27% to 42-49% over the 17 h in which division ceases. So junction angles are not 120 degrees 'irrespective of size' as a standing property of tissues: they approach 120 degrees as the tissue leaves proliferation, and never reach the corneal-endothelium regularity (75%). Confidence rises because the split verdict now rests on expert segmentations rather than on a segmenter with a known bias; the verdict stays mixed because one half of Thompson's sentence is right and the other is conditional on tissue state. Chord angles on curved bonds are a cruder angle estimate than the ridge method; they are used only for comparison across the same pipeline." ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    prov:used <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/derived/summary.json%20(sensitivity_junction_angles)%20and%20test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/derived/*_angles.csv> ;
+    delphi:evidenceAgainst "Before: 4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter (confidence 0.35). After: three-at-a-time holds (98-99.7% of interior vertices in 8 expert-segmented Drosophila epithelia); 120 degrees holds only loosely and only once division has stopped (confidence 0.6)." .
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-04--claim-test> prov:qualifiedRevision <https://w3id.org/delphi/resource/activity/thompson1917-ch07-04--claim-test--revision-2> .
   <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-04--claim-test> .
 }
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json>, <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/claim-sources/cell-geometry/results/segmenter-bias/summary.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json>, <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/derived/summary.json%20(sensitivity_junction_angles)%20and%20test-data/claim-tests/thompson-growth-form/thompson1917-ch07-09/pupal-wing-timelapse/derived/*_angles.csv> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session, claim-sources/cell-geometry/)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
@@ -114,9 +125,9 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T20:08:31.673Z"^^xsd:dateTime ;
+  this: dct:created "2026-11-01T05:10:38.405Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
-    rdfs:label "Claim test of thompson1917-ch07-04: mixed, confidence 0.35" ;
+    rdfs:label "Claim test of thompson1917-ch07-04: mixed, confidence 0.6" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     npx:hasNanopubType delphi:Assessment ;
     npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch07-04--claim-test> ;

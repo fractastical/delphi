@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Errors-in-variables branching exponent test" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Analyze at least three independent vascular modalities: retinal images, segmented 3D organ vessels and plant xylem. At each bifurcation fit r_parent^p = r_1^p + r_2^p with hierarchical errors-in-variables likelihood, accounting for pixel resolution, taper and branch-order dependence. Hold out specimens, not branch points." ;
+
+    delphi:proposedTest "General Murray scaling requires p's 95% interval within 0.2 of 3 in every modality and no varying-p model ELPD gain above 10; exclusion of 3 in two modalities refutes generality." ;
+    delphi:context "Fails if: Radius uncertainty exceeds 20% at most branches or exponent estimates shift by more than 0.3 under preregistered taper corrections." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register segmentation quality and minimum 500 bifurcations per modality. 2. Estimate radius uncertainty from repeated segmentation and exclude unresolved vessels. 3. Fit shared p = 3, p = 7/3, p = 2 and varying-p models. 4. Compare specimen-held-out predictive density and residual shear dependence." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Open, quality-controlled 3D vascular trees with calibrated voxel dimensions." ;
+    skos:note "Tool: morpholib" ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.846Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Errors-in-variables branching exponent test" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,93 @@
+{
+  "claim_id": "thompson1917-ch05-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-4/thompson-ch01-05" },
+  "variables_needed": [
+    "wall mechanical anisotropy or cellulose microfibril orientation per cell (freely growing walled cells, ideally Spirogyra or other unbranched filaments)",
+    "axial vs radial extension rate (growth anisotropy) of the same cells",
+    "cell aspect ratio or shape outline over time",
+    "a perturbation that isotropizes the wall (mutant or drug) with the resulting shape"
+  ],
+  "datasets": [
+    {
+      "id": "algaebase",
+      "name": "AlgaeBase",
+      "landing_url": "https://www.algaebase.org/",
+      "access_url": "https://api.algaebase.org/v1.3/species?genus=Spirogyra&count=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:24:00Z", "method": "HEAD landing_url (405, HEAD not allowed); GET landing_url (200, 29,379 bytes); GET API v1.3 species?genus=Spirogyra (401 Authorization Required)", "http_status": 200, "bytes": 29379 },
+      "variables_present": ["taxonomic names and some images of Spirogyra species (website); none of the mechanical variables"],
+      "variables_missing": ["wall anisotropy", "microfibril orientation", "directional extension rates", "perturbation data"],
+      "scope": "Taxonomic database; API requires a key (401)",
+      "evidence": "Landing page served 200 on GET; API endpoint returned nginx '401 Authorization Required'. Nothing on the site addresses wall mechanics.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=cellulose%20microfibril%20orientation%20cell%20wall%20anisotropy&collection=bioimages&pageSize=7",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:25:00Z", "method": "GET BioStudies search API restricted to collection=bioimages (two queries)", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["no study in the top hits images wall anisotropy with elongation in freely growing walled cells; 'Spirogyra' returned 0 hits in the bioimages collection"],
+      "scope": "Query 'cellulose microfibril orientation cell wall anisotropy' totalHits 1001 (inexact), top 7 were spindle orientation, permittivity tensor imaging, Planctomycetes envelope, smooth muscle, migration, Physcomitrium plasmodesmata, label-free architecture imaging",
+      "evidence": "JSON responses: totalHits 1001 for the anisotropy query (S-BIAD1801, S-BIAD1063, S-BSST390, S-BIAD3931, S-BIAD2122, S-BIAD466, S-BIAD25); totalHits 0 for 'Spirogyra'.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/project/search/?key=Organism&value=Arabidopsis%20thaliana",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-10-31T23:26:00Z", "method": "HEAD landing_url (302 to webclient); GET searchengine project search Organism=Arabidopsis thaliana", "http_status": 200, "bytes": null },
+      "variables_present": ["one plant study on cell-wall synthases and organ shape: idr0032-yang-meristem 'Regulation of Meristem Morphogenesis by Cell Wall Synthases in Arabidopsis' (meristem images with wall-synthase perturbation)"],
+      "variables_missing": ["freely growing single cells (meristem cells are constrained by neighbours)", "microfibril orientation", "directional extensibility", "algal cells"],
+      "scope": "3 Arabidopsis projects in IDR (idr0032, idr0077, idr0107); no algal filament study",
+      "evidence": "Search response size 3 with the three project names and publication titles.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-anisotropic-growth-hypocotyl",
+      "name": "Data from: Anisotropic growth is achieved through the additive mechanical effect of material anisotropy and elastic asymmetry (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4s4b3nf",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4s4b3nf/download",
+      "doi": "10.5061/dryad.4s4b3nf",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:27:00Z", "method": "GET Dryad dataset API record", "http_status": 200, "bytes": 303443401 },
+      "variables_present": ["cell-wall mechanical anisotropy (material anisotropy and elastic asymmetry) measured alongside anisotropic elongation in Arabidopsis hypocotyl cells, with a mechanical growth model (per abstract)"],
+      "variables_missing": ["freely growing isolated cells (hypocotyl cells are in a tissue)", "algae/Spirogyra", "microfibril angle per cell (not confirmed from the record)"],
+      "scope": "One species (Arabidopsis thaliana), one organ; 303 MB deposit, not downloaded",
+      "evidence": "Dryad API: identifier doi:10.5061/dryad.4s4b3nf, publicationDate 2019-07-30, license CC0-1.0, storageSize 303443401; abstract attributes anisotropic growth to oriented cellulose and pectin-based elastic asymmetry.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "BioStudies (bioimages collection)", "query": "cellulose microfibril orientation cell wall anisotropy", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=cellulose%20microfibril%20orientation%20cell%20wall%20anisotropy&collection=bioimages&pageSize=7", "hits": 1001, "note": "no relevant top hit" },
+    { "source": "BioStudies (bioimages collection)", "query": "Spirogyra", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Spirogyra&collection=bioimages&pageSize=5", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "cell wall anisotropy microfibril growth", "url": "https://datadryad.org/api/v2/search?q=cell%20wall%20anisotropy%20microfibril%20growth&per_page=7", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "\"microfibril angle\" OR \"wall anisotropy\" growth cell elongation", "url": "https://zenodo.org/api/records?q=%22microfibril%20angle%22%20OR%20%22wall%20anisotropy%22%20growth%20cell%20elongation&size=7&sort=bestmatch", "hits": 295122, "note": "first hit dryad.4s4b3nf relevant; also a wood microfibril-angle script (zenodo.3699590), not cell growth" },
+    { "source": "IDR searchengine (projects)", "query": "Organism = Arabidopsis thaliana", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/project/search/?key=Organism&value=Arabidopsis%20thaliana", "hits": 3, "note": "idr0032 cell wall synthases in meristem" },
+    { "source": "AlgaeBase API", "query": "species?genus=Spirogyra", "url": "https://api.algaebase.org/v1.3/species?genus=Spirogyra&count=1", "hits": null, "note": "401, API key required" }
+  ],
+  "status": "partial",
+  "summary": "No public dataset pairs wall anisotropy with directional extension in Spirogyra or any freely growing algal filament. The closest open data are for Arabidopsis: a 303 MB Dryad deposit (dryad.4s4b3nf, CC0) with wall mechanical anisotropy and elongation in hypocotyl cells, and IDR idr0032 with wall-synthase perturbation of meristem morphology; both are cells inside tissues, outside the claim's 'without external restraint' scope.",
+  "next_step": "Either accept tissue-embedded plant cells as a proxy and pre-register on dryad.4s4b3nf, or image Spirogyra/Nitella filaments with polarized light or AFM to get microfibril orientation and axial vs radial strain in the same cells.",
+  "obstacles_confirmed": [
+    "Spirogyra-specific perturbation data are limited (none found in BioImage Archive, IDR, Dryad, Zenodo).",
+    "Microfibril angle and growth anisotropy are published for model cells, not archived with the algal images."
+  ]
+}

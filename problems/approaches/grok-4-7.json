@@ -1,0 +1,1718 @@
+{
+  "model": "grok-4-7",
+  "provider": "xAI",
+  "generated": "2026-11-01T04:20:00Z",
+  "approaches": [
+    {
+      "problem": "rule110-universality-machine-checked",
+      "n": 1,
+      "title": "Kernel-check Cook's ether, gliders and collision table",
+      "kind": "formalization",
+      "method": "In the repo's Lean 4.35.0 and Mathlib 4.35.0, encode Rule 110 as the Boolean function on (Bool × Bool × Bool) given by Wolfram's 8-bit table number 110. Do not use the formula left XOR (center OR right); that formula is Rule 30. Transcribe the periodic background word and every glider word from Cook 2004, without rewriting them. Prove the background is invariant under the spacetime shift Cook states. For each published collision, evolve the finite word with a pure Lean function and prove equality to Cook's product word by kernel reduction (rfl or decide on a Bool), never native_decide, sorry, or an extra axiom. Split any evolution the kernel cannot reduce in one pass into blocks of a few hundred steps with an intermediate word that is itself a lemma. The glider catalog, the background and the collision table are separate lemmas, as the acceptance criteria require.",
+      "steps": [
+        "Define rule110 : Bool × Bool × Bool → Bool from the 8-bit table and prove it matches Wolfram number 110.",
+        "Transcribe Cook's periodic background and prove the invariance he claims.",
+        "Transcribe each glider as a finite word on that background.",
+        "Discharge each collision lemma by blocked kernel reduction of the pure step function.",
+        "Record #print axioms output and reject the module if any axiom other than propext, Classical.choice or Quot.sound appears."
+      ],
+      "decisive_result": "A Lean module, with no sorry, whose lemmas are exactly Cook's background, glider catalog and collision table, each proved by reduction of the cellular-automaton step.",
+      "failure_signature": "Any transcribed collision evolves to a word different from Cook's table, or a collision is too long for blocked kernel reduction and no alternative proof is found. A mismatched collision is also evidence against the published table.",
+      "tools": ["lean4", "cellular-automaton-simulation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.15.1.1", "note": "Cook 2004, Universality in elementary cellular automata" }
+      ],
+      "difficulty": "hard",
+      "missing": "Nothing external. The obstacle is proof size: Cook's table is a long finite case analysis, and Lean's kernel may force very small blocks."
+    },
+    {
+      "problem": "rule110-universality-machine-checked",
+      "n": 2,
+      "title": "Formalize cyclic-tag universality before any glider",
+      "kind": "formalization",
+      "method": "Separate the computability half of Cook's argument from the cellular-automaton half, so a bug in a glider collision cannot hide inside a tag-system lemma. Define a cyclic tag system as a finite list of appendants, a binary work string, and the rotation that appends the next word and deletes the front bit. Formalize the Cocke–Minsky simulation of a binary Turing machine by a 2-tag system, then Cook's simulation of a 2-tag system by a cyclic tag system. The main theorem is: for every Turing machine and input there is a cyclic tag system and an encoding of the input such that the tag system halts if and only if the machine does, with an explicit bound on the number of tag steps per machine step. Do not mention Rule 110 in this module. Hypotheses that Cook leaves informal (the precise halting convention, the treatment of the empty appendant) stay as named hypotheses rather than as sorry.",
+      "steps": [
+        "Define Turing machines, 2-tag systems and cyclic tag systems with explicit halting.",
+        "Formalize the Cocke–Minsky encoding and prove one-step correspondence.",
+        "Formalize Cook's tag-to-cyclic-tag encoding and prove one-step correspondence.",
+        "Compose the two simulations and extract the overhead bound.",
+        "Audit axioms. Leave Rule 110 out of the imports."
+      ],
+      "decisive_result": "A no-sorry theorem that cyclic tag systems simulate every Turing machine, with the step overhead as a proved bound.",
+      "failure_signature": "A one-step correspondence fails on a finite witness (a tag system whose encoded run disagrees with the machine), or the halting convention cannot be stated without an extra axiom.",
+      "tools": ["lean4"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.15.1.1", "note": "Cook 2004, cyclic tag systems and the reduction from tag systems" },
+        { "doi": "10.1016/j.tcs.2008.09.051", "note": "Woods and Neary 2009, survey of the small-machine and tag-system chain" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "rule110-universality-machine-checked",
+      "n": 3,
+      "title": "Compose glider lemmas into the emulation theorem",
+      "kind": "proof",
+      "method": "Assuming the collision lemmas and the cyclic-tag theorem as already checked modules, formalize Cook's compiler: a function from a cyclic tag system and a finite input to a finite set of gliders on the background. The theorem is a lockstep bisimulation. Each tag step is a fixed finite sequence of the checked collisions, and the encoding of the work string is an invariant of that sequence. Prefer the Neary–Woods polynomial-overhead presentation where it cites the same gliders, and prove the polynomial bound as a separate lemma rather than hiding it in the invariant. This module is forbidden to re-verify collisions by simulation; it may only apply the lemmas from the catalog. That split is what makes a failure here different from a failure in the table.",
+      "steps": [
+        "Define the compiler from cyclic tag systems to Rule 110 configurations using only named gliders.",
+        "State the representation invariant (work string, phase, and head glider).",
+        "Prove that each tag operation is a composition of catalogued collisions.",
+        "Prove the overhead bound, polynomial if the Neary–Woods schedule is the one formalized.",
+        "Compose with cyclic-tag universality to obtain the Rule 110 universality theorem and audit axioms."
+      ],
+      "decisive_result": "A no-sorry theorem: for every cyclic tag system and input there is a Rule 110 configuration whose evolution encodes the computation, with gliders, collisions and background used only as prior lemmas.",
+      "failure_signature": "The invariant fails on some tag operation even though every individual collision lemma is true, which means the compiler, not the table, is wrong. Partial gates with no bisimulation do not count.",
+      "tools": ["lean4"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.15.1.1", "note": "Cook 2004, glider emulation of cyclic tag systems" },
+        { "doi": "10.1007/11786986_13", "note": "Neary and Woods 2006, polynomial-time emulation and P-completeness of Rule 110" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "A month of agent time is unlikely to finish the bisimulation even after the collision lemmas exist. The missing piece is proof effort on the compiler invariant, not data or a new algorithm."
+    },
+    {
+      "problem": "smallest-universal-turing-machine-2-3",
+      "n": 1,
+      "title": "Prove Smith's tape is not eventually periodic",
+      "kind": "formalization",
+      "method": "Encode Wolfram machine 596440 exactly as published: state 1 on colors 0, 1, 2 writes (1, right, state 2), (2, left, state 1), (1, left, state 1); state 2 writes (2, left, state 1), (2, right, state 2), (0, right, state 1). Define eventually periodic as the existence of a center bound N and periods p, q such that the tape repeats with period p to the right of N and period q to the left. Define finite support as the case where both periodic parts are the blank symbol. Formalize Smith's doubling recurrence for the infinite initial condition, as described in his prize proof and in the public development at the Wolfram Institute Lean notes, and prove that this particular tape is not eventually periodic. Separately audit that public development against this repo's rules: no sorry, no extra axioms. The audit's job is to isolate the infinite-tape hypothesis, not to re-prove universality under a periodic background.",
+      "steps": [
+        "Define machine 596440 and the two tape restrictions as Lean predicates.",
+        "Transcribe Smith's doubling construction of the infinite initial tape.",
+        "Prove that tape is not eventually periodic.",
+        "Audit the public Lean development and list every hypothesis it still assumes, in particular the non-periodic background.",
+        "Reject the module if universality is stated without that hypothesis."
+      ],
+      "decisive_result": "A no-sorry lemma that Smith's infinite initial condition is not eventually periodic, plus an axiom audit showing his universality theorem uses that tape.",
+      "failure_signature": "The doubling recurrence in fact produces an eventually periodic tape, or the public development's universality theorem does not depend on a non-periodic background. Either outcome would change the status of the objection rather than confirm it.",
+      "tools": ["lean4"],
+      "datasets": [
+        {
+          "name": "Wolfram (2,3) universality in Lean",
+          "url": "https://wolframinstitute.github.io/TuringMachine/",
+          "note": "Public development claiming theorems Smith.wolfram23_universal_ic and Smith.wolfram23_infinite_ic; used as the artifact to audit, not as a finished no-sorry proof."
+        },
+        {
+          "name": "Wolfram 2,3 Turing machine technical details",
+          "url": "https://www.wolframscience.com/prizes/tm23/technicaldetails.html",
+          "note": "Transition table of machine 596440."
+        }
+      ],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.29.1.1", "note": "Smith 2020, Universality of Wolfram's 2, 3 Turing Machine" }
+      ],
+      "difficulty": "hard",
+      "missing": "The public Lean notes list open items. Closing those items under a no-sorry rule may exceed a month even though the non-periodicity lemma itself is the smaller target."
+    },
+    {
+      "problem": "smallest-universal-turing-machine-2-3",
+      "n": 2,
+      "title": "Decide the machine on eventually periodic tapes",
+      "kind": "proof",
+      "method": "Try to refute conventional universality by a regularity theorem. Fix an eventually periodic initial tape with left period q, right period p and a finite center of length L. The head will destroy periodicity, so the configuration space is not the finite set of phases. The attack is to find an invariant of machine 596440 that restores finiteness: a bound on the number of non-periodic cells, or a vector of local statistics (for example counts of 1s and 2s modulo a small integer) that determines the future and takes values in a finite monoid. If every space-time diagram from an eventually periodic tape is generated by a finite automaton whose state is that invariant, then halting and reachability of any finite target pattern are decidable, which refutes universality under the conventional restriction. The invariant has to be proved for all p, q and L, not checked up to a bound. A bound-only result belongs to the search approach and is not this theorem.",
+      "steps": [
+        "Define the configuration graph of machine 596440 on eventually periodic tapes.",
+        "Search symbolically for a finite invariant by enumerating small moduli and local window statistics.",
+        "If a candidate invariant closes, prove it is preserved by all six transitions.",
+        "Prove that the invariant's state, plus the head state, determines the next window.",
+        "Conclude decidability of reachability, which is the anti-universality theorem."
+      ],
+      "decisive_result": "A no-sorry theorem that reachability for machine 596440 on every eventually periodic tape is decidable.",
+      "failure_signature": "Every candidate finite invariant fails on an explicit tape: the non-periodic region grows without a periodic residue. That kills this proof route and leaves conventional universality open.",
+      "tools": ["lean4", "turing-machine-enumeration"],
+      "datasets": [
+        {
+          "name": "Wolfram 2,3 Turing machine technical details",
+          "url": "https://www.wolframscience.com/prizes/tm23/technicaldetails.html",
+          "note": "The six transitions of machine 596440."
+        }
+      ],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.29.1.1", "note": "Smith 2020, the non-periodic background this approach is not allowed to use" },
+        { "doi": "10.1016/j.tcs.2008.09.051", "note": "Woods and Neary 2009, the blank and periodic-background convention for small universal machines" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "No known finite invariant for this machine. Finding one is open mathematics, not a missing dataset."
+    },
+    {
+      "problem": "smallest-universal-turing-machine-2-3",
+      "n": 3,
+      "title": "Search a bounded periodic-background encoding family",
+      "kind": "computation",
+      "method": "Search for a positive construction inside an explicit family, so exhaustion is a real partial result. The family is: a right-infinite periodic background of period at most 32 over the alphabet {0,1,2}, a finite program region of length at most 10^4, and a block encoding that uses only the block sizes already appearing in Smith's system-0 to system-3 schedule. For each candidate, simulate machine 596440 and test whether the successive visits of the head to the left end reproduce one full step of a fixed universal cyclic tag system (two appendants, the smallest Cook system that is already universal once cyclic-tag universality is granted) for at least 100 tag steps, with the background period unchanged outside the program. The search is exhaustive over periods and over program regions drawn from that block grammar, not over all strings of length 10^4. Publish the grammar, the seed, and the list of simulated candidates.",
+      "steps": [
+        "Fix the target cyclic tag system and the block grammar before any simulation.",
+        "Enumerate background periods from 1 to 32 and program blocks within the grammar up to length 10^4.",
+        "Simulate machine 596440 from each candidate for enough steps to cover 100 tag steps or until the background is corrupted.",
+        "Accept a candidate only if the decoded tag step matches and the background period is intact.",
+        "If the grammar is exhausted with no accept, report the bound as a negative partial result."
+      ],
+      "decisive_result": "Either an explicit periodic-background initial tape, of period at most 32 and program length at most 10^4, that emulates 100 steps of the chosen cyclic tag system, or a machine-readable exhaustion certificate for that grammar.",
+      "failure_signature": "Exhaustion of this grammar does not refute conventional universality. The approach has failed to settle the question if the grammar is exhausted, and it has failed as a search if a candidate is accepted by one simulator and rejected by an independent reimplementation.",
+      "tools": ["turing-machine-enumeration"],
+      "datasets": [
+        {
+          "name": "Wolfram 2,3 Turing machine technical details",
+          "url": "https://www.wolframscience.com/prizes/tm23/technicaldetails.html",
+          "note": "Machine 596440 transition table used as the simulator specification."
+        }
+      ],
+      "references": [
+        { "doi": "10.25088/ComplexSystems.29.1.1", "note": "Smith 2020, source of the block sizes the grammar is allowed to use" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "rule54-universality",
+      "n": 1,
+      "title": "Exhaustive collision census of the 2006 glider catalog",
+      "kind": "computation",
+      "method": "Take every glider and compound glider named by Martínez, Adamatzky and McIntosh 2006, on the periodic ether they use, and collide every ordered pair at every separation from 1 to 256 cells. Evolve each collision for 10^5 steps or until the configuration is a disjoint union of catalogued gliders on the ether. Two independent simulators must agree. From the resulting table, search for a finite gate set that simulates one append of a cyclic tag system: a memory-carrying glider that survives a round trip, a fan-out, and a collision sequence whose net effect is that append. New logic gates that do not compose into that append are recorded and then counted as failure, matching the problem's falsifier that partial gates leave the question open.",
+      "steps": [
+        "Transcribe the 2006 glider words and ether; do not invent new names.",
+        "Collide all pairs at separations 1 through 256, cutoff 10^5 steps, with two simulators.",
+        "Classify products as ether, catalogued gliders, or a new persistent object.",
+        "Search the table for a cyclic-tag append realized as a finite collision sequence.",
+        "If found, emit the sequence as a witness; if not, emit the census and stop."
+      ],
+      "decisive_result": "A collision sequence, reproduced by both simulators, whose net glider content is one step of a cyclic tag system, or a complete census up to separation 256 with no such sequence.",
+      "failure_signature": "The census finds gates, oscillators or a new glider but no composition that implements a tag append. That is the partial-result failure the problem already names. Disagreement between the two simulators invalidates the census.",
+      "tools": ["cellular-automaton-simulation", "glider-collision-search"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.chaos.2005.07.013", "note": "Martínez, Adamatzky and McIntosh 2006, Phenomenology of glider collisions in cellular automaton Rule 54" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "rule54-universality",
+      "n": 2,
+      "title": "Prove a defect invariant that blocks unbounded memory",
+      "kind": "proof",
+      "method": "Attempt a negative theorem that applies to every finite perturbation of the ether, not only to the 2006 gliders. Rule 54's ether is periodic. Treat gliders as defects. Search for a conserved quantity taking values in a finite monoid: a sum of local window weights modulo m, or a pairing between left-going and right-going defects, that every space-time diagram must preserve. The universality-refuting conclusion is that the set of defects reachable from a finite perturbation is a regular language, so the diagram cannot encode an arbitrary binary work string. The conservation law has to be proved from the 8-bit table for every configuration, then specialized to finite ether perturbations. Compatibility of the invariant with a glider that stores an arbitrary string is an immediate failure of this route.",
+      "steps": [
+        "Define the ether and the defect of a finite window relative to it.",
+        "Enumerate small modular weightings and test them against the 8-bit table.",
+        "Prove any surviving weighting is invariant for every configuration.",
+        "Prove that finite perturbations stay inside a regular defect language.",
+        "Conclude that no such perturbation simulates a cyclic tag system on arbitrary inputs."
+      ],
+      "decisive_result": "A proof that every finite perturbation of the Rule 54 ether has space-time defect language regular, hence cannot emulate a cyclic tag system on all inputs.",
+      "failure_signature": "The invariant, if it exists, still permits a defect whose internal tape is an arbitrary finite word. The route has then failed even if the invariant is true.",
+      "tools": ["lean4", "cellular-automaton-simulation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.chaos.2005.07.013", "note": "Martínez, Adamatzky and McIntosh 2006, source of the ether and the known defects the invariant must reproduce" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "No published conservation law of this strength. The swarm lacks a theorem, not a dataset."
+    },
+    {
+      "problem": "rule54-universality",
+      "n": 3,
+      "title": "Lean-check the published gates and their generated monoid",
+      "kind": "formalization",
+      "method": "Formalize only the collisions Martínez, Adamatzky and McIntosh actually used to build gates, as kernel-checked lemmas of the same kind as the Rule 110 table, then stop at the algebra those gates generate. Represent each gate as a relation on a finite set of glider occupancy vectors. Compute the monoid generated by composition up to a stated vector length. Prove either that the monoid contains a copy of a cyclic-tag append, or that every element is a function of a finite set of counters that cannot store an arbitrary work string. This can succeed as a non-universality proof for this gate set while the wider Rule 54 question stays open, and it fails differently from the census: the census can find a new glider that this monoid never sees.",
+      "steps": [
+        "Transcribe the published gate collisions and check them by kernel reduction.",
+        "Encode each gate as a relation on occupancy vectors.",
+        "Close the monoid under composition up to the stated length.",
+        "Test whether a cyclic-tag append embeds in that monoid.",
+        "If it does not, prove the monoid's memory is bounded by the counters found in the closure."
+      ],
+      "decisive_result": "Either a checked embedding of one cyclic-tag step in the monoid of the 2006 gates, or a proof that this monoid cannot store an arbitrary work string.",
+      "failure_signature": "The monoid is too large to close and no embedding is found. That is an inconclusive stop, not a non-universality proof. A simulator mismatch on a published gate also fails the approach.",
+      "tools": ["lean4", "cellular-automaton-simulation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.chaos.2005.07.013", "note": "Martínez, Adamatzky and McIntosh 2006, the gate collisions to formalize" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "rule30-center-column",
+      "n": 1,
+      "title": "Certify a period lower bound past the published checks",
+      "kind": "mixed",
+      "method": "Prove the elementary step in Lean: the Rule 30 cell is left XOR (center OR right). Then certify a long center-column prefix by blocked replay. An external bit-packed simulator emits a row hash every K steps; Lean replays each block from the certified start row and checks the hash and the center bit. The theorem is that if the center column is periodic with period p, then p exceeds N, where N is the length of the certified prefix with no period. N must be strictly larger than the longest prefix the Rule 30 prize page reports as already computed on the day the run starts. Read that horizon from the prize page first and write it into the pre-registration. A certified prefix that does not beat the published horizon is not a result under the acceptance criteria.",
+      "steps": [
+        "Record the computational horizon stated on the prize page before running.",
+        "Prove the Rule 30 step function in Lean.",
+        "Emit block hashes from a bit-packed simulator for a prefix longer than that horizon.",
+        "Check every block in Lean.",
+        "Prove that absence of a repeat in the certified prefix rules out every period at most N."
+      ],
+      "decisive_result": "A no-sorry theorem that any period of the center column exceeds the published computational horizon recorded at the start of the run.",
+      "failure_signature": "A repeat is found, which refutes non-periodicity if it is a true period, or the certified N does not exceed the published horizon, in which case the approach has not met its own bar.",
+      "tools": ["lean4", "large-scale-simulation"],
+      "datasets": [
+        {
+          "name": "Wolfram Rule 30 Prizes",
+          "url": "https://www.rule30prize.org/",
+          "note": "Source of the three problem statements and of the computational horizon the certified prefix must beat."
+        }
+      ],
+      "references": [],
+      "difficulty": "hard",
+      "missing": "Lean kernel time. If the published horizon is far beyond what blocked replay can certify in a month, this approach cannot finish as stated."
+    },
+    {
+      "problem": "rule30-center-column",
+      "n": 2,
+      "title": "Prove density one half from left permutivity",
+      "kind": "proof",
+      "method": "The local rule f(l, c, r) = l XOR (c OR r) is left-permutive: for every fixed center and right, the two choices of the left neighbor give opposite outputs. Prove that permutivity, then the standard consequences that can be formalized: the global map on bi-infinite configurations is surjective, and the fair Bernoulli product measure is invariant. The prize question is not about almost every configuration. It is about the single orbit of the configuration with one black cell. The remaining lemma is equidistribution of that orbit's center cell: the visit frequency of black at the center tends to 1/2. State equidistribution as a separate theorem whose hypotheses, if any extra ergodicity assumption is used, are written explicitly. An extra assumption means the prize problem is not solved.",
+      "steps": [
+        "Prove left permutivity from the XOR-OR formula.",
+        "Prove surjectivity on bi-infinite configurations.",
+        "Prove invariance of the fair Bernoulli measure.",
+        "Attempt equidistribution of the single-seed center cell with no added assumption.",
+        "If an ergodicity hypothesis is required, stop and label the prize statement unproved."
+      ],
+      "decisive_result": "A no-sorry proof that the center-cell frequency along the single-seed orbit tends to 1/2, with no hypothesis beyond the rule and the initial cell.",
+      "failure_signature": "The measure lemmas go through but equidistribution of this orbit needs an assumption that is itself open. The approach has then failed on the prize statement even if the lemmas are worth keeping.",
+      "tools": ["lean4", "symbolic-dynamics"],
+      "datasets": [],
+      "references": [
+        { "note": "Wolfram Rule 30 Prizes, 2019, problem 2: each color occurs equally often on average. Page: https://www.rule30prize.org/" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "A proof idea that upgrades invariance of Bernoulli measure to equidistribution of one explicit orbit. That is the open step."
+    },
+    {
+      "problem": "rule30-center-column",
+      "n": 3,
+      "title": "Show the center column is not 2-automatic",
+      "kind": "proof",
+      "method": "Attack the linear-effort prize by way of automatic sequences. A shortcut that computed the n-th center cell from the binary digits of n in o(n) time, uniformly, would make the sequence 2-automatic or at least would give a finite 2-kernel. Compute the 2-kernel of the center column: the subsequences u(2^k n + r) for residues r. Prove in Lean that the step function commutes with the kernel construction in the usual way for a cellular automaton. Then exhibit more distinct kernel sequences than any finite automaton of a given size can hold, using a certified prefix from the first approach as the witness for the small kernels, and a theorem that a new distinct subsequence appears at arbitrarily large scales. Refuting all linear recurrences over GF(2) up to a fixed order is a weaker lemma and should be stated separately; it does not by itself give an Ω(n) lower bound.",
+      "steps": [
+        "Define the 2-kernel of the center column.",
+        "Prove the Rule 30 step constrains kernel sequences.",
+        "Certify, from a checked prefix, that the kernel already has more than M distinct sequences.",
+        "Prove distinctness persists at arbitrary scale, or isolate the missing lemma.",
+        "Separately refute linear recurrences up to an order fixed by the certified prefix, and do not call that the prize theorem."
+      ],
+      "decisive_result": "A proof that the center column is not 2-automatic, together with a reduction showing that any uniform o(n) digit-based algorithm would imply automaticity. That is a form of the linear-effort lower bound, not yet a general Ω(n) time lower bound against all algorithms.",
+      "failure_signature": "The kernel collapses to a finite set, or a new distinct subsequence cannot be forced past the certified prefix. Recurrence-refutation alone is a failure to reach the prize statement.",
+      "tools": ["lean4", "large-scale-simulation"],
+      "datasets": [
+        {
+          "name": "Wolfram Rule 30 Prizes",
+          "url": "https://www.rule30prize.org/",
+          "note": "Problem 3 asks for at least linear effort in n for the n-th center cell."
+        }
+      ],
+      "references": [],
+      "difficulty": "long-shot",
+      "missing": "A general time lower bound against arbitrary algorithms is beyond a kernel argument. This approach only targets digit-based and automatic shortcuts."
+    },
+    {
+      "problem": "turing-capable-network-topologies",
+      "n": 1,
+      "title": "Formalize equal-diffusion impossibility and the n=2 list",
+      "kind": "formalization",
+      "method": "Two theorems, both classical, both absent as checked lemmas. First, for every dimension n, if the diffusion matrix is a scalar multiple of the identity, every eigenvalue of J minus q squared D is an eigenvalue of J shifted by a non-positive real, so Hurwitz stability of J implies stability at every wave number. Equal diffusion cannot create a Turing instability. This does not contradict Marcon et al., who found patterning by mechanisms other than that linear instability; the theorem's statement must say diffusion-driven linear instability, not patterning. Second, for n = 2, derive the necessary and sufficient sign patterns: the inhibitor diffuses faster, and the Jacobian signs are the activator-inhibitor pattern or the substrate-depletion pattern. Use the Routh–Hurwitz criteria on the quadratic characteristic polynomial. Hypotheses are the signs and which species diffuse.",
+      "steps": [
+        "Define the Jacobian, the diagonal diffusion matrix and the dispersion relation.",
+        "Prove the equal-diffusion theorem for general n.",
+        "Specialize to n = 2 and compute the Hurwitz inequalities.",
+        "Case-split the sign patterns and prove the two classical patterns are exactly the Turing-capable ones.",
+        "Audit axioms."
+      ],
+      "decisive_result": "No-sorry theorems: equal diffusivities forbid a Turing instability in every dimension, and for two species the Turing-capable sign patterns are exactly the two classical ones.",
+      "failure_signature": "A concrete 2-by-2 sign pattern outside those two classes, with numerical rates, that is stable without diffusion and unstable at some wave number. That would falsify the classification.",
+      "tools": ["lean4", "linear-algebra"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1098/rstb.1952.0012", "note": "Turing 1952, The chemical basis of morphogenesis" },
+        { "doi": "10.7554/eLife.14022", "note": "Marcon et al. 2016, patterning with equal diffusion, which this theorem does not claim to forbid" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "turing-capable-network-topologies",
+      "n": 2,
+      "title": "Exact n=3 sign-pattern census by interval bounds",
+      "kind": "computation",
+      "method": "Enumerate all 3^9 = 19683 sign patterns in {-1, 0, +1}^{3×3}. Quotient by simultaneous permutation of the three species only after the raw census, so the quotient cannot hide a disagreement. A pattern is Turing-capable if there exist positive rate magnitudes and a non-negative diffusion vector, not a scalar multiple of the identity, such that J is Hurwitz and J minus q squared D is not Hurwitz for some q > 0. Hurwitz for 3×3 is the three Routh–Hurwitz inequalities on the characteristic polynomial. Search by log-uniform samples of the nonzero magnitudes in [10^{-2}, 10^{2}], 200 draws per pattern, and a log grid of q. Every pattern not decided by a sample goes to interval branch-and-bound on the log-magnitudes. Capable means a concrete witness box. Incapable means the parameter domain is covered by boxes that violate the conditions. A pattern still unresolved below a minimum box width is a failure of the census, not a silent negative. Compare witnesses with the Turing-instability labels in Marcon et al. 2016 and Scholes et al. 2019, not with their broader patterning labels.",
+      "steps": [
+        "Enumerate the 19683 sign patterns and the diffusion supports.",
+        "Apply the Routh–Hurwitz test to samples and to the q grid.",
+        "Branch-and-bound every undecided pattern with interval arithmetic.",
+        "Emit a witness or a covering certificate for each pattern.",
+        "Match the capable set against the Turing labels in the two atlases and list every disagreement."
+      ],
+      "decisive_result": "A complete partition of the 19683 patterns into capable and incapable, with a witness or a covering certificate for each, and an empty disagreement list against the published Turing labels or an explicit list of disagreements.",
+      "failure_signature": "More than 1 percent of patterns remain unresolved, or a published Turing-capable network is certified incapable, or the converse. Either is a failed census or a failed atlas entry, and the approach must say which.",
+      "tools": ["enumeration", "sign-pattern-matrices", "linear-algebra"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.7554/eLife.14022", "note": "Marcon et al. 2016, atlas used only for its Turing-instability labels" },
+        { "doi": "10.1016/j.cels.2019.07.007", "note": "Scholes et al. 2019, network atlas of Turing patterns" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "turing-capable-network-topologies",
+      "n": 3,
+      "title": "Monte Carlo the n=4 genericity conjecture",
+      "kind": "computation",
+      "method": "The genericity claim is that for n at least 3, almost all topologies with a feedback loop are Turing-capable. For n = 4 an exact census of 3^16 patterns is not the target. Draw 2000 sign patterns uniformly among those whose interaction digraph contains at least one directed cycle, assign diffusion to a non-empty random subset of species, and test 100 log-uniform rate draws with the same Routh–Hurwitz and wave-number sweep as the n = 3 census. Estimate the capable fraction and a Clopper–Pearson 95 percent interval. Almost-all is pre-registered as a fraction above 0.9. A cycle is required in the sample by construction, so the estimate is conditional on that event. This sample can refute the conjecture and cannot prove it.",
+      "steps": [
+        "Sample 2000 four-species sign patterns conditioned on having a directed cycle.",
+        "Sample diffusion supports that are not scalar.",
+        "Test 100 rate draws per pattern with the Hurwitz criteria.",
+        "Compute the capable fraction and the Clopper–Pearson interval.",
+        "Declare the conjecture refuted for n = 4 if the interval lies below 0.9, and unrefuted otherwise."
+      ],
+      "decisive_result": "A Clopper–Pearson 95 percent interval for the Turing-capable fraction among 4-node cyclic sign patterns. The conjecture is refuted for this n if the interval lies entirely below 0.9.",
+      "failure_signature": "The interval covers both sides of 0.9, so the sample does not decide the conjecture. That is a failed test, not evidence for the conjecture. Patterns found capable only because diffusion was accidentally scalar are a bug, not a result.",
+      "tools": ["enumeration", "sign-pattern-matrices"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.cels.2019.07.007", "note": "Scholes et al. 2019, the numerical genericity claim this sample tests at n = 4" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "hamiltons-rule-exact-scope",
+      "n": 1,
+      "title": "Three Lean theorems for the three readings of rb > c",
+      "kind": "formalization",
+      "method": "Formalize the Birch–Okasha separation as three theorems with disjoint hypotheses. Price's identity first: the change in mean breeding value equals the covariance of fitness and breeding value divided by mean fitness, plus the expected fitness-weighted transmission term. Under fair meiosis the transmission term is zero, so the sign of allele-frequency change is the sign of that covariance. Regression form: define r as the least-squares regression of partner genotype on actor genotype, and b, c as the partial regressions of fitness on partner and actor genotype. Prove that r b - c equals the covariance ratio by the normal equations, so the regression form predicts the sign of frequency change whenever the transmission term vanishes. This is an identity, and the theorem should say so. Additive form: fitness is exactly 1 - c x + b y with b, c constant and y the partner phenotype. Prove the same sign prediction with genealogical relatedness in place of the regression. Counterexample theorem: with fitness 1 - c x + b x y, b and c frozen at one frequency do not preserve the sign at another frequency. State the 2010–2011 correspondence in the module docstring: Nowak, Tarnita and Wilson attack dynamic sufficiency of inclusive-fitness maximization; Gardner, West and Wild defend the regression identity; those are different theorems.",
+      "steps": [
+        "Prove Price's identity and the fair-meiosis corollary.",
+        "Prove the regression form from the normal equations, labeled as an identity.",
+        "Prove the additive constant-b, constant-c form with genealogical relatedness.",
+        "Prove a frequency-dependent counterexample to the frozen additive predictor.",
+        "Map each theorem onto the 2010 and 2011 claims in the module documentation."
+      ],
+      "decisive_result": "Three no-sorry theorems with explicit hypotheses, plus a short map from those theorems onto the 2010–2011 dispute.",
+      "failure_signature": "A model inside the regression theorem's hypotheses where the regression form has the wrong sign of allele-frequency change. That would refute the identity and the formalization together.",
+      "tools": ["lean4", "population-genetics", "price-equation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1038/227520a0", "note": "Price 1970, Selection and covariance" },
+        { "doi": "10.1016/0022-5193(64)90038-4", "note": "Hamilton 1964, The genetical evolution of social behaviour I" },
+        { "doi": "10.1038/nature09205", "note": "Nowak, Tarnita and Wilson 2010, The evolution of eusociality" },
+        { "doi": "10.1111/j.1420-9101.2011.02236.x", "note": "Gardner, West and Wild 2011, The genetical theory of kin selection" },
+        { "doi": "10.1093/biosci/biu196", "note": "Birch and Okasha 2015, Kin selection and its critics" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "hamiltons-rule-exact-scope",
+      "n": 2,
+      "title": "Exact Moran chain where frozen rb > c has the wrong sign",
+      "kind": "computation",
+      "method": "Give a finite witness that does not rely on Monte Carlo error. Population of N = 6 haploid individuals, reproduction a Moran birth-death update, interaction in three fixed pairs so genealogical relatedness inside a pair is 1 and between pairs is 0. Phenotype x in {0,1}. Fitness w = 1 - c x + b x y with b = 5 and c = 1, where y is the partner phenotype. The state is the integer count of cooperators, 0 through 6, and the chain is written in closed form. The additive predictor freezes b and c at frequency 1/2 by an ordinary least-squares regression on the exact stationary-conditional fitnesses at states with three cooperators, then is applied at every other state. The regression predictor is refit at each state. Compare signs with the exact expected frequency change. Pre-register success as: the refit regression matches the sign of expected change at every non-absorbing state where the absolute expected change exceeds 0, and the frozen predictor disagrees at least at one endpoint state.",
+      "steps": [
+        "Write the 7-state Moran transition matrix for the paired population and the synergistic payoff.",
+        "Compute exact expected frequency change at each state.",
+        "Fit the frozen additive regression at the three-cooperator states.",
+        "Refit the regression at every state.",
+        "Compare signs and emit the disagreement table."
+      ],
+      "decisive_result": "An exact table, with rational arithmetic, where the refit regression matches every nonzero expected frequency change and the additive coefficients frozen at frequency 1/2 disagree in sign at least once.",
+      "failure_signature": "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees. The second outcome would contradict the regression identity and fail the formalization too.",
+      "tools": ["population-genetics"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1111/j.1420-9101.2011.02236.x", "note": "Gardner, West and Wild 2011, the regression form this chain is built to separate from the additive form" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "hamiltons-rule-exact-scope",
+      "n": 3,
+      "title": "Separate the regression identity from ESS maximization",
+      "kind": "computation",
+      "method": "Nowak, Tarnita and Wilson's target is dynamic sufficiency of inclusive-fitness maximization, not the regression identity. Use the same Moran chain as the sign witness. Compute its exact stationary distribution by solving the linear balance equations on the transient states with mutation probability u = 0.01 each birth, so the chain is irreducible. Define the inclusive-fitness ESS as the strategy that maximizes r b_marg - c with genealogical r from the pair structure and b_marg the marginal benefit at that frequency. Pre-register the comparison: the stationary mean frequency is not within 0.05 of the ESS frequency, while the one-step regression identity still holds at every state. That package shows an identity with predictive content for one-step change and no content for the long-run optimum. It fails differently from the sign witness, which never looks at the stationary distribution.",
+      "steps": [
+        "Add mutation u = 0.01 and solve the stationary distribution exactly.",
+        "Compute the inclusive-fitness ESS frequency from the marginal benefit.",
+        "Check the one-step regression identity at each state.",
+        "Compare stationary mean frequency to the ESS with tolerance 0.05.",
+        "Report the pair of outcomes as the scope statement for this model."
+      ],
+      "decisive_result": "Exact stationary mean at least 0.05 away from the inclusive-fitness ESS, together with the regression identity holding at every state of the same chain.",
+      "failure_signature": "The stationary mean sits within 0.05 of the ESS. This model then does not witness the gap Nowak et al. claim, and another payoff would be a new approach rather than a rescue of this one.",
+      "tools": ["population-genetics"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1038/nature09205", "note": "Nowak, Tarnita and Wilson 2010, dynamic sufficiency is the claim under test" },
+        { "doi": "10.1093/biosci/biu196", "note": "Birch and Okasha 2015, the separation between the identity and the maximization reading" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "phyllotaxis-attractor-classification",
+      "n": 1,
+      "title": "Interval-certify cylindrical Fibonacci and Lucas branches",
+      "kind": "computation",
+      "method": "Implement the discrete cylindrical map exactly as defined by Atela, Golé and Hotton 2003, whose fixed points are cylindrical lattices and whose bifurcation parameter is the growth parameter of their diagram. Do not substitute a different potential. On a uniform grid of that parameter across the interval their paper analyzes, certify attracting cycles by interval Newton on the return map: a cycle is certified when an interval box maps into itself and the interval derivative excludes magnitude 1 or greater. Classify certified limits by parastichy pair: consecutive Fibonacci numbers, consecutive Lucas numbers, or the bijugate doubles. A trajectory whose interval enclosure stays away from every classified cycle is an unclassified attractor. The golden-angle branch is the divergence 2π/φ^2 with φ = (1 + sqrt(5))/2. Full Lebesgue measure of its basin is not claimed by a grid; the grid certifies which cycles exist.",
+      "steps": [
+        "Encode the Atela–Golé–Hotton cylindrical map from the paper, not a proxy.",
+        "Sweep their growth parameter on a stated grid.",
+        "Certify attracting cycles by interval Newton.",
+        "Label each cycle as Fibonacci, Lucas, bijugate, or unclassified.",
+        "Emit the certified partition of the parameter interval."
+      ],
+      "decisive_result": "A certified partition of the paper's parameter interval into basins of Fibonacci, Lucas and bijugate cycles, with every grid point accounted for.",
+      "failure_signature": "An interval-certified attractor that is none of those families. That is the falsifier the problem states: an attractor outside the classified set.",
+      "tools": ["interval-arithmetic", "dynamical-systems", "simulation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1007/s00332-002-0513-1", "note": "Atela, Golé and Hotton 2003, A dynamical system for plant pattern formation" },
+        { "doi": "10.1103/PhysRevLett.68.2098", "note": "Douady and Couder 1992, the physical model this map discretizes" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "phyllotaxis-attractor-classification",
+      "n": 2,
+      "title": "Formalize the Atela–Golé–Hotton fixed-point theorem",
+      "kind": "formalization",
+      "method": "Turn the 2003 existence-and-stability argument into Lean lemmas, restricted to the hypotheses printed in that paper. The first theorem is the characterization of fixed points as cylindrical lattices whose divergence angle is a noble number, with the Fibonacci and Lucas branches identified by their continued-fraction endings. The second is stability of those fixed points on the branches where the paper proves stability, with the same restrictions. Do not extend the theorem to the disc, to bijugate branches the paper does not cover, or to a full-measure basin. Those are different claims. A proof that uses an unformalized estimate must keep that estimate as a named hypothesis. The module is a success only if the named hypotheses are exactly the paper's.",
+      "steps": [
+        "Define the cylindrical lattice and the divergence angle.",
+        "Prove the fixed-point characterization and the continued-fraction labeling.",
+        "Formalize the stability estimates under the paper's restrictions.",
+        "Leave any unformalized estimate as a named hypothesis and list it.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry fixed-point theorem and a stability theorem whose hypotheses match Atela, Golé and Hotton 2003, including the Lucas branch where their proof includes it.",
+      "failure_signature": "A numerically certified attractor from the interval sweep lies outside the theorem's fixed-point list inside the theorem's parameter range. The formalization and the sweep then disagree.",
+      "tools": ["lean4", "dynamical-systems"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1007/s00332-002-0513-1", "note": "Atela, Golé and Hotton 2003, the theorem being formalized" },
+        { "doi": "10.1016/j.physd.2015.05.003", "note": "Pennybacker, Shipman and Newell 2015, the review that marks the remaining gaps" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "The paper is a long real-analysis argument. A month is enough to formalize definitions and perhaps the fixed-point labeling, and unlikely to finish every stability estimate."
+    },
+    {
+      "problem": "phyllotaxis-attractor-classification",
+      "n": 3,
+      "title": "Monte Carlo basin volumes on the disc",
+      "kind": "simulation",
+      "method": "The disc geometry is the gap the cylindrical theorem does not close. Implement the Douady–Couder disc rule: each new primordium is placed at the angular minimum of the repulsive field of the existing primordia on a growing disc, with the growth parameter in the same role as in their 1992 simulations. Sweep 200 parameter values. At each, launch 500 random initial angles and place 300 primordia. Classify the last 50 divergence angles by distance to the golden angle, the Lucas angle, and the bijugate angles. Estimate basin volume as the fraction of seeds in each class, with a bootstrap percentile interval of 1000 resamples. An unclassified attractor has angular error above 10^{-3} radians from every listed noble angle over those 50 primordia and estimated measure above 0.01. This atlas can falsify a proposed complete list and cannot prove full measure.",
+      "steps": [
+        "Implement the disc placement rule from Douady and Couder 1992.",
+        "Sweep 200 growth parameters and 500 seeds, 300 primordia each.",
+        "Classify terminal divergence angles against the noble list.",
+        "Bootstrap the basin-volume estimates.",
+        "Flag any class with measure above 0.01 that is not on the list."
+      ],
+      "decisive_result": "A basin-volume table with bootstrap intervals. The classified list fails if any unclassified class has estimated measure above 0.01.",
+      "failure_signature": "Discovery of such an unclassified attractor. Failure of a different kind is a simulator bug: two implementations disagree on the terminal angle of a shared seed by more than 10^{-3} radians.",
+      "tools": ["simulation", "dynamical-systems"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1103/PhysRevLett.68.2098", "note": "Douady and Couder 1992, Phyllotaxis as a physical self-organized growth process" },
+        { "doi": "10.1103/PhysRevLett.66.224", "note": "Levitov 1991, Energetic approach to phyllotaxis" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "lewontins-paradox-of-variation",
+      "n": 1,
+      "title": "Pre-register the diversity-census slope with a range covariate",
+      "kind": "data-test",
+      "method": "Pre-register before downloading tables. Response is log10 of nucleotide diversity π from the Leffler et al. 2012 compilation, with the Buffalo 2021 estimates used only as a second, separately reported column where the species overlap. Predictor is log10 of census size as published in those supplements. Covariate is log10 of GBIF range area: occurrences for the species with coordinate uncertainty below 10 km, reduced to presence on a 0.1 degree grid, range area the axis-aligned bounding box, species with fewer than 20 occupied cells dropped. Primary estimator is a nested taxonomic random-effects model, species within genus within family within order, fit by REML, not a single time-calibrated tree of all life. Neutral prediction is slope 1 of log10 π on log10 N. Secondary estimator, mammals only, is PGLS with Pagel's lambda on 100 trees from the Upham, Esselstyn and Jetz credible set. Linked selection is not fit in this approach. The verdict is about the slope: if the 95 percent profile interval includes 1, neutral scaling of diversity with census size is not rejected and the paradox sits in the intercept.",
+      "steps": [
+        "Write the model, the GBIF filter and the drop rule before opening the supplements.",
+        "Join Leffler diversity and census size to GBIF bounding-box area.",
+        "Fit the nested random-effects model by REML and record the profile interval for the slope.",
+        "Repeat PGLS on the mammal overlap across 100 Upham trees.",
+        "Call the estimators mixed if one interval contains 1 and the other excludes it."
+      ],
+      "decisive_result": "A 95 percent interval for the slope of log10 π on log10 census N. Neutral scaling is rejected only if that interval excludes 1 in the primary model.",
+      "failure_signature": "Fewer than 30 species survive the GBIF cell filter, in which case the verdict is inconclusive and underpowered. A slope interval that includes both 0 and 1 is also indecisive and is reported as such.",
+      "tools": ["gbif", "phylogenetic-comparative-methods", "data-test"],
+      "datasets": [
+        {
+          "name": "Leffler et al. 2012 diversity compilation",
+          "url": "https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388",
+          "note": "Species-level nucleotide diversity and the census sizes used in that paper."
+        },
+        {
+          "name": "Buffalo 2021 diversity-census reanalysis",
+          "url": "https://elifesciences.org/articles/67509",
+          "note": "Second diversity column, reported separately, not pooled with Leffler in the primary fit."
+        },
+        {
+          "name": "GBIF occurrence API",
+          "url": "https://api.gbif.org/v1/",
+          "note": "Occurrences used only to build range bounding boxes under the pre-registered filter."
+        },
+        {
+          "name": "Upham mammal phylogenies",
+          "url": "https://vertlife.org/data/mammals/",
+          "note": "One hundred node-dated trees for the mammal-only PGLS."
+        }
+      ],
+      "references": [
+        { "doi": "10.1371/journal.pbio.1001388", "note": "Leffler et al. 2012, Revisiting an old riddle: what determines genetic diversity levels within species?" },
+        { "doi": "10.7554/eLife.67509", "note": "Buffalo 2021, Quantifying the relationship between genetic diversity and population size" },
+        { "doi": "10.1371/journal.pbio.3000494", "note": "Upham, Esselstyn and Jetz 2019, the mammal trees" },
+        { "doi": "10.1038/217624a0", "note": "Kimura 1968, the neutral prediction that heterozygosity scales with N" }
+      ],
+      "difficulty": "hard",
+      "missing": "Census sizes are only as good as the supplements. GBIF bounding boxes are a range proxy, not a census, and the model treats them as a covariate rather than as N."
+    },
+    {
+      "problem": "lewontins-paradox-of-variation",
+      "n": 2,
+      "title": "Test whether published recombination maps close the residual",
+      "kind": "data-test",
+      "method": "Pre-register a second test aimed at linked selection, using only species that have both a diversity estimate in the Leffler or Buffalo tables and a public genetic map with at least 10^3 markers in centimorgans. Homo sapiens enters through the 1000 Genomes resource; every other species enters only with a map meeting the same marker floor. For each such species compute map length per megabase. Fit log10 π = a + b log10 N + c (map length per megabase) in the same nested taxonomic model as the slope test. Linked selection closes the gap only if, after this covariate, the residual slope on log10 N has a 95 percent interval containing 0 and the root-mean-square residual of log10 π is below 0.5. Both conditions are required. If fewer than 8 species qualify, the verdict is inconclusive, underpowered, and is not filled in by dropping the marker floor.",
+      "steps": [
+        "Freeze the marker floor and the two numerical conditions before listing species.",
+        "Admit a species only when both a diversity row and a qualifying public map exist.",
+        "Fit the nested model with map length per megabase as covariate.",
+        "Record the residual slope interval and the residual RMSE.",
+        "Stop as underpowered if fewer than 8 species qualify."
+      ],
+      "decisive_result": "Residual slope interval containing 0 and residual RMSE of log10 π below 0.5, on at least 8 species with real maps. Otherwise linked selection, as measured here, does not close the gap.",
+      "failure_signature": "The residual slope interval excludes 0, or the RMSE stays at or above 0.5. Dropping the marker floor after seeing the fit is a failed pre-registration, not a result.",
+      "tools": ["data-test", "population-genetics"],
+      "datasets": [
+        {
+          "name": "1000 Genomes Project",
+          "url": "https://www.internationalgenome.org/",
+          "note": "Human genetic map and diversity resources. Other species enter only with a comparable public map."
+        },
+        {
+          "name": "Leffler et al. 2012 diversity compilation",
+          "url": "https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388",
+          "note": "Diversity values joined to maps."
+        }
+      ],
+      "references": [
+        { "doi": "10.1371/journal.pbio.1002112", "note": "Corbett-Detig, Hartl and Sackton 2015, linked selection as the hypothesis under test" },
+        { "doi": "10.7554/eLife.67509", "note": "Buffalo 2021, the claim that linked selection does not close the gap" }
+      ],
+      "difficulty": "hard",
+      "missing": "Public genetic maps for most of the Leffler species. The test is designed to return underpowered rather than to invent maps."
+    },
+    {
+      "problem": "lewontins-paradox-of-variation",
+      "n": 3,
+      "title": "Forward simulations of sweeps, background selection and bottlenecks",
+      "kind": "computation",
+      "method": "Ask whether a pre-specified demographic-plus-selection process can reproduce the empirical slope, using the slope from the first approach as a fixed target and not refitting it. Three regimes, parameters frozen first: neutral Wright–Fisher with N_e equal to census N; recurrent hitchhiking plus background selection with a stated deleterious mutation rate and a beneficial rate scaled per megabase; and a bottleneck regime with a contraction of factor 100 lasting a stated fraction of each run. For each regime, simulate a grid of census sizes spanning the empirical range, 20 replicates per size, and estimate the slope of mean log10 π on log10 N. A regime accounts for the paradox only if its slope's simulation interval covers the empirical slope and its diversity range covers the empirical diversity range within a factor of two at both ends. Code and seeds are part of the result.",
+      "steps": [
+        "Freeze mutation rates, selection coefficients and the bottleneck schedule before fitting.",
+        "Simulate the three regimes across the census-size grid, 20 replicates.",
+        "Estimate each regime's slope of log10 π on log10 N.",
+        "Compare slope and endpoint diversity with the empirical target.",
+        "Reject a regime that misses either the slope or the endpoint range."
+      ],
+      "decisive_result": "A regime whose simulated slope interval covers the empirical slope and whose diversity range matches both empirical endpoints within a factor of two. If none does, demography-plus-linked-selection of this form does not resolve the paradox.",
+      "failure_signature": "All three regimes miss the slope or the endpoint range. Tuning the rates after seeing the empirical slope is a failed pre-registration.",
+      "tools": ["population-genetics"],
+      "datasets": [
+        {
+          "name": "Leffler et al. 2012 diversity compilation",
+          "url": "https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001388",
+          "note": "Empirical slope and diversity range used only as the pre-registered target."
+        }
+      ],
+      "references": [
+        { "doi": "10.1371/journal.pbio.1002112", "note": "Corbett-Detig, Hartl and Sackton 2015, the linked-selection regime" },
+        { "doi": "10.7554/eLife.67509", "note": "Buffalo 2021, the empirical target the simulations must hit" }
+      ],
+      "difficulty": "hard",
+      "missing": "Species-specific recombination maps are not used here; the regimes are deliberately generic. A species-matched map is the other approach."
+    },
+    {
+      "problem": "metabolic-scaling-exponent",
+      "n": 1,
+      "title": "PGLS of PanTHERIA basal rate against body mass",
+      "kind": "data-test",
+      "method": "Use PanTHERIA 1.0, Wilson and Reeder 2005 file, columns 18-1_BasalMetRate_mLO2hr and the paired mass 5-2_BasalMetRateMass_g. The Ecological Archives metadata says metabolic rate was accepted only with a mass from the same individuals, measured resting, post-absorptive, in the thermoneutral zone. Drop the missing-value code -999. Primary regression is log10(BMR) on log10(paired mass), PGLS with Pagel's lambda, repeated on 100 trees from the Upham credible set. A species-typical mass sensitivity uses 5-1_AdultBodyMass_g and is reported separately. Model comparison, pre-registered: a single slope, order-specific slopes, and a quadratic term in log mass. The curved or order-specific model wins if its AIC beats the single power law by more than 10 on at least 95 of the 100 trees. The single-exponent claim is decided by the 95 percent interval of the single slope: it must exclude either 2/3 or 3/4. If the interval contains both, the question is underdetermined, which is the problem's own falsifier. Geographic mean temperature in PanTHERIA is not body temperature and is not used as a thermoregulatory control.",
+      "steps": [
+        "Pre-register the columns, the missing code, the AIC gap and the two target exponents.",
+        "Drop -999 and match species to the Upham trees.",
+        "Fit Pagel's lambda PGLS on 100 trees for the paired-mass regression.",
+        "Compare single-slope, order-specific and quadratic models by AIC.",
+        "Repeat with adult body mass as a labeled sensitivity and do not pool the two masses."
+      ],
+      "decisive_result": "On at least 95 of 100 trees, either a single-slope 95 percent interval that excludes 2/3 or excludes 3/4, or an order-specific or quadratic model that beats the power law by AIC of more than 10.",
+      "failure_signature": "The single-slope interval contains both 2/3 and 3/4 and no alternative model beats the power law by the AIC gap. The universality question is then underdetermined on PanTHERIA.",
+      "tools": ["phylogenetic-comparative-methods", "allometry", "data-test"],
+      "datasets": [
+        {
+          "name": "PanTHERIA 1.0 Ecological Archives E090-184",
+          "url": "https://esapubs.org/archive/ecol/E090/184/metadata.htm",
+          "note": "Basal metabolic rate in mL O2/hr and the paired body mass; missing code -999; Wilson and Reeder 2005 file has 5416 species records."
+        },
+        {
+          "name": "Upham mammal phylogenies",
+          "url": "https://vertlife.org/data/mammals/",
+          "note": "One hundred trees for Pagel's lambda PGLS."
+        }
+      ],
+      "references": [
+        { "doi": "10.1890/08-1494.1", "note": "Jones et al. 2009, PanTHERIA" },
+        { "doi": "10.1371/journal.pbio.3000494", "note": "Upham, Esselstyn and Jetz 2019, mammal phylogenies" },
+        { "doi": "10.1126/science.276.5309.122", "note": "West, Brown and Enquist 1997, the 3/4 prediction" },
+        { "doi": "10.1073/pnas.0436428100", "note": "White and Seymour 2003, the 2/3 claim after physiological controls" },
+        { "doi": "10.3733/hilg.v06n11p315", "note": "Kleiber 1932, Body size and metabolism" }
+      ],
+      "difficulty": "tractable",
+      "missing": "A species-level body-temperature table joined to this taxonomy. PanTHERIA's geographic temperature is not a substitute, so the White and Seymour control is not replicated here."
+    },
+    {
+      "problem": "metabolic-scaling-exponent",
+      "n": 2,
+      "title": "Lean statement of the West–Brown–Enquist exponent",
+      "kind": "formalization",
+      "method": "Formalize the scaling argument under explicit hypotheses, and make the step Kozlowski and Konarzewski dispute a separate lemma. Hypotheses: a self-similar branching network with fixed branching ratio; a space-filling condition relating the linear scale factor to that ratio; a terminal unit whose size does not depend on body mass; and a flow or impedance condition that fixes how cross-section scales across a branch. From those, prove that metabolic rate scales as mass to the 3/4. Then prove a second lemma that names the alternative service-volume assumption used in the critique and shows whether it is consistent with invariant terminal units. The module must not hide either assumption inside a definition. Empirical truth of the hypotheses is out of scope, as in the Thompson Lean standard.",
+      "steps": [
+        "Define branching ratio, scale factor, terminal-unit size and service volume.",
+        "Prove the 3/4 exponent from the stated hypotheses.",
+        "State the critiqued service-volume assumption as a second definition.",
+        "Prove consistency or inconsistency with invariant terminal units.",
+        "Audit axioms and write the scope note that the hypotheses are not data."
+      ],
+      "decisive_result": "A no-sorry derivation of the 3/4 exponent under named hypotheses, and a second lemma that settles consistency of the critiqued alternative with invariant capillaries.",
+      "failure_signature": "The 3/4 exponent is obtained only by assuming the conclusion, or the two lemmas use incompatible definitions of service volume without saying so.",
+      "tools": ["lean4", "allometry"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1126/science.276.5309.122", "note": "West, Brown and Enquist 1997, A general model for the origin of allometric scaling laws in biology" },
+        { "doi": "10.1111/j.0269-8463.2004.00830.x", "note": "Kozlowski and Konarzewski 2004, the critique of the derivation" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "metabolic-scaling-exponent",
+      "n": 3,
+      "title": "Finite-generation networks and the approach to 3/4",
+      "kind": "computation",
+      "method": "The Lean theorem is an infinite-generation statement. Build the finite network the hypotheses describe: branching ratio 2, generations G from 2 to 24, area-preserving branch radii, terminal units of fixed size, service volume the sum of the terminal service volumes. Define metabolic rate as total terminal flow. Regress log rate on log service volume across the generation sequence and report the local exponent between successive generations. The numerical claim matching the theorem is that the local exponent is within 0.01 of 3/4 by some G at most 24. Also build the alternative network from the critique's service-volume assumption and report its exponent. This checks the algebra of both lemmas and says nothing about real mammals.",
+      "steps": [
+        "Implement both finite networks from the Lean hypotheses.",
+        "Compute total flow and service volume at each generation from 2 to 24.",
+        "Estimate the local log-log exponent between successive generations.",
+        "Test whether the primary network is within 0.01 of 3/4 by generation 24.",
+        "Report the alternative network's exponent beside it."
+      ],
+      "decisive_result": "The primary network's local exponent lies within 0.01 of 3/4 at some generation at most 24, and the alternative network's exponent is reported from the same code.",
+      "failure_signature": "The primary exponent stays more than 0.01 away from 3/4 through generation 24. The finite network then does not realize the theorem, and one of the two must be wrong.",
+      "tools": ["allometry"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1126/science.276.5309.122", "note": "West, Brown and Enquist 1997, the network being generated" },
+        { "doi": "10.1111/j.0269-8463.2004.00830.x", "note": "Kozlowski and Konarzewski 2004, the alternative service-volume assumption" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "species-area-exponent",
+      "n": 1,
+      "title": "Power law against METE on GIFT island floras",
+      "kind": "data-test",
+      "method": "Pre-register on GIFT island regions: complete vascular-plant checklists, native species, region area as returned by the GIFT API. Exclude incomplete lists. Fit three models with the same data and the same log-likelihood: the power law log S = log c + z log A by a negative-binomial GLM with log area as offset predictor; the logarithmic curve S = c + z log A under the same likelihood family; and the METE species-area curve implemented by meteR's meteSAR, following Harte et al. 2009, where expected richness is the sum over the MaxEnt species-abundance distribution of the probability a species is present. Universal exponent, pre-registered: the pooled z has a 95 percent interval of width less than 0.1, and every island group with at least 10 islands has a z interval overlapping that pooled interval. Groups are the island-group identifiers GIFT returns; if that field is absent, stop, do not invent clusters. METE wins only if its AIC beats the power law by more than 10 and its mean absolute residual is smaller.",
+      "steps": [
+        "Freeze the likelihood, the width criterion and the AIC gap before querying GIFT.",
+        "Download complete native vascular-plant island checklists and areas.",
+        "Fit the power law, the logarithmic curve and meteSAR.",
+        "Compute pooled and per-group z intervals.",
+        "Apply the universal-exponent rule and the METE rule separately."
+      ],
+      "decisive_result": "Either a pooled z interval narrower than 0.1 that every qualifying island group overlaps, or a rejection of that universality, plus an AIC comparison of METE against the power law with gap 10.",
+      "failure_signature": "Group identifiers are missing, or fewer than five groups have 10 islands. The test is then inconclusive. A METE win on residual and a loss on AIC, or the converse, is a split result and does not count as a win.",
+      "tools": ["gbif", "macroecology", "model-comparison", "data-test"],
+      "datasets": [
+        {
+          "name": "GIFT, Global Inventory of Floras and Traits",
+          "url": "https://gift.uni-goettingen.de/",
+          "note": "Island checklists, native status and region area."
+        },
+        {
+          "name": "GIFT R package documentation",
+          "url": "https://biogeomacro.github.io/GIFT/",
+          "note": "API access to checklists, including the island geographic type."
+        },
+        {
+          "name": "meteR",
+          "url": "https://cran.r-project.org/package=meteR",
+          "note": "meteSAR implementation of the Harte species-area curve."
+        }
+      ],
+      "references": [
+        { "doi": "10.1111/j.1461-0248.2009.01328.x", "note": "Harte et al. 2009, the METE species-area curve" },
+        { "doi": "10.1111/jbi.13623", "note": "Weigelt et al. 2019, GIFT" },
+        { "doi": "10.1111/2041-210X.14213", "note": "Denelle, Weigelt and Kreft, the GIFT R package" },
+        { "doi": "10.1111/j.1461-0248.2005.00848.x", "note": "Drakare, Lennon and Hillebrand 2006, context dependence of z" },
+        { "doi": "10.1111/j.1365-2699.2011.02652.x", "note": "Triantis, Guilhaumon and Whittaker 2012, comparison of island species-area forms" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "species-area-exponent",
+      "n": 2,
+      "title": "A logseries null for the island exponent",
+      "kind": "computation",
+      "method": "Test the sampling explanation of z without fitting z on the same islands used to build the null. Fit Fisher's logseries to the single largest GIFT island, or to one pre-registered mainland GIFT region if the largest island is itself in the test set. Freeze those parameters. Place individuals independently onto the other islands with probability proportional to island area, thinning the same abundance vector. Estimate z by the same negative-binomial GLM as the data test, 1000 replicates. The empirical pooled z is a sampling consequence if it lies inside the central 95 percent of this null. The null uses the empirical area distribution and does not use the empirical species lists of the test islands.",
+      "steps": [
+        "Choose the calibration region and freeze it before estimating z on the remainder.",
+        "Fit the logseries on the calibration region only.",
+        "Thin individuals onto the other islands proportional to area, 1000 times.",
+        "Estimate z with the same GLM as the data test.",
+        "Locate the empirical z in the null distribution."
+      ],
+      "decisive_result": "The empirical pooled z either lies inside the central 95 percent of the logseries-placement null or it does not. Inside means the cluster of z is reproduced by this sampling model.",
+      "failure_signature": "The empirical z falls outside the null interval. A biological mechanism is then still required, and this approach has not explained the exponent. Using the test islands to fit the logseries is a failed pre-registration.",
+      "tools": ["macroecology", "model-comparison"],
+      "datasets": [
+        {
+          "name": "GIFT, Global Inventory of Floras and Traits",
+          "url": "https://gift.uni-goettingen.de/",
+          "note": "Calibration-region abundances and the area distribution of the remaining islands."
+        }
+      ],
+      "references": [
+        { "doi": "10.1111/j.1461-0248.2009.01328.x", "note": "Harte et al. 2009, the MaxEnt logseries this null approximates in the calibration region" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "species-area-exponent",
+      "n": 3,
+      "title": "Prove the METE slope is not a constant power",
+      "kind": "formalization",
+      "method": "Formalize the Harte 2009 claim that the MaxEnt species-area curve is not a power law, so a local exponent near 0.25 is an accident of scale. Define expected richness S(A) as S0 times the sum over abundances of the MaxEnt species-abundance probabilities times the probability a species of that abundance is present in a nested cell of area A. Define the local exponent as the derivative of log S with respect to log A. Prove it is not constant on (0, A0) under the Harte constraints, and prove the published limiting statement that the local exponent tends to 0, not to 1/4, as mean abundance per species goes to infinity. This is a theorem about the model. It does not say islands obey the model.",
+      "steps": [
+        "Encode the MaxEnt abundance distribution and the spatial presence probability from Harte et al. 2009.",
+        "Define S(A) and the local exponent.",
+        "Prove the local exponent is non-constant for finite mean abundance.",
+        "Prove the infinite-abundance limit is 0.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry proof that the METE local exponent is not constant and tends to 0 as mean abundance per species tends to infinity.",
+      "failure_signature": "Under the stated constraints the local exponent is in fact constant. The formalization would then have found that METE does not say what the approach claims it says.",
+      "tools": ["lean4", "macroecology"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1111/j.1461-0248.2009.01328.x", "note": "Harte et al. 2009, Biodiversity scales from plots to biomes with a universal species-area curve" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "clade-trajectory-universality",
+      "n": 1,
+      "title": "SQS hat-shape test of marine orders and families",
+      "kind": "data-test",
+      "method": "Pre-register on the Paleobiology Database occurrence API. Taxa: marine invertebrate orders and families with at least 50 occurrences and at least 8 occupied international stages, accepted names only. Richness in each stage is shareholder-quorum subsampling at quorum 0.6 with 1000 trials, using Alroy's sqs. A clade is hat-shaped if the stage of peak subsampled richness lies in the middle third of its occupied duration and richness at both endpoint stages is below half the peak. The null for each clade is a constant-rate birth-death trajectory conditioned on the same duration and the same number of occurrences, passed through the same quorum filter, 200 replicates. The clade p-value is the fraction of null trajectories with symmetry at least as strong. The summary is the fraction of clades that are hat-shaped. Universality, pre-registered, requires that fraction above 0.5 and a bootstrap interval for the excess over the null mean that excludes 0. Repeat with the two most recent Cenozoic stages removed. If that sensitivity flips the call, the result is a pull-of-the-recent artifact.",
+      "steps": [
+        "Freeze quorum, trials, occurrence floor, hat definition and the 0.5 fraction before download.",
+        "Download PBDB occurrences for accepted marine invertebrate orders and families.",
+        "Compute SQS richness curves and the hat indicator.",
+        "Simulate the conditioned birth-death null through the same filter.",
+        "Bootstrap the excess over the null and repeat after dropping the last two Cenozoic stages."
+      ],
+      "decisive_result": "Fraction of qualifying clades hat-shaped, with a bootstrap interval for its excess over the null. Supports a general hat only if the fraction exceeds 0.5, the excess interval excludes 0, and the call survives dropping the last two Cenozoic stages.",
+      "failure_signature": "The excess interval contains 0, or the call flips when recent stages are dropped. The pattern is then indistinguishable from the null or is a sampling-edge artifact.",
+      "tools": ["pbdb", "paleobiology-statistics", "subsampling", "data-test"],
+      "datasets": [
+        {
+          "name": "Paleobiology Database data service 1.2",
+          "url": "https://paleobiodb.org/data1.2/",
+          "note": "Occurrence lists for marine invertebrate orders and families."
+        },
+        {
+          "name": "Alroy shareholder quorum subsampling",
+          "url": "http://bio.mq.edu.au/~jalroy/SQS.html",
+          "note": "sqs implementation, quorum 0.6, 1000 trials."
+        }
+      ],
+      "references": [
+        { "doi": "10.1666/06084.1", "note": "Foote 2007, Symmetric waxing and waning of marine invertebrate genera" },
+        { "doi": "10.1098/rspb.2007.0712", "note": "Liow and Stenseth 2007, The rise and fall of species" },
+        { "doi": "10.1126/science.1239431", "note": "Quental and Marshall 2013, How the Red Queen drives terrestrial mammals to extinction" }
+      ],
+      "difficulty": "hard",
+      "missing": "PBDB taxonomic status is not a monophyly proof. The test excludes unaccepted names and still cannot guarantee monophyletic clades."
+    },
+    {
+      "problem": "clade-trajectory-universality",
+      "n": 2,
+      "title": "A sampling-intensity null that increases toward the present",
+      "kind": "computation",
+      "method": "The birth-death null above uses constant sampling. This null uses the empirical PBDB collection counts per international stage as a time-varying sampling probability, normalized once from the global marine-invertebrate collection curve and then frozen. Simulate origination and extinction at constant rates, sample occurrences with that curve, and apply the same SQS hat statistic. The empirical hat fraction is an artifact of sampling intensity if it lies inside the central 95 percent of this null. The collection curve is a property of the database, computed once, not fit to the clade shapes. This can exonerate a hat that the constant-sampling null flags, or the reverse, which is why it is a separate approach.",
+      "steps": [
+        "Compute the global marine collection count per stage and freeze it.",
+        "Simulate constant-rate origination and extinction sampled with that curve.",
+        "Pass simulations through SQS and the hat statistic.",
+        "Place the empirical hat fraction in the null predictive interval.",
+        "Do not refit the collection curve to clade shape."
+      ],
+      "decisive_result": "The empirical hat fraction lies inside or outside the central 95 percent of the sampling-intensity null. Inside means the hat fraction is accounted for by the collection curve.",
+      "failure_signature": "The empirical fraction lies outside that interval. Sampling intensity of this form then does not explain the pattern, and the approach has failed as an artifact explanation.",
+      "tools": ["pbdb", "paleobiology-statistics"],
+      "datasets": [
+        {
+          "name": "Paleobiology Database data service 1.2",
+          "url": "https://paleobiodb.org/data1.2/",
+          "note": "Global collection counts per stage, and the empirical hat fraction from the paired test."
+        }
+      ],
+      "references": [
+        { "doi": "10.1666/06084.1", "note": "Foote 2007, the symmetry claim the sampling null tries to reproduce" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "clade-trajectory-universality",
+      "n": 3,
+      "title": "Diversity-dependent extinction versus constant rates",
+      "kind": "computation",
+      "method": "If hats survive the sampling nulls, ask whether diversity-dependent extinction fits the declines better than constant rates. On each SQS curve that passed the occurrence floor, fit two birth-death models by Poisson likelihood of the stage-to-stage richness changes: constant origination and extinction, and constant origination with extinction linear in standing SQS richness. Compare by AIC. Diversity dependence is supported only if it beats the constant model by more than 10 in AIC for a fraction of clades whose bootstrap interval lies above 0.5. This can fail while the hat-shape test succeeds: symmetric-looking curves need not have diversity-dependent rates. It is the Red Queen piece of the question, not a second hat statistic.",
+      "steps": [
+        "Freeze the linear extinction model and the AIC gap.",
+        "Fit both likelihoods on each SQS curve.",
+        "Record the fraction of clades with AIC gap above 10.",
+        "Bootstrap that fraction.",
+        "Require the interval to lie above 0.5."
+      ],
+      "decisive_result": "Bootstrap interval, entirely above 0.5, for the fraction of clades in which diversity-dependent extinction beats constant rates by AIC of more than 10.",
+      "failure_signature": "The interval is not entirely above 0.5. Diversity-dependent extinction then does not explain the declines in this model class, whether or not the curves look hat-shaped.",
+      "tools": ["pbdb", "paleobiology-statistics", "model-comparison"],
+      "datasets": [
+        {
+          "name": "Paleobiology Database data service 1.2",
+          "url": "https://paleobiodb.org/data1.2/",
+          "note": "Stage-to-stage SQS richness used as the likelihood data."
+        }
+      ],
+      "references": [
+        { "doi": "10.1126/science.1239431", "note": "Quental and Marshall 2013, diversity-dependent decline is the hypothesis" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "empty-shell-morphospace",
+      "n": 1,
+      "title": "Prove the planispiral non-intersection boundary",
+      "kind": "formalization",
+      "method": "Raup's parameters are whorl expansion W, relative distance D of the generating curve from the coiling axis, and translation T. For the planispiral case T = 0, define the shell as the Thompson logarithmic spiral of expansion W with a circular generating curve of Raup's D. Prove the necessary and sufficient algebraic inequality on W and D such that the generating circle at angle θ does not meet the circle at angle θ minus 2π. The theorem is that inequality, derived inside Lean from the definitions, not copied from a secondary source. State the open solid-of-revolution case T ≠ 0 as out of scope. This is the developmental-constraint boundary the occupancy test will use.",
+      "steps": [
+        "Define W, D and the planispiral logarithmic spiral.",
+        "Write the two successive generating circles.",
+        "Prove they are disjoint if and only if the derived inequality holds.",
+        "Leave T ≠ 0 unformalized and say so.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry equivalence between non-intersection of successive planispiral whorls and an explicit inequality in W and D.",
+      "failure_signature": "A numerically non-intersecting (W, D) pair that violates the inequality, or the converse. The statement is then false.",
+      "tools": ["lean4", "theoretical-morphology"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1111/brv.12276", "note": "Gerber 2017, The geometry of morphospaces, used for the parameter definitions and the occupancy question" },
+        { "note": "Raup 1966, Geometric analysis of shell coiling: general problems. https://www.jstor.org/stable/1301405" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "empty-shell-morphospace",
+      "n": 2,
+      "title": "Held-out occupancy models on museum meshes",
+      "kind": "data-test",
+      "method": "Measure W, D and T with the morpholib MorphoEval pipeline on open gastropod and cephalopod meshes from MorphoSource, supplemented by iDigBio specimen records for provenance. A taxon enters only if it resolves to a GBIF key or an Open Tree taxon. Pre-register a minimum of 30 species; below that the verdict is underpowered. Three predictive models, scored by log predictive density on families held out one at a time. Developmental constraint: the planispiral inequality from the Lean theorem, with a Gaussian likelihood inside the allowed region and a fixed penalty outside. Functional: from each mesh, the center of mass must project inside the aperture-down contact footprint, and a thickness proxy from the mesh, if the mesh has a wall, supplies a strength score; meshes without a wall use only the stability score. Phylogenetic: a phylogenetic Gaussian process on the Open Tree subtree. The developmental or functional model wins only if its expected log predictive density beats the phylogenetic model by an interval that excludes 0. If neither does, the question stays open, which is the stated falsifier.",
+      "steps": [
+        "Freeze the 30-species floor and the scoring rule before measuring meshes.",
+        "Measure W, D, T on MorphoSource shells with MorphoEval and keep provenance from iDigBio.",
+        "Fit the geometric, functional and phylogenetic models.",
+        "Score them by family-held-out log predictive density.",
+        "Declare a winner only if it beats the phylogenetic model with an interval excluding 0."
+      ],
+      "decisive_result": "A held-out log-predictive comparison. A non-phylogenetic model wins only if its advantage over the phylogenetic Gaussian process has an interval excluding 0, on at least 30 species.",
+      "failure_signature": "Neither geometric nor functional model beats the phylogenetic model, or fewer than 30 species have measurable meshes. The question then stays open on present public scans.",
+      "tools": ["morpholib", "3d-shape-analysis", "data-test"],
+      "datasets": [
+        {
+          "name": "MorphoSource",
+          "url": "https://www.morphosource.org/",
+          "note": "Open 3D meshes of gastropod and cephalopod shells."
+        },
+        {
+          "name": "iDigBio",
+          "url": "https://www.idigbio.org/",
+          "note": "Specimen provenance for the meshes."
+        },
+        {
+          "name": "Open Tree of Life",
+          "url": "https://tree.opentreeoflife.org/",
+          "note": "Induced subtree for the phylogenetic Gaussian process."
+        }
+      ],
+      "references": [
+        { "doi": "10.1111/brv.12276", "note": "Gerber 2017, the occupancy question and Raup-space geometry" },
+        { "note": "Raup 1966, Geometric analysis of shell coiling: general problems, parameter definitions. https://www.jstor.org/stable/1301405" }
+      ],
+      "difficulty": "hard",
+      "missing": "Most shells are not scanned. The test is built to return underpowered if the open meshes do not reach 30 species."
+    },
+    {
+      "problem": "empty-shell-morphospace",
+      "n": 3,
+      "title": "Grid the generating curve and compare empty cells",
+      "kind": "simulation",
+      "method": "Fill a rectangular grid in (W, D, T) at the resolution of Raup's published figures, generate the logarithmic-spiral solid, and mark cells whose successive whorls intersect. Overlay the empirical (W, D, T) points from the mesh measurements. Developmental constraint explains an empty region only where the empty cells are exactly the intersecting cells, up to a pre-registered boundary strip of one grid cell. Empirical points inside the intersecting region falsify the generating model. Empty cells that do not intersect remain unexplained by this geometric filter and are passed to the functional model rather than called a success. This approach never sees phylogeny, so it cannot be rescued by a phylogenetic random walk.",
+      "steps": [
+        "Choose the grid from Raup's figure limits and freeze it.",
+        "Mark intersecting cells by the same circle test used in the Lean theorem, extended numerically to T ≠ 0.",
+        "Overlay measured shells.",
+        "Count empirical points in intersecting cells and empty non-intersecting cells.",
+        "Accept developmental constraint only for regions where those two sets match within one grid cell."
+      ],
+      "decisive_result": "A cell-wise map. Developmental constraint accounts for a named empty region only if that region matches the intersecting cells within a one-cell strip and no measured shell falls in an intersecting cell.",
+      "failure_signature": "A measured shell lies in an intersecting cell, or a large empty region is non-intersecting. Geometry then does not explain that emptiness.",
+      "tools": ["theoretical-morphology", "simulation"],
+      "datasets": [
+        {
+          "name": "MorphoSource",
+          "url": "https://www.morphosource.org/",
+          "note": "Empirical shells overlaid on the grid."
+        }
+      ],
+      "references": [
+        { "note": "Raup 1966, Geometric analysis of shell coiling: general problems, the parameter box being re-gridded. https://www.jstor.org/stable/1301405" },
+        { "doi": "10.1111/brv.12276", "note": "Gerber 2017, review of proposed explanations for the empty region" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "somite-number-control",
+      "n": 1,
+      "title": "Clock period over elongation time versus vertebral counts",
+      "kind": "data-test",
+      "method": "Pre-register the clock-and-wavefront prediction N = T_elongation / T_clock. A species enters only when a published time-lapse study reports both the segmentation-clock period and the duration of axis elongation, and an independent count of vertebrae or somites exists. Gomez et al. 2008 is the seed list, not a cap: later papers enter under the same measurement rule. The tolerance is |log(N_predicted / N_observed)| < log(1.25), that is, within 25 percent. The claim is supported only if every qualifying species meets the tolerance. If fewer than 6 species qualify, the verdict is inconclusive, underpowered, and is not converted into support by relaxing the tolerance. Vertebral counts and clock measurements must come from different publications so the count is not the number the clock paper already compared.",
+      "steps": [
+        "Freeze the 25 percent tolerance and the 6-species floor.",
+        "Admit a species only with both clock measurements and an independent vertebral count.",
+        "Compute N_predicted = T_elongation / T_clock.",
+        "Apply the log-ratio tolerance to each species.",
+        "Support the claim only if every qualifying species passes and at least 6 qualify."
+      ],
+      "decisive_result": "Every qualifying species within 25 percent, with at least 6 species. Otherwise the comparative prediction is not supported at the pre-registered bar.",
+      "failure_signature": "Two or more qualifying species miss the 25 percent tolerance. A single miss with at least 6 species is a mixed result, not support. Fewer than 6 species is underpowered.",
+      "tools": ["developmental-biology", "comparative-data", "data-test"],
+      "datasets": [
+        {
+          "name": "FishBase",
+          "url": "https://www.fishbase.se/",
+          "note": "Vertebral counts for fishes, used only when a clock measurement also exists and the count's source is not the clock paper."
+        }
+      ],
+      "references": [
+        { "doi": "10.1016/S0022-5193(76)80131-2", "note": "Cooke and Zeeman 1976, the clock-and-wavefront model" },
+        { "doi": "10.1038/nature07020", "note": "Gomez et al. 2008, Control of segment number in vertebrate embryos" },
+        { "doi": "10.1242/dev.063735", "note": "Oates, Morelli and Soroldoni 2012, Patterning embryos with oscillations" }
+      ],
+      "difficulty": "tractable",
+      "missing": "Clock period and elongation duration are published for only a handful of species. The test is expected to hit the underpowered floor, and that is an acceptable outcome."
+    },
+    {
+      "problem": "somite-number-control",
+      "n": 2,
+      "title": "Rank unmeasured species by expected variance reduction",
+      "kind": "computation",
+      "method": "The second acceptance criterion is a ranked list of species whose clock measurement would most reduce uncertainty. Use FishBase vertebral counts as the response and the Open Tree vertebrate subtree as the covariance. The model is N = α T / τ with log α a phylogenetic Gaussian process. Species that already have a clock measurement anchor the process. For every FishBase species without a clock measurement, compute the expected reduction in posterior variance of α from observing its clock period, using the current phylogenetic covariance. Rank by that reduction. Extremes that are phylogenetically redundant with zebrafish, chick, mouse or snake should rank low. The list is the result; it does not test the mechanism.",
+      "steps": [
+        "Assemble FishBase vertebral counts and the Open Tree distances.",
+        "Anchor the phylogenetic regression at species with published clock data.",
+        "Compute expected variance reduction for each unmeasured species.",
+        "Publish the ranked list with the variance reductions.",
+        "Note species that cannot be ranked because they are absent from the tree."
+      ],
+      "decisive_result": "A ranked list of unmeasured species with the expected reduction in variance of the clock-and-wavefront coefficient.",
+      "failure_signature": "The ranking is unchanged if phylogenetic covariance is replaced by a star phylogeny, in which case the list is only a ranking by vertebral-count extremity and does not use the tree. Report that degeneration rather than hiding it.",
+      "tools": ["comparative-data"],
+      "datasets": [
+        {
+          "name": "FishBase",
+          "url": "https://www.fishbase.se/",
+          "note": "Vertebral counts used as the response for the value-of-information ranking."
+        },
+        {
+          "name": "Open Tree of Life",
+          "url": "https://tree.opentreeoflife.org/",
+          "note": "Vertebrate subtree supplying phylogenetic covariance."
+        }
+      ],
+      "references": [
+        { "doi": "10.1038/nature07020", "note": "Gomez et al. 2008, the measured species that anchor the ranking" }
+      ],
+      "difficulty": "tractable",
+      "missing": "FishBase does not cover tetrapods. Tetrapod counts enter only from literature sources named in the result, and species without a count are omitted."
+    },
+    {
+      "problem": "somite-number-control",
+      "n": 3,
+      "title": "Hold out mouse, chick and snake from a zebrafish-fit clock",
+      "kind": "simulation",
+      "method": "Fit a delayed-coupling phase-oscillator model of the segmentation clock to zebrafish only: coupling delay, intrinsic period, and elongation speed set so the simulated somite count matches the zebrafish count within the same 25 percent tolerance. Freeze those parameters. Predict chick, mouse and corn snake by changing only the two quantities Gomez et al. identify as the evolutionary variables, clock period and elongation speed, to the values published for those species. The model fails if any of those three predictions misses the 25 percent tolerance. No parameter may be touched after the zebrafish fit. This fails differently from the comparative ratio test: the ratio test can pass while this oscillator, with its frozen coupling, misses the other species.",
+      "steps": [
+        "Specify the delayed-coupling oscillator and fit it to zebrafish only.",
+        "Freeze coupling and intrinsic parameters.",
+        "Insert published clock period and elongation speed for chick, mouse and corn snake.",
+        "Simulate somite number.",
+        "Apply the 25 percent tolerance to each held-out species."
+      ],
+      "decisive_result": "Chick, mouse and corn snake somite counts each within 25 percent of the zebrafish-calibrated oscillator, with no refitting.",
+      "failure_signature": "Any one of the three held-out species misses the tolerance. The oscillator then does not carry the comparative prediction, even if the bare ratio N = T/τ does.",
+      "tools": ["simulation", "developmental-biology"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1038/nature07020", "note": "Gomez et al. 2008, the four species and the two evolutionary variables" },
+        { "doi": "10.1242/dev.063735", "note": "Oates, Morelli and Soroldoni 2012, the oscillator phenomenology being implemented" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "murrays-law-vascular-optimality",
+      "n": 1,
+      "title": "Derive the junction exponent from a stated cost",
+      "kind": "formalization",
+      "method": "Minimize, for one vessel, a Poiseuille pumping cost proportional to Q squared over r to the fourth plus a blood-volume cost proportional to r squared. Prove the optimum is r cubed proportional to Q. At a junction with Q_parent = Q_1 + Q_2 and the same constant of proportionality, prove r_parent cubed equals r_1 cubed plus r_2 cubed. Then replace the resistance exponent by a parameter b and the flow exponent by a parameter a, and prove the junction exponent is (b + 2) / a for a volume cost proportional to r squared. State which (a, b) would yield 7/3, and do not assert that turbulent flow has those exponents unless the algebra produces them from a stated friction law. The laminar cubic law and the general exponent are the theorems.",
+      "steps": [
+        "Define Poiseuille power and volume cost.",
+        "Prove the cubic optimum and the junction law.",
+        "Generalize to resistance exponent b and flow exponent a.",
+        "Solve for the (a, b) pair that would give junction exponent 7/3.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry cubic junction law under Poiseuille-plus-volume cost, and a general exponent (b + 2) / a with the unique (a, b) pair that equals 7/3.",
+      "failure_signature": "The cubic law does not follow from those costs, or more than one (a, b) pair on the stated family yields 7/3. The derivation would then not pin down the turbulent alternative.",
+      "tools": ["lean4"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1073/pnas.12.3.207", "note": "Murray 1926, The physiological principle of minimum work I" },
+        { "doi": "10.1085/jgp.78.4.431", "note": "Sherman 1981, On connecting large vessels to small" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "murrays-law-vascular-optimality",
+      "n": 2,
+      "title": "Estimate the branching exponent on retina and large vessels",
+      "kind": "data-test",
+      "method": "Pre-register three sources: the DRIVE gold-standard vessel segmentations (40 images), the HRF gold-standard segmentations (45 images: 15 healthy, 15 glaucoma, 15 diabetic retinopathy), and the cardiovascular models in the Vascular Model Repository. Extract branch points from the existing segmentations and from the repository centerlines. At each bifurcation estimate α by minimizing the squared difference between log(r_parent to the α) and log(r_1 to the α plus r_2 to the α). Pool α in a Gaussian model with a random intercept for image or model. Hypotheses, decided by AIC and by the 95 percent interval: a single α whose interval contains 3, a single α whose interval contains 7/3, or no single exponent. No single exponent wins if a model with α depending on source (retina versus large vessel) beats the single-α model by AIC of more than 10, or if the single-α interval has width greater than 1. A source with fewer than 100 branch points is dropped. The test proceeds only if at least two sources remain.",
+      "steps": [
+        "Freeze the estimator, the AIC gap and the 100-branch minimum.",
+        "Extract bifurcations from DRIVE, HRF and the Vascular Model Repository.",
+        "Estimate per-junction α and pool with a random intercept.",
+        "Compare α = 3, α = 7/3 and a source-dependent α by AIC and intervals.",
+        "Drop any source under 100 branch points and stop if fewer than two sources remain."
+      ],
+      "decisive_result": "A 95 percent interval for α and an AIC comparison. Murray's cubic law is supported only if the interval contains 3 and excludes 7/3, and the source-dependent model does not win.",
+      "failure_signature": "The interval excludes 3 in both retina and large vessels, which refutes a general cubic law, or the interval contains both 3 and 7/3 and the source model does not win, which leaves the exponent unresolved.",
+      "tools": ["image-segmentation", "vascular-morphometry", "data-test"],
+      "datasets": [
+        {
+          "name": "DRIVE retinal vessel segmentation",
+          "url": "https://drive.grand-challenge.org/",
+          "note": "Forty fundus images with manual vessel masks; branch points taken from the masks."
+        },
+        {
+          "name": "High-Resolution Fundus image database",
+          "url": "https://www5.cs.fau.de/research/data/fundus-images/index.html",
+          "note": "Forty-five images with binary vessel gold standards."
+        },
+        {
+          "name": "Vascular Model Repository",
+          "url": "https://www.vascularmodel.com/",
+          "note": "Cardiovascular models whose centerline radii supply large-vessel bifurcations."
+        }
+      ],
+      "references": [
+        { "doi": "10.1073/pnas.12.3.207", "note": "Murray 1926, the cubic prediction" },
+        { "doi": "10.1085/jgp.78.4.431", "note": "Sherman 1981, arterial agreement with the cubic law" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "murrays-law-vascular-optimality",
+      "n": 3,
+      "title": "Xylem conduits and a radius-dependent exponent",
+      "kind": "data-test",
+      "method": "Two pre-registered extensions that can support an amended law even if the pooled animal exponent excludes 3. First, transcribe conduit radii at branch points from the tables of McCulloh, Sperry and Adler 2003, with a checksum of the transcription. Do not digitize figures. If the tables are not numerically usable, drop the xylem arm and say so. Estimate α by the same one-dimensional fit. Plant xylem agrees with Murray only if its interval contains 3. Second, on the retinal junctions only, regress per-junction α on log parent radius, with a random intercept for image. A shear-dependent amendment is supported if the slope's 95 percent interval excludes 0. These two tests are not pooled with the animal single-exponent test.",
+      "steps": [
+        "Transcribe McCulloh tabled radii or drop xylem if the tables are not numeric.",
+        "Estimate xylem α and its interval.",
+        "Regress retinal per-junction α on log parent radius.",
+        "Support a radius-dependent exponent only if the slope interval excludes 0.",
+        "Report xylem and the slope as separate calls."
+      ],
+      "decisive_result": "A xylem interval that contains or excludes 3, and a retinal slope of α on log parent radius whose interval contains or excludes 0.",
+      "failure_signature": "Xylem excludes 3, which refutes a cross-kingdom cubic law, or the retinal slope interval contains 0, which fails the shear-dependent amendment. Unusable tables make xylem inconclusive rather than a refutation.",
+      "tools": ["vascular-morphometry", "data-test"],
+      "datasets": [
+        {
+          "name": "DRIVE retinal vessel segmentation",
+          "url": "https://drive.grand-challenge.org/",
+          "note": "Retinal junctions for the radius regression."
+        },
+        {
+          "name": "High-Resolution Fundus image database",
+          "url": "https://www5.cs.fau.de/research/data/fundus-images/index.html",
+          "note": "Additional retinal junctions for the same regression."
+        }
+      ],
+      "references": [
+        { "doi": "10.1038/nature01444", "note": "McCulloh, Sperry and Adler 2003, Water transport in plants obeys Murray's law; tabled radii only" }
+      ],
+      "difficulty": "hard",
+      "missing": "A public xylem file of branch-point radii. If the 2003 tables cannot be transcribed without guessing, the xylem arm stops."
+    },
+    {
+      "problem": "morphogenesis-cognition-gene-overlap",
+      "n": 1,
+      "title": "Pleiotropy-matched overlap of morphogenesis and learning genes",
+      "kind": "data-test",
+      "method": "Pre-register human genes with GO:0009653 (anatomical structure morphogenesis) and GO:0007611 (learning or memory). Primary run excludes evidence code IEA; a second run includes it and is labeled. Background is human protein-coding genes. The statistic is the odds ratio of the intersection. The null is 10,000 permutations that preserve both set sizes and match genes on the number of GO annotations and on degree in the public INDRA statement graph. Wide overlap, the pre-registered threshold, is an odds ratio above 2 and a permutation p-value below 0.01. The same threshold is a primary endpoint, not a subgroup glance, for the subsets annotated with GO:0005216 (monoatomic ion channel activity; the synonym is ion channel activity) and with GO:0005921 (gap junction). Housekeeping is partly absorbed by the annotation-count match; it is not a separate covariate invented after the test.",
+      "steps": [
+        "Freeze the two GO sets, the IEA rule, the odds-ratio threshold and the permutation scheme.",
+        "Pull annotations from Gene Ontology and degrees from INDRA.",
+        "Compute the observed odds ratio.",
+        "Run 10,000 matched permutations.",
+        "Apply the same test to the ion-channel and gap-junction subsets as primary endpoints."
+      ],
+      "decisive_result": "Odds ratio above 2 and permutation p below 0.01 for the full sets and, separately, for the ion-channel subset and the gap-junction subset.",
+      "failure_signature": "The full-set odds ratio falls inside the matched null. That refutes wide overlap beyond pleiotropy and annotation volume. A hit that appears only in the IEA-included run is annotation noise and does not count.",
+      "tools": ["indra-cogex", "gene-set-statistics", "data-test"],
+      "datasets": [
+        {
+          "name": "Gene Ontology",
+          "url": "https://geneontology.org/",
+          "note": "Annotations for GO:0009653, GO:0007611, GO:0005216 and GO:0005921."
+        },
+        {
+          "name": "INDRA CoGEx",
+          "url": "https://discovery.indra.bio/",
+          "note": "Statement degree used to match the permutation null."
+        }
+      ],
+      "references": [
+        { "doi": "10.3389/fnsys.2022.768201", "note": "Levin 2022, Technological approach to mind everywhere, the overlap prediction" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "morphogenesis-cognition-gene-overlap",
+      "n": 2,
+      "title": "INDRA statement density inside the intersection",
+      "kind": "data-test",
+      "method": "Set overlap can be shared annotation fashion. This test asks whether genes in the intersection are mechanistically tied. Count INDRA statements with evidence count at least 5 that connect a GO:0009653 gene to a GO:0007611 gene. Compare with 10,000 random bipartitions that preserve the two set sizes and the joint degree sequence. The pre-registered effect is a statement count above the 99th percentile of that null. Repeat for the ion-channel subset and the gap-junction subset. A gene-set hit with a null statement density means the shared genes are not preferentially wired to each other in INDRA, which is a different negative from a failed overlap test.",
+      "steps": [
+        "Build the morphogenesis and learning sets as in the overlap test.",
+        "Count INDRA statements of evidence count at least 5 across the cut.",
+        "Permute bipartitions preserving sizes and degrees, 10,000 times.",
+        "Apply the 99th-percentile threshold.",
+        "Repeat for ion channels and gap junctions."
+      ],
+      "decisive_result": "Cross-set INDRA statement count above the 99th percentile of the degree-preserving null, overall and in the two bioelectric subsets.",
+      "failure_signature": "The count lies within the null. Overlap of annotations, if it exists, is then not matched by INDRA evidence between the sets.",
+      "tools": ["indra-cogex", "gene-set-statistics", "data-test"],
+      "datasets": [
+        {
+          "name": "INDRA CoGEx",
+          "url": "https://discovery.indra.bio/",
+          "note": "Statements and evidence counts between the two gene sets."
+        },
+        {
+          "name": "Gene Ontology",
+          "url": "https://geneontology.org/",
+          "note": "Set membership."
+        }
+      ],
+      "references": [
+        { "doi": "10.3389/fnsys.2022.768201", "note": "Levin 2022, the bioelectric subset is part of the prediction" }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "morphogenesis-cognition-gene-overlap",
+      "n": 3,
+      "title": "Repeat the overlap using only pre-2015 annotations",
+      "kind": "data-test",
+      "method": "Annotation fashion after Levin's papers would inflate overlap. Repeat the matched odds-ratio test using only GO annotations whose assignment date is before 2015, if QuickGO exposes that date. Keep the same sets, the same exclusion of IEA, and the same thresholds. If dates are not in the download, the approach stops as inconclusive rather than using a proxy such as the paper's publication year. A signal present in the full ontology and absent before 2015 is evidence of later annotation, not of a standing shared gene set. A signal present before 2015 survives that objection.",
+      "steps": [
+        "Check whether annotation dates are present before computing the odds ratio.",
+        "Restrict to dates before 2015.",
+        "Reuse the matched permutation null.",
+        "Apply the odds-ratio and p-value thresholds.",
+        "If dates are absent, record inconclusive and stop."
+      ],
+      "decisive_result": "The pre-2015 odds ratio either clears the same threshold as the full test or it does not. Clearing it supports overlap that predates the recent annotation wave.",
+      "failure_signature": "The pre-2015 odds ratio falls inside the null while the full-ontology test does not. The apparent overlap is then carried by later annotations.",
+      "tools": ["gene-set-statistics", "data-test"],
+      "datasets": [
+        {
+          "name": "Gene Ontology",
+          "url": "https://geneontology.org/",
+          "note": "Annotation dates, used only if the download actually contains them."
+        }
+      ],
+      "references": [
+        { "doi": "10.3389/fnsys.2022.768201", "note": "Levin 2022, the date cut is chosen to precede this paper" }
+      ],
+      "difficulty": "tractable",
+      "missing": "GO assignment dates may be absent from the query used. The approach then cannot run, and that is a stated stop."
+    },
+    {
+      "problem": "bioelectric-prepattern-predicts-anatomy",
+      "n": 1,
+      "title": "Leave-one-paper-out decoder of published Vmem figures",
+      "kind": "data-test",
+      "method": "Admissible images are the voltage-reporter figures (DiBAC or CC2-DMPE) in the open-access papers of Levin and Martyniuk 2018, Pietak and Levin 2016, and Durant et al. 2017, with the phenotype class taken from the caption: for planaria, two-headed, normal, or no-head; for the other tissues, the classes the caption itself names. Features, frozen first, are the anterior-posterior dipole of the reported potential, the number of domains above the caption's own threshold, and a left-right asymmetry index. The split is by paper: train on two, test on the third, all three rotations. Support requires accuracy at least 0.7 and a binomial test against the test paper's majority class at p below 0.05, in at least two rotations. Independent experiments, not panels of one experiment, are the sample. Fewer than 20 independent experiments across the three papers makes the test underpowered. Raw stacks are not required and are not invented.",
+      "steps": [
+        "Freeze features, classes and the 0.7 accuracy bar before measuring figures.",
+        "Encode each admissible figure's features from the published image and its caption.",
+        "Rotate training and test by paper.",
+        "Score accuracy against the majority-class baseline.",
+        "Stop as underpowered if fewer than 20 independent experiments exist."
+      ],
+      "decisive_result": "Accuracy at least 0.7 and above the majority class at p below 0.05 in at least two of three paper rotations, on at least 20 independent experiments.",
+      "failure_signature": "Accuracy consistent with the majority class in two or more rotations. The dipole-and-domain decoder then does not predict anatomy on these figures.",
+      "tools": ["image-analysis", "data-test"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.biosystems.2017.08.009", "note": "Levin and Martyniuk 2018, The bioelectric code" },
+        { "doi": "10.3389/fbioe.2016.00055", "note": "Pietak and Levin 2016, BETSE paper, included for its published Vmem figures" },
+        { "doi": "10.1016/j.bpj.2017.04.011", "note": "Durant et al. 2017, planarian bioelectric perturbations" }
+      ],
+      "difficulty": "hard",
+      "missing": "Raw microscopy. Published figures are a biased subset of the experiments, and the test cannot repair that."
+    },
+    {
+      "problem": "bioelectric-prepattern-predicts-anatomy",
+      "n": 2,
+      "title": "Freeze BETSE parameters and predict a held-out perturbation",
+      "kind": "simulation",
+      "method": "Use the BETSE engine. Fix parameters at the published defaults in Pietak and Levin 2016 before looking at outcome counts. Choose one channel-block or gap-junction perturbation that Durant et al. 2017 report and that was not used to set those defaults. Map the simulated anterior-posterior Vmem difference onto the phenotype classes with a threshold frozen from the control simulation alone. Compare the predicted class with the published outcome. frontier_simulate may be called only as a bounded bioelectric preview to see whether a parameter dictionary is inside its allowlisted family. Its ephemeral result is not evidence and cannot meet this test. Success is the correct class on that held-out perturbation and on one additional perturbation from the same paper, both chosen before the run.",
+      "steps": [
+        "Pin the BETSE commit and the published default parameters.",
+        "Name the two held-out perturbations before simulating.",
+        "Derive the decision threshold from the control simulation only.",
+        "Simulate the two perturbations and emit phenotype classes.",
+        "Score them against the paper. Do not retune."
+      ],
+      "decisive_result": "Both pre-named held-out perturbations assigned the published phenotype class by the frozen threshold.",
+      "failure_signature": "Either perturbation is misclassified. Retuning parameters to obtain the class fails the approach.",
+      "tools": ["bioelectric-simulation", "frontier_simulate"],
+      "datasets": [
+        {
+          "name": "BETSE source",
+          "url": "https://gitlab.com/betse/betse",
+          "note": "Bioelectric Tissue Simulation Engine used for the frozen-parameter runs."
+        }
+      ],
+      "references": [
+        { "doi": "10.3389/fbioe.2016.00055", "note": "Pietak and Levin 2016, source of the default parameters" },
+        { "doi": "10.1016/j.bpj.2017.04.011", "note": "Durant et al. 2017, the held-out planarian perturbations" }
+      ],
+      "difficulty": "hard",
+      "missing": "frontier_simulate is a bounded preview and is not a substitute for BETSE. The swarm still needs a local BETSE run for the evidence."
+    },
+    {
+      "problem": "bioelectric-prepattern-predicts-anatomy",
+      "n": 3,
+      "title": "Prove which Vmem summaries cannot identify anatomy",
+      "kind": "formalization",
+      "method": "A decoder that sees only the anterior-posterior dipole and the number of supra-threshold domains assigns the same phenotype to any two fields that agree on those summaries. Prove that statement. Then apply it to the admissible figures: search for two experiments with different caption phenotypes whose dipole and domain count agree within a tolerance frozen first (relative dipole difference below 0.1, same domain count). A hit refutes every decoder that uses only those features. Absence of a hit does not confirm the bioelectric code; it only says these features are not yet contradicted by the figures. This approach can refute a feature set that the classifier approach would merely score as inaccurate.",
+      "steps": [
+        "Prove the identifiability lemma for dipole and domain count.",
+        "Freeze the 0.1 relative tolerance.",
+        "Measure the summaries on the admissible figures.",
+        "Search for a cross-phenotype collision under that tolerance.",
+        "Report a refuting pair or the absence of one."
+      ],
+      "decisive_result": "Either a pair of published experiments with different phenotypes and summaries inside the tolerance, which refutes dipole-and-domain decoders, or an exhaustive statement that no such pair exists in the admissible figures.",
+      "failure_signature": "The lemma is false for some pair of fields, which would be a mathematics error, or the figure measurements are too coarse to decide equality within 0.1, in which case the empirical half is inconclusive.",
+      "tools": ["lean4", "image-analysis"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.biosystems.2017.08.009", "note": "Levin and Martyniuk 2018, the mapping this lemma constrains" },
+        { "doi": "10.1016/j.bpj.2017.04.011", "note": "Durant et al. 2017, planarian figure set searched for a colliding pair" }
+      ],
+      "difficulty": "tractable",
+      "missing": "Raw pixel values. Figure measurements may be too coarse for the 0.1 tolerance, and the approach then stops as inconclusive on the empirical half."
+    },
+    {
+      "problem": "grn-memory-generic-or-biological",
+      "n": 1,
+      "title": "Match 350 random ODE networks to the 35 BioModels",
+      "kind": "computation",
+      "method": "Re-run the Biswas, Manicka, Hoel and Levin 2021 memory probes on the original models they took from BioModels, and on at least 10 random networks per model, at least 350 in total. Match each random network on node count, reaction count, and kinetic family (mass-action or Hill, matching the source model). Draw parameter magnitudes from the empirical distribution of the absolute values in that source model. Randomize regulatory signs in this approach; the topology-preserving arm is the next one. Probes are the paper's UCS-based, pairing, associative and consolidation memories, plus habituation. The enrichment statistic is the paired difference in the number of memory kinds present. Success, pre-registered, is a permutation p-value below 0.01 against the random ensemble and at least 20 of the 35 biological models showing strictly more memory kinds than their matched random networks. Publish seeds and the model identifiers.",
+      "steps": [
+        "Pin the 35 BioModels identifiers from the paper before simulating.",
+        "Build at least 10 matched random networks for each, signs randomized.",
+        "Run the five probes with the paper's protocol.",
+        "Compute the paired permutation test.",
+        "Require p below 0.01 and at least 20 of 35 models strictly enriched."
+      ],
+      "decisive_result": "Permutation p below 0.01 and strict enrichment in at least 20 of 35 models. Otherwise memory in this protocol is not enriched relative to the matched random networks.",
+      "failure_signature": "The random networks meet or exceed the biological memory rate. That refutes the biological-signature reading for this match. A probe implementation that cannot reproduce the paper's count on the original 35 models invalidates the run before the null is interpreted.",
+      "tools": ["ode-simulation", "biomodels", "random-network-nulls", "data-test"],
+      "datasets": [
+        {
+          "name": "BioModels",
+          "url": "https://www.ebi.ac.uk/biomodels/",
+          "note": "The pathway models named by Biswas et al. 2021."
+        }
+      ],
+      "references": [
+        { "doi": "10.1016/j.isci.2021.102131", "note": "Biswas, Manicka, Hoel and Levin 2021, Gene regulatory networks exhibit several kinds of memory" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "grn-memory-generic-or-biological",
+      "n": 2,
+      "title": "Factor topology against kinetics in the memory rate",
+      "kind": "computation",
+      "method": "Cross two factors the single matched null confounds. Arm A keeps the biological reaction graph and redraws parameters from the same magnitude distribution. Arm B rewires the graph to the same degree sequence and keeps the original parameters. Arm C does both and is the null from the first approach. Each arm has the same 10 networks per model. The biological-signature claim for topology survives only if arm A still shows the enrichment and arm B does not. The claim for kinetics survives only if arm B shows it and arm A does not. If arm A already loses the enrichment, topology is not the carrier. Pre-register that split before looking at which arm wins.",
+      "steps": [
+        "Build arms A, B and C with the shared size match.",
+        "Run the same five probes.",
+        "Test enrichment separately in each arm.",
+        "Assign the effect to topology, kinetics, both, or neither by the pre-registered pattern.",
+        "Do not reinterpret the pattern after seeing it."
+      ],
+      "decisive_result": "A four-way call: enrichment in A only (topology), B only (kinetics), both, or neither, using the same p-value and 20-of-35 rule in each arm.",
+      "failure_signature": "Arm C differs from the first approach's null on the same seeds, which means the factor arms are not comparable. Substantively, enrichment in neither arm refutes a biological signature of either factor.",
+      "tools": ["ode-simulation", "biomodels", "random-network-nulls"],
+      "datasets": [
+        {
+          "name": "BioModels",
+          "url": "https://www.ebi.ac.uk/biomodels/",
+          "note": "Source graphs and parameter magnitudes for the three arms."
+        }
+      ],
+      "references": [
+        { "doi": "10.1016/j.isci.2021.102131", "note": "Biswas et al. 2021, the probes held fixed across arms" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "grn-memory-generic-or-biological",
+      "n": 3,
+      "title": "Prove habituation for one nonlinear motif and not for linear ODEs",
+      "kind": "formalization",
+      "method": "Define habituation as three inequalities on a forced ODE: repeated identical pulses produce strictly decreasing peak responses; after a rest interval longer than a stated multiple of the pulse spacing, the next peak returns to within 10 percent of the first; the decrement happens for every pulse amplitude in an open interval. Prove that a three-variable system with slow negative feedback satisfies this on an open set of parameters. Prove that no linear system of the same input-output shape can satisfy decrement for all amplitudes in an interval and recovery after rest, because superposition fixes the gain. This shows habituation is generic for that motif and absent for linear kinetics. It does not show that BioModels are enriched. A failure here leaves the enrichment test untouched.",
+      "steps": [
+        "Write the habituation inequalities as a Lean predicate.",
+        "Define the three-variable negative-feedback system.",
+        "Prove the predicate on an open parameter set.",
+        "Prove linear systems of the same shape fail the predicate.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry existence theorem for the nonlinear motif and a no-sorry impossibility theorem for linear kinetics, under the stated habituation predicate.",
+      "failure_signature": "The nonlinear motif fails recovery or fails decrement on every open set tried, or a linear system is found that meets the predicate. Either kills the generic-versus-linear claim.",
+      "tools": ["lean4", "ode-simulation"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.isci.2021.102131", "note": "Biswas et al. 2021, source of the habituation behaviour being formalized, not of the motif proof" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "active-inference-morphogenesis-falsifiable",
+      "n": 1,
+      "title": "Fix the generative model, then rank regeneration times",
+      "kind": "data-test",
+      "method": "Before opening a regeneration time course, fix the generative model to the shared target morphology used by Friston, Levin, Sengupta and Pezzulo 2015, with no free retargeting. Define the surprise of a cut as the variational free energy of that initial condition under the fixed target. The prediction is ordinal: among fragment classes of one species in one paper, the ordering of free energies must match the ordering of regeneration times, with Spearman rank correlation above 0.5. Planarian fragment series are the admissible data, and only series that report times for at least four fragment classes. Parameters of the target are taken from the 2015 paper, not from the time series. Fewer than four classes, or times that exist only as unlabeled cartoons, makes the test inconclusive.",
+      "steps": [
+        "Transcribe the 2015 target morphology and freeze it.",
+        "Define free energy of a cut under that target.",
+        "List fragment classes and published times from one admissible series.",
+        "Compute Spearman correlation between free-energy rank and time rank.",
+        "Refute the fixed model if the correlation is at most 0.5."
+      ],
+      "decisive_result": "Spearman correlation above 0.5 between pre-registered free-energy rank and regeneration-time rank, on at least four fragment classes.",
+      "failure_signature": "Correlation at most 0.5. Changing the target after seeing the times fails the approach and is the unfalsifiability pattern the problem names.",
+      "tools": ["variational-inference", "developmental-biology", "data-test"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1098/rsif.2014.1383", "note": "Friston, Levin, Sengupta and Pezzulo 2015, Knowing one's place" },
+        { "doi": "10.1016/j.plrev.2019.06.001", "note": "Kuchling, Friston, Georgiev and Levin 2020, Morphogenesis as Bayesian inference" }
+      ],
+      "difficulty": "hard",
+      "missing": "Quantitative regeneration times for four or more fragment classes in one paper. If the papers only show cartoons, the test is inconclusive."
+    },
+    {
+      "problem": "active-inference-morphogenesis-falsifiable",
+      "n": 2,
+      "title": "Prove the free-target class is tautological",
+      "kind": "formalization",
+      "method": "Two theorems. First, if the generative model may be any smooth target morphology plus a positive precision, then for every observed morphology there exists a target equal to it that minimizes variational free energy. That class is unfalsifiable, and the theorem should say so. Second, with the target fixed as in the 2015 paper, the free-energy ordering of a finite set of cuts is not an identity: exhibit two cuts whose free-energy order is determined by the fixed target, so a reversed regeneration-time order would violate the prediction. The second theorem is the falsifiable form. If the fixed-target ordering can still be reversed by using a degree of freedom the paper leaves open, the second theorem fails and the approach concludes that the published model is not yet a test.",
+      "steps": [
+        "Define variational free energy for a morphology and a target.",
+        "Prove existence of a minimizing target for every observation.",
+        "Instantiate the 2015 target and rank a finite set of cuts.",
+        "Show the ranking is invariant under the degrees of freedom the paper leaves free, or name the freedom that flips it.",
+        "Audit axioms."
+      ],
+      "decisive_result": "A no-sorry tautology theorem for free targets, and either a no-sorry non-identity for the fixed 2015 target or a proof that a free parameter in that paper flips the ranking.",
+      "failure_signature": "The fixed-target ranking flips under a parameter the pre-registration treated as frozen. The model is then not testable in the form stated, which the problem accepts as a result only if it is proved rather than asserted.",
+      "tools": ["lean4", "variational-inference"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1098/rsif.2014.1383", "note": "Friston et al. 2015, the model class" },
+        { "doi": "10.1016/j.plrev.2019.06.001", "note": "Kuchling et al. 2020, the regeneration extension" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "active-inference-morphogenesis-falsifiable",
+      "n": 3,
+      "title": "Lattice simulation with the target frozen before the cut",
+      "kind": "simulation",
+      "method": "Implement the cell-lattice update from Kuchling et al. 2020 only if the paper states a complete parameter set. If it gives a schematic without numbers, stop and mark the approach not operationalizable. When numbers exist, freeze them, apply one cut geometry that the paper reports but that is not the figure used to illustrate the update, and predict the polarity class. frontier_simulate's mechanobiology preview may be used to check that a lattice energy is inside its allowlisted family; it does not replace the lattice run and is not evidence. Success is the published polarity class. One cut, named first.",
+      "steps": [
+        "Extract numerical parameters from Kuchling et al. 2020 or stop.",
+        "Name the held-out cut before simulating.",
+        "Run the lattice update with the frozen target.",
+        "Compare predicted polarity with the paper.",
+        "Do not add a parameter to repair a miss."
+      ],
+      "decisive_result": "The pre-named cut's published polarity, from a parameter set taken entirely from the paper.",
+      "failure_signature": "The polarity is wrong, or the paper has no complete parameter set. The second case is a failed operationalization, not a refutation of active inference.",
+      "tools": ["simulation", "frontier_simulate", "variational-inference"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1016/j.plrev.2019.06.001", "note": "Kuchling et al. 2020, the update rule and the only allowed source of parameters" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "A fully numerical parameter set in the paper. If the model is schematic, this approach cannot start."
+    },
+    {
+      "problem": "kelvin-problem-in-epithelia",
+      "n": 1,
+      "title": "Scutoid frequency against curvature in the 2018 data",
+      "kind": "data-test",
+      "method": "Use the supplementary tables of Gómez-Gálvez et al. 2018, not a re-segmentation, unless the tables lack per-tissue scutoid frequencies. If they lack frequencies, stop as data-unavailable rather than tracing figures. The prediction is the paper's own energy-minimizing scutoid fraction as a function of the measured curvature and cell aspect ratio. Pre-register success as either every curvature bin within 10 percentage points of the predicted fraction, or a Spearman correlation above 0.8 between predicted and observed fractions across bins. Bins are the paper's bins. A new segmentation pipeline is a different project and is not a rescue if the tables are insufficient.",
+      "steps": [
+        "Read the supplement and stop if frequencies and curvatures are not numeric.",
+        "Transcribe bin-wise scutoid fractions and curvatures with a checksum.",
+        "Compute the paper's predicted fraction at each bin.",
+        "Apply the 10-point tolerance and the Spearman threshold.",
+        "Support the energy account only if one of the two pre-registered conditions holds."
+      ],
+      "decisive_result": "Either all bins within 10 percentage points of the predicted scutoid fraction, or Spearman correlation above 0.8.",
+      "failure_signature": "Both conditions fail. The energy-minimizing scutoid prediction then does not fit the paper's own binned data. Missing numeric tables are inconclusive, not a refutation.",
+      "tools": ["3d-segmentation", "cell-geometry", "data-test"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1038/s41467-018-05376-1", "note": "Gómez-Gálvez et al. 2018, Scutoids are a geometrical solution to three-dimensional packing of epithelia" }
+      ],
+      "difficulty": "hard",
+      "missing": "If the supplement contains images rather than frequencies, the swarm lacks the numeric table and should not invent one by tracing."
+    },
+    {
+      "problem": "kelvin-problem-in-epithelia",
+      "n": 2,
+      "title": "Anneal equal-volume foams against Weaire–Phelan",
+      "kind": "computation",
+      "method": "Use Brakke's Surface Evolver. First reproduce the surface area per unit volume of Kelvin's truncated octahedron and of the Weaire–Phelan foam in the same normalization, to a relative tolerance of 10^{-4}. Then anneal 200 random equal-volume periodic foams with 8 cells and 200 with 16 cells, from random seeds declared in advance, with a fixed iteration budget. A counterexample is a foam whose area per unit volume is lower than the reproduced Weaire–Phelan value by more than 10^{-4}. Failure to find one does not prove optimality. The approach settles the mathematical problem only in the counterexample direction. Reproducing the two known areas is a check, not a solution of Kelvin's problem.",
+      "steps": [
+        "Reproduce Kelvin and Weaire–Phelan areas to relative 10^{-4}.",
+        "Declare seeds and the iteration budget.",
+        "Anneal 200 eight-cell foams and 200 sixteen-cell foams.",
+        "Compare the best area with Weaire–Phelan.",
+        "Publish the best foam if it wins, otherwise the negative search record."
+      ],
+      "decisive_result": "A periodic equal-volume foam whose Surface Evolver area is more than 10^{-4} below the reproduced Weaire–Phelan area, or an honest negative record of the 400-foam search.",
+      "failure_signature": "The search returns Weaire–Phelan as the best candidate. Kelvin's problem stays open. A failure of reproduction beyond 10^{-4} invalidates the comparison.",
+      "tools": ["surface-evolver"],
+      "datasets": [
+        {
+          "name": "Surface Evolver",
+          "url": "https://kenbrakke.com/evolver/evolver.html",
+          "note": "Ken Brakke's Surface Evolver, used for both reproduction and the random search."
+        }
+      ],
+      "references": [
+        { "doi": "10.1080/09500839408241577", "note": "Weaire and Phelan 1994, A counter-example to Kelvin's conjecture" },
+        { "doi": "10.1007/s004540010071", "note": "Hales 2001, The honeycomb conjecture, the settled two-dimensional analogue, not the target" }
+      ],
+      "difficulty": "long-shot",
+      "missing": "A certificate of global optimality. Annealing cannot supply one. Thirty years of search have not beaten Weaire–Phelan, so a month of random starts is unlikely to."
+    },
+    {
+      "problem": "kelvin-problem-in-epithelia",
+      "n": 3,
+      "title": "Lean-check a lower bound and the Kelvin–Weaire gap",
+      "kind": "formalization",
+      "method": "Two checked statements, neither of which is global optimality. First, formalize a lower bound on surface area for a periodic partition into equal-volume cells that is strictly stronger than the single-cell isoperimetric inequality obtained by ignoring shared faces, and prove it in Lean with interval arithmetic where a radical is involved. Second, formalize the areas of the Kelvin truncated octahedron and the Weaire–Phelan cell in the same normalization and prove the Weaire–Phelan area is smaller, to a stated interval. The acceptance criteria allow a Lean-checked lower bound that does not identify the minimizer. Do not describe the comparison of two candidates as a lower bound on all partitions.",
+      "steps": [
+        "Prove a shared-face lower bound above the isolated-sphere area.",
+        "Compute Kelvin's cell area as an interval.",
+        "Compute the Weaire–Phelan area as an interval.",
+        "Prove the Weaire–Phelan interval lies strictly below Kelvin's.",
+        "State that global optimality remains open, and audit axioms."
+      ],
+      "decisive_result": "A no-sorry lower bound strictly above the isolated-sphere area, and a no-sorry inequality that the Weaire–Phelan cell has smaller area than Kelvin's cell.",
+      "failure_signature": "The bound does not exceed the isolated-sphere area, or the interval arithmetic cannot separate the two foam areas. The approach has then not produced the promised checked comparison.",
+      "tools": ["lean4", "surface-evolver"],
+      "datasets": [],
+      "references": [
+        { "doi": "10.1080/09500839408241577", "note": "Weaire and Phelan 1994, the comparison being machine-checked" },
+        { "doi": "10.1007/s004540010071", "note": "Hales 2001, the two-dimensional theorem used as a model of what a finished proof looks like" }
+      ],
+      "difficulty": "hard",
+      "missing": "A proof of optimality for any three-dimensional partition. This approach does not claim one."
+    },
+    {
+      "problem": "mutant-morphant-discrepancy-prediction",
+      "n": 1,
+      "title": "Test the NMD-plus-paralog rule on all doubly assayed genes",
+      "kind": "data-test",
+      "method": "Labels come from ZFIN downloads: Morpholinos.txt, CRISPR.txt, and phenoGeneCleanData_fish.txt. A gene is labeled only if it has both a morpholino phenotype and at least one mutant or CRISPR allele. It is a discrepancy if the morpholino is abnormal for an anatomy term and no mutant or CRISPR allele of that gene is abnormal for that term. Genes with no mutant are unlabeled, not counted as concordant. The rule, frozen first: predict discrepancy if and only if a representative frameshift or nonsense lesion lies more than 50 nucleotides upstream of the last exon-exon junction, the vertebrate nonsense-mediated-decay position rule, and Ensembl reports a paralogue with at least 70 percent identity over at least half the length. Hold out entire paralogue families, not single genes. The rule supports predictability if, on the held-out families, precision is at least 0.6 and the bootstrap interval for precision minus the base rate excludes 0. Report recall and do not require it to match precision.",
+      "steps": [
+        "Build labels from the three ZFIN files with the anatomy-term rule.",
+        "Annotate NMD position and Ensembl paralogue identity.",
+        "Hold out paralogue families.",
+        "Apply the Boolean rule.",
+        "Require held-out precision at least 0.6 and a bootstrap interval for precision minus base rate that excludes 0."
+      ],
+      "decisive_result": "Held-out precision at least 0.6 with a bootstrap interval for precision minus the discrepancy base rate excluding 0.",
+      "failure_signature": "The interval for precision minus base rate contains 0. The rule then does not beat the base rate, which refutes predictability of this form.",
+      "tools": ["zfin", "indra-cogex", "data-test"],
+      "datasets": [
+        {
+          "name": "ZFIN downloads",
+          "url": "https://zfin.org/downloads",
+          "note": "Morpholinos.txt, CRISPR.txt and phenoGeneCleanData_fish.txt supply labels."
+        },
+        {
+          "name": "Ensembl",
+          "url": "https://www.ensembl.org/",
+          "note": "Exon structure for the 50-nucleotide rule and Compara paralogue identity."
+        }
+      ],
+      "references": [
+        { "doi": "10.1016/j.devcel.2014.11.018", "note": "Kok et al. 2015, the discrepancy observation" },
+        { "doi": "10.1038/nature14580", "note": "Rossi et al. 2015, Genetic compensation induced by deleterious mutations but not gene knockdowns" },
+        { "doi": "10.1038/s41586-019-1064-z", "note": "El-Brolosy et al. 2019, the NMD and sequence-similarity mechanism" }
+      ],
+      "difficulty": "hard",
+      "missing": "The 50-nucleotide rule is the mammalian exon-junction convention. Zebrafish may differ, and a failure may mean the threshold is wrong rather than that compensation is unpredictable."
+    },
+    {
+      "problem": "mutant-morphant-discrepancy-prediction",
+      "n": 2,
+      "title": "Family-held-out logistic model with an INDRA ablation",
+      "kind": "data-test",
+      "method": "Same labels and the same paralogue-family holdout. Fit an L2-regularized logistic regression. Feature block S: the NMD indicator, maximum paralogue identity, and paralogue count from Ensembl. Feature block I: INDRA degree and the presence of an INDRA edge to a paralogue. The full model uses both. Predictability is an area under the ROC curve above 0.70 on held-out families. The sequence block is the carrier if it beats the INDRA-only model by a DeLong test at p below 0.01 and the INDRA-only model does not itself clear 0.70. Nested cross-validation inside the training families chooses the L2 penalty. Do not use a random gene split, which leaks paralogues.",
+      "steps": [
+        "Reuse the ZFIN labels and the family partition.",
+        "Build sequence features and INDRA features.",
+        "Choose the L2 penalty inside training families only.",
+        "Score held-out AUROC for the full model, block S and block I.",
+        "DeLong-test block S against block I."
+      ],
+      "decisive_result": "Held-out AUROC above 0.70 for the sequence block, and a DeLong p-value below 0.01 against the INDRA-only block if that comparison is needed to assign the signal.",
+      "failure_signature": "Held-out AUROC at or below 0.70 for every block. Present features then do not predict discrepancy. An AUROC that collapses when families are held out after looking strong on a random split is leakage, not a result.",
+      "tools": ["zfin", "indra-cogex", "machine-learning", "data-test"],
+      "datasets": [
+        {
+          "name": "ZFIN downloads",
+          "url": "https://zfin.org/downloads",
+          "note": "Labels from Morpholinos.txt, CRISPR.txt and phenoGeneCleanData_fish.txt."
+        },
+        {
+          "name": "Ensembl",
+          "url": "https://www.ensembl.org/",
+          "note": "Paralogue and exon features."
+        },
+        {
+          "name": "INDRA CoGEx",
+          "url": "https://discovery.indra.bio/",
+          "note": "Degree and paralogue-edge features for the ablation."
+        }
+      ],
+      "references": [
+        { "doi": "10.1038/s41586-019-1064-z", "note": "El-Brolosy et al. 2019, the sequence mechanism the sequence block encodes" },
+        { "doi": "10.1016/j.devcel.2014.11.018", "note": "Kok et al. 2015, the phenotype discrepancy being predicted" }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "mutant-morphant-discrepancy-prediction",
+      "n": 3,
+      "title": "Score untested morpholino genes and check calibration",
+      "kind": "data-test",
+      "method": "The acceptance criteria ask for a ranked list of genes not yet tested as mutants. Fit the one-parameter mechanistic score P(discrepancy) = logistic(a + b times maximum paralogue identity + c times the NMD indicator) on the training families from the Boolean-rule split. The score must beat an intercept-only model on held-out families by a likelihood-ratio test at p below 0.01, and the reliability diagram of deciles must be monotone. Only then score genes that have a morpholino phenotype and no mutant allele. Publish the top 50 with the three features and the score. The list is a prediction, not a confirmation. Future experiments are outside the approach. A non-monotone reliability diagram fails the list even if the likelihood-ratio test passes.",
+      "steps": [
+        "Fit a, b and c on training families only.",
+        "Likelihood-ratio test against the intercept on held-out families.",
+        "Build the decile reliability diagram and require monotonicity.",
+        "Score morpholino genes that have no mutant allele.",
+        "Publish the top 50 with features and scores."
+      ],
+      "decisive_result": "A likelihood-ratio p-value below 0.01 against the intercept, a monotone decile reliability diagram, and a published top-50 list of untested genes.",
+      "failure_signature": "The likelihood-ratio test misses 0.01, or the reliability diagram is not monotone. No list is published in those cases.",
+      "tools": ["zfin", "machine-learning", "data-test"],
+      "datasets": [
+        {
+          "name": "ZFIN downloads",
+          "url": "https://zfin.org/downloads",
+          "note": "Morpholino genes without mutant alleles are the prediction set; doubly assayed genes are the calibration set."
+        },
+        {
+          "name": "Ensembl",
+          "url": "https://www.ensembl.org/",
+          "note": "Identity and NMD features for the scored genes."
+        }
+      ],
+      "references": [
+        { "doi": "10.1038/s41586-019-1064-z", "note": "El-Brolosy et al. 2019, the mechanism the score encodes" },
+        { "doi": "10.1038/nature14580", "note": "Rossi et al. 2015, genetic compensation as the phenotype being ranked" }
+      ],
+      "difficulty": "hard",
+      "missing": "Laboratory tests of the top 50. The swarm can publish the list and cannot confirm it."
+    }
+  ]
+}

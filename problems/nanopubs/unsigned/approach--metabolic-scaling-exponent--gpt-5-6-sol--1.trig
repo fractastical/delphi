@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Phylogenetic model comparison across endotherms" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> ;
+    dct:description "Pre-register adult, postabsorptive, thermoneutral basal-metabolism inclusion rules and fit mammal and bird data with phylogenetic generalized least squares. Compare fixed slopes 2/3 and 3/4, an estimated common slope, clade-specific slopes and a quadratic log-mass model using leave-one-family-out prediction." ;
+
+    delphi:proposedTest "Universality is supported only if one common-slope model beats every curved or clade-varying model by ELPD at least 10 and its 95% interval width is below 0.04; otherwise report the best heterogeneity structure." ;
+    delphi:context "Fails if: Protocol covariates are missing for over 30% of records or 2/3 and 3/4 remain inside the common-slope interval, yielding an inconclusive universal exponent." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Resolve taxa against the organisms layer and deduplicate measurements by source. 2. Require at least 300 species and 20 families, recording temperature and measurement protocol. 3. Fit all five models with body-temperature and study random effects. 4. Use family-held-out ELPD and calibrated residuals for the preregistered verdict." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: anage" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch03-10> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/metabolic-scaling-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Is there a universal metabolic scaling exponent?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to metabolic-scaling-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.845Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to metabolic-scaling-exponent: Phylogenetic model comparison across endotherms" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/metabolic-scaling-exponent--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

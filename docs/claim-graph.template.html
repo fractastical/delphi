@@ -160,7 +160,7 @@ $('subtitle').textContent = `${CLAIMS.length} claims from ${new Set(CLAIMS.map(c
 $('asof').textContent = `As of ${new Date(DATA.built.replace(' ', 'T') + 'Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
 $('legend').innerHTML = `<span><b>Corner triangle</b> = proof status, else data-test verdict:</span>` +
   STANDS.map(s => `<span><i class="tri" style="background:${scol(s)}"></i>${STAND[s].short}${EV[s] ? ' (data)' : ''}</span>`).join('') +
-  `<span>· <b style="color:#e0a100">★</b> theorem · <b style="color:#6f6f6f">∑</b> math, not yet proved · dashed card = draft, not published</span>` +
+  `<span>· <b style="color:#e0a100">★</b> theorem · <b style="color:#6f6f6f">∑</b> math, not yet proved · picture on a card = final frame of the MorphoEval simulation that tests (black frame) or models (grey frame) the claim · dashed card = draft, not published</span>` +
   `<span>· <b>On each edge</b>: <span class="pill pT">T</span>testability, how far today's open data could settle it · <span class="pill pP">P</span>truth, blind GPT and Grok assessors' mean probability that it is true${truthN ? '' : ' (not scored yet)'} · 0–1</span>`;
 
 /* ---- tree model: root → group (thinker or decade) → chapter (books) → claim ---- */
@@ -203,14 +203,19 @@ function buildTree(mode) {
 const claimNode = (c, mode) => ({ id: `n:${c.id}`, kind: 'claim', label: c.label, claim: c, claims: [c], children: [],
   sub: mode === 'date' ? `${short(c.thinker)} ${c.year}` : c.kind });
 
+/* ---- simulation snapshot: final frame of the MorphoEval model that tests or models the claim ---- */
+// Built by scripts/site/morpholib-thumbs.py into docs/thumbs/; `thumb` is attached in build-claim-graph.mjs.
+const nh = n => n.kind === 'claim' && n.claim.thumb ? H + THUMB_H : H;
+
 /* ---- layout: columns of stacked cards ---- */
 const W = 158, H = 76, COLW = W + 44, GAP = 38, TOP = 30;
+const THUMB_H = 66, THUMB_BOX = 58, THUMB_W = W - 12; // card growth, image height, image width
 let NODES = [], EDGES = [], WIDTH = 0, HEIGHT = 0;
 function layout() {
   NODES = []; EDGES = [];
   const root = TREE, cols = root.children.length;
   WIDTH = Math.max(1200, cols * COLW + 40);
-  const place = (n, x, y) => { n.x = x; n.y = y; NODES.push(n); };
+  const place = (n, x, y) => { n.x = x; n.y = y; n.h = nh(n); NODES.push(n); };
   place(root, WIDTH / 2 - W / 2, TOP);
   let maxY = 0;
   const left = (WIDTH - cols * COLW) / 2;
@@ -221,10 +226,10 @@ function layout() {
     let y = g.y + H + GAP, prev = g;
     for (const ch of g.children) {
       place(ch, x, y); EDGES.push({ from: prev, to: ch, kind: ch.kind === 'claim' ? 'claim' : 'spine' });
-      y += H + GAP; prev = ch;
+      y += ch.h + GAP; prev = ch;
       if (ch.kind === 'chapter' && OPEN.has(ch.id)) {
         let p = ch;
-        for (const cn of ch.children) { place(cn, x + 12, y); EDGES.push({ from: p, to: cn, kind: 'claim' }); y += H + GAP; p = cn; }
+        for (const cn of ch.children) { place(cn, x + 12, y); EDGES.push({ from: p, to: cn, kind: 'claim' }); y += cn.h + GAP; p = cn; }
         y += 10;
       }
     }
@@ -247,7 +252,7 @@ function draw() {
   const vp = document.createElementNS(NS, 'g'); vp.id = 'viewport'; vp.setAttribute('transform', viewTransform()); svg.appendChild(vp);
   const hit = n => n.claims.some(matches);
   for (const e of EDGES) {
-    const a = e.from, b = e.to, x1 = a.x + W / 2, y1 = a.y + H, x2 = b.x + W / 2, y2 = b.y, mid = (y1 + y2) / 2;
+    const a = e.from, b = e.to, x1 = a.x + W / 2, y1 = a.y + a.h, x2 = b.x + W / 2, y2 = b.y, mid = (y1 + y2) / 2;
     const d = Math.abs(x1 - x2) < 4 ? `M${x1},${y1} L${x2},${y2}` : `M${x1},${y1} C${x1},${mid} ${x2},${mid} ${x2},${y2}`;
     const faded = S.q && !hit(b);
     mk('path', { d, fill: 'none', stroke: e.kind === 'claim' ? '#6f6f6f' : '#b3b3b3', 'stroke-width': e.kind === 'claim' ? 1.4 : 1.2, opacity: faded ? .2 : 1 });
@@ -264,7 +269,8 @@ function draw() {
     const root = n.kind === 'root', sel = S.sel === n.id, draft = n.claim?.draft, open = OPEN.has(n.id);
     const faded = S.q && !hit(n);
     g.setAttribute('opacity', faded ? .25 : 1);
-    mk('rect', { x: n.x, y: n.y, width: W, height: H, rx: 2, fill: root ? '#000' : '#fff',
+    const h = n.h;
+    mk('rect', { x: n.x, y: n.y, width: W, height: h, rx: 2, fill: root ? '#000' : '#fff',
       stroke: sel ? '#0f3bff' : root ? '#000' : S.q && hit(n) ? '#0f3bff' : n.kind === 'group' ? '#000' : n.kind === 'chapter' ? '#6f6f6f' : '#b3b3b3', 'stroke-width': sel ? 2.6 : n.kind === 'group' ? 1.6 : 1, 'stroke-dasharray': draft ? '5 3' : '' }, g);
     if (!root && n.claims.length) mk('path', { d: `M${n.x + 1},${n.y + 1} h18 L${n.x + 1},${n.y + 19} z`, fill: corner(n.claims) }, g);
     const lines = wrap(n.label, root ? 12 : 23).slice(0, 2);
@@ -281,11 +287,20 @@ function draw() {
       const nm = n.claims.filter(c => c.math).length, nt = n.claims.filter(c => c.theorem).length;
       if (nm) { const t = mk('text', { x: n.x + 8, y: n.y + H - 12, 'font-size': 9.5, 'font-weight': 700, fill: '#000' }, g); t.textContent = `★ ${nt}  ∑ ${nm}`; }
     }
-    if (n.kind === 'claim' && mark(n.claim)) { const t = mk('text', { x: n.x + 8, y: n.y + H - 7, 'font-size': 9, 'font-weight': 700, fill: n.claim.theorem ? '#e0a100' : '#6f6f6f' }, g);
+    if (n.kind === 'claim' && n.claim.thumb) {
+      // Snapshot of the simulation: a small image box above the bottom row, cover-cropped.
+      const th = n.claim.thumb, by = n.y + h - 17 - THUMB_BOX, bx = n.x + 6;
+      const img = mk('image', { x: bx, y: by, width: THUMB_W, height: THUMB_BOX, href: th.src, preserveAspectRatio: 'xMidYMid slice' }, g);
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', th.src);
+      mk('rect', { x: bx, y: by, width: THUMB_W, height: THUMB_BOX, fill: 'none', stroke: th.relation === 'tests' ? '#000' : '#b3b3b3', 'stroke-width': .8 }, g);
+      const lab = mk('text', { x: bx + THUMB_W - 3, y: by + THUMB_BOX - 3, 'text-anchor': 'end', 'font-size': 7.5, 'font-weight': 700, fill: '#fff', stroke: '#000', 'stroke-width': 2, 'paint-order': 'stroke', 'letter-spacing': .3 }, g);
+      lab.textContent = th.relation === 'tests' ? 'SIMULATION · TESTS' : 'SIMULATION · MODELS';
+    }
+    if (n.kind === 'claim' && mark(n.claim)) { const t = mk('text', { x: n.x + 8, y: n.y + h - 7, 'font-size': 9, 'font-weight': 700, fill: n.claim.theorem ? '#e0a100' : '#6f6f6f' }, g);
       t.textContent = n.claim.theorem ? '★ theorem' : '∑ math'; }
     if (n.kind === 'chapter') { const t = mk('text', { x: n.x + W - 8, y: n.y + H - 12, 'text-anchor': 'end', 'font-size': 9.5, 'font-weight': 700, fill: '#000' }, g); t.textContent = open ? '▲ hide' : `▼ ${n.claims.length}`; }
-    if (n.kind === 'claim' && n.claim.registry === 'production') { const t = mk('text', { x: n.x + W - 7, y: n.y + H - 7, 'text-anchor': 'end', 'font-size': 9, fill: '#1a9e4b' }, g); t.textContent = '● live'; }
-    const tl = document.createElementNS(NS, 'title'); tl.textContent = n.kind === 'claim' ? `${n.label} — ${LEVEL[n.claim.verification].label}${n.claim.evidence ? ` · ${EV[n.claim.evidence].label}` : ''}${n.claim.theorem ? ' · theorem' : n.claim.math ? ' · math' : ''}`
+    if (n.kind === 'claim' && n.claim.registry === 'production') { const t = mk('text', { x: n.x + W - 7, y: n.y + h - 7, 'text-anchor': 'end', 'font-size': 9, fill: '#1a9e4b' }, g); t.textContent = '● live'; }
+    const tl = document.createElementNS(NS, 'title'); tl.textContent = n.kind === 'claim' ? `${n.label} — ${LEVEL[n.claim.verification].label}${n.claim.evidence ? ` · ${EV[n.claim.evidence].label}` : ''}${n.claim.theorem ? ' · theorem' : n.claim.math ? ' · math' : ''}${n.claim.thumb ? `\nSnapshot: MorphoEval ${n.claim.thumb.morpholib} (${n.claim.thumb.relation} this claim), frame ${n.claim.thumb.frame}/${n.claim.thumb.frames} of ${n.claim.thumb.media}` : ''}`
       : `${n.label} — ${n.sub} · ${n.claims.filter(c => c.theorem).length} theorems, ${n.claims.filter(c => c.math).length} math claims`; g.appendChild(tl);
   }
   applyView();
@@ -442,6 +457,8 @@ function claimHtml(c) {
   <h2>${esc(c.label)}</h2>
   <p class="small mut" style="margin:0">${esc(c.thinker)} · <i>${esc(c.work)}</i> (${c.year})${c.section && !c.section.startsWith(c.work) ? ` · ${esc(c.section)}` : ''}${c.locator ? ` · ${esc(c.locator)}` : ''}</p>
   ${npBlock(c)}
+  ${c.thumb ? `<a href="${esc(c.thumb.source)}" target="_blank" rel="noopener" title="Open the full animation in morpholib ↗" style="display:block;margin:10px 0"><img src="${esc(c.thumb.src)}" alt="Final frame of the ${esc(c.thumb.morpholib)} simulation" style="display:block;width:100%;border:1px solid var(--ink)"></a>
+  <p class="small mut" style="margin:-4px 0 8px">Simulation snapshot: final frame (${c.thumb.frame} of ${c.thumb.frames}) of MorphoEval model <code>${esc(c.thumb.morpholib)}</code>, which ${c.thumb.relation === 'tests' ? 'tests' : 'models'} this claim. <a href="${esc(c.thumb.source)}" target="_blank" rel="noopener">Full animation ↗</a></p>` : ''}
   <p>${esc(c.text)}</p>
   ${c.quote ? `<blockquote>“${esc(c.quote)}”</blockquote>` : ''}
   ${c.notation ? `<h3>Formal statement</h3><p><code>${esc(c.notation)}</code></p>` : ''}

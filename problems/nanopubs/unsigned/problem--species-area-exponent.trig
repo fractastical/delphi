@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" ;
+    dct:description "Is the island species-area relationship a power law with a near-universal exponent z around 0.25, and if so what sets that value; or is the power law an approximation to a non-power form (as the maximum entropy theory of ecology predicts) whose apparent exponent depends on scale?" ;
+
+    skos:historyNote "Known state: Darwin recorded that islands hold fewer species than equal continental areas (ch12-04). Drakare, Lennon and Hillebrand (2006) meta-analysed 794 species-area curves and found z depends on sampling design, habitat and body size; Harte et al. (2009) derived a universal non-power curve from METE; Triantis, Guilhaumon and Whittaker (2012) compared 20 functional forms across 601 island datasets and found the power law best overall but with substantial variation in z. Whether a single mechanism sets z is unresolved." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered test on GBIF occurrence counts for a defined set of island archipelagos (from the organisms layer), fitting the power law, METE and at least two alternatives with identical sampling corrections, stating in advance the decision rule for 'universal exponent' versus 'scale-dependent form'." ;
+    skos:scopeNote "Refuted if: METE predictions failing systematically at the island scale would refute the universal non-power form; z intervals that do not overlap across archipelagos refute universality." ;
+    skos:note "Data access: GBIF (open), island area from Triantis et al. 2012 supplementary data (open)." ;
+    skos:note "Requires: gbif" ;
+    skos:note "Requires: macroecology" ;
+    skos:note "Requires: model-comparison" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: ecological" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2005.00848.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2009.01328.x> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1365-2699.2011.02652.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1111/j.1461-0248.2005.00848.x> dct:title "The imprint of the geographical, evolutionary and ecological context on species–area relationships" ;
+    dct:bibliographicCitation "Drakare, Lennon and Hillebrand 2006, The imprint of the geographical, evolutionary and ecological context on species-area relationships" .
+  <https://doi.org/10.1111/j.1461-0248.2009.01328.x> dct:title "Biodiversity scales from plots to biomes with a universal species–area curve" ;
+    dct:bibliographicCitation "Harte et al. 2009, Biodiversity scales from plots to biomes with a universal species-area curve" .
+  <https://doi.org/10.1111/j.1365-2699.2011.02652.x> dct:title "The island species–area relationship: biology and statistics" ;
+    dct:bibliographicCitation "Triantis, Guilhaumon and Whittaker 2012, The island species-area relationship: biology and statistics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.840Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Why does the species-area exponent cluster where it does?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

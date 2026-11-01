@@ -33,7 +33,7 @@ def main():
     runs_path = HERE / "derived" / "runs.json"
     runs = json.loads(runs_path.read_text()) if runs_path.exists() else {}
     runs_path.parent.mkdir(exist_ok=True)
-    op = (runs.get("octamer") or {}).get("operation_id") or submit_alphafold3(client, "smedinx11-octamer", octamer_input(u["sequence"]), data / "tmp")
+    op = submit_alphafold3(client, "smedinx11-octamer", octamer_input(u["sequence"]), data / "tmp")
     runs["octamer"] = {"operation_id": op}
     runs["construct"] = {"uniprot": {k: v for k, v in u.items() if k != "sequence"}, "range": [START, END], "copies": COPIES}
     runs_path.write_text(json.dumps(runs, indent=1))

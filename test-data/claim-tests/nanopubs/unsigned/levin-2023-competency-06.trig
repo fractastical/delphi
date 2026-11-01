@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2023-competency-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2023-competency-06: refutes, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "In a re-implementation of the Shreesha & Levin (2023) mixed-population experiment (200 embryos, hardwired plus a competent minority, selection of the top 10% on phenotypic fitness, 20 generations), the competency needed for competent embryos to dominate falls as their initial share rises (about 75 at 10%, 40 at 20%, 10 at 30%), they do not dominate at 2.5% even at competency 95, and when they dominate they do so within two or three generations." ;
+    delphi:passCriterion "Pre-registered design: initial competent shares 2.5%, 10%, 20%, 30% (5, 20, 40, 60 of 200) x competency 5, 10, ..., 95 (19 levels) x 50 repeats x 20 generations (generation 1 = initial population, counts taken before selection). 'Dominates' = mean over repeats of the competent share at generation 20 > 0.5. c*(p) = smallest tested competency from which dominance holds at that and every higher tested level (c* = 100 if none). Pass if all of: (P1) c*(10%) > c*(20%) > c*(30%); (P2) |c*(10%) - 75| <= 20, |c*(20%) - 40| <= 20, c*(30%) <= 20; (P3) at 2.5% and competency 95 the mean competent share at generation 20 is <= 0.6; (P4) in every dominating condition at 10/20/30% with competency >= c*, the mean competent share first exceeds 0.5 within 3 rounds of selection (by generation 4)." ;
+    delphi:failCriterion "Pre-registered: refutes if c*(30%) >= c*(10%) (threshold does not fall with share), or |c* - claimed| > 40 for any of 10/20/30%, or at 2.5% competency 95 the mean competent share at generation 20 is > 0.75. Any other failure of P1-P4 -> mixed. A sensitivity run reproducing two quirks of the authors' code (the type label can be overwritten by point mutation and the last structural gene is never mutated) is reported but does not enter the verdict." ;
+    delphi:expectedObservation "A dominance threshold in competency that decreases with initial competent share near 75/40/10 at 10/20/30%, no dominance at 2.5% up to competency 95, and rapid (<= 3 generation) takeover where dominance occurs." ;
+    delphi:disconfirmingObservation "Thresholds that do not fall with share or sit far (> 40 swaps) from the reported values, or clear dominance at 2.5%." ;
+    delphi:admissibleDatasets "Runs of the mixed-population model as described in the paper (200 embryos, competent minority, top-10% selection on phenotypic fitness for competent and genotypic for hardwired embryos, crossover, mutation probability 0.6), with heritable type labels; unspecified details from the authors' public code." ;
+    delphi:inferenceMethod "Mean competent share over 50 repeats per condition at generation 20 compared with 0.5 to define dominance; threshold c* read off a 5-swap competency grid and compared with the claimed values with a +/-20 tolerance; takeover time from the mean share curve." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py simulates mixed populations of 200 embryos with 5, 20, 40 or 60 competent embryos (2.5, 10, 20, 30%) at competency 5 to 95 in steps of 5, 50 repeats of 20 generations each, for the model as described and for the authors'-code-quirk variant. Each generation it records the competent share before selection. Dominance and the threshold c* are read from the mean share at generation 20, and the takeover time from the first generation at which the mean share exceeds 0.5." ;
+    rdfs:comment "Measured: [object Object] smallest tested competency (5-swap grid, 5-95; 100 = none) from which the mean competent share at generation 20 exceeds 0.5, by initial competent share (n = 50, Monte Carlo; fixed seed, deterministic for a given numpy version; threshold resolution 5 swaps). Interpretation: Simulation-result claim, tested by replication of the mixed-population experiment as the paper describes it: 200 embryos, a competent minority with a fixed competency, competent embryos selected on phenotypic and hardwired on genotypic fitness, top 10% kept, crossover and point mutation, 20 generations. The type label is heritable and goes with the left crossover segment as in the authors' code. 'Dominate' = mean competent share over 50 repeats at generation 20 > 0.5; 'competency needed' = the smallest tested level (5-swap grid) from which dominance holds at all higher levels. The paper reports neither its dominance criterion nor its number of runs ('several'), and its Table 2 was not available to this test. A sensitivity variant reproduces two quirks of the authors' Exp2 code: point mutations are drawn over the label position too (so about 1.2% of embryos per generation get a label that is developed as competent but counted as hardwired), and the last structural gene is never mutated." ;
+    delphi:evidenceAgainst "This is a replication of a simulation, not an empirical test: it shows what follows from the stated model, not what real cellular competency does." ;
+    delphi:evidenceAgainst "In the model as described, the threshold falls with initial share only from 10% to 20% (c* = 35, 15, 15 at 10, 20, 30% vs claimed 75, 40, 10), and at 2.5% competents reach a mean share of 0.94 at competency 95 (c* = 60), so the pre-registered fail rule (2.5% share > 0.75) triggers. At the lowest dominating level the mean share first exceeded 0.5 at generation 5-8 (4-7 rounds of selection), so P4 fails too; well above the threshold it did so at generation 2-3." ;
+    delphi:evidenceAgainst "The qualitative direction (more competency or a larger initial share makes takeover more likely) is reproduced; what fails is the reported numbers and the 2.5% non-dominance." ;
+    delphi:evidenceAgainst "The authors'-code-quirk variant comes much closer to the paper: c* = 65, 35, 25 at 10, 20, 30% and a mean share of 0.40 at 2.5% / competency 95 (no level up to 95 dominates). This suggests the published values depend on the label-mutation quirk of the released code, in which mutated competent-developing embryos are counted as hardwired, rather than on the model as described. The verdict follows the pre-registered rule for the model as described." ;
+    delphi:evidenceAgainst "Dominance is defined here on mean share over 50 repeats; the paper does not say how 'dominate' or 'equal percentages' was judged or how many runs it used, and Table 2 was not consulted." ;
+    delphi:evidenceAgainst "The repository was restructured while this test ran (claim-tests/ moved to test-data/claim-tests/, books/ to claim-sources/); the pre-registered planned_datasets keep the old paths." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2023-competency-06/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Mixed-population runs of the Shreesha & Levin (2023) model, 4 initial shares x 19 competency levels x 50 repeats x 20 generations, two variants (generated by analysis.py)" ;
+    dct:description "competent share per generation per condition; summaries in derived/conditions.json" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Shreesha L, Levin M (2023) Cellular Competency during Development Alters Evolutionary Dynamics in an Artificial Embryogeny Model. Entropy 25(1):131" ;
+    dct:description "model specification (Sections 2-3, Discussion); full text vendored in claim-sources/levin-papers/inputs/2023-competency.txt" ;
+    prov:wasDerivedFrom <https://doi.org/10.3390/e25010131> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2023-competency-06--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Authors' simulation code for Shreesha & Levin (2023), CellularCompetency" ;
+    dct:description "unspecified mixed-population details (label handling, crossover, mutation, selection); not imported" ;
+    delphi:hasChecksum "sha256:8357fe689efe9ab76efd8c5f39bbf474a5b15ff4381be856b17a6dbc7c080c46" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/hyperparameters.json> ;
+    delphi:hasChecksum "sha256:55ad59da900e896f2b59b153c8dcdfe9371d0c3f01a8fc5ba3638a430badc1d6" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/core_functions.py> ;
+    delphi:hasChecksum "sha256:99ed242a34eac6ff3e54305eb1c9694f680e2c0ede611ff468c4961cce52df96" ;
+    prov:atLocation <https://raw.githubusercontent.com/Niwhskal/CellularCompetency/2be29f96628c83613074e1d2b874e66cff9279cc/all_tests/Exp2-MixedPrevalence.py> ;
+    prov:wasDerivedFrom <https://github.com/Niwhskal/CellularCompetency> ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/levin-2023-competency-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2023-competency-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/levin-papers/levin-2023-competency-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/1a9d4d282b93b0233edbeefd3225299a7353333a/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T05:10:38.400Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2023-competency-06: refutes, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2023-competency-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

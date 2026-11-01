@@ -1,0 +1,92 @@
+{
+  "claim_id": "thompson1917-ch04-03",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-10-31T23:45:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-fable-5.1", "run": "scout-3/thompson-ch01-05" },
+  "variables_needed": [
+    "nuclear sphericity / shape metrics per cell (3D segmentation)",
+    "cell type or tissue context (fluid cytoplasm vs. muscle, mucus-laden epithelium)",
+    "cytoplasmic stiffness or rheology for the same cells",
+    "external stress anisotropy or confinement state of the cell"
+  ],
+  "datasets": [
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=Phenotype&value=nuclear%20shape&operator=contains",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-10-31T23:39:00Z", "method": "HEAD landing_url (302); GET /api/v0/m/projects/?limit=1; GET searchengine Phenotype contains 'nuclear shape'", "http_status": 200, "bytes": null },
+      "variables_present": ["nuclear shape phenotype annotations per image (2,605 images; all first-page hits from idr0013-neumann-mitocheck/screenA, HeLa RNAi screen)"],
+      "variables_missing": ["cytoplasmic stiffness or rheology", "cell-type contrast (muscle, secretory epithelium)", "external stress anisotropy"],
+      "scope": "147 projects in the OMERO API; 'nuclear shape' phenotype hits are HeLa cell RNAi screen images, not a cell-type comparison",
+      "evidence": "API /api/v0/m/projects/ meta.totalCount=147; searchengine query returned size=2605, 3 pages; all 1,000 first-page results have screen_name 'idr0013-neumann-mitocheck/screenA'. Exact-value search for 'nuclear shape phenotype' returned 0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "cell-image-library",
+      "name": "Cell Image Library (CIL)",
+      "landing_url": "https://www.cellimagelibrary.org/",
+      "access_url": "https://www.cellimagelibrary.org/images?k=nucleus%20shape",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-10-31T23:39:30Z", "method": "HEAD landing_url; GET keyword search page", "http_status": 200, "bytes": null },
+      "variables_present": [],
+      "variables_missing": ["quantified nuclear shape", "cytoplasmic stiffness", "stress anisotropy"],
+      "scope": "Curated reference micrographs; the keyword-search HTML returned 200 but exposed no result count or CIL ids to curl (client-rendered)",
+      "evidence": "Landing 200; search page 200 with no parsable hit count (0 'CIL:' identifiers in the returned HTML). A micrograph archive without per-cell shape metrics or mechanical metadata.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "human-protein-atlas-subcellular",
+      "name": "Human Protein Atlas — Subcellular (Cell) section",
+      "landing_url": "https://www.proteinatlas.org/humanproteome/subcellular",
+      "access_url": "https://www.proteinatlas.org/api/search_download.php?search=LMNA&format=json&columns=g,scl&compress=no",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok", "gpt"],
+      "checked": { "at": "2026-10-31T23:40:00Z", "method": "HEAD www.proteinatlas.org (200); HEAD /humanproteome/cell (404, assessor URL); HEAD /humanproteome/subcellular (200); GET search_download API", "http_status": 200, "bytes": null },
+      "variables_present": ["immunofluorescence images of nuclei (DAPI channel) across ~37 human cell lines", "tissue IHC images incl. muscle and secretory epithelia"],
+      "variables_missing": ["quantified nuclear sphericity", "cytoplasmic stiffness", "stress anisotropy"],
+      "scope": "Human cell lines and tissues; images and protein-location annotations, no shape measurements",
+      "evidence": "API returned JSON e.g. {\"Gene\":\"LMNA\",\"Subcellular location\":[\"Nuclear speckles\"]}. The GPT URL https://www.proteinatlas.org/humanproteome/cell returns 404; the section now lives at /humanproteome/subcellular (200).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "allen-cell-hipsc-single-cell-image-dataset",
+      "name": "Allen Cell hiPSC Single-Cell Image Dataset (WTC-11, 3D nuclear and cell segmentations)",
+      "landing_url": "https://app.quilt.bio/b/allencell/tree/aics/hipsc_single_cell_image_dataset/",
+      "access_url": "https://allencell.s3.amazonaws.com/aics/hipsc_single_cell_image_dataset/metadata.csv",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-10-31T23:43:00Z", "method": "GET S3 ListObjectsV2 prefix listing; GET README.md; HEAD metadata.csv", "http_status": 200, "bytes": 1692668963 },
+      "variables_present": ["3D nuclear and cell segmentations per cell (crop_seg/*.ome.tif, fov_seg_path *_CellNucSegCombined.ome.tiff)", "per-cell metadata.csv (CellId, FOVId, structure_name = cell line)"],
+      "variables_missing": ["cytoplasmic stiffness or rheology", "cell-type contrast beyond one hiPSC line", "stress anisotropy (cells are in colonies on glass)"],
+      "scope": "One human iPSC line (WTC-11) with 25 tagged-structure sublines; cells in 2D colonies",
+      "evidence": "S3 listing returned KeyCount=5, IsTruncated=true with README.md (5,879 bytes) and crop_raw/*.ome.tif; README describes crop_seg, fov_seg_path (CellNucSegCombined) and metadata.csv columns; metadata.csv HEAD 200, Content-Length 1692668963. Quilt landing redirected from open.quiltdata.com to app.quilt.bio (200).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "IDR searchengine", "query": "Phenotype = 'nuclear shape phenotype' (exact)", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=Phenotype&value=nuclear%20shape%20phenotype", "hits": 0, "note": null },
+    { "source": "IDR searchengine", "query": "Phenotype contains 'nuclear shape'", "url": "https://idr.openmicroscopy.org/searchengine/api/v1/resources/image/search/?key=Phenotype&value=nuclear%20shape&operator=contains", "hits": 2605, "note": "all first-page hits idr0013 MitoCheck HeLa screen" },
+    { "source": "Zenodo", "query": "\"nuclear shape\" AND (stiffness OR rheology OR \"cytoplasmic stiffness\"), type=dataset", "url": "https://zenodo.org/api/records?q=%22nuclear%20shape%22%20AND%20%28stiffness%20OR%20rheology%20OR%20%22cytoplasmic%20stiffness%22%29&size=5&type=dataset", "hits": 1, "note": "10.5061/dryad.c806hk2 'Cell migration through three-dimensional confining pores' — nuclear deformation under confinement, migration study, not cytoplasmic rheology by cell type" },
+    { "source": "DataCite", "query": "\"nuclear shape\" cells dataset, resource-type dataset", "url": "https://api.datacite.org/dois?query=%22nuclear+shape%22+cells+dataset&resource-type-id=dataset&page%5Bsize%5D=6", "hits": 0, "note": null },
+    { "source": "AWS Open Data / S3", "query": "allencell bucket prefix aics/hipsc_single_cell_image_dataset/", "url": "https://allencell.s3.amazonaws.com/?list-type=2&prefix=aics/hipsc_single_cell_image_dataset/&max-keys=5", "hits": 5, "note": "truncated listing; registry.opendata.aws/allencell/ returned 404" }
+  ],
+  "status": "partial",
+  "summary": "Nuclear shape is measurable at scale from public 3D segmentations (Allen Cell hiPSC dataset, metadata.csv 1.69 GB; IDR MitoCheck 'nuclear shape' phenotype on 2,605 HeLa images) and qualitatively from HPA and CIL micrographs across cell types including muscle and secretory epithelia, but no public dataset pairs nuclear roundness with cytoplasmic stiffness, rheology or pressure anisotropy for the same cells. The HPA URL named by GPT (/humanproteome/cell) is now a 404; the section is /humanproteome/subcellular.",
+  "next_step": "Compile a cell-type panel from HPA tissue images (skeletal muscle, goblet-cell epithelium, fibroblasts) scored for nuclear aspect ratio, and pair with published AFM/microrheology moduli per cell type from the literature; or seek a dataset combining Brillouin/AFM stiffness maps with nuclear segmentation.",
+  "obstacles_confirmed": [
+    "Most image datasets lack matched cytoplasmic rheology or pressure.",
+    "Image archives rarely include a stiffness measurement for the same cell."
+  ]
+}
