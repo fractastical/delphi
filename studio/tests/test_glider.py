@@ -243,3 +243,9 @@ def test_download_sidecar_pins_the_zip(rev):
     z = ROOT / d["path"]
     assert d["revision"] == rev and z.stat().st_size == d["bytes"] and sha(z) == d["sha256"]
     assert d["manifest_sha256"] == sha(OUT / rev / "manifest.json")
+
+
+def test_open_review_findings_name_real_revisions_and_stay_unresolved_until_a_new_revision():
+    f = json.loads((OUT / "REVIEW_FINDINGS.json").read_text())["findings"]
+    assert f and all(set(x["revisions"]) <= set(REVS) for x in f)
+    assert all(x["status"] in {"unresolved", "resolved"} for x in f)

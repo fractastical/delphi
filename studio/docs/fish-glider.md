@@ -70,6 +70,15 @@ pelvics at 0.48 SL.
   `download.json`, beside the ZIP and outside it, pins the ZIP's path, size and sha256. The ZIP is deterministic:
   the same files give the same bytes.
 
+**Open finding: thin body wall at the forward catch slot (unresolved).** Reviewer claude-13 measured two
+readings of 0.115 mm at about (19.4, ±5.9, 8.8) mm on the r3 body, against the 0.45 mm rule. The r4 body is the same
+mesh.
+- **The builder's gate missed it.** Its sampler logged an edge-limited 0.31 mm reading at (18.38, 6.39, 8.15), and
+  edge-limited readings are reported but do not gate.
+- **Consequence.** r4 is a fit and balance print only, with no launch clearance.
+- **Record.** The finding is in `artifacts/glider/REVIEW_FINDINGS.json`, outside the frozen revisions and the ZIP.
+  It will be fixed in a new revision, never by editing r4.
+
 **All five revisions fail claude-07's preliminary mass limit.** The limit is about 10.5 g, which gives
 V_trim ≤ 8 m/s at C_L 0.5. They are kept as printable launch prototypes with that failure stated.
 - **Measured split** (`r1-light`): body 10.95 g, each pectoral 2.40 g, each pelvic 0.69 g.

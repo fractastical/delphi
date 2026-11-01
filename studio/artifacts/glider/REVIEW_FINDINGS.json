@@ -1,0 +1,17 @@
+{
+  "schema": "frontier.glider.review-findings/1",
+  "note": "Open reviewer findings, kept outside every frozen revision and outside the print-set ZIP so that recording one never edits frozen bytes. A finding is resolved only in a NEW revision; frozen revisions are never edited.",
+  "findings": [
+    {
+      "id": "body_thin_wall_near_forward_catch_slot",
+      "status": "unresolved",
+      "found_by": "reviewer claude-13 (independent wall check of r3-daane body.stl), relayed by root 2026-10-31",
+      "what": "two wall readings of 0.115 mm at about (19.4, +/-5.9, 8.8) mm in the fish frame, near the forward (x 20 mm) catch slot, against the provisional 0.45 mm wall rule",
+      "revisions": ["r2-light", "r3-daane", "r4-daane-printfix"],
+      "revisions_basis": "r3-daane: reviewer's reading. r4-daane-printfix: body mesh-identical to r3 (bytes after the 80-byte header identical). r2-light: same x 20 slot design, not re-measured; listed as likely, not confirmed. r1 (fixed catch at x 28) not checked.",
+      "own_check_missed_it": "the builder's sampler (3000 samples, seed 7) recorded an edge-limited reading of 0.31 mm at (18.38, 6.39, 8.15) in r4's manifest (body wall.edge_limited_below_rule_at_mm), reported but not gating, because exit and entry normals were not opposed. The gate therefore passed a region a reviewer measured at 0.115 mm.",
+      "consequence": "r4-daane-printfix is a FIT/BALANCE test print only. No launch clearance: the catch region may print thin, leak or break under band load.",
+      "next": "investigate the slot-liner/dorsal-shell geometry and the sampler's edge classification in a new revision (r5); r4 is not edited"
+    }
+  ]
+}
