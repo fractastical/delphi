@@ -116,3 +116,11 @@ def test_prepared_bundle_is_valid_but_not_database_integration():
     assert derived["payload"]["provenance"]["adapter_code_sha256"] == manifest["adapter_code_sha256"]
     assert all(x["ok"] for x in manifest["checks"])
     assert "no DB" in manifest["status"]
+
+
+def test_transitive_cross_species_catalog_component_is_fully_purged():
+    rows = [{"id": name, "species": name, "group": "fixture", "catalog_tokens": tokens}
+            for name, tokens in [("held", ["A"]), ("bridge", ["A", "B"]), ("transitive", ["B"]), ("independent", ["C"])]]
+    split = next(x for x in blocked_folds(rows, "species") if x["heldout_block"] == "held")
+    assert [x["id"] for x in split["train"]] == ["independent"]
+    assert set(split["purged_ids"]) == {"bridge", "transitive"}

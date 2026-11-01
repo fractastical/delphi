@@ -94,10 +94,10 @@ def blocked_folds(rows, scheme):
             raise ValueError("Unknown blocking scheme")
         for label in sorted(set(labels.values())):
             test = [x for x in subset if labels[x["id"]] == label]
-            tokens = {token for x in test for token in x["catalog_tokens"]}
+            held_components = {components[x["id"]] for x in test}
             candidates = [x for x in subset if labels[x["id"]] != label]
-            train = [x for x in candidates if not tokens.intersection(x["catalog_tokens"])]
-            purged = [x["id"] for x in candidates if tokens.intersection(x["catalog_tokens"])]
+            train = [x for x in candidates if components[x["id"]] not in held_components]
+            purged = [x["id"] for x in candidates if components[x["id"]] in held_components]
             yield {"scheme": scheme, "group": group, "heldout_block": label, "train": train, "test": test, "purged_ids": purged}
 
 

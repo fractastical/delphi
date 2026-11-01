@@ -10,7 +10,7 @@ import time
 
 import numpy as np
 
-from .model import PredictionCache, StaleModelError, blocked_folds, fit, import_observations, predict, version
+from .model import PredictionCache, StaleModelError, blocked_folds, catalog_components, fit, import_observations, predict, version
 
 ROOT = Path(__file__).resolve().parents[2]
 ART = ROOT / "artifacts/observed-allometry"
@@ -57,6 +57,9 @@ def validation(rows, cfg):
     folds = []
     for scheme in ["species", "catalog"]:
         for split in blocked_folds(rows, scheme):
+            components = catalog_components([r for r in rows if r["group"] == split["group"]])
+            if {components[r["id"]] for r in split["train"]} & {components[r["id"]] for r in split["test"]}:
+                raise ValueError("Connected catalog component leakage across blocked split")
             train_tokens = {t for r in split["train"] for t in r["catalog_tokens"]}
             test_tokens = {t for r in split["test"] for t in r["catalog_tokens"]}
             if train_tokens & test_tokens:
@@ -77,8 +80,9 @@ def update_demo(rows, cfg):
     selection = cfg["update_demo"]
     group = [r for r in rows if r["group"] == selection["group"]]
     heldout = [r for r in group if r["species"] in selection["heldout_species"]]
-    forbidden = {t for r in heldout for t in r["catalog_tokens"]}
-    eligible = [r for r in group if not forbidden.intersection(r["catalog_tokens"])]
+    components = catalog_components(group)
+    forbidden = {components[r["id"]] for r in heldout}
+    eligible = [r for r in group if components[r["id"]] not in forbidden]
     initial = [r for r in eligible if r["species"] in selection["version1_species"]]
     added = [r for r in eligible if r["species"] in selection["version2_add_species"]]
     before, after = fit(initial, selection["outcome"]), fit(initial + added, selection["outcome"])
@@ -115,7 +119,7 @@ def run(out):
     start = time.monotonic()
     cfg = json.loads((ART / "protocol.json").read_text())
     contract = json.loads((ART / "import-contract.json").read_text())
-    for name in ["protocol.json", "import-contract.json"]:
+    for name in ["protocol.json", "import-contract.json"] + (["component-purge-correction.json"] if (ART / "component-purge-correction.json").is_file() else []):
         path = f"artifacts/observed-allometry/{name}"
         recorded = subprocess.check_output(["git", "show", f"HEAD:{path}"], cwd=ROOT)
         if recorded != (ROOT / path).read_bytes():
@@ -154,7 +158,8 @@ def run(out):
     environment = {"python": platform.python_version(), "numpy": np.__version__}
     dump(out / "receipt.json", {
         "schema": "frontier.observed-allometry.receipt/1", "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
-        "protocol": ref(ART / "protocol.json"), "import_contract": ref(ART / "import-contract.json"),
+        "protocol": ref(ART / "protocol.json"),
+        "protocol_correction": ref(ART / "component-purge-correction.json") if (ART / "component-purge-correction.json").is_file() else None, "import_contract": ref(ART / "import-contract.json"),
         "source_observations": ref(ROOT / contract["path"]), "code": [ref(p) for p in sorted(Path(__file__).parent.glob("*.py"))],
         "environment": environment, "environment_sha256": version(environment), "wall_seconds": time.monotonic() - start,
         "files": [ref(p) for p in sorted(out.iterdir())], "dollars": None, "provider_jobs": 0,
