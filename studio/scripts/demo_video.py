@@ -350,6 +350,26 @@ def validate_media_map(story: dict, media_map_path: Path) -> tuple[dict, list[di
     return media_map, list(sources.values())
 
 
+def _source_reference(source_path: str, fallback_commit: str) -> dict:
+    path = Path(source_path).resolve()
+    try:
+        repo = Path(subprocess.run(["git", "-C", str(path.parent), "rev-parse", "--show-toplevel"],
+                                   check=True, capture_output=True, text=True, timeout=10).stdout.strip())
+        relative = path.relative_to(repo).as_posix()
+        commit_result = subprocess.run(["git", "-C", str(repo), "log", "-1", "--format=%H", "--", relative],
+                                       check=True, capture_output=True, text=True, timeout=10)
+        commit = commit_result.stdout.strip() or fallback_commit
+        remote = subprocess.run(["git", "-C", str(repo), "remote", "get-url", "origin"],
+                                check=True, capture_output=True, text=True, timeout=10).stdout.strip()
+        if remote.startswith("https://github.com/"):
+            url = f"{remote.rstrip('.git')}/blob/{commit}/{relative}"
+        else:
+            url = None
+        return {"path": relative, "commit": commit, "url": url}
+    except (subprocess.CalledProcessError, OSError, ValueError, subprocess.TimeoutExpired):
+        return {"path": path.name, "commit": fallback_commit, "url": None}
+
+
 def _font_path(bold: bool = False) -> Path:
     preferred = Path("/home/ubuntu/.local/share/fonts/Inter-SemiBold.ttf" if bold else "/home/ubuntu/.local/share/fonts/Inter-Regular.ttf")
     fallback = Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf")
@@ -579,17 +599,25 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
     capture_manifest_path = Path(media_map["capture_manifest_path"])
     if not capture_manifest_path.is_file() or sha256_file(capture_manifest_path) != media_map["capture_manifest_sha256"]:
         raise ValueError("captured-screen manifest hash mismatch")
+    renderer_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
+                                     text=True, timeout=10, check=True).stdout.strip()
+    renderer_sha256 = sha256_file(Path(__file__).resolve())
+    stable_sources = []
+    for row in source_rows:
+        reference = _source_reference(row["path"], renderer_commit)
+        stable_sources.append({**row, "path": reference["path"], "source_commit": reference["commit"],
+                               "source_url": reference["url"]})
     manifest = {"schema": "frontier.demo-video.release/1", "status": "complete" if only_cut is None else "preview",
-                "storyboard": {"path": str(story_path), "sha256": sha256_file(story_path), "commit": media_map["storyboard_commit"]},
-                "renderer_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
-                                                  text=True, timeout=10, check=True).stdout.strip(),
+                "storyboard": {"path": "artifacts/demo-video/storyboard.json", "sha256": sha256_file(story_path), "commit": media_map["storyboard_commit"]},
+                "renderer_commit": renderer_commit,
                 "media_map": {"path": str(media_map_path.relative_to(ROOT)), "sha256": sha256_file(media_map_path)},
                 "tts_manifest": {"path": str(tts_path.relative_to(ROOT)), "sha256": sha256_file(tts_path),
                                  "provider": tts_manifest["provider"], "model": tts_manifest["model"],
                                  "voice_id": tts_manifest["voice_id"], "provider_requests_this_run": tts_manifest["provider_requests_this_run"]},
                 "source_capture_manifest": {"path": str(capture_manifest_path), "sha256": sha256_file(capture_manifest_path),
                                              "release_sha": media_map["site_release_sha"]},
-                "source_files": source_rows, "cuts": rendered,
+                "source_files": stable_sources, "cuts": rendered,
+                "renderer_sha256": renderer_sha256,
                 "limits": ["Computational prototype; not a biologically realized flying fish.",
                            "Simulation playback retains source timing; short clips hold on their final saved state for display only.",
                            "No total spend claim; provider execution, runtime allocation and scientific success are separately sourced."],
