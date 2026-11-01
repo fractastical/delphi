@@ -270,8 +270,9 @@ preregistration outcomes is
 
 Six actuation phase patterns, matched in material, amplitude, frequency and duration,
 rank travelling **0.3644** body lengths in five cycles, longitudinal **0.1532**,
-lateral **0.1412**, dorsoventral **0.0031**, checker and uniform at **1e-5**. None
-diverged.
+lateral **0.1412**, dorsoventral **0.0031**, checker and uniform at **2e-5**. None
+diverged. That is a ratio of **16,565**, or **4.2 orders of magnitude** — an earlier version of
+this paragraph said "about five orders", which overstated it.
 
 The controls are what make that table worth reading. Setting the coefficient of
 thermal expansion to zero and setting the temperature amplitude to zero give
@@ -302,13 +303,26 @@ voxels against 0.0188 on a 10x6x6 body of 5 mm voxels, an 8.2x drop. The protoco
 predicted no convergence and said so in advance.
 
 Two post-hoc diagnostics, labelled as such in the artifact, explain it. Global damping
-as the cause is **refuted**: displacement rises with the damping ratio at both
-resolutions, and matching total drag widens the gap to 15x rather than closing it.
+as the cause is **refuted**, in the weaker form the data actually support: displacement is
+higher at the largest damping ratio than at zero on both lattices (coarse 0.0237 to 0.1532,
+fine 0.0047 to 0.0188), so raising it does not suppress the motion the way a purely parasitic
+drag would, and matching total drag by halving it on the fine lattice widens the gap to 15x
+rather than closing it. Two cautions, both from independent audit and both confirmed here:
+the fine series is **not monotone** — 0.00466, 0.00425, 0.01039, 0.01878 at damping ratios 0,
+0.025, 0.05 and 0.1, so only the endpoints are ordered — and global damping **is** a
+dissipative `-C*v` term. What these runs bear on is rectification of the actuation cycle, not
+the sign of that term, and the mechanism is not identified.
+
 Actuator-layout parity is **supported**: at fixed 10 mm resolution and fixed damping,
 `nx` = 4, 5, 6, 7 give 0.0200, 0.1532, 0.0086 and 0.0796 body lengths, so an odd
 voxel count moves 7.6x to 17.8x further than its adjacent even neighbours (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25; non-adjacent pairs are not part of the claim). The longitudinal
 pattern splits at `x < nx/2`, so the refinement arm confounded lattice resolution with
 actuator-layout asymmetry. That is an artefact of our encoding, not of the engine.
+
+**That series is a diagnostic, not an isolated cause.** Varying `nx` at a fixed voxel size
+changes the voxel count, the body length and the mass together: 36 voxels at 36 g for nx=4
+through 63 voxels at 63 g for nx=7. Parity is identified as a large effect; length and mass
+are not held constant and their separate contributions are unmeasured.
 
 With the confound removed — the travelling-wave pattern sets phase as a gradient and
 so carries its own asymmetry at any `nx` — the two bodies move **14.577281 mm** and
@@ -367,7 +381,11 @@ imposed temperature only** — no orientations, no deformed voxel meshes, no for
 may draw centre points, a link graph or nominal glyphs and must label them as such; it must not
 invent cellular textures, traction arrows or deformed tissue boundaries, and `temp_C` is an
 imposed numerical actuation signal rather than a measured cellular state. Use SI axes, and if
-body lengths are shown, say which denominator.
+body lengths are shown, say which denominator. One sampling limitation goes with it: the
+headline displacement is taken from the centre of mass at the simulator's exact step
+boundaries, while the CSV is written every `record_every` steps, so a value re-derived from
+the CSV can differ slightly from the stored metric. Use the stored metric for the number and
+the CSV for the shape.
 
 The known threat to its validity is that the rectifying ground reaction is part Coulomb friction
 and part global damping to an absolute frame — Voxelyze's global damping is a numerical

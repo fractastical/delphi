@@ -81,7 +81,7 @@
  ],
  "arm_A_verdict": {
   "predeclared": "at least one pattern >= 0.05 body lengths and not all equal",
-  "observed": "best travelling at 0.3644 BL, worst uniform at 0.000022 BL; spread spans ~5 orders of magnitude",
+  "observed": "best travelling at 0.364432 BL, worst uniform at 0.000022 BL; ratio 16565, which is 4.22 orders of magnitude (independent audit computed 4.23 from the same artifacts; the small difference is rounding of the smallest value). CORRECTION 2026-11-01: an earlier version of this field said 'spans ~5 orders of magnitude', which overstated it.",
   "met": true
  },
  "controls": {
@@ -248,7 +248,22 @@
     "fine_zeta_0.025": 0.00425,
     "fine_zeta_0": 0.00466
    },
-   "why_refuted": "displacement RISES with zeta at both resolutions, so global damping is not a parasitic drag here; and matching total drag by halving zeta on the fine lattice widens the gap to 15x rather than closing it"
+   "why_refuted": "displacement is HIGHER at the largest zeta than at zero at both resolutions (coarse 0.02365 -> 0.15318; fine 0.00466 -> 0.01878), so increasing global damping does not suppress this motion the way a purely parasitic drag would; and matching total drag by halving zeta on the fine lattice widens the coarse/fine gap to 15x rather than closing it.",
+   "CORRECTION_2026-11-01": "two overstatements removed, both raised by independent audit and both confirmed here from the stored artifacts. (1) An earlier version said displacement 'rises with zeta' at both resolutions. The fine series is NOT strictly monotone: zeta 0 -> 0.00466, 0.025 -> 0.00425 (a DECREASE), 0.05 -> 0.01039, 0.1 -> 0.01878. Only the endpoints are ordered. (2) An earlier version said global damping 'is not a parasitic drag here', which could be read as denying that it dissipates. It is a dissipative -C*v term (VX_Material.h:94). What these runs show is about RECTIFICATION of the actuation cycle, not about the sign of the term, and the mechanism is not identified.",
+   "monotonicity": {
+    "coarse_endpoints_only": {
+     "zeta_0": 0.02365,
+     "zeta_0.1": 0.15318
+    },
+    "fine_series": {
+     "zeta_0": 0.00466,
+     "zeta_0.025": 0.00425,
+     "zeta_0.05": 0.01039,
+     "zeta_0.1": 0.01878
+    },
+    "strictly_monotone": false,
+    "note": "a non-monotone series does not support a simple trend statement"
+   }
   },
   "hypothesis_2_parity_confound": {
    "statement": "the longitudinal pattern splits at x < nx/2, so nx=5 gives an asymmetric 2|3 actuator layout and nx=10 a symmetric 5|5 one. Net translation needs a broken mirror symmetry, so the comparison confounded lattice resolution with actuator-layout parity.",
@@ -265,7 +280,8 @@
     "nx5_over_nx4": 7.6475,
     "nx5_over_nx6": 17.8095,
     "nx7_over_nx6": 9.2537
-   }
+   },
+   "CAVEAT_bodies_are_not_matched": "varying nx at fixed voxel size changes the voxel COUNT, the body LENGTH and the MASS together: nx=4 is 36 voxels / 30 mm centre span / 40 mm envelope / 36 g; nx=5 is 45 / 40 / 50 / 45 g; nx=6 is 54 / 50 / 60 / 54 g; nx=7 is 63 / 60 / 70 / 63 g. So this series is a DIAGNOSTIC that identifies parity as a large effect, NOT an isolated demonstration that parity is the single cause. Length and mass are not held constant and their separate contributions are unmeasured. Raised by independent audit."
   },
   "clean_refinement_test": {
    "statement": "the travelling-wave pattern sets phase as a gradient 2*pi*x/nx and carries its own asymmetry at any nx, so it has no parity confound.",
@@ -337,7 +353,8 @@
    "forces or tractions",
    "any measured cellular state"
   ],
-  "rendering_constraint": "travelling-voxels.csv stores voxel CENTRES and the imposed temperature only. A renderer may draw centre points, a link graph or nominal glyphs, and must label them as such. It must not invent cellular textures, traction arrows or deformed tissue boundaries. temp_C is an imposed numerical thermal actuation signal, not a measured cellular state. Use SI axes; if body lengths are shown, state which denominator."
+  "rendering_constraint": "travelling-voxels.csv stores voxel CENTRES and the imposed temperature only. A renderer may draw centre points, a link graph or nominal glyphs, and must label them as such. It must not invent cellular textures, traction arrows or deformed tissue boundaries. temp_C is an imposed numerical thermal actuation signal, not a measured cellular state. Use SI axes; if body lengths are shown, state which denominator.",
+  "endpoint_sampling_limitation": "the headline net displacement is computed from the centre of mass at the exact step boundaries inside the simulator (the first measurement step and the final step), whereas the CSV is written every record_every steps. The CSV endpoints therefore need not coincide with the metric's endpoints, so a value re-derived from the CSV can differ slightly from the stored net_disp_m. Use the stored metric for the number and the CSV for the shape. Raised by independent audit."
  },
  "model_scale_labelling": {
   "what_this_object_is": "a numerical soft-voxel ground-contact mechanics benchmark, not tissue",
@@ -349,5 +366,18 @@
    "measured or material-calibrated"
   ],
   "no_fluid_interpretation": "global damping is a numerical absolute-frame term, not CFD and not fluid drag. No swimming interpretation is available."
+ },
+ "independent_audit_2026-11-01": {
+  "scope": "24 simulation runs and 11 analytic runs re-read; the 241 x 45 centre-of-mass and voxel data checked for consistency; 6 of the cheap controls independently rebuilt and reproduced",
+  "no_new_runs_requested": true,
+  "findings_accepted": [
+   "travelling-wave 2.74% withdrawn for 15.5739% at a common denominator",
+   "pattern spread is 4.2 orders, not ~5",
+   "parity series is a diagnostic, not an isolated cause",
+   "global damping is a dissipative -Cv term and the fine zeta series is not monotone",
+   "CSV endpoint sampling differs from the metric's endpoints"
+  ],
+  "findings_rejected": [],
+  "note": "every figure in the audit was recomputed here from the stored artifacts before acceptance"
  }
 }

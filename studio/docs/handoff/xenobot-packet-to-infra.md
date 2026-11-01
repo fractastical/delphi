@@ -144,6 +144,9 @@ Six actuation phase patterns, matched material, amplitude, frequency and duratio
 | checker | 0.0000 |
 | uniform | 0.0000 |
 
+The spread is a ratio of 16,565, which is **4.2 orders of magnitude**, not the "five"
+an earlier version said.
+
 Controls B (cte=0) and C (amplitude=0) are numerically identical and ~0, as they must
 be. Control D removes friction and gives **exactly 0.0** horizontal displacement:
 centre-of-mass x and y constant to nine decimals across all 241 samples while z ranges
@@ -184,7 +187,10 @@ Hypothesis 2, actuator-layout parity, **SUPPORTED**: at fixed 10 mm resolution a
 fixed zeta, nx = 4, 5, 6, 7 give 0.0200, 0.1532, 0.0086, 0.0796 body lengths. Odd nx
 moves 7.6×–17.8× further than its adjacent even neighbours (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25; non-adjacent pairs are not part of the claim). The `longitudinal` split at
 `x < nx/2` confounded lattice resolution with layout asymmetry. **That is my own
-encoding, not the engine.**
+encoding, not the engine.** It is a **diagnostic, not an isolated cause**: varying `nx`
+at fixed voxel size changes count, length and mass together (36 voxels at 36 g for nx=4
+through 63 at 63 g for nx=7), so parity is identified as a large effect while length and
+mass are not held constant.
 
 With that confound removed — the travelling-wave pattern sets phase as a gradient and
 carries its own asymmetry at any nx — coarse and fine move **14.577281 mm** and
@@ -237,4 +243,8 @@ uncertainty.**
 
 Trajectory data for animation is at
 `artifacts/voxel-actuation/trajectory/travelling-voxels.csv` (241 frames × 45 voxels),
-produced by this run. **No upstream recording is reused anywhere in this artifact.**
+produced by this run. **No upstream recording is reused anywhere in this artifact.** It
+stores voxel centres and the imposed temperature only — no orientations, no deformed
+meshes, no forces — and its sampling grid is `record_every` steps, which does not
+coincide with the exact step boundaries the headline displacement is measured at, so use
+the stored metric for the number and the CSV for the shape.
