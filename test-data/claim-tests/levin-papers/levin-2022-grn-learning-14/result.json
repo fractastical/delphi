@@ -1,0 +1,30 @@
+{
+  "claim_id": "levin-2022-grn-learning-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, then under the paper's six-pulse habituation protocol every BioModels pathway model that integrates has at least one stimulus–response pair whose mean expression falls by a factor of 1/1.5 at each successive lengthening pulse, and that pair is between 1% and 50% of the pairs tested in that model.",
+  "pass_criterion": "Pre-registered, before any BioModels file or the supplement archive was opened. Let T be the number of testable models (defined in test_contract). Let Z be how many of them have zero habituating pairs. A model fraction is the number of habituating pairs divided by the number of finite pairs evaluated. Supports only if all of: (S1) the engagement check passes; (S2) T >= 20; (S3) Z = 0; (S4) every testable model's fraction lies in [0.01, 0.50].",
+  "fail_criterion": "Pre-registered. If the engagement check fails, the verdict is inconclusive with reason other, whatever the habituation counts are. If fewer than 15 of the Table S1 model files can be downloaded, inconclusive with reason data-unavailable. If files download but T < 20, inconclusive with reason underpowered. If the engagement check passes and T >= 20, refutes if Z >= 4 or more than half of the testable models have a fraction outside [0.01, 0.50]; otherwise, if S3 or S4 fails, the verdict is mixed. A descriptive count of pairs that also meet a stricter successive ratio of 1/2 is recorded and does not decide the verdict.",
+  "planned_datasets": [
+    "biswas-2023-ijms-supplement-table-s1",
+    "biomodels-sbml-of-table-s1-ids"
+  ],
+  "test_contract": {
+    "expected_observation": "Every numerically testable model from the paper's Table S1 has at least one up- or down-clamped stimulus–response pair whose six stimulation-window means fall by a factor of at least 1/1.5 at every step, and the share of such pairs in that model is between 1% and 50%.",
+    "disconfirming_observation": "Four or more testable models with no such pair, or a majority of testable models whose habituating share lies outside 1–50%. A single hold-out model, or a minority outside the band, is mixed rather than a refutation, because the integrator is not the authors' MATLAB ode23tb.",
+    "admissible_datasets": "The 35 BioModels identifiers named in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (doi:10.3390/ijms24010285), fetched as public SBML from the BioModels/biomodels.org archive. No author result table, figure, or precomputed trajectory may enter the verdict. Models that do not load, whose initial relax is non-finite, that have more than 40 floating species, or for which fewer than half of attempted pairs return finite means, are not testable; they are excluded from T and are not counted as failures.",
+    "inference_method": "Six clamped pulses with durations 50, 60, 70, 80, 90 and 100 model-time units (the methods' 5000-to-10000 steps at the stated output step h = 0.01), each followed by an unclamped relax of the same length. Up-clamp is the species' maximum over the initial 0–100 relax, times 100; down-clamp is that minimum divided by 100 (paper MathML mm39–mm41). Habituation is mean(R) on pulse i+1 <= mean(R) on pulse i times 1/1.5 for all five steps, with every pulse mean finite and the first pulse mean > 1e-12. Fraction = habituating pairs / finite pairs. Engagement check: at least half of testable models have at least one pair whose first-pulse mean of R differs from the mean of R over the last 10 time units of the initial relax by a factor of 1.5 or more. Thresholds are S1–S4 above; no threshold is fit after seeing counts."
+  },
+  "interpretation": "The claim calls habituation 'a progressive 50% drop' and the source sentence says 'decrease in expression by 50% (i.e., a ratio of 1:1.5)'. The methods equation is the fraction 1/1.5 applied to successive stimulation-window means (MathML ids mm41 and mm42 in the Europe PMC full text), which is a drop to two-thirds, not to one-half. The verdict uses 1/1.5, because that is the criterion that the stated 27-model count was computed with. A true half-drop (ratio 1/2) is reported beside it and does not decide the verdict. 'Testable' in the claim is the authors' MATLAB subset (27 of 35); here it is every Table S1 model that integrates under the rules in the contract, so T need not equal 27 for a support. The continuous clamp (species held at the target, derivative not applied) is the intervention their MATLAB loop approximated by re-integrating and resetting; the chunk length '(10)' in that workaround is not multiplied into the epoch durations. This is a simulation of published ODE models. It does not measure pharmacoresistance in organisms.",
+  "caveats": [
+    "Registration written on 2026-11-01 before any BioModels SBML file was fetched and before the supplement zip was downloaded. The zip URL was checked with an HTTP HEAD only (content-type application/zip, content-length 2886027). Methods formulas were read from the already-vendored paper text and from Europe PMC full text XML PMC9820177, which contains no Table S1 identifiers and no per-model habituation counts."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/levin-grn-learning-tests-8733",
+    "date": "2026-11-01"
+  }
+}
