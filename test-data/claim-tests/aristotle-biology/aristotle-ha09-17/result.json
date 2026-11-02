@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha09-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-17",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:40:23Z",
+  "hypothesis": "If the claim holds, FishBase species accounts for the genus Lophius describe a head filament (illicium or esca) that is used to lure prey, and they describe the fish as hidden in sand or mud while it does so.",
+  "pass_criterion": "Pre-registered. Species are the valid Lophius binomials in FishBase v25.04 species.parquet (Genus Lophius, a non-empty species epithet, epithet not sp or spp). For each, fetch https://www.fishbase.se/summary/{Genus}-{Species}.html and score the biology slice: text from the first 'Biology' heading until Life cycle, Diet, Main reference, or 4000 characters, whichever comes first. If there is no Biology heading, the species is unscored. Anatomy matches if the slice contains illicium, esca, filament or 'first dorsal spine'. Use matches if the slice contains illicium or esca, or 'as a lure' or 'to lure', or filament/illicium/esca in the same sentence as attract, prey or lure. The fisheries phrase 'used as bait' does not count as use unless illicium, esca or lure is in that same sentence. Burial matches sand, mud, bury, buried or conceal, and does not match on the word bottom alone. A species is full support only if anatomy, use and burial all match. The claim passes if at least 3 species are scored and the full-support fraction is at least 2/3.",
+  "fail_criterion": "Pre-registered. The claim is refuted only if at least 3 species are scored and the anatomy match count is 0. If at least 3 are scored and anatomy matches for at least 2/3 but full support is below 2/3, the verdict is mixed (the filament is in the accounts, the lure-while-buried sequence is not). If fewer than 3 species are scored, the verdict is inconclusive with reason data-unavailable. Pages that fail to return HTTP 200 are unscored, not contradictions.",
+  "planned_datasets": [
+    "fishbase-v25.04-species-and-lophius-summaries"
+  ],
+  "test_contract": {
+    "expected_observation": "At least two thirds of scored Lophius accounts name the head filament and say that it lures prey while the fish is hidden in sand or mud.",
+    "disconfirming_observation": "Scored Lophius accounts do not mention an illicium, esca, filament or first dorsal spine at all.",
+    "admissible_datasets": "The public FishBase species list for genus Lophius and the public species-summary pages, which compile the anatomical and biological literature. A page is admissible only if a Biology section can be cut out, so that diet and fisheries sentences elsewhere on the page cannot trip the lure words.",
+    "inference_method": "Fixed substring rules on the Biology slice, then a two-thirds threshold on the full-support fraction. No weights and no second coder. The fisheries sense of 'used as bait' is excluded up front."
+  },
+  "interpretation": "The fishing-frog is the angler of the genus Lophius, the shallow-water genus Aristotle could have seen, not the deep-sea ceratioid anglers. 'Filaments ... in front of its eyes ... round at the tips ... used as baits' while the fish is hidden in sand and mud is scored as three pieces: the illicium or esca is present, it is described as a lure, and the account mentions burial in sand or mud. The test uses what the compiled accounts say. It does not measure a video of a strike.",
+  "caveats": [
+    "The summary URL for Lophius-piscatorius returned HTTP 200 on HEAD. The body was not read. species.parquet was not opened.",
+    "Keyword counts on a compiled account are a coarser measurement than a filmed feeding sequence. A pass means the accounts state the three pieces, not that this session timed a predation event. Confidence on a pass is capped at 0.6.",
+    "A refutation by absence of the words would be weak, so absence refutes only when several scored pages exist and none of them has the anatomical terms, and confidence on that refutation is capped at 0.45."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-cf1c",
+    "date": "2026-11-01"
+  }
+}

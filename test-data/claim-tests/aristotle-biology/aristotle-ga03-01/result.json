@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-ga03-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-01",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:40:23Z",
+  "hypothesis": "If the claim holds for cartilaginous fishes as a class, species with a recorded reproductive mode are live-bearing (an egg formed inside the mother, young born alive) rather than external egg-layers, so the oviparous fraction is at most a few percent.",
+  "pass_criterion": "Pre-registered. Primary source is the FishBase v25.04 reproduc table joined to species and families. A chondrichthyan is a row whose taxonomy cell matches Elasmobranchii, Holocephali or Chondrichthyes (case-insensitive). RepGuild2 (the second Balon guild field) maps to live-bearing if it contains 'internal live', and to oviparous if it contains 'egg scatter', 'brood hid', 'clutch tend', 'nester' or 'external brood'. Blank and unmapped values are unknown and stay out of the denominator. Multiple rows for one SpecCode must agree or the species is dropped as a conflict. Let n be the number of species classed live-bearing or oviparous, and p_ovi the oviparous fraction of n. The mode clause passes if n >= 50 and p_ovi <= 0.05. The same thresholds on Elasmobranchii alone are a sensitivity: if the all-chondrichthyan call and the elasmobranch-only call are supports versus refutes, the verdict is mixed. Sharkipedia traits v1.0 (Zenodo 10.5281/zenodo.6656525), trait_name 'Reproductive mode', is the second source: oviparous if the value contains 'ovipar'; live-bearing if it contains vivipar, placental, lecithotroph, histotroph, oophag, adelphophag, matrotroph, trophonem, aplacental or 'yolk-sac'; a value matching both is ambiguous and dropped; species with both classes across rows are conflicts and dropped. Sharkipedia is powered if its n >= 40. If both sources are powered and one passes while the other refutes, the verdict is mixed. If only one is powered, it decides. The soft-shell and one-colour clause is tested only if reproduc or eggs has a column whose name matches shell, egg case, colour or color: it fails if 10 or more species otherwise classed live-bearing are coded horny, keratinous or hard-shelled. A mode pass with that shell failure is mixed. If no such column exists, the mode verdict stands and the shell clause is recorded as untested.",
+  "fail_criterion": "Pre-registered. The mode clause is refuted if n >= 50 and p_ovi >= 0.20 on the source that decides (FishBase if powered, otherwise Sharkipedia if powered). A refuted mode clause refutes the claim even if shell colour is untested, because the claim says cartilaginous fishes bear live young. If 0.05 < p_ovi < 0.20 on the deciding source, the verdict is mixed (live birth is common but not the class character). If both sources have n below their minimum, the verdict is inconclusive with reason underpowered. If the files cannot be fetched or no taxonomy cell matches the three class names, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-v25.04-reproduc-parquet",
+    "sharkipedia-traits-v1.0-zenodo-6656525"
+  ],
+  "test_contract": {
+    "expected_observation": "Among cartilaginous fishes with an explicit reproductive-mode code, at least 95 percent are internal live-bearers and at most 5 percent lay eggs.",
+    "disconfirming_observation": "Egg-laying is at least 20 percent of the species with a coded mode, so live birth is not the class character Aristotle states.",
+    "admissible_datasets": "A public species-level compilation of chondrichthyan reproductive mode, assembled from the primary literature and independent of Aristotle's text, with a documented mode field (live-bearing versus egg-laying) and enough coded species to estimate a class-wide fraction (at least 50 on FishBase, at least 40 on Sharkipedia).",
+    "inference_method": "Map the documented guild or trait strings to live-bearing or oviparous with the fixed substrings above, drop conflicts, and compare the oviparous fraction to 0.05 and 0.20. No model is fit. The shell-colour clause is applied only when a matching column exists."
+  },
+  "interpretation": "Aristotle's selachians are the cartilaginous fishes, and the sentence says the group forms a soft, one-coloured egg inside and then bears live young. That is read as a class-wide reproductive mode, not as a remark about one Mediterranean species. 'Oviparous internally but produce the young alive' is scored as live-bearing (yolk-sac, histotrophic or placental), and species that deposit egg cases are scored oviparous. Chimaeras (Holocephali) are inside the modern class and inside the primary count; the elasmobranch-only count is reported and can move a disagreement to mixed. Egg colour and shell hardness are part of the sentence but are not assumed to be a column; if they are absent the test says so and does not treat that absence as support.",
+  "caveats": [
+    "Before this registration, the FishBase reproduction-table manual and the Zenodo record metadata (file name, byte size, md5, CC BY 4.0) were read, and the parquet and CSV URLs were checked with HTTP HEAD. No reproductive-mode values were tabulated.",
+    "A web-search preview of the Sharkipedia reproductive-mode trait page listed 15 rows and included the word oviparous once. Thresholds were taken from the claim's universal wording, not from that preview, and the traits CSV was not opened.",
+    "FishBase RepGuild2 is Balon's care guild. 'Internal live bearers' is the live-birth state. Egg-case depositors are expected to fall in an egg-laying guild; if the table uses some other string, those species count as unknown rather than being forced into a class.",
+    "The manual states that reproduction coverage is a few thousand records for all fishes, so cartilaginous fishes may be under the minimum n. That outcome is inconclusive, not a quiet pass.",
+    "A pass or a fail on mode does not measure egg colour. Confidence is capped at 0.75 when the shell column is absent."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-cf1c",
+    "date": "2026-11-01"
+  }
+}

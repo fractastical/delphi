@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha04-28",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha04-28",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:40:23Z",
+  "hypothesis": "If the claim holds, the European eel Anguilla anguilla has no separate sexes and no recorded eggs, fecundity or larval stage in a public ichthyological compilation.",
+  "pass_criterion": "Pre-registered. Using FishBase v25.04, the primary species is Anguilla anguilla. The claim passes only if the reproduc Mode text is populated and explicitly denies a sex (it matches 'no sex', 'sexless' or 'neither male') and does not match any closed Mode choice from the FishBase manual (dioecism, protandry, protogyny, hermaphroditism, parthenogenesis), and the eggs table has zero rows for its SpecCode, the larvae table has zero rows, larvaepresence does not mark larvae as present, and fecundity has no positive fecundity value. Blank fields are not a pass. Other Anguilla species are tabulated and do not decide the verdict. A pass also requires that an OBIS life-stage count, if a complete filtered count is obtained, shows zero larval Anguilla anguilla records.",
+  "fail_criterion": "Pre-registered. The claim is refuted if Anguilla anguilla has either a positive sex record or a positive offspring record. A positive sex record is a reproduc Mode value matching dioecism, protandry, protogyny, hermaphroditism or parthenogenesis (the manual's closed list: each of these states a sex system), or a Mode value that names males and females, or fecundity rows that include both male and female. A positive offspring record is at least one eggs-table row, or at least one larvae-table row, or larvaepresence marking larvae present, or a positive fecundity value. Either arm is enough, because the sentence says the eel is neither male nor female and engenders nothing. OBIS can add an offspring record only from a complete count: a statistics or facet total, or a full export, of Anguilla anguilla occurrences whose lifeStage is larval or whose scientific name contains leptocephalus. A partial page of occurrences is not evidence. If the species is missing, or every field is blank and no complete OBIS larval count is available, the verdict is inconclusive with reason data-unavailable. Genus-level totals are reported and do not override a species-level result.",
+  "planned_datasets": [
+    "fishbase-v25.04-reproduc-eggs-larvae-fecundity",
+    "obis-anguilla-anguilla-lifestage"
+  ],
+  "test_contract": {
+    "expected_observation": "The European eel's reproduction fields are filled in and state that it has no separate sexes, no eggs and no larvae.",
+    "disconfirming_observation": "A coded reproductive mode of separate sexes, or any positive record of eggs, fecundity or larvae, for Anguilla anguilla.",
+    "admissible_datasets": "A public, literature-compiled fish database that stores reproductive mode, eggs, fecundity or larval presence at species level, plus a public occurrence index that can return a complete larval count. Blank fields are missing data, not a record that eggs were looked for and not found.",
+    "inference_method": "Join Anguilla anguilla to SpecCode and apply the boolean checks above. One positive arm refutes the universal negative. No rate is estimated and no threshold other than zero versus at least one is used."
+  },
+  "interpretation": "The eel of the Greek rivers and the Mediterranean is Anguilla anguilla. 'Neither male nor female' is read as the absence of separate sexes, which FishBase codes as Mode = dioecism when males and females both exist. 'Engenders nothing' and the accompanying statement that no egg has been seen are read as the absence of eggs, fecundity and a larval stage. River-caught silver eels are immature; a dataset that only sampled rivers could mimic Aristotle's observation, so a larval or egg record is counted wherever the compilation recorded it, including the sea. The test does not ask whether Aristotle could have seen the Sargasso spawning aggregation.",
+  "caveats": [
+    "Before this registration the FishBase manual's definition of Mode (dioecism versus forms of hermaphroditism) was read, and the parquet URLs were checked with HTTP HEAD. The reproduc, eggs, larvae, larvaepresence and fecundity tables were not opened.",
+    "The OBIS manual lists lifeStage as a Darwin Core field and not as a documented v3 query filter. If no complete filtered count is available, OBIS is not used, and that absence is not itself a verdict.",
+    "A refutation shows that the universal negative is false for Anguilla anguilla. It does not reconstruct when the sexes and the eggs were first described."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-cf1c",
+    "date": "2026-11-01"
+  }
+}
