@@ -1,0 +1,35 @@
+{
+  "claim_id": "levin-2022-grn-learning-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-11",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T01:05:00Z",
+  "hypothesis": "If UCS-based memory in these pathway ODEs is stable, then among Table S1 models that form at least one such memory, most keep more than half of those memories after a wait of 100 times the training relax, a recall test in the middle of that wait usually does not remove them, and a recall that increases the number kept is uncommon.",
+  "pass_criterion": "Pre-registered (supports). A model counts only if its SBML loads and the memory screen finishes inside 240 seconds. Among models with at least one UCS memory, let n be the number whose retention arms also finish. Supports requires n >= 10 and all three of the following: (A) more than n/2 models keep a retained fraction strictly above 0.5 on an uninterrupted wait of 100 times the base relax; (B) on at least 80% of the n models, the fraction kept after a recall at 10 times followed by a further wait of 90 times is at least the uninterrupted fraction minus 0.10; (C) the share of models whose recalled fraction exceeds the uninterrupted fraction by more than 0.05 is strictly under 0.20.",
+  "fail_criterion": "Pre-registered. If n < 10, the verdict is inconclusive (underpowered if n > 0, data-unavailable if n = 0). If n >= 10 and A, B and C are all false, the verdict is refutes. If n >= 10 and some but not all of A, B and C hold, the verdict is mixed. Models with no UCS memory are outside the claim and are not failures.",
+  "planned_datasets": [
+    "biswas2022-table-s1-biomodels",
+    "biomodels-sbml-table-s1"
+  ],
+  "test_contract": {
+    "expected_observation": "Most models that form a UCS memory still pass that memory test for more than half of those pairs after a 100-fold wait, recalling the memory once along the way usually costs no more than 10 percentage points, and a recall that raises the count by more than 5 percentage points is limited to under one model in five.",
+    "disconfirming_observation": "Half or fewer of those models keep more than half their memories at the 100-fold wait, or recall lowers the kept fraction by more than 10 percentage points in more than 20% of models, or recall raises it by more than 5 percentage points in 20% or more of models.",
+    "admissible_datasets": "The same 35 curated BioModels identifiers as Table S1 of Biswas, Clawson and Levin, doi:10.3390/ijms24010285, integrated from the public SBML. No author result matrix. A model that does not load or that exceeds 240 seconds is not in n.",
+    "inference_method": "UCS memory follows the paper's memory evaluator: base relax 50 time units (5000 steps of 0.01), clamp at 100 times the baseline maximum or the baseline minimum divided by 100, response up if the stimulation mean is at least twice both the baseline mean and the following free-run mean, down if it is at most half of both, and retained if after a further 50 time units the mean still holds at least half the excursion (DetectMem). The 100-fold wait is 5000 time units from the post-training state, then the same stim-and-relax test. The recall arm waits 500, runs that test, waits another 4500, and tests again. Thresholds are the three clauses in pass_criterion. Confidence is 0.45 when moving one model across the majority boundary of clause A would change A, otherwise 0.70 when n >= 20 and 0.55 when n < 20. Inconclusive uses 0.60."
+  },
+  "interpretation": "The claim is about ODE models that already show UCS-based memory, not about every BioModels file and not about cells. 'The bulk' is read as the paper's own line that a loss under 50% is not a significant loss, so a model keeps the bulk when the retained fraction is strictly above one half. 'Most' means strictly more than half of those models. 'Testing does not destroy' is the chained re-stimulation at 10 times the base relax, compared with an uninterrupted wait of 100 times. 'Rare' is pre-registered as under 20% of models gaining more than 5 percentage points. The network parameters and reactions are not edited. A pass would show the behaviour in the ODEs only.",
+  "caveats": [
+    "Table S1 identifiers were already copied for the habituation test. No retention trajectory is generated before this registration.",
+    "The authors' MATLAB (MEMORY_EVALUATOR_ODE_SLURM1.m, Test_US_Memory.m, DetectMem.m, UCS_Mem_Eval_After_Time_Lag_For_Review_SLURM.m) fixes simCnt = 5000, RscaleUp = 2 and the lags 10 and 100. Their lag script retests each lag from the original post-training state rather than chaining the 10-fold test into the 100-fold test. The chained arm here is the paper's prose description of a test that might destroy the memory, which that file does not implement.",
+    "Restoring a saved concentration vector uses reset and then overwrites the concentrations, so model time restarts. An autonomous ODE is unchanged. A model with an explicit time event can differ.",
+    "Window means are averages of samples every 0.1 time unit. The long waits are averaged from samples every 0.5 time unit."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/levin-grn-learning-tests-4186",
+    "date": "2026-11-01"
+  },
+  "deviations": []
+}

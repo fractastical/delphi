@@ -1,0 +1,33 @@
+{
+  "claim_id": "levin-2022-grn-learning-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-08",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T01:05:00Z",
+  "hypothesis": "If a pathway ODE can form a memory from stimulation alone, then at least one Table S1 model has a UCS memory: a stimulus changes a response by the factor of 2 used in the paper, the change is still at least half present after the stimulus is removed, and the SBML parameters and reactions were not modified.",
+  "pass_criterion": "Pre-registered (supports). Supports if the screen finds at least one UCS memory, as defined in the test contract, in any model that integrates. The claim is existential ('can be formed'), so one pair is enough, including when fewer than 10 models integrate.",
+  "fail_criterion": "Pre-registered. Refutes if at least 10 models integrate and none of them has a UCS memory. If fewer than 10 models integrate and none shows a UCS memory, the verdict is inconclusive (underpowered if at least one model integrated, otherwise data-unavailable). There is no mixed outcome: the claim is existential.",
+  "planned_datasets": [
+    "biswas2022-table-s1-biomodels",
+    "biomodels-sbml-table-s1"
+  ],
+  "test_contract": {
+    "expected_observation": "At least one directed stimulus–response pair, in an unedited BioModels ODE, regulates the response by a factor of two during a clamp and still holds at least half of that excursion after the clamp is released.",
+    "disconfirming_observation": "Every integrable Table S1 model, and at least 10 of them, fails to produce any such pair.",
+    "admissible_datasets": "The 35 curated BioModels identifiers in Table S1 of Biswas, Clawson and Levin, doi:10.3390/ijms24010285, as public SBML. Parameters, reactions and initial conditions stay at the file's values. Clamps change only the stimulus concentration during a pulse.",
+    "inference_method": "Same UCS-memory screen as levin-2022-grn-learning-11: 50 time-unit baseline, clamp at 100 times the baseline max or the baseline min over 100, factor-of-two regulation against both the baseline and the next free window, then half-excursion retention over the next 50 time units. One success supports. Zero successes with at least 10 integrable models refutes. Confidence is 0.70 on supports, 0.55 on refutes, and 0.60 on inconclusive."
+  },
+  "interpretation": "The claim says memories, for example associative memory, can be formed by stimulation through dynamics alone, without changing structure or parameters. UCS memory is the simplest memory the same paper defines that way: one stimulus, then a lasting response, with the equations untouched. Associative memory is the example in parentheses, not a second requirement of this test. A success does not show that cells learn.",
+  "caveats": [
+    "No memory trajectory for this claim is generated before this registration. The Table S1 identifier list was fixed earlier, from the supplement, for the habituation test.",
+    "The screen does not train a neutral stimulus into a conditioned stimulus. A failure of this UCS test would not by itself say that associative conditioning is impossible, but a success is enough for the existential wording, because UCS memory is in the class the sentence asserts."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/levin-grn-learning-tests-4186",
+    "date": "2026-11-01"
+  },
+  "deviations": []
+}
