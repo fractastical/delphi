@@ -1,0 +1,39 @@
+{
+  "claim_id": "aristotle-ga01-35",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-35",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:39Z",
+  "created": "2026-11-01",
+  "hypothesis": "If every animal that can move about has the sexes in separate individuals, then fishes, which locomote, will not be coded as protandrous, protogynous, truly hermaphroditic, or parthenogenetic.",
+  "pass_criterion": "Pre-registered. Supports is not awarded from this table. The claim covers all locomotory animals, and a fish reproduction table cannot show that motile invertebrates are gonochoric. A count of zero non-separate species, even with at least 500 classified fish species, is inconclusive with reason underpowered, not supports.",
+  "fail_criterion": "Pre-registered. Refutes if at least 100 fish species have a classified mode and at least 10 of them are non-separate (a mode string that, after lowercasing and collapsing whitespace, contains protand, protogyn, hermaphrod, or parthenogen). Mixed if at least 100 species are classified and the non-separate count is 1 to 9. Inconclusive with reason underpowered if fewer than 100 species are classified, or if the non-separate count is 0. Inconclusive with reason data-unavailable if the snapshot cannot be retrieved, if SpecCode or Mode cannot be identified, or if the chosen Mode column has no alphabetic values (the documented vocabulary is text, and integer codes are not remapped). The Mode column is the field named Mode, else a field whose name equals mode, else the first field whose name contains mode and not model. A species with any non-separate row is non-separate; otherwise a species with any dioecious row (value starting with dioec, or equal to gonochorism or gonochoristic) is separate; any other non-blank mode is other and is excluded from the classified count. Blank modes are ignored. Confidence if refutes: 0.80 when the non-separate count is at least 50 and at least 90% of non-blank mode values are exactly one of dioecism, protandry, protogyny, true hermaphroditism, parthenogenesis; 0.55 when more than 10% of species with a non-blank mode fall in other; otherwise 0.65. Confidence if mixed: 0.45. Confidence if inconclusive: 0.35.",
+  "planned_datasets": [
+    "fishbase-reproduc-v26.06"
+  ],
+  "thresholds": {
+    "min_classified_species": 100,
+    "refute_min_nonseparate_species": 10,
+    "high_confidence_min_nonseparate_species": 50,
+    "documented_vocabulary_min_fraction": 0.9,
+    "other_species_confidence_cap_fraction": 0.1
+  },
+  "test_contract": {
+    "expected_observation": "Every fish species with a coded reproductive mode is dioecious: separate male and female individuals, with no protandry, protogyny, true hermaphroditism, or parthenogenesis.",
+    "disconfirming_observation": "At least 10 fish species are coded with a mode in which one individual is not stably one sex, or in which there are not separate sexes. Fishes move about, so they are inside the claim's scope, and the universal fails if they fail.",
+    "admissible_datasets": "A public, versioned compilation of fish reproductive modes, coded independently of Aristotle's text, with one row per stock or species and a mode field whose vocabulary is documented. Fishes count as animals that move about. The table must not be a private extract and must be retrievable by URL.",
+    "inference_method": "From FishBase snapshot fb/v26.06 table reproduc, count distinct SpecCode. Classify each non-blank Mode by the substring rules in fail_criterion. Compare the non-separate species count with 10 and the classified species count with 100. Species names, if joined from the species table, are reported and do not enter the count. No model is fit."
+  },
+  "interpretation": "Separate sexes means one individual is male and another is female, which is FishBase dioecism. Protandry and protogyny are sequential hermaphroditism of one individual, and true hermaphroditism is simultaneous; both contradict separate sexes. Parthenogenesis is reproduction without a separate male and female pair, so it is scored against the claim as well and reported as its own count. The test does not use sessile animals and does not claim to have surveyed invertebrates. Plants are outside the dataset and outside the part of the sentence under test.",
+  "caveats": [
+    "Before this registration the Source Cooperative bucket listing was read (versions through v26.06; reproduc.parquet listed at 381404 bytes). The parquet body and its column values were not read. The mode vocabulary is taken from the FishBase REPRODUCTION table manual.",
+    "The registration was written in the knowledge that hermaphroditism is widely reported in fishes. Thresholds were not fitted to a count from this snapshot.",
+    "A refutation applies to the universal claim because fishes locomote. It does not estimate the frequency of hermaphroditism among all animals."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-tests-a821",
+    "date": "2026-11-01"
+  }
+}

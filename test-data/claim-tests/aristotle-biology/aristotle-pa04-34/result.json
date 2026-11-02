@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-pa04-34",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-34",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:39Z",
+  "created": "2026-11-01",
+  "hypothesis": "If no fish has testes, internally or externally, then a published table of testes masses for bony fishes and sharks will not contain a positive testes mass.",
+  "pass_criterion": "Pre-registered. Supports is not awarded from this file. Confirming a universal absence would require an anatomical survey that scored testis presence as absent for the fishes and the footless animals it examined. This file is a compilation of testes masses for fishes, assembled because the organ was weighed, and it does not include serpents. No pattern of values in it meets a pass rule.",
+  "fail_criterion": "Pre-registered. Refutes if at least 10 distinct fish species have a numeric testes mass strictly greater than 0. Mixed if 1 to 9 fish species have a numeric testes mass strictly greater than 0. Inconclusive with reason data-unavailable if the file cannot be retrieved, no testes-mass column can be identified, or no numeric mass is present. Inconclusive with reason other if numeric masses are present and none is strictly greater than 0: zeros in a testes-size table are a data problem, not a demonstration that the organ is absent. The mass column is the header that contains testis or testes and contains mass or weight, and does not contain residual, gsi, relative, ratio, or index. If several match, prefer a header containing combined or total, else the first. A species column is the first header among species, scientific_name, scientific name, binomial, taxon, latin. Rows whose group value contains mammal, bird, reptile, snake, or amphibian are not counted as fish and are reported separately. All other rows are fish, including sharks. Confidence: refutes 0.70, mixed 0.40, inconclusive 0.35.",
+  "planned_datasets": [
+    "dryad-10.5061/dryad.fd3nq57-MPdata2018"
+  ],
+  "thresholds": {
+    "refute_min_species_positive_mass": 10
+  },
+  "test_contract": {
+    "expected_observation": "No fish species in the table has a testes mass above zero, because the claim says fishes have no testes inside or outside the body.",
+    "disconfirming_observation": "At least 10 fish species have a recorded testes mass above zero. That is testicular tissue that was weighed, which the claim denies for every fish, internally and externally.",
+    "admissible_datasets": "A public table of measured testes masses for fishes, with species identifiers, under a licence that allows reuse. The measurements must come from weighed organs, not from a residual index alone. A compilation of masses can refute a universal absence. It cannot confirm absence. Serpents are inside the claim and outside this file; they are not required for a refutation of the fish clause, and the fish clause is enough to refute the conjunction.",
+    "inference_method": "Parse MPdata2018.csv. Identify the testes-mass column and the species column by the header rules in fail_criterion. Count distinct species with a numeric mass strictly greater than 0, after excluding non-fish group labels if a group column exists. Apply the thresholds 10 (refutes) and 1 to 9 (mixed). No regression is run. The paper's sperm-competition result is not used."
+  },
+  "interpretation": "The claim says no fish has testicles either externally or internally, and neither does any footless animal, including serpents. Testes mass is a measurement of the internal male gonad. A positive mass refutes the fish clause as written. It does not test serpents, caecilians, or eels beyond the fishes in the file. Sharks are fish. The historical possibility that testicle meant only a compact scrotal organ is recorded as a caveat and does not change the scoring, because the sentence under test says externally or internally.",
+  "caveats": [
+    "Before this registration the Dryad API record was read: file names and sizes, CC0 licence, title, and usage note. MPdata2018.csv was not downloaded. No mass value was seen. The threshold of 10 species is a guard against a single mis-coded row, not a fit to this file.",
+    "Serpents are untested by the planned file. Refuting the fish clause refutes the whole sentence, which is a conjunction, and leaves the footless-tetrapod clause open.",
+    "Aristotle elsewhere treats elongate male gonads as ducts. The scoring follows the tested sentence, which denies internal testicles as well as external ones."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-tests-a821",
+    "date": "2026-11-01"
+  }
+}

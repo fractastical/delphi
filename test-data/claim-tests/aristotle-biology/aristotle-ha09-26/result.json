@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-ha09-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-26",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:39Z",
+  "created": "2026-11-01",
+  "hypothesis": "If a honey bee on one foraging trip never moves from one kind of flower to another before returning to the hive, then each corbicular pollen load from Apis mellifera contains only one pollen kind.",
+  "pass_criterion": "Pre-registered. Supports if at least 30 honey-bee pollen loads can be scored and none of them contains more than one pollen kind.",
+  "fail_criterion": "Pre-registered. Refutes if at least 30 honey-bee loads can be scored and the fraction that contain two or more pollen kinds is at least 0.10. Mixed if at least 30 loads can be scored and that fraction is greater than 0 and less than 0.10. Inconclusive with reason underpowered if fewer than 30 loads can be scored. Inconclusive with reason data-unavailable if the file cannot be retrieved, honey-bee rows cannot be identified, the grouping columns site, period, day and bee are missing, or no pollen-kind column can be identified by the priority list in the contract. A load is one unique combination of site, period, day and bee among rows whose species value, lowercased, is hb or contains mellifera or honey. A load is mixed if it has at least two distinct non-blank pollen-kind values; single-kind if it has exactly one; excluded if it has none. Confidence: supports 0.55 (one landscape and season; a load is a proxy for a trip); refutes 0.75; mixed 0.60; inconclusive 0.30.",
+  "planned_datasets": [
+    "dryad-10.5061/dryad.tdz08kq88-dataset_pollen_raw"
+  ],
+  "thresholds": {
+    "min_loads": 30,
+    "refute_min_mixed_fraction": 0.1
+  },
+  "test_contract": {
+    "expected_observation": "Every scored honey-bee corbicular load contains pollen of a single kind.",
+    "disconfirming_observation": "At least one in ten scored honey-bee loads contains two or more pollen kinds, which means the bee meddled with more than one kind before the load was taken.",
+    "admissible_datasets": "Individual honey-bee pollen loads, not colony-level honey or mixed hive samples, with the plant kind identified per load, from a public file with a stated licence. One landscape can refute a universal never. It cannot by itself prove the behaviour in every season and region. Bumble bees in the same file are out of scope and are not scored.",
+    "inference_method": "Group dataset_pollen_raw.csv to one load per site, period, day and bee. Restrict to honey bees. Choose the pollen-kind column by this header priority, compared after lowercasing and removing spaces and underscores: morphotype, pollen_morphotype, pollenmorphotype, pollentype, pollen_type, plant_species, plantspecies, floral_species, family, genus, taxon, pollen. Do not use the column named species (that column is the bee, as described on the Dryad page). Fraction mixed = mixed loads / scored loads. Thresholds: 0 supports, at least 0.10 refutes, strictly between them mixed."
+  },
+  "interpretation": "Aristotle's unit is one expedition ending at the hive. A corbicular pollen load collected from a forager is the usual measurement of the flowers visited on the trip that produced that load. Microscopy can under-count rare grains, so a mixed load is stronger evidence of inconstancy than a pure load is of perfect constancy. The claim names the bee in the honey context (the hive); Apis mellifera is the species scored. Flower kind follows the dataset's pollen morphotype or, if that column is absent, the next column on the priority list.",
+  "caveats": [
+    "Before this registration the Dryad API record was read: file names and sizes, CC0 licence, and the methods paragraph. dataset_pollen_raw.csv was not downloaded. The abstract says honey bees were more flower-constant than bumble bees and does not give a mixed-load fraction. The 0 and 0.10 thresholds come from the claim's never, not from that sentence.",
+    "Grouping columns site, period, day and bee, and the species code hb, are those named on the Dryad landing page. Bee numbers do not correspond across days, which is why day and period are part of the load key."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-tests-a821",
+    "date": "2026-11-01"
+  }
+}

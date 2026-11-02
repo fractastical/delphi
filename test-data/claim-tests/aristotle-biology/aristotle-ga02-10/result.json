@@ -1,0 +1,40 @@
+{
+  "claim_id": "aristotle-ga02-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-10",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:39Z",
+  "created": "2026-11-01",
+  "hypothesis": "If the parts of an embryo come into being in succession, the structures in a vertebrate anatomy ontology will be assigned different start stages spread over at least a day of development, rather than all being present from the one-cell stage.",
+  "pass_criterion": "Pre-registered. Supports if at least 50 anatomical items match a stage with a numeric begin-hour, the number of distinct matched start stages is at least 5, the span from the earliest to the latest matched begin-hour is at least 24, and it is not the case that at least 95% of matched items share one start stage whose begin-hour is at most 1.",
+  "fail_criterion": "Pre-registered. Refutes if at least 50 items match and at least 95% of them share one start stage whose begin-hour is at most 1, and either the distinct start-stage count is below 5 or the begin-hour span is below 24. Mixed if at least 50 items match and neither the support rule nor the refute rule holds, including the case where at least 95% share a begin-hour of at most 1 while the span is still at least 24 and at least 5 stages occur. Inconclusive with reason underpowered if fewer than 50 items match a stage hour. Inconclusive with reason data-unavailable if either file cannot be retrieved or the stage hours cannot be parsed. Match start-stage identifiers to the stage-series id first, and if fewer than 50 match, also try the stage OBO id. Rows are tab-separated. A header row is used when present; otherwise an anatomy row is id, name, start stage, end stage, and a stage row is id, OBO id, name, begin hours, end hours, with extra fields folded into the name. Confidence: supports 0.60, refutes 0.55, mixed 0.40, inconclusive 0.30.",
+  "planned_datasets": [
+    "zfin-anatomy-item-2026-10-31",
+    "zfin-stage-series-2026-10-31"
+  ],
+  "thresholds": {
+    "min_items": 50,
+    "min_distinct_stages": 5,
+    "min_span_hours": 24,
+    "early_begin_hours_max": 1,
+    "modal_fraction_for_early": 0.95
+  },
+  "test_contract": {
+    "expected_observation": "Zebrafish anatomical structures are first recorded at different developmental stages, and those onset times span at least 24 hours across at least 5 stages.",
+    "disconfirming_observation": "At least 95% of structures are annotated as present from a stage that begins at or before 1 hour, and there is no additional spread of onsets across 5 stages and 24 hours. That pattern is the preformation reading: the parts are already there at the start.",
+    "admissible_datasets": "A public developmental anatomy ontology for an animal embryo in which each structure has a start stage tied to a staging series with begin times in hours. The ontology must be curated from developmental observations, not from Aristotle. One species can show that succession happens in a real embryo. It does not survey every phylum.",
+    "inference_method": "Join ZFIN anatomy items to the zebrafish stage series on the start-stage identifier. Compute the number of matched items, the number of distinct start stages, the max-minus-min begin hour, and the fraction of items on the modal start stage. Apply the thresholds in pass_criterion and fail_criterion. A secondary tally of items with begin hours at most 1 is reported and does not set the verdict."
+  },
+  "interpretation": "Aristotle's contrast is with the view that all parts exist together from the beginning. The ZFIN start stage is the curated onset of each anatomical term in Danio rerio, and the stage series gives that onset in hours post-fertilization. This is one animal, used as a direct observational series of the kind the claim says is plain to the senses. It is not a survey of all animal embryos. End stages are ignored. Gene-expression files are not used: the question is when the part is said to exist, not when a transcript is detected.",
+  "caveats": [
+    "Before this registration the ZFIN download index was read (tab-separated files, column names, sizes 220 KB and 2 KB, report date 31 Oct 2026) and HTTP headers were checked (content-length 226263 for anatomy_item.txt and 2766 for stage_ontology.txt). A web retrieval also returned portions of both files while the URLs were being identified. No count of distinct start stages and no hour span was computed. The thresholds are round numbers taken from the claim, not from that glimpse.",
+    "The download page states no SPDX licence. The files are replaced daily, so the recorded SHA-256 is the snapshot that was measured.",
+    "An ontology start stage is a curated statement of onset, not a stopwatch reading taken for this test."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-tests-a821",
+    "date": "2026-11-01"
+  }
+}
