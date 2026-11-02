@@ -1,0 +1,38 @@
+{
+  "claim_id": "aristotle-pa02-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-17",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If man has the largest brain in proportion to his size, the human brain-mass/body-mass ratio is strictly greater than that of every other species in a broad mammal sample and a broad bird sample; and if the brain is larger in men than in women, male human brain mass exceeds female human brain mass.",
+  "pass_criterion": "Pre-registered. Two clauses. Proportion holds only if Homo sapiens has a strictly higher species-median brain/body mass ratio than every other species in the mammal file (at least 200 species) and a strictly higher ratio than every species in a bird file (at least 100 species). Sex holds only if the mammal file has either (i) at least 5 male and 5 female adult Homo sapiens brain-mass values with the male arithmetic mean greater and a two-sided Welch p < 0.05, or (ii) exactly one male and one female aggregate value with the male value greater. The claim is supported only when both clauses hold. Files that contain Homo sapiens are ranked internally. A file without Homo sapiens is compared with the mammal-file human ratio, which is dimensionless when brain and body are in the same mass unit inside each file. Rows marked juvenile, neonate, infant, fetal, newborn, or subadult are dropped when an age column exists.",
+  "fail_criterion": "Pre-registered. Proportion fails if any non-human species in an admissible file has a species-median ratio greater than or equal to the human ratio used for that file. One counterexample is enough; the sample-size floors apply only to support. Sex fails if a sufficient male/female comparison exists and the male brain mass is not greater (aggregate case) or the male mean is not both greater and significant at 0.05 (individual case). Combination rule: score only clauses that can be scored. If every scored clause fails, the verdict is refutes. If at least one scored clause holds and at least one fails, the verdict is mixed. If the only scored clause holds, or neither clause can be scored, the verdict is inconclusive with reason other, or underpowered when the only obstacle is a sample-size floor, or data-unavailable when the mammal file cannot be read. A modern encephalization residual is computed for description and does not enter this rule.",
+  "planned_datasets": [
+    "burger-2019-mammal-brain-dryad-2r62k7s",
+    "jimenez-ortega-2020-bird-brain-dryad-sqv9s4n27",
+    "font-2019-reptile-bird-brain-dryad-pd5hh46"
+  ],
+  "test_contract": {
+    "expected_observation": "The species-median human brain/body mass ratio is strictly the largest among at least 200 mammal species and larger than every species in a bird sample of at least 100, and male human brain mass exceeds female human brain mass on the pre-registered test.",
+    "disconfirming_observation": "Any non-human species whose brain/body mass ratio is at least as high as the human ratio, or a male human brain mass that is not larger than the female one. Either conjunct failing while the other holds is mixed; a single measured failure with the other clause unscored refutes the conjunction.",
+    "admissible_datasets": "Public species-level brain and body masses, compiled independently of Aristotle, with brain and body in the same mass unit within each file (or both headers silent, in which case the file's published description as masses is accepted and the ratio is treated as dimensionless). A header that puts brain and body in different units, or pairs a volume with a mass, makes that file inadmissible. The mammal file must be the Burger Dryad table; birds are the Jiménez-Ortega Dryad table; the Font Dryad table is an additional reptile-and-bird check that can refute but is not required for support.",
+    "inference_method": "Species median of brain mass divided by body mass. Homo sapiens is the exact binomial, excluding names that contain neanderthal, erectus, habilis, or floresiensis. Support needs strict inequality against every other species in the mammal and bird sets. The sex clause uses absolute brain mass, which is what 'larger in men than in women' says, not the ratio. The log-log residual of brain on body among mammals is reported and ignored by the verdict."
+  },
+  "interpretation": "'In proportion to his size' is the raw brain/body mass ratio, the quantity Aristotle's wording names. An allometric residual, or encephalization quotient, is a modern reinterpretation and is not the test. 'Larger in men than in women' is absolute brain mass. The samples are vertebrates that have published brain masses, not literally every animal. Support still requires both a large mammal set and a large bird set so the superlative is not scored on mammals alone. A single non-human species at or above the human ratio refutes the superlative inside these data.",
+  "secondary_analyses_descriptive": [
+    "Ordinary least-squares residual of log10(brain mass) on log10(body mass) fitted to non-human mammals, and the human residual's rank. Not used for the verdict."
+  ],
+  "caveats": [
+    "Written before any of the three Dryad files was downloaded. The landing pages were checked: Burger 2019 states brain size and body size in grams with sex when reported; Jiménez-Ortega 2020 states brain size and body mass for birds; Font 2019 states brain mass and body mass for reptiles and birds. No species ratio was computed.",
+    "The Willerman 1991 student MRI table and the SOCR brain-to-body table were not used, because their values appeared in search snippets before this registration.",
+    "Assessments were hints only.",
+    "Confidence rule, fixed now: 0.72 if supports or refutes; 0.60 if mixed; 0.40 if inconclusive. The superlative cannot be stronger than the taxonomic coverage of the files."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  }
+}

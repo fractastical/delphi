@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ga01-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If large animals have few young and small animals have many, then within mammals and within birds, species with greater adult body mass have smaller litter or clutch sizes.",
+  "pass_criterion": "Pre-registered. In AnAge, for Class Mammalia and for Class Aves separately, keep rows with Adult weight (g) > 0 and Litter/Clutch size > 0. The claim is supported only if both classes satisfy all of: n >= 40 species, at least 10 species at or below the median adult weight and at least 10 strictly above it, Spearman rank correlation of adult weight with litter or clutch size <= -0.20 with two-sided p < 0.05, and the median litter or clutch size of the heavier half strictly less than that of the lighter half.",
+  "fail_criterion": "Pre-registered. The claim is refuted only if both classes satisfy all of: n >= 40, both halves have at least 10 species, Spearman rho >= 0, and the heavier half's median litter or clutch size is greater than or equal to the lighter half's. If both classes are scorable (n >= 40 and both halves have at least 10) but the outcome is neither the pass nor the fail rule, including one class passing and the other failing, the verdict is mixed. If either class has n < 40 or a half with fewer than 10 species, or a correlation that is not finite, the verdict is inconclusive with reason underpowered. If the columns are missing, reason data-unavailable.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "In both mammals and birds, litter or clutch size declines with adult body mass: rank correlation at most -0.20, and the heavier half of species has the smaller median brood.",
+    "disconfirming_observation": "In both classes the rank correlation is non-negative and the heavier half does not have fewer young. Disagreement between the two classes is mixed rather than a refutation of the general claim.",
+    "admissible_datasets": "A public species-level compilation of adult body mass and litter or clutch size for mammals and birds, independent of Aristotle's text, with a retrievable file, licence, and checksum. The two classes are tested separately so a difference between classes is not mistaken for a size effect.",
+    "inference_method": "Spearman rank correlation (two-sided) of adult weight against litter or clutch size within each class, plus a median split of litter or clutch size at the class median adult weight. Thresholds are rho -0.20 and p 0.05, and a strict inequality of the two median brood sizes. An all-species correlation is reported and does not set the verdict."
+  },
+  "interpretation": "Aristotle's 'large animals have few young, the small many' is read as a within-class rank association between adult body mass and offspring number per litter or clutch, not as annual fecundity and not as a particular slope. Mammals and birds are the two classes AnAge covers well enough to score separately. The claim says animals generally, so support requires the pattern in both classes. Log transformation is not used; the rank correlation already matches 'larger' and 'fewer'.",
+  "caveats": [
+    "Written before this session downloaded or read anage_data.txt. No body mass or litter size was inspected.",
+    "Assessments were hints only.",
+    "Litter or clutch size is not annual fecundity. A species can have a small litter and many litters a year. That quantity is out of this test.",
+    "Confidence rule, fixed now: 0.82 if supported and both correlations are <= -0.35; 0.70 if supported otherwise; 0.74 if refuted; 0.58 if mixed; 0.40 if inconclusive."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  }
+}
