@@ -22,16 +22,18 @@ DATA = HERE / "data"
 DERIVED = HERE / "derived"
 RESULT = HERE / "result.json"
 UA = "delphisci-claim-test/aristotle-biology"
+# The paths named at registration (wwwn.cdc.gov/Nchs/Nhanes/<cycle>/<FILE>.XPT) return a CDC
+# 404 HTML page. The same public files are served from the current DataFiles directory.
 CYCLES = [
     {
         "id": "2015-2016",
-        "demo": "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/DEMO_I.XPT",
-        "ohx": "https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/OHXDEN_I.XPT",
+        "demo": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt",
+        "ohx": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/OHXDEN_I.xpt",
     },
     {
         "id": "2017-2018",
-        "demo": "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT",
-        "ohx": "https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/OHXDEN_J.XPT",
+        "demo": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+        "ohx": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/OHXDEN_J.xpt",
     },
 ]
 TEETH = ["OHX01TC", "OHX16TC", "OHX17TC", "OHX32TC"]
@@ -96,7 +98,7 @@ def main():
     for col in TEETH + ["RIDAGEYR", "WTMEC2YR", "OHDEXSTS", "SEQN"]:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-    codes = df[TEETH].stack(dropna=True)
+    codes = df[TEETH].melt(value_name="code")["code"].dropna()
     if int((codes == PRESENT).sum()) == 0:
         counts = {str(k): int(v) for k, v in codes.value_counts(dropna=False).items()}
         (DERIVED / "code_counts.json").write_text(json.dumps(counts, indent=2) + "\n")
@@ -173,8 +175,8 @@ def main():
         f"Counted examinees aged 15–25: {n_15_25}. Plateau prevalence: {plateau}. Half-plateau age: {proxy}.",
         f"Verdict {verdict}. Eruption in old age was not tested.",
     ]
-    if deviations:
-        result["deviations"] = list(result.get("deviations") or []) + deviations
+    deviations.insert(0, "The registration URLs under /Nchs/Nhanes/<cycle>/ returned a CDC 404 page. The same public XPT files were downloaded from /Nchs/Data/Nhanes/Public/<year>/DataFiles/. Tooth codes, weights and age thresholds are unchanged.")
+    result["deviations"] = deviations
     result["datasets"] = [
         {
             "id": "nhanes-2015-2016-ohxden-demo",

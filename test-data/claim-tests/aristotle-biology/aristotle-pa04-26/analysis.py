@@ -8,11 +8,22 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+
+
+def clean(obj):
+    if isinstance(obj, dict):
+        return {str(k): clean(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [clean(v) for v in obj]
+    if isinstance(obj, float) and (math.isnan(obj) or math.isinf(obj)):
+        return None
+    return obj
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -81,7 +92,7 @@ def main():
             "md5_matches_archive_page": meta["md5"] == MD5_EXPECTED,
         },
     }
-    (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2, default=str) + "\n")
+    (DERIVED / "measured.json").write_text(json.dumps(clean(measured), indent=2) + "\n")
     result = json.loads(RESULT.read_text())
     result["status"] = "complete"
     result["data_kind"] = "biological" if n_hits or n_mono or n_other else "none"
@@ -96,7 +107,7 @@ def main():
         "Counted species in Aves, Reptilia or order Monotremata with a positive weaning age or weaning weight. "
         "One such species refutes the universal. None leaves the claim inconclusive, because a blank cell is not evidence that milk is absent."
     )
-    result["measured"] = json.loads(json.dumps(measured, default=str))
+    result["measured"] = clean(measured)
     result["results_summary"] = [
         f"Oviparous rows (birds, reptiles, monotremes): {int(oviparous.sum())}. Counterexamples with weaning: {n_hits}.",
         f"Monotremata rows: {n_mono}. Other mammals with weaning_d > 0: {n_other_wean} of {n_other}.",

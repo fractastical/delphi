@@ -151,30 +151,52 @@ def amniote_block(df, mask):
 
 
 def fish_from_paired(fec: pd.DataFrame):
+    """Body weight on the fecundity record.
+
+    The pre-registration named a column BodyWeight, from a different FishBase extract.
+    This table has WeightMin, WeightMax and WeightMean. Those are the paired weights.
+    Weight is the midpoint of min and max when both are positive, else WeightMean, else whichever bound is positive.
+    """
     spec = find_col(fec.columns, "SpecCode", "speccode")
     fmin = find_col(fec.columns, "FecundityMin", "fecunditymin")
     fmax = find_col(fec.columns, "FecundityMax", "fecunditymax")
-    body = find_col(fec.columns, "BodyWeight", "bodyweight")
-    if spec is None or fmin is None or body is None:
-        return None, {"spec": spec, "fmin": fmin, "fmax": fmax, "body": body, "reason": "missing-column"}
-    work = fec[[spec, fmin, body] + ([fmax] if fmax else [])].copy()
-    work[fmin] = pd.to_numeric(work[fmin], errors="coerce")
-    work[body] = pd.to_numeric(work[body], errors="coerce")
+    wmin = find_col(fec.columns, "WeightMin", "weightmin", "BodyWeight")
+    wmax = find_col(fec.columns, "WeightMax", "weightmax")
+    wmean = find_col(fec.columns, "WeightMean", "weightmean")
+    if spec is None or fmin is None or (wmin is None and wmean is None):
+        return None, {"spec": spec, "fmin": fmin, "wmin": wmin, "wmean": wmean, "reason": "missing-column"}
+    cols = [spec, fmin] + [c for c in (fmax, wmin, wmax, wmean) if c]
+    work = fec[cols].copy()
+    for col in cols[1:]:
+        work[col] = pd.to_numeric(work[col], errors="coerce")
     if fmax:
-        work[fmax] = pd.to_numeric(work[fmax], errors="coerce")
-        both = work[fmin].gt(0) & work[fmax].gt(0)
-        work["fecundity"] = np.where(both, (work[fmin] + work[fmax]) / 2.0, work[fmin])
+        both_f = work[fmin].gt(0) & work[fmax].gt(0)
+        work["fecundity"] = np.where(both_f, (work[fmin] + work[fmax]) / 2.0, work[fmin])
     else:
         work["fecundity"] = work[fmin]
-    work = work[(work["fecundity"] > 0) & (work[body] > 0)]
+    work["mass"] = np.nan
+    if wmin and wmax:
+        both_w = work[wmin].gt(0) & work[wmax].gt(0)
+        work.loc[both_w, "mass"] = (work.loc[both_w, wmin] + work.loc[both_w, wmax]) / 2.0
+    if wmean:
+        missing = work["mass"].isna() & work[wmean].gt(0)
+        work.loc[missing, "mass"] = work.loc[missing, wmean]
+    for col in (wmin, wmax):
+        if col:
+            missing = work["mass"].isna() & work[col].gt(0)
+            work.loc[missing, "mass"] = work.loc[missing, col]
+    work = work[(work["fecundity"] > 0) & (work["mass"] > 0)]
+    note = {"rows": int(len(work)), "weight_columns": [c for c in (wmin, wmax, wmean) if c]}
     if work.empty:
-        return spearman(np.array([]), np.array([])), {"rows": 0, "body_column": body}
-    grouped = work.groupby(spec).agg(fecundity=("fecundity", "median"), mass=(body, "median"))
+        block = spearman(np.array([]), np.array([]))
+        return block, note
+    grouped = work.groupby(spec).agg(fecundity=("fecundity", "median"), mass=("mass", "median"))
     block = spearman(grouped["mass"].to_numpy(), grouped["fecundity"].to_numpy())
-    block["aggregation"] = "median of absolute fecundity and BodyWeight on the same fecundity record"
+    block["aggregation"] = "species median of absolute fecundity and of WeightMin/WeightMax/WeightMean on the same fecundity record"
     block["rows"] = int(len(work))
-    block["body_column"] = body
-    return block, {"rows": int(len(work)), "species": int(len(grouped)), "body_column": body}
+    block["weight_columns"] = note["weight_columns"]
+    note["species"] = int(len(grouped))
+    return block, note
 
 
 def fish_fallback(fec: pd.DataFrame, species: pd.DataFrame):
@@ -263,7 +285,7 @@ def main():
         f"Terrestrial mammals: n={mammal['n']}, rho={mammal['rho']}, p={mammal['p']}, {mammal['class']}.",
         f"Reptiles: n={reptile['n']}, rho={reptile['rho']}, p={reptile['p']}, {reptile['class']}. Walking combined: {walking_label}.",
         f"Birds: n={flying['n']}, rho={flying['rho']}, p={flying['p']}, {flying['class']}.",
-        f"Fishes ({'fallback species.Weight' if used_fallback else 'paired BodyWeight'}): n={swimming_block.get('n')}, rho={swimming_block.get('rho')}, p={swimming_block.get('p')}, {swimming_block.get('class')}.",
+        f"Fishes ({'fallback species.Weight' if used_fallback else 'paired weight on the fecundity record'}): n={swimming_block.get('n')}, rho={swimming_block.get('rho')}, p={swimming_block.get('p')}, {swimming_block.get('class')}.",
         f"Bats, not in the walking set: n={bat['n']}, rho={bat['rho']}, {bat['class']}.",
         f"Verdict {verdict}.",
     ]
@@ -326,11 +348,16 @@ def main():
             "role": "absolute fecundity and body weight of fishes",
         },
     ]
-    devs = list(result.get("deviations") or [])
+    devs = []
     if am_meta["md5"] != AMNIOTE_MD5:
         devs.append("Amniote file md5 did not match the Ecological Archives page; counts were still computed from the downloaded bytes and the mismatch is recorded on the file object.")
-    if used_fallback and paired is not None and paired.get("n", 0) < MIN_N:
-        devs.append("Paired fecundity-record body weights covered fewer than 40 species, so the pre-registered species.Weight fallback was used for the swimming verdict.")
+    devs.append(
+        "The fecundity table has WeightMin, WeightMax and WeightMean, not a column named BodyWeight. "
+        "Those fields are the body weight on the same record, so they are the primary paired analysis. "
+        "species.Weight is used only when fewer than 40 species have one of those weights."
+    )
+    if used_fallback:
+        devs.append("Fewer than 40 species had a positive paired weight, so the pre-registered species.Weight fallback was used for the swimming verdict.")
     if devs:
         result["deviations"] = devs
     RESULT.write_text(json.dumps(clean(result), indent=2) + "\n")
