@@ -1,0 +1,182 @@
+{
+  "claim_id": "wolfram2002-ch12-34",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-34",
+  "project": "wolfram-nks",
+  "status": "complete",
+  "hypothesis": "The exponential-Diophantine gadgets in Wolfram's note, including the bitwise formulas for rules 30 and 110 and the binomial-mod-2 encoding of BitAnd and BitOr, hold as integer equivalences on the pre-registered boxes, and iterating the rule 110 formula reproduces the cellular automaton.",
+  "pass_criterion": "Pre-registered. All integer ranges below are inclusive. Bit convention, frozen: bit k of a formula output equals the elementary rule on (left, center, right) = (bit k, bit k-1, bit k-2), negative bits read as 0, Wolfram neighborhood index 4*left+2*center+right. Formula 30 is BitXor[a, 2*BitOr[a, 2*a]]. Formula 110 is BitXor[BitAnd[a, 2*a, 4*a], BitOr[2*a, 4*a]]. Part F: both formulas equal an independent truth-table scan for every a from 0 through 65535 (integer equality). Part H: for every a from 0 through 255, iterating formula 110 for 8 steps equals iterating the truth-table scan for 8 steps. Part G, every pair or triple in range, zero counterexamples: for a,b in 0..40, a^2+b^2=0 iff a=b=0; a*b=0 iff a=0 or b=0; a+b=0 iff a=b=0; for a,b in 0..40 there exists an integer c with 0 <= c <= 40 and b = a+c+1 iff a < b. For a in 0..40, b in 0..40, c in 1..40, there exists d >= 0 with b = a + c*d and a < c iff a = b mod c; there exists d >= 0 with b = a*c + d and d < c iff a = floor(b/c). Part B: for b,c in 0..8 and a >= 0, with n = 2*b+1, a equals C(b,c) iff a < n and there exist integers d,e >= 0 with e < n^c and (n+1)^b = n^c * (a + d*n) + e. Part L: for x,y in 0..128, C(x,y) is odd iff every bit set in y is set in x (math.comb exact). Part A: for c,d in 0..64, writing sigma(x,y) for 'C(x,y) is odd', sigma(c, a) and sigma(d, a) and sigma(b, c) and sigma(b, d) and a+b = c+d hold for a = c AND d and b = c OR d, and for no other a,b in 0..64. SUPPORTS if every counterexample count is 0. Confidence if supports: 0.88.",
+  "fail_criterion": "Pre-registered. REFUTES if part F is positive (either formula disagrees with the truth table on any a in 0..65535) or part H is positive. MIXED if parts F and H are zero but any of parts G, B, L, A has a positive counterexample count (the closed bitwise step matches rule 110 and the Diophantine translation of its bit operations does not, on the stated box). The note's fully expanded polynomial of 2154 variables is not built and is not a verdict gate. This computation does not search for a sentence independent of Peano arithmetic; a zero counterexample count supports the encoding the book uses to emulate rule 110, which is the computational content of the claim, and the further appeal to G\u00f6del's theorem is recorded as a caveat rather than a measured implication. INCONCLUSIVE with reason 'other' is not used unless a count overflows or math.comb fails to return an integer, in which case the run stops without a supports verdict. Confidence: mixed 0.74, refutes 0.90, inconclusive 0.40.",
+  "planned_datasets": [
+    "rule110-diophantine-gadgets"
+  ],
+  "interpretation": "The claim (NKS p. 785-786 and the note on universal Diophantine equations) says an exponential Diophantine equation can be built whose solutions emulate rule 110, and that because rule 110 is universal the axioms of arithmetic support universality, which implies there are arithmetic statements that cannot be proved true or false. The computation tests the emulation gadgets the note actually writes down: the rule 30 and rule 110 integer formulas, the relations a^2+b^2=0, ab=0, a<b, mod, quotient, the binomial equation for C(b,c), Lucas parity for BitAnd/BitOr, and an 8-step rule 110 history. It does not replay Cook's proof that rule 110 is universal and does not exhibit an unprovable arithmetic sentence. Those two implications remain outside the measured verdict and are stated as caveats. Wolfram's note says the exponential equation can be rewritten as a polynomial in 2154 variables; that expansion is quoted from the note and is not recomputed here.",
+  "test_contract": {
+    "expected_observation": "On every pre-registered box the Diophantine gadget agrees with the arithmetic relation it is supposed to encode, and the rule 110 bitwise formula agrees with the cellular automaton at every seed in 0..65535 and across 8 iterated steps from every seed in 0..255.",
+    "disconfirming_observation": "Any seed in 0..65535 at which the rule 110 formula differs from the truth-table evolution, or any 8-step history from a seed in 0..255 that differs.",
+    "admissible_datasets": "Only integers generated and checked inside analysis.py. Binomial coefficients are Python math.comb. No downloaded equation file and no DOI.",
+    "inference_method": "Counterexample counts. Supports when all are zero. Refutes when the rule 110 or rule 30 formula or the 8-step history disagrees. Mixed when the formulas agree and a Diophantine gadget does not. Confidence: supports 0.88, mixed 0.74, refutes 0.90, inconclusive 0.40."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/wolfram-claim-tests-7ca2",
+    "date": "2026-11-01"
+  },
+  "data_kind": "computational",
+  "verdict": "mixed",
+  "confidence": 0.74,
+  "measured": {
+    "value": 32,
+    "unit": "counterexamples across the rule formulas, the 8-step histories, and the Diophantine gadgets",
+    "n": 65536,
+    "uncertainty": "exact",
+    "extra": {
+      "formula30_mismatches": 0,
+      "formula110_mismatches": 0,
+      "history8_mismatches": 0,
+      "gadget_counterexamples": 0,
+      "binomial_counterexamples": 32,
+      "binomial_counterexamples_b0": 2,
+      "lucas_counterexamples": 0,
+      "bitand_counterexamples": 0,
+      "binomial_pairs_checked": 822,
+      "bitand_quadruples_checked": 17850625,
+      "formula_mismatch_examples": [],
+      "history_mismatch_example": null,
+      "gadget_examples": [],
+      "binomial_examples": [
+        {
+          "a": 0,
+          "b": 0,
+          "c": 0,
+          "n": 1,
+          "comb": 1,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "n": 1,
+          "comb": 1,
+          "encoding_accepts": false,
+          "should": true
+        },
+        {
+          "a": 2,
+          "b": 6,
+          "c": 2,
+          "n": 13,
+          "comb": 15,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 15,
+          "b": 6,
+          "c": 2,
+          "n": 13,
+          "comb": 15,
+          "encoding_accepts": false,
+          "should": true
+        },
+        {
+          "a": 8,
+          "b": 6,
+          "c": 3,
+          "n": 13,
+          "comb": 20,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 20,
+          "b": 6,
+          "c": 3,
+          "n": 13,
+          "comb": 20,
+          "encoding_accepts": false,
+          "should": true
+        },
+        {
+          "a": 3,
+          "b": 6,
+          "c": 4,
+          "n": 13,
+          "comb": 15,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 15,
+          "b": 6,
+          "c": 4,
+          "n": 13,
+          "comb": 15,
+          "encoding_accepts": false,
+          "should": true
+        },
+        {
+          "a": 6,
+          "b": 6,
+          "c": 5,
+          "n": 13,
+          "comb": 6,
+          "encoding_accepts": false,
+          "should": true
+        },
+        {
+          "a": 7,
+          "b": 6,
+          "c": 5,
+          "n": 13,
+          "comb": 6,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 6,
+          "b": 7,
+          "c": 2,
+          "n": 15,
+          "comb": 21,
+          "encoding_accepts": true,
+          "should": false
+        },
+        {
+          "a": 21,
+          "b": 7,
+          "c": 2,
+          "n": 15,
+          "comb": 21,
+          "encoding_accepts": false,
+          "should": true
+        }
+      ],
+      "lucas_examples": [],
+      "bitand_examples": []
+    }
+  },
+  "method": "analysis.py compares two implementations of one infinite-line step. The bitwise formulas are BitXor[a, 2 BitOr[a, 2a]] for rule 30 and BitXor[BitAnd[a, 2a, 4a], BitOr[2a, 4a]] for rule 110. The other implementation sets bit k from the Wolfram truth table on neighbors (bit k, bit k-1, bit k-2). They are compared for every integer from 0 through 65535, and the rule 110 formula is iterated eight steps from every integer from 0 through 255. The note's gadgets (sums of squares, products, strict inequality, mod, quotient, the base-(2b+1) binomial equation, Lucas parity, and the BitAnd/BitOr translation) are checked by exhaustive enumeration on the pre-registered boxes. Criteria were frozen in commit 093ca8002a77b774b469b965ff599d123fdaefbb before this run.",
+  "datasets": [
+    {
+      "id": "rule110-diophantine-gadgets",
+      "name": "Integer checks of the NKS rule 30 and rule 110 formulas and the note's Diophantine gadgets, generated by analysis.py",
+      "landing_url": "https://www.wolframscience.com/nks/p785--implications-for-mathematics-and-its-foundations/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "elementary rules 30 and 110; integer formulas a XOR ((a OR 2a) << 1) and (a AND 2a AND 4a) XOR (2a OR 4a); bit k reads neighborhood (bit k, bit k-1, bit k-2); seeds 0..65535 and 8-step histories from 0..255; gadget boxes a,b in 0..40, c in 1..40, binomial b,c in 0..8, Lucas x,y in 0..128, BitAnd c,d,a,b in 0..64",
+      "files": [],
+      "role": "the finite integer boxes on which the rule 110 encoding is checked"
+    }
+  ],
+  "caveats": [
+    "The computation shows whether these integer encodings match the cellular automaton and the stated arithmetic relations. It does not show that organisms follow the claim.",
+    "Rule 110's universality is Cook's theorem and was not re-proved here. No search for a sentence independent of Peano arithmetic was run, so the step from an emulated universal cellular automaton to G\u00f6del's theorem is not a measured implication of this test.",
+    "Wolfram's note says the exponential equation can be rewritten as a polynomial in 2154 variables. That figure is quoted from the note and was not recomputed.",
+    "The bitwise formulas matched the truth table on every seed from 0 through 65535 (0 rule-30 mismatches, 0 rule-110 mismatches) and on every 8-step history (0 mismatches). Lucas parity and the BitAnd/BitOr translation had 0 and 0 counterexamples. The base-(2b+1) binomial equation had 32 counterexamples on the checked candidates, 2 of them at b=0, where the base n=1 is degenerate; the rest are values such as C(6,2)=15 and C(6,3)=20, which are larger than n=13, so the coefficient is not a single digit."
+  ]
+}

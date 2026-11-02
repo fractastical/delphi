@@ -1,0 +1,81 @@
+{
+  "claim_id": "wolfram2002-ch12-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-09",
+  "project": "wolfram-nks",
+  "status": "complete",
+  "hypothesis": "Wrapping an integer equation with sin(pi x)^2 turns its integer solutions into the real solutions of a trigonometric equation, and the integer step formulas Wolfram gives for rules 30 and 110 match those cellular automata, so solvability of the resulting trigonometric equation tracks the automaton; a pure polynomial equation does not, because every real root of a low-degree polynomial lies inside Cauchy's bound and is decided by Sturm's theorem without following an unbounded evolution.",
+  "pass_criterion": "Pre-registered. Three parts, all required for SUPPORTS. Part F (formulas): for every integer a from 0 through 65535, bit k (k >= 0) of BitXor[a, 2*BitOr[a, 2*a]] equals rule 30 on the neighborhood (left, center, right) = (bit k, bit k-1, bit k-2), and bit k of BitXor[BitAnd[a, 2*a, 4*a], BitOr[2*a, 4*a]] equals rule 110 on that same neighborhood, where missing negative bits are 0 and rule bits are the standard Wolfram numbering (neighborhood index 4*left+2*center+right). The comparison is integer equality between the formula and an independent loop over the eight-row truth table. Part T (trigonometric lift): for all integers x,y,z from 0 through 30, sin(pi x)^2 + sin(pi y)^2 + sin(pi z)^2 + (x^2+y^2-z^2)^2 is numerically < 1e-8 if and only if x^2+y^2=z^2, using math.sin, and for every point of {0, 0.5, 1, ..., 20}^3 that is not an integer triple the same expression is > 1e-6. Separately, for every integer a from 0 through 500, with b = rule30_formula(a), the expression sin(pi a)^2 + sin(pi b)^2 + (b - rule30_formula(a))^2 is < 1e-8, the same expression with b replaced by b+1 is >= 1, and at a+0.5 the sine term alone is > 0.5. Part E (unbounded periodic evolution): on a periodic ring of width 8, for rules 30 and 110 and every initial state 0..255, the event 'cell 0 is 1 at some time t >= 0' occurs if and only if it occurs at some t < 256, and a second independent stepper agrees on every state of every trajectory. The trigonometric-integer witness (the trajectory integers plugged into sum of sin(pi a_i)^2 plus squared step residuals plus the squared defect of the event bit) is < 1e-8 exactly for those initial states where the event occurs and is not exhibited otherwise. Part P (polynomial contrast): for every univariate polynomial of degree 1..5 with coefficients in {-2,-1,0,1,2} and nonzero leading coefficient, Sturm's theorem with exact integer pseudo-remainders decides real-root existence, and every real root isolated by bisection lies inside Cauchy's bound 1 + max |a_k/a_n|; a numpy.roots complex root counts against the bound only if |z| > bound + 1e-4 and |p(z)| <= 1e-6. SUPPORTS if formula mismatches = 0, trigonometric disagreements = 0, periodic stepper disagreements = 0, event-encoding disagreements = 0, Cauchy violations = 0, and Sturm-versus-sign-count disagreements = 0. Confidence if supports: 0.90.",
+  "fail_criterion": "Pre-registered. REFUTES if any formula mismatch on 0..65535 is positive, or any integer Pythagorean triple in 0..30 disagrees with the trigonometric expression, or any non-integer half-grid point in the stated grid has trigonometric expression <= 1e-6, or the rule-30 one-step lift disagrees on any a in 0..500. MIXED if parts F, T and E all have zero disagreements but part P has a Cauchy violation or a Sturm disagreement (the trigonometric encoding works and the polynomial contrast does not). INCONCLUSIVE with reason 'other' if any sine value that the criterion treats as a clear zero or a clear nonzero lands in the closed ambiguous band from 1e-8 to 1e-6. Confidence: mixed 0.72, refutes 0.86, inconclusive 0.45.",
+  "planned_datasets": [
+    "trig-integer-lift-and-eca-formula"
+  ],
+  "interpretation": "The claim (NKS pp. 731-732, note on p. 1129) says pure polynomial equations do not yield computations beyond ordinary discrete systems, because an algebraic bound locates their isolated real solutions, whereas allowing trigonometric functions converts integer equations into real equations (the note's example is sin(pi x)^2 + sin(pi y)^2 + sin(pi z)^2 + (x^2+y^2-z^2)^2 = 0 for Pythagorean triples), and integer equations can encode a cellular-automaton trajectory of unbounded length. The integer step formulas tested are the ones the universal-Diophantine note gives for rules 30 and 110: BitXor[a, 2 BitOr[a, 2a]] and BitXor[BitAnd[a, 2a, 4a], BitOr[2a, 4a]]. The bit convention is frozen before the run: output bit k is the new color of the cell whose left, center and right neighbors are bits k, k-1 and k-2. A periodic ring of width 8 makes the question 'does cell 0 ever become black' a question about an unbounded number of steps whose answer is exactly computable by the pigeonhole principle at 256 steps. This is a statement about equations and automata, not about organisms.",
+  "test_contract": {
+    "expected_observation": "The two bitwise formulas agree with the rule 30 and rule 110 tables on every 16-bit seed; the sine-squared lift is zero on exactly the integer solutions of the wrapped equation and bounded away from zero on the half-integer grid; periodic rule 30 and rule 110 event-solvability agrees with direct evolution; every real root of every enumerated low-degree polynomial lies inside Cauchy's bound.",
+    "disconfirming_observation": "Any seed in 0..65535 whose formula bit differs from the truth-table step, any integer triple in the Pythagorean grid where the trigonometric expression and the integer equation disagree, or any half-grid non-integer where the trigonometric expression is numerically zero.",
+    "admissible_datasets": "Only integers and rational grids generated inside analysis.py. Sine values come from the platform math.sin, polynomial roots from an exact Sturm isolator plus numpy.roots as a complex-root check. No downloaded table and no DOI.",
+    "inference_method": "Counts of mismatches. Supports only when every count is zero. Refutes when the formula or the trigonometric lift fails. Mixed when only the polynomial bound fails. Inconclusive when a sine value falls in the pre-set ambiguous band. Confidence: supports 0.90, mixed 0.72, refutes 0.86, inconclusive 0.45."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/wolfram-claim-tests-7ca2",
+    "date": "2026-11-01"
+  },
+  "data_kind": "computational",
+  "verdict": "supports",
+  "confidence": 0.9,
+  "measured": {
+    "value": 0,
+    "unit": "disagreements in the formula, trigonometric, periodic-event, and polynomial checks",
+    "n": 15620,
+    "uncertainty": "exact on the integer checks; sine values use math.sin with the pre-registered bands",
+    "extra": {
+      "formula30_mismatches": 0,
+      "formula110_mismatches": 0,
+      "pythagorean_n": 29791,
+      "pythagorean_disagreements": 0,
+      "pythagorean_ambiguous": 0,
+      "half_grid_n": 59660,
+      "half_grid_disagreements": 0,
+      "half_grid_ambiguous": 0,
+      "rule30_lift_disagreements": 0,
+      "rule30_lift_ambiguous": 0,
+      "max_rule30_image_on_0_to_500": 2044,
+      "stepper_disagreements": 0,
+      "pigeonhole_disagreements": 0,
+      "event_witness_disagreements": 0,
+      "event_witness_ambiguous": 0,
+      "event_initial_conditions": {
+        "30": 254,
+        "110": 255
+      },
+      "n_polynomials": 15620,
+      "n_with_a_real_root": 14934,
+      "cauchy_violations_sturm": 0,
+      "cauchy_violations_numpy": 0,
+      "sturm_sign_disagreements": 0,
+      "cauchy_violations": 0
+    }
+  },
+  "method": "analysis.py checks four frozen comparisons. The rule 30 and rule 110 bitwise formulas are compared with an independent truth-table scan for every integer from 0 through 65535, using neighborhood (bit k, bit k-1, bit k-2). The sine-squared lift of x^2+y^2=z^2 is evaluated on every integer triple from 0 through 30 and on the half-integer grid from 0 to 20, and the same lift is applied to one rule-30 step for every seed from 0 through 500. On a periodic ring of width 8, two steppers evolve rules 30 and 110 from every seed for 512 steps, and a sine-squared witness is plugged in whenever cell 0 becomes 1. Every polynomial of degree 1 through 5 with coefficients in -2..2 and nonzero leading coefficient is tested by an exact Sturm sequence: real roots strictly outside Cauchy's bound are counted by sign variations, and numpy.roots is applied with the pre-registered acceptance band. Criteria were frozen in commit 093ca8002a77b774b469b965ff599d123fdaefbb before this run.",
+  "datasets": [
+    {
+      "id": "trig-integer-lift-and-eca-formula",
+      "name": "Sine-squared lifts, rule 30 and rule 110 formulas, periodic rings, and the low-degree polynomial family, generated by analysis.py",
+      "landing_url": "https://www.wolframscience.com/nks/p731--the-validity-of-the-principle/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "rules 30 and 110; formulas a XOR ((a OR 2a)<<1) and (a AND 2a AND 4a) XOR (2a OR 4a); Pythagorean grid 0..30 and half-integer grid 0,0.5,..,20; periodic width 8; polynomials degree 1..5, coefficients -2..2",
+      "files": [],
+      "role": "the equations and automata compared in the test"
+    }
+  ],
+  "caveats": [
+    "The computation shows that these equations and automata agree as mathematics. It does not show that organisms follow the claim.",
+    "The periodic ring makes 'does cell 0 ever become black' a question about an unbounded number of steps whose answer is settled by the pigeonhole principle within 256 states. It is not an infinite-line cellular automaton with an uncomputable limit.",
+    "Cauchy's bound and Sturm's theorem are applied to one explicit family of low-degree univariate polynomials, which is the algebraic half of the claim on that family, not a survey of every polynomial equation."
+  ]
+}
