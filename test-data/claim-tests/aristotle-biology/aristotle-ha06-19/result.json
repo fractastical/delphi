@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha06-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-19",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Dolphins of the genus Delphinus and porpoises of the genus Phocoena produce milk and suckle their young.",
+  "pass_criterion": "Pre-registered, before any weaning age or teat number for these genera was read. Supports only if each genus has at least one species with a positive weaning age in days and at least one species with a teat number of at least 1, and no recorded weaning age or teat number for that genus is zero. Weaning age is the suckling period. Teat number is the evidence of mammary delivery of milk. Missing codes do not count as zero: PanTHERIA values below 0 are missing, and blank or non-numeric values are missing. If several species in a genus have a value, every positive value must be greater than 0 and at least one must be present. Genera are Delphinus and Phocoena only. Tursiops, Stenella, Phocoenoides and other genera are not substitutes.",
+  "fail_criterion": "Pre-registered. Refutes if either genus has a recorded weaning age of 0 or a recorded teat number of 0 in any of the three compilations. Mixed if one genus meets the pass rule and the other has no zero but is missing weaning or teat number, or if two compilations disagree by one giving a positive value and another giving zero for the same quantity. Inconclusive, reason underpowered, if either genus lacks a positive weaning age or lacks a positive teat number and no zero is recorded. Inconclusive, reason data-unavailable, if none of the three files can be retrieved.",
+  "planned_datasets": [
+    "anage-hagr-dataset-zip",
+    "pantheria-1-0-wr05-aug2008",
+    "amniote-life-history-database-aug-2015"
+  ],
+  "test_contract": {
+    "expected_observation": "At least one Delphinus species and one Phocoena species have a weaning age above zero days and a teat count of at least one.",
+    "disconfirming_observation": "A species in either genus is recorded with weaning age 0 or teat number 0, meaning no suckling period or no teats.",
+    "admissible_datasets": "The same three mammal trait compilations named for aristotle-ga02-39, which were already retrieved for that test and are re-fetched here: AnAge https://genomics.senescence.info/species/dataset.zip (weaning column whose header contains Weaning and days and does not contain weight), PanTHERIA https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt (25-1_WeaningAge_d and 24-1_TeatNumber), and the Amniote median table https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv (weaning_d). No weaning or teat value for Delphinus or Phocoena was read before this registration. No other genus may be added after the values are seen.",
+    "inference_method": "Group rows by genus Delphinus or Phocoena using the genus column or the first token of the binomial. Classify each non-missing weaning age and teat number as positive or zero. Supports if both genera have at least one positive weaning age and at least one positive teat number and no zeros. Refutes if any recorded zero occurs in either genus. Otherwise inconclusive, with the reason in fail_criterion. A compilation that lacks a teat column can corroborate weaning only."
+  },
+  "interpretation": "The quote says dolphins and porpoises are provided with milk and suckle their young. The scope names Delphinus and Phocoena, so those genera are the test, not cetaceans in general. Suckling is mapped to a recorded weaning age, which is the length of the period the young feeds on milk. Milk is mapped to a recorded teat number of at least one, because a teat is the anatomical outlet of mammary milk. A weaning age without a teat count supports only the suckling clause. The test does not measure milk composition.",
+  "caveats": [
+    "No weaning age or teat number for these genera was read before this file was committed. Column names come from the compilations' published metadata, which was read for the earlier horse-and-ass test.",
+    "These files give one species-level figure, not a count of nursing observations.",
+    "A genus with a weaning age and no teat number is not scored as having milk."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  }
+}
