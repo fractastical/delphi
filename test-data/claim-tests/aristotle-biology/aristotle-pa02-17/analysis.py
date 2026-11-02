@@ -173,11 +173,15 @@ def read_xlsx(content):
 
 def read_csv(content):
     text = content.decode("utf-8-sig")
-    try:
-        dialect = csv.Sniffer().sniff(text[:4096], delimiters=",\t;")
-    except csv.Error:
-        dialect = csv.excel
-    rows = list(csv.reader(io.StringIO(text), dialect))
+    first = text.splitlines()[0] if text else ""
+    # Quote-aware. The sniffer can drop the quote character and split fields such as ">2,<12".
+    if first.count(";") > first.count(","):
+        delim = ";"
+    elif "\t" in first and first.count("\t") > first.count(","):
+        delim = "\t"
+    else:
+        delim = ","
+    rows = list(csv.reader(io.StringIO(text), delimiter=delim, quotechar='"'))
     return {"csv": rows}
 
 
@@ -210,9 +214,13 @@ def pick_columns(headers):
                 continue
             if pred(n):
                 score = 0
-                if any(k in n for k in ("mass", "weight", "size")):
+                if any(k in n for k in ("sample", "reference", "resid", "count")):
+                    score -= 5
+                if any(k in n for k in ("mass", "weight")):
+                    score += 4
+                elif "size" in n:
                     score += 2
-                if unit_token(h):
+                if unit_token(h) or n.endswith("massg") or n.endswith("weightg"):
                     score += 1
                 hits.append((score, h))
         if not hits:
@@ -246,11 +254,22 @@ def header_row(rows):
 
 
 def num(value):
+    """Parse a cell. Commas are decimal marks unless they are thousands separators."""
     if value is None:
         return None
-    s = str(value).strip().replace(",", "")
+    s = str(value).strip().replace(" ", "")
     if s == "" or s.lower() in {"na", "nan", "null", ".", "-"}:
         return None
+    if "," in s and "." in s:
+        if s.rfind(",") > s.rfind("."):
+            s = s.replace(".", "").replace(",", ".")
+        else:
+            s = s.replace(",", "")
+    elif "," in s:
+        if re.fullmatch(r"\d{1,3}(,\d{3})+", s):
+            s = s.replace(",", "")
+        else:
+            s = s.replace(",", ".")
     try:
         v = float(s)
     except ValueError:
@@ -307,8 +326,12 @@ def rows_to_records(table_rows):
         genus = str(row.get(cols["genus"], "")).strip() if cols["genus"] else ""
         species = str(row.get(cols["species"], "")).strip() if cols["species"] else ""
         binomial = str(row.get(cols["binomial"], "")).strip() if cols["binomial"] else ""
-        if genus and species:
+        # A species column that already holds a binomial (underscores or spaces) is used as-is.
+        # An epithet is combined with the genus. This does not change which mass columns are used.
+        if genus and species and "_" not in species and " " not in species:
             name = f"{genus} {species}"
+        elif species and ("_" in species or " " in species):
+            name = species
         elif binomial:
             name = binomial
         elif species:
@@ -512,22 +535,17 @@ def main():
 
     # Re-summarize non-mammal sets against the mammal human ratio when they lack their own human.
     final_sets = []
-    for summary, recs in mammal_sets:
-        final_sets.append(summarize_set(summary["label"], recs, human_ratio))
-    for summary, recs in other_sets:
-        final_sets.append(summarize_set(summary["label"], recs, human_ratio))
+    for summary, recs in mammal_sets + other_sets:
+        fresh = summarize_set(summary["label"], recs, human_ratio)
+        if summary.get("columns"):
+            fresh["columns"] = summary["columns"]
+        final_sets.append(fresh)
 
     sex = score_sex(mammal_records)
     residual = descriptive_residual(mammal_records)
 
-    mammal_ok = [s for s in final_sets if s["label"].endswith(":mammals") or ":mammals" in s["label"] or s["label"].endswith("mammals")]
-    # Burger labels come out as id:mammals because role mammals is used when no class split.
-    if not mammal_ok:
-        mammal_ok = [s for s in final_sets if "burger-2019" in s["label"]]
-    bird_sets = [s for s in final_sets if s["source_role"] == "birds" or s["label"].endswith(":birds")]
-    # source_role may be missing on re-summary. Recover from label.
-    bird_sets = [s for s in final_sets if s["label"].endswith(":birds") or s["label"].endswith(":birds")]
-    # Jiménez-Ortega role is birds, so label ends with :birds. Font split also ends with :birds.
+    mammal_ok = [s for s in final_sets if s["label"].endswith(":mammals") or "burger-2019" in s["label"]]
+    bird_sets = [s for s in final_sets if s["label"].endswith(":birds")]
     reptile_sets = [s for s in final_sets if s["label"].endswith(":reptiles")]
 
     def fails(s):
@@ -579,6 +597,7 @@ def main():
         keep = {k: s[k] for k in (
             "label", "n_species", "n_human_buckets", "human_ratio_within", "reference_human_ratio",
             "n_counterexamples", "highest_other", "counterexamples_top", "human_buckets", "top5",
+            "columns",
         ) if k in s}
         return keep
 
@@ -603,6 +622,18 @@ def main():
             "descriptive_log_residual": residual,
         },
     }
+    result["deviations"] = [{
+        "date": "2026-11-02",
+        "thresholds_unchanged": True,
+        "reason": (
+            "The first execution matched the columns Sample_size.brain and Sample_size.body, "
+            "because the word size outranked mass when the gram unit was written as an underscore "
+            "suffix, and the quoted sample-size field '>2,<12' was also split by the CSV sniffer. "
+            "That run found no Homo sapiens row and is not the recorded measurement. The reader now "
+            "keeps quote characters and prefers a mass column over a sample-size column. The "
+            "pass and fail thresholds are unchanged."
+        ),
+    }]
     result["method"] = (
         "Downloaded the three Dryad files, solved the Dryad download challenge when it was presented, "
         "and read brain and body masses. Species ratios are medians of brain/body. Homo sapiens was "

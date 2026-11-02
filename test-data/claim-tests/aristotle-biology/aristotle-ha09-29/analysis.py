@@ -27,16 +27,27 @@ def norm(header):
 
 
 def num(value):
+    """Parse a cell. Commas are decimal marks unless they are thousands separators."""
     if value is None:
         return None
-    s = str(value).strip().replace(",", "")
+    s = str(value).strip().replace(" ", "")
     if s == "" or s.lower() in {"na", "nan", "null", ".", "-"}:
         return None
+    if "," in s and "." in s:
+        if s.rfind(",") > s.rfind("."):
+            s = s.replace(".", "").replace(",", ".")
+        else:
+            s = s.replace(",", "")
+    elif "," in s:
+        if re.fullmatch(r"\d{1,3}(,\d{3})+", s):
+            s = s.replace(",", "")
+        else:
+            s = s.replace(",", ".")
     try:
         v = float(s)
     except ValueError:
         return None
-    if v != v:
+    if v != v or v in (float("inf"), float("-inf")):
         return None
     return v
 
@@ -54,7 +65,8 @@ def find_aof(headers):
 def find_life(headers):
     for h in headers:
         n = norm(h)
-        if "lifespan" in n or n in {"longevity", "agelast", "agelastdays"} or "agelast" in n:
+        # LSP is the lifespan abbreviation in the Requier file (see deviations).
+        if n == "lsp" or "lifespan" in n or n in {"longevity", "agelast", "agelastdays"} or "agelast" in n:
             return h
     return None
 
@@ -140,11 +152,25 @@ def main():
             result.pop("reason", None)
         result["measured"] = measured
         result["method"] = (
-            "Downloaded the Requier figshare life-history CSV and identified columns by the "
-            "pre-registered header rules. The task clause is the median of age at onset of "
-            "foraging divided by lifespan, with cutoffs 0.35 and 0.50. Hairiness is scored only "
-            "when a hairiness column and a separate worker-age column are both present."
+            "Downloaded the Requier figshare life-history CSV. Decimal commas were parsed as "
+            "decimal marks. The lifespan column is named LSP and is the lifespan variable named "
+            "in the figshare description, so the primary rule is the median of AOF/LSP with "
+            "cutoffs 0.35 and 0.50. Hairiness is scored only when a hairiness column and a "
+            "separate worker-age column are both present. Thresholds were not changed."
         )
+        result["deviations"] = [{
+            "date": "2026-11-02",
+            "thresholds_unchanged": True,
+            "reason": (
+                "Two parser fixes after the file header was read, before the verdict was kept. "
+                "The CSV uses semicolon separators and decimal commas. A first execution stripped "
+                "commas, so 47,5 became 475 and the median AOF was the fabricated value 46 days; "
+                "that execution was discarded and is not the recorded measurement. The lifespan "
+                "column is headed LSP, an abbreviation the original header list did not contain. "
+                "LSP is mapped to lifespan so the pre-registered primary statistic, median "
+                "AOF/lifespan, is the one that sets the verdict. The 0.35 and 0.50 cutoffs are unchanged."
+            ),
+        }]
         result["results_summary"] = summary
         DERIVED.mkdir(exist_ok=True)
         (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2) + "\n")

@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-22",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-22",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:41:36Z",
   "hypothesis": "If large animals have few young and small animals have many, then within mammals and within birds, species with greater adult body mass have smaller litter or clutch sizes.",
   "pass_criterion": "Pre-registered. In AnAge, for Class Mammalia and for Class Aves separately, keep rows with Adult weight (g) > 0 and Litter/Clutch size > 0. The claim is supported only if both classes satisfy all of: n >= 40 species, at least 10 species at or below the median adult weight and at least 10 strictly above it, Spearman rank correlation of adult weight with litter or clutch size <= -0.20 with two-sided p < 0.05, and the median litter or clutch size of the heavier half strictly less than that of the lighter half.",
@@ -29,5 +29,79 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-a5fd",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database, build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gks1155",
+      "version": "build 15",
+      "license": "CC BY 3.0 (Human Ageing Genomic Resources terms)",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:46:31Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "adult body mass and litter or clutch size of mammals and birds"
+    }
+  ],
+  "verdict": "mixed",
+  "data_kind": "biological",
+  "confidence": 0.58,
+  "measured": {
+    "value": -0.5106757673008679,
+    "unit": "Spearman rho of adult weight vs litter size within Mammalia",
+    "n": 1239,
+    "uncertainty": null,
+    "extra": {
+      "mammalia": {
+        "class": "mammalia",
+        "n": 1239,
+        "spearman_rho": -0.5106757673008679,
+        "spearman_p": 3.0167124395298476e-83,
+        "median_adult_weight_g": 1300.0,
+        "n_lighter_or_equal": 622,
+        "n_heavier": 617,
+        "median_litter_lighter": 3.0,
+        "median_litter_heavier": 1.0,
+        "min_adult_weight_g": 2.1,
+        "max_adult_weight_g": 136000000.0,
+        "scorable": true,
+        "passes": true,
+        "fails": false
+      },
+      "aves": {
+        "class": "aves",
+        "n": 590,
+        "spearman_rho": -0.12342103823282953,
+        "spearman_p": 0.002673167430333002,
+        "median_adult_weight_g": 81.66499999999999,
+        "n_lighter_or_equal": 295,
+        "n_heavier": 295,
+        "median_litter_lighter": 4.0,
+        "median_litter_heavier": 3.72,
+        "min_adult_weight_g": 2.6,
+        "max_adult_weight_g": 13000.0,
+        "scorable": true,
+        "passes": false,
+        "fails": false
+      },
+      "all_classes_descriptive": {
+        "n": 1948,
+        "spearman_rho": -0.39762383673879814,
+        "spearman_p": 8.565844678349436e-75
+      }
+    }
+  },
+  "method": "Downloaded the AnAge build zip and, within Mammalia and within Aves, computed the Spearman correlation of adult weight with litter or clutch size and compared median brood size below and above the median adult weight. Both classes had to meet the pre-registered pass rule to support, or the fail rule to refute. The all-class correlation is descriptive only.",
+  "results_summary": [
+    "Mammalia n=1239 rho=-0.5106757673008679 p=3.0167124395298476e-83 lighter median litter=3.0 heavier=1.0.",
+    "Aves n=590 rho=-0.12342103823282953 p=0.002673167430333002 lighter median clutch=4.0 heavier=3.72.",
+    "Verdict mixed."
+  ]
 }
