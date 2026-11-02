@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha08-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-13",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, a recorded longevity for the European eel reaches seven years: the greater of FishBase's wild and captive maxima, and the AnAge maximum longevity, are each at least 7 years.",
+  "pass_criterion": "Pre-registered (claim supported). Both sources, when present, have a maximum longevity of at least 7 years. FishBase maximum is the greater of LongevityWild and LongevityCaptive for the single Anguilla anguilla row in the v26.06 species table, ignoring nulls. AnAge maximum is the value in the column named Maximum longevity (yrs), or the unique column whose header contains both longevity and yrs, for Genus Anguilla and Species anguilla. Units are years. A value of at least 7 supports that source.",
+  "fail_criterion": "Pre-registered. A source refutes the claim if its maximum is present and strictly less than 7. If both sources refute, the verdict is refutes. If one supports and the other refutes, the verdict is mixed. If only one source can be read, the verdict follows that source and is not mixed. If a source's value is null or the species row is absent, that source is missing. If both sources are missing or neither file can be downloaded, the verdict is inconclusive with reason data-unavailable. A checksum mismatch against the first retrieval is data-unavailable. A maximum greater than 8 does not refute: the sentence says 'in some cases', not 'at most eight'.",
+  "planned_datasets": [
+    "fishbase-rfishbase-parquet-v26.06-species",
+    "anage-build-dataset-zip"
+  ],
+  "test_contract": {
+    "expected_observation": "The recorded maximum longevity of Anguilla anguilla is at least 7 years in FishBase and in AnAge.",
+    "disconfirming_observation": "A recorded maximum strictly below 7 years. A maximum above 8 is not disconfirming, because the sentence does not set an upper bound.",
+    "admissible_datasets": "Public compiled longevity fields for Anguilla anguilla, in years, with the species identified by the binomial. The fields must be maxima or validated longevity records, not a growth coefficient. Other eel species do not count. The Cyrene-free scope is the European eel only.",
+    "inference_method": "Take the greater of the non-null FishBase wild and captive maxima. Take the AnAge maximum. Each source supports if its number is >= 7 and refutes if it is < 7. Both support → supports; both refute → refutes; disagreement → mixed; one source only → that source's verdict."
+  },
+  "interpretation": "The sentence says the eel in some cases lives for seven or eight years. 'In some cases' is an existence claim: some European eels attain a lifespan of seven or eight years. It does not say that seven or eight is the maximum, and it does not say that no eel lives longer. A recorded maximum of at least 7 years means at least one eel attained seven years, which is what 'in some cases' requires. A recorded maximum below 7 means the compiled record does not contain such an eel. The test uses maxima because that is what these databases publish; it is not an age-at-death distribution, so it cannot show what fraction of eels die at seven or eight.",
+  "confidence_rule_preregistered": "Both sources present and agreeing: 0.75. Only one source present: 0.6. Mixed because the two sources disagree: 0.5. Inconclusive: 0.35.",
+  "caveats": [
+    "Criteria were written before the AnAge zip was downloaded and before LongevityWild or LongevityCaptive was read. The species parquet schema, including the names of those columns, was already known from the migration test, which did not select them.",
+    "A maximum of 15 years, for example, supports 'in some cases seven or eight'. It does not measure how many eels die at that age."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  }
+}
