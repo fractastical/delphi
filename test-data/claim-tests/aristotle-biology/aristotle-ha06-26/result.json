@@ -1,0 +1,380 @@
+{
+  "claim_id": "aristotle-ha06-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-26",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds in FishBase's recorded migration categories, the European eel's category is a seaward migration from fresh water to the sea, and a strict majority of the named Mediterranean grey mullets have a category whose definition is movement from the sea up into fresh or brackish water.",
+  "pass_criterion": "Pre-registered (claim supported). Both components below are supported. Eel component: the valid species row for Anguilla anguilla has AnaCat, after casefolding and stripping whitespace, equal to catadromous, and it is flagged present in salt water and in fresh or brackish water. Mullet component: at least 4 of the 6 pre-registered Mediterranean Mugilidae binomials resolve to a valid species row in family Mugilidae with non-missing AnaCat, and a strict majority of those resolved rows have AnaCat in {anadromous, amphidromous} and are flagged present in salt water and in fresh or brackish water. Presence flags accept FishBase's yes codes 1 and -1; 0 is absence; any other value is missing. A missing habitat flag does not by itself support a component.",
+  "fail_criterion": "Pre-registered. The eel component is refuted if a valid Anguilla anguilla row exists and AnaCat is one of anadromous, amphidromous, potamodromous, limnodromous, oceanodromous or non-migratory. The mullet component is refuted if at least 4 Mugilidae rows with non-missing AnaCat are resolved and a strict majority have AnaCat in {catadromous, potamodromous, limnodromous, oceanodromous, non-migratory}, or if a strict majority fail the salt-water plus fresh-or-brackish presence requirement even when AnaCat is anadromous or amphidromous. Overall verdict is refutes if both components are refuted, and mixed if one is supported and the other is refuted. A tie (no strict majority) on the mullet vote, a missing AnaCat for the eel, fewer than 4 resolved mullet rows, or two or more species rows for the same binomial, is not a refutation: the verdict is inconclusive with reason underpowered. If the snapshot cannot be downloaded or the checksum of a re-download does not match the checksum recorded at first retrieval, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-rfishbase-parquet-v26.06-species-families",
+    "fishbase-glossary-migration-terms"
+  ],
+  "test_contract": {
+    "expected_observation": "Anguilla anguilla is coded catadromous (FishBase glossary: migrating from freshwater to the sea to spawn) and occurs in both the sea and fresh or brackish water, and a strict majority of Mugil cephalus, Chelon auratus, Chelon labrosus, Chelon ramada, Chelon saliens and Oedalechilus labeo are coded anadromous or amphidromous and occur in both the sea and fresh or brackish water.",
+    "disconfirming_observation": "The eel's recorded migration is not seaward from fresh water, or the majority migration category of those grey mullets is not an inland movement from the sea. Catadromous on a mullet is a disconfirming observation for the mullet sentence, because that code means fresh water to the sea, the direction the claim assigns to eels rather than to mullets.",
+    "admissible_datasets": "A versioned, publicly fetchable snapshot of FishBase species records with the AnaCat migration field and fresh, brackish and saltwater flags, plus the FishBase glossary entries that define those migration words. Records must be editorially compiled from the fisheries literature, not from Aristotle's text. Species outside Anguilla anguilla and the six named Mediterranean Mugilidae binomials do not count. Habitat flags alone, without AnaCat, do not count as a direction.",
+    "inference_method": "Exact match of AnaCat to the glossary terms named in the pass and fail criteria, combined with a yes/no reading of the habitat flags. The mullet component is a strict majority among resolved rows. The two components are scored separately and then combined: both supported → supports; both refuted → refutes; one of each → mixed; an undecided component → inconclusive (underpowered, or data-unavailable if the file cannot be fetched). No other statistic is used for the verdict."
+  },
+  "interpretation": "The claim states a contrast of direction: grey mullets move from the sea up into marshes and rivers, and eels move down from marshes and rivers to the sea. It does not state a spawning rule, a season, or a distance. FishBase AnaCat is the migration pattern 'normally for spawning or feeding'. The eel sentence is scored only against catadromous, whose FishBase glossary definition is migrating from freshwater to the sea to spawn. The mullet sentence ('goes up from the sea') is scored only against anadromous (ascend rivers to spawn) and amphidromous (the glossary's return from the sea into fresh water). Catadromous is not counted as support for mullets. That refuses a modern life-cycle reading on which every catadromous fish also has a young stage that enters rivers from the sea: the AnaCat field does not record that stage, and treating the field as if it did would erase the contrast the sentence draws. The Cyrene-to-Mediterranean scope is the European eel and the six grey-mullet species long treated as the native Mediterranean Mugilidae; Lessepsian mullets are not in the pre-registered list. Marshes are scored as brackish or fresh water, which is what FishBase records.",
+  "species_list_preregistered": {
+    "eel": [
+      "Anguilla anguilla"
+    ],
+    "mullet": [
+      "Mugil cephalus",
+      "Chelon auratus",
+      "Chelon labrosus",
+      "Chelon ramada",
+      "Chelon saliens",
+      "Oedalechilus labeo"
+    ],
+    "name_fallback_same_epithet_only": "If a binomial is absent, a species row with the same specific epithet and family Mugilidae may be used only when exactly one such row exists. Otherwise the name is unresolved."
+  },
+  "confidence_rule_preregistered": "If the verdict is supports or refutes and all 6 mullets plus the eel are resolved with non-missing habitat flags: 0.7. If the verdict is mixed under the same completeness: 0.65. If the verdict is reached with only 4 or 5 mullet rows, or with a missing habitat flag that was not required for that row's component verdict: 0.5. Inconclusive: 0.45. These values are confidence in the verdict as a test of the stated directions, not a probability that Aristotle was right about every lagoon.",
+  "caveats": [
+    "Criteria in this file were written before the FishBase species parquet was downloaded and before any AnaCat value for these species was read.",
+    "AnaCat does not encode the juvenile shoreward run of a catadromous fish. A mullet coded catadromous can still be caught entering a marsh. That fact is outside this field and is not a reason to change the criterion after the codes are seen.",
+    "FishBase is a compiled database (CC BY-NC 4.0), not a telemetry study. The test measures the recorded categories, not a new count of tagged fish.",
+    "The rOpenSci live API host presented a self-signed certificate on 2026-11-01 and was not used. The versioned parquet snapshot on Source Cooperative is the admissible file.",
+    "Oedalechilus labeo has no AnaCat in snapshot v26.06, so the mullet majority is taken over the five rows that have a category. Confidence 0.5 is the pre-registered value for a vote on four or five mullet rows.",
+    "Live fishbase.se summary pages (version string (06/2026) and Attribution-NonCommercial 4.0 International on search.php) carry the same migration word as AnaCat. Their raw SHA-256 is not stable, because the HTML includes a per-request processing time; sha256 on those files is of the HTML with that number replaced by TIME."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  },
+  "verdict": "mixed",
+  "confidence": 0.5,
+  "data_kind": "biological",
+  "measured": {
+    "value": 1,
+    "unit": "migration components supported, of 2 (eel seaward; mullet inland from the sea)",
+    "n": 6,
+    "uncertainty": "mullet inland-support 0/5; mullet catadromous-or-other 5/5",
+    "extra": {
+      "eel_component": "supports",
+      "mullet_component": "refutes",
+      "eel": {
+        "spec_code": 35,
+        "genus": "Anguilla",
+        "species": "anguilla",
+        "fb_name": "European eel",
+        "family": "Anguillidae",
+        "anacat": "catadromous",
+        "fresh": true,
+        "brackish": true,
+        "saltwater": true,
+        "component": "supports"
+      },
+      "mullets": [
+        {
+          "queried_as": "Mugil cephalus",
+          "match": "exact",
+          "spec_code": 785,
+          "genus": "Mugil",
+          "species": "cephalus",
+          "fb_name": "Flathead grey mullet",
+          "family": "Mugilidae",
+          "anacat": "catadromous",
+          "fresh": true,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        },
+        {
+          "queried_as": "Chelon auratus",
+          "match": "exact",
+          "spec_code": 1735,
+          "genus": "Chelon",
+          "species": "auratus",
+          "fb_name": "Golden grey mullet",
+          "family": "Mugilidae",
+          "anacat": "catadromous",
+          "fresh": true,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        },
+        {
+          "queried_as": "Chelon labrosus",
+          "match": "exact",
+          "spec_code": 2499,
+          "genus": "Chelon",
+          "species": "labrosus",
+          "fb_name": "Thicklip grey mullet",
+          "family": "Mugilidae",
+          "anacat": "catadromous",
+          "fresh": true,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        },
+        {
+          "queried_as": "Chelon ramada",
+          "match": "exact",
+          "spec_code": 4583,
+          "genus": "Chelon",
+          "species": "ramada",
+          "fb_name": "Thinlip grey mullet",
+          "family": "Mugilidae",
+          "anacat": "catadromous",
+          "fresh": true,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        },
+        {
+          "queried_as": "Chelon saliens",
+          "match": "exact",
+          "spec_code": 1736,
+          "genus": "Chelon",
+          "species": "saliens",
+          "fb_name": "Leaping mullet",
+          "family": "Mugilidae",
+          "anacat": "catadromous",
+          "fresh": false,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        },
+        {
+          "queried_as": "Oedalechilus labeo",
+          "match": "exact",
+          "spec_code": 16324,
+          "genus": "Oedalechilus",
+          "species": "labeo",
+          "fb_name": "Boxlip mullet",
+          "family": "Mugilidae",
+          "anacat": null,
+          "fresh": false,
+          "brackish": true,
+          "saltwater": true,
+          "inland_and_sea": true
+        }
+      ],
+      "counts": {
+        "mullet_resolved": 5,
+        "mullet_inland_support": 0,
+        "mullet_disconfirm": 5,
+        "mullet_inland_habitat_fail": 0
+      },
+      "live_ecology_matches_parquet": true,
+      "live_pages": [
+        {
+          "spec_code": 35,
+          "binomial": "Anguilla anguilla",
+          "download_url": "https://www.fishbase.se/summary/35",
+          "raw_byte_size": 71755,
+          "normalized_byte_size": 71745,
+          "sha256_normalized": "92399a6af73f05c58f1863e6093f7cc9ea26f70320a2294798ee9bdb7dd6a791",
+          "live_anacat": "catadromous",
+          "live_ref": "30240",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 785,
+          "binomial": "Mugil cephalus",
+          "download_url": "https://www.fishbase.se/summary/785",
+          "raw_byte_size": 73358,
+          "normalized_byte_size": 73348,
+          "sha256_normalized": "9c410bc3bc3cc683483ca8c64ddeb7280fa23c6e3661fee02f13a4c1b8ed1df1",
+          "live_anacat": "catadromous",
+          "live_ref": "138269",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 1735,
+          "binomial": "Chelon auratus",
+          "download_url": "https://www.fishbase.se/summary/1735",
+          "raw_byte_size": 63071,
+          "normalized_byte_size": 63061,
+          "sha256_normalized": "771fd72cb7cbb559fae8cc3541e34d9535d4ae277e5006ab1c31bf1ccf59f648",
+          "live_anacat": "catadromous",
+          "live_ref": "138280",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 2499,
+          "binomial": "Chelon labrosus",
+          "download_url": "https://www.fishbase.se/summary/2499",
+          "raw_byte_size": 62050,
+          "normalized_byte_size": 62040,
+          "sha256_normalized": "0d140a8b629bd0fe708d9cc1e26d0bf498547b8e2173f8da81400c76248040cb",
+          "live_anacat": "catadromous",
+          "live_ref": "46888",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 4583,
+          "binomial": "Chelon ramada",
+          "download_url": "https://www.fishbase.se/summary/4583",
+          "raw_byte_size": 63337,
+          "normalized_byte_size": 63327,
+          "sha256_normalized": "4cc75ea8baccaf34d408e59781b25166a0648a7b286992047ea761a27f123d72",
+          "live_anacat": "catadromous",
+          "live_ref": "138297",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 1736,
+          "binomial": "Chelon saliens",
+          "download_url": "https://www.fishbase.se/summary/1736",
+          "raw_byte_size": 60902,
+          "normalized_byte_size": 60892,
+          "sha256_normalized": "33a8f992bf9567e49214482c7e242e11d36d4a29423b1f8376e619804b9569f5",
+          "live_anacat": "catadromous",
+          "live_ref": "138297",
+          "matches_parquet": true
+        },
+        {
+          "spec_code": 16324,
+          "binomial": "Oedalechilus labeo",
+          "download_url": "https://www.fishbase.se/summary/16324",
+          "raw_byte_size": 55326,
+          "normalized_byte_size": 55316,
+          "sha256_normalized": "f74b9295a703fea1b5eac68e2c6c384ce807929a878b0874eec5ca541abe8a8a",
+          "live_anacat": null,
+          "live_ref": null,
+          "matches_parquet": true
+        }
+      ]
+    }
+  },
+  "method": "Downloaded the FishBase v26.06 species and families parquet files from Source Cooperative, checked both SHA-256 values against the first retrieval, and read only SpecCode, names, family, Fresh, Brack, Saltwater and AnaCat. Yes-flags accept 1 and -1. The European eel and the six pre-registered Mediterranean mullet binomials were scored with the pre-registered strict-majority rule. The same species' live summary pages were re-fetched and the migration word on the Ecology line was compared with AnaCat; that comparison is reported and is not an input to the verdict. Glossary pages were fetched to pin the term definitions used in the mapping.",
+  "results_summary": [
+    "Eel component supports: Anguilla anguilla AnaCat=catadromous, fresh=True, brackish=True, saltwater=True (SpecCode 35).",
+    "Mullet rows: Mugil cephalus=catadromous, Chelon auratus=catadromous, Chelon labrosus=catadromous, Chelon ramada=catadromous, Chelon saliens=catadromous, Oedalechilus labeo=None.",
+    "Mullet vote: inland-support 0/5, disconfirming categories 5/5.",
+    "Overall verdict mixed. Live ecology lines match the parquet categories: True."
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-rfishbase-parquet-v26.06-species-families",
+      "name": "FishBase backend snapshot v26.06, species and families tables (rfishbase parquet)",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v26.06",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 274721,
+          "sha256": "2f5e806d0af38aa4fe5422d29cdff94a2532382203b0d6b60412e48f4f4b4147"
+        }
+      ],
+      "role": "AnaCat migration category and fresh, brackish and saltwater flags for the European eel and six Mediterranean grey mullets; family names for the Mugilidae check"
+    },
+    {
+      "id": "fishbase-glossary-migration-terms",
+      "name": "FishBase glossary entries for catadromous, anadromous and amphidromous",
+      "landing_url": "https://www.fishbase.se/glossary/Glossary.php",
+      "doi": null,
+      "version": "as served 2026-11-01",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "catadromous.html",
+          "download_url": "https://www.fishbase.se/glossary/Glossary.php?q=catadromous",
+          "byte_size": 13562,
+          "sha256": "24865c20cd048f86900a8fdd143fc0fb6fb4f707e789372141b735074b8e7ba2",
+          "retrieved_at": "2026-11-02T00:23:26Z"
+        },
+        {
+          "name": "anadromous.html",
+          "download_url": "https://www.fishbase.se/glossary/Glossary.php?q=anadromous",
+          "byte_size": 13503,
+          "sha256": "e584f4c01407b75924827f5761ee1ec0325d263a812eaca75e418973fb8e08a9",
+          "retrieved_at": "2026-11-02T00:23:26Z"
+        },
+        {
+          "name": "amphidromous.html",
+          "download_url": "https://www.fishbase.se/glossary/Glossary.php?q=amphidromous",
+          "byte_size": 13760,
+          "sha256": "2f7667452f210c473fccffff400de34e8e275e36ceb309ede73ccde63523bb27",
+          "retrieved_at": "2026-11-02T00:23:26Z"
+        }
+      ],
+      "role": "definitions that fix how AnaCat strings map onto the directions in the claim"
+    },
+    {
+      "id": "fishbase-live-summaries-2026-11-01",
+      "name": "FishBase species summary pages for the seven SpecCodes",
+      "landing_url": "https://www.fishbase.se/",
+      "doi": null,
+      "version": "(06/2026)",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "35.html",
+          "download_url": "https://www.fishbase.se/summary/35",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 71745,
+          "sha256": "92399a6af73f05c58f1863e6093f7cc9ea26f70320a2294798ee9bdb7dd6a791",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "785.html",
+          "download_url": "https://www.fishbase.se/summary/785",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 73348,
+          "sha256": "9c410bc3bc3cc683483ca8c64ddeb7280fa23c6e3661fee02f13a4c1b8ed1df1",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "1735.html",
+          "download_url": "https://www.fishbase.se/summary/1735",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 63061,
+          "sha256": "771fd72cb7cbb559fae8cc3541e34d9535d4ae277e5006ab1c31bf1ccf59f648",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "2499.html",
+          "download_url": "https://www.fishbase.se/summary/2499",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 62040,
+          "sha256": "0d140a8b629bd0fe708d9cc1e26d0bf498547b8e2173f8da81400c76248040cb",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "4583.html",
+          "download_url": "https://www.fishbase.se/summary/4583",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 63327,
+          "sha256": "4cc75ea8baccaf34d408e59781b25166a0648a7b286992047ea761a27f123d72",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "1736.html",
+          "download_url": "https://www.fishbase.se/summary/1736",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 60892,
+          "sha256": "33a8f992bf9567e49214482c7e242e11d36d4a29423b1f8376e619804b9569f5",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        },
+        {
+          "name": "16324.html",
+          "download_url": "https://www.fishbase.se/summary/16324",
+          "retrieved_at": "2026-11-02T00:23:26Z",
+          "byte_size": 55316,
+          "sha256": "f74b9295a703fea1b5eac68e2c6c384ce807929a878b0874eec5ca541abe8a8a",
+          "sha256_note": "HTML with the per-request processing-time number replaced by TIME"
+        }
+      ],
+      "role": "same-day re-query of the live source; the Ecology migration word is checked against AnaCat and is not used to choose the verdict"
+    }
+  ]
+}

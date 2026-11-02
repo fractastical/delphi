@@ -1,0 +1,107 @@
+{
+  "claim_id": "aristotle-ha08-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-13",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, a recorded longevity for the European eel reaches seven years: the greater of FishBase's wild and captive maxima, and the AnAge maximum longevity, are each at least 7 years.",
+  "pass_criterion": "Pre-registered (claim supported). Both sources, when present, have a maximum longevity of at least 7 years. FishBase maximum is the greater of LongevityWild and LongevityCaptive for the single Anguilla anguilla row in the v26.06 species table, ignoring nulls. AnAge maximum is the value in the column named Maximum longevity (yrs), or the unique column whose header contains both longevity and yrs, for Genus Anguilla and Species anguilla. Units are years. A value of at least 7 supports that source.",
+  "fail_criterion": "Pre-registered. A source refutes the claim if its maximum is present and strictly less than 7. If both sources refute, the verdict is refutes. If one supports and the other refutes, the verdict is mixed. If only one source can be read, the verdict follows that source and is not mixed. If a source's value is null or the species row is absent, that source is missing. If both sources are missing or neither file can be downloaded, the verdict is inconclusive with reason data-unavailable. A checksum mismatch against the first retrieval is data-unavailable. A maximum greater than 8 does not refute: the sentence says 'in some cases', not 'at most eight'.",
+  "planned_datasets": [
+    "fishbase-rfishbase-parquet-v26.06-species",
+    "anage-build-dataset-zip"
+  ],
+  "test_contract": {
+    "expected_observation": "The recorded maximum longevity of Anguilla anguilla is at least 7 years in FishBase and in AnAge.",
+    "disconfirming_observation": "A recorded maximum strictly below 7 years. A maximum above 8 is not disconfirming, because the sentence does not set an upper bound.",
+    "admissible_datasets": "Public compiled longevity fields for Anguilla anguilla, in years, with the species identified by the binomial. The fields must be maxima or validated longevity records, not a growth coefficient. Other eel species do not count. The Cyrene-free scope is the European eel only.",
+    "inference_method": "Take the greater of the non-null FishBase wild and captive maxima. Take the AnAge maximum. Each source supports if its number is >= 7 and refutes if it is < 7. Both support → supports; both refute → refutes; disagreement → mixed; one source only → that source's verdict."
+  },
+  "interpretation": "The sentence says the eel in some cases lives for seven or eight years. 'In some cases' is an existence claim: some European eels attain a lifespan of seven or eight years. It does not say that seven or eight is the maximum, and it does not say that no eel lives longer. A recorded maximum of at least 7 years means at least one eel attained seven years, which is what 'in some cases' requires. A recorded maximum below 7 means the compiled record does not contain such an eel. The test uses maxima because that is what these databases publish; it is not an age-at-death distribution, so it cannot show what fraction of eels die at seven or eight.",
+  "confidence_rule_preregistered": "Both sources present and agreeing: 0.75. Only one source present: 0.6. Mixed because the two sources disagree: 0.5. Inconclusive: 0.35.",
+  "caveats": [
+    "Criteria were written before the AnAge zip was downloaded and before LongevityWild or LongevityCaptive was read. The species parquet schema, including the names of those columns, was already known from the migration test, which did not select them.",
+    "A maximum of 15 years, for example, supports 'in some cases seven or eight'. It does not measure how many eels die at that age.",
+    "AnAge build 15 (3 July 2023) records the European eel maximum as a captivity record with sample size 'small' and data quality 'acceptable'. FishBase records separate wild and captive maxima. Neither database is an age-at-death distribution. Reference titles were not resolved beyond the id numbers stored in each file."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  },
+  "verdict": "supports",
+  "confidence": 0.75,
+  "data_kind": "biological",
+  "measured": {
+    "value": 55.0,
+    "unit": "years, lower of the source maxima that could be read",
+    "n": 2,
+    "uncertainty": "FishBase maximum 55.0 (wild 23.0, captive 55.0); AnAge 88.0",
+    "extra": {
+      "fishbase": {
+        "wild_years": 23.0,
+        "captive_years": 55.0,
+        "wild_ref": 106807,
+        "captive_ref": 72462,
+        "maximum_years": 55.0
+      },
+      "fishbase_component": "supports",
+      "anage": {
+        "maximum_years": 88.0,
+        "column": "Maximum longevity (yrs)",
+        "common_name": "European eel",
+        "specimen_origin": "captivity",
+        "sample_size": "small",
+        "data_quality": "acceptable",
+        "references": "2,232,454,523",
+        "hagrid": "03792"
+      },
+      "anage_component": "supports"
+    }
+  },
+  "method": "Downloaded the FishBase v26.06 species parquet and the AnAge build-15 zip and checked both SHA-256 values. For the single Anguilla anguilla row, the FishBase maximum is the greater of LongevityWild and LongevityCaptive. The AnAge maximum is Maximum longevity (yrs). A source supports the claim at 7 years or more and refutes it below 7. The two sources are combined as pre-registered.",
+  "results_summary": [
+    "FishBase: wild 23.0 years (ref 106807), captive 55.0 years (ref 72462), maximum 55.0, component supports.",
+    "AnAge build 15: maximum 88.0 years, origin captivity, quality acceptable, component supports.",
+    "Verdict supports. The lower of the two maxima is 55.0 years."
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-rfishbase-parquet-v26.06-species",
+      "name": "FishBase backend snapshot v26.06, species table",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v26.06",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:41:49Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101"
+        }
+      ],
+      "role": "wild and captive maximum longevity, in years, for Anguilla anguilla"
+    },
+    {
+      "id": "anage-build-dataset-zip",
+      "name": "AnAge build 15 species dataset",
+      "landing_url": "https://genomics.senescence.info/species/dataset.zip",
+      "doi": null,
+      "version": "build 15 (2023-07-03)",
+      "license": "free to use under Human Ageing Genomic Resources conditions",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:41:49Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "maximum longevity in years for Anguilla anguilla"
+    }
+  ]
+}
