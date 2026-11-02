@@ -1,0 +1,46 @@
+{
+  "claim_id": "aristotle-ha06-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-26",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds in FishBase's recorded migration categories, the European eel's category is a seaward migration from fresh water to the sea, and a strict majority of the named Mediterranean grey mullets have a category whose definition is movement from the sea up into fresh or brackish water.",
+  "pass_criterion": "Pre-registered (claim supported). Both components below are supported. Eel component: the valid species row for Anguilla anguilla has AnaCat, after casefolding and stripping whitespace, equal to catadromous, and it is flagged present in salt water and in fresh or brackish water. Mullet component: at least 4 of the 6 pre-registered Mediterranean Mugilidae binomials resolve to a valid species row in family Mugilidae with non-missing AnaCat, and a strict majority of those resolved rows have AnaCat in {anadromous, amphidromous} and are flagged present in salt water and in fresh or brackish water. Presence flags accept FishBase's yes codes 1 and -1; 0 is absence; any other value is missing. A missing habitat flag does not by itself support a component.",
+  "fail_criterion": "Pre-registered. The eel component is refuted if a valid Anguilla anguilla row exists and AnaCat is one of anadromous, amphidromous, potamodromous, limnodromous, oceanodromous or non-migratory. The mullet component is refuted if at least 4 Mugilidae rows with non-missing AnaCat are resolved and a strict majority have AnaCat in {catadromous, potamodromous, limnodromous, oceanodromous, non-migratory}, or if a strict majority fail the salt-water plus fresh-or-brackish presence requirement even when AnaCat is anadromous or amphidromous. Overall verdict is refutes if both components are refuted, and mixed if one is supported and the other is refuted. A tie (no strict majority) on the mullet vote, a missing AnaCat for the eel, fewer than 4 resolved mullet rows, or two or more species rows for the same binomial, is not a refutation: the verdict is inconclusive with reason underpowered. If the snapshot cannot be downloaded or the checksum of a re-download does not match the checksum recorded at first retrieval, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-rfishbase-parquet-v26.06-species-families",
+    "fishbase-glossary-migration-terms"
+  ],
+  "test_contract": {
+    "expected_observation": "Anguilla anguilla is coded catadromous (FishBase glossary: migrating from freshwater to the sea to spawn) and occurs in both the sea and fresh or brackish water, and a strict majority of Mugil cephalus, Chelon auratus, Chelon labrosus, Chelon ramada, Chelon saliens and Oedalechilus labeo are coded anadromous or amphidromous and occur in both the sea and fresh or brackish water.",
+    "disconfirming_observation": "The eel's recorded migration is not seaward from fresh water, or the majority migration category of those grey mullets is not an inland movement from the sea. Catadromous on a mullet is a disconfirming observation for the mullet sentence, because that code means fresh water to the sea, the direction the claim assigns to eels rather than to mullets.",
+    "admissible_datasets": "A versioned, publicly fetchable snapshot of FishBase species records with the AnaCat migration field and fresh, brackish and saltwater flags, plus the FishBase glossary entries that define those migration words. Records must be editorially compiled from the fisheries literature, not from Aristotle's text. Species outside Anguilla anguilla and the six named Mediterranean Mugilidae binomials do not count. Habitat flags alone, without AnaCat, do not count as a direction.",
+    "inference_method": "Exact match of AnaCat to the glossary terms named in the pass and fail criteria, combined with a yes/no reading of the habitat flags. The mullet component is a strict majority among resolved rows. The two components are scored separately and then combined: both supported → supports; both refuted → refutes; one of each → mixed; an undecided component → inconclusive (underpowered, or data-unavailable if the file cannot be fetched). No other statistic is used for the verdict."
+  },
+  "interpretation": "The claim states a contrast of direction: grey mullets move from the sea up into marshes and rivers, and eels move down from marshes and rivers to the sea. It does not state a spawning rule, a season, or a distance. FishBase AnaCat is the migration pattern 'normally for spawning or feeding'. The eel sentence is scored only against catadromous, whose FishBase glossary definition is migrating from freshwater to the sea to spawn. The mullet sentence ('goes up from the sea') is scored only against anadromous (ascend rivers to spawn) and amphidromous (the glossary's return from the sea into fresh water). Catadromous is not counted as support for mullets. That refuses a modern life-cycle reading on which every catadromous fish also has a young stage that enters rivers from the sea: the AnaCat field does not record that stage, and treating the field as if it did would erase the contrast the sentence draws. The Cyrene-to-Mediterranean scope is the European eel and the six grey-mullet species long treated as the native Mediterranean Mugilidae; Lessepsian mullets are not in the pre-registered list. Marshes are scored as brackish or fresh water, which is what FishBase records.",
+  "species_list_preregistered": {
+    "eel": ["Anguilla anguilla"],
+    "mullet": [
+      "Mugil cephalus",
+      "Chelon auratus",
+      "Chelon labrosus",
+      "Chelon ramada",
+      "Chelon saliens",
+      "Oedalechilus labeo"
+    ],
+    "name_fallback_same_epithet_only": "If a binomial is absent, a species row with the same specific epithet and family Mugilidae may be used only when exactly one such row exists. Otherwise the name is unresolved."
+  },
+  "confidence_rule_preregistered": "If the verdict is supports or refutes and all 6 mullets plus the eel are resolved with non-missing habitat flags: 0.7. If the verdict is mixed under the same completeness: 0.65. If the verdict is reached with only 4 or 5 mullet rows, or with a missing habitat flag that was not required for that row's component verdict: 0.5. Inconclusive: 0.45. These values are confidence in the verdict as a test of the stated directions, not a probability that Aristotle was right about every lagoon.",
+  "caveats": [
+    "Criteria in this file were written before the FishBase species parquet was downloaded and before any AnaCat value for these species was read.",
+    "AnaCat does not encode the juvenile shoreward run of a catadromous fish. A mullet coded catadromous can still be caught entering a marsh. That fact is outside this field and is not a reason to change the criterion after the codes are seen.",
+    "FishBase is a compiled database (CC BY-NC 4.0), not a telemetry study. The test measures the recorded categories, not a new count of tagged fish.",
+    "The rOpenSci live API host presented a self-signed certificate on 2026-11-01 and was not used. The versioned parquet snapshot on Source Cooperative is the admissible file."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  }
+}
