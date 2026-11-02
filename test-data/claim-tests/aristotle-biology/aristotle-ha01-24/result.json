@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha01-24",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-24",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "In every animal that has kidneys, the right kidney lies cranial ('higher') to the left kidney.",
   "pass_criterion": "Pre-registered. SUPPORTS if at least two species, including Homo sapiens and at least one non-human, are each scored from an explicit side comparison and every scored species has the right kidney cranial to the left.",
   "fail_criterion": "Pre-registered. REFUTES if at least one scored species has the right kidney caudal or level with the left. A single counterexample refutes the universal. MIXED if the only species that can be scored has conflicting statements across sources, so the direction is not established, or if two sources of the same species disagree. INCONCLUSIVE with reason data-unavailable if no source states a left-right difference.",
@@ -23,5 +23,140 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-954e",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "openstax-anatomy-physiology-2e-25-3",
+      "name": "OpenStax Anatomy and Physiology 2e, section 25.3",
+      "landing_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/25-3-gross-anatomy-of-the-kidney",
+      "doi": null,
+      "version": "2e",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/25-3-gross-anatomy-of-the-kidney",
+          "retrieved_at": "2026-11-02T00:52:00Z",
+          "byte_size": 347369,
+          "sha256": "095bdf15fec36791ab4add34b735bae57e7886c862c1ae142a11adfeee363980",
+          "label": "openstax"
+        }
+      ],
+      "role": "human kidney position"
+    },
+    {
+      "id": "jabsom-hawaii-posterior-abdominal-wall",
+      "name": "JABSOM posterior abdominal wall",
+      "landing_url": "https://xrcore.jabsom.hawaii.edu/abdomen/4-4-posterior-abdominal-wall.html",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://xrcore.jabsom.hawaii.edu/abdomen/4-4-posterior-abdominal-wall.html",
+          "retrieved_at": "2026-11-02T00:52:01Z",
+          "byte_size": 60277,
+          "sha256": "519ed325b2af2a770a0585bf08222ce014e288d5b3d9b0ffd48dd0a5c604e265",
+          "label": "hawaii"
+        }
+      ],
+      "role": "independent human kidney position"
+    },
+    {
+      "id": "umn-dog-cat-abdominal-viscera",
+      "name": "University of Minnesota dog and cat abdominal viscera guide",
+      "landing_url": "https://pressbooks.umn.edu/dogcatanatomylabguide/chapter/part-2-abdominal-viscera/",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://pressbooks.umn.edu/dogcatanatomylabguide/chapter/part-2-abdominal-viscera/",
+          "retrieved_at": "2026-11-02T00:52:02Z",
+          "byte_size": 108747,
+          "sha256": "3ff65edbde62460f10278bf42602bd4f0da98459d2aa2ef15383c9af5fae9420",
+          "label": "umn"
+        }
+      ],
+      "role": "non-human kidney position"
+    }
+  ],
+  "method": "Each page was stripped to sentences. A sentence scores the right kidney caudal when it says the right kidney is lower or the left lies more cranial, and cranial when it says the right kidney is further cranially. The two human pages must agree. The dog-and-cat guide scores both species only from its side-comparison sentence, which does not name one of them.",
+  "measured": {
+    "value": 1,
+    "unit": "scored species in which the right kidney is caudal to the left",
+    "n": 3,
+    "uncertainty": null,
+    "extra": {
+      "sources": [
+        {
+          "id": "openstax",
+          "species_context": "Homo sapiens",
+          "call": "right_caudal",
+          "hits": [
+            {
+              "direction": "right_caudal",
+              "sentence": "External Anatomy The left kidney is located at about the T12 to L3 vertebrae, whereas the right is lower due to slight displacement by the liver."
+            }
+          ]
+        },
+        {
+          "id": "hawaii",
+          "species_context": "Homo sapiens",
+          "call": "right_caudal",
+          "hits": [
+            {
+              "direction": "right_caudal",
+              "sentence": "The mid-portion of the left kidney contacts the 12 th rib; therefore, the left kidney lies more cranial in the retroperitoneal space compared to the right kidney."
+            }
+          ]
+        },
+        {
+          "id": "umn",
+          "species_context": "Canis familiaris and Felis catus",
+          "call": "right_cranial",
+          "hits": [
+            {
+              "direction": "right_cranial",
+              "sentence": "The right kidney is located further cranially than the left."
+            }
+          ]
+        }
+      ],
+      "species_scores": [
+        {
+          "species": "Homo sapiens",
+          "right_kidney": "caudal",
+          "sources": [
+            "openstax",
+            "hawaii"
+          ]
+        },
+        {
+          "species": "Canis familiaris",
+          "right_kidney": "cranial",
+          "sources": [
+            "umn"
+          ],
+          "sentence_names_species": false
+        },
+        {
+          "species": "Felis catus",
+          "right_kidney": "cranial",
+          "sources": [
+            "umn"
+          ],
+          "sentence_names_species": false
+        }
+      ]
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.88,
+  "data_kind": "biological",
+  "headline": "In humans the right kidney is the lower one, in both OpenStax and the Hawaii cadaver guide, so it is not higher in every animal.",
+  "caveats": [
+    "The dog-and-cat sentence says the right kidney is further cranial, and it does not separate the two species.",
+    "A universal is refuted by the human arrangement even where a carnivore matches Aristotle.",
+    "These are anatomical teaching texts, not a survey of every kidney-bearing animal."
+  ]
 }

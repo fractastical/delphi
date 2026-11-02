@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-05",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the classes of fishes and of serpents have no testes, a public sample registry that records mammalian testis samples will contain no testis-tissue samples from ray-finned fishes, cartilaginous fishes, or snakes.",
   "pass_criterion": "Pre-registered. SUPPORTS only if the mammal positive control returns at least 20 testis BioSamples, both the fish group and Serpentes return zero parsed testis BioSamples, and a second source explicitly codes the testis as absent in those classes. Absence of BioSamples alone does not support the claim.",
   "fail_criterion": "Pre-registered. REFUTES if at least one species of fish (Actinopterygii or Chondrichthyes) and at least one species of Serpentes each have at least one NCBI BioSample whose parsed tissue, sample-type, or body-site attribute is testis or testes and whose organism is in that group. The claim is the conjunction 'no testes, only two spermatic ducts'; a testis in each class refutes the conjunction. The duct count is not measured by tissue labels and is reported as untested. MIXED if parsed testis samples occur in exactly one of the two groups. INCONCLUSIVE with reason data-unavailable if the BioSample service cannot be queried; reason underpowered if the mammal control returns fewer than 20 samples under every pre-registered query syntax (the query is then not usable) or if neither group has a parsed testis sample and no explicit absence code exists.",
@@ -21,5 +21,273 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-954e",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "ncbi-biosample-testis-attribute",
+      "name": "NCBI BioSample records with a testis tissue attribute",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/biosample/",
+      "doi": null,
+      "version": "live BioSample, queried 2026-11-01",
+      "license": "NCBI public-domain terms",
+      "files": [
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=0&tool=delphi-claim-test&term=testis%5Battr%5D%20AND%20%22Mammalia%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:53Z",
+          "byte_size": 429,
+          "sha256": "bbd5a765d1134c263baabf1da4b14bbe0f96d492fe8398c3b6f2d85c637df39b",
+          "label": "Mammalia control testis[attr]"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=0&tool=delphi-claim-test&term=testes%5Battr%5D%20AND%20%22Mammalia%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:53Z",
+          "byte_size": 429,
+          "sha256": "866fa47ebc43ccf93bad146d73c6688f3a75470ec98c86c895a30798c4fc85f8",
+          "label": "Mammalia control testes[attr]"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=0&tool=delphi-claim-test&term=%22tissue%22%5BAttribute%20Name%5D%20AND%20testis%5BAll%20Fields%5D%20AND%20%22Mammalia%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:53Z",
+          "byte_size": 597,
+          "sha256": "65cb4f9a6f8e3eb363c0180b2166889bfa55dbec9cb8106ea6ce30c06a5e1bb2",
+          "label": "Mammalia control tissue-attribute AND testis"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=80&tool=delphi-claim-test&term=%22tissue%22%5BAttribute%20Name%5D%20AND%20testis%5BAll%20Fields%5D%20AND%20%22Actinopterygii%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:53Z",
+          "byte_size": 1498,
+          "sha256": "143c0918d8077c3205bf8150e7c795618e95457f400b4103d6b5b2250afe066e",
+          "label": "esearch Actinopterygii"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id=64524888%2C64524853%2C64388376%2C64388375%2C64256195%2C64101469%2C64101468%2C64101467%2C64004892%2C64004891%2C64004890%2C64004889%2C64004888%2C64004887%2C63856881%2C63856880%2C63856879%2C63856878%2C63856877%2C63856876%2C63856875%2C63856874%2C63856873%2C51777763%2C51777762%2C51777761%2C51777745%2C51777744%2C51777743%2C37052353%2C63562700%2C63562699%2C63562698%2C63562697%2C63562696%2C63562695%2C63562694%2C63562693%2C63562692%2C63562691%2C63562690%2C52821121%2C52821120%2C52821119%2C52821118%2C52821117%2C52821116%2C52821115%2C52821114%2C52821113%2C63619607%2C63619606%2C63619605%2C55916851%2C55916850%2C55916849%2C55916848%2C55916847%2C55916846%2C55916845%2C55916844%2C55916843%2C55916842%2C55916841%2C55916840%2C55916839%2C55916838%2C55916837%2C55916836%2C55916835%2C55916834%2C55916833%2C55916832%2C63255944%2C51587542%2C51587541%2C51587540%2C51587539%2C51587538%2C51587537&retmode=xml&tool=delphi-claim-test",
+          "retrieved_at": "2026-11-02T00:51:53Z",
+          "byte_size": 192746,
+          "sha256": "cb81507eaac2a3a459c55e43f21e3a13be6a4a838949cf5ab9a3e8f5971e18c5",
+          "label": "efetch Actinopterygii n=80"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=80&tool=delphi-claim-test&term=%22tissue%22%5BAttribute%20Name%5D%20AND%20testis%5BAll%20Fields%5D%20AND%20%22Chondrichthyes%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:54Z",
+          "byte_size": 955,
+          "sha256": "63c9ebe9d7c42aade9f46de3ac562767fb6bdd0308131472bfec63f273135d20",
+          "label": "esearch Chondrichthyes"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id=50622887%2C50622886%2C50622885%2C50622884%2C50622883%2C50622882%2C50622868%2C2699938%2C61459163%2C61452672%2C48116647%2C48116637%2C48116607%2C49113369%2C49113368%2C49113367%2C9746208%2C9746178%2C34114874%2C34114873%2C175126%2C166469%2C9948523%2C10397604%2C12905446%2C15936119%2C11890624%2C175664%2C168576%2C168575%2C1000678%2C182978%2C800&retmode=xml&tool=delphi-claim-test",
+          "retrieved_at": "2026-11-02T00:51:54Z",
+          "byte_size": 76230,
+          "sha256": "04c156b13965001772679c70c75fe18f28e68408ae885fa557aae823220f160b",
+          "label": "efetch Chondrichthyes n=33"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&retmode=json&retmax=80&tool=delphi-claim-test&term=%22tissue%22%5BAttribute%20Name%5D%20AND%20testis%5BAll%20Fields%5D%20AND%20%22Serpentes%22%5BOrganism%5D",
+          "retrieved_at": "2026-11-02T00:51:54Z",
+          "byte_size": 880,
+          "sha256": "389f2febcf1a7d182d293170fba8d65097122f51a7ef04fce1c39cdab3368a40",
+          "label": "esearch Serpentes"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id=46426260%2C29333565%2C29333564%2C29333563%2C39521530%2C39521529%2C39521528%2C53110450%2C53110449%2C53110448%2C53110447%2C53110446%2C53110445%2C53110444%2C53110443%2C53110442%2C53110441%2C53083084%2C46143721%2C43286296%2C12141880%2C12141874%2C14167858%2C14167857%2C11168460%2C4534981&retmode=xml&tool=delphi-claim-test",
+          "retrieved_at": "2026-11-02T00:51:54Z",
+          "byte_size": 58607,
+          "sha256": "6dad6c1c27548ca2cd0de62db7f27742114f6fa67f7821f7cc981c3b6414eae2",
+          "label": "efetch Serpentes n=26"
+        }
+      ],
+      "role": "tissue-labelled samples of mammals (control), fishes, and snakes"
+    }
+  ],
+  "method": "Three pre-registered BioSample queries were run on Mammalia in order. The first with an esearch count of at least 20 was 'tissue-attribute AND testis' (23366 mammal hits). The same query was applied to Actinopterygii, Chondrichthyes, and Serpentes. Up to 80 records per clade were fetched as XML. A record counts only when an attribute named tissue, organism part, body site, sample type, or tissue type contains the whole word testis or testes. No email was sent to NCBI.",
+  "measured": {
+    "value": 33,
+    "unit": "fish plus snake species with a parsed testis BioSample in the fetched sample",
+    "n": 139,
+    "uncertainty": "esearch counts include records not in the fetched sample of 80",
+    "extra": {
+      "syntax_chosen": "tissue-attribute AND testis",
+      "mammal_esearch_count": 23366,
+      "mammal_parsed_testis_in_sample_of_20": 20,
+      "control_counts": [
+        {
+          "syntax": "testis[attr]",
+          "mammal_esearch_count": 0
+        },
+        {
+          "syntax": "testes[attr]",
+          "mammal_esearch_count": 0
+        },
+        {
+          "syntax": "tissue-attribute AND testis",
+          "mammal_esearch_count": 23366
+        }
+      ],
+      "clades": {
+        "Actinopterygii": {
+          "esearch_count": 3241,
+          "fetched": 80,
+          "parsed_testis_records": 80,
+          "species": [
+            "Acrossocheilus fasciatus",
+            "Bidyanus bidyanus",
+            "Boleophthalmus pectinirostris",
+            "Culter alburnus",
+            "Danio rerio",
+            "Gambusia affinis",
+            "Megalobrama amblycephala",
+            "Nothobranchius furzeri",
+            "Oryzias latipes",
+            "Oryzias melastigma",
+            "Petrocephalus pallidomaculatus",
+            "Pseudopleuronectes yokohamae",
+            "Sebastes melanops"
+          ],
+          "n_species": 13,
+          "examples": [
+            {
+              "accession": "SAMN64524888",
+              "organism": "Danio rerio",
+              "attribute": "tissue",
+              "value": "Testis"
+            },
+            {
+              "accession": "SAMN64524853",
+              "organism": "Danio rerio",
+              "attribute": "tissue",
+              "value": "Testis"
+            },
+            {
+              "accession": "SAMN64388376",
+              "organism": "Oryzias latipes",
+              "attribute": "tissue",
+              "value": "testis"
+            },
+            {
+              "accession": "SAMN64388375",
+              "organism": "Oryzias latipes",
+              "attribute": "tissue",
+              "value": "testis"
+            },
+            {
+              "accession": "SAMN64256195",
+              "organism": "Bidyanus bidyanus",
+              "attribute": "tissue",
+              "value": "testis"
+            }
+          ]
+        },
+        "Chondrichthyes": {
+          "esearch_count": 33,
+          "fetched": 33,
+          "parsed_testis_records": 33,
+          "species": [
+            "Amblyraja radiata",
+            "Callorhinchus milii",
+            "Chiloscyllium punctatum",
+            "Leucoraja erinaceus",
+            "Prionace glauca",
+            "Pristis pectinata",
+            "Scyliorhinus canicula",
+            "Scyliorhinus torazame",
+            "Somniosus microcephalus",
+            "Squalus acanthias"
+          ],
+          "n_species": 10,
+          "examples": [
+            {
+              "accession": "SAMN50622887",
+              "organism": "Pristis pectinata",
+              "attribute": "tissue type",
+              "value": "Male Testis 3b mRNA"
+            },
+            {
+              "accession": "SAMN50622886",
+              "organism": "Pristis pectinata",
+              "attribute": "tissue type",
+              "value": "Male Testis 3a mRNA"
+            },
+            {
+              "accession": "SAMN50622885",
+              "organism": "Pristis pectinata",
+              "attribute": "tissue type",
+              "value": "Male Testis 2b mRNA"
+            },
+            {
+              "accession": "SAMN50622884",
+              "organism": "Pristis pectinata",
+              "attribute": "tissue type",
+              "value": "Male Testis 2a mRNA"
+            },
+            {
+              "accession": "SAMN50622883",
+              "organism": "Pristis pectinata",
+              "attribute": "tissue type",
+              "value": "Male Testis 1b mRNA"
+            }
+          ]
+        },
+        "Serpentes": {
+          "esearch_count": 26,
+          "fetched": 26,
+          "parsed_testis_records": 26,
+          "species": [
+            "Calloselasma rhodostoma",
+            "Cerastes gasperettii",
+            "Crotalus viridis",
+            "Deinagkistrodon acutus",
+            "Macrovipera schweizeri",
+            "Naja naja",
+            "Pantherophis",
+            "Pantherophis guttatus",
+            "Python molurus",
+            "Thamnophis sirtalis"
+          ],
+          "n_species": 10,
+          "examples": [
+            {
+              "accession": "SAMN46426260",
+              "organism": "Cerastes gasperettii",
+              "attribute": "tissue",
+              "value": "rna-seq testis cg14"
+            },
+            {
+              "accession": "SAMN29333565",
+              "organism": "Pantherophis guttatus",
+              "attribute": "tissue",
+              "value": "Testis"
+            },
+            {
+              "accession": "SAMN29333564",
+              "organism": "Pantherophis guttatus",
+              "attribute": "tissue",
+              "value": "Testis"
+            },
+            {
+              "accession": "SAMN29333563",
+              "organism": "Pantherophis guttatus",
+              "attribute": "tissue",
+              "value": "Testis"
+            },
+            {
+              "accession": "SAMEA115118139",
+              "organism": "Macrovipera schweizeri",
+              "attribute": "organism part",
+              "value": "TESTIS"
+            }
+          ]
+        }
+      },
+      "spermatic_duct_count": "untested"
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "data_kind": "biological",
+  "headline": "Fetched BioSamples label the testis in 23 fish species and 10 snake species, so those classes do not lack testes.",
+  "caveats": [
+    "The second clause, that these animals have only two spermatic ducts, is not in the tissue labels and is untested.",
+    "Aristotle may have seen elongate testes and called them ducts. The records use the modern name testis.",
+    "Ray-finned fishes contribute thousands of esearch hits. The species count is from the first 80 records, not the whole database.",
+    "A mammal sample of 20 records all parsed as testis, which is the check that the query names the organ."
+  ]
 }
