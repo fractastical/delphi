@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha02-07",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-07",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Humans shed their front teeth, no species in the eruption table sheds molars, and the pig sheds no teeth.",
   "pass_criterion": "Supports only if all three clauses hold. (1) Humans shed front teeth: primary incisors are described as erupted and later replaced or shed. (2) No animal sheds molars: the eruption table lists no deciduous molar for any species. (3) The pig sheds none of its teeth: the pig has no deciduous incisor, canine or premolar with an eruption time.",
   "fail_criterion": "Refutes if clause 3 fails and clause 2 fails. Mixed if clause 3 fails and clause 2 holds, or if clause 3 holds and clause 2 fails. Clause 1 is reported either way and does not by itself change a mixed or refutes verdict reached from clauses 2 and 3. Inconclusive, reason data-unavailable, if the pig row cannot be parsed. A deciduous tooth with a later permanent successor of the same class counts as shed. Permanent molars with no deciduous predecessor count as not shed.",
@@ -22,5 +22,119 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-7800",
     "date": "2026-11-01"
-  }
+  },
+  "preregistered": true,
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.83,
+  "deviations": [
+    {
+      "field": "datasets",
+      "change": "The human clause was read from OpenStax Anatomy and Physiology 2e section 23.3.",
+      "why": "The NCBI Bookshelf URL returned a browser-check page. Pass and fail thresholds were not changed. Clause 1 does not decide a mixed or refutes verdict on its own."
+    }
+  ],
+  "method": "The Merck eruption table lists deciduous incisors, canines and premolars separately from permanent molars. A deciduous cell with an eruption age counts as a tooth that is shed when its permanent successor erupts. The pig sheds teeth if any such cell is filled. No species sheds molars if the table has no deciduous-molar row. OpenStax says the deciduous teeth are replaced and that the incisors are the front teeth; that is clause 1. Clause 3 failing while clause 2 holds is mixed, as pre-registered.",
+  "measured": {
+    "value": 7,
+    "unit": "pig deciduous tooth classes with an eruption time",
+    "n": 7,
+    "uncertainty": null,
+    "extra": {
+      "clause_man_sheds_front_teeth": true,
+      "clause_no_species_sheds_molars": true,
+      "clause_pig_sheds_none": false,
+      "pig_deciduous": [
+        {
+          "tooth": "Di1",
+          "cell": "3–4 wk",
+          "present": true
+        },
+        {
+          "tooth": "Di2",
+          "cell": "2–3 mo",
+          "present": true
+        },
+        {
+          "tooth": "Di3",
+          "cell": "Before birth",
+          "present": true
+        },
+        {
+          "tooth": "Dc",
+          "cell": "Before birth",
+          "present": true
+        },
+        {
+          "tooth": "Dp2",
+          "cell": "4–6 wk",
+          "present": true
+        },
+        {
+          "tooth": "Dp3",
+          "cell": "1½ mo",
+          "present": true
+        },
+        {
+          "tooth": "Dp4",
+          "cell": "1–5 wk",
+          "present": true
+        }
+      ],
+      "deciduous_molar_rows": [],
+      "openstax_replaced": true,
+      "openstax_incisors_are_front": true
+    }
+  },
+  "caveats": [
+    "Deciduous premolars are not counted as molars. Aristotle's 'molars' might have included cheek teeth that are now called premolars; that broader reading is not the one pre-registered.",
+    "The table covers horse, cow, sheep, goat, pig, dog and cat. Elephants, which replace molars, are outside this measurement.",
+    "NCBI Bookshelf did not return chapter text to this client."
+  ],
+  "datasets": [
+    {
+      "id": "merck-eruption-of-the-teeth",
+      "name": "Merck Veterinary Manual, eruption of the teeth",
+      "landing_url": "https://www.merckvetmanual.com/digestive-system/dental-development-and-anatomy/estimation-of-age-by-examination-of-the-teeth-in-animals",
+      "doi": null,
+      "version": "page retrieved with this run",
+      "license": "publicly readable; Merck Veterinary Manual terms",
+      "files": [
+        {
+          "download_url": "https://www.merckvetmanual.com/digestive-system/dental-development-and-anatomy/estimation-of-age-by-examination-of-the-teeth-in-animals",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 480573,
+          "sha256": "5d2c5bf4d999894372ba22c6595c5950d1f1c7cb3eaeb079cbbc5fe7e804f1bb",
+          "role": "eruption table"
+        }
+      ],
+      "role": "deciduous and permanent eruption rows"
+    },
+    {
+      "id": "ncbi-bookshelf-primary-dentition",
+      "name": "NCBI Bookshelf page (blocked) and OpenStax section 23.3",
+      "landing_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+      "doi": null,
+      "version": "2e",
+      "license": "OpenStax CC BY 4.0; NCBI page was a browser check",
+      "files": [
+        {
+          "download_url": "https://www.ncbi.nlm.nih.gov/books/NBK573074/",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 21391,
+          "sha256": "c4a0591823ec340e24cd9b8e4325c8d5da4d0a8836878c22a611027f80210d2d",
+          "role": "planned human primary-dentition page"
+        },
+        {
+          "download_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 379223,
+          "sha256": "b5913834c91deb654184243d6b2a067acec8d48550d1d345e919e7ec785533a0",
+          "role": "human tooth replacement"
+        }
+      ],
+      "role": "whether humans replace deciduous front teeth"
+    }
+  ],
+  "headline": "The pig has 7 deciduous tooth classes that erupt and are replaced, while the table lists no deciduous molars."
 }

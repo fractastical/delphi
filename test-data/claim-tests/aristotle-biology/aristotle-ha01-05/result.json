@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha01-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-05",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Each named domesticated kind — horse, cattle, swine, sheep, goat and dog — still has an extant wild progenitor or wild conspecific population.",
   "pass_criterion": "Supports only if all six wild taxa below are extant: Wikidata IUCN conservation status (P141) is one of least concern, near threatened, vulnerable, endangered or critically endangered, and the GBIF species record matched from that name is not marked extinct. Names that GBIF treats as synonyms are followed to the accepted species, and both the extinct flag and the Wikidata status are read for that accepted species.",
   "fail_criterion": "Refutes if at least one of the six is IUCN Extinct or Extinct in the Wild, or GBIF marks the matched species extinct. Inconclusive, reason other, if none is extinct but at least one name cannot be matched or has no IUCN status other than data deficient or not evaluated. Feral populations of the domestic form do not count as the wild kind.",
@@ -22,5 +22,245 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-7800",
     "date": "2026-11-01"
-  }
+  },
+  "preregistered": true,
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.86,
+  "method": "Each pre-registered wild name was queried on Wikidata for IUCN conservation status (P141) and matched in the GBIF backbone. Synonyms were followed to the accepted GBIF species, and that record's extinct flag was read. A kind is extinct if Wikidata calls the pre-registered name extinct or extinct in the wild, or if GBIF marks the matched species extinct. A kind is extant only if the status used is a living IUCN category and GBIF does not mark it extinct. One extinct kind refutes the claim that every named domesticate is still found wild.",
+  "measured": {
+    "value": 1,
+    "unit": "named kinds whose wild taxon is extinct or extinct in the wild",
+    "n": 6,
+    "uncertainty": null,
+    "extra": {
+      "kinds": [
+        {
+          "kind": "horse",
+          "name": "Equus ferus",
+          "wikidata_status": "endangered",
+          "status_used": "endangered",
+          "gbif_match_status": "ACCEPTED",
+          "gbif_scientific_name": "Equus ferus Boddaert, 1785",
+          "gbif_accepted": null,
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "extant"
+        },
+        {
+          "kind": "cattle",
+          "name": "Bos primigenius",
+          "wikidata_status": "extinct",
+          "status_used": "extinct",
+          "gbif_match_status": "SYNONYM",
+          "gbif_scientific_name": "Bos primigenius Bojanus, 1827",
+          "gbif_accepted": "Bos taurus primigenius Bojanus, 1827",
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "extinct"
+        },
+        {
+          "kind": "swine",
+          "name": "Sus scrofa",
+          "wikidata_status": "least concern",
+          "status_used": "least concern",
+          "gbif_match_status": "ACCEPTED",
+          "gbif_scientific_name": "Sus scrofa Linnaeus, 1758",
+          "gbif_accepted": null,
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "extant"
+        },
+        {
+          "kind": "sheep",
+          "name": "Ovis orientalis",
+          "wikidata_status": null,
+          "status_used": null,
+          "gbif_match_status": "SYNONYM",
+          "gbif_scientific_name": "Ovis orientalis Gmelin, 1774",
+          "gbif_accepted": "Ovis aries orientalis Gmelin, 1774",
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "unresolved"
+        },
+        {
+          "kind": "goat",
+          "name": "Capra aegagrus",
+          "wikidata_status": "near threatened",
+          "status_used": "near threatened",
+          "gbif_match_status": "SYNONYM",
+          "gbif_scientific_name": "Capra aegagrus Erxleben, 1777",
+          "gbif_accepted": "Capra hircus aegagrus Erxleben, 1777",
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "extant"
+        },
+        {
+          "kind": "dog",
+          "name": "Canis lupus",
+          "wikidata_status": "least concern",
+          "status_used": "least concern",
+          "gbif_match_status": "ACCEPTED",
+          "gbif_scientific_name": "Canis lupus Linnaeus, 1758",
+          "gbif_accepted": null,
+          "gbif_extinct": false,
+          "gbif_extinct_raw": null,
+          "state": "extant"
+        }
+      ],
+      "extant": 4,
+      "unresolved": 1
+    }
+  },
+  "caveats": [
+    "Feral domestic herds are not counted as the wild kind.",
+    "The translator's bracketed 'man' is not one of the six kinds in the claim sentence.",
+    "Where GBIF lumps a wild name into a domestic species, the IUCN status of the pre-registered wild name is still the status that can refute the kind.",
+    "Wikidata's IUCN statement is a structured copy of the Red List category, not a fresh download of the Red List API."
+  ],
+  "deviations": [],
+  "datasets": [
+    {
+      "id": "wikidata-iucn-p141",
+      "name": "Wikidata IUCN conservation status (P141)",
+      "landing_url": "https://www.wikidata.org/wiki/Property:P141",
+      "doi": null,
+      "version": "live query",
+      "license": "CC0",
+      "files": [
+        {
+          "download_url": "https://query.wikidata.org/sparql",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 2640,
+          "sha256": "e22b4cd8a04bc7a031b3495c1bc14dc55f78f6a75711e86d59e4fee2f31de1ac",
+          "role": "Wikidata IUCN status for the six wild names"
+        },
+        {
+          "download_url": "https://query.wikidata.org/sparql",
+          "retrieved_at": "2026-11-02T01:02:51Z",
+          "byte_size": 93,
+          "sha256": "91ee9c74251ecd94c6074a77dc4fa08588161329da0acbcd3cca7b9245f098e6",
+          "role": "Wikidata IUCN for accepted name Ovis aries orientalis"
+        }
+      ],
+      "role": "IUCN category of each wild name"
+    },
+    {
+      "id": "gbif-species-match",
+      "name": "GBIF backbone species match",
+      "landing_url": "https://www.gbif.org/",
+      "doi": null,
+      "version": "live backbone",
+      "license": "GBIF terms; occurrence and backbone data as published by GBIF",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Equus%20ferus&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 430,
+          "sha256": "aa94ea0312721079b72c637c02ac57e4a7d70c6c48692b2d6414a0e943436dcd",
+          "role": "GBIF match Equus ferus"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/4409270",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 985,
+          "sha256": "04e7698115cc715d7c9b4261380a6c3d74104e37ed5e8c722b50164c3ba68de7",
+          "role": "GBIF species 4409270"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Bos%20primigenius&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 459,
+          "sha256": "7ae6115931d961327fcd3e6b31718e60a16b765836af4a930430c4414b166cff",
+          "role": "GBIF match Bos primigenius"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/2441024",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 971,
+          "sha256": "434270f551adea6f6333c6e27f1f37e7a3962fe34af081915737c0a4d5797a77",
+          "role": "GBIF species 2441024"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/4262590",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 940,
+          "sha256": "d10040b6148039ecb150190334b9d6be76daa6f48bc275611a744e893a28ce7b",
+          "role": "GBIF accepted 4262590"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Sus%20scrofa&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 423,
+          "sha256": "1f67f16dd5578c047258111180e1fd8556c069589b2a18d82bc165c263d5815a",
+          "role": "GBIF match Sus scrofa"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/7705930",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 1163,
+          "sha256": "5fe6a5740af22ef659a61d57cda61242f297c5c9a2d9a7a997e15c23015764d9",
+          "role": "GBIF species 7705930"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Ovis%20orientalis&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:50Z",
+          "byte_size": 459,
+          "sha256": "bb346fb1680eccb18880fc34690057cc9e3961da1f6fd55de8ff0ebc09016b3b",
+          "role": "GBIF match Ovis orientalis"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/2441112",
+          "retrieved_at": "2026-11-02T01:02:50Z",
+          "byte_size": 983,
+          "sha256": "ed15750dbe651a0c0638558111c6058ab875a3f6f7ffb22c89375c460c1eb68b",
+          "role": "GBIF species 2441112"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/4262537",
+          "retrieved_at": "2026-11-02T01:02:50Z",
+          "byte_size": 952,
+          "sha256": "b24c3de4c5ba57c73ade477851a676d784ba613171992723206b2c5d0e00f247",
+          "role": "GBIF accepted 4262537"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Capra%20aegagrus&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:51Z",
+          "byte_size": 462,
+          "sha256": "8d510b05edab51987f178ccf3a07ba656c9e713b7f95d91f501219afa2716efa",
+          "role": "GBIF match Capra aegagrus"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/4409366",
+          "retrieved_at": "2026-11-02T01:02:51Z",
+          "byte_size": 979,
+          "sha256": "c7b9de5503c44efd519f6400e92633bc4a9001c19060de28837ced85f1f66857",
+          "role": "GBIF species 4409366"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/4262706",
+          "retrieved_at": "2026-11-02T01:02:52Z",
+          "byte_size": 945,
+          "sha256": "2fc6f8bc3eecc6f9faea140ce0428c5ffcbb37bf29c4f40a504de8abd3c987c7",
+          "role": "GBIF accepted 4262706"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Canis%20lupus&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T01:02:52Z",
+          "byte_size": 426,
+          "sha256": "4ad19f1600b2274a0049b1efea74da50b7b9d585dd9facebf0d8502928f5b527",
+          "role": "GBIF match Canis lupus"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/5219173",
+          "retrieved_at": "2026-11-02T01:02:52Z",
+          "byte_size": 1002,
+          "sha256": "ee662cdbabdaf720abd3d36753fb4cb8250172fe3f6cda6f73b9e6e701863ca8",
+          "role": "GBIF species 5219173"
+        }
+      ],
+      "role": "synonym resolution and extinct flag"
+    }
+  ],
+  "headline": "Not every named domesticate still has a wild kind: cattle (Bos primigenius: extinct). 4 of 6 are extant and 1 unresolved."
 }
