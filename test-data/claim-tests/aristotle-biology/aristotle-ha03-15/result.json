@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha03-15",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-15",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:26:24Z",
   "hypothesis": "If the elephant has no nails at all, a paper that records the tissue collected from named elephants will not record keratinous toenails taken from them.",
   "pass_criterion": "Pre-registered. This dataset cannot support the claim. It is a study of elephant toenails, so a count of zero parsed donors is a failure to find the sample table, not a measurement that nails are absent. The clause 'all other toed animals have nails' is not in this dataset and is not scored. There is no pass outcome.",
@@ -27,5 +27,84 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-1551",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "europepmc-PMC11295213-elephant-toenail",
+      "name": "Nailing it: elephant toenails for hormone analysis, Europe PMC full text",
+      "landing_url": "https://europepmc.org/article/PMC/PMC11295213",
+      "doi": "10.1093/conphys/coae048",
+      "version": "PMC11295213",
+      "license": "CC BY",
+      "files": [
+        {
+          "name": "PMC11295213.fullTextXML",
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11295213/fullTextXML",
+          "retrieved_at": "2026-11-02T00:38:35Z",
+          "byte_size": 121740,
+          "sha256": "71880b265abb4d01eeeddc8715320f9bdaeccfe37a04c72534003925013db320"
+        }
+      ],
+      "role": "sample table of elephants from which toenail trimmings were collected"
+    }
+  ],
+  "method": "Downloaded the Europe PMC JATS XML for PMC11295213 and hashed it. A table whose caption says the samples were toenail trimmings was parsed, and each row naming Loxodonta or Elephas was counted as a donor. One donor refutes the claim that the elephant has no nails at all. The clause about all other toed animals was not in this file and was not scored.",
+  "measured": {
+    "value": 7,
+    "unit": "elephants recorded as sources of toenail tissue",
+    "n": 7,
+    "uncertainty": "count of table rows; not a nail-count per foot",
+    "extra": {
+      "genera": [
+        "Elephas",
+        "Loxodonta"
+      ],
+      "n_loxodonta": 3,
+      "n_elephas": 4,
+      "donors": [
+        {
+          "individual": "Anna",
+          "genus": "Loxodonta",
+          "species_cell": "Loxodonta africana"
+        },
+        {
+          "individual": "Felix",
+          "genus": "Loxodonta",
+          "species_cell": "L. africana"
+        },
+        {
+          "individual": "Samson",
+          "genus": "Loxodonta",
+          "species_cell": "L. africana"
+        },
+        {
+          "individual": "Kamala",
+          "genus": "Elephas",
+          "species_cell": "Elephas maximus"
+        },
+        {
+          "individual": "Maharani",
+          "genus": "Elephas",
+          "species_cell": "E. maximus"
+        },
+        {
+          "individual": "Spike",
+          "genus": "Elephas",
+          "species_cell": "E. maximus"
+        },
+        {
+          "individual": "Swarna",
+          "genus": "Elephas",
+          "species_cell": "E. maximus"
+        }
+      ]
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "results_summary": [
+    "Toenail donors parsed from the sample table: 7. Genera: ['Elephas', 'Loxodonta'].",
+    "Keratinous toenail tissue taken from an elephant refutes 'has no nails whatsoever'. Other toed animals were not tested."
+  ]
 }

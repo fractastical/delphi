@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-35",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-35",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:26:24Z",
   "hypothesis": "If every animal that can move about has the sexes in separate individuals, then no fish species in the FishBase reproduction table has a recorded mode of simultaneous or sequential hermaphroditism, because a fish is an animal that moves about and a hermaphroditic fish is one individual that is both male and female.",
   "pass_criterion": "Pre-registered. Among distinct FishBase SpecCode values whose ReproMode is non-empty, let n_mode be the count, n_herm the count whose mode string (lower-cased) contains 'hermaphrod', 'protandr' or 'protogyn', and n_dioec the count whose mode string contains 'dioec'. The claim is supported only if n_mode >= 100, n_herm = 0 and n_dioec >= 50. Parthenogenesis is counted and reported but is not a counterexample and is not required for the pass.",
@@ -27,5 +27,177 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-1551",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "fishbase-rfishbase-snapshot-v24.07-reproduc",
+      "name": "FishBase reproduction and species tables, rfishbase snapshot v24.07",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "fb/v24.07",
+      "license": "CC BY-NC (FishBase, redistributed by the rfishbase snapshot)",
+      "files": [
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:30:43Z",
+          "byte_size": 555433,
+          "sha256": "24c208a224357c36f3e4a5b6e34357837671f0c5a0b3954c2fe698d26909155b"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:30:44Z",
+          "byte_size": 5469594,
+          "sha256": "571c60b0b47cf50ca28d49b01b6abc17ab0506d8233e7d703b2c87e3ff41fb3c"
+        }
+      ],
+      "role": "species-level reproductive mode; species table supplies scientific names for the examples"
+    }
+  ],
+  "method": "Downloaded the v24.07 reproduc and species parquet files, hashed them, and grouped non-empty ReproMode values by SpecCode. A species is hermaphrodite if any mode string contains hermaphrod, protandr or protogyn, dioecious if any contains dioec, and parthenogenetic if any contains parthen. The pre-registered rule was applied to those counts. Parthenogenesis is reported and does not decide the verdict.",
+  "measured": {
+    "value": 500,
+    "unit": "fish species with a hermaphrodite reproduction mode",
+    "n": 11777,
+    "uncertainty": "exact count of distinct SpecCode values",
+    "extra": {
+      "n_dioecism": 11275,
+      "n_parthenogenesis": 2,
+      "n_other_mode": 0,
+      "n_coded_both_hermaphrodite_and_dioecism": 0,
+      "mode_strings": [
+        {
+          "mode": "dioecism",
+          "n_species": 11275
+        },
+        {
+          "mode": "protogyny",
+          "n_species": 374
+        },
+        {
+          "mode": "protandry",
+          "n_species": 69
+        },
+        {
+          "mode": "true hermaphroditism",
+          "n_species": 57
+        },
+        {
+          "mode": "parthenogenesis",
+          "n_species": 2
+        }
+      ],
+      "hermaphrodite_examples": [
+        {
+          "spec_code": 8109,
+          "name": "Acanthopagrus australis",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 5526,
+          "name": "Acanthopagrus berda",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 4543,
+          "name": "Acanthopagrus bifasciatus",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 6356,
+          "name": "Acanthopagrus latus",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 67330,
+          "name": "Acanthopagrus morrisonae",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 6531,
+          "name": "Acanthopagrus schlegelii",
+          "modes": [
+            "protandry"
+          ]
+        },
+        {
+          "spec_code": 14420,
+          "name": "Achoerodus gouldii",
+          "modes": [
+            "protogyny"
+          ]
+        },
+        {
+          "spec_code": 50808,
+          "name": "Achoerodus viridis",
+          "modes": [
+            "protogyny"
+          ]
+        },
+        {
+          "spec_code": 6441,
+          "name": "Aethaloperca rogaa",
+          "modes": [
+            "protogyny"
+          ]
+        },
+        {
+          "spec_code": 22983,
+          "name": "Ahliesaurus brevis",
+          "modes": [
+            "true hermaphroditism"
+          ]
+        },
+        {
+          "spec_code": 2728,
+          "name": "Alepisaurus brevirostris",
+          "modes": [
+            "true hermaphroditism"
+          ]
+        },
+        {
+          "spec_code": 99,
+          "name": "Alepisaurus ferox",
+          "modes": [
+            "true hermaphroditism"
+          ]
+        }
+      ],
+      "parthenogenesis_examples": [
+        {
+          "spec_code": 6376,
+          "name": "Carassius gibelio",
+          "modes": [
+            "parthenogenesis"
+          ]
+        },
+        {
+          "spec_code": 3225,
+          "name": "Poecilia formosa",
+          "modes": [
+            "parthenogenesis"
+          ]
+        }
+      ]
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "results_summary": [
+    "Coded species: 11777. Hermaphrodite (protandry, protogyny or true hermaphroditism): 500. Dioecism: 11275. Parthenogenesis, not used for the verdict: 2. Other filled modes: 0.",
+    "Species carrying both a hermaphrodite code and a dioecism code: 0. Those count as hermaphrodite, as pre-registered.",
+    "Verdict refutes: the universal is refuted by any hermaphrodite fish, and fishes move about."
+  ]
 }

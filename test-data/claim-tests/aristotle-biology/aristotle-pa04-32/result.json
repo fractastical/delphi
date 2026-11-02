@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa04-32",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-32",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:26:24Z",
   "hypothesis": "If most fishes have an operculum and selachians have none because their skeleton is cartilage, then in the FishBase morphology table the operculum is present in most scored species, absent in every scored elasmobranch, and likewise absent in other fishes whose skeleton is cartilaginous.",
   "pass_criterion": "Pre-registered. Collapse morphdat to one value per SpecCode: present if any admissible row is 1, absent if every admissible row is 0. Admissible values are 0 and 1 only. Join species to families and drop families with Synonym = 1. Let p_all be the proportion present among all scored species, p_elas among species whose family Class contains 'elasmobranch' (case-insensitive), n_all and n_elas the corresponding counts. The distributional claim is supported only if n_all >= 100, n_elas >= 20, p_all > 0.5 and p_elas = 0, and the causal clause is not contradicted: either the cartilaginous comparison groups below are missing, or they also have p = 0. When those groups are missing, the verdict may still be supports, at the lower confidence fixed in the analysis.",
@@ -27,5 +27,163 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-1551",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "fishbase-rfishbase-snapshot-v24.07-morphdat",
+      "name": "FishBase morphology, species and family tables, rfishbase snapshot v24.07",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "fb/v24.07",
+      "license": "CC BY-NC (FishBase, redistributed by the rfishbase snapshot)",
+      "files": [
+        {
+          "name": "morphdat.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/morphdat.parquet",
+          "retrieved_at": "2026-11-02T00:35:31Z",
+          "byte_size": 7760461,
+          "sha256": "22b84f935686cc68619d53c073233a62434549e2bf8c959ae0d9dc52f4a83845"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:35:32Z",
+          "byte_size": 5469594,
+          "sha256": "571c60b0b47cf50ca28d49b01b6abc17ab0506d8233e7d703b2c87e3ff41fb3c"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:35:33Z",
+          "byte_size": 435976,
+          "sha256": "e8392f861ade49ece972df4cb080ba8d5af6b4c855239c6c6bc91654de1a1032"
+        }
+      ],
+      "role": "operculum presence joined to class and order"
+    }
+  ],
+  "method": "Downloaded morphdat, species and families from the FishBase v24.07 snapshot and hashed them. OperculumPresent values other than 0 or 1 were counted and, if rare, excluded. Each species was scored present if any stock was 1 and absent if every stock was 0. Synonym families (Synonym = 1) were dropped. Elasmobranchii, chimaeras and sturgeons were identified by the pre-registered substrings of Class and Order, and the pre-registered thresholds were applied.",
+  "measured": {
+    "value": 0.0,
+    "unit": "proportion of scored elasmobranch species with an operculum coded present",
+    "n": 743,
+    "uncertainty": "exact species counts after collapsing stocks",
+    "extra": {
+      "all_scored": {
+        "n": 18468,
+        "n_present": 0,
+        "proportion_present": 0.0
+      },
+      "elasmobranchii": {
+        "n": 743,
+        "n_present": 0,
+        "proportion_present": 0.0
+      },
+      "holocephali_or_chimaera_order": {
+        "n": 40,
+        "n_present": 0,
+        "proportion_present": 0.0
+      },
+      "acipenseriformes": {
+        "n": 11,
+        "n_present": 0,
+        "proportion_present": 0.0
+      },
+      "by_class": [
+        {
+          "n": 11,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Chondrostei"
+        },
+        {
+          "n": 8,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Cladistii"
+        },
+        {
+          "n": 4,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Dipneusti"
+        },
+        {
+          "n": 743,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Elasmobranchii"
+        },
+        {
+          "n": 40,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Holocephali"
+        },
+        {
+          "n": 7,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Holostei"
+        },
+        {
+          "n": 89,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Myxini"
+        },
+        {
+          "n": 44,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Petromyzonti"
+        },
+        {
+          "n": 17522,
+          "n_present": 0,
+          "proportion_present": 0.0,
+          "class_name": "Teleostei"
+        }
+      ],
+      "n_morphdat_rows": 21844,
+      "n_operculum_nonnull": 21844,
+      "n_operculum_outside_0_1": 3352,
+      "share_outside_0_1": 0.15345174876396264,
+      "operculum_value_counts": [
+        {
+          "value": 0,
+          "n": 18492
+        },
+        {
+          "value": -1,
+          "n": 3352
+        }
+      ],
+      "n_species_unmatched_to_family": 0,
+      "n_species_with_conflicting_class_or_order": 0,
+      "elasmobranch_species_coded_present": [],
+      "class_names": [
+        "Chondrostei",
+        "Cladistii",
+        "Dipneusti",
+        "Elasmobranchii",
+        "Holocephali",
+        "Holostei",
+        "Myxini",
+        "Petromyzonti",
+        "Teleostei"
+      ],
+      "elasmobranch_class_string_present": true
+    }
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.7,
+  "data_kind": "biological",
+  "results_summary": [
+    "OperculumPresent values in the file: [{'value': 0, 'n': 18492}, {'value': -1, 'n': 3352}]. Codes other than 0 and 1 are 3352 of 21844 non-null rows.",
+    "Scored species: 18468, proportion with an operculum 0.0. Elasmobranchs: 743, proportion 0.0.",
+    "Holocephali or chimaera-order species: {'n': 40, 'n_present': 0, 'proportion_present': 0.0}. Sturgeon-order species: {'n': 11, 'n_present': 0, 'proportion_present': 0.0}.",
+    "Verdict inconclusive. The distributional contrast and the 'because cartilage' clause are separated in the pre-registered rule."
+  ],
+  "reason": "other"
 }

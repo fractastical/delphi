@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-26",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-26",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:26:24Z",
   "hypothesis": "If a honey bee never visits a second kind of flower on one foraging trip, then every corbicular pollen load taken from Apis mellifera in the Dryad pollen-load table is a single pollen morphotype, once morphotypes that are only a trace of the grains are set aside.",
   "pass_criterion": "Pre-registered. Restrict to rows with species code hb (honey bee). One load is one combination of period, day, site and bee. A morphotype counts in that load when its proportion of counted grains is at least 0.05, using the prop column, or count/total_count when prop is blank. Let n be the number of loads and p the proportion of loads with two or more counted morphotypes. The claim is supported only if n >= 30 and p = 0.",
@@ -27,5 +27,54 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-1551",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "dryad-10.5061-dryad.tdz08kq88-dataset-pollen-raw",
+      "name": "dataset_pollen_raw.csv from Pollen collection by the western honey bee and common eastern bumble bee",
+      "landing_url": "https://doi.org/10.5061/dryad.tdz08kq88",
+      "doi": "10.5061/dryad.tdz08kq88",
+      "version": "v20250206",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "dataset_pollen_raw.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3848538",
+          "retrieved_at": "2026-11-02T00:35:06Z",
+          "byte_size": 138028,
+          "sha256": "293ca90d695aa49dfc6a56c657fcb96c06cfe0efb07eb62d95cc797c553880ad"
+        }
+      ],
+      "role": "per-load pollen morphotype counts for honey bees and bumble bees; only honey-bee rows are scored"
+    }
+  ],
+  "method": "Downloaded dataset_pollen_raw.csv, hashed it, and kept rows with species hb. A load is the combination of period, day, site and bee. Morphotype shares in a load were summed. A morphotype counts toward the verdict when its share is at least 5% of counted grains. The pre-registered rule was applied to the proportion of loads with two or more such morphotypes. Bumble-bee rows were not scored.",
+  "measured": {
+    "value": 0.107824,
+    "unit": "proportion of honey-bee pollen loads with two or more morphotypes each at least 5% of counted grains",
+    "n": 1048,
+    "uncertainty": "exact proportion of loads; grain counts are the dataset's microscopy counts",
+    "extra": {
+      "n_honey_bee_rows": 1591,
+      "n_mixed_loads_at_5pct": 113,
+      "n_mixed_loads_any_second_morphotype": 405,
+      "proportion_mixed_any_abundance": 0.38645,
+      "n_loads_with_one_counted_morphotype": 935,
+      "proportion_scale": "fraction",
+      "threshold_in_file_units": 0.05,
+      "loads_by_n_morphotypes_unthresholded": {
+        "1": 643,
+        "2": 285,
+        "3": 106,
+        "4": 12,
+        "5": 2
+      }
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "results_summary": [
+    "Honey-bee loads: 1048. Loads with two morphotypes at or above 5% of grains: 113 (p=0.10782442748091603). Loads with any second morphotype, not used for the verdict: 405."
+  ]
 }
