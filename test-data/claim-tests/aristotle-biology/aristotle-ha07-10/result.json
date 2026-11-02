@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha07-10",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-10",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:31:09Z",
   "hypothesis": "If the claim holds, no child born before seven months of pregnancy survives, and children born at seven months are the earliest who do.",
   "pass_criterion": "Pre-registered (claim supported). In the ONS workbook cimdeathcohort2024.xlsx for England and Wales in 2024, every gestational-age bin whose upper bound is strictly below 28 completed weeks has zero survivors, those bins together contain at least 100 live births, and, if a bin covering 28 to 31 completed weeks is present, that bin has at least one survivor. A survivor is a live birth minus a death, using infant deaths under one year when that count is in the same table, and otherwise deaths under 28 days. Confidence if this pass is met: 0.55, because one country and one year is not every circumstance.",
@@ -27,5 +27,87 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-a564",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "ons-england-wales-child-infant-mortality-2024-cimdeathcohort",
+      "name": "Child and infant mortality (by year of death), England and Wales, 2024",
+      "landing_url": "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/datasets/childmortalitystatisticschildhoodinfantandperinatalchildhoodinfantandperinatalmortalityinenglandandwales/2024",
+      "doi": null,
+      "version": "2024 release, corrected workbook cimdeathcohort2024.xlsx",
+      "license": "Open Government Licence v3.0",
+      "files": [
+        {
+          "name": "cimdeathcohort2024.xlsx",
+          "download_url": "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/datasets/childmortalitystatisticschildhoodinfantandperinatalchildhoodinfantandperinatalmortalityinenglandandwales/2024/cimdeathcohort2024.xlsx",
+          "retrieved_at": "2026-11-02T00:31:36Z",
+          "byte_size": 1501092,
+          "sha256": "f66f81a39cbfedb39db152c377a807ad0cdcbda7c600dd6a1054b2083b973c09",
+          "matches_registered_sha256": true,
+          "matches_registered_size": true
+        }
+      ],
+      "role": "live births and infant deaths by gestational age in England and Wales, Table 8"
+    }
+  ],
+  "measured": {
+    "value": 1768,
+    "unit": "live births below 28 completed weeks minus infant deaths under one year in those bins",
+    "n": 2845,
+    "uncertainty": "death-cohort numerator can include infants born in the previous year, so a positive difference is a lower bound",
+    "extra": {
+      "checksums_ok": true,
+      "filters": "Year 2024, country England and Wales, ethnicity All ethnicities, cause group All causes",
+      "horizon": "infant death under 1 year",
+      "bins": [
+        {
+          "gestational_age": "Under 24 weeks",
+          "highest_completed_week": 23,
+          "admissible_before_28_weeks": true,
+          "seven_month_bin": false,
+          "live_births": 884,
+          "infant_deaths_under_1_year": 723,
+          "neonatal_deaths_under_28_days": 698,
+          "survivors_to_1_year_period_difference": 161,
+          "alive_at_28_days_period_difference": 186
+        },
+        {
+          "gestational_age": "24 to 27 weeks",
+          "highest_completed_week": 27,
+          "admissible_before_28_weeks": true,
+          "seven_month_bin": false,
+          "live_births": 1961,
+          "infant_deaths_under_1_year": 354,
+          "neonatal_deaths_under_28_days": 269,
+          "survivors_to_1_year_period_difference": 1607,
+          "alive_at_28_days_period_difference": 1692
+        },
+        {
+          "gestational_age": "28 to 31 weeks",
+          "highest_completed_week": 31,
+          "admissible_before_28_weeks": false,
+          "seven_month_bin": true,
+          "live_births": 4425,
+          "infant_deaths_under_1_year": 152,
+          "neonatal_deaths_under_28_days": 93,
+          "survivors_to_1_year_period_difference": 4273,
+          "alive_at_28_days_period_difference": 4332
+        }
+      ],
+      "admissible_bins_unusable": [],
+      "live_births_before_28_weeks": 2845,
+      "infant_deaths_before_28_weeks": 1077,
+      "survivors_before_28_weeks": 1768,
+      "death_cohort_note": "Table 8 is a death cohort: infant deaths occurring in 2024 are divided by live births in 2024. Deaths of infants born in 2023 can sit in the numerator, so births minus deaths is a lower bound on survivors of the 2024 births, not an exact cohort count."
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "method": "Downloaded the ONS 2024 death-cohort workbook and checked its size and SHA-256. From Table 8 kept the 2024 rows for England and Wales, all ethnicities and all causes, so country, ethnicity and cause subgroups were not added twice. Treated 'Under 24 weeks' and '24 to 27 weeks' as the bins lying entirely below 28 completed weeks. Subtracted infant deaths under one year from live births in each of those bins and applied the pre-registered rule. 'Most of them are weakly' was not scored.",
+  "results_summary": [
+    "Live births below 28 completed weeks: 2845. Infant deaths under one year in those bins: 1077. Births minus deaths: 1768.",
+    "Bins: Under 24 weeks: 884 live births, 723 infant deaths, difference 161; 24 to 27 weeks: 1961 live births, 354 infant deaths, difference 1607.",
+    "The difference is positive in a death-cohort table, so it understates rather than invents survivors of this year's births."
+  ]
 }
