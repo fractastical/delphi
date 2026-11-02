@@ -1,0 +1,491 @@
+{
+  "claim_id": "aristotle-ha09-38",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-38",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, the living animals classified as ruminants lack upper front teeth, with only a few ruminant species carrying teeth in the upper jaw as well, and the named examples cattle, sheep and goats are ruminants without upper incisors.",
+  "pass_criterion": "Pre-registered support rule. A species is a ruminant when HerbiTraits Fermentation.Type is exactly Foregut Ruminant and Species.Status contains the word Extant. Upper front teeth are the top-incisor count in the Hartigan mammal dentition file. A dental common name is applied to every extant HerbiTraits species of one genus, using this fixed map and no other: cow, ox, cattle, bull to Bos; sheep, ewe, ram to Ovis; goat to Capra; deer to Cervus; elk to Cervus; moose to Alces; caribou and reindeer to Rangifer; camel to Camelus; llama and alpaca to Lama; giraffe to Giraffa; pig, hog and boar to Sus; horse, mare and stallion to Equus; hippopotamus and hippo to Hippopotamus. If the dental name is not in that map, it matches a HerbiTraits common name only when the two normalized strings are equal. A name that would attach to more than one genus is not used. The example clause passes if at least one extant species in each of Bos, Ovis and Capra is a Foregut Ruminant and has a top-incisor count of 0. The group clause passes if at least 8 extant Foregut Ruminant species receive a top-incisor count and at least 80 percent of them have a count of 0. The claim is supported only when both clauses pass. A count of 0 is the absence of upper incisors. A positive count is teeth in the upper jaw.",
+  "fail_criterion": "Pre-registered refutation rule. The example clause fails if any of Bos, Ovis or Capra has a joined extant species that is not a Foregut Ruminant or that has a top-incisor count greater than 0. The group clause fails if at least 8 extant Foregut Ruminant species have a count and fewer than 50 percent of them have a count of 0. Any failed clause refutes the claim. If no clause fails and the group has fewer than 8 joined ruminants, the verdict is inconclusive with reason underpowered. If a file cannot be downloaded, the verdict is inconclusive with reason data-unavailable. If both files download but the top-incisor column cannot be identified, the verdict is inconclusive with reason other. If the group fraction is at least 50 percent and below 80 percent and the example clause does not fail, the verdict is mixed. If the example genera are missing from the join and the group clause passes, the verdict is mixed.",
+  "planned_datasets": [
+    "herbitraits-1.2-lundgren-2021",
+    "hartigan-mammal-dentition-file19"
+  ],
+  "test_contract": {
+    "expected_observation": "Extant foregut ruminants, including cattle, sheep and goats, have no upper incisors, aside from a minority of ruminant species that do have upper incisors.",
+    "disconfirming_observation": "Cattle, sheep or goats are not foregut ruminants or have upper incisors, or most foregut ruminants that can be matched to a dental formula have upper incisors.",
+    "admissible_datasets": "An open species-level fermentation classification that separates foregut ruminants from other herbivores, and an open dental-formula table that counts upper incisors separately from lower incisors. The fermentation class must not be copied from the dental table. Extinct species do not count. A login wall does not count.",
+    "inference_method": "Join the dental common names to genera with the fixed map in pass_criterion, give every extant species of that genus the same top-incisor count, then apply the example clause and the 80 percent group clause. The fraction uses extant Foregut Ruminant species only. Species with no joined count are excluded, not scored as having teeth. A fraction from 50 percent up to but not including 80 percent is mixed. Fewer than 8 joined ruminants is underpowered."
+  },
+  "interpretation": "Rumination is read as HerbiTraits' class Foregut Ruminant, which is cud-chewing foregut fermentation, not the broader class Foregut Non-ruminant. Upper front teeth are the upper incisors, the teeth ruminants replace with a dental pad. The claim allows a few ruminants with teeth in both jaws, so the pass threshold is 80 percent without upper incisors rather than every species. The test does not ask whether every mammal that lacks upper incisors ruminates. Cattle, sheep and goats are the examples named in the claim. The common-name map is only a link from the dental file's labels to genera; it is not itself a fermentation measurement.",
+  "caveats": [
+    "Before this registration the HerbiTraits metadata dictionary was read, including the five fermentation labels. The trait table of species and the dental-formula file were not opened. No species was scored.",
+    "One dental formula is applied to every extant species of the mapped genus. A species that differs from that genus pattern would be mis-scored. The map was written before either data file was opened.",
+    "HerbiTraits covers large herbivores of at least 10 kg. Small ruminants under that mass are absent.",
+    "The Hartigan file's labels that hit the fixed map are elk, deer, moose and reindeer. Cattle, sheep and goat are not labels in that file, so Bos, Ovis and Capra receive no top-incisor count. The map was not extended to fill that gap.",
+    "One count is copied to every extant species of the matched genus. Cervus receives the elk and deer formulae, which agree at 0 upper incisors."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-claim-tests-957f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "inconclusive",
+  "confidence": 0.48,
+  "measured": {
+    "value": 1.0,
+    "unit": "fraction of joined extant foregut ruminants with top-incisor count 0",
+    "n": 7,
+    "uncertainty": null,
+    "extra": {
+      "n_top_incisors_zero": 7,
+      "fraction_top_incisors_zero": 1.0,
+      "example_status": "missing",
+      "group_status": "underpowered",
+      "example_genera": {
+        "Bos": {
+          "n_extant": 4,
+          "n_extant_foregut_ruminant": 4,
+          "n_joined_extant": 0,
+          "top_incisors": null,
+          "clause": "missing"
+        },
+        "Ovis": {
+          "n_extant": 6,
+          "n_extant_foregut_ruminant": 6,
+          "n_joined_extant": 0,
+          "top_incisors": null,
+          "clause": "missing"
+        },
+        "Capra": {
+          "n_extant": 10,
+          "n_extant_foregut_ruminant": 10,
+          "n_joined_extant": 0,
+          "top_incisors": null,
+          "clause": "missing"
+        }
+      },
+      "genera_assigned": {
+        "Alces": {
+          "top_incisors": 0,
+          "sources": [
+            "Moose (I=0, fixed-map)"
+          ]
+        },
+        "Cervus": {
+          "top_incisors": 0,
+          "sources": [
+            "Elk (I=0, fixed-map)",
+            "Deer (I=0, fixed-map)"
+          ]
+        },
+        "Oreamnos": {
+          "top_incisors": 0,
+          "sources": [
+            "Mountain goat (I=0, exact-common-name)"
+          ]
+        },
+        "Rangifer": {
+          "top_incisors": 0,
+          "sources": [
+            "Reindeer (I=0, fixed-map)"
+          ]
+        }
+      },
+      "dental_names_used": [
+        {
+          "dental_name": "Elk",
+          "genus": "Cervus",
+          "top_incisors": 0,
+          "route": "fixed-map"
+        },
+        {
+          "dental_name": "Deer",
+          "genus": "Cervus",
+          "top_incisors": 0,
+          "route": "fixed-map"
+        },
+        {
+          "dental_name": "Moose",
+          "genus": "Alces",
+          "top_incisors": 0,
+          "route": "fixed-map"
+        },
+        {
+          "dental_name": "Reindeer",
+          "genus": "Rangifer",
+          "top_incisors": 0,
+          "route": "fixed-map"
+        },
+        {
+          "dental_name": "Mountain goat",
+          "genus": "Oreamnos",
+          "top_incisors": 0,
+          "route": "exact-common-name"
+        }
+      ],
+      "dental_names_not_used": [
+        {
+          "dental_name": "Opossum",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Hairy tail mole",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Common mole",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Star nose mole",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Brown bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Silver hair bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Pigmy bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "House bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Red bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Hoary bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Lump nose bat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Armadillo",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Pika",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Snowshoe rabbit",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Beaver",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Marmot",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Groundhog",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Prairie Dog",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Ground Squirrel",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Chipmunk",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Gray squirrel",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Fox squirrel",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Pocket gopher",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Kangaroo rat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Pack rat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Field mouse",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Muskrat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Black rat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "House mouse",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Porcupine",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Guinea pig",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Coyote",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Wolf",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Fox",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Bear",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Civet cat",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Raccoon",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Marten",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Fisher",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Weasel",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Mink",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Ferrer",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Wolverine",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Badger",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Skunk",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "River otter",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Sea otter",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Jaguar",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Ocelot",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Cougar",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Lynx",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Fur seal",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Sea lion",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Walrus",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Grey seal",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Elephant seal",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Peccary",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Antelope",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Bison",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Musk ox",
+          "why": "no common-name match",
+          "genera": []
+        },
+        {
+          "dental_name": "Mountain sheep",
+          "why": "no common-name match",
+          "genera": []
+        }
+      ],
+      "genus_count_conflicts": [],
+      "dental_rows": 66,
+      "column_identified": true
+    }
+  },
+  "method": "Downloaded HerbiTraits 1.2 and the Hartigan dentition file. A ruminant is an extant species whose Fermentation.Type is exactly Foregut Ruminant. Column I is the top-incisor count, as the file header states. Each dental common name is attached to one genus by the fixed map, or, if it is not in the map, by an exact match to one HerbiTraits common name after case-folding. Every extant species of that genus receives that count. The example clause and the 80 percent group clause are then applied as pre-registered. Species with no count are excluded from the fraction.",
+  "results_summary": [
+    "Group underpowered: 7 of 7 joined extant foregut ruminants have a top-incisor count of 0 (fraction 1.0). Example clause missing: Bos missing, Ovis missing, Capra missing."
+  ],
+  "deviations": [
+    {
+      "field": "normalized strings",
+      "change": "Case-folding, hyphen and underscore to space, other punctuation removed, whitespace collapsed.",
+      "why": "The pre-registered rule says normalized strings must be equal and does not name the function. This does not add map keys and does not change the 80 percent, 50 percent, or n>=8 thresholds."
+    }
+  ],
+  "reason": "underpowered",
+  "datasets": [
+    {
+      "id": "herbitraits-1.2-lundgren-2021",
+      "name": "HerbiTraits 1.2, functional traits of late Quaternary large-bodied herbivores",
+      "landing_url": "https://github.com/MegaPast2Future/HerbiTraits",
+      "doi": "10.1038/s41597-020-00788-5",
+      "version": "1.2",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "HerbiTraits_1.2.csv",
+          "download_url": "https://raw.githubusercontent.com/MegaPast2Future/HerbiTraits/master/Data/HerbiTraits_1.2/HerbiTraits_1.2/HerbiTraits_1.2.csv",
+          "retrieved_at": "2026-11-02T00:36:48Z",
+          "byte_size": 915210,
+          "sha256": "b9762e9f7794b6bc51556a20d9c5b7609ba1c77f428ee124406e13011575831c"
+        }
+      ],
+      "role": "fermentation class, independent of the dental formulae; Foregut Ruminant is the ruminant class"
+    },
+    {
+      "id": "hartigan-mammal-dentition-file19",
+      "name": "Dentition of mammals, Hartigan Clustering Algorithms page 170, Burkardt file19",
+      "landing_url": "https://people.sc.fsu.edu/~jburkardt/datasets/hartigan/file19.txt",
+      "doi": null,
+      "version": "burkardt transcription, Last-Modified 2011-10-16",
+      "license": null,
+      "files": [
+        {
+          "name": "file19.txt",
+          "download_url": "https://people.sc.fsu.edu/~jburkardt/datasets/hartigan/file19.txt",
+          "retrieved_at": "2026-11-02T00:36:49Z",
+          "byte_size": 2768,
+          "sha256": "76cdc59d9627273829764aa3eeb6293ce9c094be4d36716aa2f182279970287e"
+        }
+      ],
+      "role": "upper-incisor counts; column I is named as top incisors in the file header"
+    }
+  ]
+}

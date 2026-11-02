@@ -1,0 +1,182 @@
+{
+  "claim_id": "aristotle-ha08-29",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-29",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, crabs, crawfish and lobsters each shed the exoskeleton more than once as they grow, rather than casting it a single time.",
+  "pass_criterion": "Pre-registered support rule, one clause per group. Crab: in the snow-crab growth sheet, the instar index (the column that numbers successive instars, not a 0/1 flag for the terminal molt) reaches at least 3. Reaching the third instar takes at least two molts. Crawfish: in the Cambarus survey, animals whose carapace hardness is the README's soft class (EHS 0/1) have carapace lengths with maximum/minimum at least 1.5, and at least 5 soft animals are below the median carapace length of all measured animals and at least 5 are above it. Lobster: in the Homarus americanus fishery sheet, rows coded as recently molted have carapace lengths with maximum/minimum at least 1.5, and at least 5 of those rows are below the sample median length and at least 5 are above it. Recently molted means, in this order: a shell or hardness column whose value matches soft, paper, or EHS 0; otherwise a molt-stage column whose value matches postmolt, soft, or the stage letters A or B. The claim is supported only when all three clauses pass. A terminal-molt flag equal to 1 does not fail the crab clause: a last molt can follow a series of earlier molts.",
+  "fail_criterion": "Pre-registered refutation rule. The crab clause fails if an instar column is present and its maximum is 1. The crawfish clause fails if at least 10 soft animals are measured and the ratio of their maximum to minimum carapace length is below 1.10. The lobster clause fails if at least 30 recently molted animals are measured and that ratio is below 1.10. Any failed clause refutes the claim. If no clause fails and any clause is underpowered (crawfish: fewer than 5 soft animals; lobster: fewer than 30 recently molted animals; crab: an instar column exists but has no numeric index), the verdict is inconclusive with reason underpowered. If a planned file cannot be downloaded, the verdict is inconclusive with reason data-unavailable. If a file downloads but the named column is absent, that clause is unmeasured; if no clause then fails and at least one clause passes while another is unmeasured, the verdict is mixed. If every clause is unmeasured, the verdict is inconclusive with reason other. A ratio between 1.10 and 1.50, with the sample-size minimum met, is neither a pass nor a fail: that clause is intermediate, and the verdict is mixed if no clause fails.",
+  "planned_datasets": [
+    "figshare-4037664-snow-crab-growth",
+    "dryad-qjq2bvqqq-cambarus-sinking-creek",
+    "zenodo-6588031-homarus-moult"
+  ],
+  "test_contract": {
+    "expected_observation": "A crab growth series contains a third instar or later, and both a crayfish sample and a lobster sample include recently molted animals at widely different body sizes, including both below and above the sample's median size.",
+    "disconfirming_observation": "The crab series never passes the first instar, or every recently molted crayfish, or every recently molted lobster, is essentially the same size, as if the shell were cast once.",
+    "admissible_datasets": "Open measurements of a crab, a crawfish or crayfish, and a lobster, taken independently of Aristotle, that either number successive instars or record shell condition together with body size. A login wall does not count. A 0/1 terminal-molt flag without an instar index does not by itself show whether earlier molts occurred.",
+    "inference_method": "Score the three clauses in pass_criterion and fail_criterion. Support requires all three to pass. Any fail refutes. Intermediate ratios and a mix of pass with unmeasured give mixed. Underpowered and missing files give the inconclusive reasons named in fail_criterion. Size ratios use positive lengths only. The crawfish median is the median carapace length of every animal with a length, not only the soft ones. The lobster median is the median carapace length of every animal with a length."
+  },
+  "interpretation": "The claim is that these animals shed repeatedly, not a count of the exact number of molts and not a denial that growth eventually stops. 'Crabs' are read as a brachyuran, here the snow crab Chionoecetes opilio. 'Lobsters' are read as the clawed lobster Homarus americanus. 'Crawfish' is read as a freshwater crayfish, Cambarus appalachiensis. In Aristotle the marine crawfish is often the spiny lobster; a freshwater crayfish is the animal the English word crawfish names, and the test says so. A soft shell is a recent ecdysis. Soft shells at both small and large sizes mean ecdysis is not a single event at one size. An instar number of 3 or more means the crab has molted to get from one instar to the next at least twice.",
+  "caveats": [
+    "Before this registration the figshare, Dryad and Zenodo file names and byte sizes were read, and the Cambarus README was read for the hardness codes. The snow-crab workbook, the Cambarus CSV and the lobster CSV were not opened. No instar number, length or hardness value was computed.",
+    "The snow-crab landing page says the sheet compiles carapace width at instars 1 through 13 and that a separate number counts the terminal molt. A pass on the crab clause is therefore the expected direction. The threshold used here is 3, and the terminal-molt flag is not the instar index.",
+    "Cross-sectional soft shells are not a diary of one animal. They show that molting occurs at more than one size. They do not count the lifetime total for a named individual.",
+    "The lobster file is a fishery sample of legal-sized and sublegal animals. It can show repeated molting across the sizes that were landed. It cannot show the larval molts.",
+    "Soft shells are a cross-section, not repeated observations of one animal. The snow-crab instars are a compiled growth schedule: each step is a molt the schedule says the animal passes through. Crawfish here is a freshwater Cambarus, which is what the English word names; Aristotle's marine crawfish is often read as a spiny lobster."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-claim-tests-957f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.8,
+  "measured": {
+    "value": 13,
+    "unit": "maximum snow-crab instar index (a value of 3 or more means at least two molts)",
+    "n": 16,
+    "uncertainty": null,
+    "extra": {
+      "crab_status": "pass",
+      "crab_max_instar": 13,
+      "crab_sheets": {
+        "M13": {
+          "n_rows": 16,
+          "min_instar": 1,
+          "max_instar": 13
+        },
+        "M12": {
+          "n_rows": 15,
+          "min_instar": 1,
+          "max_instar": 12
+        },
+        "M11": {
+          "n_rows": 14,
+          "min_instar": 1,
+          "max_instar": 11
+        },
+        "F11": {
+          "n_rows": 14,
+          "min_instar": 1,
+          "max_instar": 11
+        }
+      },
+      "crawfish_status": "pass",
+      "crawfish_n_soft": 42,
+      "crawfish_soft_max_over_min": 3.0255,
+      "crawfish_soft_mm": [
+        15.7,
+        47.5
+      ],
+      "crawfish_soft_below_above_median": [
+        29,
+        13
+      ],
+      "crawfish_median_mm": 28.4,
+      "lobster_status": "pass",
+      "lobster_n_soft": 4345,
+      "lobster_soft_max_over_min": 17.4757,
+      "lobster_soft_mm": [
+        10.3,
+        180.0
+      ],
+      "lobster_soft_below_above_median": [
+        1282,
+        2896
+      ],
+      "lobster_median_mm": 87.0,
+      "lobster_soft_p01_p99_mm": [
+        71.0,
+        140.0
+      ],
+      "lobster_soft_p01_p99_ratio": 1.9718
+    }
+  },
+  "deviations": [
+    {
+      "field": "lobster recently-molted code",
+      "change": "Shellhardness equal to 1 is counted as soft.",
+      "why": "The pre-registered rule matched the words soft, paper or EHS 0. This sheet stores hardness as integers. The data paper's own code table labels 1 as Soft, 2 as Medium and 3 as Hard. Moultstage_group 1 was not used: that code pools postmoult with intermoult."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "figshare-4037664-snow-crab-growth",
+      "name": "Growth data of snow crab (Chionoecetes opilio)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.4037664.v1",
+      "doi": "10.6084/m9.figshare.4037664.v1",
+      "version": "v1",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "snow_crab.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/6504888",
+          "retrieved_at": "2026-11-02T00:30:48Z",
+          "byte_size": 13303,
+          "sha256": "378662230c47631b64ff3582687a09536adbf185b5b12002ee16deaaa04151c5"
+        }
+      ],
+      "role": "carapace width of snow crab at successive instars"
+    },
+    {
+      "id": "dryad-qjq2bvqqq-cambarus-sinking-creek",
+      "name": "A survey of Cambarus crayfish and their symbiotic branchiobdellidans, Sinking Creek, Newport, VA, USA 2017-2018",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.qjq2bvqqq",
+      "doi": "10.5061/dryad.qjq2bvqqq",
+      "version": "1",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "cambarus.zip",
+          "download_url": "https://datadryad.org/api/v2/versions/353121/download",
+          "retrieved_at": "2026-11-02T00:30:51Z",
+          "byte_size": 139341,
+          "sha256": "6f30aeca42ea996bf0348db1490537ff20567fe3848c88ae91ff581c7d616b3b"
+        },
+        {
+          "name": "Sinking_Creek_Crayfish_and_Branchiobdellidan_Survey.csv",
+          "download_url": "https://datadryad.org/api/v2/versions/353121/download",
+          "retrieved_at": "2026-11-02T00:30:51Z",
+          "byte_size": 131176,
+          "sha256": "c8ecfab90661ea79be43b1d63637368087b3d4b8d4dd537d0e1337111c4b1959"
+        },
+        {
+          "name": "README.md",
+          "download_url": "https://datadryad.org/api/v2/versions/353121/download",
+          "retrieved_at": "2026-11-02T00:30:51Z",
+          "byte_size": 7730,
+          "sha256": "5e29ebf84c7a4c02631f9e20c0b94e8412928a93057f217fe578b49fae2a84b5"
+        }
+      ],
+      "role": "carapace length and carapace hardness of Cambarus appalachiensis; EHS 0/1 is the soft exoskeleton"
+    },
+    {
+      "id": "zenodo-6588031-homarus-moult",
+      "name": "Fisheries dataset on moulting patterns and shell quality of American lobsters Homarus americanus in Atlantic Canada",
+      "landing_url": "https://doi.org/10.5281/zenodo.6588031",
+      "doi": "10.5281/zenodo.6588031",
+      "version": "1",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "ALMQ_2004_2015_27.5.csv",
+          "download_url": "https://zenodo.org/api/records/6588031/files/ALMQ_2004_2015_27.5.csv/content",
+          "retrieved_at": "2026-11-02T00:31:04Z",
+          "byte_size": 11104362,
+          "sha256": "cf8295b2f96ca8d60251069c3b98374d7c5c3850f3f0624cff735c6423d15352"
+        }
+      ],
+      "role": "carapace size and shell hardness of Homarus americanus; hardness 1 is soft"
+    }
+  ],
+  "method": "Downloaded the snow-crab workbook, the Cambarus Dryad zip and the Homarus Zenodo CSV. The crab clause uses the maximum Instar across sheets. The crawfish clause uses rows whose Carapace Hardness (EHS) matches EHS 0, compared with the median carapace length of every measured animal. The lobster clause uses Shellhardness 1, the code the data paper labels Soft, compared with the median of the Size column. The verdict is the pre-registered map of the three clause statuses.",
+  "results_summary": [
+    "Crab pass: maximum instar 13 (sheets: M13 max 13, M12 max 12, M11 max 11, F11 max 11).",
+    "Crawfish pass: 42 soft animals, carapace 15.7\u201347.5 mm (max/min 3.0255), 29 below and 13 above the median 28.4 mm.",
+    "Lobster pass: 4345 soft-shelled animals, size 10.3\u2013180.0 mm (max/min 17.4757), 1282 below and 2896 above the median 87.0 mm. The 1st to 99th percentiles are 71.0\u2013140.0 mm (ratio 1.9718); that percentile ratio is descriptive and is not the verdict ratio."
+  ]
+}

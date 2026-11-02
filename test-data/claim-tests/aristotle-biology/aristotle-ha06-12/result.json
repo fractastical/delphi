@@ -1,0 +1,239 @@
+{
+  "claim_id": "aristotle-ha06-12",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-12",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds for the common cuckoo, public breeding records place its eggs in the nests of other bird species that are smaller than the cuckoo, the usual number of cuckoo eggs in a parasitized nest is one, the laying female removes or eats the host's eggs, and the host hatches and rears the young cuckoo.",
+  "pass_criterion": "Pre-registered support rule. Clause A passes if the Stokke parasitism tables (ESM1, and ESM3 and ESM4 when they are host-by-rate tables) contain at least 30 distinct host species with a positive parasitism record and every such record names a host other than Cuculus canorus. Clause B passes if at least 20 of those host species have a positive adult body mass and at least 80 percent of them are strictly lighter than the adult body mass of Cuculus canorus, using a mass column in Stokke ESM2 when that file itself contains Cuculus canorus, otherwise the species-level body-mass column of AVONET. Clause E passes if the Lowther Cuculiformes host list, inside the account whose heading contains Cuculus canorus, marks at least 10 distinct host species with that file's own successful-rearing prefix ('&' or '%'). Clauses C and D are scored only when the downloaded tables contain, respectively, a per-nest count of cuckoo eggs and a record of whether the laying female removed or ate a host egg. C passes if at least 30 parasitized nests are counted and at least 70 percent contain exactly one cuckoo egg. D passes if at least 20 layings are observed and at least 50 percent record removal or consumption of a host egg. The claim is supported only when A, B and E all pass and every scored clause among C and D also passes. A clause that is unmeasured or underpowered does not count as a pass. C or D underpowered (column present, sample below its minimum) does not block support when A, B and E pass.",
+  "fail_criterion": "Pre-registered refutation rule. The claim is refuted if any one clause fails. A fails if fewer than 5 distinct host species have a positive parasitism record, or if 5 or more records name Cuculus canorus as the nest owner. B fails if at least 20 host species have a body mass and fewer than 50 percent are strictly lighter than the cuckoo. C fails if at least 30 parasitized nests have an egg count and fewer than 50 percent contain exactly one cuckoo egg. D fails if at least 20 layings record the female's behaviour at laying and at least 80 percent leave the host clutch untouched. E fails if the Cuculus canorus account is found, the rearing-mark characters survive text extraction somewhere in the file, and zero host species in that account carry a '&' or '%' prefix. If no clause fails: the verdict is mixed when A and B pass but E is unmeasured, or when B is intermediate (fraction lighter at least 50 percent and below 80 percent) and A does not fail, or when C or D is intermediate (C: fraction of single-egg nests at least 50 percent and below 70 percent; D has no intermediate band). The verdict is inconclusive with reason underpowered when no clause fails and A or B is underpowered (A: 5 to 29 host species; B: masses exist for fewer than 20 hosts). The verdict is inconclusive with reason data-unavailable when the Stokke files cannot be downloaded, or when no clause can be scored. The verdict is inconclusive with reason other when the files download but no mass column and no AVONET mass can be joined and E also cannot be scored. Intermediate B with a failed clause is a refutation, not mixed. Descriptive counts (Hippolais among the hosts, median host mass, number of population rows) are reported and do not enter the verdict.",
+  "planned_datasets": [
+    "stokke-2018-dryad-9r0n681",
+    "lowther-2025-ow-cuckoo-host-list",
+    "avonet-tobias-2022-figshare-16586228"
+  ],
+  "test_contract": {
+    "expected_observation": "Common-cuckoo eggs are recorded in the nests of other bird species, those host species are lighter as adults than the cuckoo, a parasitized nest usually holds one cuckoo egg, the laying female removes or eats host eggs, and host species are recorded as hatching and rearing the young cuckoo.",
+    "disconfirming_observation": "The cuckoo is recorded incubating its own nest as the usual breeding record, or the hosts with a measured body mass are not mostly lighter than the cuckoo, or parasitized nests usually hold a number of cuckoo eggs other than one, or observed females usually leave the host clutch intact, or the common-cuckoo host account marks no host as having reared the young.",
+    "admissible_datasets": "Open compilations of Cuculus canorus parasitism that name the host species, an open host list that marks successful rearing by the host, and an open species-level table of adult avian body mass measured independently of Aristotle. Records of other cuckoo species do not count. A login-walled nest-record scheme does not count. A parasitism-rate table can score laying in other birds' nests and host size; it cannot by itself score eggs per nest or egg-eating unless it has those columns.",
+    "inference_method": "Score clauses A through E as defined in pass_criterion and fail_criterion, then apply that decision map in order: any failed clause refutes the compound claim; support requires A, B and E to pass, with C and D either passing or unmeasured (an underpowered C or D does not block support); otherwise mixed or inconclusive as specified. Body mass is matched on the binomial. Where several numeric mass columns exist, use the one with the most positive values whose name contains 'mass' and does not contain 'source', 'error', 'sd' or 'se'; if separate male and female masses are the only mass columns, use their mean when both are present. A parasitism record is positive when a rate or count column is greater than zero, or when a host-list row has no rate column. The Lowther account begins at the first heading line containing 'Cuculus canorus' and ends at the next heading whose binomial belongs to a different species in the genera Clamator, Pachycoccyx, Cuculus, Cercococcyx, Cacomantis, Chrysococcyx, Surniculus, Hierococcyx, Eudynamys or Scythrops. If text extraction of the whole host list contains neither '&' nor '%', clause E is unmeasured rather than failed."
+  },
+  "interpretation": "The claim is tested as a compound natural-history statement about the common cuckoo, which is the species named in the scope, not as a theory of brood-parasite evolution. 'Builds no nest' is read as the absence of records in which the cuckoo is the nest owner, in compilations of its breeding records. 'A smaller bird' is read as adult body mass of the host species strictly below the adult body mass of Cuculus canorus. 'Usually one' is read as at least 70 percent of parasitized nests, and is left unmeasured if the tables are rates rather than per-nest egg counts. 'Devouring' the host's eggs is scored only from a column that records removal or eating by the laying female; ejection of host eggs by the cuckoo chick is not substituted for it. 'The host hatches and rears' is read from the host list's own successful-rearing marks. The scope note that hosts include the hypolais is reported as a presence check and is not part of the verdict. No modern claim about gentes, egg mimicry or chick eviction is tested.",
+  "caveats": [
+    "Before this registration the Dryad file names, byte sizes and the one-line file descriptions (parasitism rates, species traits, sources), the AVONET file names and sizes, and the Lowther file's content type and byte size were read from repository metadata. The workbooks, the AVONET table and the body of the Cuculus canorus host account were not opened, and no mass, rate or host count was computed.",
+    "A web-search snippet of the Lowther file showed the legend that a name prefixed with '&' or '%' usually means the host reared the parasite, and showed the layout of accounts other than Cuculus canorus. That legend is the file's own key. The common-cuckoo account was not used to choose any threshold.",
+    "The Dryad abstract, read as the dataset description, states that the authors find a preference for intermediate-sized passerine hosts. Passerines are mostly lighter than a common cuckoo, so a pass on clause B is the expected direction. The fraction itself was not computed before registration.",
+    "A parasitism-rate compilation is built from eggs found in other species' nests, so it is weak evidence that the cuckoo never builds a nest: a nest of its own would sit outside the sampling frame. Clause A therefore tests that the recorded breeding mode is laying in named foreign hosts, not a census of every nest in Europe.",
+    "The host list marks known successes. It is not a sample of nests with a failure rate, so clause E tests whether rearing by the host is recorded for many host species, not the proportion of eggs that fledge.",
+    "Clauses C (usually one cuckoo egg) and D (the female devours the host's eggs) have no column in these files, so the support verdict does not speak for those two clauses. Clause A counts eggs recorded in other species' nests; a nest built by the cuckoo would not be in a parasitism compilation. Clause E counts host species the compiler marked as having reared a cuckoo, not the fraction of nests that fledged."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-claim-tests-957f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.58,
+  "datasets": [
+    {
+      "id": "stokke-2018-dryad-9r0n681",
+      "name": "Data from: Characteristics determining host suitability for a generalist parasite",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.9r0n681",
+      "doi": "10.5061/dryad.9r0n681",
+      "version": "1",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "doi_10.5061_dryad.9r0n681__v20190411.zip",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 294850,
+          "sha256": "c8c0c0bdeb706284b18e121e8c6983c0c4daa8fa5630348582137fa1166e1120",
+          "note": "Per-file Dryad links returned HTTP 401. The version zip is the public download. Members below are the files inside it."
+        },
+        {
+          "name": "Stokke_data_parasitism_Germany_Dryad_ESM4.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 22392,
+          "sha256": "89d6f4ae14bd7ccc3bd7e1892ce4f386266f89f5da95e0974d5434fb4520cfa4"
+        },
+        {
+          "name": "Stokke_data_parasitism_UK_Dryad_ESM3.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 18890,
+          "sha256": "4f49f24860be12618f43a8d2e9d202787952385b0a71122b03916a4ca19a6c16"
+        },
+        {
+          "name": "Stokke_data_parasitism_rates_Dryad_ESM1.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 179294,
+          "sha256": "dcbefc6a4b63067a13d358340b175f3ea97606f119442c97bfcd9e0497c1596b"
+        },
+        {
+          "name": "Stokke_data_passerines_Dryad_ESM2.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 21630,
+          "sha256": "790c100acd7207688c92ba1133a1581b4bffb5bd19d5df61481d23744e753538"
+        },
+        {
+          "name": "Stokke_data_sources_Dryad_ESM5.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/6072/download",
+          "retrieved_at": "2026-11-02T00:23:10Z",
+          "byte_size": 51628,
+          "sha256": "0c7d2ce46ead3c8612e1bec9a1ab1ffc7d9a34029dead5ead2da3177c24c5a25"
+        }
+      ],
+      "role": "population parasitism rates of Cuculus canorus and the host species they name"
+    },
+    {
+      "id": "lowther-2025-ow-cuckoo-host-list",
+      "name": "Host list of avian brood parasites \u2014 2 \u2014 Cuculiformes, Old World cuckoos (Peter E. Lowther, Field Museum, version 05 Jun 2025)",
+      "landing_url": "https://www.datocms-assets.com/44232/1749565809-host-list-ow-cuckoos-05jun2025.pdf",
+      "doi": null,
+      "version": "05 Jun 2025",
+      "license": "not stated on the file; public working copy posted by the Field Museum author",
+      "files": [
+        {
+          "name": "host-list-ow-cuckoos-05jun2025.pdf",
+          "download_url": "https://www.datocms-assets.com/44232/1749565809-host-list-ow-cuckoos-05jun2025.pdf",
+          "retrieved_at": "2026-11-02T00:23:11Z",
+          "byte_size": 391897,
+          "sha256": "81d8261af716788779e432b9cb4ba2d6f28b774ddc0ab164bc6d87c497af7998"
+        }
+      ],
+      "role": "host species of Cuculus canorus, with the compiler's mark for hosts that have reared the parasite"
+    },
+    {
+      "id": "avonet-tobias-2022-figshare-16586228",
+      "name": "AVONET: morphological, ecological and geographical data for all birds",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.16586228.v7",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "version": "v7",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "AVONET Supplementary dataset 1.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/34480856",
+          "retrieved_at": "2026-11-02T00:23:43Z",
+          "byte_size": 21524673,
+          "sha256": "eb645e83dddb40f1654a3e8d721998dbca76eff540231b7b809267c1e96f8d3e"
+        }
+      ],
+      "role": "species-mean adult body mass in grams, sheet AVONET1_BirdLife, column Mass"
+    }
+  ],
+  "method": "Downloaded the Stokke Dryad version zip (per-file links returned HTTP 401), the Lowther host-list PDF, and AVONET Supplementary dataset 1. A host species counts as parasitized if ESM1 par_nests, ESM3 parasitism cases, or ESM4 parasitism cases is greater than zero. Adult body mass is the AVONET1_BirdLife Mass of that binomial. Rearing is a host binomial on a line prefixed with '&' or '%' inside the Cuculus canorus account, which runs from its heading to the next other brood-parasite heading that carries a year. Clauses C and D are unmeasured because those columns are not in the files. The verdict is the pre-registered map applied to the five clause statuses. Confidence is 0.58 on a support verdict when C and D are both unmeasured.",
+  "results_summary": [
+    "Clause A pass: 102 host species with a positive parasitism record; 0 rows name Cuculus canorus as the host. Positive rows: {'ESM1': 710, 'ESM3': 61, 'ESM4': 72}.",
+    "Clause B pass: 90 of 93 matched hosts are lighter than Cuculus canorus at 111.36 g (fraction 0.9677); 9 parasitized names did not match AVONET. Heavier hosts: Corvus corone (570.0 g; ESM1 parasitized nests 0, UK cases 1, Germany cases 0), Pica pica (217.5 g; ESM1 parasitized nests 0, UK cases 0, Germany cases 1), Turdus viscivorus (117.4 g; ESM1 parasitized nests 3, UK cases 0, Germany cases 3).",
+    "Clauses C and D unmeasured: par_nests and parasitism cases count parasitized nests or cases, not cuckoo eggs inside one nest; no column records whether the laying female removed or ate a host egg.",
+    "Clause E pass: 23 host species in the Cuculus canorus account carry the file's successful-rearing prefix.",
+    "Scope check, not in the verdict: Hippolais species with a positive Stokke record: Hippolais icterina, Hippolais pallida, Hippolais polyglotta."
+  ],
+  "measured": {
+    "value": 0.9677,
+    "unit": "fraction of parasitized host species with adult body mass below Cuculus canorus",
+    "n": 93,
+    "uncertainty": null,
+    "extra": {
+      "cuckoo_mass_g": 111.36,
+      "cuckoo_mass_source": "Dunning",
+      "cuckoo_mass_inference": "NO",
+      "n_parasitized_host_species": 102,
+      "n_lighter": 90,
+      "n_unmatched_to_avonet": 9,
+      "median_host_mass_g": 17.7,
+      "heavier_hosts": [
+        {
+          "host": "Corvus corone",
+          "mass_g": 570.0,
+          "lighter": false,
+          "positive_counts": {
+            "ESM1_par_nests": 0,
+            "ESM3_cases": 1.0,
+            "ESM4_cases": 0
+          }
+        },
+        {
+          "host": "Pica pica",
+          "mass_g": 217.48,
+          "lighter": false,
+          "positive_counts": {
+            "ESM1_par_nests": 0,
+            "ESM3_cases": 0,
+            "ESM4_cases": 1.0
+          }
+        },
+        {
+          "host": "Turdus viscivorus",
+          "mass_g": 117.37,
+          "lighter": false,
+          "positive_counts": {
+            "ESM1_par_nests": 3.0,
+            "ESM3_cases": 0,
+            "ESM4_cases": 3.0
+          }
+        }
+      ],
+      "positive_rows": {
+        "ESM1": 710,
+        "ESM3": 61,
+        "ESM4": 72
+      },
+      "self_host_rows": 0,
+      "clause_A": "pass",
+      "clause_B": "pass",
+      "clause_C": "unmeasured",
+      "clause_D": "unmeasured",
+      "clause_E": "pass",
+      "n_hosts_marked_reared": 23,
+      "reared_hosts": [
+        "Lanius collurio",
+        "Lanius excubitor",
+        "Hirundo rustica",
+        "Phylloscopus sibilatrix",
+        "Acrocephalus scirpaceus",
+        "Acrocephalus palustris",
+        "Acrocephalus arundinaceus",
+        "Sylvia borin",
+        "Sylvia communis",
+        "Troglodytes troglodytes",
+        "Turdus merula",
+        "Muscicapa striata",
+        "Erithacus rubecula",
+        "Phoenicurus phoenicurus",
+        "Saxicola torquata",
+        "Prunella modularis",
+        "Anthus trivialis",
+        "Anthus pratensis",
+        "Anthus spinoletta",
+        "Motacilla cinerea",
+        "Motacilla alba",
+        "Fringilla montifringilla",
+        "Emberiza schoeniculus"
+      ],
+      "hippolais_parasitized_in_stokke": [
+        "Hippolais icterina",
+        "Hippolais pallida",
+        "Hippolais polyglotta"
+      ],
+      "hippolais_lines_in_lowther_account": [
+        "Icterine Warbler, Hippolais icterina  (W1-R)",
+        "Eastern Olivaceous Warbler, Hippolais pallida (Antonov et al 2007)",
+        "Cuckoo, Cuculus canorus, parasitism on Eastern Olivaceous Warblers, Hippolais pallida"
+      ],
+      "stokke_body_size_check_not_used_for_verdict": {
+        "n": 86,
+        "n_lighter_than_avonet_cuckoo": 82,
+        "fraction_lighter": 0.9534883720930233,
+        "note": "Stokke labels this column body size, not mass. The verdict uses AVONET Mass."
+      }
+    }
+  }
+}
