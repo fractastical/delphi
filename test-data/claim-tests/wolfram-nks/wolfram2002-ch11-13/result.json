@@ -1,0 +1,25 @@
+{
+  "claim_id": "wolfram2002-ch11-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-13",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "Once a system can realize every boolean function of two bits, a structurally richer system that can also realize every such function realizes exactly the same set, while a system with no information flow realizes a strictly smaller set.",
+  "pass_criterion": "Pre-registered. The universe U is the 16 functions from {0,1}^2 to {0,1}, truth tables ordered by inputs (b0,b1) = (0,0), (0,1), (1,0), (1,1). Three systems. (1) Elementary cellular automata, Wolfram numbers 0..255, fixed-0 boundaries. Encoding: output cell at position -1 starts at 0; input bits at positions 0 and 1; a program of 6 bits at positions 2..7 (64 programs); all other cells 0; evolve t = 1..16 steps on the tape from -17 to 23 inclusive. A function f is realized if some program and some t make cell -1 equal f(b0,b1) for all four inputs. (2) One radius-4 binary cellular automaton, one step. Neighborhood positions relative to the center, from -4 to +4. Input b0 is at +1, b1 at +2. Program bits p00, p01, p10, p11 sit at -4, -3, -2, -1 and the 16 programs are exactly the 16 truth tables in the input order above. The local rule sets the new center to the program bit indexed by b0 + 2*b1, ignoring every other neighbor. Initial center is 0. Read the center after 1 step. (3) A 2-symbol Turing machine on the tape [output=0, b0, b1, p00, p01, p10, p11]. From a head start on b0 it stores b0, moves right, stores b1, moves to p00, steps right b0+2*b1 cells, reads that bit, returns to the output cell, writes it, and halts. The same 16 truth-table programs are used. Let Cap(S) be the set of functions realized. SUPPORTS if Cap(radius-4) = Cap(TM) = U, |Cap(rule 0)| <= 4, every elementary rule has |Cap| <= 16, and every elementary rule with |Cap| = 16 has Cap equal to U. Confidence if supports: 0.84.",
+  "fail_criterion": "Pre-registered. REFUTES if |Cap(rule 0)| >= 16 (the null rule already performs every computation in U, so this encoding does not measure a threshold) or if any elementary rule has |Cap| > 16. INCONCLUSIVE with reason 'underpowered' if |Cap(radius-4)| < 16 or |Cap(TM)| < 16 (a system built to sit at the ceiling did not reach it, so equality past the ceiling was not tested). MIXED if both ceiling systems equal U and |Cap(rule 0)| <= 4, but some elementary rule has |Cap| = 16 whose set of functions is a proper subset of U (impossible if cardinality is 16, retained so a counting bug cannot be scored as support) or if the two ceiling sets are both size 16 and unequal. Two size-16 subsets of a 16-element set are equal, so a reported inequality at size 16 is a counting error and is MIXED rather than a refutation of the book. Confidence: mixed 0.70, refutes 0.80, inconclusive 0.50.",
+  "planned_datasets": [
+    "boolean-capability-threshold"
+  ],
+  "interpretation": "The claim (NKS p. 675) says that as rules grow more capable they pass a threshold of universality, after which the set of computations they can perform is the same, so a more sophisticated rule and a different kind of system gain nothing further about what they can compute. Universality over all partial recursive functions is not a finite enumeration. The computation uses a finite universe that can actually be saturated: all 16 boolean functions of two bits. The radius-4 rule and the Turing machine are different constructions aimed at that ceiling; the elementary rules, including rule 0, are the progressive family underneath. Capability is the set of functions, not the encoding, so the comparison across kinds is extensional. A computation shows these sets are equal as mathematics, not that organisms compute.",
+  "test_contract": {
+    "expected_observation": "The radius-4 cellular automaton and the lookup Turing machine each realize all 16 boolean functions of two bits and those two sets are equal, rule 0 realizes at most 4 of them, and no elementary rule realizes more than those 16.",
+    "disconfirming_observation": "Rule 0 realizes all 16 functions under the elementary encoding, or some elementary rule realizes more than 16 functions.",
+    "admissible_datasets": "Only configurations evolved by analysis.py from the pre-registered encodings. Elementary rules use Wolfram numbers 0..255. The radius-4 rule is the boolean multiplexer stated in the pass criterion, not a Wolfram code number. No external dataset.",
+    "inference_method": "Compare the sets of realized truth tables. Supports when both ceiling systems equal the full 16 and rule 0 is at most 4. Inconclusive (underpowered) when a ceiling system misses the full set. Refutes when rule 0 is already at the ceiling or a cardinality exceeds 16. Confidence: supports 0.84, mixed 0.70, refutes 0.80, inconclusive 0.50."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/wolfram-claim-tests-7ca2",
+    "date": "2026-11-01"
+  }
+}
