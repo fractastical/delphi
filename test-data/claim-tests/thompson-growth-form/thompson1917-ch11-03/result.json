@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch11-03",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-03",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If a constant ratio of longitudinal to transverse growth produces a logarithmic spiral, and the magnitude of that ratio fixes the spiral's constant angle, then ammonoid species whose whorl-height index drifts through ontogeny will also show a drifting whorl expansion rate, and species whose whorl-height index stays steady will keep a steady expansion rate.",
   "pass_criterion": "Pre-registered (claim supported). From Walton and Korn's ontogenetic table (Dryad 10.5061/dryad.c17p8, file Ontogenetic_Conch_Parameter_Data.xlsx, registered md5 0302022d2f622b73754cf0e66c54f2ac, 215182 bytes), keep a species only if it has at least 8 rows with finite WER > 0 and UWI in [0, 1). Set WHI = (1 - UWI) / 2. CV is the sample standard deviation (divisor n - 1) divided by the mean. Let rho be the Spearman rank correlation, across eligible species, between CV(WHI) and CV(WER): average ranks for ties, then the Pearson correlation of the ranks. The two-sided p-value is from t = rho * sqrt((n - 2) / (1 - rho^2)) with n - 2 degrees of freedom, or p = 0 when |rho| = 1. Supported only if n >= 40, rho >= 0.30 and p < 0.01.",
   "fail_criterion": "Pre-registered (claim refuted). Refuted if n >= 40 and rho <= 0.10. If 0.10 < rho < 0.30, or if rho >= 0.30 but p >= 0.01, the verdict is mixed. If rho is not finite, the verdict is inconclusive with reason other. If fewer than 40 species are eligible, the verdict is inconclusive with reason underpowered. If the file is missing a per-species ontogenetic series of both WER and UWI, or its md5 or byte size differs from the values registered above, the verdict is inconclusive with reason data-unavailable.",
@@ -35,5 +35,67 @@
     "model": "grok-4.7",
     "run": "cursor/thompson-ch11-shell-tests-f00f",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.45,
+  "datasets": [
+    {
+      "id": "walton-korn-2018-ontogenetic-conch-dryad-c17p8",
+      "name": "Ontogenetic conch parameters of 177 Devonian to Jurassic ammonoid species",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.c17p8",
+      "doi": "10.5061/dryad.c17p8",
+      "version": "2018-05-16",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "Ontogenetic_Conch_Parameter_Data.xlsx",
+          "download_url": "https://datadryad.org/api/v2/versions/7242/download",
+          "retrieved_at": "2026-11-02T00:48:08Z",
+          "byte_size": 215182,
+          "sha256": "fbe2012f1d420ef7b292141ae0ed0ea8d046c4c15303663565dc72e0727ebe40",
+          "md5": "0302022d2f622b73754cf0e66c54f2ac",
+          "matches_registered_md5": true,
+          "matches_registered_size": true
+        }
+      ],
+      "role": "ontogenetic CWI, UWI and WER for ammonoid median sections, one species per row"
+    }
+  ],
+  "measured": {
+    "value": 0.21966,
+    "unit": "Spearman rho of CV(WHI) against CV(WER)",
+    "n": 179,
+    "uncertainty": "two-sided p = 0.00313249",
+    "extra": {
+      "p": 0.0031324854885978236,
+      "scipy_spearman_rho": 0.2196597828133827,
+      "scipy_spearman_p": 0.0031324854885978236,
+      "min_stages": 8,
+      "median_cv_whi": 0.12789438132991504,
+      "median_cv_wer": 0.07202823233792484,
+      "fraction_cv_wer_at_most_0.10": 0.8435754189944135,
+      "cwi_sensitivity": {
+        "n": 179,
+        "rho": 0.1634486221831649,
+        "p": 0.028801198344677065
+      },
+      "steady_whi_magnitude": null,
+      "n_steady_whi_cv_at_most_0.05": 6,
+      "alpha_from_mean_wer_deg": {
+        "n": 179,
+        "median_deg": 85.36397535518978,
+        "min_deg": 82.93616009392481,
+        "max_deg": 86.60154833942683
+      },
+      "checksum_ok": true
+    }
+  },
+  "method": "Downloaded the Dryad version archive, extracted Ontogenetic_Conch_Parameter_Data.xlsx, and checked its md5 and byte size against the Dryad file record registered before download. UWI and WER are on separate sheets in wide form (whorl columns). Stages were paired by whorl header. A species entered the correlation only with at least 8 stages where WER > 0 and UWI was in [0, 1). WHI = (1 - UWI) / 2. Spearman rho is the Pearson correlation of average ranks, and the p-value is the pre-registered t approximation. The verdict is the rule in pass_criterion and fail_criterion. CWI, the steady-WHI regression and the angles are descriptive.",
+  "results_summary": [
+    "Eligible species: 179 (every species row had at least 8 paired stages). Spearman rho of CV(WHI) against CV(WER) = 0.21966, two-sided p = 0.003132.",
+    "Verdict mixed, confidence 0.45. The support rule needs rho >= 0.30 and p < 0.01; the refute rule is rho <= 0.10; this result is in between.",
+    "Median CV(WHI) = 0.1279, median CV(WER) = 0.0720, and 0.844 of species have CV(WER) <= 0.10. CWI in place of WHI gives rho = 0.1634 (p = 0.0288). Species with CV(WHI) <= 0.05: 6, so the magnitude regression was not run (it needed 15). alpha from mean WER spans 82.94 to 86.60 degrees (median 85.36). These descriptions are not the verdict.",
+    "The Dryad abstract describes this table as globular and pachyconic ammonoids. The angles sit in a narrow band near 85 degrees, so there is little expansion-rate difference for a transverse ratio to determine. Horns are not in the table."
+  ]
 }
