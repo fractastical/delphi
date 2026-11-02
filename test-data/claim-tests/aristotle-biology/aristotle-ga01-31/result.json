@@ -1,0 +1,88 @@
+{
+  "claim_id": "aristotle-ga01-31",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-31",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:39:45Z",
+  "preregistration_commit": "063e6e8e6845fe2d4aa5d72d9ee5b8ede3dc6a08",
+  "hypothesis": "If nothing material from the male becomes part of the embryo, and what comes from him only imparts motion and form, then a child's genome contains no alleles that are present in the father and absent from the mother.",
+  "pass_criterion": "Pre-registered. On chromosome 22 (contig name 22 or chr22) of the 1000 Genomes pilot CEU trio, keep biallelic or multi-allelic SNPs whose alleles are single A/C/G/T bases, FILTER is PASS or '.', and the child (NA12878), father (NA12891), and mother (NA12892) are all called. An informative site has the mother homozygous and the father carrying at least one allele the mother lacks. p is the fraction of informative sites at which the child carries an allele that is absent from the mother and present in the father. Maternal concordance is the fraction of sites where the mother is homozygous and the child is called at which the child carries the mother's allele. SUPPORTS if p <= 0.01, n_informative >= 100, and maternal concordance >= 0.95.",
+  "fail_criterion": "Pre-registered. REFUTES if p >= 0.40, n_informative >= 100, and maternal concordance >= 0.95. MIXED if 0.01 < p < 0.40, n_informative >= 100, and maternal concordance >= 0.95. INCONCLUSIVE, reason underpowered, if the file is retrieved but n_informative < 100. INCONCLUSIVE, reason other, if n_informative >= 100 but maternal concordance < 0.95 (the calls do not show that this child inherited the mother's genome, so paternal counts are not interpretable). INCONCLUSIVE, reason data-unavailable, if the trio VCF cannot be retrieved or does not contain these three sample IDs.",
+  "planned_datasets": [
+    "1000genomes-pilot-ceu-trio-snps-2010-09"
+  ],
+  "interpretation": "The clause tested is the one the quote states: even if something comes away from the male, it does not give rise to the embryo by being in the embryo, but only by imparting motion and form. 'Material in the embryo' is mapped to DNA sequence in the offspring genome, which is a chemical constituent of the offspring's cells. Humans are inside the claim's scope, all animals with two sexes, and are the species Aristotle discusses through this part of Generation of Animals. The modal wording 'it is not necessary' (nothing need come from the male) is a second reading, about whether male-less generation can occur; this test does not measure parthenogenesis. One autosome of one trio is enough to refute a universal denial of male material if paternal alleles are present, and is not a survey of all animals.",
+  "test_contract": {
+    "expected_observation": "At informative chromosome-22 sites, the child almost never carries an allele that the father has and the mother lacks (p <= 0.01), so no paternal sequence is in the offspring.",
+    "disconfirming_observation": "The child carries a father-only allele at 40% or more of informative sites, which is paternal DNA in the offspring and cannot be genotyping noise.",
+    "admissible_datasets": "A public genotype file for a human mother-father-child trio in which all three are called at the same sites, from a project that is not a commentary on Aristotle. Chromosome 22 only. Samples must be the CEU trio NA12878 (child), NA12891 (father), NA12892 (mother), or the file is data-unavailable.",
+    "inference_method": "Among SNPs where the mother is homozygous and the father carries another allele, compute the fraction p of sites where the child carries that paternal allele. Require maternal concordance >= 0.95 as a check that the child really is this mother's offspring. Support at p <= 0.01, refute at p >= 0.40, mixed between, with at least 100 informative sites."
+  },
+  "datasets": [
+    {
+      "id": "1000genomes-pilot-ceu-trio-snps-2010-09",
+      "name": "1000 Genomes Pilot 2 CEU trio SNP genotypes (NA12878, NA12891, NA12892), March 2010 release",
+      "landing_url": "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/paper_data_sets/a_map_of_human_variation/trio/snps/",
+      "doi": "10.1038/nature09534",
+      "version": "CEU.trio.2010_09",
+      "license": "Open FTP release of the 1000 Genomes Project. The accompanying README does not name a licence.",
+      "files": [
+        {
+          "download_url": "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/paper_data_sets/a_map_of_human_variation/trio/snps/CEU.trio.2010_09.genotypes.vcf.gz",
+          "retrieved_at": "2026-11-02T00:45:35Z",
+          "byte_size": 91893147,
+          "sha256": "f44e32c0c40ec93cd7fd2db9004d36e4322606b24f237a537c547028aab24f34"
+        },
+        {
+          "download_url": "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/paper_data_sets/a_map_of_human_variation/trio/snps/README.2010_10.trio_snps",
+          "retrieved_at": "2026-11-02T00:45:38Z",
+          "byte_size": 3527,
+          "sha256": "43a0dbac5bc4ec65dba51bf5ae70ec61cd5ac3c15a15ef6adcb7809b919e91d7"
+        }
+      ],
+      "role": "genotypes of the CEU daughter, father, and mother on chromosome 22"
+    }
+  ],
+  "method": "analysis.py downloads the CEU trio VCF and streams chromosome 22. It keeps SNPs with single-base alleles, FILTER PASS or '.', and a called genotype for NA12878, NA12891, and NA12892. An informative site has a homozygous mother and a father who carries another allele. p is the fraction of those sites where the child carries that father-only allele. Maternal concordance is the fraction of mother-homozygous sites where the child carries the mother's allele. The father-heterozygous and father-homozygous-other slices are reported beside p and are not part of the threshold.",
+  "measured": {
+    "value": 0.616435,
+    "unit": "fraction of informative chromosome-22 sites where the child carries a father-only allele",
+    "n": 16915,
+    "uncertainty": null,
+    "extra": {
+      "n_chr22_rows": 44739,
+      "n_snps_all_called": 44739,
+      "n_mother_homozygous": 22134,
+      "n_maternal_concordant": 22134,
+      "maternal_concordance": 1.0,
+      "n_informative": 16915,
+      "n_transmitted": 10427,
+      "p_paternal": 0.616435,
+      "n_informative_father_heterozygous": 13228,
+      "n_transmitted_father_heterozygous": 6740,
+      "p_father_heterozygous": 0.509525,
+      "n_informative_father_homozygous_other": 3687,
+      "n_transmitted_father_homozygous_other": 3687,
+      "p_father_homozygous_other": 1.0,
+      "child": "NA12878",
+      "father": "NA12891",
+      "mother": "NA12892"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.88,
+  "caveats": [
+    "p = 10427/16915 = 0.616435, with maternal concordance 22134/22134. Both clear the pre-registered refute rule (p >= 0.40, n >= 100, concordance >= 0.95).",
+    "The release README says one of the two callers kept only sites consistent with Mendelian inheritance. Where the father is homozygous for the non-maternal allele, transmission is 3687/3687, which that filter would enforce. Where the father is heterozygous, a child who does not inherit his other allele is still Mendelian and stays in the file: that slice is 6740/13228 = 0.509525, still above 0.40.",
+    "The genotypes are from lymphoblastoid cell lines of the adults (Coriell CEPH Utah family 1463), mapped to NCBI build 36, not from a zygote biopsy. The reading is that this person's genome is the genome of the embryo she developed from.",
+    "One human trio and one chromosome. Humans are inside the stated scope, so paternal sequence in this child refutes a universal denial that male material enters the embryo. Other animals were not measured. Parthenogenesis, the modal reading that male material is not necessary in every species, was not tested.",
+    "Mapping 'material in the embryo' to DNA sequence is a modern reading of the quote's contrast between what is in the embryo and what only imparts motion and form."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/test-aristotle-ga03-27-ga01-31-f35a",
+    "date": "2026-11-01"
+  }
+}
