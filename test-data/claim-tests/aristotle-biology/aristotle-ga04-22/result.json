@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga04-22",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-22",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:45:00Z",
   "hypothesis": "If human females develop more slowly in the womb and, after birth, reach puberty, the prime of life, and old age sooner than males, then female live births have a longer gestational age than male live births, female menarche is earlier than male voice break, the female age of lowest adult mortality is younger than the male age, and females reach a high adult mortality rate at a younger age than males.",
   "pass_criterion": "Supports only if all four clauses hold. Prenatal: among US live births in the 2023 NVSS natality file with known sex and a recorded gestational age in weeks, the female median weeks is greater than the male median. Puberty: in the full text of the population study PMC6378593, mean age at menarche is less than mean age at male voice break. Prime: in the UN WPP 2024 abridged mortality schedule for the World in 2023 (indicator 79, sexes male and female, median variant), the female age-group start between 15 and 50 with the lowest m(x) is younger than the male age-group start. Old age: the first age group with ageStart at least 50 whose m(x) is at least 0.02 per year begins at a younger age in females than in males. Point estimates decide; no minimum gap is required.",
@@ -24,5 +24,153 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claims-c60f",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.8,
+  "measured": {
+    "value": 39.0,
+    "unit": "female median obstetric estimate of gestation, weeks, US natality 2023",
+    "n": 3602293,
+    "uncertainty": "medians of integer weeks; a tie is not 'longer'",
+    "extra": {
+      "clauses": {
+        "prenatal_female_longer_gestation": false,
+        "puberty_menarche_before_voice_break": true,
+        "prime_female_younger": false,
+        "old_age_female_younger": false
+      },
+      "gestation": {
+        "lines": 3605081,
+        "oe_records": 3602293,
+        "female_median_oe_weeks": 39.0,
+        "male_median_oe_weeks": 39.0,
+        "female_n": 1759261,
+        "male_n": 1843032,
+        "female_median_combined_weeks": 39.0,
+        "male_median_combined_weeks": 39.0,
+        "female_longer": false
+      },
+      "puberty": {
+        "doi": "10.1111/ppe.12507",
+        "voice_break_mean": 13.1,
+        "voice_break_ci": [
+          13.0,
+          13.1
+        ],
+        "menarche_mean": 13.0,
+        "menarche_ci": [
+          13.0,
+          13.1
+        ],
+        "female_earlier": true
+      },
+      "life_table": {
+        "value_column": "mx",
+        "scale": "per_year",
+        "threshold": 0.02,
+        "male": {
+          "prime_age_start": 15,
+          "prime_mx": 0.00122159,
+          "old_age_start": 65
+        },
+        "female": {
+          "prime_age_start": 15,
+          "prime_mx": 0.00086493,
+          "old_age_start": 70
+        },
+        "female_prime_earlier": false,
+        "female_old_age_earlier": false
+      },
+      "e0_2023": {
+        "male": 70.5472,
+        "female": 75.8857
+      }
+    }
+  },
+  "datasets": [
+    {
+      "id": "cdc-nvss-natality-2023",
+      "name": "NCHS 2023 natality public-use file",
+      "landing_url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/DVS/natality/Nat2023us.zip",
+      "doi": null,
+      "version": "Nat2023PublicUS.c20240509.r20240724",
+      "license": "US government public data",
+      "role": "sex and obstetric gestational age of live births",
+      "files": [
+        {
+          "download_url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/DVS/natality/Nat2023us.zip",
+          "retrieved_at": "2026-11-02T00:50:34Z",
+          "byte_size": 229522736,
+          "sha256": "4474daab3475af096397e26ed5fdb541b1df59ee9b555fc0b31db84c44d83663"
+        }
+      ]
+    },
+    {
+      "id": "pmc6378593-puberty-timing",
+      "name": "Brix et al. population puberty timing, Europe PMC full text",
+      "landing_url": "https://europepmc.org/article/PMC/PMC6378593",
+      "doi": "10.1111/ppe.12507",
+      "version": "PMC6378593",
+      "license": "CC BY",
+      "role": "mean age at menarche and at voice break",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6378593/fullTextXML",
+          "retrieved_at": "2026-11-02T00:47:46Z",
+          "byte_size": 117583,
+          "sha256": "9862ce89c3593a3dd17a46815de38ace909e13308e338c02fd8911cd6db7c513"
+        }
+      ]
+    },
+    {
+      "id": "un-wpp2024-mx5-world-2023",
+      "name": "UN WPP central death rates by sex and abridged age, world, open-numbers mirror",
+      "landing_url": "https://github.com/open-numbers/ddf--unpop--world_population_prospects",
+      "doi": null,
+      "version": "open-numbers master, medium variant, year 2023",
+      "license": "CC BY 3.0 IGO (UN WPP)",
+      "role": "age of lowest adult mortality and onset of a 2 percent death rate",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/open-numbers/ddf--unpop--world_population_prospects/master/life_table/ddf--datapoints--mx--by--world--time--sex--age_group_broad.csv",
+          "retrieved_at": "2026-11-02T00:57:25Z",
+          "byte_size": 183523,
+          "sha256": "d2a2e3b7b7ee0a871e583d3639e3b69939f66fdb3960362b40539243c5579901"
+        },
+        {
+          "download_url": "https://raw.githubusercontent.com/open-numbers/ddf--unpop--world_population_prospects/master/life_table/ddf--datapoints--ex--by--world--time--sex--age_group_broad.csv",
+          "retrieved_at": "2026-11-02T00:57:25Z",
+          "byte_size": 161949,
+          "sha256": "51509430d8b233ca3e59d94f42219bd486f812fa2af6ddc9fee8fc303b570577"
+        }
+      ]
+    }
+  ],
+  "method": "Gestation is the obstetric estimate in bytes 499-500 of the 2023 natality file (1-indexed positions 499-500), sex in byte 475. Female median 39.0 weeks (n=1759261), male median 39.0 weeks (n=1843032). Puberty means are parsed from the results sentence of PMC6378593. Menarche 13.0 years, voice break 13.1 years. Prime and old age use the open-numbers world life table for 2023. Rates are treated as per_year because the median adult mx is at or below 1; the old-age threshold used is 0.02. Female prime age-group start 15, male 15. Female old-age onset 70, male 65.",
+  "deviations": [
+    {
+      "field": "life-table source",
+      "change": "The UN Population Data Portal data endpoint returned HTTP 401 Bearer. Central death rates mx were read from the open-numbers GitHub mirror of the WPP medium-variant life table, world, year 2023, sex codes 1 and 2. The comparisons are the ones that were pre-registered.",
+      "why": "The named API refused unauthenticated data requests. The mirror is the same WPP table."
+    },
+    {
+      "field": "mx units",
+      "change": "The file's adult rates are on the scale 'per_year'. The pre-registered 0.02 per year is applied as 0.02 in the file's units.",
+      "why": "The concept file does not state the multiplier. The scale rule was fixed as: median adult mx > 1 means per thousand."
+    },
+    {
+      "field": "gestational-age field",
+      "change": "The verdict uses OEGest_Comb, bytes 499-500, the obstetric estimate the user guide says replaced the menstrual estimate. Combined gestation, bytes 490-491, is reported and does not set the verdict.",
+      "why": "The natality user guide documents two week-count fields. The obstetric estimate is the one NCHS describes as the current measure."
+    }
+  ],
+  "caveats": [
+    "Gestation is one US year, including the territories that share this public-use file (about 22 thousand of 3.63 million records). The median is over the whole file.",
+    "Menarche and voice break are one Danish cohort's means. The reported intervals overlap, and the clause still follows the point estimates, as pre-registered.",
+    "Prime of life is the five-year age group of lowest mortality between 15 and 50, not a measured peak of strength or fertility.",
+    "Old age is the first age group at or after 50 whose central death rate reaches the threshold. It is not menopause and not the age of the oldest person.",
+    "Life expectancy at birth is stored as extra and does not set the verdict.",
+    "A search snippet had already shown the puberty point estimates. The rule remained 'earlier means a smaller age', with no minimum gap."
+  ]
 }

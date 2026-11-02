@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-22",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-22",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:45:00Z",
   "hypothesis": "If the octopus hunts by matching the colour of adjacent stones and does the same when alarmed, then in a field image study of octopuses most individuals' body patterns resemble a nearby discrete object, including rock or stone, and that match is recorded in both a prey-approach context and an alarm context.",
   "pass_criterion": "From the full text of Josef et al. 2012 (PMC3359305), the fraction of imaged octopuses whose pattern is reported to match a distinct nearby object is greater than 0.5, the matched objects include rock or stone, AND the study records that match both during prey approach (hunting) and during alarm or disturbance. That outcome supports the claim.",
@@ -22,5 +22,58 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claims-c60f",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.64,
+  "measured": {
+    "value": 0.9091,
+    "unit": "fraction of imaged octopuses reported to match a nearby object",
+    "n": 11,
+    "uncertainty": "10 of 11; one case noted as not clear in the same sentence",
+    "extra": {
+      "numerator": 10,
+      "denominator": 11,
+      "rocks_or_stones_in_match_sentence": true,
+      "methods_mention_hunting_or_prey": false,
+      "methods_mention_alarm_or_disturbance": false,
+      "methods_mention_camouflage": true,
+      "octopus_names_in_full_text": [
+        "Octopus and",
+        "Octopus background",
+        "Octopus cyanea",
+        "Octopus is",
+        "Octopus mantle",
+        "Octopus similarity"
+      ],
+      "match_sentence": "In most cases (10 out of 11 octopuses, with 1 case not clear), after superimposing the resemblance graph over the original image, we noticed that the areas of high resemblance matched distinct landmarks such as corals, noticeable rocks, patches of unevenly colored sand, or an algae patch whose appearance differed from that of its surroundings."
+    }
+  },
+  "datasets": [
+    {
+      "id": "josef2012-plosone-pmc3359305",
+      "name": "Josef, Amodio, Fiorito and Shashar 2012, PLOS ONE e37579, Europe PMC full text",
+      "landing_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0037579",
+      "doi": "10.1371/journal.pone.0037579",
+      "version": "PMC3359305",
+      "license": "CC BY 4.0",
+      "role": "field image counts of octopus background matching",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3359305/fullTextXML",
+          "retrieved_at": "2026-11-02T00:47:21Z",
+          "byte_size": 71470,
+          "sha256": "ffd236f61f12123eba51b2951c5b352ecf308a514feec34d336c07b7aaf6d8c5"
+        }
+      ]
+    }
+  ],
+  "method": "analysis.py downloads the Europe PMC JATS full text of PMC3359305 and takes the fraction in the results sentence that reports how many octopuses matched a nearby landmark. That fraction is 10 of 11. The matched-object sentence names rocks: True. The methods section mentions hunting or prey: False; alarm or disturbance: False; camouflage: True. Support required a majority match, rocks or stones, and both a hunting context and an alarm context. A majority match that does not meet both contexts is the partial outcome named in the fail criterion.",
+  "caveats": [
+    "Eleven images from one reef (Eilat) are not a sample of all octopuses.",
+    "The animals were photographed already camouflaged. The methods do not record a prey approach or an alarm stimulus, so the two occasions Aristotle names are not separated.",
+    "Octopus cyanea and O. vulgaris are both named; the 10-of-11 count is not split by species.",
+    "A web-search snippet showed this count before preregistration. The threshold stayed a majority.",
+    "Matching a nearby rock, coral, sand patch, or alga is a broader reading than matching only stones."
+  ]
 }
