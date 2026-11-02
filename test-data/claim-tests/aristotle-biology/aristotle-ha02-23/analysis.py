@@ -160,10 +160,20 @@ def bird_axioms(typedefs, terms):
         for rel in term["rels"]:
             rel_name = typedefs.get(rel["rel"], rel["rel"]).lower().replace("_", " ")
             comment = rel["comment"].lower()
-            bird = "aves" in comment or "gallus" in comment or comment.strip() in {"bird", "birds"}
-            if not bird or "taxon" not in rel_name:
+            if "taxon" not in rel_name:
                 continue
-            note = {"organ": label, "relation": rel_name, "target": rel["comment"] or rel["target"]}
+            bird = "aves" in comment or "gallus" in comment or comment.strip() in {"bird", "birds"}
+            note = {
+                "organ": label,
+                "relation": rel_name,
+                "target": rel["target"],
+                "comment": rel["comment"],
+                "scored": bird,
+            }
+            if not bird:
+                note["why"] = "the taxon id is not named Aves or Gallus in this file"
+                notes.append(note)
+                continue
             notes.append(note)
             if "never" in rel_name:
                 absent.add(label)
@@ -235,7 +245,7 @@ def main():
                     "adult": adult_id is None or item["end"] == adult_id,
                 }
             )
-    typedefs, terms = parse_obo(CACHE / "renal-minimal.obo".read_text(encoding="utf-8", errors="replace"))
+    typedefs, terms = parse_obo((CACHE / "renal-minimal.obo").read_text(encoding="utf-8", errors="replace"))
     bird = bird_axioms(typedefs, terms)
     verdict, reason = decide(hits, bird)
     adult_hits = [row for row in hits if row["adult"]]

@@ -76,15 +76,19 @@ def qualifies(headers):
 
 
 def file_links(html):
-    pairs = re.findall(r'href="(/downloads/file_stream/\d+)"[^>]*>\s*([^<]+\.(?:xlsx|csv|txt))', html, re.I)
-    if pairs:
-        return [(f"https://datadryad.org{href}", name.strip()) for href, name in pairs]
-    hrefs = re.findall(r'href="(/downloads/file_stream/\d+)"', html)
-    names = re.findall(r"[\w.\-]+\.(?:xlsx|csv|txt)", html)
-    # Fall back to pairing in order when the markup separates them.
+    """One spreadsheet per file_stream link. Markup may put an icon tag before the filename."""
     out = []
-    data_names = [name for name in names if not name.lower().startswith("doi_")]
-    for href, name in zip(hrefs, data_names):
+    seen = set()
+    for match in re.finditer(r'href="(/downloads/file_stream/\d+)"[^>]*>(.*?)</a>', html, re.I | re.S):
+        href, inner = match.group(1), match.group(2)
+        text = re.sub(r"<[^>]+>", "", inner)
+        name_match = re.search(r"([^\s<>]+\.(?:xlsx|csv|txt))", text, re.I)
+        if not name_match:
+            continue
+        name = name_match.group(1).strip()
+        if href in seen or "readme" in name.lower():
+            continue
+        seen.add(href)
         out.append((f"https://datadryad.org{href}", name))
     return out
 
@@ -95,6 +99,16 @@ def self_test():
     assert not qualifies(["ID", "Red Mean", "Luminance Mean"])
     assert qualifies(["Pupa", "frass_mg"])
     assert not qualifies(["Stage", "Mass"])
+    html = (
+        '<a href="/downloads/file_stream/1"><i class="x"></i>Color.xlsx</a>'
+        '<a href="/downloads/file_stream/1"><i class="x"></i>Color.xlsx</a>'
+        '<a href="/downloads/file_stream/2"><i class="x"></i>Performance_clean.xlsx</a>'
+        '<a href="/downloads/file_stream/3"><i class="x"></i>README.md</a>'
+    )
+    assert file_links(html) == [
+        ("https://datadryad.org/downloads/file_stream/1", "Color.xlsx"),
+        ("https://datadryad.org/downloads/file_stream/2", "Performance_clean.xlsx"),
+    ]
     print("self-test ok")
 
 
@@ -144,11 +158,31 @@ def main():
     if not qualifying:
         verdict = "inconclusive"
         reason = "data-unavailable"
+        header_rows = [row for row in inspected if "headers" in row]
+        errors = [row for row in inspected if row.get("error")]
+        if header_rows:
+            uncertainty = "header screen only; body values were not used"
+            method = (
+                "Downloaded the two pre-registered Dryad packages and read only the header row of each spreadsheet. "
+                "A file qualifies only if the header names both a larval or pupal stage and feeding or excretion. "
+                "None did, so body values were not analysed and the verdict is data-unavailable."
+            )
+            summary = "No planned file contains both a stage contrast and a feeding or excretion variable."
+        else:
+            uncertainty = "spreadsheet downloads failed; headers and body values were not read"
+            method = (
+                "Downloaded the landing pages of the two pre-registered Dryad packages. "
+                "Each spreadsheet URL failed, so no header row was read and no body value was used. "
+                "The verdict is data-unavailable."
+            )
+            summary = (
+                f"{len(errors)} spreadsheet download attempts failed, so the stage and feeding columns were not measured."
+            )
         measured = {
             "value": 0,
             "unit": "planned files with both a stage contrast and a feeding or excretion variable",
             "n": len(inspected),
-            "uncertainty": "header screen only; body values were not used",
+            "uncertainty": uncertainty,
             "extra": {"inspected": [{k: v for k, v in row.items() if k != "sha256"} for row in inspected]},
         }
         # keep checksums in datasets, not duplicated in extra
@@ -159,14 +193,10 @@ def main():
                 "reason": reason,
                 "confidence": 0.85,
                 "data_kind": "none",
-                "method": (
-                    "Downloaded the two pre-registered Dryad packages and read only the header row of each spreadsheet. "
-                    "A file qualifies only if the header names both a larval or pupal stage and feeding or excretion. "
-                    "None did, so body values were not analysed and the verdict is data-unavailable."
-                ),
+                "method": method,
                 "datasets": datasets,
                 "measured": measured,
-                "results_summary": ["No planned file contains both a stage contrast and a feeding or excretion variable."],
+                "results_summary": [summary],
             }
         )
     else:
