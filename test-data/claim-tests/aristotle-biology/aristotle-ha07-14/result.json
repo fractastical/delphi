@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha07-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-14",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If menstruation ceases in most women at about forty, and in some lasts to about fifty, and women of about that age bear children, then the median recalled age at natural menopause is within two years of forty, a minority of those ages fall around fifty, and civil registration records live births at ages 48 and 49.",
+  "pass_criterion": "Pre-registered. Menopause: NHANES 2017-2018 RHQ_J, women with RHD043 equal to 7 (Menopause/Change of life), exact RHQ060 ages from 20 through 59 inclusive. Codes 19, 60, 777, and 999 are excluded from the median. Weighted median uses DEMO_J WTINT2YR by the same cumulative-weight rule as the menarche test (smallest age at which cumulative positive weight reaches half the total). Unweighted median uses equal weights. Near means both medians are in [38, 42]. Far means a median is less than or equal to 35 or greater than or equal to 45. The tail condition holds if at least 10 included women have an exact age in [48, 52] and that count is at most half of the included women. Births: Eurostat demo_fagec, ages Y48 and Y49 only, summing the marital-status total if a total category is present and otherwise summing the non-total marital categories, and summing only geographic codes of length 2 (aggregates such as EU, EA, EEA, and codes containing an underscore are excluded). Supports only if both menopause medians are near, the tail condition holds, at least 100 included menopause ages remain, and the summed Y48 plus Y49 births are at least 1. Refutes if both medians are far and at least 100 included ages remain. The far rule wins over the support rule. Mixed if the medians are gray or disagree, or the medians are near but the tail or the Eurostat birth count fails the support rule, or Eurostat cannot be fetched when the medians are near. Inconclusive with reason 'data-unavailable' if the NHANES files or WTINT2YR cannot be used. Inconclusive with reason 'underpowered' if fewer than 100 included menopause ages remain. Inconclusive with reason 'other' if code 60 or code 19 exceeds 5 percent of RHQ060 values among RHD043=7. Y_GE50 is downloaded and reported and is not used in the verdict, because that bin includes age 50 and cannot show a birth after 50. NHANES RHD190 is not used, because the public code 45 means '45 years or older' and cannot separate age 50 from later ages. Confidence: 0.75 if refutes, 0.50 if supports, 0.55 if mixed.",
+  "fail_criterion": "Pre-registered. The claim is refuted when both the weighted and the unweighted medians of exact age at natural menopause are at or below 35 or at or above 45, so that cessation is not 'about forty' for most women in this sample. A birth after the fiftieth year is not scored: the public files located for this test do not separate age 50 from later ages.",
+  "planned_datasets": [
+    "nhanes-2017-2018-rhq-j",
+    "nhanes-2017-2018-demo-j",
+    "eurostat-demo-fagec"
+  ],
+  "test_contract": {
+    "expected_observation": "Median recalled age at natural menopause is inside [38, 42], at least 10 of those women and not more than half report an age from 48 to 52, and Eurostat records at least one live birth to a mother aged 48 or 49.",
+    "disconfirming_observation": "Both the weighted and the unweighted menopause medians are at or below 35 or at or above 45.",
+    "admissible_datasets": "A public health-interview file that separates menopause from hysterectomy and records age at the last menstrual period in single years, plus a civil-registration series of live births by single year of the mother's age through 49. Series that top-code at 45, or that bin 50 with all later ages, are not admissible for the sentence 'none beyond fifty'. No login-gated fertility database is used.",
+    "inference_method": "Two medians, classified as near or far with the fixed cutoffs above, a count of ages 48 to 52, and a sum of registered births at ages 48 and 49. The universal negative 'no birth after 50' is not assigned a verdict. No assessor score is used."
+  },
+  "interpretation": "The quote says menstrual discharge ceases in most women about the fortieth year, lasts to the fiftieth in some, that women of that age have borne children, and that beyond that age there is no case on record. Qwen's partial verdict was that births to women past fifty are too sparse to settle the last clause. That clause is not measurable in the public files checked before registration: NHANES top-codes age at last live birth at '45 or older', Eurostat's open age is Y_GE50, and the Human Fertility Database zip redirects to a login. The test therefore scores the menstrual clause and the existence of births at 48 and 49, and it says so. It does not claim to have tested the absence of births after 50. The sample for menopause is United States residents interviewed in 2017-2018 who gave menopause as the reason periods had stopped.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the XPT files and the Eurostat data query were downloaded. Codebook labels, including RHD043 code 7 and the RHQ060 and RHD190 special codes, were read from the NHANES HTML documentation, which also prints frequencies. Those frequencies are not the measurements. Age cutoffs are the claim's fortieth and fiftieth years. https://www.humanfertility.org/File/Download/Files/zip/USA.zip redirects to /Account/Login and is not a planned file."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  }
+}

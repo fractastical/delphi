@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ga04-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-25",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If man lives longer than any animal of which there is credible experience, except the elephant, then in a curated maximum-longevity table the human record exceeds every non-elephant animal record that the table itself marks as credible, and an elephant record is at least as long as the human record.",
+  "pass_criterion": "Pre-registered. From AnAge rows with Kingdom Animalia (if that column is present), a parseable maximum longevity in years greater than 0, and Data quality exactly 'high' or 'acceptable' (case-insensitive). Homo sapiens is the human row (genus Homo, species sapiens); if several admissible human rows exist, the human record is their maximum. Elephants are genus Elephas or Loxodonta only. Let n_exceed be the number of admissible non-human, non-elephant rows whose maximum longevity is greater than or equal to the human record. Supports only if n_exceed is 0, at least one admissible elephant row exists, and the maximum elephant longevity is greater than or equal to the human record. Refutes if n_exceed is at least 1. Mixed if n_exceed is 0 and either no admissible elephant row exists or the elephant maximum is strictly below the human record. Inconclusive with reason 'underpowered' if fewer than 100 admissible animal rows remain, and with reason 'data-unavailable' if the zip cannot be fetched or Homo sapiens has no admissible longevity. If the Data quality column does not contain the tokens high and acceptable, do not relabel other tokens; inconclusive with reason 'other'. Confidence, set with the verdict and not by revising this rule: 0.85 if refutes and n_exceed is at least 3; 0.60 if refutes and n_exceed is 1 or 2; 0.70 if supports; 0.55 if mixed.",
+  "fail_criterion": "Pre-registered. The claim is refuted when one or more non-elephant animals with AnAge data quality high or acceptable have a maximum longevity greater than or equal to Homo sapiens. A tie counts against 'lives a longer time than'. Outcomes that meet neither the support nor the refute rule are mixed or inconclusive as stated in pass_criterion.",
+  "planned_datasets": [
+    "anage-build-dataset-zip"
+  ],
+  "test_contract": {
+    "expected_observation": "Among AnAge maximum-longevity records marked high or acceptable, Homo sapiens exceeds every species except those in Elephas or Loxodonta, and at least one elephant record is greater than or equal to the human record.",
+    "disconfirming_observation": "At least one non-elephant animal with high or acceptable data quality has a maximum longevity greater than or equal to the human record.",
+    "admissible_datasets": "A public, curated compilation of maximum recorded longevity for many animal species, assembled independently of Aristotle's text, with an explicit quality flag. Captive and wild records are both admissible; the quality flag is the credibility filter. Records the database marks below acceptable are excluded rather than re-scored.",
+    "inference_method": "Rank admissible maximum longevities. The human value is the maximum among admissible Homo sapiens rows. n_exceed counts admissible non-elephant species at or above that value. Thresholds are the support, refute, mixed, and inconclusive rules in pass_criterion. No model score is used."
+  },
+  "interpretation": "The sentence tested is Aristotle's: man lives longer than any animal of which there is credible experience, except the elephant. One assessor treated 'credible experience' as only partly mappable onto a modern table. The measurable reading uses AnAge's own quality flag (high or acceptable) as that credibility filter and treats the elephant exception as the genera Elephas and Loxodonta. The test does not reconstruct which species Aristotle had seen. Specimen origin is stored with each exceeding species and is not a second verdict.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the AnAge zip was downloaded. The URL https://genomics.senescence.info/species/dataset.zip returned HTTP 200 with content-length 169150. Column names were taken from the public R loader for that zip and from the HAGR download page, not from opening the file. No longevity value was read."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  }
+}

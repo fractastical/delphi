@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha06-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-01",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If birds with crooked talons are unprolific except the kestrel, which is the most prolific of them and lays four eggs and occasionally more, then among raptors and owls the common kestrel has the strictly highest median clutch and a recorded maximum of at least 5, and every other species in that set has a median clutch of at most 3.",
+  "pass_criterion": "Pre-registered. Use species-level rows only (subspecies blank or the missing code -999) in class Aves whose order is Accipitriformes, Falconiformes, or Strigiformes, with litter_or_clutch_size_n greater than 0 (values below 0 are the dataset's missing code and are dropped). One row per genus+species; if a genus+species is duplicated at species level, drop that species. The kestrel is genus Falco and species tinnunculus, not Falco naumanni. Kmed is its median clutch. Kmax is max_litter_clutch_size from Amniote_Range_Count_Aug_2015.csv for that same species (values below 0 are missing). Others are the remaining species with a positive median. Let C1 be: every other median is less than or equal to 3. Let C2 be: Kmed is strictly greater than every other median. Let C3 be: Kmax is greater than or equal to 5. Supports only if C1, C2, and C3 all hold and n_other is at least 30. Refutes if Kmax is less than 4, or if any other median is greater than or equal to Kmed. Mixed if Kmax is at least 4 and C2 holds, but C1 fails or Kmax is exactly 4 (four eggs are recorded, but not 'occasionally more', or not every other raptor is unprolific). Inconclusive with reason 'data-unavailable' if the zip or either CSV is missing or the published MD5 does not match (database file 10e7c14395d95ed7f53258f96fadb4f7, range file 8095602c7d10befc52feaf22db8e6c76). Inconclusive with reason 'underpowered' if Falco tinnunculus has no species-level median or n_other is below 30. Inconclusive with reason 'other' if more than one species-level row remains for Falco tinnunculus. Do not add orders after seeing clutch sizes. Confidence: 0.80 if supports or refutes, 0.55 if mixed.",
+  "fail_criterion": "Pre-registered. The claim is refuted if the common kestrel's recorded maximum clutch is below 4, or if any other included raptor or owl has a median clutch greater than or equal to the kestrel's median. A universal 'all others are unprolific' failure with the kestrel still strictly first and a maximum of at least 4 is mixed, not a full refutation.",
+  "planned_datasets": [
+    "myhrvold-2015-amniote-figshare-3563457-v1"
+  ],
+  "test_contract": {
+    "expected_observation": "In the amniote life-history medians, Falco tinnunculus has a higher median clutch than every other species in Accipitriformes, Falconiformes, and Strigiformes, those other medians are all at most 3, and the kestrel's recorded maximum is at least 5.",
+    "disconfirming_observation": "The kestrel maximum is below 4, or at least one other raptor or owl has a median clutch greater than or equal to the kestrel median.",
+    "admissible_datasets": "A public species-level compilation of avian clutch size, independent of Aristotle, covering hawks, falcons, and owls, with both a median and a maximum. The 2015 order names are accepted as printed. Cathartiformes is not added. Negative values are the documented missing code -999, not clutch sizes.",
+    "inference_method": "Compare the species-level median clutch and the published maximum. Unprolific is pre-registered as a median of at most 3 eggs. Most prolific means a strictly greatest median. 'Four and occasionally more' means a maximum of at least 5. Thresholds are C1, C2, and C3 in pass_criterion."
+  },
+  "interpretation": "Crooked-talon birds are the orders named in the claim's scope: Accipitriformes, Falconiformes, and owls (Strigiformes). The kestrel is the common kestrel, Falco tinnunculus. 'Unprolific' has no number in the sentence; the cutoff of 3 eggs is this test's measurable reading of a small clutch, set before seeing the table. The median ranks typical clutch size. The maximum is what 'as many as four, and occasionally more' refers to. A species-level median cannot by itself show an occasional larger clutch, which is why the range file is required.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the figshare zip was downloaded. https://api.figshare.com/v2/articles/3563457 lists ECOL_96_269.zip (6539535 bytes) at https://ndownloader.figshare.com/files/8067269, licence CC0, doi 10.6084/m9.figshare.3563457.v1. The direct Ecological Archives CSV URL returned HTTP 404, so the figshare copy of the same release is the file. Column names and the -999 missing code were read from the Ecological Archives metadata page. MD5 strings were copied from that page's file list. No clutch size was read."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  }
+}

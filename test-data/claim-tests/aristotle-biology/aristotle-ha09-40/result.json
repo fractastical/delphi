@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha09-40",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-40",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If the redbreast and the redstart are one bird in two seasonal plumages, and the beccafico and the blackcap likewise, then each pair is a single accepted species and the two forms are not separate species present in Europe in the same months.",
+  "pass_criterion": "Pre-registered. Names are fixed to the claim's stated scope: Erithacus rubecula (redbreast), Phoenicurus phoenicurus (common redstart), Sylvia atricapilla (blackcap), Sylvia borin (beccafico / garden warbler). For each name, GBIF species/match must return a species-rank hit with matchType other than NONE. The accepted key is acceptedUsageKey if present, otherwise usageKey. A pair is one species if the two accepted keys are equal. European presence uses occurrence/search with that accepted taxonKey, continent=EUROPE, occurrenceStatus=PRESENT, facet=month, limit=0. A month counts only when its facet count is at least 20. A species is usable only if its European occurrence count is at least 100. Supports only if both pairs collapse to one accepted species. Refutes only if both pairs have two different accepted keys and each pair shares at least 3 counted months. Mixed if the pairs disagree, or both pairs are distinct species but at least one pair shares fewer than 3 counted months. Inconclusive with reason 'data-unavailable' if any match fails, the continent filter is rejected, or the facet block is missing. Inconclusive with reason 'underpowered' if any species has fewer than 100 European occurrences. Do not switch the continent or the names after seeing counts. Confidence: 0.85 if refutes, 0.40 if supports (a shared key would be a taxonomy collapse, which is unlikely to be the biological claim without a specimen series), 0.50 if mixed.",
+  "fail_criterion": "Pre-registered. The transformation claim is refuted when each pair is two accepted species in the GBIF backbone and, in Europe, each pair is recorded in at least three of the same calendar months with at least 20 occurrences of each species in that month. Distinct species with little month overlap are mixed, not a refutation, because seasonal separation alone does not show they are one bird.",
+  "planned_datasets": [
+    "gbif-species-match",
+    "gbif-occurrence-month-facet-europe"
+  ],
+  "test_contract": {
+    "expected_observation": "Each named pair resolves to one accepted GBIF species, rather than to two species that are both present in Europe across shared months.",
+    "disconfirming_observation": "Both pairs are distinct accepted species, and each pair has at least three European months in which both species have at least 20 occurrence records.",
+    "admissible_datasets": "A public taxonomic backbone and public occurrence records with month and continent, independent of Aristotle's text. Europe is the geographic scope because the claim's species are European. Counts, not media files, are the observation. Licences on individual occurrences are not re-published; only monthly totals are used.",
+    "inference_method": "Species match to an accepted usage key, then a month facet of European occurrences. Thresholds are equality of accepted keys and an overlap of at least three months with counts of at least 20, applied to both pairs, as stated in pass_criterion."
+  },
+  "interpretation": "Aristotle says the redbreast and the redstart change into one another and differ practically only in plumage colour, and that the beccafico and the blackcap do the same. The measurable reading uses the modern species named in this claim's scope. A shared accepted name would support one-bird identity. Two accepted species that occur in Europe in the same months cannot be seasonal plumages of one bird. Plumage photographs and genomes are not in this test. The ancient-name mapping is the scope's mapping and is an assumption of the test.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before any species/match or occurrence query. https://api.gbif.org/v1/ and https://api.gbif.org/v1/species/match returned HTTP 200 on HEAD. No taxon key, occurrence count, or month total was read."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  }
+}

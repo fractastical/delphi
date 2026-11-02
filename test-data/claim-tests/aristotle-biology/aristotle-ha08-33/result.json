@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha08-33",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-33",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If rabies is fatal to every bitten animal except man, then public surveillance records no human death from rabies.",
+  "pass_criterion": "Pre-registered. Primary series: WHO GHO indicator NTD_RAB2 via https://apps.who.int/gho/athena/api/GHO/NTD_RAB2.json?profile=simple . Keep country-year rows and drop aggregates whose geography code is GLOBAL, AFR, AMR, EMR, EUR, SEAR, or WPR, or whose spatial dimension type is REGION. A positive country-year has a numeric death count of at least 1. Concordance series: the Our World in Data CSV of the same chart, rows whose country code matches three letters, with the same positive rule; blank codes and the entity World are aggregates and are dropped. Refutes if WHO has at least one positive country-year and OWID, if it parses, also has at least one. If OWID does not parse, the verdict still follows WHO and the failed check is recorded in caveats. If WHO has at least one positive country-year and OWID parses to zero positive country-years, the verdict is mixed. Supports is not available from a run of zeros: if WHO returns at least 50 country-year rows and every numeric value is 0, the verdict is inconclusive with reason 'underpowered', because absent reports do not show that man cannot die of rabies. Inconclusive with reason 'data-unavailable' if the WHO file cannot be fetched or no country-year numeric values can be identified. Animal fatality and canine fatality are not scored. Confidence: 0.88 if refutes and WHO positive country-years are at least 10; 0.70 if refutes and that count is 1 to 9; 0.40 if mixed.",
+  "fail_criterion": "Pre-registered. The exception for man is false, and so the claim as stated is refuted, when WHO country reports contain at least one human rabies death and the OWID concordance file does not contradict that by parsing to all zeros. Zeros across the WHO series do not support the exception.",
+  "planned_datasets": [
+    "who-gho-ntd-rab2",
+    "owid-reported-rabies-deaths"
+  ],
+  "test_contract": {
+    "expected_observation": "No country-year in the WHO reported-human-rabies-deaths series has a count of at least 1. That observation is not treated as support.",
+    "disconfirming_observation": "At least one country-year reports one or more human deaths from rabies, and the OWID extract of the same indicator agrees that at least one such country-year exists.",
+    "admissible_datasets": "Official reported counts of human deaths attributed to rabies, by country and year, from a public health agency, plus one public re-publication of that indicator used only as a concordance check. Post-exposure prophylaxis is not a reason to drop a recorded death. Animal-outbreak files are not required for this clause and are not added after the human series is seen.",
+    "inference_method": "Count country-years with a numeric value of at least 1, after dropping pre-listed regional aggregates. One such year refutes the exception for man. A series of zeros is underpowered, not a pass. The OWID file can only move a WHO refute to mixed if it parses and contains no positive country-year."
+  },
+  "interpretation": "The sentence says the disease is fatal to the dog and to any animal the dog bites, man excepted. Assessors disagreed on whether 'any animal whatever' is covered by surveillance. The measurable reading tested here is the exception for man: a recorded human death from rabies makes that exception false, and a conjunction with a false clause is false. Fatality in dogs and in every other bitten species is not measured. Modern prophylaxis can prevent some deaths; a death that is nevertheless recorded is still a death. The test does not estimate the untreated case-fatality ratio.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before either series was downloaded. HEAD of the WHO athena URL returned HTTP 200. HEAD of the OWID CSV returned HTTP 200 and content-length 30829. The GHO OData host https://ghoapi.azureedge.net/api/Indicator returned HTTP 500, so it is not the planned source. No death count was read. The indicator definition page states that figures are deaths reported by national authorities and may be laboratory-confirmed only or clinically diagnosed as well."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  }
+}
