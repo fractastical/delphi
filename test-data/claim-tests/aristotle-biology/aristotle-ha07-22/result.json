@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha07-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:25:00Z",
+  "hypothesis": "Among women who are still breastfeeding their last child, not currently pregnant, and not using the pill or an injectable contraceptive, most are still amenorrheic, while a visible minority have already resumed menstruation.",
+  "pass_criterion": "Pre-registered (supports). In the pooled eligible sample defined below, the weighted proportion still amenorrheic is at least 0.60, the weighted proportion whose amenorrhea has ended is at least 0.05, and the eligible sample has at least 200 women. Survey weights are used as specified in inference_method.",
+  "fail_criterion": "Pre-registered (refutes). The same weighted proportion still amenorrheic is at most 0.50. If that proportion is greater than 0.50 and less than 0.60, or is at least 0.60 but the proportion whose amenorrhea has ended is under 0.05, or at least three surveys each with 100 or more eligible women disagree (at least one survey at or above 0.60 and at least one at or below 0.50), the verdict is mixed. If no survey can be read, the verdict is inconclusive with reason data-unavailable. If surveys can be read but fewer than 200 women are eligible, or a coding check below fails for every survey, the verdict is inconclusive with reason underpowered or other as specified.",
+  "planned_datasets": [
+    "wfs-standard-recode-public-use"
+  ],
+  "interpretation": "Aristotle's general rule is read as a statement about women who are producing milk, not about all postpartum women and not about the contraceptive failure rate. 'A flow of milk' is self-reported current breastfeeding of the last child. 'Menstrual purgations do not take place' is an open amenorrhea interval. The quoted exception, that discharge has been known to occur during suckling, is a requirement that resumed menstruation be observed, not a nuisance. The clause that moisture is not directed in several directions at once is a proposed mechanism and is not measured. Pregnancy and hormonal contraceptives also stop menstruation, so those women are removed rather than counted as support for the lactation rule. Months are the survey's own month codes.",
+  "test_contract": {
+    "expected_observation": "In public fertility-survey microdata, the weighted share of currently breastfeeding, non-pregnant, non-hormonally-contracepting women who are still amenorrheic is at least 0.60, and at least 0.05 have a closed amenorrhea interval.",
+    "disconfirming_observation": "That same weighted share still amenorrheic is 0.50 or lower, so menstruation during ongoing breastfeeding is at least as common as amenorrhea.",
+    "admissible_datasets": "Public-use individual microdata, not a registration wall, in which the same woman has a current-breastfeeding indicator and an amenorrhea measure that separates 'still amenorrheic' from a completed duration and from not-stated. The World Fertility Survey standard recode files distributed for public use at wfs.dhsprogram.com meet this. Aggregates that do not identify breastfeeding and menstrual status on the same woman do not. The codebook may be read before the data file; the data file may not.",
+    "inference_method": "Eligible woman: still breastfeeding the last child (F117 = 1), not currently pregnant (V206 = 0), current method not pill or injection (V635 not in {1, 11}), and amenorrhea in the open pregnancy interval (F122) equal to 96 (still amenorrheic) or to an integer from 0 through 41 inclusive (completed months; the interval has closed). Codes 87, 88 and 99 on F122, and any other value, are not eligible. Within each survey, the proportion still amenorrheic uses the sample weight V006/1000, dropping non-positive weights. Each survey's weights are then rescaled to sum to its number of eligible women, and the surveys are pooled, so each eligible woman counts once after her own survey's design weight. Thresholds are those in pass_criterion and fail_criterion. A survey is used only if its original WFS dictionary (.dct, not the ISSA .dic) defines these variables with the Kenya SR02 labels: F117 value 1 = Yes and 0 = No, na, ns; F122 value 96 = Still amenorrheic, with minimum 0, maximum 41, and 87/88/99 as no data, not applicable and not stated; V206 value 0 = not pregnant and 1 = yes; V635 value 1 = pill and 11 = injection; V006 = sample weight per 1000. F121 is the back-reference of F117 (1 = yes, still amenorrheic). A survey is dropped if its logical record length does not divide the file, the parsed record count differs from the dictionary %FILE count, more than 1 percent of non-missing ages (V010) fall outside 15–50, more than 5 percent of rows that pass the F117/V206/V635 filters have an F122 value outside {0..41, 96, 87, 88, 99}, or concordance of F122 with F121 on eligible rows is under 95 percent (F122 = 96 must have F121 = 1, and F122 in 0..41 must have F121 = 0). Positions and labels are taken from each dictionary at run time. Full breastfeeding, where a dictionary defines it, is reported and does not enter the verdict."
+  },
+  "caveats": [
+    "Only the Kenya 1977–78 dictionary was opened before this registration. No standard-recode data file, marginals file, or amenorrhea frequency was read. Other surveys are included only if their dictionaries match the labels above.",
+    "Current breastfeeding includes partial breastfeeding. The survey does not measure milk volume.",
+    "The World Fertility Survey samples are national samples from the late 1970s and early 1980s, not a draw from all lactating women."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-3f12",
+    "date": "2026-11-01"
+  }
+}
