@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-35",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-35",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:39:39Z",
   "created": "2026-11-01",
   "hypothesis": "If every animal that can move about has the sexes in separate individuals, then fishes, which locomote, will not be coded as protandrous, protogynous, truly hermaphroditic, or parthenogenetic.",
@@ -35,5 +35,143 @@
     "model": "grok-4.7-high-fast",
     "run": "cursor/aristotle-biology-tests-a821",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "datasets": [
+    {
+      "id": "fishbase-reproduc-v26.06",
+      "name": "FishBase reproduction table, parquet snapshot fb/v26.06",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v26.06",
+      "license": "CC-BY-NC (FishBase.org Team, as stated on the Source Cooperative dataset card)",
+      "files": [
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "final_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:56:54Z",
+          "byte_size": 381404,
+          "sha256": "b631704f0f4972acdb2edb5d3105f0a6172adb4c473d73e505113f8288418247"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "final_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:56:55Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101",
+          "role_note": "Joined for binomials of example species only. Not used in the count and not committed (over 1 MB)."
+        }
+      ],
+      "role": "reproductive mode of fishes, counted as distinct SpecCode"
+    }
+  ],
+  "measured": {
+    "value": 522,
+    "unit": "fish species with a non-separate reproductive mode",
+    "n": 14299,
+    "uncertainty": null,
+    "extra": {
+      "separate_species": 13777,
+      "other_species": 0,
+      "nonblank_mode_values": 14299,
+      "documented_vocabulary_fraction": 1.0,
+      "other_species_fraction": 0.0,
+      "mode_value_counts": {
+        "dioecism": 13777,
+        "protogyny": 394,
+        "protandry": 69,
+        "true hermaphroditism": 57,
+        "parthenogenesis": 2
+      },
+      "nonseparate_mode_row_counts": {
+        "protogyny": 394,
+        "true hermaphroditism": 57,
+        "protandry": 69,
+        "parthenogenesis": 2
+      },
+      "example_nonseparate_species": [
+        {
+          "spec_code": "12",
+          "name": "Cephalopholis cruentata"
+        },
+        {
+          "spec_code": "14",
+          "name": "Epinephelus adscensionis"
+        },
+        {
+          "spec_code": "15",
+          "name": "Epinephelus guttatus"
+        },
+        {
+          "spec_code": "16",
+          "name": "Epinephelus itajara"
+        },
+        {
+          "spec_code": "17",
+          "name": "Epinephelus morio"
+        },
+        {
+          "spec_code": "58",
+          "name": "Coris julis"
+        },
+        {
+          "spec_code": "59",
+          "name": "Symphodus melops"
+        },
+        {
+          "spec_code": "99",
+          "name": "Alepisaurus ferox"
+        },
+        {
+          "spec_code": "203",
+          "name": "Boops boops"
+        },
+        {
+          "spec_code": "204",
+          "name": "Sarpa salpa"
+        },
+        {
+          "spec_code": "340",
+          "name": "Eleutheronema tetradactylum"
+        },
+        {
+          "spec_code": "341",
+          "name": "Galeoides decadactylus"
+        },
+        {
+          "spec_code": "345",
+          "name": "Centropomus undecimalis"
+        },
+        {
+          "spec_code": "346",
+          "name": "Lates calcarifer"
+        },
+        {
+          "spec_code": "348",
+          "name": "Epinephelus analogus"
+        }
+      ],
+      "mode_column": "ReproMode",
+      "spec_column": "SpecCode",
+      "species_names_joined": true,
+      "species_table_error": null
+    }
+  },
+  "method": "Downloaded the pinned FishBase v26.06 reproduc parquet, hashed it, and classified each SpecCode from its Mode strings using the pre-registered substring rules. Distinct species, not rows, were counted. The species parquet was joined only to name examples and was not used in the verdict. The decision rule in fail_criterion was applied unchanged.",
+  "results_summary": [
+    "Classified species (separate or non-separate): 14299. Non-separate: 522. Separate: 13777. Other: 0.",
+    "Non-blank mode values in the documented five-word vocabulary: 14299 of 14299 (1.0000).",
+    "Mode value counts: dioecism=13777, protogyny=394, protandry=69, true hermaphroditism=57, parthenogenesis=2."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "change": "column name only",
+      "note": "The snapshot has no column named Mode. The pre-registered fallback (a name containing mode and not model) selected ReproMode. Thresholds were not changed."
+    }
+  ]
 }

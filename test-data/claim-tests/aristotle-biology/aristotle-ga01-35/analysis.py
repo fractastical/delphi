@@ -305,6 +305,19 @@ def main() -> None:
             f"Non-blank mode values in the documented five-word vocabulary: {documented_n} of {nonblank_values} ({vocab_fraction:.4f}).",
             "Mode value counts: " + ", ".join(f"{k}={v}" for k, v in sorted(value_counts.items(), key=lambda kv: (-kv[1], kv[0]))[:12]) + ".",
         ]
+        deviations = []
+        if mode_col != "Mode":
+            deviations.append(
+                {
+                    "date": "2026-11-01",
+                    "change": "column name only",
+                    "note": (
+                        f"The snapshot has no column named Mode. The pre-registered fallback "
+                        f"(a name containing mode and not model) selected {mode_col}. "
+                        "Thresholds were not changed."
+                    ),
+                }
+            )
         finish(
             result,
             locked,
@@ -317,7 +330,7 @@ def main() -> None:
             measured=measured,
             summary=summary,
             extra=None,
-            deviations=[],
+            deviations=deviations,
         )
 
 

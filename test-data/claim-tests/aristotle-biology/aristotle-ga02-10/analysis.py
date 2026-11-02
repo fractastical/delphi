@@ -239,6 +239,27 @@ def main() -> None:
                     "items": count,
                 }
             )
+        known = [m for m in matched if m["stage_name"].strip().lower() != "unknown"]
+        known_stages = {}
+        for m in known:
+            known_stages[m["stage_id"]] = known_stages.get(m["stage_id"], 0) + 1
+        if known:
+            known_begins = [m["begin"] for m in known]
+            known_span = max(known_begins) - min(known_begins)
+            known_modal_id, known_modal_n = max(known_stages.items(), key=lambda kv: (kv[1], kv[0]))
+            excluding_unknown = {
+                "items": len(known),
+                "distinct_start_stages": len(known_stages),
+                "span_hours": round(known_span, 4),
+                "earliest_begin_hours": min(known_begins),
+                "latest_begin_hours": max(known_begins),
+                "modal_stage_name": by_id[known_modal_id]["name"],
+                "modal_begin_hours": by_id[known_modal_id]["begin"],
+                "modal_fraction": round(known_modal_n / len(known), 6),
+                "used_for_verdict": False,
+            }
+        else:
+            excluding_unknown = {"items": 0, "used_for_verdict": False}
         measured = {
             "value": round(span, 4),
             "unit": "hours between earliest and latest anatomy start stage",
@@ -258,11 +279,17 @@ def main() -> None:
                 "anatomy_rows_parsed": len(items),
                 "stage_rows_parsed": len(stages),
                 "stage_histogram": histogram,
+                "excluding_unknown_stage": excluding_unknown,
             },
         }
         summary = [
             f"Matched anatomical items: {len(matched)} of {len(items)} parsed. Distinct start stages: {distinct}. Begin-hour span: {span:.4f} (from {min(begins)} to {max(begins)}).",
             f"Modal start stage: {by_id[modal_id]['name']} at {modal_begin} h, fraction {modal_fraction:.4f}. Items with begin hours <= 1: {early_n}.",
+            (
+                "Excluding the stage named Unknown, which is not used for the verdict: "
+                f"{excluding_unknown.get('items')} items, {excluding_unknown.get('distinct_start_stages')} stages, "
+                f"span {excluding_unknown.get('span_hours')} hours."
+            ),
         ]
         conclude(result, locked, original_caveats, anatomy_meta, stage_meta, verdict, reason, confidence, measured, summary)
 
@@ -313,9 +340,16 @@ def conclude(result, locked, original_caveats, anatomy_meta, stage_meta, verdict
         "No expression file was used."
     )
     result["results_summary"] = summary
-    result["caveats"] = original_caveats + [
+    extra_caveats = [
         "No SPDX licence is stated on https://zfin.org/downloads. The files are public daily reports."
     ]
+    modal_name = ((measured.get("extra") or {}).get("modal_stage_name") or "")
+    if modal_name.strip().lower() == "unknown":
+        extra_caveats.append(
+            "The modal start stage is named Unknown. Those rows have no curated onset, and the stage series places Unknown at 0 hours. "
+            "The verdict follows the pre-registered rule on the full set. The same span and stage count with Unknown removed are reported in measured.extra.excluding_unknown_stage and do not set the verdict."
+        )
+    result["caveats"] = original_caveats + extra_caveats
     for key, value in locked.items():
         if result.get(key) != value:
             sys.exit(f"locked field changed: {key}")
