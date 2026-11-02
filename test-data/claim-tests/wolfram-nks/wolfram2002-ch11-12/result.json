@@ -2,7 +2,7 @@
   "claim_id": "wolfram2002-ch11-12",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-12",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "A Turing machine, a register machine and a sequential substitution system can each emulate every elementary cellular automaton on every short periodic configuration, and one six-color cellular automaton can emulate a specified Turing machine, so these structurally different systems produce the same computed configurations.",
   "pass_criterion": "Pre-registered. Forward direction. Periodic elementary cellular automata, Wolfram rules 0..255, width W = 5, every one of the 32 initial rows, evolution for T = 3 steps. Three emulators must match the cellular automaton cell for cell at every step. (1) Sequential substitution system. Symbols are the bits plus an end marker E and markers M_{p,f} with p,f in {0,1}. Initial string is M_{c4, c0} followed by c0 c1 c2 c3 c4 E. Leftmost sequential rules: M_{p,f} c r -> new(p,c,r) M_{c,f} r whenever r is a bit, and M_{p,f} c E -> new(p,c,f) Mdone E, where new(L,C,R) is the elementary rule on that neighborhood. After 5 substitutions the bit prefix must equal one periodic step; repeat from the new row for 3 steps. (2) Turing machine with the same finite control: symbols {0,1,E}, states M_{p,f} plus Halt. Head starts on c0. In state M_{p,f}, read c; if the next symbol is a bit r, write new(p,c,r), enter M_{c,f}, and leave the head on r; if the next symbol is E, write new(p,c,f) and halt. (3) Register machine with instructions INC, DEC, JZ and HALT only. Registers hold the packed row and the rule number. The program, compiled into those instructions, extracts the periodic bits (i-1, i, i+1) mod 5 for i = 0..4, writes rule bit 4*L+2*C+R into an output register, and replaces the row. It does this for 3 steps. Reverse direction. Turing machine 'flip-zeros': symbols {0,1}, states {Q, H}, tape a ring of length 6. Transitions: (Q,0) writes 1 and moves right staying in Q; (Q,1) writes 1 and stays in H; (H,0) and (H,1) stay, writing the same symbol. Six-color radius-1 periodic cellular automaton with colors 0,1 = tape symbols without a head, 2,3 = head Q on symbol 0,1, and 4,5 = head H on symbol 0,1. Local rule, applied to every neighborhood: center 2 becomes 1; center 3 becomes 5; center 0 or 1 whose left neighbor is 2 becomes 2 or 3 respectively; every other center stays. Every one of the 64 tapes, head starting in Q at every one of the 6 positions, for 6 successive steps, must match the Turing machine. SUPPORTS if forward_mismatched_cells == 0 and reverse_mismatched_steps == 0. Confidence if supports: 0.86.",
   "fail_criterion": "Pre-registered. REFUTES if forward_mismatched_cells > 0 (the Turing machine, the register machine or the substitution system disagrees with the elementary cellular automaton on any rule, seed or step in the box). MIXED if forward_mismatched_cells == 0 and reverse_mismatched_steps > 0 (the other systems emulate every elementary rule in the box, and the cellular automaton fails to emulate the specified Turing machine). INCONCLUSIVE with reason 'other' if a simulator fails to halt within the pre-registered step budget: 100 substitution or Turing steps per cellular-automaton step, and 100000 register instructions per cellular-automaton step. Confidence: mixed 0.70, refutes 0.88, inconclusive 0.45.",
@@ -21,5 +21,48 @@
     "model": "Grok 4.7",
     "run": "cursor/wolfram-claim-tests-7ca2",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "computational",
+  "verdict": "supports",
+  "confidence": 0.86,
+  "measured": {
+    "value": 0,
+    "unit": "cell or step disagreements between emulators",
+    "n": 122880,
+    "uncertainty": "exact",
+    "extra": {
+      "forward_mismatched_cells": 0,
+      "mismatched_by_emulator": {
+        "substitution": 0,
+        "turing": 0,
+        "register": 0
+      },
+      "reverse_mismatched_steps": 0,
+      "register_budget_hits": 0,
+      "register_max_instructions_executed": 29891,
+      "register_program_length": 1122,
+      "rules": 256,
+      "width": 5,
+      "steps": 3
+    }
+  },
+  "method": "analysis.py evolves every elementary rule on every periodic row of width 5 for 3 steps, and evolves the same rows with a sequential substitution system and a Turing machine that carry the original first bit in their finite control, and with one register-machine program of INC, DEC and JZ instructions that extracts periodic bits and writes the rule bit. In the other direction a six-color radius-1 cellular automaton is compared with the flip-zeros Turing machine on every tape of length 6, every head position and 6 steps. Criteria were frozen in commit 093ca8002a77b774b469b965ff599d123fdaefbb before this run.",
+  "datasets": [
+    {
+      "id": "cross-system-emulation-eca",
+      "name": "Elementary rules 0..255 emulated by a Turing machine, a register machine and a sequential substitution system, plus one six-color cellular automaton emulating flip-zeros, generated by analysis.py",
+      "landing_url": "https://www.wolframscience.com/nks/p674--implications-of-universality/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "periodic elementary cellular automata, Wolfram rules 0..255, width 5, 3 steps; 2-symbol-plus-endmarker Turing machine and sequential substitution system with marker state M_(p,f); register machine with INC, DEC, JZ, HALT; reverse: 6-color radius-1 cellular automaton and the flip-zeros Turing machine, ring length 6, 6 steps",
+      "files": [],
+      "role": "the programs whose configurations are compared cell by cell"
+    }
+  ],
+  "caveats": [
+    "The computation shows that these particular programs produce the same configurations on the pre-registered boxes. It does not show that organisms follow the claim, and it does not show that every rule of every kind is universal.",
+    "The forward emulators are general elementary-rule interpreters: the same substitution rules, Turing control and register program run every Wolfram number from 0 through 255. The reverse direction is one Turing machine, not every Turing machine."
+  ]
 }

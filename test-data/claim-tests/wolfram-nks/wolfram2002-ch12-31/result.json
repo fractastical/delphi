@@ -2,14 +2,14 @@
   "claim_id": "wolfram2002-ch12-31",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-31",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "On every length-non-decreasing multiway system in the stated family, if the reachable strings of a given length are both complete and consistent under complement negation, then scanning the evolution in discovery order until a queried string or its complement appears always terminates and the string found is the only one of the pair that is ever reached; systems for which that scan fails to halt, or for which both a string and its complement appear, are not both complete and consistent.",
   "pass_criterion": "Pre-registered. Alphabet {0,1}. Start string '1'. Negation is bitwise complement (the verdict uses this negation). A multiway system is a set of 0, 1 or 2 rules lhs -> rhs with lhs, rhs nonempty words, |lhs| in {1,2}, |rhs| in {|lhs|, |lhs|+1}, and lhs != rhs. Rules apply at every match site, left to right, and the reachable set of strings of length <= 6 is the exact BFS closure (length-non-decreasing, so no path to a short string goes through a longer one). Discovery order is the order strings are first inserted, with rules tried in lexicographic order of (lhs, rhs) and match sites left to right. At each length n = 1..6, S is the reachable strings of length n and U is all 2^n strings. Complete: for every s in U, s is in S or complement(s) is in S. Consistent: for no s in U are both in S. The procedure scans discovery order until it meets s or complement(s). It terminates with a safe exclusive answer when exactly one of the pair is in the closure and that one is the string met. An independent DFS closure must equal the BFS closure on every system. SUPPORTS if all of: (i) dfs_bfs_disagreements == 0; (ii) cc_procedure_failures == 0, where a failure is a (system, n) that is complete and consistent but some s in U does not get a safe exclusive answer; (iii) n_complete_and_consistent >= 1; (iv) n_incomplete >= 1; (v) n_inconsistent >= 1; (vi) n_inconsistent_unsafe >= 1, where unsafe means some pair both appear and the later one appears strictly after the first in discovery order, so stopping at the first does not license the conclusion that the other is never reached. Confidence if supports: 0.92.",
   "fail_criterion": "Pre-registered. REFUTES if cc_procedure_failures > 0 (a complete consistent system for which the book's procedure misses a string or meets both members of a pair). MIXED if dfs_bfs_disagreements == 0 and cc_procedure_failures == 0 but at least one of the witness counts (iii), (iv), (v), (vi) is zero, so the implication holds only vacuously or the inconsistent case never shows an unsafe early stop. INCONCLUSIVE with reason 'other' if dfs_bfs_disagreements > 0. Reversal negation (an involution with palindromic fixed points) is computed and reported for the same systems and lengths but is not a verdict gate: a fixed point is both a string and its negation, so completeness and consistency cannot hold together on any length that contains a palindrome, and that degeneracy is not the book's negation. A reversal case that is somehow complete and consistent and still fails the procedure would REFUTE. Confidence: mixed 0.70, refutes 0.88, inconclusive 0.40.",
   "planned_datasets": [
     "multiway-01-length-nondecreasing-closure"
   ],
-  "interpretation": "Wolfram's statement (NKS p. 783) is the conditional: if questions about whether a string is ever reached are undecidable, the multiway system cannot be both complete and consistent, because completeness plus consistency is itself a terminating procedure — run the system until the string or its negation appears; completeness guarantees one appears, and consistency guarantees the other never does. This test enumerates that procedure on every small length-non-decreasing multiway system whose reachable set up to length 6 is finite and exact. It does not and cannot exhibit algorithmic undecidability inside a finite closure; the finite shadow of an undecided question is a string for which the scan exhausts the closure without meeting the string or its complement, which is incompleteness. Complement is a fixed-point-free involution, so a string and its negation are always distinct, matching the book's figure in which a string and its negation are different objects.",
+  "interpretation": "Wolfram's statement (NKS p. 783) is the conditional: if questions about whether a string is ever reached are undecidable, the multiway system cannot be both complete and consistent, because completeness plus consistency is itself a terminating procedure \u2014 run the system until the string or its negation appears; completeness guarantees one appears, and consistency guarantees the other never does. This test enumerates that procedure on every small length-non-decreasing multiway system whose reachable set up to length 6 is finite and exact. It does not and cannot exhibit algorithmic undecidability inside a finite closure; the finite shadow of an undecided question is a string for which the scan exhausts the closure without meeting the string or its complement, which is incompleteness. Complement is a fixed-point-free involution, so a string and its negation are always distinct, matching the book's figure in which a string and its negation are different objects.",
   "test_contract": {
     "expected_observation": "Zero complete-and-consistent (system, length) cases in which the discovery-order scan fails to decide a string safely, together with at least one complete-and-consistent case, one incomplete case, and one inconsistent case in which both a string and its complement appear with the second strictly later in discovery order.",
     "disconfirming_observation": "Any length-non-decreasing system in the family that is complete and consistent under complement at some length n <= 6 and yet has a binary string of that length for which the scan does not terminate on exactly one of the string and its complement.",
@@ -21,5 +21,270 @@
     "model": "Grok 4.7",
     "run": "cursor/wolfram-claim-tests-7ca2",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "computational",
+  "verdict": "supports",
+  "confidence": 0.92,
+  "measured": {
+    "value": 0,
+    "unit": "complete-and-consistent (system, length) cases whose discovery-order scan is not a safe exclusive decision",
+    "n": 8916,
+    "uncertainty": "exact",
+    "extra": {
+      "n_rules": 54,
+      "n_systems": 1486,
+      "lengths": "1..6",
+      "dfs_bfs_disagreements": 0,
+      "complement": {
+        "failures": 0,
+        "n_cc": 1498,
+        "n_incomplete": 7349,
+        "n_inconsistent": 88,
+        "n_unsafe": 88
+      },
+      "reversal": {
+        "failures": 0,
+        "n_cc": 0,
+        "n_incomplete": 8847,
+        "n_inconsistent": 2044,
+        "n_unsafe": 153
+      },
+      "complement_by_length": {
+        "1": {
+          "cc": 1432,
+          "incomplete": 0,
+          "inconsistent": 54,
+          "unsafe": 54
+        },
+        "2": {
+          "cc": 18,
+          "incomplete": 1465,
+          "inconsistent": 9,
+          "unsafe": 9
+        },
+        "3": {
+          "cc": 12,
+          "incomplete": 1471,
+          "inconsistent": 6,
+          "unsafe": 6
+        },
+        "4": {
+          "cc": 12,
+          "incomplete": 1471,
+          "inconsistent": 8,
+          "unsafe": 8
+        },
+        "5": {
+          "cc": 12,
+          "incomplete": 1471,
+          "inconsistent": 3,
+          "unsafe": 3
+        },
+        "6": {
+          "cc": 12,
+          "incomplete": 1471,
+          "inconsistent": 8,
+          "unsafe": 8
+        }
+      },
+      "complement_examples": {
+        "cc": [
+          {
+            "rules": [],
+            "length": 1,
+            "generated": [
+              "1"
+            ]
+          },
+          {
+            "rules": [
+              "0->00"
+            ],
+            "length": 1,
+            "generated": [
+              "1"
+            ]
+          },
+          {
+            "rules": [
+              "0->01"
+            ],
+            "length": 1,
+            "generated": [
+              "1"
+            ]
+          }
+        ],
+        "incomplete": [
+          {
+            "rules": [],
+            "length": 2,
+            "generated_count": 0
+          },
+          {
+            "rules": [],
+            "length": 3,
+            "generated_count": 0
+          },
+          {
+            "rules": [
+              "0->00"
+            ],
+            "length": 2,
+            "generated_count": 0
+          }
+        ],
+        "inconsistent_unsafe": [
+          {
+            "rules": [
+              "1->0"
+            ],
+            "first": "1",
+            "later": "0",
+            "length": 1
+          },
+          {
+            "rules": [
+              "0->00",
+              "1->0"
+            ],
+            "first": "1",
+            "later": "0",
+            "length": 1
+          },
+          {
+            "rules": [
+              "0->01",
+              "1->0"
+            ],
+            "first": "1",
+            "later": "0",
+            "length": 1
+          }
+        ]
+      },
+      "reversal_cc_failure_examples": [],
+      "named_systems": {
+        "(no rules)": {
+          "reachable": [
+            "1"
+          ],
+          "complement": [
+            {
+              "length": 1,
+              "complete": true,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 1
+            },
+            {
+              "length": 2,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 3,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 4,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 5,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 6,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            }
+          ]
+        },
+        "1->0": {
+          "reachable": [
+            "1",
+            "0"
+          ],
+          "complement": [
+            {
+              "length": 1,
+              "complete": true,
+              "consistent": false,
+              "unsafe": true,
+              "generated": 2
+            },
+            {
+              "length": 2,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 3,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 4,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 5,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            },
+            {
+              "length": 6,
+              "complete": false,
+              "consistent": true,
+              "unsafe": false,
+              "generated": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "method": "analysis.py enumerates every multiway system on {0,1} with 0, 1 or 2 length-non-decreasing rules (left side length 1 or 2, right side the same length or one symbol longer, left side different from the right side), started from the string 1. The reachable strings of length at most 6 are the exact breadth-first closure; a depth-first search must produce the same set. At each length from 1 to 6 the closure is scored complete and consistent under complement, and the scan in discovery order is required to meet exactly one of each queried string and its complement. Reversal is scored the same way and can only move the verdict to refutes. Criteria were frozen in commit 093ca8002a77b774b469b965ff599d123fdaefbb before this run.",
+  "datasets": [
+    {
+      "id": "multiway-01-length-nondecreasing-closure",
+      "name": "All 0-, 1- and 2-rule length-non-decreasing multiway systems on alphabet 01, closure through length 6, generated by analysis.py",
+      "landing_url": "https://www.wolframscience.com/nks/p783--implications-for-mathematics-and-its-foundations/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "multiway string substitution; alphabet 01; start 1; rules lhs->rhs with |lhs| in {1,2}, |rhs| in {|lhs|,|lhs|+1}, lhs != rhs; 0, 1 or 2 rules; matches applied left to right; BFS closure of strings of length <= 6; negation = bitwise complement (verdict) and reversal (reported)",
+      "files": [],
+      "role": "the finite multiway systems on which the completeness-consistency procedure is checked"
+    }
+  ],
+  "caveats": [
+    "The computation shows that the decision procedure in the claim holds as a mathematical fact about every system in this finite family. It does not show that organisms follow it.",
+    "A finite closure cannot be algorithmically undecidable. The finite counterpart of an unanswered reachability question is a string whose scan exhausts the closure without meeting the string or its complement, which is incompleteness, and that is what was counted.",
+    "Reversal was not a route to support: every length has a palindrome, which is a fixed point of reversal, so completeness and consistency cannot hold together. The book's negation pairs a string with a different string; complement does that."
+  ]
 }
