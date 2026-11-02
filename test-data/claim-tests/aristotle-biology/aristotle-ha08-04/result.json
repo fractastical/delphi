@@ -1,0 +1,368 @@
+{
+  "claim_id": "aristotle-ha08-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-04",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "For each named kind (sea turtle, crocodile, hippopotamus, Mediterranean monk seal as the seal, freshwater tortoise, and true frog), public trait tables record an aquatic or marine life, and public species accounts record lungs or periodic air-breathing plus breeding on land, shore, beach, bank, or ice rather than underwater birth or aquatic eggs.",
+  "pass_criterion": "Pre-registered. A named group passes only when all three clauses pass: L (lives in water), A (air-breathing proxy), and B (breeds on or near land). The claim is supported only when all six groups pass. Clause L is read from trait tables, not from the prose. Sea turtles are ReptTraits Testudines in genera Chelonia, Caretta, Eretmochelys, Lepidochelys, Natator, or Dermochelys; L passes if at least 80% of species with a habitat code are water-living and fails if that share is below 50%, with at least 4 coded species required. Crocodiles are ReptTraits family Crocodylidae (if fewer than 8 coded species, the pre-registered fallback is order Crocodylia); L passes at or above 80% water-living and fails below 50%, with at least 8 coded species. Freshwater tortoises are ReptTraits Testudines excluding those marine genera and excluding family Testudinidae; L passes if at least 50% are water-living and fails if the share is below 25%, with at least 30 coded species. Water-living for reptiles means the microhabitat string contains semi-aquatic or semiaquatic; if microhabitat is missing, a habitat-type string matching ocean, marine, wetland, swamp, mangrove, river, lake, freshwater, aquatic, marsh, stream, estuary, pond, bog, riparian, or coast counts, and a terrestrial-only microhabitat does not. Hippopotamus is the PHYLACINE 1.2.1 row whose binomial normalizes to Hippopotamus amphibius; L passes if Marine or Freshwater is 1 and fails if both are 0. Seals are PHYLACINE family Phocidae; L passes if at least 80% have Marine or Freshwater equal to 1 and fails below 50%, with at least 10 species, and the Monachus monachus row itself must be water-living when present. Frogs are AmphiBIO rows with Order Anura and Family Ranidae; L passes if at least 50% of rows with a habitat flag have Aqu present and fails below 25%, with at least 30 habitat-coded rows. Between the pass and fail cuts, a clause is mixed. Clause A is scored from Wikipedia plain text of the pre-registered pages (Sea turtle; Crocodile, fallback Crocodilia; Hippopotamus; Mediterranean monk seal, fallback Earless seal; Freshwater turtle, fallback Emys orbicularis; Frog), lead plus sections on biology, description, anatomy, physiology, respiration, reproduction, behaviour, ecology, and habitat, skipping taxonomy, evolution, culture, and references. A passes on lungs or breathing air or surfacing to breathe, after cancelling a hit preceded within six words by no, not, without, lack, or never. A fails on lungless, no lungs, without lungs, gills instead of lungs, or never surfaces, unless that sentence is hedged by few, some, exception, rarely, occasionally, a handful, or one or two species. Clause B uses the same pages. B passes when nesting, egg-laying, birth, or pupping is tied within the pre-registered window to land, beach, shore, sand, bank, soil, ground, or, for birth and pupping, ice or a haul-out. B fails on birth underwater or in the water, or on eggs laid in water; tadpole, aquatic larva, and larval stage count as B failures only for the frog page. The same negation and hedge rules apply. Frog B is taken from AmphiBIO when that table scores it: among Ranidae with Aqu present and a breeding flag, B fails if at least 70% are Lar without Dir, and passes if at least 70% are Dir without Lar, with at least 20 coded rows; Wikipedia does not override a pass or fail from AmphiBIO. A ReptTraits reproductive-mode value of oviparous does not score B. A group fails if any scored clause is fail; it passes only if L, A, and B are all pass; otherwise it is unscored.",
+  "fail_criterion": "Pre-registered. The claim is refuted when at least three of the six groups fail. One or two failing groups, with at least one group passing, is mixed. If a required data file cannot be downloaded or its checksum does not match the pin below, the verdict is inconclusive with reason data-unavailable. If the files load but fewer than four groups are pass or fail, or none fail and fewer than six pass, the verdict is inconclusive with reason underpowered. A mixed clause is not a fail and not a pass.",
+  "planned_datasets": [
+    "amphibio-v1-figshare-4644424",
+    "repttraits-v1-2-figshare-24572683",
+    "phylacine-1.2.1-trait-data",
+    "wikipedia-en-natural-history-extracts"
+  ],
+  "test_contract": {
+    "expected_observation": "Each of the six named kinds is recorded as water-living, as breathing air with lungs or by surfacing, and as nesting, laying, or giving birth out of the water.",
+    "disconfirming_observation": "At least three named kinds are recorded either as not water-living, or as gill-breathing or lungless without an exception hedge, or as giving birth or laying eggs in the water. For frogs, a free larval stage without direct development in at least 70% of aquatic ranids is a breeding-site failure.",
+    "admissible_datasets": "Open species-level trait tables that code habitat or breeding mode independently of Aristotle's text, plus the English Wikipedia articles named above at the revision retrieved by the script. Oviparity alone is not a breeding-site record. Assessor scores are not data.",
+    "inference_method": "Group-level proportions from the trait tables use the cuts in pass_criterion. Air-breathing and, except for ranid frogs, breeding site are sentence matches on the filtered Wikipedia text with the negation and hedge rules in pass_criterion. A group must pass L, A, and B. Support requires 6 passes; refutation requires at least 3 failures; 1 or 2 failures is mixed; otherwise inconclusive as in fail_criterion."
+  },
+  "interpretation": "The sentence under test is the list in History of Animals VIII.2: the sea-turtle, the crocodile, the hippopotamus, the seal, the fresh-water tortoise, and the frog choke or drown unless they breathe atmospheric air from time to time, breed and rear their young on dry land or near the land, and pass their lives in water. Sea turtles are the living cheloniid and dermochelyid genera. The crocodile is Crocodylidae, not alligators or gharials. The seal is scored for habitat as Phocidae and for air and breeding as the Mediterranean monk seal, the seal of Aristotle's sea. The fresh-water tortoise is non-marine Testudines outside the land-tortoise family Testudinidae. The frog is Ranidae, not every anuran. Clause A is an anatomical and behavioural proxy (lungs or surfacing), not a measured time to drowning. Clause B treats a free-swimming anuran larva as breeding in water; the words 'near the land' are not inferred from the larval flag, because AmphiBIO does not record shoreline versus open water. Ice and haul-out births count as out of the water. Direct development counts as the land-breeding pass for frogs. The material details of parental care beyond where the eggs or neonates are placed are not separated from that proxy.",
+  "caveats": [
+    "Criteria were fixed before any trait table or Wikipedia article body was downloaded or read. Figshare file names, byte sizes, and MD5 checksums, the PHYLACINE commit and git blob id, and Wikipedia page existence were checked as metadata only.",
+    "Assessor resolvability scores are not used as evidence and do not enter the verdict.",
+    "Having lungs, or a statement that the animal surfaces to breathe, is not a measurement of time to drowning. Cutaneous or cloacal gas exchange is not scored unless the text states that the kind is lungless or does not surface.",
+    "Oviparous in ReptTraits is not treated as a land nest. Mammal birth site is taken from the named Wikipedia articles because PHYLACINE codes life habit and not parturition site.",
+    "Descriptive counts that are not in the decision rule: the aquatic share of all Anura, the semi-aquatic share of Alligatoridae and Gavialidae, the marine or freshwater share of Otariidae when that family is present, and ReptTraits reproductive-mode tallies.",
+    "Crocodylidae fail clause L because 1 of 16 coded rows matched a water microhabitat token (proportion 0.0625). Microhabitat is filled for those rows, so the rule does not consult Habitat type. That column is wetlands for this family, and the repeated microhabitat string is not aquatic or marine. The fail is that coding, not a demonstration that crocodiles live on land.",
+    "The hippopotamus article says calves are born on land or in shallow water, and that the animal surfaces to breathe while asleep underwater. Fail patterns do not mention shallow water, so breeding passed. PHYLACINE flags this species marine, freshwater, and terrestrial; living in water passes on either water flag.",
+    "Mediterranean monk seal breeding is mixed. One sentence says females give birth on beaches or in underwater caves, so both a pass pattern and a fail pattern fire. The group stays unscored.",
+    "Frog air-breathing is mixed: the article describes lungs and also names Barbourula kalimantanensis as lungless. Breeding is the AmphiBIO result, 241 of 241 aquatic ranids with a breeding code are larval and none are direct developers (proportion 1.0). Wikipedia does not override that fail.",
+    "The title Freshwater turtle redirects to Turtle, so some matched nesting sentences are about sea turtles. The same article also says turtles lay their eggs on land.",
+    "Clause A is a text proxy for lungs or surfacing. It is not a measured time to drowning."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-ha08-04-pa02-29-1386",
+    "date": "2026-11-01"
+  },
+  "checksum_pins": {
+    "amphibio_zip_md5": "3d2c8f3371516209f190fc842f26e32b",
+    "repttraits_v12_xlsx_md5": "a00be695740e752db2654537bbb0814c",
+    "phylacine_commit": "f4ec385d302cacafe3a591f12f02df2585706119",
+    "phylacine_git_blob_sha1": "69431490dddb3f9f54fa6e64603858b591162f7b"
+  },
+  "verdict": "mixed",
+  "confidence": 0.65,
+  "data_kind": "biological",
+  "measured": {
+    "value": 3,
+    "unit": "named groups passing all three clauses",
+    "n": 5,
+    "uncertainty": null,
+    "extra": {
+      "pass_count": 3,
+      "fail_count": 2,
+      "unscored_count": 1,
+      "groups_with_all_three_clauses_scored": 4,
+      "confidence_formula": 0.65,
+      "frog_wikipedia_disagrees_with_amphibio": false,
+      "groups": {
+        "sea_turtle": {
+          "L": "pass",
+          "L_detail": {
+            "n_flag": 7,
+            "n": 7,
+            "proportion": 1.0,
+            "status": "pass"
+          },
+          "n_rows": 7,
+          "A": "pass",
+          "wiki_pages": [
+            "Sea turtle"
+          ],
+          "B": "pass",
+          "B_source": "wikipedia",
+          "group": "pass"
+        },
+        "freshwater_tortoise": {
+          "L": "pass",
+          "L_detail": {
+            "n_flag": 246,
+            "n": 289,
+            "proportion": 0.8512,
+            "status": "pass"
+          },
+          "n_rows": 307,
+          "A": "pass",
+          "wiki_pages": [
+            "Turtle"
+          ],
+          "B": "pass",
+          "B_source": "wikipedia",
+          "group": "pass"
+        },
+        "crocodile": {
+          "L": "fail",
+          "L_detail": {
+            "n_flag": 1,
+            "n": 16,
+            "proportion": 0.0625,
+            "status": "fail"
+          },
+          "n_rows": 18,
+          "used_order_fallback": false,
+          "A": "pass",
+          "wiki_pages": [
+            "Crocodile",
+            "Crocodylia"
+          ],
+          "B": "pass",
+          "B_source": "wikipedia",
+          "group": "fail"
+        },
+        "hippopotamus": {
+          "L": "pass",
+          "L_detail": {
+            "n": 1,
+            "marine": "present",
+            "freshwater": "present",
+            "terrestrial": "present"
+          },
+          "A": "pass",
+          "wiki_pages": [
+            "Hippopotamus"
+          ],
+          "B": "pass",
+          "B_source": "wikipedia",
+          "group": "pass"
+        },
+        "seal": {
+          "L": "pass",
+          "L_detail": {
+            "n_flag": 19,
+            "n": 19,
+            "proportion": 1.0,
+            "status": "pass"
+          },
+          "monachus_monachus": "present",
+          "A": "pass",
+          "wiki_pages": [
+            "Mediterranean monk seal",
+            "Earless seal"
+          ],
+          "B": "mixed",
+          "B_source": "wikipedia",
+          "group": "unscored"
+        },
+        "frog": {
+          "L": "pass",
+          "L_detail": {
+            "n_flag": 257,
+            "n": 304,
+            "proportion": 0.8454,
+            "status": "pass"
+          },
+          "n_rows": 347,
+          "B_amphibio": {
+            "status": "fail",
+            "n": 241,
+            "lar_without_dir": 241,
+            "dir_without_lar": 0,
+            "lar_without_dir_proportion": 1.0,
+            "dir_without_lar_proportion": 0.0
+          },
+          "A": "mixed",
+          "wiki_pages": [
+            "Frog"
+          ],
+          "B": "fail",
+          "B_source": "amphibio",
+          "group": "fail"
+        }
+      },
+      "descriptive": {
+        "reproductive_mode_sea_turtle": {
+          "oviparous": 7
+        },
+        "reproductive_mode_freshwater_tortoise": {
+          "oviparous": 307
+        },
+        "reproductive_mode_crocodile": {
+          "oviparous": 18
+        },
+        "alligatoridae": {
+          "n_flag": 0,
+          "n": 8,
+          "proportion": 0.0,
+          "status": "fail"
+        },
+        "gavialidae": {
+          "n_flag": 0,
+          "n": 1,
+          "proportion": 0.0,
+          "status": "fail"
+        },
+        "otariidae": {
+          "n_flag": 16,
+          "n": 16,
+          "proportion": 1.0,
+          "status": "descriptive"
+        },
+        "anura_aqu": {
+          "n_flag": 3287,
+          "n": 5527,
+          "proportion": 0.5947,
+          "status": "descriptive"
+        }
+      },
+      "problems": []
+    }
+  },
+  "results_summary": [
+    "sea_turtle: pass (L=pass, A=pass, B=pass, B_source=wikipedia)",
+    "crocodile: fail (L=fail, A=pass, B=pass, B_source=wikipedia)",
+    "hippopotamus: pass (L=pass, A=pass, B=pass, B_source=wikipedia)",
+    "seal: unscored (L=pass, A=pass, B=mixed, B_source=wikipedia)",
+    "freshwater_tortoise: pass (L=pass, A=pass, B=pass, B_source=wikipedia)",
+    "frog: fail (L=pass, A=mixed, B=fail, B_source=amphibio)",
+    "groups passing all three clauses: 3; failing: 2; unscored: 1"
+  ],
+  "method": "Downloaded the pinned AmphiBIO zip, ReptTraits v1.2 workbook, and PHYLACINE 1.2.1 trait table, checked the MD5 or git blob pin, and scored water-living from AmphiBIO Aqu, ReptTraits microhabitat, and PHYLACINE Marine/Freshwater using the pre-registered group definitions and cuts. Fetched the named English Wikipedia articles, kept the lead and natural-history sections, and applied the pre-registered sentence patterns for lungs or surfacing, including the gerund surfacing to breathe, and for where eggs or young are placed. A negation in the six words before a fail pattern cancels it. Microhabitat tokens aquatic and marine count as water-living together with semi-aquatic. Ranid breeding mode came from AmphiBIO Dir and Lar when that table met its sample floor. A group passes only if water-living, air-breathing, and breeding site all pass.",
+  "datasets": [
+    {
+      "id": "amphibio-v1-figshare-4644424",
+      "name": "AmphiBIO v1, amphibian ecological traits",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.4644424.v5",
+      "doi": "10.6084/m9.figshare.4644424.v5",
+      "version": "v5",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "AmphiBIO_v1.zip",
+          "download_url": "https://ndownloader.figshare.com/files/8828578",
+          "retrieved_at": "2026-11-02T00:29:46Z",
+          "byte_size": 1437220,
+          "sha256": "15185ffec078423ff7b99d1f16d4daa351a5a8861dd27e5574d05f9a58bc4626"
+        }
+      ],
+      "role": "Ranidae habitat (Aqu) and breeding strategy (Dir, Lar, Viv)"
+    },
+    {
+      "id": "repttraits-v1-2-figshare-24572683",
+      "name": "ReptTraits v1.2 ecological traits of reptiles",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.24572683.v4",
+      "doi": "10.6084/m9.figshare.24572683.v4",
+      "version": "v1.2 file on article v4",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "ReptTraits dataset v1-2.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/45408133",
+          "retrieved_at": "2026-11-02T00:29:48Z",
+          "byte_size": 18545434,
+          "sha256": "74eb6fd0e2626c75bdbeacb50a08b1762eee42e2b3cfda4a0f1134b84971718a"
+        }
+      ],
+      "role": "microhabitat of sea turtles, crocodylids, and non-marine non-testudinid turtles"
+    },
+    {
+      "id": "phylacine-1.2.1-trait-data",
+      "name": "PHYLACINE 1.2.1 mammal trait table",
+      "landing_url": "https://doi.org/10.5281/zenodo.3690867",
+      "doi": "10.5281/zenodo.3690867",
+      "version": "1.2.1",
+      "license": "No SPDX id on the GitHub repository; cite Faurby et al. 2018 (10.1002/ecy.2443) and the 1.2.1 Zenodo release",
+      "files": [
+        {
+          "name": "Trait_data.csv",
+          "download_url": "https://raw.githubusercontent.com/MegaPast2Future/PHYLACINE_1.2/f4ec385d302cacafe3a591f12f02df2585706119/Data/Traits/Trait_data.csv",
+          "retrieved_at": "2026-11-02T00:29:48Z",
+          "byte_size": 2700815,
+          "sha256": "ab035a8fab3d18673dea1d4a56f741e3ea9f8ba460461c7a1e738621ca315ec7"
+        }
+      ],
+      "role": "Marine and Freshwater flags for Hippopotamus amphibius and Phocidae"
+    },
+    {
+      "id": "wikipedia-en-natural-history-extracts",
+      "name": "English Wikipedia articles named in the pre-registration",
+      "landing_url": "https://en.wikipedia.org/wiki/Main_Page",
+      "doi": null,
+      "version": "revision ids on each file",
+      "license": "CC BY-SA 4.0",
+      "files": [
+        {
+          "name": "Sea turtle",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Sea+turtle&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:25Z",
+          "byte_size": 480088,
+          "sha256": "6a89b6a06e6332c5452c7853fae7ffdff60dcf268efa0a82ceeebbe43f4b828f",
+          "revid": 1382787414
+        },
+        {
+          "name": "Crocodile",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Crocodile&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:25Z",
+          "byte_size": 566631,
+          "sha256": "3c662dcbe50a1fb456339f81c5e3e5631f135acff15cd6cdd926e90dde17877c",
+          "revid": 1372417258
+        },
+        {
+          "name": "Crocodylia",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Crocodilia&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:26Z",
+          "byte_size": 641031,
+          "sha256": "e7d946b34d65acb05dadad274f81f3838a2d0fa68bf82f654d71f8a9518b68cf",
+          "revid": 1380955981
+        },
+        {
+          "name": "Hippopotamus",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Hippopotamus&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:27Z",
+          "byte_size": 451883,
+          "sha256": "20965d88a4e446e7c4b414656f09aa27d6d3fa0cee55cae79120ff534e2ecc44",
+          "revid": 1382059641
+        },
+        {
+          "name": "Mediterranean monk seal",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Mediterranean+monk+seal&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:28Z",
+          "byte_size": 372590,
+          "sha256": "9afc051295161e5f80b2a63c97653ce6b39629ffc525d990fd7d4d48195640ed",
+          "revid": 1371073251
+        },
+        {
+          "name": "Earless seal",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Earless+seal&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:29Z",
+          "byte_size": 320032,
+          "sha256": "042f023f438ac333b6e8444eba47b9439a9d0794815bf907b917b41a6d3fc2f8",
+          "revid": 1373661905
+        },
+        {
+          "name": "Turtle",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Freshwater+turtle&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:29Z",
+          "byte_size": 598575,
+          "sha256": "081914fc0f314f4183b8e4c927d1578022553dd99e6f0adb498483a39774d756",
+          "revid": 1375970473
+        },
+        {
+          "name": "Frog",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Frog&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:30Z",
+          "byte_size": 724587,
+          "sha256": "c18ad1d0153c863d10e9e1c56a164390dfb9a56103b644a20094a7f61a9f0b63",
+          "revid": 1381001026
+        }
+      ],
+      "role": "sentence-level proxy for lungs or surfacing and for where eggs or young are placed"
+    }
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Microhabitat tokens aquatic and marine count as water-living, together with semi-aquatic.",
+      "why": "The first scorer treated only the substring semi-aquatic as water-living when Microhabitat was filled, and used marine or aquatic words only in Habitat type when Microhabitat was blank. In ReptTraits all 7 sea turtles are Microhabitat Marine and the freshwater-tortoise pool is mostly Microhabitat Aquatic (the rerun scores 246 of 289 coded rows, proportion 0.8512). Scoring Marine as not water-living reversed the clause. The pass and fail cuts were not changed."
+    },
+    {
+      "date": "2026-11-01",
+      "what": "The air-breathing pattern matches the gerund 'surfacing to breathe', and a negation in the six words before a fail pattern cancels that fail.",
+      "why": "Both behaviours are already stated in pass_criterion. The first pattern matched only surface and surfaces, so the hippopotamus sentence was missed, and the turtle sentence 'do not lay eggs underwater' was counted as a water nest."
+    }
+  ]
+}
