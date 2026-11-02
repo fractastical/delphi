@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha05-17",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-17",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, among these four pigeons the wood pigeon (ring-dove) is largest, the stock dove next and only a little larger than the rock pigeon (common pigeon), and the turtle dove smallest.",
   "pass_criterion": "Supports if both body mass and wing length, as species means, are strictly ordered Columba palumbus > Columba oenas > Columba livia > Streptopelia turtur, and the mass ratio Columba oenas / Columba livia is greater than 1.01 and at most 1.25. 'A little larger' is that mass-ratio band. A comparison is a tie, not a strict difference, when the ratio of the two means is between 0.99 and 1.01 inclusive. Strictly larger means the ratio of the claimed-larger species to the other is greater than 1.01.",
   "fail_criterion": "Refutes if neither mass nor wing length has the order above, and at least one adjacent pair is reversed (ratio of claimed-larger to claimed-smaller below 0.99) in each of the two measurements. Mixed if the two measurements disagree, or if the only departures from the order are ties, or if the order holds in both measurements but the oenas/livia mass ratio is outside (1.01, 1.25]. Inconclusive, reason data-unavailable, if any of the four species lacks a Species1 row, a positive Mass, or a positive Wing.Length in the AVONET BirdLife sheet. Exact Species1 strings only: Columba palumbus, Columba oenas, Columba livia, Streptopelia turtur. No synonym is substituted after the file is opened.",
@@ -29,5 +29,66 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claim-tests-c47a",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "avonet-tobias2022-eledata-birdlife",
+      "name": "AVONET ELEData.zip, TraitData/AVONET1_BirdLife.csv species means",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "version": "figshare ELEData.zip; paper 10.1111/ele.13898",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/38429873/ELEData.zip?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIYCQYOYV5JSSROOA/20261102/eu-west-1/s3/aws4_request&X-Amz-Date=20261102T003106Z&X-Amz-Expires=10&X-Amz-SignedHeaders=host&X-Amz-Signature=0a957ef7f6b5d1c7cc59603fac1459f05ffbebc99307b08defe0362f40b7576c",
+          "retrieved_at": "2026-11-02T00:31:07Z",
+          "byte_size": 17758930,
+          "sha256": "e7e76dbe5c389753ff73a70d8a09b5fa01a15e75f359b34b01e2602b85e88f32"
+        }
+      ],
+      "role": "species-mean body mass and wing length of the four columbids"
+    }
+  ],
+  "method": "Downloaded the AVONET ELEData zip, read AVONET1_BirdLife.csv, and kept the four exact Species1 rows. Adjacent species were compared on mass and on wing length with a 1.01 ratio required for a strict difference. The stock dove counts as a little larger than the rock pigeon only when its mass ratio is above 1.01 and at most 1.25. Both measurements must show the full order, and the mass ratio must fall in that band, to support the claim.",
+  "measured": {
+    "value": 490.0,
+    "unit": "species-mean body mass of Columba palumbus, grams",
+    "n": 4,
+    "uncertainty": "AVONET species means; a pair is a tie when the ratio is within 1 percent",
+    "extra": {
+      "mass_order_state": "reversed",
+      "wing_order_state": "reversed",
+      "oenas_over_livia_mass": 0.821,
+      "little_larger_band": false,
+      "means": [
+        {
+          "species": "Columba palumbus",
+          "mass_g": 490.0,
+          "wing_mm": 246.4
+        },
+        {
+          "species": "Columba oenas",
+          "mass_g": 290.8,
+          "wing_mm": 214.8
+        },
+        {
+          "species": "Columba livia",
+          "mass_g": 354.2,
+          "wing_mm": 219.6
+        },
+        {
+          "species": "Streptopelia turtur",
+          "mass_g": 132.0,
+          "wing_mm": 170.7
+        }
+      ],
+      "missing": []
+    }
+  },
+  "results_summary": [
+    "The wood pigeon is heaviest (490.0 g) and the turtle dove lightest (132.0 g), but the stock dove (290.8 g, wing 214.8 mm) is smaller than the rock pigeon (354.2 g, wing 219.6 mm) on both measurements, so both reverse the claimed order."
+  ]
 }
