@@ -1,0 +1,231 @@
+{
+  "claim_id": "aristotle-ga04-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-15",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "Among walking mammals, flying birds and swimming fishes, species with larger adult body mass produce fewer young per litter, clutch or spawning bout.",
+  "pass_criterion": "Pre-registered. Within each of three groups, compute the Spearman rank correlation (two-sided) between adult body mass and offspring number, using only species with both values positive. A group passes if n >= 40, rho < -0.20 and p < 0.01. A group fails if n >= 40 and rho >= 0. A group is weak if n >= 40 and rho < 0 but rho >= -0.20 or p >= 0.01. A group is underpowered if n < 40. Walking uses terrestrial mammals (class Mammalia, excluding orders Chiroptera, Cetacea and Sirenia, and excluding the whale and sirenian families listed in the script). If Reptilia also has n >= 40, walking passes only if both mammals and reptiles pass, fails only if both fail, and is otherwise weak. Flying is class Aves. Swimming is fishes: species median of absolute fecundity against median body weight on the same FishBase fecundity record; if fewer than 40 species have a paired weight, the pre-registered fallback joins species-median absolute fecundity to FishBase species.Weight. The claim is supported only if walking, flying and swimming all pass. It is refuted if at least two groups fail. It is inconclusive with reason underpowered if fewer than two groups are measured (n >= 40). Every other pattern is mixed.",
+  "fail_criterion": "Pre-registered. Refutes if at least two of the three groups (walking, flying, swimming) have n >= 40 and Spearman rho >= 0. A single group with rho >= 0, or a negative but weak correlation, does not by itself refute the claim; that pattern is mixed.",
+  "planned_datasets": [
+    "amniote-life-history-database-2015",
+    "fishbase-v25.04-fecundity"
+  ],
+  "test_contract": {
+    "expected_observation": "Spearman rho between adult body mass and litter, clutch or absolute fecundity is negative and at least -0.20, with two-sided p < 0.01, separately in terrestrial mammals, birds and fishes, each with at least 40 species.",
+    "disconfirming_observation": "A non-negative rank correlation (rho >= 0) in at least two of those three groups: larger species would then not produce fewer young.",
+    "admissible_datasets": "Published species-level compilations of adult body mass and litter, clutch or absolute fecundity for mammals, birds and fishes, assembled independently of Aristotle's text, with missing values coded rather than imputed for this test. Relative fecundity (eggs per unit mass) is not admissible, because it already divides by size.",
+    "inference_method": "Spearman rank correlation, two-sided, on species medians. No phylogenetic regression and no outlier deletion. Group rules and the three-group decision are those in pass_criterion and fail_criterion. Reptiles, bats, whales and sirenians are reported and do not silently enter the terrestrial-mammal set."
+  },
+  "interpretation": "Walking animals are terrestrial mammals, with reptiles reported as a second walking class because the database separates them. Flying animals are birds, including flightless species (no flight trait is in the file). Swimming animals are fishes, and offspring number is absolute fecundity (eggs or embryos in a ripe female), not relative fecundity. The nutriment-allocation mechanism is not tested. Missing database values of -999 or non-positive numbers are treated as absent.",
+  "caveats": [
+    "Registration written before either data file was opened in this session. Column names were taken from the Ecological Archives E096-269 metadata and from the column names already used by an earlier test script in this repository. The archive page states that the compilers regressed litter size on body mass during quality control; that slope was not read and is not used.",
+    "Field names FecundityMin and BodyWeight were visible in vendored FishBase extracts for a few named species while searching the repository for a fecundity table. Those values were not used to choose the threshold. The full fecundity table was not opened.",
+    "A rank correlation is an across-species pattern. It does not show that nutriment is diverted from offspring to growth, and it is not phylogenetically controlled."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.6,
+  "method": "Spearman correlations of offspring number against adult body mass. Mammals, birds and reptiles come from the Amniote Life-History Database, with -999 read as missing. Terrestrial mammals exclude bats, the orders Cetacea and Sirenia, and the named whale and sirenian families. Fishes use FishBase v25.04 absolute fecundity (midpoint of min and max when both are positive, otherwise the minimum). Body weight was taken from the same fecundity record and averaged as a species median.",
+  "measured": {
+    "value": -0.6155440486229524,
+    "unit": "Spearman rho, terrestrial-mammal litter size vs adult body mass (full verdict uses all three groups)",
+    "n": 2696,
+    "uncertainty": "two-sided p = 6.180e-281",
+    "extra": {
+      "walking_terrestrial_mammals": {
+        "n": 2696,
+        "rho": -0.6155440486229524,
+        "p": 6.179610578318084e-281,
+        "class": "pass",
+        "mass_min_g": 2.33,
+        "mass_max_g": 4630000.0,
+        "young_min": 0.9,
+        "young_max": 16.89
+      },
+      "walking_reptiles": {
+        "n": 1790,
+        "rho": 0.6772051188850896,
+        "p": 1.6037952899812126e-240,
+        "class": "fail",
+        "mass_min_g": 0.3,
+        "mass_max_g": 420000.0,
+        "young_min": 1.0,
+        "young_max": 156.0
+      },
+      "walking_combined": "weak",
+      "flying_birds": {
+        "n": 6625,
+        "rho": 0.042935287683366546,
+        "p": 0.00047294103128655196,
+        "class": "fail",
+        "mass_min_g": 1.9,
+        "mass_max_g": 109250.0,
+        "young_min": 1.0,
+        "young_max": 35.65
+      },
+      "swimming": {
+        "n": 223,
+        "rho": 0.5757180941241163,
+        "p": 4.3893376470944145e-21,
+        "class": "fail",
+        "mass_min_g": 0.406000018119812,
+        "mass_max_g": 6000000.0,
+        "young_min": 50.0,
+        "young_max": 65200000.0,
+        "aggregation": "species median of absolute fecundity and of WeightMin/WeightMax/WeightMean on the same fecundity record",
+        "rows": 309,
+        "weight_columns": [
+          "WeightMin",
+          "WeightMax",
+          "WeightMean"
+        ]
+      },
+      "swimming_used_fallback": false,
+      "swimming_paired": {
+        "n": 223,
+        "rho": 0.5757180941241163,
+        "p": 4.3893376470944145e-21,
+        "class": "fail",
+        "mass_min_g": 0.406000018119812,
+        "mass_max_g": 6000000.0,
+        "young_min": 50.0,
+        "young_max": 65200000.0,
+        "aggregation": "species median of absolute fecundity and of WeightMin/WeightMax/WeightMean on the same fecundity record",
+        "rows": 309,
+        "weight_columns": [
+          "WeightMin",
+          "WeightMax",
+          "WeightMean"
+        ]
+      },
+      "bats_descriptive": {
+        "n": 647,
+        "rho": -0.1370759311353632,
+        "p": 0.0004714657108710403,
+        "class": "weak",
+        "mass_min_g": 1.98,
+        "mass_max_g": 1087.04,
+        "young_min": 0.98,
+        "young_max": 3.12
+      },
+      "fish_columns": [
+        "autoctr",
+        "StockCode",
+        "SpecCode",
+        "MainRefNo",
+        "SourceRef",
+        "C_Code",
+        "E_CODE",
+        "Locality",
+        "FecundityMin",
+        "WeightMin",
+        "LengthFecunMin",
+        "LengthTypeFecMin",
+        "FecundityMax",
+        "WeightMax",
+        "LengthFecunMax",
+        "LengthTypeFecMax",
+        "FecundityMean",
+        "WeightMean",
+        "LengthFecunMean",
+        "LengthTypeFecMean",
+        "FecundityType",
+        "FecComment",
+        "FecundityRef",
+        "RelFecundityMin",
+        "FecunMinRef",
+        "RelFecundityMean",
+        "FecunMeanRef",
+        "RelFecundityMax",
+        "FecunMaxRef",
+        "LengthMin",
+        "LengthMax",
+        "LengthType",
+        "Number",
+        "a",
+        "b",
+        "r2",
+        "SEa",
+        "SEb",
+        "SDa",
+        "SDb",
+        "LCLa",
+        "UCLa",
+        "LCLb",
+        "UCLb",
+        "SpawningCycles",
+        "SpCycleRef",
+        "AddInfos",
+        "Entered",
+        "Dateentered",
+        "Modified",
+        "Datemodified",
+        "Expert",
+        "Datechecked",
+        "autoctr_spawn"
+      ]
+    }
+  },
+  "results_summary": [
+    "Terrestrial mammals: n=2696, rho=-0.6155440486229524, p=6.179610578318084e-281, pass.",
+    "Reptiles: n=1790, rho=0.6772051188850896, p=1.6037952899812126e-240, fail. Walking combined: weak.",
+    "Birds: n=6625, rho=0.042935287683366546, p=0.00047294103128655196, fail.",
+    "Fishes (paired weight on the fecundity record): n=223, rho=0.5757180941241163, p=4.3893376470944145e-21, fail.",
+    "Bats, not in the walking set: n=647, rho=-0.1370759311353632, weak.",
+    "Verdict refutes."
+  ],
+  "datasets": [
+    {
+      "id": "amniote-life-history-database-2015",
+      "name": "Amniote Life-History Database (Myhrvold et al. 2015)",
+      "landing_url": "https://esapubs.org/archive/ecol/E096/269/",
+      "doi": "10.1890/15-0846.1",
+      "version": "Aug 2015",
+      "license": "CC0",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv",
+          "retrieved_at": "2026-11-02T00:47:57Z",
+          "byte_size": 4728122,
+          "sha256": "ae16377ebe8a172949c2b8c200a50c5d0c7fc04d34bd3c9704635da4a4d51f53"
+        }
+      ],
+      "role": "adult body mass and litter or clutch size for mammals, birds and reptiles"
+    },
+    {
+      "id": "fishbase-v25.04-fecundity",
+      "name": "FishBase v25.04 fecundity and species tables (rfishbase parquet mirror)",
+      "landing_url": "https://www.fishbase.se/",
+      "doi": null,
+      "version": "04/2025",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/fecundity.parquet",
+          "retrieved_at": "2026-11-02T00:47:57Z",
+          "byte_size": 361529,
+          "sha256": "a80778e28bd4584b60b2d34d52ff5db2509839fc25121256df15844f4cbd2e91",
+          "name": "fecundity.parquet"
+        },
+        {
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:47:57Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4",
+          "name": "species.parquet"
+        }
+      ],
+      "role": "absolute fecundity and body weight of fishes"
+    }
+  ],
+  "deviations": [
+    "The fecundity table has WeightMin, WeightMax and WeightMean, not a column named BodyWeight. Those fields are the body weight on the same record, so they are the primary paired analysis. species.Weight is used only when fewer than 40 species have one of those weights."
+  ]
+}

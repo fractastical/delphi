@@ -1,0 +1,169 @@
+{
+  "claim_id": "aristotle-ga03-24",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-24",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "Accepted species of shelled molluscs (gastropods, bivalves, chitons and scaphopods) are few on land relative to the sea: terrestrial species number less than a tenth of marine species.",
+  "pass_criterion": "Pre-registered. Count accepted species in Gastropoda, Bivalvia, Polyplacophora and Scaphopoda. Let R be terrestrial count divided by marine count. A source qualifies if marine count is at least 500. The GBIF backbone also requires that the fraction of accepted species carrying a habitat value is at least 0.40, and that the terrestrial count and the marine count are each different from the unfiltered total (otherwise the habitat filter was ignored and GBIF is disqualified). MolluscaBase qualifies if the statistics page yields marine, terrestrial and freshwater accepted-species counts. The claim is supported only if every qualifying source has R < 0.10. It is refuted if every qualifying source has R >= 0.25. If sources disagree, or any qualifying source has R in [0.10, 0.25), the verdict is mixed. If no source qualifies, the verdict is inconclusive with reason data-unavailable.",
+  "fail_criterion": "Pre-registered. Refutes 'few or no kinds live on land' if every qualifying source has at least one terrestrial species per four marine species (R >= 0.25), with marine n >= 500.",
+  "planned_datasets": [
+    "gbif-backbone-species-habitat",
+    "molluscabase-stats"
+  ],
+  "test_contract": {
+    "expected_observation": "Accepted shelled-mollusc species flagged terrestrial are fewer than one tenth of those flagged marine.",
+    "disconfirming_observation": "Terrestrial species are at least a quarter as numerous as marine species, in every source that qualifies.",
+    "admissible_datasets": "Global taxonomic registers that flag environment for molluscs and include terrestrial snails, not a marine-only list. Cephalopods are excluded because Aristotle treated them apart from testaceans. Counts of occurrences are not a substitute for species counts.",
+    "inference_method": "Ratio of accepted terrestrial species to accepted marine species, summed over the four classes. Two sources are compared with the agreement rule in pass_criterion. Freshwater is reported and is not in the ratio."
+  },
+  "interpretation": "Testaceans are shelled molluscs: Gastropoda, Bivalvia, Polyplacophora and Scaphopoda. Land snails and terrestrial slugs both fall in Gastropoda; the dataset has no shell flag, so shell-less slugs remain inside the terrestrial count. That biases terrestrial richness upward, against the claim. 'Few or none, snails excepted' is read as terrestrial richness under 10 percent of marine richness. The middle band is mixed rather than forced into few or many. Cephalopods are out of scope.",
+  "caveats": [
+    "No species counts were requested before this registration. The MolluscaBase statistics page and the GBIF species API were checked only for an HTTP status.",
+    "GBIF backbone habitat is one label per species and is often blank. A marine-heavy label set could make land snails look rare. The agreement rule with MolluscaBase is there so a marine-biased source cannot support the claim alone when the molluscan register disagrees.",
+    "Taxonomic effort differs by habitat. Richness is not abundance and is not the number of kinds Aristotle could see in Greece."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.55,
+  "method": "Counted accepted species in the GBIF backbone for Gastropoda, Bivalvia, Polyplacophora and Scaphopoda, with and without the habitat filters TERRESTRIAL, MARINE and FRESHWATER. Also fetched the MolluscaBase statistics page and kept it only if marine, terrestrial and freshwater counts could be read from the text. The verdict follows the pre-registered agreement rule. Cephalopods are not in the sum.",
+  "measured": {
+    "value": 0.3948641522412014,
+    "unit": "terrestrial accepted species / marine accepted species (first qualifying source; both are in extra)",
+    "n": 87230,
+    "uncertainty": null,
+    "extra": {
+      "gbif": {
+        "dataset_key": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+        "dataset_title": "GBIF Backbone Taxonomy",
+        "classes": [
+          {
+            "name": "Gastropoda",
+            "usageKey": 225,
+            "rank": "CLASS",
+            "status": "ACCEPTED",
+            "scientificName": "Gastropoda",
+            "matchType": "EXACT",
+            "counts": {
+              "total": 122355,
+              "TERRESTRIAL": 34441,
+              "MARINE": 63744,
+              "FRESHWATER": 11591
+            }
+          },
+          {
+            "name": "Bivalvia",
+            "usageKey": 137,
+            "rank": "CLASS",
+            "status": "ACCEPTED",
+            "scientificName": "Bivalvia",
+            "matchType": "EXACT",
+            "counts": {
+              "total": 35205,
+              "TERRESTRIAL": 3,
+              "MARINE": 21352,
+              "FRESHWATER": 4730
+            }
+          },
+          {
+            "name": "Polyplacophora",
+            "usageKey": 346,
+            "rank": "CLASS",
+            "status": "ACCEPTED",
+            "scientificName": "Polyplacophora",
+            "matchType": "EXACT",
+            "counts": {
+              "total": 1468,
+              "TERRESTRIAL": 0,
+              "MARINE": 1372,
+              "FRESHWATER": 0
+            }
+          },
+          {
+            "name": "Scaphopoda",
+            "usageKey": 276,
+            "rank": "CLASS",
+            "status": "ACCEPTED",
+            "scientificName": "Scaphopoda",
+            "matchType": "EXACT",
+            "counts": {
+              "total": 878,
+              "TERRESTRIAL": 0,
+              "MARINE": 762,
+              "FRESHWATER": 0
+            }
+          }
+        ],
+        "totals": {
+          "total": 159906,
+          "TERRESTRIAL": 34444,
+          "MARINE": 87230,
+          "FRESHWATER": 16321
+        },
+        "coverage": 0.8629757482520981,
+        "filter_ignored": false,
+        "overlap": false,
+        "ratio_terrestrial_over_marine": 0.3948641522412014,
+        "qualifies": true,
+        "band": "refutes"
+      },
+      "molluscabase": {
+        "qualifies": false,
+        "band": "unqualified",
+        "parsed": false,
+        "retrieved_at": "2026-11-02T00:48:40Z"
+      },
+      "qualifying_sources": [
+        "gbif"
+      ]
+    }
+  },
+  "results_summary": [
+    "GBIF GBIF Backbone Taxonomy: terrestrial 34444, marine 87230, freshwater 16321, total 159906, coverage 0.863, qualifies True, band refutes.",
+    "MolluscaBase qualifies False, band unqualified, ratio None.",
+    "Verdict refutes."
+  ],
+  "datasets": [
+    {
+      "id": "gbif-backbone-species-habitat",
+      "name": "GBIF Backbone Taxonomy",
+      "landing_url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "doi": null,
+      "version": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "license": "CC BY 4.0 (GBIF backbone)",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/search",
+          "retrieved_at": "2026-11-02T00:47:56Z",
+          "byte_size": 77,
+          "sha256": "4dfa0d3232d25262f8b3ffbd1f306c3280d0b4e182e717a636263ce16ea1321c",
+          "name": "gbif species/search counts recorded in derived/measured.json"
+        }
+      ],
+      "role": "accepted species counts by habitat for four shelled-mollusc classes"
+    },
+    {
+      "id": "molluscabase-stats",
+      "name": "MolluscaBase statistics page",
+      "landing_url": "https://www.molluscabase.org/",
+      "doi": null,
+      "version": "2026-11-02",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://www.molluscabase.org/aphia.php?p=stats",
+          "retrieved_at": "2026-11-02T00:48:40Z",
+          "byte_size": 79978,
+          "sha256": "1bd689ddc4b4c01ec00a132a8230ed954370a6e7528596025d90a13b1cdcff85"
+        }
+      ],
+      "role": "accepted mollusc counts by environment, used only if the page text exposes them"
+    }
+  ]
+}

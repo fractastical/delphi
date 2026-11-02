@@ -1,0 +1,313 @@
+{
+  "claim_id": "aristotle-ha08-27",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-27",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "The birds Aristotle says hide through the winter, rather than migrate to warmer countries, are recorded in the same latitudes in December\u2013February as in June\u2013August.",
+  "pass_criterion": "Pre-registered. For each of eight named species, query GBIF occurrence counts with coordinates, no geospatial issue, occurrence status PRESENT, basis of record HUMAN_OBSERVATION or OBSERVATION, year 2000 through 2026, in 5-degree latitude bins from -55 to 70. Summer is months 6\u20138; winter is months 12, 1 and 2. The seasonal median latitude is interpolated from that histogram. A species counts only if both seasons have at least 200 occurrences and the summer median latitude is at least 25 degrees north. It stays if the absolute difference of the two medians is under 5 degrees. It migrates south if the summer median minus the winter median is at least 10 degrees. The claim is supported if at least 6 of the 8 species stay. It is refuted if at least 6 migrate south. If fewer than 4 species count, the verdict is inconclusive with reason underpowered. Otherwise the verdict is mixed.",
+  "fail_criterion": "Pre-registered. Refutes 'they do not migrate to warmer countries but hide where they are' if at least 6 of the 8 species have a winter median latitude at least 10 degrees south of the summer median, with the sample-size gates in pass_criterion.",
+  "planned_datasets": [
+    "gbif-occurrence-api"
+  ],
+  "test_contract": {
+    "expected_observation": "Winter and summer occurrence centroids of the eight named species stay within 5 degrees of latitude, so the birds are recorded where they breed rather than in warmer countries.",
+    "disconfirming_observation": "The winter centroid lies at least 10 degrees south of the summer centroid for at least six of the eight species: the birds are recorded in warmer countries in winter.",
+    "admissible_datasets": "Georeferenced, dated occurrence records of the named species from a public aggregator, restricted to human observations from 2000 onward with coordinates that GBIF does not flag as geospatial issues. Tracking studies are admissible but are not required. Records without coordinates do not count.",
+    "inference_method": "Median latitude from 5-degree GBIF count histograms, summer (Jun\u2013Aug) minus winter (Dec\u2013Feb). Species mappings, gates and the 6-of-8 rule are fixed in pass_criterion. The owl and the cushat are queried and reported and are not part of the 8."
+  },
+  "interpretation": "Species are fixed before any count is requested. Swallow = Hirundo rustica; kite = Milvus migrans (the common kite of Greece); stork = Ciconia ciconia; owzel = Turdus merula (ouzel as the English name of the blackbird); turtle-dove = Streptopelia turtur; lark = Alauda arvensis; thrush = Turdus philomelos; starling = Sturnus vulgaris. Athene noctua is the little owl, which the text says hides only for a few days, and Columba palumbus is the cushat, which the text says sometimes hides and sometimes migrates. Neither enters the 6-of-8 rule. The test decides whether the eight are recorded in warmer countries in winter. It does not test featherless torpor in holes: absence of a latitude shift is compatible with ordinary residency as well as with hiding.",
+  "caveats": [
+    "No GBIF count for these species was requested before this registration.",
+    "GBIF records follow where observers are. A latitude shift can be exaggerated or hidden by seasonal effort. The summer-median gate (at least 25 N) drops a species whose summer records are not northern.",
+    "Hiding in a hole would remove the bird from view. This design can refute hiding-in-place by showing the bird in a warmer country. It cannot prove torpor.",
+    "Streptopelia turtur is classified as staying because its winter median (46.6 N) is within 2 degrees of its summer median (44.7 N), but the winter sample is small (3,633 records against 248,373 in summer) and the largest winter bin is 50–55 N (905 records). European observer effort can hold the median in the north even if many individuals winter in Africa. The pre-registered median and the 5-degree gate were not changed. Reclassifying this one species would still leave the verdict mixed."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.65,
+  "method": "Matched each pre-registered scientific name to a GBIF species key, then counted human observations with coordinates from 2000 through 2026 in 5-degree latitude bins for June\u2013August and for December\u2013February. The seasonal median is interpolated inside the bin where the cumulative count crosses half. A species counts when both seasons have at least 200 records and the summer median is at least 25 N. Six of eight staying supports the non-migration clause; six of eight shifting south by at least 10 degrees refutes it.",
+  "measured": {
+    "value": 2,
+    "unit": "of the eight named species, how many have a winter median latitude at least 10 degrees south of the summer median",
+    "n": 8,
+    "uncertainty": "5 stay within 5 degrees; 0 of the eight did not meet the sample gate",
+    "extra": {
+      "n_stay": 5,
+      "n_migrate_south": 2,
+      "n_counted": 8,
+      "bins": [
+        [
+          -55,
+          -50
+        ],
+        [
+          -50,
+          -45
+        ],
+        [
+          -45,
+          -40
+        ],
+        [
+          -40,
+          -35
+        ],
+        [
+          -35,
+          -30
+        ],
+        [
+          -30,
+          -25
+        ],
+        [
+          -25,
+          -20
+        ],
+        [
+          -20,
+          -15
+        ],
+        [
+          -15,
+          -10
+        ],
+        [
+          -10,
+          -5
+        ],
+        [
+          -5,
+          0
+        ],
+        [
+          0,
+          5
+        ],
+        [
+          5,
+          10
+        ],
+        [
+          10,
+          15
+        ],
+        [
+          15,
+          20
+        ],
+        [
+          20,
+          25
+        ],
+        [
+          25,
+          30
+        ],
+        [
+          30,
+          35
+        ],
+        [
+          35,
+          40
+        ],
+        [
+          40,
+          45
+        ],
+        [
+          45,
+          50
+        ],
+        [
+          50,
+          55
+        ],
+        [
+          55,
+          60
+        ],
+        [
+          60,
+          65
+        ],
+        [
+          65,
+          70
+        ]
+      ],
+      "species": [
+        {
+          "label": "swallow",
+          "scientific": "Hirundo rustica",
+          "role": "verdict",
+          "taxonKey": 9515886,
+          "matchedName": "Hirundo rustica Linnaeus, 1758",
+          "n_summer": 6420800,
+          "n_winter": 657206,
+          "summer_median_lat": 43.19791133281381,
+          "winter_median_lat": 12.489887851344376,
+          "summer_minus_winter_deg": 30.708023481469432,
+          "class": "migrates-south"
+        },
+        {
+          "label": "kite",
+          "scientific": "Milvus migrans",
+          "role": "verdict",
+          "taxonKey": 5229167,
+          "matchedName": "Milvus migrans (Boddaert, 1783)",
+          "n_summer": 641481,
+          "n_winter": 469335,
+          "summer_median_lat": 39.868740640636986,
+          "winter_median_lat": 16.908096334454143,
+          "summer_minus_winter_deg": 22.960644306182843,
+          "class": "migrates-south"
+        },
+        {
+          "label": "stork",
+          "scientific": "Ciconia ciconia",
+          "role": "verdict",
+          "taxonKey": 2481912,
+          "matchedName": "Ciconia ciconia (Linnaeus, 1758)",
+          "n_summer": 537286,
+          "n_winter": 302551,
+          "summer_median_lat": 50.84479594040164,
+          "winter_median_lat": 44.47115731455697,
+          "summer_minus_winter_deg": 6.37363862584467,
+          "class": "intermediate"
+        },
+        {
+          "label": "owzel",
+          "scientific": "Turdus merula",
+          "role": "verdict",
+          "taxonKey": 2490719,
+          "matchedName": "Turdus merula Linnaeus, 1758",
+          "n_summer": 2530857,
+          "n_winter": 3305295,
+          "summer_median_lat": 51.053194922289244,
+          "winter_median_lat": 51.31124662617646,
+          "summer_minus_winter_deg": -0.25805170388721876,
+          "class": "stays"
+        },
+        {
+          "label": "turtle-dove",
+          "scientific": "Streptopelia turtur",
+          "role": "verdict",
+          "taxonKey": 2495708,
+          "matchedName": "Streptopelia turtur (Linnaeus, 1758)",
+          "n_summer": 248373,
+          "n_winter": 3633,
+          "summer_median_lat": 44.72881511371973,
+          "winter_median_lat": 46.55194805194805,
+          "summer_minus_winter_deg": -1.8231329382283192,
+          "class": "stays"
+        },
+        {
+          "label": "lark",
+          "scientific": "Alauda arvensis",
+          "role": "verdict",
+          "taxonKey": 8077224,
+          "matchedName": "Alauda arvensis Linnaeus, 1758",
+          "n_summer": 659044,
+          "n_winter": 440422,
+          "summer_median_lat": 53.24895204485606,
+          "winter_median_lat": 50.99809764928856,
+          "summer_minus_winter_deg": 2.250854395567501,
+          "class": "stays"
+        },
+        {
+          "label": "thrush",
+          "scientific": "Turdus philomelos",
+          "role": "verdict",
+          "taxonKey": 7901064,
+          "matchedName": "Turdus philomelos C.L.Brehm, 1831",
+          "n_summer": 846099,
+          "n_winter": 634280,
+          "summer_median_lat": 53.19340042819859,
+          "winter_median_lat": 49.742457375200736,
+          "summer_minus_winter_deg": 3.4509430529978573,
+          "class": "stays"
+        },
+        {
+          "label": "starling",
+          "scientific": "Sturnus vulgaris",
+          "role": "verdict",
+          "taxonKey": 9809229,
+          "matchedName": "Sturnus vulgaris Linnaeus, 1758",
+          "n_summer": 5034230,
+          "n_winter": 5689205,
+          "summer_median_lat": 42.95228267921553,
+          "winter_median_lat": 41.559050319447664,
+          "summer_minus_winter_deg": 1.3932323597678646,
+          "class": "stays"
+        },
+        {
+          "label": "owl",
+          "scientific": "Athene noctua",
+          "role": "descriptive",
+          "taxonKey": 2497266,
+          "matchedName": "Athene noctua (Scopoli, 1769)",
+          "n_summer": 177898,
+          "n_winter": 109434,
+          "summer_median_lat": 50.28981951614968,
+          "winter_median_lat": 45.360364053788125,
+          "summer_minus_winter_deg": 4.9294554623615525,
+          "class": "stays"
+        },
+        {
+          "label": "cushat",
+          "scientific": "Columba palumbus",
+          "role": "descriptive",
+          "taxonKey": 2495455,
+          "matchedName": "Columba palumbus Linnaeus, 1758",
+          "n_summer": 2391011,
+          "n_winter": 1801579,
+          "summer_median_lat": 52.379338212296254,
+          "winter_median_lat": 52.00104547635151,
+          "summer_minus_winter_deg": 0.378292735944747,
+          "class": "stays"
+        }
+      ]
+    }
+  },
+  "results_summary": [
+    "Hirundo rustica migrates-south (shift 30.7 deg, nS=6420800, nW=657206)",
+    "Milvus migrans migrates-south (shift 23.0 deg, nS=641481, nW=469335)",
+    "Ciconia ciconia intermediate (shift 6.4 deg, nS=537286, nW=302551)",
+    "Turdus merula stays (shift -0.3 deg, nS=2530857, nW=3305295)",
+    "Streptopelia turtur stays (shift -1.8 deg, nS=248373, nW=3633)",
+    "Alauda arvensis stays (shift 2.3 deg, nS=659044, nW=440422)",
+    "Turdus philomelos stays (shift 3.5 deg, nS=846099, nW=634280)",
+    "Sturnus vulgaris stays (shift 1.4 deg, nS=5034230, nW=5689205)",
+    "Counted 8 of 8. Stayed: 5. Migrated south: 2. Verdict mixed.",
+    "Torpor in holes was not measured. A small latitude shift does not show that the bird was hidden."
+  ],
+  "datasets": [
+    {
+      "id": "gbif-occurrence-api",
+      "name": "GBIF occurrence search counts",
+      "landing_url": "https://www.gbif.org/",
+      "doi": null,
+      "version": "2026-11-02",
+      "license": "GBIF occurrence records, various; counts queried from the public API",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search",
+          "retrieved_at": "2026-11-02T00:47:57Z",
+          "byte_size": 139024,
+          "sha256": "338b2fbe066ebc15e40b19119ceb015357664293a704282b77768336f4a4d5d7",
+          "name": "derived/gbif_counts.json"
+        }
+      ],
+      "role": "seasonal latitude histograms for the named bird species"
+    }
+  ]
+}
