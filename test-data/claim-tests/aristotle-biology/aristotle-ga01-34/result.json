@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-34",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-34",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If the claim holds, eggs of an oviparous externally fertilizing fish that milt does not reach remain unfertilized, while eggs from the same experiment that milt does reach are fertilized.",
   "pass_criterion": "Pre-registered support rule. Only an oviparous fish with external fertilization counts. The planned files are the zebrafish fertilization table (Dryad 10.5061/dryad.crjdfn38v), the round-goby egg and sperm tables (Dryad 10.5061/dryad.6djh9w10z), and the salmon and trout fertilization workbooks (Dryad 10.5061/dryad.v933m). A no-milt arm is a set of rows whose numeric sperm, milt, or sperm-concentration value is 0, or whose treatment label matches, case-insensitively, one of: no sperm, no milt, without sperm, without milt, unexposed, sperm-free, sperm free, zero sperm, 0 sperm, seawater only, water only, unfertilized control, no male, males absent, milt absent. A milt arm is the other rows of that same table in which sperm or milt was added: a positive amount, or a label that is not the no-milt arm. Fertilization proportion is fertilized eggs divided by eggs scored, a percent column divided by 100, or a proportion already on 0 to 1. A species passes if the no-milt arm mean is at most 0.05, the milt arm mean is at least 0.50, and each arm has at least 20 eggs or at least 3 replicate rows. The claim is supported only when at least one species passes and no species with both arms fails. Two treatments that both add sperm, including selected versus non-selected sperm, are not a no-milt arm. FishBase fertilization-mode codes are not a test of this claim.",
@@ -22,12 +22,669 @@
   "caveats": [
     "Before this registration the Dryad landing records, file names, byte sizes and the zebrafish README were read. The zebrafish README describes in-vitro fertilization of FRF-selected and non-selected sperm, which is not a no-milt arm. The numeric tables and workbooks were not opened. No fertilization proportion was computed.",
     "FishBase was named by the assessors and was not used. A fertilization-mode field does not say whether an egg the milt missed stays unfertilized.",
-    "The three packages are the public fish tables checked. A no-milt table outside them would be a different test."
+    "The three packages are the public fish tables checked. A no-milt table outside them would be a different test.",
+    "No planned table contained a no-milt arm together with a fertilization column. Fertilization rates from rows that were all exposed to sperm were not turned into a verdict.",
+    "Salmon and trout are oviparous external fertilizers, as are the zebrafish and the round goby. Tables for other animal groups were not in these packages."
   ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7-high-fast",
     "run": "cursor/aristotle-biology-claim-tests-957f",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "none",
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.62,
+  "measured": {
+    "value": 0,
+    "unit": "planned packages with a scoreable no-milt arm",
+    "n": 3,
+    "uncertainty": null,
+    "extra": {
+      "n_no_milt_rows": 0,
+      "scans": [
+        {
+          "id": "dryad-crjdfn38v-zebrafish-fertilization",
+          "species": "Danio rerio",
+          "download_failed": false,
+          "n_tables": 2,
+          "n_scoreable_no_milt_tables": 0,
+          "tables": [
+            {
+              "table": "sperm_traits.csv",
+              "n_rows": 40,
+              "columns": [
+                "n",
+                "ID pairs",
+                "treat",
+                "live",
+                "dead",
+                "viability_prop",
+                "count_tot",
+                "not_frag",
+                "frag",
+                "DNA integrity"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {
+                "treat": [
+                  "control",
+                  "frf"
+                ]
+              },
+              "scoreable": false
+            },
+            {
+              "table": "fertilization.csv",
+              "n_rows": 24,
+              "columns": [
+                "ID",
+                "treat",
+                "eggs",
+                "fert",
+                "no_fert",
+                "prop_fert",
+                "perc_fert"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "fert",
+                "no_fert",
+                "prop_fert",
+                "perc_fert"
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {
+                "treat": [
+                  "control",
+                  "frf"
+                ]
+              },
+              "scoreable": false
+            }
+          ]
+        },
+        {
+          "id": "dryad-6djh9w10z-round-goby",
+          "species": "Neogobius melanostomus",
+          "download_failed": false,
+          "n_tables": 4,
+          "n_scoreable_no_milt_tables": 0,
+          "tables": [
+            {
+              "table": "Length_data.csv",
+              "n_rows": 208,
+              "columns": [
+                "IND",
+                "POP",
+                "ORIGIN",
+                "PSU",
+                "GROUP",
+                "SEX",
+                "TL",
+                "SOURCE"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {
+                "GROUP": [
+                  "brackish.0psu",
+                  "brackish.16psu",
+                  "fresh.0psu",
+                  "fresh.16psu"
+                ]
+              },
+              "scoreable": false
+            },
+            {
+              "table": "Egg_measurements.csv",
+              "n_rows": 37,
+              "columns": [
+                "MALE_ID",
+                "CLUTCH_ID",
+                "HALF_CLUTCH_ID",
+                "TWIN",
+                "POP",
+                "GROUP",
+                "ORIGIN",
+                "PARENT_TREAT_SAL",
+                "EGG_TREAT_SAL",
+                "DATE",
+                "DAYS_OF_DEV",
+                "EGGS_N",
+                "PERCENT_FERT",
+                "FERT_N",
+                "PERC_BLACK_DAY20",
+                "BLACK_N",
+                "BLACK_OF_FERT"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "PERCENT_FERT",
+                "FERT_N",
+                "BLACK_OF_FERT"
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {
+                "GROUP": [
+                  "1.fresh.in.fresh",
+                  "2.fresh.in.brackish",
+                  "3.brackish.in.fresh",
+                  "4.brackish.in.brackish"
+                ],
+                "PARENT_TREAT_SAL": [
+                  "0 psu",
+                  "16 psu"
+                ],
+                "EGG_TREAT_SAL": [
+                  "0 psu",
+                  "16 psu"
+                ]
+              },
+              "scoreable": false
+            },
+            {
+              "table": "Sperm_measurement_averages.csv.csv",
+              "n_rows": 66,
+              "columns": [
+                "CASA_IND",
+                "POP",
+                "ORIGIN",
+                "TREATMENT_GROUP",
+                "PARENT_TREAT_SAL",
+                "SPERM_TREAT_SAL",
+                "PCM",
+                "VCL"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {
+                "TREATMENT_GROUP": [
+                  "brackish.0psu",
+                  "brackish.16psu",
+                  "freshwater.0psu",
+                  "freshwater.16psu"
+                ],
+                "PARENT_TREAT_SAL": [
+                  "0 psu",
+                  "16 psu"
+                ],
+                "SPERM_TREAT_SAL": [
+                  "0 psu",
+                  "16 psu"
+                ]
+              },
+              "scoreable": false
+            },
+            {
+              "table": "Suppl._Table_1.xlsx#Sheet1",
+              "n_rows": 22,
+              "columns": [
+                "Supplementary information from \u201cSperm performance limits the reproduction of an invasive fish in novel salinities\u201d",
+                "Unnamed: 1",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "Unnamed: 6",
+                "Unnamed: 7"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            }
+          ]
+        },
+        {
+          "id": "dryad-v933m-salmon-trout-fertilization",
+          "species": "Salmo salar / Salmo trutta",
+          "download_failed": false,
+          "n_tables": 14,
+          "n_scoreable_no_milt_tables": 0,
+          "tables": [
+            {
+              "table": "SALMON TROUT HYBRIDISATIONS SPERM SATURATED FINAL yeates et al 2013 Figure 1.xlsx#hybrid interfertility",
+              "n_rows": 60,
+              "columns": [
+                "Sperm type",
+                "Egg type",
+                "EGG NO",
+                "FERTILE NO",
+                "% FERTILITY",
+                "PROP. FERTILITY"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "FERTILE NO",
+                "% FERTILITY",
+                "PROP. FERTILITY"
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "SALMON TROUT HYBRIDISATIONS SPERM SATURATED FINAL yeates et al 2013 Figure 1.xlsx#5d fert checks",
+              "n_rows": 18,
+              "columns": [
+                "MALE",
+                "% day 1",
+                "% day 5-6"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "Sperm competition data Figure 1 Yeates et al 2013.xlsx#SALMON MALE COMPETITION SUCCESS",
+              "n_rows": 21,
+              "columns": [
+                "salmon hen",
+                "focal salmon male",
+                "paired trout competitor",
+                "% salmon",
+                "N total",
+                "Unnamed: 5",
+                "trout hen",
+                "focal salmon",
+                "paired competitor",
+                "% salmon hybrid",
+                "N total.1",
+                "Unnamed: 11",
+                "focal salmon male.1",
+                "% salmon.1",
+                "% salmon hybrid.1"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "Sperm competition data Figure 1 Yeates et al 2013.xlsx#TROUT MALE COMPETITION SUCCESS",
+              "n_rows": 21,
+              "columns": [
+                "Unnamed: 0",
+                "TROUT HEN",
+                "FOCAL TROUT MALE",
+                "SALMON COMPETITOR",
+                "TROUT % SUCCESS",
+                "N OFFSPRING SCORED",
+                "Unnamed: 6",
+                "SALMON HEN",
+                "FOCAL TROUT MALE.1",
+                "SALMON COMPETITOR.1",
+                "focal trout hybrid %",
+                "Focal Trout %",
+                "N OFFSPRING SCORED.1",
+                "Unnamed: 13",
+                "Unnamed: 14"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "FERTILIZATION RATE DATA YEATES ET AL 2013 FIG 2.xlsx#Sheet1",
+              "n_rows": 198,
+              "columns": [
+                "Experiment",
+                "Female",
+                "Male",
+                "OF",
+                "Dip time",
+                "Incubator",
+                "Egg Image #",
+                "Initial egg #",
+                "Fertilized",
+                "Unfert.",
+                "Total counted",
+                "diff from original",
+                "% fert success ",
+                "Standard Deviation",
+                "Standard Error ",
+                "Notes",
+                "Counter",
+                "Unnamed: 17",
+                "Unnamed: 18",
+                "Unnamed: 19",
+                "Unnamed: 20",
+                "Unnamed: 21",
+                "Unnamed: 22",
+                "Unnamed: 23",
+                "Unnamed: 24",
+                "Unnamed: 25",
+                "Unnamed: 26",
+                "Unnamed: 27",
+                "Unnamed: 28",
+                "Unnamed: 29",
+                "Unnamed: 30"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "Fertilized",
+                "Unfert.",
+                "% fert success "
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "FERTILIZATION RATE DATA YEATES ET AL 2013 FIG 2.xlsx#Sheet2",
+              "n_rows": 0,
+              "columns": [],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "FERTILIZATION RATE DATA YEATES ET AL 2013 FIG 2.xlsx#Sheet3",
+              "n_rows": 0,
+              "columns": [],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "salmon and trout male OF competition success YEATES ET AL 2013 FIG 3.xlsx#Salmon male perspective",
+              "n_rows": 60,
+              "columns": [
+                "female",
+                "OF",
+                "Fertilisation %",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "SALMON MALE",
+                "Unnamed: 7",
+                "Unnamed: 8",
+                "Unnamed: 9"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "Fertilisation %"
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "salmon and trout male OF competition success YEATES ET AL 2013 FIG 3.xlsx#Trout male perspective",
+              "n_rows": 60,
+              "columns": [
+                "female",
+                "OF",
+                "TROUT MALE SUCCESS",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "TROUT MALE",
+                "Unnamed: 7",
+                "Unnamed: 8",
+                "Unnamed: 9"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "salmon and trout male OF competition success YEATES ET AL 2013 FIG 3.xlsx#CHART MEAN DATA",
+              "n_rows": 5,
+              "columns": [
+                "Unnamed: 0",
+                "Salmon male",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "Trout male",
+                "Unnamed: 7",
+                "Unnamed: 8",
+                "Unnamed: 9",
+                "Unnamed: 10",
+                "Unnamed: 11"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "HYBRID EGG DEVELOPMENT AND EMBRYO VIABILITY RATE CHECK DATA Yeates et al 2013.xlsx#Sheet1",
+              "n_rows": 57,
+              "columns": [
+                "Unnamed: 0",
+                "Unnamed: 1",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "Unnamed: 6",
+                "Unnamed: 7",
+                "means of eyed eggs to pre-hatch",
+                "Unnamed: 9",
+                "Unnamed: 10",
+                "Unnamed: 11"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [
+                "means of eyed eggs to pre-hatch"
+              ],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "sperm trait means gage et al 2013.xlsx#evolution sperm data",
+              "n_rows": 29,
+              "columns": [
+                "Unnamed: 0",
+                "SALMON LONGEVITY",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "TROUT LONGEVITY",
+                "Unnamed: 7",
+                "Unnamed: 8",
+                "Unnamed: 9",
+                "Unnamed: 10",
+                "SALMON % MOTILITY",
+                "Unnamed: 12",
+                "Unnamed: 13",
+                "Unnamed: 14",
+                "Unnamed: 15",
+                "TROUT % MOTILITY",
+                "Unnamed: 17",
+                "Unnamed: 18",
+                "Unnamed: 19",
+                "Unnamed: 20",
+                "SALMON VELOCITY",
+                "Unnamed: 22",
+                "Unnamed: 23",
+                "Unnamed: 24",
+                "Unnamed: 25",
+                "TROUT VELOCITY",
+                "Unnamed: 27",
+                "Unnamed: 28",
+                "Unnamed: 29",
+                "Unnamed: 30",
+                "SALMON LINEARITY",
+                "Unnamed: 32",
+                "Unnamed: 33",
+                "Unnamed: 34",
+                "Unnamed: 35",
+                "TROUT LINEARITY",
+                "Unnamed: 37",
+                "Unnamed: 38"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "TRANSWELL_DATA MEANS yeates et al 2013.xlsx#Sheet1",
+              "n_rows": 105,
+              "columns": [
+                "CODE",
+                "MEAN",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "SALMON-SALMON",
+                "SALMON-TROUT",
+                "SALMON-WATER",
+                "Unnamed: 7",
+                "Unnamed: 8",
+                "TROUT-TROUT",
+                "TROUT-SALMON",
+                "TROUT-WATER",
+                "Unnamed: 12",
+                "Unnamed: 13",
+                "SALMON-SALMON.1",
+                "SALMON-TROUT.1",
+                "SALMON-WATER.1",
+                "Unnamed: 17",
+                "Unnamed: 18",
+                "TROUT-TROUT.1",
+                "TROUT-SALMON.1",
+                "TROUT-WATER.1"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            },
+            {
+              "table": "TRANSWELL_DATA MEANS yeates et al 2013.xlsx#chart means",
+              "n_rows": 4,
+              "columns": [
+                "Unnamed: 0",
+                "Unnamed: 1",
+                "Unnamed: 2",
+                "Unnamed: 3",
+                "Unnamed: 4",
+                "Unnamed: 5",
+                "Unnamed: 6"
+              ],
+              "sperm_amount_columns": [],
+              "fertilization_columns": [],
+              "n_no_milt_rows": 0,
+              "reasons": [],
+              "labels": {},
+              "scoreable": false
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "datasets": [
+    {
+      "id": "dryad-crjdfn38v-zebrafish-fertilization",
+      "name": "Female reproductive fluids attract more and better sperm in zebrafish",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.crjdfn38v",
+      "doi": "10.5061/dryad.crjdfn38v",
+      "version": "241008",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "241008.zip",
+          "download_url": "https://datadryad.org/api/v2/versions/241008/download",
+          "retrieved_at": "2026-11-02T00:44:12Z",
+          "byte_size": 3732,
+          "sha256": "83dbb1bf09205bd82fc80666322e1e47ab5bd46d9aefb2bf3e2f1c0a7dff8b56"
+        }
+      ],
+      "role": "candidate fertilization table for Danio rerio; scored only if a no-milt arm is present"
+    },
+    {
+      "id": "dryad-6djh9w10z-round-goby",
+      "name": "Sperm performance limits the reproduction of an invasive fish in novel salinities",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.6djh9w10z",
+      "doi": "10.5061/dryad.6djh9w10z",
+      "version": "106291",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "106291.zip",
+          "download_url": "https://datadryad.org/api/v2/versions/106291/download",
+          "retrieved_at": "2026-11-02T00:44:14Z",
+          "byte_size": 39830,
+          "sha256": "32a8476fa6f3afbe6d8f514b36772527c2f3f0057d50a745f1a7736f0a51c4d5"
+        }
+      ],
+      "role": "candidate fertilization table for Neogobius melanostomus; scored only if a no-milt arm is present"
+    },
+    {
+      "id": "dryad-v933m-salmon-trout-fertilization",
+      "name": "Cryptic choice of conspecific sperm controlled by ovarian fluid in salmon and trout",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.v933m",
+      "doi": "10.5061/dryad.v933m",
+      "version": "8842",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "8842.zip",
+          "download_url": "https://datadryad.org/api/v2/versions/8842/download",
+          "retrieved_at": "2026-11-02T00:44:15Z",
+          "byte_size": 150337,
+          "sha256": "795fbe40be9f1b68dae1caf14230936b6e5e635d877dccaba2532451297ee2a6"
+        }
+      ],
+      "role": "candidate fertilization table for Salmo salar / Salmo trutta; scored only if a no-milt arm is present"
+    }
+  ],
+  "method": "Downloaded the three Dryad version zips named in the pre-registration. Every table was scanned for a numeric sperm or milt amount of 0, or for a treatment label in the pre-registered list, and for a fertilization column. A package counts only when both are in the same table. No fertilization rate from a sperm-exposed row was used as a verdict.",
+  "results_summary": [
+    "None of the 3 planned fish packages has a no-milt arm. Tables were scanned for the pre-registered labels and for a sperm or milt amount of 0; 0 rows matched. Fertilization rates from sperm-exposed rows were not scored. Zebrafish fertilization labels: {'treat': ['control', 'frf']}. The word control is not in the no-milt list, and the package README describes both of those labels as sperm subpopulations."
+  ],
+  "deviations": [
+    {
+      "field": "scoreable no-milt arm",
+      "change": "A numeric zero or a matching label counts only when that same table also has a fertilization column.",
+      "why": "The pass rule needs a fertilization proportion. A sperm-trait row with a count of 0 and no egg score is not an arm of eggs the milt did not reach. This does not change the 0.05, 0.20, or 0.50 thresholds."
+    }
+  ]
 }
