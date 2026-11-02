@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa01-06",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa01-06",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If ants as a group both fly and do not fly, a public specimen corpus will contain winged ants and wingless ants, not only one of those forms.",
   "pass_criterion": "Pre-registered. Supports if AntWeb specimen records in Formicidae include at least 50 flying specimens in at least 2 genera and at least 50 non-flying specimens in at least 2 genera. A specimen is flying only when its life-stage text contains alate (and not dealate), winged, or macropterous. A specimen is non-flying when its caste is worker, or its life-stage text contains wingless, apterous, ergatoid, or dealate. A queen or a male with no wing word is neither class: ergatoid queens and wingless males exist, so caste alone does not show that they fly.",
   "fail_criterion": "Pre-registered. Refutes if one of the two classes has zero specimens and the other has at least 50, in a response that reports a total or that exhausts the matching records. Mixed if both classes are present but one is below 50 or is confined to a single genus. Inconclusive with reason underpowered if both classes are below 50. Inconclusive with reason data-unavailable if the specimen service cannot be retrieved or returns no caste and no life-stage field. Confidence is 0.8 when the pass rule is met or when one class is absent against at least 50 of the other, and 0.5 when the verdict is mixed or underpowered.",
@@ -17,7 +17,8 @@
   },
   "interpretation": "Aristotle's point is that the group Ants falls under both Flying and Walking, because some ants fly and others do not. The test asks whether both forms occur among ants. It does not ask whether flight is a species-level character, and it does not treat every queen as flying.",
   "caveats": [
-    "No AntWeb specimen response had been read when this file was committed. Worker is counted as non-flying because that is the wingless caste in the coding the pass criterion names; a worker record that also says alate would be classified by the flying rule first and would not be counted as non-flying."
+    "No AntWeb specimen response had been read when this file was committed. Worker is counted as non-flying because that is the wingless caste in the coding the pass criterion names; a worker record that also says alate would be classified by the flying rule first and would not be counted as non-flying.",
+    "From this network the AntWeb host returned a Cloudflare challenge page (HTTP 403) instead of specimen JSON. No caste or wing count was read, and no other dataset was substituted."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -25,5 +26,78 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claims-906a",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "none",
+  "verdict": "inconclusive",
+  "confidence": 0.85,
+  "reason": "data-unavailable",
+  "datasets": [
+    {
+      "id": "antweb-specimens-v3",
+      "name": "AntWeb specimen service, version 3",
+      "landing_url": "https://www.antweb.org/api.do",
+      "doi": null,
+      "version": "v3",
+      "license": "AntWeb data are available for use; the service page states the terms",
+      "files": [
+        {
+          "name": "specimens-worker",
+          "download_url": "https://api.antweb.org/v3/specimens?family=formicidae&caste=worker&limit=200",
+          "retrieved_at": "2026-11-02T00:34:39Z",
+          "byte_size": 5683,
+          "sha256": "cecde2ef00e13f4369be470ce4079fe0f1f167143a55446cebb00a6a0e3567cf",
+          "http_status": 403
+        },
+        {
+          "name": "specimens-alate",
+          "download_url": "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=alate&limit=200",
+          "retrieved_at": "2026-11-02T00:34:39Z",
+          "byte_size": 5701,
+          "sha256": "5d0ddec6bcbd8da1d2c16dd02adcdae7cdd27aa349a7cfc70c601f9df3a4be8b",
+          "http_status": 403
+        },
+        {
+          "name": "specimens-dealate",
+          "download_url": "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=dealate&limit=200",
+          "retrieved_at": "2026-11-02T00:34:39Z",
+          "byte_size": 5707,
+          "sha256": "2bcb6fbe3330986217c3112fe68498251187a02c8d9b989ce40fa178f8488d4c",
+          "http_status": 403
+        },
+        {
+          "name": "specimens-wingless",
+          "download_url": "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=wingless&limit=200",
+          "retrieved_at": "2026-11-02T00:34:39Z",
+          "byte_size": 5710,
+          "sha256": "62729e183d19d5745e9b5e4c2584201bbfdf9089bdcd522d57069c040d4a6323",
+          "http_status": 403
+        }
+      ],
+      "role": "caste and life-stage text for ant specimens, used to separate flying and non-flying individuals"
+    }
+  ],
+  "measured": {
+    "value": null,
+    "unit": "AntWeb specimens classed as flying; non-flying count is in extra",
+    "n": null,
+    "uncertainty": null,
+    "extra": {
+      "service_retrieved": false,
+      "http_status": {
+        "https://api.antweb.org/v3/specimens?family=formicidae&caste=worker&limit=200": 403,
+        "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=alate&limit=200": 403,
+        "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=dealate&limit=200": 403,
+        "https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=wingless&limit=200": 403
+      },
+      "flying_specimens": null,
+      "nonflying_specimens": null,
+      "flying_genera_in_sample": [],
+      "nonflying_genera_in_sample": []
+    }
+  },
+  "method": "Four AntWeb v3 specimen queries were requested: caste=worker, lifeStageSex=alate, lifeStageSex=dealate, and lifeStageSex=wingless, each limited to 200 records and to family Formicidae. Records would be classed by the pre-registered wing and caste rules, with genera counted on the returned sample and totals taken from the service when it reports one. A non-JSON or non-200 response is recorded as the service not retrieved.",
+  "results_summary": [
+    "HTTP status by query: {'https://api.antweb.org/v3/specimens?family=formicidae&caste=worker&limit=200': 403, 'https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=alate&limit=200': 403, 'https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=dealate&limit=200': 403, 'https://api.antweb.org/v3/specimens?family=formicidae&lifeStageSex=wingless&limit=200': 403}.",
+    "Service retrieved: False. Verdict inconclusive (data-unavailable)."
+  ]
 }
