@@ -1,0 +1,443 @@
+{
+  "claim_id": "levin-2022-grn-learning-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-09",
+  "project": "levin-papers",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:29:38Z",
+  "hypothesis": "If memory formation in these ODE pathway models is robust at training stimuli of 10x, 50x and 100x baseline, then most completed models keep the same UCS-memory count at all three strengths, at most a quarter lose memories at a weaker strength, and at least one model forms more memories at 10x or 50x than at 100x.",
+  "pass_criterion": "Pre-registered. A hit is an ordered pair of distinct floating species and a clamp direction (up or down) for which the response mean during the clamp is regulated relative to the late-baseline mean (ratio >= 2 or <= 0.5, with the near-zero rule in preregistration) and the mean over the following unclamped delay of equal length stays in that same class. M(f) is the hit count at factor f on one shared, evenly spaced sample of at most 24 pairs. A finished model is stable when M(10)=M(50)=M(100), a loss when min(M(10),M(50))<M(100), and a gain when max(M(10),M(50))>M(100). Supports when at least 6 models finish the three-factor screen, the sum of all M(f) is at least 1, the stable fraction is >= 0.50, the loss fraction is <= 0.25, and at least one model is a gain.",
+  "fail_criterion": "Pre-registered. Refutes when at least 6 models finish, the memory-hit sum is at least 1, and either the loss fraction is >= 0.50 or there is no gain and the stable fraction is < 0.25. Any other outcome on a scored panel is mixed. Fewer than 6 finished models: inconclusive, reason underpowered. A finished panel whose memory-hit sum is 0: inconclusive, reason other.",
+  "planned_datasets": [
+    "biomodels-curated-sbml",
+    "biswas-clawson-levin-2023-ijms"
+  ],
+  "interpretation": "The claim's 'number of memories' is the count of UCS-based memories in section 4.3: a clamp of one species leaves another species regulated after the clamp is released. Regulation is the paper's twice-or-half mean rule. Up and down clamps are the two stimulus signs. Factors 10, 50 and 100 multiply or divide the species' own baseline scale, matching the 10X, 50X and 100X comparison in section 2.2, where 100X is the normal training strength. 'Most models kept the same number' is a stable fraction of at least one half. 'Only 10% lost memories' is tested with a pre-registered ceiling of 25%, because this is a reimplementation on a size-capped sample rather than the authors' MATLAB run. 'Some models formed more memories with weaker stimulation' is at least one gain, which also covers their report that four models increased. The therapeutic sentence in the quote is not given its own measurement.",
+  "test_contract": {
+    "expected_observation": "On the same sampled pairs, UCS-memory counts at 10x and 50x equal the count at 100x for at least half of the completed models, fewer than or equal to a quarter of models have a lower count at a weaker factor, and at least one model has a higher count at a weaker factor.",
+    "disconfirming_observation": "At least half the completed models lose UCS memories when the factor drops below 100x, or memory counts are unstable across the three factors and no model gains memories at a weaker factor.",
+    "admissible_datasets": "Public SBML ordinary-differential-equation models from the BioModels curated collection, preferably the identifiers in the paper's Table S1, with 3 to 15 floating species so the pair sample can be integrated. Parameters and reactions stay at the deposited values. The authors' saved MATLAB result matrices are not an admissible dataset.",
+    "inference_method": "Count UCS-memory hits independently at factors 10, 50 and 100. Classify each finished model as stable, loss, gain, or both. Apply the fractions and gates in preregistration.decision. A panel with no hits is not scored as robust or as fragile."
+  },
+  "preregistration": {
+    "stimulus_factors": [
+      10,
+      50,
+      100
+    ],
+    "normal_training_factor": 100,
+    "regulation_up_ratio": 2.0,
+    "regulation_down_ratio": 0.5,
+    "phenotype_ratio": 1.5,
+    "pulse_length_multipliers": [
+      1,
+      1.2,
+      1.4,
+      1.6,
+      1.8,
+      2.0
+    ],
+    "species_min": 3,
+    "species_max": 15,
+    "max_models": 8,
+    "max_pairs": 24,
+    "max_assoc": 16,
+    "max_break_pairs": 4,
+    "max_break_nodes": 4,
+    "break_trials": 1,
+    "model_wall_seconds": 180,
+    "horizons": [
+      100,
+      10,
+      1
+    ],
+    "stimulus_duration_divisor": 10,
+    "late_window_fraction": 0.2,
+    "floor": 1e-06,
+    "near_zero": 1e-09,
+    "appear_threshold": 0.0001,
+    "sequential_start": 1,
+    "sequential_count": 80,
+    "max_download_attempts": 40,
+    "confidence_rule": "inconclusive data-unavailable 0.80, inconclusive other 0.60, inconclusive underpowered 0.55; otherwise 0.58 if every baseline-ok model came from Table S1 identifiers, 0.48 if the panel mixes Table S1 with a sequential BioModels fill, 0.42 if the panel is the sequential scan only; mixed is capped at 0.50; a supports verdict on levin-2022-grn-learning-18 is capped at 0.45 because one breaking trial can miss breaks.",
+    "decision": {
+      "levin-2022-grn-learning-09": {
+        "min_models": 6,
+        "support": {
+          "min_stable_fraction": 0.5,
+          "max_loss_fraction": 0.25,
+          "min_gain_models": 1
+        },
+        "refute": {
+          "min_loss_fraction": 0.5,
+          "max_stable_fraction_if_no_gain": 0.25
+        }
+      },
+      "levin-2022-grn-learning-18": {
+        "min_sens_models": 4,
+        "min_hab_models": 4,
+        "pair_fraction_rare": 0.05,
+        "support": {
+          "max_sens_break_rate": 0.4,
+          "min_rate_margin": 0.15,
+          "min_pair_rare_fraction": 0.5
+        },
+        "refute": {
+          "min_sens_break_rate": 0.6,
+          "max_pair_rare_fraction_exclusive": 0.25
+        }
+      },
+      "levin-2025-wisdom-04": {
+        "min_models_to_refute": 6
+      }
+    }
+  },
+  "method_template": "Public BioModels SBML files are integrated with libroadrunner. Model identifiers are read, as strings only, from the 2023 paper's public supplementary pages when those pages contain BIOMD identifiers; otherwise, and when fewer than the cap of runnable models are found, curated identifiers are scanned in order from BIOMD0000000001. A model is kept when it has 3 to 15 floating species and a finite baseline on a horizon of 100, 10 or 1 time units. Stimuli clamp a species to a multiple (10, 50 or 100) of its baseline scale, or to that scale divided by the multiple, without editing parameters or reactions. UCS memory, six-pulse habituation and sensitization, third-node breaking, and Pavlovian pairing are scored with the thresholds in preregistration, including sham controls, and the pre-registered decision rule sets the verdict.",
+  "specification_files": [
+    {
+      "id": "biswas-clawson-levin-2023-ijms",
+      "name": "Biswas, Clawson and Levin 2023, Learning in Transcriptional Network Models, Int. J. Mol. Sci. 24:285",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "doi": "10.3390/ijms24010285",
+      "version": "Europe PMC full text as vendored in the repository",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "path": "claim-sources/levin-papers/inputs/2022-grn-learning.txt",
+          "byte_size": 66301,
+          "sha256": "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58",
+          "note": "already vendored; not re-downloaded for this test. Figures, tables and reference list were omitted from this text file."
+        }
+      ],
+      "role": "methods for clamps, UCS memory, habituation, sensitization and third-node breaking"
+    }
+  ],
+  "caveats": [
+    "This is a computation on ordinary differential equation models. It does not show that the claim holds in organisms.",
+    "The protocol reimplements section 4 of Biswas, Clawson and Levin 2023. It is not their MATLAB code. The vendored paper text has the clamp formulas stripped, so stimulus timing is the pre-registered fraction of a model horizon that the solver can finish, not a recovered step count of 5000.",
+    "A sham trajectory with the same pulse schedule and no clamp must fail the 1.5-fold test before a decline or rise is counted as habituation or sensitization. The paper does not describe that control. It is here so that spontaneous decay is not scored as learning.",
+    "Associative hits likewise require that a time-matched wait, with no paired clamp, leaves the neutral node ineffective.",
+    "At most 24 stimulus-response pairs, 16 associative triples, 4 third nodes and 4 phenotype-positive pairs are tested per model, evenly spaced in identifier order, and breaking uses one trial. The same caps are used at every amplitude and for both phenotypes. Caps can miss rare events.",
+    "One breaking trial can miss a break that a second or third trial would have found, which biases breaking rates downward. A supports verdict on the sensitization-breaking claim is therefore capped at confidence 0.45.",
+    "Models with fewer than 3 or more than 15 floating species are outside this run. The surveyed set of 35 models may include larger networks that are not integrated.",
+    "Dataset-resolvability assessments were not used as evidence.",
+    "A floating species with no decay can remain at a clamped value after release. UCS memory can then be a held stimulus rather than a change in the downstream network. Associative scoring compares the neutral-node clamp with the immediately preceding relaxation so that a held stimulus is not counted as conditioning.",
+    "Run panel was sequential-biomodels. Table S1 identifier strings found: 0. Download attempts: 22. Baseline-ok models: 8.",
+    "Stimuli were temporary boundary clamps of existing species. The test does not assign parameter values and does not add or remove reactions.",
+    "This computation does not show that the claim holds in organisms.",
+    "Parameter identifiers and reaction identifiers matched the deposited models after the screens.",
+    "On at least one model, global parameter values at the end of the screens differed from the deposited values. The test never assigns parameters; the difference is left to the model's own rules and events. For levin-2025-wisdom-04 that difference counts as a changed parameter."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/test-levin-grn-wisdom-5e3c",
+    "date": "2026-11-01"
+  },
+  "deviations": [
+    {
+      "date": "2026-11-02",
+      "what": "Fixed a NameError in download_sbml: the loop iterated BIOMOD_URLS, which was never defined; the templates are BIOMD_URLS. Added progress prints. No threshold, sampling cap, dataset rule, or scoring rule changed.",
+      "why": "The preregistered script raised NameError on the first model download, before any SBML file was integrated."
+    },
+    {
+      "date": "2026-11-02",
+      "what": "The files?format=xml response is a manifest and the bare download URL is a zip. The downloader now requests the main SBML member named in that manifest (filename query on the download URL) and accepts a body only when it contains an sbml element. No threshold or scoring rule changed.",
+      "why": "The first run stored the manifest as if it were SBML. libroadrunner rejected every file. No model was integrated."
+    },
+    {
+      "date": "2026-11-02",
+      "what": "The horizon is the longest of 100, 10 and 1 that both integrates and leaves global parameter values equal to the deposited values. A longer horizon that rewrites rate constants is skipped.",
+      "why": "On BIOMD0000000001 an unclamped run to time 100 set several kf rate constants to 0, so the pre-registered invariance check failed before any stimulus. Time 10 preserved the deposited values. No pass or fail threshold changed."
+    },
+    {
+      "date": "2026-11-02",
+      "what": "A trial is scored when parameter identifiers and reaction identifiers still match the deposited model, even if global parameter values differ. Those value differences are stored as parameter_values_match_deposited. The wisdom-04 decision still requires both identifier stability and value equality: a finished model whose parameter values differ counts as a changed parameter. No ratio, sample cap, or model-count threshold changed.",
+      "why": "On BIOMD0000000001 the six-pulse schedule runs past the horizon that preserves rate constants. The deposited model's own events change kf values. The previous check treated that inequality as a failed trial, so every phenotype attempt errored and the phenotype screen was marked incomplete. The test does not assign those parameters."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "biomodels-curated-sbml",
+      "name": "BioModels curated SBML files simulated with libroadrunner",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "doi": null,
+      "version": "files retrieved at the timestamps in files[]",
+      "license": null,
+      "files": [
+        {
+          "biomodels_id": "BIOMD0000000001",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000001?filename=BIOMD0000000001_url.xml",
+          "retrieved_at": "2026-11-02T00:56:50Z",
+          "byte_size": 50538,
+          "sha256": "407fccc883f80e6d120e34d8b0810a206a5cc6535a26d4574611504e683beb08",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 12,
+          "horizon": 10.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000002",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000002?filename=BIOMD0000000002_url.xml",
+          "retrieved_at": "2026-11-02T00:57:53Z",
+          "byte_size": 46871,
+          "sha256": "7f7ee585a886f9cd88199887a9e674e070ce368b2884ceeee65dd437f3edca7f",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 13,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000005",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000005?filename=BIOMD0000000005_url.xml",
+          "retrieved_at": "2026-11-02T00:58:58Z",
+          "byte_size": 24470,
+          "sha256": "5a4f44b5a0bc8f32d3206f460f748236539de593be0fb016da2ed7cddd098e36",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 6,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000010",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010?filename=BIOMD0000000010_url.xml",
+          "retrieved_at": "2026-11-02T00:59:45Z",
+          "byte_size": 29295,
+          "sha256": "906964e07ffd570ad94a03c1222e230b54b913cd536b008392bfb6155930a966",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 8,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000012",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000012?filename=BIOMD0000000012_url.xml",
+          "retrieved_at": "2026-11-02T01:00:25Z",
+          "byte_size": 43901,
+          "sha256": "d535c84bc5fe68b01728cac5c53f8fed971176e3f0f2367a9ba1e9c043b11a2d",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 6,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000016",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000016?filename=BIOMD0000000016_url.xml",
+          "retrieved_at": "2026-11-02T01:01:13Z",
+          "byte_size": 29255,
+          "sha256": "35ad538383991b45273e2a767c0325d996d188dba10ce959de9635564813f703",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 6,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000017",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000017?filename=BIOMD0000000017_url.xml",
+          "retrieved_at": "2026-11-02T01:01:15Z",
+          "byte_size": 63765,
+          "sha256": "b75db9f5e0b418d7eb015e44565c992ebcda10f56f8934747a2677e222b16148",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 11,
+          "horizon": 100.0
+        },
+        {
+          "biomodels_id": "BIOMD0000000022",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000022?filename=BIOMD0000000022_url.xml",
+          "retrieved_at": "2026-11-02T01:02:22Z",
+          "byte_size": 66297,
+          "sha256": "0b569c675eaed0226dc4c1dcd7f7e2e210a7cbd1b5562da97e55f47c255cdf04",
+          "license": null,
+          "id_source": "sequential",
+          "n_floating": 10,
+          "horizon": 100.0
+        }
+      ],
+      "role": "ordinary differential equations of published pathway and gene-regulatory models; stimuli are temporary clamps of state variables"
+    },
+    {
+      "id": "biswas-clawson-levin-2023-ijms",
+      "name": "Biswas, Clawson and Levin 2023, Learning in Transcriptional Network Models, Int. J. Mol. Sci. 24:285",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "doi": "10.3390/ijms24010285",
+      "version": "Europe PMC full text as vendored in the repository",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "path": "claim-sources/levin-papers/inputs/2022-grn-learning.txt",
+          "byte_size": 66301,
+          "sha256": "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58",
+          "note": "already vendored; not re-downloaded for this test. Figures, tables and reference list were omitted from this text file."
+        }
+      ],
+      "role": "methods for clamps, UCS memory, habituation, sensitization and third-node breaking"
+    }
+  ],
+  "measured": {
+    "value": 0.0,
+    "unit": "fraction of completed models whose UCS-memory counts are equal at 10x, 50x and 100x",
+    "n": 7,
+    "uncertainty": "deterministic given libroadrunner 2.11 and the recorded SBML bytes; no sampling noise",
+    "extra": {
+      "panel": "sequential-biomodels",
+      "n_completed": 7,
+      "n_baseline_ok": 8,
+      "stable_models": 0,
+      "loss_models": 6,
+      "gain_models": 2,
+      "stable_fraction": 0.0,
+      "loss_fraction": 0.8571428571428571,
+      "memory_hits_sum": 294,
+      "models": [
+        {
+          "id": "BIOMD0000000001",
+          "M10": 23,
+          "M50": 26,
+          "M100": 26,
+          "tag": "loss"
+        },
+        {
+          "id": "BIOMD0000000002",
+          "M10": 18,
+          "M50": 15,
+          "M100": 16,
+          "tag": "both"
+        },
+        {
+          "id": "BIOMD0000000005",
+          "M10": 17,
+          "M50": 16,
+          "M100": 16,
+          "tag": "gain"
+        },
+        {
+          "id": "BIOMD0000000010",
+          "M10": 2,
+          "M50": 2,
+          "M100": 3,
+          "tag": "loss"
+        },
+        {
+          "id": "BIOMD0000000012",
+          "M10": 23,
+          "M50": 23,
+          "M100": 24,
+          "tag": "loss"
+        },
+        {
+          "id": "BIOMD0000000017",
+          "M10": 1,
+          "M50": 2,
+          "M100": 2,
+          "tag": "loss"
+        },
+        {
+          "id": "BIOMD0000000022",
+          "M10": 11,
+          "M50": 13,
+          "M100": 15,
+          "tag": "loss"
+        }
+      ],
+      "table_s1_ids_found": 0,
+      "download_attempts": 22,
+      "skipped": [
+        {
+          "id": "BIOMD0000000003",
+          "reason": "parameters-drift-on-baseline",
+          "n_floating": null,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000004",
+          "reason": "parameters-drift-on-baseline",
+          "n_floating": null,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000006",
+          "reason": "species-count",
+          "n_floating": 0,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000007",
+          "reason": "species-count",
+          "n_floating": 17,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000008",
+          "reason": "parameters-drift-on-baseline",
+          "n_floating": null,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000009",
+          "reason": "species-count",
+          "n_floating": 26,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000011",
+          "reason": "species-count",
+          "n_floating": 22,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000013",
+          "reason": "species-count",
+          "n_floating": 18,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000014",
+          "reason": "species-count",
+          "n_floating": 86,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000015",
+          "reason": "species-count",
+          "n_floating": 16,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000018",
+          "reason": "species-count",
+          "n_floating": 20,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000019",
+          "reason": "species-count",
+          "n_floating": 93,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000020",
+          "reason": "species-count",
+          "n_floating": 0,
+          "source": "sequential"
+        },
+        {
+          "id": "BIOMD0000000021",
+          "reason": "parameters-drift-on-baseline",
+          "n_floating": null,
+          "source": "sequential"
+        }
+      ],
+      "libroadrunner": "2.11.0"
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.42,
+  "data_kind": "computational",
+  "results_summary": [
+    "Panel: sequential-biomodels. Baseline-ok models: 8. Completed for this claim: 7.",
+    "Stable fraction 0.0, loss fraction 0.8571428571428571, gain models 2, memory-hit sum 294.",
+    "Verdict refutes, confidence 0.42."
+  ],
+  "method": "Public BioModels SBML files are integrated with libroadrunner. Model identifiers are read, as strings only, from the 2023 paper's public supplementary pages when those pages contain BIOMD identifiers; otherwise, and when fewer than the cap of runnable models are found, curated identifiers are scanned in order from BIOMD0000000001. A model is kept when it has 3 to 15 floating species and a finite baseline on a horizon of 100, 10 or 1 time units. Stimuli clamp a species to a multiple (10, 50 or 100) of its baseline scale, or to that scale divided by the multiple, without editing parameters or reactions. UCS memory, six-pulse habituation and sensitization, third-node breaking, and Pavlovian pairing are scored with the thresholds in preregistration, including sham controls, and the pre-registered decision rule sets the verdict."
+}
