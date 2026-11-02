@@ -1,0 +1,123 @@
+{
+  "claim_id": "aristotle-ha05-47",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-47",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "Species in the genus Vipera bear live young rather than laying eggs, other snakes lay eggs, and viper litters are about twenty young.",
+  "pass_criterion": "Pre-registered. On a species-level reproductive-mode table, the viper is the genus Vipera and other serpents are snakes outside that genus. Live-bearing (viviparous, including ovoviviparity) must be the mode of at least 80% of Vipera species with data and n must be at least 3. Egg-laying must be the mode of at least 80% of other snakes with data and n must be at least 50. If a litter-size column exists for at least 10 Vipera species, the median litter size must lie in the closed interval from 10 to 30. Supports only when every tested clause meets these thresholds. Parturition lasting one day, and births one at a time, are tested only if the table has such a column.",
+  "fail_criterion": "Pre-registered. Refutes if fewer than 50% of Vipera species with mode data are live-bearing. Mixed if at least 80% of Vipera are live-bearing but fewer than 80% of other snakes are egg-laying, or if mode clauses pass but the median Vipera litter size falls outside 10 to 30. Inconclusive, reason data-unavailable, if the table cannot be retrieved or has no reproductive-mode field. Inconclusive, reason underpowered, if fewer than 3 Vipera species or fewer than 50 other snakes have mode data.",
+  "planned_datasets": [
+    "zimin-2022-squamate-reproductive-mode"
+  ],
+  "test_contract": {
+    "expected_observation": "Vipera species are coded live-bearing, other snakes are coded egg-laying, and the median Vipera litter, if recorded, is about twenty (between 10 and 30 inclusive).",
+    "disconfirming_observation": "Vipera species are mostly egg-laying. Other snakes being commonly live-bearing, or a median litter outside 10 to 30, contradicts only that clause.",
+    "admissible_datasets": "A public species-level table of squamate or snake reproductive mode that names genus and species, covers both vipers and other snakes, and is independent of this repository. Oviparous means shelled eggs laid outside the mother. Viviparous and ovoviviparous both count as externally live-bearing. Lizards are not snakes.",
+    "inference_method": "Identify snakes and the genus Vipera from the table's taxonomy columns in analysis.py. Proportions use species as the unit, one row per species. Supports only if the Vipera live-bearing proportion is at least 0.80 (n>=3) and the other-snake egg-laying proportion is at least 0.80 (n>=50), and any tested litter-size median is inside [10, 30]. Refutes if the Vipera live-bearing proportion is below 0.50. Disagreement between the viper clause and the other-snake clause is mixed."
+  },
+  "interpretation": "The viper in a Greek natural history is the genus Vipera, not every species in the family Viperidae. Internally oviparous and externally viviparous is mapped to live-bearing, which covers both ovoviviparity and viviparity, because the contrast Aristotle draws is with serpents that lay eggs. About twenty young is the closed interval 10 to 30. All in one day and one at a time are separate clauses and are left untested when the table has no such column. Family-level Viperidae counts may be reported beside the genus test but do not decide the verdict.",
+  "datasets": [
+    {
+      "id": "zimin-2022-squamate-reproductive-mode",
+      "name": "Zimin and others, species-level squamate reproductive mode (Appendix S1 of the Dryad dataset mirrored on Zenodo)",
+      "landing_url": "https://zenodo.org/records/7144760",
+      "doi": "10.5061/dryad.kd51c5b6m",
+      "version": "Zenodo record 7144760",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/records/7144760/files/Appendix_S1.rar?download=1",
+          "retrieved_at": "2026-11-02T00:54:34Z",
+          "byte_size": 9408935,
+          "sha256": "bf62b96bd69b04af4a9b4e5def009bc63007d3a45b8febfa952c47f8decf258f"
+        }
+      ],
+      "role": "species-level reproductive mode for snakes, including genus Vipera"
+    }
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-5da8",
+    "date": "2026-11-01"
+  },
+  "method": "analysis.py downloaded the Zenodo RAR5 archive and extracted species_level_data.xlsx with unar, because Python's standard library cannot read this RAR5. The primary tally keeps snakes whose source.reproductive.mode is 'not imputed'. Mode 0 is oviparous, mode 1 is viviparous, and mode 2 (mixed) stays in the denominator as neither. Vipera is the genus name at the start of the species binomial. Other serpents are rows whose what column is snake and whose genus is not Vipera. The same proportions were also computed on every snake row, including imputed modes, and stored only as a sensitivity figure. The workbook has no litter-size, parturition-duration, or births-one-at-a-time column.",
+  "measured": {
+    "value": 1.0,
+    "unit": "proportion of genus Vipera species that are viviparous",
+    "n": 17,
+    "uncertainty": null,
+    "extra": {
+      "vipera_viviparous_proportion": 1.0,
+      "n_vipera_scored": 17,
+      "vipera_mode_counts": {
+        "viviparous": 17
+      },
+      "other_snakes_oviparous_proportion": 0.7923516797712652,
+      "n_other_snakes_scored": 2798,
+      "other_snake_mode_counts": {
+        "viviparous": 580,
+        "oviparous": 2217,
+        "mixed": 1
+      },
+      "imputed_snake_rows_excluded": 392,
+      "all_rows_including_imputed_vipera_viviparous_proportion": 1.0,
+      "all_rows_including_imputed_n_vipera": 17,
+      "all_rows_including_imputed_other_snakes_oviparous_proportion": 0.8053291536050157,
+      "all_rows_including_imputed_n_other": 3190,
+      "litter_columns": [],
+      "litter_size": "untested",
+      "parturition_duration": "untested",
+      "births_one_at_a_time": "untested",
+      "viviparous_other_snake_families_top": [
+        [
+          "Viperidae",
+          217
+        ],
+        [
+          "Colubridae (Natricinae)",
+          58
+        ],
+        [
+          "Boidae",
+          52
+        ],
+        [
+          "Colubridae (Dipsadinae)",
+          50
+        ],
+        [
+          "Uropeltidae",
+          47
+        ],
+        [
+          "Homalopsidae",
+          45
+        ],
+        [
+          "Elapidae",
+          44
+        ],
+        [
+          "Tropidophiidae",
+          23
+        ]
+      ],
+      "verdict_from_criteria": "mixed",
+      "reason": null
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.66,
+  "data_kind": "biological",
+  "caveats": [
+    "All 17 Vipera species with an observed mode are viviparous. None of those 17 rows is imputed.",
+    "Of 2,798 other snakes with an observed mode, 2,217 are oviparous (0.792), 580 are viviparous and 1 is mixed. That is below the pre-registered 0.80 egg-laying threshold.",
+    "Including the 392 imputed snake rows raises the other-snake oviparous share to 0.805. That figure is a sensitivity check and is not the verdict.",
+    "Litter size, birth in one day, and births one at a time are untested.",
+    "Family Viperidae counts are reported in measured.extra and do not decide the verdict. The family field sometimes names a subfamily in parentheses."
+  ],
+  "deviations": [
+    "Rows whose source.reproductive.mode is not 'not imputed' were excluded from the primary proportions, because phylogenetic imputation is a prediction rather than a measurement of that species. Counting them raises the other-snake oviparous share from 0.7923516797712652 to 0.8053291536050157, which crosses the pre-registered 0.80 line. The pass and fail thresholds were not changed."
+  ]
+}

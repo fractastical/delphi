@@ -1,0 +1,110 @@
+{
+  "claim_id": "aristotle-ha08-28",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-28",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "In brown bears (Ursus arctos), births fall inside the winter den interval, that interval covers the winter solstice, and females emerge in spring about three months after the solstice, without feeding while denned.",
+  "pass_criterion": "Pre-registered. Using individual den-entrance, birth and den-emergence dates for female Ursus arctos: at least 90% of records with all three dates have entrance before birth and birth before emergence; at least 90% of records with both den dates have the winter solstice (21 December) inside the den interval; the median emergence date is in March, April or May and falls within 30 days of the date 91 days after the preceding 21 December. Supports if those four timing conditions hold. If no feeding or fasting field exists, the fasting clause is untested and does not block support.",
+  "fail_criterion": "Pre-registered. Refutes if fewer than 50% of births fall inside the den interval, or if fewer than 50% of den intervals contain the winter solstice. Mixed if the birth-in-den and solstice conditions are at or above 50% but any support threshold (90% birth-in-den, 90% solstice coverage, spring median emergence, or the 30-day window) fails, or if a feeding field shows that denned females eat. Inconclusive, reason data-unavailable, if the table cannot be retrieved. Inconclusive, reason underpowered, if fewer than 20 records have the dates a clause needs.",
+  "planned_datasets": [
+    "usgs-grizzly-parturition-denning-2011-2021"
+  ],
+  "test_contract": {
+    "expected_observation": "Female brown bears give birth after den entrance and before den emergence, the den interval includes the winter solstice, and the median emergence is in spring within 30 days of 91 days after 21 December.",
+    "disconfirming_observation": "Births usually fall outside the den interval, or den intervals usually do not cover the winter solstice. Emergence outside the spring window, or feeding during denning, contradicts only that clause.",
+    "admissible_datasets": "Public individual-level dates of den entrance, parturition and den emergence for female Ursus arctos, with a named population and year, retrievable without authentication. Grizzly bears count as brown bears. Captive or species-other-than-Ursus-arctos records do not count.",
+    "inference_method": "Parse dates in analysis.py. Birth-in-den and solstice-coverage are proportions. Emergence timing uses the median date. The target date is 91 days after the 21 December that precedes emergence. Supports only if both proportions are at least 0.90, the median emergence month is March, April or May, and the median is within 30 days of the target. Refutes if either proportion is below 0.50. Any intermediate pattern is mixed. A missing feeding column leaves fasting untested."
+  },
+  "interpretation": "The she-bear of the claim is Ursus arctos. North American grizzly populations are that species. Winter concealment is the den interval. Three months after the winter solstice is operationalized as 91 days after 21 December, and about is a pre-set window of 30 days. Spring is March through May. Eating nothing while hidden can be scored only if the table records feeding or fasting; location data alone are not a feeding measurement.",
+  "datasets": [
+    {
+      "id": "usgs-grizzly-parturition-denning-2011-2021",
+      "name": "Costello and others 2025, observed reproductive status and estimated den entrance, emergence and birth dates for radio-marked female grizzly bears, 2011-2021",
+      "landing_url": "https://www.sciencebase.gov/catalog/item/68716b6ed4be026e1750f346",
+      "doi": "10.5066/P14WTKOF",
+      "version": "ScienceBase item 68716b6ed4be026e1750f346, last updated 2025-09-22",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "download_url": "https://www.sciencebase.gov/catalog/file/get/68716b6ed4be026e1750f346?f=__disk__65%2Fe5%2F1f%2F65e51f4efcca7872f9b2e2a8df99584114cb81a9",
+          "retrieved_at": "2026-11-02T00:51:20Z",
+          "byte_size": 14182,
+          "sha256": "ab0fdcc7cf3a46a0979767eacc90cf2e5cdbaf50c120b7e30ca6c2f219af5fcf"
+        }
+      ],
+      "role": "individual den-entrance, birth and den-emergence dates for female Ursus arctos"
+    }
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-5da8",
+    "date": "2026-11-01"
+  },
+  "method": "analysis.py read the ScienceBase item catalog, downloaded Grizzly_bear_parturition_data.csv, and parsed EntryDate, BirthDate and ExitDate. A birth counts as inside the den when entrance is before birth and birth is before emergence. A den interval covers the solstice when some 21 December falls between entrance and emergence. The emergence offset is the exit date minus 91 days after the 21 December that precedes emergence, and the reported timing is the median of those offsets. No column name contains feed, fast, forage or eat, so the fasting clause is left untested.",
+  "measured": {
+    "value": 1.0,
+    "unit": "proportion of births inside the den interval",
+    "n": 105,
+    "uncertainty": null,
+    "extra": {
+      "birth_inside_den": 1.0,
+      "n_birth": 105,
+      "solstice_inside_den": 1.0,
+      "n_den_intervals": 105,
+      "median_emergence_offset_days": 38,
+      "median_exit_day_of_year": 119,
+      "median_exit_month": 4,
+      "spring_median": true,
+      "within_30_days_of_solstice_plus_91": false,
+      "fasting_fields": [],
+      "fasting": "untested",
+      "populations": {
+        "GAAR": {
+          "n_birth": 11,
+          "birth_inside_den": 1.0,
+          "n_den": 11,
+          "solstice_inside_den": 1.0,
+          "median_emergence_offset_days": 41,
+          "median_exit_doy": 122
+        },
+        "GYE": {
+          "n_birth": 22,
+          "birth_inside_den": 1.0,
+          "n_den": 22,
+          "solstice_inside_den": 1.0,
+          "median_emergence_offset_days": 41.5,
+          "median_exit_doy": 122.5
+        },
+        "NCDE": {
+          "n_birth": 57,
+          "birth_inside_den": 1.0,
+          "n_den": 57,
+          "solstice_inside_den": 1.0,
+          "median_emergence_offset_days": 36,
+          "median_exit_doy": 117
+        },
+        "SCYE": {
+          "n_birth": 15,
+          "birth_inside_den": 1.0,
+          "n_den": 15,
+          "solstice_inside_den": 1.0,
+          "median_emergence_offset_days": 40,
+          "median_exit_doy": 121
+        }
+      },
+      "verdict_from_criteria": "mixed",
+      "reason": null
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.84,
+  "data_kind": "biological",
+  "caveats": [
+    "The bears are North American Ursus arctos (grizzly) from GAAR, GYE, NCDE and SCYE, not Mediterranean populations.",
+    "The data release describes den entrance, emergence and birth dates as estimated.",
+    "Every one of 105 births with all three dates falls inside the den, and every one of 105 den intervals covers 21 December.",
+    "The median emergence is day-of-year 119, which is April, 38 days after 91 days past the preceding solstice, outside the pre-registered 30-day window.",
+    "Whether denned females eat is untested, because the table has no feeding field. That absence does not decide the verdict."
+  ]
+}
