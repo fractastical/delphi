@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa03-07",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa03-07",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:30:00Z",
   "hypothesis": "If the claim holds, then among living mammals with paired cranial weapons, only deer have a weapon that is solid throughout, and only deer cast that weapon.",
   "pass_criterion": "Pre-registered (both clauses). Solid-throughout means the headgear character table codes the keratin sheath as absent. Casting means the table codes regeneration of bone tissue as present. Sheath-only replacement is not casting: Aristotle's other animals keep the bony core, and he says deer cast the solid horn. The solid-only clause passes if cervids are solid-throughout and no other coded family is. The shed-only clause passes if cervids regenerate bone and no other coded family does. Both clauses must pass. Cell codes: '+' present, '-' absent, '(+)' present, '(-)' absent, '+/-' means the state occurs in some members of the family. A '+/-' outside cervids on the deer-like state (sheath absent, or bone regenerated) makes that only-clause fail. A '?' leaves that family unscored; a definite counterexample in another family still fails the clause.",
@@ -19,7 +19,9 @@
   },
   "caveats": [
     "A web-search snippet had already displayed an HTML rendering of this table before the commit. The snippet is not the measurement. The script must read the article and transcribe the cells.",
-    "The table does not include rhinoceroses unless the article text does. A pass would then be a pass inside ruminant headgear, which the caveat must repeat if that is the outcome."
+    "The table does not include rhinoceroses unless the article text does. A pass would then be a pass inside ruminant headgear, which the caveat must repeat if that is the outcome.",
+    "Analysis: Giraffe ossicones are scored solid-throughout because Table 1 codes their epidermis as having no keratin sheath. Pronghorns regenerate the keratin sheath and not the bone, so they are not scored as casting the horn.",
+    "Analysis: Rhinoceroses are outside this table. The article page contains no rhinoceros wording, so they were not coded."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -27,5 +29,78 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-05bb",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.7,
+  "datasets": [
+    {
+      "id": "davis-brakora-lee-2011-ruminant-headgear-table1",
+      "name": "Davis, Brakora and Lee 2011, Table 1, Evolution of ruminant headgear",
+      "landing_url": "https://doi.org/10.1098/rspb.2011.0938",
+      "doi": "10.1098/rspb.2011.0938",
+      "version": "Proc R Soc B 278:2857-2865",
+      "license": "Full text publicly readable on PMC; copyright The Royal Society 2011",
+      "files": [
+        {
+          "name": "table1.html",
+          "download_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3151718/table/RSPB20110938TB1/",
+          "retrieved_at": "2026-11-02T00:38:52Z",
+          "byte_size": 19091,
+          "sha256": "b3ec764c522d1ee3051edc7b204fe811e3ae6cd6662dcf02ef1177d8775d83b1"
+        },
+        {
+          "name": "article.html",
+          "download_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3151718/",
+          "retrieved_at": "2026-11-02T00:38:52Z",
+          "byte_size": 230850,
+          "sha256": "dca56166a77fb81a490c37c496266991e5591f46a7d6bff0eefd1da93ffd8995"
+        }
+      ],
+      "role": "character table of keratin sheath and bone regeneration for cervids, bovids, giraffids and antilocaprids"
+    }
+  ],
+  "measured": {
+    "value": 1,
+    "unit": "only-clauses that hold (solid-throughout exclusive to deer; bone-casting exclusive to deer)",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "families": {
+        "cervids": {
+          "keratin_sheath": "-",
+          "solid_throughout": true,
+          "bone_regeneration": "+",
+          "casts_bone": true
+        },
+        "bovids": {
+          "keratin_sheath": "+",
+          "solid_throughout": false,
+          "bone_regeneration": "-",
+          "casts_bone": false
+        },
+        "giraffids": {
+          "keratin_sheath": "-",
+          "solid_throughout": true,
+          "bone_regeneration": "-",
+          "casts_bone": false
+        },
+        "antilocaprids": {
+          "keratin_sheath": "+",
+          "solid_throughout": false,
+          "bone_regeneration": "-",
+          "casts_bone": false
+        }
+      },
+      "solid_only_clause": "fail",
+      "shed_only_clause": "pass",
+      "rhinoceros_mentions_in_article_html": 0
+    }
+  },
+  "method": "Fetched the PMC HTML of Table 1 and the article, transcribed the keratin-sheath row and the regeneration-of-bone-tissue row for the four families, and applied the pre-registered only-clause rules. A keratin sheath absent is solid-throughout; regeneration of bone is casting. Sheath-only renewal is not casting. The article HTML does not mention rhinoceroses, so Rhinocerotidae was not added.",
+  "results_summary": [
+    "Keratin sheath codes: cervids=-, bovids=+, giraffids=-, antilocaprids=+.",
+    "Bone regeneration codes: cervids=+, bovids=-, giraffids=-, antilocaprids=-.",
+    "Solid-only clause fail; shed-only clause pass. giraffids lack a keratin sheath (solid bone under skin) and do not regenerate it."
+  ]
 }
