@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha03-04",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-04",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, dogfish and the other selachians give birth to young rather than laying eggs, with development completed inside the mother.",
   "pass_criterion": "Pre-registered (supports). Primary table: Hughes and Blackburn Dryad file shark_modepruned_F_parity.csv (doi:10.5061/dryad.80gb5mm12), column mode, categories Live-bearing and Egg-laying as named in the deposit's file description. Selachians are binomials matching FishBase v25.04 species in class Elasmobranchii, sharks and rays together, which is the claim's scope. Supports only if at least 50 matched species have a non-empty mode and the number coded Egg-laying is 0.",
   "fail_criterion": "Pre-registered. Refutes if at least 10 matched species are Egg-laying, or if the egg-laying proportion is at least 0.10 among at least 30 matched species. Mixed if the egg-laying count is from 1 to 9 and the proportion is below 0.10. Inconclusive with reason underpowered if fewer than 30 species match with a non-empty mode. Inconclusive with reason data-unavailable if the file cannot be retrieved or the mode labels are not Live-bearing and Egg-laying. shark_modepruned_D.csv may be tabulated by mode as a description and does not change the verdict.",
@@ -21,7 +21,8 @@
   "caveats": [
     "Only the Dryad file description was read before registration. It says shark_modepruned_F_parity.csv codes Live-bearing and Egg-laying. No species row was read.",
     "A Sharkipedia search snippet showed an oviparous catshark and several viviparous sharks. That snippet is not this dataset and was not counted.",
-    "Dogfish genera are not a separate verdict. Their modes will be listed after the run."
+    "Dogfish genera are not a separate verdict. Their modes will be listed after the run.",
+    "After the run, 186 Dryad binomials did not match a FishBase Elasmobranchii species. The unmatched sample includes chimaeras, which are outside that class, and names FishBase spells differently. They are excluded from the proportion. The 342 matched egg-laying species are the verdict count."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -29,5 +30,93 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-ec43",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.83,
+  "datasets": [
+    {
+      "id": "dryad-10.5061-dryad.80gb5mm12",
+      "name": "Hughes and Blackburn 2025 reanalysis of Katona et al. 2023 chondrichthyan reproductive modes",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.80gb5mm12",
+      "doi": "10.5061/dryad.80gb5mm12",
+      "version": "2025-01-26",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "shark_modepruned_F_parity.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3901775",
+          "retrieved_at": "2026-11-02T00:42:44Z",
+          "byte_size": 31965,
+          "sha256": "d74e0becf3782bb68a112c8f45eaf75c1b8acd21d631bdea485046bff15af3cf"
+        },
+        {
+          "name": "shark_modepruned_D.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3901770",
+          "retrieved_at": "2026-11-02T00:42:45Z",
+          "byte_size": 38539,
+          "sha256": "bb32d5be6070379d3e44db08d58eb1d6f30a64a4ed7a7b89c4afe26b65d8a872"
+        }
+      ],
+      "role": "parity (live-bearing versus egg-laying) for the verdict; finer modes in the D file are descriptive"
+    },
+    {
+      "id": "fishbase-v25.04-taxonomy",
+      "name": "FishBase v25.04 species, families, and orders",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 427298,
+          "sha256": "3f09bbb09c1c10219277f35b4f8c42aebedd5f1b8e00ebdfdeb0e16574b0e090"
+        },
+        {
+          "name": "orders.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/orders.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 49042,
+          "sha256": "a0f33b60ffbc1950ae8b57f652fd0b327f7d00713602c0f4e847ca1d8c8f69a0"
+        }
+      ],
+      "role": "match binomials to Elasmobranchii, including rays"
+    }
+  ],
+  "method": "Downloaded the Dryad parity file and the FishBase taxonomy tables. Each binomial was matched to class Elasmobranchii. A species with any Egg-laying row counts as egg-laying. The pre-registered thresholds were applied to that count. The D file's nutrition modes were counted and not used for the verdict. Headers seen: parity species, mode; D file species, mode.",
+  "measured": {
+    "value": 0.443,
+    "unit": "proportion of matched elasmobranch species coded egg-laying",
+    "n": 772,
+    "uncertainty": null,
+    "extra": {
+      "n_egg_laying": 342,
+      "n_live_bearing_only": 430,
+      "n_unmatched": 186,
+      "egg_by_order": {
+        "Rajiformes": 187,
+        "Carcharhiniformes": 123,
+        "Orectolobiformes": 23,
+        "Heterodontiformes": 9
+      },
+      "dogfish_n": 71,
+      "dogfish_egg_laying": 26
+    }
+  },
+  "results_summary": [
+    "Matched selachians: 342 of 772 are egg-laying (0.443).",
+    "Live-bearing only: 430. Unmatched or non-elasmobranch names: 186.",
+    "Egg-laying by order: Rajiformes 187, Carcharhiniformes 123, Orectolobiformes 23, Heterodontiformes 9.",
+    "Named dogfish genera in the matched set: 71, of which 26 are egg-laying."
+  ]
 }

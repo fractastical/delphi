@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha01-10",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-10",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, some sharks retain yolked eggs that develop inside the mother and are born live, while the human and the horse carry a foetus rather than laying an egg.",
   "pass_criterion": "Pre-registered (supports). Primary shark table: Hughes and Blackburn's Dryad file shark_modepruned_D.csv (doi:10.5061/dryad.80gb5mm12), column mode, categories as named in that deposit's file description. A species counts as hatching eggs internally only when mode is exactly Yolk-only_viviparity. Sharks are binomials that match a FishBase v25.04 species in class Elasmobranchii whose order is not batoid, using the same batoid order rule as aristotle-ha05-03. Supports only if at least 10 matched shark species are Yolk-only_viviparity, and AnAge (genomics.senescence.info species dataset.zip) has a non-null Gestation/Incubation value for Homo sapiens and for Equus caballus, both in class Mammalia and neither in order Monotremata.",
   "fail_criterion": "Pre-registered. Refutes if no matched shark species is Yolk-only_viviparity, or if Homo sapiens or Equus caballus is present as a monotreme or has no gestation value while an incubation-only coding is present. Mixed if the count of yolk-only sharks is from 1 to 9 and both mammals meet the gestation rule. Inconclusive with reason data-unavailable if the Dryad mode file or the AnAge file cannot be retrieved, or if the mode column does not contain the named category labels. Unmatched binomials are excluded from the shark count, not treated as non-sharks that fail the claim.",
@@ -21,7 +21,8 @@
   "caveats": [
     "The Dryad file description, not the data file, was read before registration. It names the mode labels Egg-laying, Live-bearing_with_oophagy, Live-bearing_with_uterine_milk, Placental_viviparity, and Yolk-only_viviparity. No species row and no count of modes was read.",
     "A web-search snippet of a Sharkipedia reproductive-mode page showed both oviparous and viviparous labels for individual elasmobranchs. That snippet is not the dataset and was not counted.",
-    "AnAge's column is labelled gestation/incubation in one field. Order Monotremata is the pre-registered egg-laying mammal exclusion. A gestation number is not a measurement of foetal membranes."
+    "AnAge's column is labelled gestation/incubation in one field. Order Monotremata is the pre-registered egg-laying mammal exclusion. A gestation number is not a measurement of foetal membranes.",
+    "After the run, 197 non-batoid sharks have yolk-only viviparity as their only mode. Egg-laying, oophagy, uterine milk, and placental viviparity are in the same file and are not counted as the internal-egg example, because the claim says some sharks. The human and horse figures are AnAge species entries for gestation length and order, not a measurement of foetal membranes."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -29,5 +30,109 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-ec43",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.72,
+  "datasets": [
+    {
+      "id": "dryad-10.5061-dryad.80gb5mm12-shark-modepruned-D",
+      "name": "Hughes and Blackburn 2025 shark_modepruned_D.csv, Katona et al. 2023 modes",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.80gb5mm12",
+      "doi": "10.5061/dryad.80gb5mm12",
+      "version": "2025-01-26",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "name": "shark_modepruned_D.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3901770",
+          "retrieved_at": "2026-11-02T00:42:44Z",
+          "byte_size": 38539,
+          "sha256": "bb32d5be6070379d3e44db08d58eb1d6f30a64a4ed7a7b89c4afe26b65d8a872"
+        }
+      ],
+      "role": "yolk-only viviparity versus other reproductive modes"
+    },
+    {
+      "id": "anage-build",
+      "name": "AnAge species dataset",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "anage_data.txt",
+      "license": "AnAge is free to use with citation; the build page does not name a SPDX licence",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:42:44Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "gestation days for Homo sapiens and Equus caballus"
+    },
+    {
+      "id": "fishbase-v25.04-taxonomy",
+      "name": "FishBase v25.04 species, families, and orders",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 427298,
+          "sha256": "3f09bbb09c1c10219277f35b4f8c42aebedd5f1b8e00ebdfdeb0e16574b0e090"
+        },
+        {
+          "name": "orders.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/orders.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 49042,
+          "sha256": "a0f33b60ffbc1950ae8b57f652fd0b327f7d00713602c0f4e847ca1d8c8f69a0"
+        }
+      ],
+      "role": "separate non-batoid sharks from rays"
+    }
+  ],
+  "method": "Downloaded shark_modepruned_D.csv and matched binomials to FishBase. A shark counts as hatching a retained egg only when its sole mode is Yolk-only_viviparity. AnAge rows for Homo sapiens and Equus caballus were read for a positive gestation value, class Mammalia, and an order other than Monotremata. Mode-file headers: species, mode. AnAge gestation column: Gestation/Incubation (days).",
+  "measured": {
+    "value": 197,
+    "unit": "shark species coded yolk-only viviparity",
+    "n": 197,
+    "uncertainty": null,
+    "extra": {
+      "n_yolk_only_rays": 13,
+      "homo_sapiens_gestation_days": 280.0,
+      "homo_sapiens_order": "Primates",
+      "equus_caballus_gestation_days": 337.0,
+      "equus_caballus_order": "Perissodactyla",
+      "mode_counts_sharks": {
+        "Egg-laying": 146,
+        "Live-bearing_with_oophagy": 16,
+        "Live-bearing_with_uterine_milk": 1,
+        "Placental_viviparity": 78,
+        "Yolk-only_viviparity": 197
+      },
+      "mode_counts_rays": {
+        "Egg-laying": 187,
+        "Live-bearing_with_uterine_milk": 134,
+        "Yolk-only_viviparity": 13
+      }
+    }
+  },
+  "results_summary": [
+    "Yolk-only viviparous sharks: 197. Yolk-only rays, not counted toward the shark example: 13.",
+    "Homo sapiens gestation 280.0 days, order Primates. Equus caballus gestation 337.0 days, order Perissodactyla.",
+    "Shark mode counts: Yolk-only_viviparity 197, Egg-laying 146, Placental_viviparity 78, Live-bearing_with_oophagy 16, Live-bearing_with_uterine_milk 1"
+  ]
 }

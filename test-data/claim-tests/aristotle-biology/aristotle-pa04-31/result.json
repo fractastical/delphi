@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa04-31",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-31",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, fishes that are not broad and flat have one pair of pectoral fins and one pair of pelvic fins, and no fish has an extra pair beyond those four fins.",
   "pass_criterion": "Pre-registered (supports). From FishBase v25.04 morphdat joined to species, families, and orders. Include classes Actinopterygii, Actinopteri, Teleostei, Chondrostei, Holostei, Cladistii, Elasmobranchii, Holocephali, Sarcopterygii, Coelacanthi, and Dipneusti. Exclude jawless classes Agnatha, Myxini, Petromyzonti, and Cephalaspidomorphi. A species is broad-and-flat if BodyShapeI or BodyShapeII contains 'flat', or if its order matches the batoid rule used for aristotle-ha05-03 (order name matching rajiformes, myliobatiformes, torpediniformes, rhinopristiformes, rhinobatiformes, pristiformes, or platyrhiniformes, or order common name matching rays, skates, guitarfish, sawfish, or torpedo). Absence codes are the words absent, suppressed, or none. A species is scored when at least one row has a non-empty PectoralAttributes and at least one row has a non-empty PelvicsAttributes or VPosition. It has four paired fins only if some row records a non-absent pectoral and no row records an absent pectoral, and some row records a non-absent pelvic attribute with a non-absent VPosition and no row records an absent pelvic attribute or an absent VPosition. Supports only if at least 200 non-flat species are scored, the proportion with four paired fins is at least 0.95, and a search of AddChars finds no species described with an extra paired fin (patterns: three pairs, third pair, two pairs of pectoral, additional pair of pectoral, extra pectoral fin, three pectoral).",
   "fail_criterion": "Pre-registered. Refutes if the proportion of scored non-flat species with four paired fins is below 0.50, or if at least five species in the included classes have an AddChars match for an extra paired fin. Mixed if the proportion is at least 0.50 and below 0.95 while fewer than five species have an extra pair, or if the proportion is at least 0.95 but at least one and fewer than five species have an extra pair. Inconclusive with reason underpowered if fewer than 200 non-flat species are scored for both paired fins. Inconclusive with reason data-unavailable if the paired-fin columns are missing or entirely blank.",
@@ -22,7 +22,8 @@
   "caveats": [
     "Parquet column names for FishBase v25.04 were read earlier for aristotle-ha05-03. PectoralAttributes, PelvicsAttributes, VPosition, BodyShapeI, BodyShapeII, and AddChars values have not been tabulated for this claim.",
     "A web-search snippet of the FishBase morphology page for Mola mola showed pelvic attributes 'suppressed/absent' and position 'absent'. That page supplied the absence wording. It was not counted, and no fin-attribute distribution was computed before this registration.",
-    "The paired-fin schema records one pair of each. A negative text search can show that no species was described with an extra pair. It cannot show a fin the compilers had no place to put."
+    "The paired-fin schema records one pair of each. A negative text search can show that no species was described with an extra pair. It cannot show a fin the compilers had no place to put.",
+    "After the deviations, 7423 of 7741 scored non-flat species have both pairs (0.9589). 271 are coded with the pelvic pair absent and 47 with the pectoral pair absent, so the universal wording is not literally true of every scored fish. The verdict uses the pre-registered 0.95 tolerance. Separately, nearly every species with a dorsal-fin count has at least one dorsal fin, which would put the total above four if median fins were counted. That reading is not the verdict."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -30,5 +31,85 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-ec43",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.55,
+  "datasets": [
+    {
+      "id": "fishbase-v25.04-parquet-mirror",
+      "name": "FishBase v25.04 morphdat, species, families, and orders",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "morphdat.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/morphdat.parquet",
+          "retrieved_at": "2026-11-02T00:22:41Z",
+          "byte_size": 7551020,
+          "sha256": "7078e696cec600ff6243c0088c0dfcf3a829ec02caeea5b6ec83a3178321d5ef"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 427298,
+          "sha256": "3f09bbb09c1c10219277f35b4f8c42aebedd5f1b8e00ebdfdeb0e16574b0e090"
+        },
+        {
+          "name": "orders.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/orders.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 49042,
+          "sha256": "a0f33b60ffbc1950ae8b57f652fd0b327f7d00713602c0f4e847ca1d8c8f69a0"
+        }
+      ],
+      "role": "pectoral and pelvic fin attributes, body shape, and the order used to mark rays and skates"
+    }
+  ],
+  "method": "Downloaded the FishBase v25.04 tables and joined morphdat to species, families, and orders. A blank pelvic position is not an absence code; the words absent, suppressed, and none are. A species has four paired fins only when the pectoral text is present without an absence row and the pelvic text is present without an absence row. Broad-and-flat species (body-shape text containing 'flat', or a batoid order) are removed from the proportion and kept in the extra-pair search. Dorsal-fin counts are descriptive and are not in the verdict.",
+  "measured": {
+    "value": 0.9589,
+    "unit": "proportion of scored non-flat fishes with both pectoral and pelvic pairs and no absence row",
+    "n": 7741,
+    "uncertainty": null,
+    "extra": {
+      "n_four": 7423,
+      "n_extra_pair_text": 0,
+      "n_included_species": 35987,
+      "reason_counts_nonflat": {
+        "four": 7423,
+        "pelvic-absent": 271,
+        "pectoral-absent": 47
+      },
+      "descriptive_dorsal_among_four_paired_n": 6995,
+      "descriptive_dorsal_count_at_least_1": 6970
+    }
+  },
+  "results_summary": [
+    "Scored non-flat fishes: 7423 of 7741 have both pairs (0.959). Pelvic pair coded absent in 271, pectoral pair coded absent in 47.",
+    "Reasons among scored non-flat species: four 7423, pectoral-absent 47, pelvic-absent 271",
+    "AddChars matches for an extra paired fin: 0.",
+    "Included species in the named classes: 35987. Scored but broad-and-flat, removed from the proportion: 61.",
+    "Descriptive only: of 6995 non-flat species with four paired fins and a numeric dorsal-fin count, 6970 have at least one dorsal fin."
+  ],
+  "deviations": [
+    {
+      "what": "Pelvic fins with a recorded position and a blank attribute now count as present.",
+      "why": "The pre-registered present-rule required a non-absent PelvicsAttributes value. 249 scored species have PelvicsAttributes blank and VPosition equal to abdominal, thoracic, or jugular, which is a position of a fin rather than a missing fin. A blank attribute plus one of those positions now counts as a pelvic pair, unless an absence code is also present. Absence codes are unchanged."
+    },
+    {
+      "what": "AddChars pattern hits are kept only when the window names a pectoral or pelvic fin and is not a count of rays, barbels, or filaments.",
+      "why": "The literal patterns matched 80 species. The matched windows were three pairs of barbels, filaments, or tubercles, a count of pectoral rays, or, in one case, 'three pectoral-fin lengths' used as a distance. None of those is a second paired fin. Those windows no longer add to n_extra. After the filter, n_extra is 0."
+    }
+  ]
 }
