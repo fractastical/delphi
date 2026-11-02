@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa04-15",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-15",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The neck of the wolf (Canis lupus) and the neck of the lion (Panthera leo) each consists of a single bone, whereas other animals with a neck have several cervical vertebrae.",
   "pass_criterion": "Pre-registered, before any vertebral count was read. Supports only if both species have a cervical-element count of exactly 1 in every admissible source that records that species, and the vertebral-formula table records at least one other mammal with a cervical count of 2 or more. A count is the number of cervical vertebrae or separately identified cervical bones, not a length in millimetres. Names accepted are the binomials Canis lupus and Panthera leo only. Canis lupus familiaris, Canis latrans, Panthera pardus and Panthera tigris are not substitutes.",
   "fail_criterion": "Pre-registered. Refutes if at least one of the two species has cervical-element count greater than 1 in every source that records it. Mixed if the sources that record a species disagree on whether the count is 1 or greater than 1, and neither species is greater than 1 in every source that records it. Inconclusive, reason underpowered, if either species has no count and the other is not greater than 1 in every source that records it. Inconclusive, reason data-unavailable, if none of the three sources returns a page or file that can be read. A source that loads but does not name the species contributes no count for it.",
@@ -21,7 +21,10 @@
   "caveats": [
     "Header checks only. No cervical count was read before this file was committed.",
     "The Idaho page is one grey-wolf specimen, and the lion paper is one osteological description. A count above 1 on either source is enough to reject 'a single bone' for that species; it is not a survey of variation.",
-    "Domestic dogs and leopards are out of scope even if a file happens to contain them."
+    "Domestic dogs and leopards are out of scope even if a file happens to contain them.",
+    "The wolf page titles four cervical elements (the first, the second, the third, and the last) and does not print a complete cervical formula. Four separately titled elements are already more than one bone.",
+    "The vertebral-formula table has no Canis lupus row. The wolf count comes only from the museum specimen page.",
+    "constraintMaster.csv was downloaded and hashed. Its rows are not one species each, so the pre-registered exact-name rule gives it no count."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -29,5 +32,166 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-de78",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "measured": {
+    "value": 4,
+    "unit": "cervical elements; the smaller species count among the sources that entered the verdict",
+    "n": 3,
+    "uncertainty": "the wolf figure is a count of separately titled elements on one specimen page, not a stated total; the lion figures are published counts",
+    "extra": {
+      "species_consensus": {
+        "Canis lupus": "many",
+        "Panthera leo": "many"
+      },
+      "observations": [
+        {
+          "species": "Panthera leo",
+          "count": 7,
+          "source": "vertebral-pattern-cerbus-2024",
+          "detail": "Cervical column"
+        },
+        {
+          "species": "Canis lupus",
+          "count": 4,
+          "source": "imnh-grey-wolf-r884-cervicals",
+          "detail": [
+            "Cervical Vertebrae 1 - Atlas (Axial)",
+            "Cervical Vertebrae 2 - Axis (Axial)",
+            "Cervical Vertebrae 3 (Axial)",
+            "Cervical Vertebrae Last (Axial)"
+          ]
+        },
+        {
+          "species": "Panthera leo",
+          "count": 7,
+          "source": "onwuama-lion-axial-skeleton-2021",
+          "detail": "dible 1 Sternum 6 Ribs 26 (13 pairs) Cervical vertebra 7 Thoracic vertebra 13 Lumbar vertebra"
+        }
+      ],
+      "wolf_page": {
+        "contains_canis_lupus": true,
+        "labels": [
+          "Cervical Vertebrae 1 - Atlas (Axial)",
+          "Cervical Vertebrae 2 - Axis (Axial)",
+          "Cervical Vertebrae 3 (Axial)",
+          "Cervical Vertebrae Last (Axial)"
+        ],
+        "count": 4
+      },
+      "lion_paper": {
+        "admissible": true,
+        "count": 7,
+        "snippet": "dible 1 Sternum 6 Ribs 26 (13 pairs) Cervical vertebra 7 Thoracic vertebra 13 Lumbar vertebra",
+        "title": "Morphological studies on the axial skeleton of the African Lion (Panthera leo)",
+        "pdf_url": "https://www.veterinarypaper.com/pdf/2021/vol6issue2/PartA/5-4-28-366.pdf",
+        "pdf_pages": 6
+      },
+      "name_presence": {
+        "Canis lupus in species.csv": false,
+        "Panthera leo in species.csv": true,
+        "constraintMaster exact-binomial rows": 0
+      },
+      "other_species_in_vertebral_formula_table": {
+        "other_species_cervical_ge_2": 289,
+        "other_species_cervical_eq_1": 78,
+        "rows": 388
+      }
+    }
+  },
+  "deviations": [
+    {
+      "what": "The lion cervical count was read from the PDF linked on the DOI landing page, not from the HTML itself.",
+      "why": "The DOI resolves to an HTML page whose title is the lion paper, but that HTML does not contain a cervical row. The PDF linked from the page is the article. pypdf extracts the text. The PDF is about 1.1 MB and is not committed."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "vertebral-pattern-cerbus-2024",
+      "name": "Vertebral formula tables (Cerbus, Hiratani and Kawaguchi), GitHub dbkk/vertebral_pattern",
+      "landing_url": "https://github.com/dbkk/vertebral_pattern",
+      "doi": "10.1073/pnas.2411421121",
+      "version": "a766ce94587640a2654e33bff14a7ddaf00aa732",
+      "license": "Data deposited with the paper in the public GitHub repository; no separate license file was retrieved",
+      "files": [
+        {
+          "name": "vertebralData.csv",
+          "download_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/fullFormulaTree/vertebralData.csv",
+          "final_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/fullFormulaTree/vertebralData.csv",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 15834,
+          "sha256": "4c7dc0b51aa004e190067d0c7e44c0389999683d2fe762b2889f3013962b2db0"
+        },
+        {
+          "name": "species.csv",
+          "download_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/fullFormulaTree/species.csv",
+          "final_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/fullFormulaTree/species.csv",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 7310,
+          "sha256": "0a3abe08eda6177dcf9e19077d0f91dc84ae4e4226cb71fa601f0d4c815175c4"
+        },
+        {
+          "name": "constraintMaster.csv",
+          "download_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/constraintMaster.csv",
+          "final_url": "https://raw.githubusercontent.com/dbkk/vertebral_pattern/a766ce94587640a2654e33bff14a7ddaf00aa732/vertebral/constraintMaster.csv",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 529283,
+          "sha256": "fe82899199899a47d13e4649f03bd2c84490dd45be69e2d7a68112e6719d72bf"
+        }
+      ],
+      "role": "species-level cervical counts; a row counts only when its species cell is exactly Canis lupus or Panthera leo"
+    },
+    {
+      "id": "imnh-grey-wolf-r884-cervicals",
+      "name": "Idaho Museum of Natural History virtual osteology, grey wolf",
+      "landing_url": "https://virtual.imnh.iri.isu.edu/Osteo/View/Grey_Wolf/614",
+      "doi": null,
+      "version": "page retrieved 2026-11-02T00:31:43Z",
+      "license": "Idaho Museum of Natural History virtual specimen page; no Creative Commons mark was read off the page",
+      "files": [
+        {
+          "download_url": "https://virtual.imnh.iri.isu.edu/Osteo/View/Grey_Wolf/614",
+          "final_url": "https://virtual.imnh.iri.isu.edu/Osteo/View/Grey_Wolf/614",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 310598,
+          "sha256": "f3126bc899c7cda50372c7598f401fb07b0ba71b52c065d0c597a27854306223"
+        }
+      ],
+      "role": "separately titled cervical elements of one Canis lupus specimen"
+    },
+    {
+      "id": "onwuama-lion-axial-skeleton-2021",
+      "name": "Onwuama, Jaji, Salami and Kigir 2021, axial skeleton of the African lion",
+      "landing_url": "https://doi.org/10.22271/veterinary.2021.v6.i2a.328",
+      "doi": "10.22271/veterinary.2021.v6.i2a.328",
+      "version": "2021; 6(2): 09-14",
+      "license": "Copyright 2021, the journal (VET), as printed on the PDF",
+      "files": [
+        {
+          "download_url": "https://doi.org/10.22271/veterinary.2021.v6.i2a.328",
+          "final_url": "https://www.veterinarypaper.com/archives/2021/6/2/A/5-4-28",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 48105,
+          "sha256": "aee76856b2385132138a48753131de5d1a9575f9963a05857117573790b1046b"
+        },
+        {
+          "download_url": "https://www.veterinarypaper.com/pdf/2021/vol6issue2/PartA/5-4-28-366.pdf",
+          "final_url": "https://www.veterinarypaper.com/pdf/2021/vol6issue2/PartA/5-4-28-366.pdf",
+          "retrieved_at": "2026-11-02T00:31:43Z",
+          "byte_size": 1107631,
+          "sha256": "d1f63d6a5e97c16fbeaa35c8789bbd0bb239569be2172e4eacd661a941a5e34b"
+        }
+      ],
+      "role": "published cervical-vertebra count for Panthera leo"
+    }
+  ],
+  "method": "Downloaded the three pre-registered vertebral-pattern files at the pinned commit and kept a cervical count only from a row whose species cell is exactly Canis lupus or Panthera leo. constraintMaster.csv is a tree-node table and has no such row, so it contributes no count. Counted distinct 'Cervical Vertebra' headings on the Idaho grey-wolf page after checking that the page names Canis lupus. Read the lion count from the PDF linked on the DOI landing page, whose title names the lion, using the first 'Cervical vertebra' row integer.",
+  "results_summary": [
+    "Panthera leo: 7 (vertebral-pattern-cerbus-2024)",
+    "Canis lupus: 4 (imnh-grey-wolf-r884-cervicals)",
+    "Panthera leo: 7 (onwuama-lion-axial-skeleton-2021)",
+    "Consensus: Canis lupus=many, Panthera leo=many"
+  ]
 }
