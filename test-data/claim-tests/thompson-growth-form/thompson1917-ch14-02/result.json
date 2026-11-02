@@ -1,0 +1,44 @@
+{
+  "claim_id": "thompson1917-ch14-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-02",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "On a sunflower capitulum the two locally conspicuous opposed parastichies cross at an angle that stays about the same from the inner disc to the rim, and a right-angle crossing is an uncommon special case rather than the typical one.",
+  "pass_criterion": "Pre-registered (supports). After the method gate below passes: among usable capitula, at least 70% have a radial range of band-mean intersection angles ≤ 15°, and at most 25% have a head-mean intersection angle ≥ 85°. At least 5 usable capitula are required.",
+  "fail_criterion": "Pre-registered (refutes). After the method gate passes and with at least 5 usable capitula: either at least 70% of usable capitula have a radial range ≥ 30° (the crossing angle is not constant), or at least 70% have range ≤ 15° and at least 50% have head-mean ≥ 85° (the crossing is constant and typically orthogonal). If at least 5 capitula are usable and neither the pass nor the fail rule is met, the verdict is mixed. If the method gate fails, the verdict is inconclusive with reason other and the biological counts are not interpreted. If no capitulum is usable, inconclusive with reason data-unavailable. If 1 to 4 capitula are usable, inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "wikimedia-commons-category-helianthus-annuus-fruit",
+    "turings-sunflowers-dryad-f9k77-annotated-images-fallback"
+  ],
+  "interpretation": "Thompson's sentence is read as a claim about the spirals on a sunflower disc, which is the case he is contrasting with Church: they cross isogonally (one angle along the disc), and a right angle is only a particular, uncommon case of two logarithmic spirals about one pole. 'The spirals' are operationalized as the two locally conspicuous contact directions at each seed: the two shortest distinct nearest-neighbour lattice directions. Their intersection angle is the smaller angle between those two undirected lines, in (0, 90] degrees. 'Isogonal' means that angle's band means change by at most 15° from the inner band to the outer band. 'Orthogonal' means a head-mean of at least 85° (within 5° of a right angle). This is the crossing a viewer sees between the parastichies that are actually in contact at that radius. It is not the angle of one fixed index-step family followed from centre to rim; that reading is not used, because assigning a generative index from a photograph is unstable once seeds are missed, and it was set aside before any photograph was measured. The same measurement on a Vogel (equal-area, golden-angle) lattice is nearly constant and near 78°, so it counts as isogonal and not orthogonal; a logarithmic spiral with plastochron ratio 1.02 is isogonal and orthogonal. Those two synthetics are the method gate, not evidence about sunflowers. Scope is Helianthus annuus capitula. Other inflorescences are not tested. No assessment score is used.",
+  "test_contract": {
+    "expected_observation": "On real sunflower seed heads, the angle between the two shortest contact directions is steady across radius (band-mean range ≤ 15° on at least 70% of usable heads) and the head-mean is below 85° for more than 75% of usable heads.",
+    "disconfirming_observation": "Either the band-mean range is at least 30° on at least 70% of usable heads, or the angle is steady and the head-mean is at least 85° on at least half of usable heads. A lattice that cannot be resolved, or fewer than 5 usable heads, does not confirm or refute the claim.",
+    "admissible_datasets": "Openly licensed photographs of Helianthus annuus capitula in which individual seeds or florets are visible, taken independently of Thompson's text. The primary source is every JPEG or PNG in Wikimedia Commons category 'Helianthus annuus (fruit)' whose shorter side is at least 800 pixels. The Dryad Turing's Sunflowers annotated-image zip (doi:10.5061/dryad.f9k77) is admissible only as a pre-registered fallback if the Wikimedia category yields fewer than 5 usable heads, and then only the first 40 raster images in alphabetical path order. Counts without positions are not admissible. Images are not hand-picked.",
+    "inference_method": "At each detected seed between 0.40 R and 0.90 R (R = 95th percentile of distance from the mean of the points), take the 6 nearest neighbours, cluster their undirected directions at 18°, and record the smaller angle between the lines of the two shortest clusters. Average that angle in three radial bands [0.40, 0.567), [0.567, 0.733), [0.733, 0.90). A head is usable only if both dark-blob and bright-blob detectors are tried and at least one yields ≥ 150 points, ≥ 25 angles in every band, every band's sample standard deviation ≤ 18°, and at least 15% of points inside 0.5 R. If both polarities are usable, keep the one with more points. Thresholds are those in pass_criterion and fail_criterion. A synthetic method gate must pass before those thresholds are applied to photographs."
+  },
+  "method_gate": {
+    "role": "The gate checks the measurer. It is not evidence about sunflowers. Biological rules are applied only if every item passes.",
+    "fermat_coordinates": "N=450 points, r=sqrt(k), golden angle 2π/φ^2, φ=(1+sqrt(5))/2, k=1..450. Require range of the three band means in [4, 12] degrees and head-mean in [74, 83], with each band's sample standard deviation ≤ 12.",
+    "log_orthogonal_coordinates": "N=240 points, r = 1.02^k, same golden angle, k=0..239. Require range ≤ 2° and head-mean ≥ 88°.",
+    "log_oblique_coordinates": "N=160 points, r = 1.04^k, same golden angle, k=0..159. Require range ≤ 2° and head-mean in [50, 65].",
+    "fermat_rendered_image": "Render the same Fermat points as dark Gaussian dots (scale 7 px per coordinate unit, dot sigma 2.0 px, image smoothed with a Gaussian of sigma 0.6 px, then pixel noise N(0, 0.01) from numpy Generator seed 0) and detect dark blobs (high-pass: smooth sigma 1.0 minus smooth sigma 8; minima of a size-5 filter darker than -0.05; greedy non-maximum suppression at 5 px). Require the detected count within 10% of 450, the range within 4° of the coordinate-analysis range, and the head-mean within 4° of the coordinate-analysis head-mean."
+  },
+  "detector": {
+    "decode": "ffmpeg to 8-bit gray raw video, one frame. Shorter side below 800 pixels, from Wikimedia imageinfo, is skipped as below resolution and is not a detection failure.",
+    "polarities": "Dark blobs: local minima of (smooth_1 - smooth_8) below -0.05. Bright blobs: local maxima of (smooth_1 - smooth_8) above +0.05. Minimum filter or maximum filter size 5. Non-maximum suppression distance is 0.6% of the shorter image side, but at least 4 pixels.",
+    "center": "Arithmetic mean of the kept points. R is the 95th percentile of distance to that mean.",
+    "fallback": "If fewer than 5 Wikimedia images are usable, download doi:10.5061/dryad.f9k77 file 'Annotated seedhead images 20160205.zip' (Dryad file id 4661), walk raster images (jpeg, png, tiff) inside the zip and any embedded pptx/ppt in alphabetical path order, and measure the first 40 with the same rules. Pool them with the Wikimedia usable heads. Annotation strokes may make a head fail the lattice standard deviation; that failure stays a failure."
+  },
+  "secondary_analyses_descriptive": [
+    "The list of head-means and ranges, and the median head-mean, reported in measured.extra and not used to choose the verdict.",
+    "How many images were skipped for resolution, failed detection, or failed the lattice quality rule."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/thompson-ch14-spiral-angle-ecd6",
+    "date": "2026-11-01"
+  }
+}
