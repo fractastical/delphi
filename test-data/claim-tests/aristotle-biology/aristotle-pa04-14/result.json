@@ -1,0 +1,110 @@
+{
+  "claim_id": "aristotle-pa04-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-14",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the claim holds for the cuttlefish, squid and octopus named in it, those three kinds each have eight arms, and the arms are short relative to the mantle in cuttlefish and squid and longer relative to the mantle in the octopus.",
+  "pass_criterion": "Pre-registered. Count clause passes if an admissible anatomical source states that cuttlefish, squid and octopus each have eight arms. Tentacles or proboscises, when the same source distinguishes them, are not added to the arm count. Length clause passes if, on specimen or species-mean measurements, the group median of (arm length / mantle length) for octopus exceeds the cuttlefish median and the squid median by at least 0.50 mantle-lengths each. Arm length for an individual is the median of its measured arms; a species value is the median of individual ratios, or the ratio of published mean arm length to mean mantle length when only means are given. A group median is the median of its species values. Each group needs at least 5 individuals or 2 species, else the length clause is unscored. Both clauses must pass for the verdict 'supports'.",
+  "fail_criterion": "Pre-registered. Verdict 'refutes' if the count clause fails (any of the three kinds is stated to have an arm count other than 8, tentacles excluded) or if the count clause passes and the length clause fails (octopus group median is less than or equal to both the cuttlefish median and the squid median). Verdict 'mixed' if the count clause passes and the length clause is partial: the octopus median exceeds only one of the other two groups, or it exceeds both but by less than 0.50 for at least one comparison. Verdict 'inconclusive' with reason 'data-unavailable' if the count source cannot be read, or if the count clause passes and the length clause is unscored because a group's measurements cannot be obtained or fall below the minimum n. Verdict 'inconclusive' with reason 'underpowered' if length measurements exist but every group is below the minimum n. Confidence, set by this rule and not revised after the numbers: 0.72 when both clauses are scored and each group has at least 2 species or 10 individuals; 0.60 when the verdict rests on the count clause alone; 0.55 for mixed; 0.35 for inconclusive.",
+  "planned_datasets": [
+    "treatise-online-17-anatomy-of-recent-coleoids",
+    "guerra-2001-sepia-morphometrics",
+    "hosono-2024-heterololigo-arm-lengths",
+    "voss-mehta-2022-octopus-arm-measurements",
+    "sealifebase-v26.06-morphdat-if-arm-fields-exist"
+  ],
+  "interpretation": "The sentence under test is the eight-feet count and the length contrast among Sepias, Calamaries and Poulps. In the same paragraph Aristotle separates two long proboscises of cuttlefish and squid from the eight feet, and says the poulp has no proboscises. Feet are therefore the arms, and proboscises are the tentacles. Short and long are read relative to the trunk, measured as arm length divided by mantle length. Nautiluses and other cephalopods outside cuttlefish, squid and octopus are outside the stated scope and are not scored. This is not a test of whether Aristotle's material-redistribution explanation is true.",
+  "test_contract": {
+    "expected_observation": "Cuttlefish, squid and octopus are each described as having eight arms, and the median arm-length/mantle-length of octopuses exceeds that of cuttlefish and of squid by at least half a mantle length.",
+    "disconfirming_observation": "Any of the three kinds has an arm count other than eight, tentacles excluded, or the octopus arm-length/mantle-length median is not greater than both of the other two.",
+    "admissible_datasets": "Open anatomical descriptions or specimen tables that state arm counts or measure arm length and mantle length of sepiids, squid and octopods, independent of Aristotle's text. A SeaLifeBase morphometrics table counts only if it actually has an arm-count field or numeric arm length and mantle length; otherwise it is not used.",
+    "inference_method": "Code arm counts from the anatomical text, tentacles excluded. For lengths, reduce arms within an individual to their median, individuals within a species to their median ratio (or the ratio of published means), and species within a kind to the group median. Compare those three medians with the fixed margin 0.50. Apply the verdict table in fail_criterion."
+  },
+  "caveats": [
+    "Before this file was committed, landing pages and documentation for the planned datasets were checked to confirm that the URLs respond and that arm count or arm length is the kind of variable they carry. No specimen table was downloaded and no arm-length ratio was computed.",
+    "Search snippets had already described the Treatise chapter as stating that decapodiform coleoids have four pairs of arms plus a pair of tentacles. That sentence is not used as a measurement; the script must extract it from the fetched text.",
+    "Analysis: The arm count is a group diagnosis in a morphological review, not a recount of specimens. Cuttlefish enter as Sepia officinalis (Decapodiformes, Sepiida). Squid enter because the chapter's diagram of extant myopsid and oegopsid squids labels arms I through IV, the same four pairs the Decapodiformes sentence counts, and the chapter says the tentacles of some so-called eight-armed squids are resorbed later. That resorption does not change the arm count of eight. Tentacles were not added.",
+    "Analysis: No arm-length to mantle-length ratios for the three kinds were obtained. The length files were not measurement tables, and SeaLifeBase morphdat has no arm or mantle field, so the length contrast is untested. The verdict is inconclusive for that reason. The count clause itself passed."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-05bb",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "inconclusive",
+  "confidence": 0.35,
+  "reason": "data-unavailable",
+  "datasets": [
+    {
+      "id": "treatise-online-17-anatomy-of-recent-coleoids",
+      "name": "Nixon 2011, Treatise Online 17, Part M Chapter 3, Anatomy of Recent forms",
+      "landing_url": "https://doi.org/10.17161/to.v0i0.4087",
+      "doi": "10.17161/to.v0i0.4087",
+      "version": "Treatise Online Number 17",
+      "license": "University of Kansas Paleontological Institute; PDF publicly downloadable from the journal",
+      "files": [
+        {
+          "name": "nixon2011-anatomy.pdf",
+          "download_url": "https://journals.ku.edu/treatiseonline/article/download/4087/3854",
+          "retrieved_at": "2026-11-02T00:39:51Z",
+          "byte_size": 6168548,
+          "sha256": "2757962e14f6275a5aad0fb240a6abd365538801ca79d1f8cf1992cc684aaf75"
+        }
+      ],
+      "role": "group-level arm and tentacle counts for Decapodiformes and Octopodiformes"
+    },
+    {
+      "id": "sealifebase-v26.06-morphdat-if-arm-fields-exist",
+      "name": "SeaLifeBase morphdat snapshot v26.06",
+      "landing_url": "https://www.sealifebase.ca/",
+      "doi": null,
+      "version": "v26.06",
+      "license": null,
+      "files": [
+        {
+          "name": "slb-morphdat.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/slb/v26.06/parquet/morphdat.parquet",
+          "retrieved_at": "2026-11-02T00:39:53Z",
+          "byte_size": 295779,
+          "sha256": "86443d53cf2e14941dbd2c85f5f0cf4c6d4a6aae4e5f04a030aee83922aa3b37"
+        }
+      ],
+      "role": "checked for an arm-length or mantle-length field; none is present, so it was not used for the length clause"
+    }
+  ],
+  "measured": {
+    "value": 8,
+    "unit": "arms stated for Decapodiformes (cuttlefish and squid) and for Octopodiformes (octopus)",
+    "n": 3,
+    "uncertainty": null,
+    "extra": {
+      "decapodiformes_arms": 8,
+      "decapodiformes_tentacles": 2,
+      "octopodiformes_arms": 8,
+      "count_clause": "pass",
+      "length_clause": "unscored",
+      "quotes": {
+        "decapodiformes": "ten appendages are present in Decapodiformes: four pairs of arms and a pair of tentacles",
+        "octopodiformes": "Octopodiformes have just four pair of arms",
+        "sepia_in_decapodiformes": "Sepia officinalis (Decapodiformes, Sepiida)",
+        "squid_tentacle_mention": "extant myopsid and oegopsid squids; arm I is dorsal and arm IV is ventral"
+      },
+      "length_attempts": [
+        "hosono-2024-heterololigo-arm-lengths: HTTP Error 403: Forbidden",
+        "voss-mehta-2022-octopus-arm-measurements: HTTP Error 403: Forbidden",
+        "guerra-2001-sepia-morphometrics: HTTP Error 404: Not Found"
+      ],
+      "sealifebase_morphdat": "SeaLifeBase v26.06 morphdat has 159 columns; 0 match arm, tentacle or mantle.",
+      "squid_arm_pairs_i_through_iv": true
+    }
+  },
+  "method": "Downloaded Nixon 2011 and extracted the sentences that give the appendage counts. Decapodiformes, which the chapter identifies as including Sepia officinalis (Sepiida), are stated to have four pairs of arms and one pair of tentacles. Myopsid and oegopsid squids are drawn with arms I through IV, which is four pairs, and tentacles are not added. Octopodiformes are stated to have just four pairs of arms. The three planned measurement files were requested and did not return tables (hosono-2024-heterololigo-arm-lengths: HTTP Error 403: Forbidden; voss-mehta-2022-octopus-arm-measurements: HTTP Error 403: Forbidden; guerra-2001-sepia-morphometrics: HTTP Error 404: Not Found). SeaLifeBase v26.06 morphdat has 159 columns; 0 match arm, tentacle or mantle. The length clause is unscored.",
+  "results_summary": [
+    "Count clause passes: Decapodiformes 8 arms and 2 tentacles; Octopodiformes 8 arms.",
+    "Length clause unscored. hosono-2024-heterololigo-arm-lengths: HTTP Error 403: Forbidden voss-mehta-2022-octopus-arm-measurements: HTTP Error 403: Forbidden guerra-2001-sepia-morphometrics: HTTP Error 404: Not Found"
+  ]
+}

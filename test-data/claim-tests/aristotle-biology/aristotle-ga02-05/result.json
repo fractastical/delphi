@@ -1,0 +1,155 @@
+{
+  "claim_id": "aristotle-ga02-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-05",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the claim holds, every animal that is internally viviparous in Aristotle's sense also breathes air, so a survey that separates maternal nourishment of the embryo from mere retention of a yolky egg will find no water-breathing species in the internally viviparous class.",
+  "pass_criterion": "Pre-registered (claim supported). Using the reproductive-mode table, at least 15 species are coded Placental_viviparity, at least 90 percent of those species match a FishBase respiration record, and every matched placental species is coded as air-breathing. Yolk-only live birth and egg-laying are not counted as internal viviparity.",
+  "fail_criterion": "Pre-registered (claim refuted). At least one species coded Placental_viviparity matches a FishBase record that is not air-breathing. If the mode table contains no placental species, the same rule is applied to the wider matrotrophic set (Placental_viviparity, Live-bearing_with_oophagy, Live-bearing_with_uterine_milk) and a single non-air-breathing match refutes. Yolk-only viviparity does not refute and does not support: Aristotle already classed cartilaginous fishes that keep a yolky egg inside and then bear the young as externally viviparous. Verdict 'mixed' is not used unless the placental class is entirely air-breathing or unmatched while at least one oophagy or uterine-milk species is a matched non-air-breather, in which case the strict placental reading is unscored and the wider matrotrophic reading is refuted. Verdict 'inconclusive' with reason 'data-unavailable' if neither the Dryad mode file nor the FishBase reproduc backup can be read, or if no air-breathing field exists. Verdict 'inconclusive' with reason 'underpowered' if fewer than 15 species fall in the class being tested or fewer than half of them match a respiration record and the matched non-air-breathing count is zero. Confidence: 0.80 if at least five placental species are matched non-air-breathers; 0.65 if the refutation uses fewer than five placental species or only the wider matrotrophic set; 0.40 if the verdict is supports (the table covers chondrichthyans, so an absence of counterexamples is not a survey of all animals); 0.35 if inconclusive.",
+  "planned_datasets": [
+    "hughes-blackburn-2025-dryad-shark-ray-modes",
+    "fishbase-v26.06-species-and-respiration",
+    "fishbase-v26.06-reproduc-backup"
+  ],
+  "interpretation": "Internally viviparous follows Aristotle's contrast in this chapter: the embryo is kept inside and nourished by the mother, as in man, viviparous quadrupeds and cetaceans, as against cartilaginous fishes that 'first lay eggs within themselves' and are only afterwards externally viviparous. Placental viviparity, oophagy and uterine-milk (histotroph) live birth are maternal nourishment. Yolk-only live birth is the egg-inside case and is excluded from the test class. Breathing air means the FishBase air-breathing field is affirmative, including facultative air-breathing. Gill ventilation of water is not air-breathing. The parenthetical scope (man, viviparous quadrupeds, cetaceans) names the animals Aristotle counted as internally viviparous; the sentence under test is the universal 'nothing is internally viviparous unless it breathe air', so a water-breathing placental fish is inside the claim.",
+  "test_contract": {
+    "expected_observation": "Every species coded as placentally viviparous in the reproductive-mode table is coded as air-breathing in FishBase.",
+    "disconfirming_observation": "At least one placentally viviparous species is coded as not air-breathing. Yolk-only live-bearing fishes do not count as that counterexample.",
+    "admissible_datasets": "An open species-level reproductive-mode table that separates placental viviparity, other matrotrophy, yolk-only live birth and egg-laying for chondrichthyans, joined to a FishBase snapshot field that records air-breathing. The FishBase reproduc text is a backup only if the Dryad mode file cannot be fetched, and only rows whose guild is internal live-bearing and whose text matches the pre-registered patterns.",
+    "inference_method": "Count species by mode. Match binomials to FishBase. A species is not air-breathing when the air-breathing field is no, false, 0, water or gill, and is air-breathing when it is yes, true, 1, obligate or facultative. One matched placental non-air-breather refutes the universal. Thresholds and the backup text patterns are fixed in pass_criterion, fail_criterion and the backup note in method_preregistered."
+  },
+  "method_preregistered": "Primary modes from shark_modepruned_E.csv (column mode) in Hughes and Blackburn's Dryad deposit, the corrected coding of Katona and colleagues. Backup, only if that file cannot be downloaded: FishBase v26.06 reproduc.parquet rows whose RepGuild2 contains 'internal live bearer'. On those rows, placental if the text matches /placenta/i; oophagy if /oophag/i; uterine milk if /histotroph|uterine milk|matrotroph/i; yolk-only if /ovovivipar|yolk-?sac vivipar|lecithotroph|aplacental/i and the row is not placental. A species inherits placental if any of its rows is placental. Respiration is the first column whose name matches /air.?breath/i in species.parquet, else ecology.parquet, else swimming.parquet, FishBase snapshot v26.06 on data.source.coop. Facultative air-breathers count as air-breathing.",
+  "caveats": [
+    "Landing-page documentation for the Dryad deposit and the FishBase snapshot listing were viewed before this commit. The mode CSV and the parquet tables were not downloaded, and no species was classified.",
+    "Most FishBase species, including the placental elasmobranchs and teleosts in this count, are coded 'only water-breathing (assumed)' rather than from a species-by-species respiration paper. The code is the database's statement that they are not air-breathers. It is not a new measurement of gill ventilation.",
+    "The test class is FishBase's placental live-bearers, which are fishes. It does not re-survey mammals. A single non-air-breathing placental fish refutes the universal.",
+    "The Dryad file shark_modepruned_E.csv was not used. The download URL returns an interstitial bot check rather than the CSV. The pre-registered FishBase reproduc backup was used instead.",
+    "Analysis: All 75 species whose notes still say placenta are coded 'only water-breathing (assumed)' (WaterAssumed), FishBase's default water-breathing category, rather than from a species-by-species respiration paper. The code is the database's statement that they are not air-breathers. It is not a new measurement of gill ventilation. Genera in the set: Carcharhinus, Chaenogaleus, Eusphyra, Glyphis, Hemigaleus, Hypogaleus, Iago, Isogomphodon, Lamiopsis, Leptocharias, Loxodon, Mustelus, Nasolamia, Negaprion, Paragaleus, Prionace, Rhizoprionodon, Scoliodon, Scylliogaleus, Sphyrna, Triaenodon.",
+    "Analysis: The test class is the FishBase internal-live-bearer notes that still contain the word placenta after the negation filter. It does not re-survey mammals, and it does not add yolk-only live birth. A single non-air-breathing placental fish refutes the universal. Species whose notes never use the word placenta are outside this backup pattern.",
+    "Analysis: The Dryad file shark_modepruned_E.csv was not used. The download URL returns an interstitial bot check rather than the CSV. The pre-registered FishBase reproduc backup was used instead."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-05bb",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "deviations": [
+    {
+      "what": "The backup pattern /placenta/i also matches the negation 'aplacental' and the phrase 'without a placenta'.",
+      "why": "Those phrases deny a placenta. Rows are placental only after those negations are removed. Thresholds are unchanged. Yolk-only rows are still excluded from the test class."
+    },
+    {
+      "what": "FishBase stores air-breathing as the codes in airbreathingref, not the words yes/no.",
+      "why": "Codes whose label contains 'air-breathing' (Facultative, FacultativeGenus, FacultativeObligate, Obligate, ObligateGenus) count as air-breathing, including facultative, as pre-registered. Codes whose label is water-breathing (Water, WaterAssumed) count as not air-breathing. WaterAssumed is FishBase's explicit 'only water-breathing (assumed)' category."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-v26.06-species-and-respiration",
+      "name": "FishBase species table snapshot v26.06, air-breathing field, via the rfishbase source.coop release",
+      "landing_url": "https://www.fishbase.se/",
+      "doi": null,
+      "version": "v26.06",
+      "license": null,
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:38:54Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101"
+        },
+        {
+          "name": "airbreathingref.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/airbreathingref.parquet",
+          "retrieved_at": "2026-11-02T00:38:54Z",
+          "byte_size": 736,
+          "sha256": "14c8af688933e28be5be0e9a480b0be1b2d4afc5fe0358817d0e9c042f214897"
+        }
+      ],
+      "role": "air-breathing code for each species, with the seven-row code list"
+    },
+    {
+      "id": "fishbase-v26.06-reproduc-backup",
+      "name": "FishBase reproduc table snapshot v26.06",
+      "landing_url": "https://www.fishbase.org/manual/english/FishBaseThe_REPRODUCTION_Table.htm",
+      "doi": null,
+      "version": "v26.06",
+      "license": null,
+      "files": [
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:38:55Z",
+          "byte_size": 381404,
+          "sha256": "b631704f0f4972acdb2edb5d3105f0a6172adb4c473d73e505113f8288418247"
+        }
+      ],
+      "role": "internal live bearers whose notes state a placenta, used because the Dryad mode file could not be downloaded"
+    }
+  ],
+  "measured": {
+    "value": 75,
+    "unit": "placentally viviparous species coded not air-breathing",
+    "n": 75,
+    "uncertainty": null,
+    "extra": {
+      "source": "fishbase-reproduc-backup",
+      "placental_species": 75,
+      "matched_respiration": 75,
+      "match_rate": 1.0,
+      "air_breathing": 0,
+      "not_air_breathing": 75,
+      "of_which_water_assumed": 75,
+      "of_which_water_explicit": 0,
+      "unmatched": 0,
+      "example_non_air_binomials": [
+        "Carcharhinus acronotus",
+        "Carcharhinus albimarginatus",
+        "Carcharhinus altimus",
+        "Carcharhinus amblyrhynchoides",
+        "Carcharhinus amblyrhynchos",
+        "Carcharhinus amboinensis",
+        "Carcharhinus borneensis",
+        "Carcharhinus brachyurus"
+      ],
+      "genera": [
+        "Carcharhinus",
+        "Chaenogaleus",
+        "Eusphyra",
+        "Glyphis",
+        "Hemigaleus",
+        "Hypogaleus",
+        "Iago",
+        "Isogomphodon",
+        "Lamiopsis",
+        "Leptocharias",
+        "Loxodon",
+        "Mustelus",
+        "Nasolamia",
+        "Negaprion",
+        "Paragaleus",
+        "Prionace",
+        "Rhizoprionodon",
+        "Scoliodon",
+        "Scylliogaleus",
+        "Sphyrna",
+        "Triaenodon"
+      ],
+      "n_genera": 21,
+      "dryad_error": "csv https://datadryad.org/downloads/file_stream/4253772: HTTP Error 403: Forbidden"
+    }
+  },
+  "method": "Tried the Dryad mode file (not downloaded: csv https://datadryad.org/downloads/file_stream/4253772: HTTP Error 403: Forbidden). Classified internal live bearers as placental only when the note still says placenta after removing 'aplacental' and 'without a placenta'. Joined to FishBase species.AirBreathing. One matched non-air-breathing placental species refutes the universal. Yolk-only live birth was not used as a counterexample.",
+  "results_summary": [
+    "Placental species: 75. Air-breathing 0, not air-breathing 75 (Water 0, WaterAssumed 75), unmatched 0.",
+    "Match rate 1.000. Examples not air-breathing: Carcharhinus acronotus, Carcharhinus albimarginatus, Carcharhinus altimus, Carcharhinus amblyrhynchoides, Carcharhinus amblyrhynchos, Carcharhinus amboinensis, Carcharhinus borneensis, Carcharhinus brachyurus.",
+    "Source of the reproductive class: fishbase-reproduc-backup."
+  ]
+}
