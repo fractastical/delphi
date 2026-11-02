@@ -1,0 +1,132 @@
+{
+  "claim_id": "levin-2022-grn-learning-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-18",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:29:38Z",
+  "hypothesis": "If breaking sensitization is less likely than breaking habituation in these ODE pathway models, then a third-node clamp abolishes sensitization in a smaller share of models than it abolishes habituation, sensitization breaks in at most 40% of sensitizing models, and in at least half of sensitizing models fewer than 5% of the stable pairs break.",
+  "pass_criterion": "Pre-registered. Habituation is six lengthening UCS clamps, each response mean at most the previous mean divided by 1.5, and the same schedule with no clamp failing that test. Sensitization is the same schedule with each mean at least 1.5 times the previous, again with the sham failing. A pair is stable when, from the end of that six-pulse run, a wait equal to a breaker clamp plus its relax, followed by two equal UCS pulses, still meets the same 1.5-fold test. It is broken when one third-node clamp (at most four nodes, both directions, one trial, normal factor 100) makes those two pulses fail the test while the no-breaker wait still passes. Let S be finished models with at least one sensitizing pair and H those with at least one habituating pair. Supports when |S|>=4, |H|>=4, each phenotype has at least one stable pair in total, the fraction of S with any broken stable pair is <= 0.40, the fraction of H with any broken stable pair is at least 0.15 higher, and at least half of S have broken/stable < 0.05.",
+  "fail_criterion": "Pre-registered. Refutes when |S|>=4, |H|>=4, each phenotype has at least one stable pair, and any of the following holds: the sensitization model-break rate is greater than or equal to the habituation model-break rate, the sensitization model-break rate is >= 0.60, or the fraction of S with pair-break fraction < 0.05 is < 0.25. If the sample gates pass and neither the support nor the refute rule matches, the verdict is mixed. Fewer than 4 sensitizing models or fewer than 4 habituating models: inconclusive, reason underpowered. Either phenotype having zero stable pairs: inconclusive, reason other.",
+  "planned_datasets": [
+    "biomodels-curated-sbml",
+    "biswas-clawson-levin-2023-ijms"
+  ],
+  "interpretation": "Section 2.8 states that sensitization could be broken by stimulating a third node in 8 of 27 sensitizing models, mostly for fewer than 5% of node pairs, and that breaking sensitization is less likely than breaking habituation (17 of 27 in section 2.7). Eight of 27 is about 0.30 and 17 of 27 is about 0.63. The support rule asks for a sensitization break rate of at most 0.40, a gap of at least 0.15 in favour of habituation breaking, and a majority of sensitizing models under a 5% pair-break fraction. The 1.5-fold rule is the paper's sensitization criterion and the ratio it writes as 1:1.5 for habituation. The paper's '50% decrease' wording is not used, because the same paragraph defines the ratio as 1:1.5. A third node is any other floating species. The remark that therapies may need other avenues is not measured separately; it is carried by the rate comparison.",
+  "test_contract": {
+    "expected_observation": "Among models that show each phenotype, third-node clamps abolish habituation in a clearly larger share of models than sensitization, sensitization is broken in well under half of sensitizing models, and most of those models break on fewer than 5% of the pairs that still show the phenotype.",
+    "disconfirming_observation": "Sensitization is broken at least as often as habituation, or it is broken in most sensitizing models, or most sensitizing models break on 5% or more of their stable pairs.",
+    "admissible_datasets": "Public SBML ODE models from BioModels, preferably the paper's Table S1 identifiers, 3 to 15 floating species, parameters and reactions left at the deposited values. Saved outputs from the authors' MATLAB repository are not admissible.",
+    "inference_method": "Score sham-controlled habituation and sensitization, then a no-breaker retest and a one-trial third-node retest. Model-break rates are broken-models over phenotype-positive models. Pair-break fraction is broken stable pairs over stable pairs, and is 0 when the phenotype does not survive the no-breaker retest. Compare the rates with the gates in preregistration.decision."
+  },
+  "preregistration": {
+    "stimulus_factors": [
+      10,
+      50,
+      100
+    ],
+    "normal_training_factor": 100,
+    "regulation_up_ratio": 2.0,
+    "regulation_down_ratio": 0.5,
+    "phenotype_ratio": 1.5,
+    "pulse_length_multipliers": [
+      1,
+      1.2,
+      1.4,
+      1.6,
+      1.8,
+      2.0
+    ],
+    "species_min": 3,
+    "species_max": 15,
+    "max_models": 8,
+    "max_pairs": 24,
+    "max_assoc": 16,
+    "max_break_pairs": 4,
+    "max_break_nodes": 4,
+    "break_trials": 1,
+    "model_wall_seconds": 180,
+    "horizons": [
+      100,
+      10,
+      1
+    ],
+    "stimulus_duration_divisor": 10,
+    "late_window_fraction": 0.2,
+    "floor": 1e-06,
+    "near_zero": 1e-09,
+    "appear_threshold": 0.0001,
+    "sequential_start": 1,
+    "sequential_count": 80,
+    "max_download_attempts": 40,
+    "confidence_rule": "inconclusive data-unavailable 0.80, inconclusive other 0.60, inconclusive underpowered 0.55; otherwise 0.58 if every baseline-ok model came from Table S1 identifiers, 0.48 if the panel mixes Table S1 with a sequential BioModels fill, 0.42 if the panel is the sequential scan only; mixed is capped at 0.50; a supports verdict on levin-2022-grn-learning-18 is capped at 0.45 because one breaking trial can miss breaks.",
+    "decision": {
+      "levin-2022-grn-learning-09": {
+        "min_models": 6,
+        "support": {
+          "min_stable_fraction": 0.5,
+          "max_loss_fraction": 0.25,
+          "min_gain_models": 1
+        },
+        "refute": {
+          "min_loss_fraction": 0.5,
+          "max_stable_fraction_if_no_gain": 0.25
+        }
+      },
+      "levin-2022-grn-learning-18": {
+        "min_sens_models": 4,
+        "min_hab_models": 4,
+        "pair_fraction_rare": 0.05,
+        "support": {
+          "max_sens_break_rate": 0.4,
+          "min_rate_margin": 0.15,
+          "min_pair_rare_fraction": 0.5
+        },
+        "refute": {
+          "min_sens_break_rate": 0.6,
+          "max_pair_rare_fraction_exclusive": 0.25
+        }
+      },
+      "levin-2025-wisdom-04": {
+        "min_models_to_refute": 6
+      }
+    }
+  },
+  "method_template": "Public BioModels SBML files are integrated with libroadrunner. Model identifiers are read, as strings only, from the 2023 paper's public supplementary pages when those pages contain BIOMD identifiers; otherwise, and when fewer than the cap of runnable models are found, curated identifiers are scanned in order from BIOMD0000000001. A model is kept when it has 3 to 15 floating species and a finite baseline on a horizon of 100, 10 or 1 time units. Stimuli clamp a species to a multiple (10, 50 or 100) of its baseline scale, or to that scale divided by the multiple, without editing parameters or reactions. UCS memory, six-pulse habituation and sensitization, third-node breaking, and Pavlovian pairing are scored with the thresholds in preregistration, including sham controls, and the pre-registered decision rule sets the verdict.",
+  "specification_files": [
+    {
+      "id": "biswas-clawson-levin-2023-ijms",
+      "name": "Biswas, Clawson and Levin 2023, Learning in Transcriptional Network Models, Int. J. Mol. Sci. 24:285",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "doi": "10.3390/ijms24010285",
+      "version": "Europe PMC full text as vendored in the repository",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "path": "claim-sources/levin-papers/inputs/2022-grn-learning.txt",
+          "byte_size": 66301,
+          "sha256": "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58",
+          "note": "already vendored; not re-downloaded for this test. Figures, tables and reference list were omitted from this text file."
+        }
+      ],
+      "role": "methods for clamps, UCS memory, habituation, sensitization and third-node breaking"
+    }
+  ],
+  "caveats": [
+    "This is a computation on ordinary differential equation models. It does not show that the claim holds in organisms.",
+    "The protocol reimplements section 4 of Biswas, Clawson and Levin 2023. It is not their MATLAB code. The vendored paper text has the clamp formulas stripped, so stimulus timing is the pre-registered fraction of a model horizon that the solver can finish, not a recovered step count of 5000.",
+    "A sham trajectory with the same pulse schedule and no clamp must fail the 1.5-fold test before a decline or rise is counted as habituation or sensitization. The paper does not describe that control. It is here so that spontaneous decay is not scored as learning.",
+    "Associative hits likewise require that a time-matched wait, with no paired clamp, leaves the neutral node ineffective.",
+    "At most 24 stimulus-response pairs, 16 associative triples, 4 third nodes and 4 phenotype-positive pairs are tested per model, evenly spaced in identifier order, and breaking uses one trial. The same caps are used at every amplitude and for both phenotypes. Caps can miss rare events.",
+    "One breaking trial can miss a break that a second or third trial would have found, which biases breaking rates downward. A supports verdict on the sensitization-breaking claim is therefore capped at confidence 0.45.",
+    "Models with fewer than 3 or more than 15 floating species are outside this run. The surveyed set of 35 models may include larger networks that are not integrated.",
+    "Dataset-resolvability assessments were not used as evidence.",
+    "A floating species with no decay can remain at a clamped value after release. UCS memory can then be a held stimulus rather than a change in the downstream network. Associative scoring compares the neutral-node clamp with the immediately preceding relaxation so that a held stimulus is not counted as conditioning."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/test-levin-grn-wisdom-5e3c",
+    "date": "2026-11-01"
+  }
+}

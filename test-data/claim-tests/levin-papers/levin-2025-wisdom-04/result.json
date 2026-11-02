@@ -1,0 +1,150 @@
+{
+  "claim_id": "levin-2025-wisdom-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2025-wisdom-04",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:29:38Z",
+  "hypothesis": "If simple fixed-topology ODE models of gene-regulatory networks and molecular pathways learn, then public pathway models, with parameters and reactions held fixed, show habituation, sensitization, and Pavlovian conditioning under the pre-registered protocols.",
+  "pass_criterion": "Pre-registered. Supports when at least one model that finishes the phenotype and associative screens has a sham-controlled habituating pair, at least one has a sham-controlled sensitizing pair, at least one has an associative hit, and every such model's global parameter values and reaction identifiers are unchanged. An associative hit is a triple and two clamp directions where the UCS regulates the response, the other node does not, a wait of the same duration as training-plus-relax still leaves that node ineffective relative to the segment before the test clamp, and after the two nodes are clamped together the second node alone regulates the response relative to the immediately preceding relaxation (twice-or-half), not relative to the original baseline.",
+  "fail_criterion": "Pre-registered. Refutes when at least 6 models finish both screens and habituation is absent, or sensitization is absent, or associative conditioning is absent, or any finished model changes a parameter or a reaction. Finding all three phenotypes supports the claim even if fewer than 6 models finish. Any smaller panel that does not show all three is inconclusive, reason underpowered.",
+  "planned_datasets": [
+    "biomodels-curated-sbml",
+    "biswas-clawson-levin-2023-ijms",
+    "levin-2025-bioessays-wisdom"
+  ],
+  "interpretation": "The 2025 sentence reports that standard training protocols applied to simple GRN and pathway models produce habituation, sensitization and Pavlovian conditioning, as a dynamical state memory with no change to topology or edge strengths. The cited computations are the group's Boolean and ODE studies. This test reruns the ODE reading on public BioModels: clamps change state only. Habituation and sensitization use the 1.5-fold six-pulse definitions from the 2023 methods. Pavlovian conditioning is the associative-memory procedure in section 4.3: a node that does not regulate the response comes to regulate it after being paired with one that does. The Boolean models are not rerun. The claim is an existence claim about this class of models, so one model of each phenotype is enough to support it, while absence on a panel of at least six finished models refutes it for that panel. Associative regulation is scored against the immediately preceding relaxation segment, so a stimulus species that merely stays at its clamped value is not credited to the neutral node.",
+  "test_contract": {
+    "expected_observation": "At least one fixed-parameter ODE model shows sham-controlled habituation, at least one shows sham-controlled sensitization, and at least one shows pairing-dependent control of the response by a previously neutral node.",
+    "disconfirming_observation": "On at least six finished models, one or more of those three phenotypes never occurs, or a phenotype occurs only after a parameter or reaction has changed.",
+    "admissible_datasets": "Public SBML ODE models of molecular pathways or gene regulation from BioModels, with 3 to 15 floating species. Stimuli may clamp state variables. Changing rate constants, adding species, or adding reactions is not an admissible manipulation. The authors' result tables are not admissible.",
+    "inference_method": "Run the habituation, sensitization and associative screens. Count models with at least one hit of each kind. Confirm the parameter vector and the reaction-identifier list after the screens. Apply the existence rule in preregistration.decision."
+  },
+  "preregistration": {
+    "stimulus_factors": [
+      10,
+      50,
+      100
+    ],
+    "normal_training_factor": 100,
+    "regulation_up_ratio": 2.0,
+    "regulation_down_ratio": 0.5,
+    "phenotype_ratio": 1.5,
+    "pulse_length_multipliers": [
+      1,
+      1.2,
+      1.4,
+      1.6,
+      1.8,
+      2.0
+    ],
+    "species_min": 3,
+    "species_max": 15,
+    "max_models": 8,
+    "max_pairs": 24,
+    "max_assoc": 16,
+    "max_break_pairs": 4,
+    "max_break_nodes": 4,
+    "break_trials": 1,
+    "model_wall_seconds": 180,
+    "horizons": [
+      100,
+      10,
+      1
+    ],
+    "stimulus_duration_divisor": 10,
+    "late_window_fraction": 0.2,
+    "floor": 1e-06,
+    "near_zero": 1e-09,
+    "appear_threshold": 0.0001,
+    "sequential_start": 1,
+    "sequential_count": 80,
+    "max_download_attempts": 40,
+    "confidence_rule": "inconclusive data-unavailable 0.80, inconclusive other 0.60, inconclusive underpowered 0.55; otherwise 0.58 if every baseline-ok model came from Table S1 identifiers, 0.48 if the panel mixes Table S1 with a sequential BioModels fill, 0.42 if the panel is the sequential scan only; mixed is capped at 0.50; a supports verdict on levin-2022-grn-learning-18 is capped at 0.45 because one breaking trial can miss breaks.",
+    "decision": {
+      "levin-2022-grn-learning-09": {
+        "min_models": 6,
+        "support": {
+          "min_stable_fraction": 0.5,
+          "max_loss_fraction": 0.25,
+          "min_gain_models": 1
+        },
+        "refute": {
+          "min_loss_fraction": 0.5,
+          "max_stable_fraction_if_no_gain": 0.25
+        }
+      },
+      "levin-2022-grn-learning-18": {
+        "min_sens_models": 4,
+        "min_hab_models": 4,
+        "pair_fraction_rare": 0.05,
+        "support": {
+          "max_sens_break_rate": 0.4,
+          "min_rate_margin": 0.15,
+          "min_pair_rare_fraction": 0.5
+        },
+        "refute": {
+          "min_sens_break_rate": 0.6,
+          "max_pair_rare_fraction_exclusive": 0.25
+        }
+      },
+      "levin-2025-wisdom-04": {
+        "min_models_to_refute": 6
+      }
+    }
+  },
+  "method_template": "Public BioModels SBML files are integrated with libroadrunner. Model identifiers are read, as strings only, from the 2023 paper's public supplementary pages when those pages contain BIOMD identifiers; otherwise, and when fewer than the cap of runnable models are found, curated identifiers are scanned in order from BIOMD0000000001. A model is kept when it has 3 to 15 floating species and a finite baseline on a horizon of 100, 10 or 1 time units. Stimuli clamp a species to a multiple (10, 50 or 100) of its baseline scale, or to that scale divided by the multiple, without editing parameters or reactions. UCS memory, six-pulse habituation and sensitization, third-node breaking, and Pavlovian pairing are scored with the thresholds in preregistration, including sham controls, and the pre-registered decision rule sets the verdict.",
+  "specification_files": [
+    {
+      "id": "biswas-clawson-levin-2023-ijms",
+      "name": "Biswas, Clawson and Levin 2023, Learning in Transcriptional Network Models, Int. J. Mol. Sci. 24:285",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "doi": "10.3390/ijms24010285",
+      "version": "Europe PMC full text as vendored in the repository",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "path": "claim-sources/levin-papers/inputs/2022-grn-learning.txt",
+          "byte_size": 66301,
+          "sha256": "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58",
+          "note": "already vendored; not re-downloaded for this test. Figures, tables and reference list were omitted from this text file."
+        }
+      ],
+      "role": "methods for clamps, UCS memory, habituation, sensitization and third-node breaking"
+    },
+    {
+      "id": "levin-2025-bioessays-wisdom",
+      "name": "Levin 2025, The Multiscale Wisdom of the Body, BioEssays 47:e2400196",
+      "landing_url": "https://doi.org/10.1002/bies.202400196",
+      "doi": "10.1002/bies.202400196",
+      "version": "Europe PMC full text as vendored in the repository",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "path": "claim-sources/levin-papers/inputs/2025-wisdom.txt",
+          "byte_size": 69476,
+          "sha256": "02854aed93973b2e5b1103d19ffd7b6acd5db75e59aa542b08d3bc6b9d50009b",
+          "note": "already vendored; not re-downloaded for this test."
+        }
+      ],
+      "role": "statement of the claim; the cited learning results are the 2023 ODE study and the earlier Boolean GRN study"
+    }
+  ],
+  "caveats": [
+    "This is a computation on ordinary differential equation models. It does not show that the claim holds in organisms.",
+    "The protocol reimplements section 4 of Biswas, Clawson and Levin 2023. It is not their MATLAB code. The vendored paper text has the clamp formulas stripped, so stimulus timing is the pre-registered fraction of a model horizon that the solver can finish, not a recovered step count of 5000.",
+    "A sham trajectory with the same pulse schedule and no clamp must fail the 1.5-fold test before a decline or rise is counted as habituation or sensitization. The paper does not describe that control. It is here so that spontaneous decay is not scored as learning.",
+    "Associative hits likewise require that a time-matched wait, with no paired clamp, leaves the neutral node ineffective.",
+    "At most 24 stimulus-response pairs, 16 associative triples, 4 third nodes and 4 phenotype-positive pairs are tested per model, evenly spaced in identifier order, and breaking uses one trial. The same caps are used at every amplitude and for both phenotypes. Caps can miss rare events.",
+    "One breaking trial can miss a break that a second or third trial would have found, which biases breaking rates downward. A supports verdict on the sensitization-breaking claim is therefore capped at confidence 0.45.",
+    "Models with fewer than 3 or more than 15 floating species are outside this run. The surveyed set of 35 models may include larger networks that are not integrated.",
+    "Dataset-resolvability assessments were not used as evidence.",
+    "A floating species with no decay can remain at a clamped value after release. UCS memory can then be a held stimulus rather than a change in the downstream network. Associative scoring compares the neutral-node clamp with the immediately preceding relaxation so that a held stimulus is not counted as conditioning."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/test-levin-grn-wisdom-5e3c",
+    "date": "2026-11-01"
+  }
+}
