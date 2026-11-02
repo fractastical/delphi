@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga01-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-05",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:40:00Z",
   "hypothesis": "If fishes have no testes, the FishBase reproduction table will not record a reproductive mode that the FishBase manual defines as males developing testes, or as hermaphroditism that includes testicular tissue.",
   "pass_criterion": "Pre-registered. Using FishBase snapshot fb/v26.06 table reproduc.parquet, identify the mode column as the column whose non-null values intersect the manual's vocabulary (dioecism, protandry, protogyny, true hermaphroditism, parthenogenesis), allowing case and spacing differences. The unit is a distinct SpecCode. A species is recognized if any row has a vocabulary mode. A species is testicular if any row has dioecism, protandry, protogyny, or true hermaphroditism. Parthenogenesis does not count as testicular. The fish component supports 'no testes' only if the number of recognized species is at least 100 and the number of testicular species is 0. The joint claim (fishes and serpents) is supported only if the fish component supports it and a serpent dataset with the same rule also supports it. No serpent dataset is planned in this registration, so a fish pass does not by itself support the joint claim.",
@@ -27,5 +27,53 @@
     "model": "grok-4.7",
     "run": "bc-379d5832-d98e-4d52-9a6a-8932cf4d582a",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "method": "Downloaded the FishBase v26.06 reproduc table, selected the column whose values match the manual's reproductive-mode vocabulary, and counted distinct SpecCode values. Dioecism, protandry, protogyny and true hermaphroditism were coded as testicular, following the manual's definition that dioecism is males developing testes. Parthenogenesis was not. Snakes are not in this table. A testicular count of at least 100 refutes the joint claim.",
+  "measured": {
+    "value": 14297,
+    "unit": "FishBase species with a reproductive mode the manual ties to testicular tissue",
+    "n": 14299,
+    "uncertainty": "compiled modes, not a new dissection; one row-group per stock collapsed to SpecCode",
+    "extra": {
+      "mode_column": "ReproMode",
+      "recognized_species": 14299,
+      "testicular_species": 14297,
+      "parthenogenesis_only_species": 2,
+      "species_with_mode": {
+        "dioecism": 13777,
+        "protogyny": 394,
+        "true hermaphroditism": 57,
+        "protandry": 69,
+        "parthenogenesis": 2
+      },
+      "n_rows": 14509
+    }
+  },
+  "datasets": [
+    {
+      "id": "fishbase-fb-v26.06-reproduc",
+      "name": "FishBase reproduction table, snapshot fb/v26.06",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v26.06",
+      "license": "CC-BY-NC, FishBase.org team, via the rfishbase parquet snapshot",
+      "files": [
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:32:18Z",
+          "byte_size": 381404,
+          "sha256": "b631704f0f4972acdb2edb5d3105f0a6172adb4c473d73e505113f8288418247"
+        }
+      ],
+      "role": "reproductive mode of fishes; dioecism is defined by the FishBase manual as males developing testes"
+    }
+  ],
+  "results_summary": [
+    "Mode column ReproMode. Recognized species 14299. Testicular species 14297.",
+    "Mode occupancy (a species can carry more than one mode across stocks): {\"dioecism\": 13777, \"protogyny\": 394, \"true hermaphroditism\": 57, \"protandry\": 69, \"parthenogenesis\": 2}",
+    "Serpents were not in FishBase. The joint claim is refuted by the fish count alone when that count is at least 100."
+  ]
 }

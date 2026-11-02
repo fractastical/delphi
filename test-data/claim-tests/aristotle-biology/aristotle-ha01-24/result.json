@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha01-24",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-24",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:40:00Z",
   "hypothesis": "If the right kidney lies higher than the left in animals that have kidneys, then in human CT segmentations the center of mass of the right kidney is superior to the center of mass of the left kidney.",
   "pass_criterion": "Pre-registered. From the TotalSegmentator small subset (Zenodo 10.5281/zenodo.8367170, file Totalsegmentator_dataset_small_v2.zip, publisher md5 53c02c76a2ada07fd7c5c55aac5c91fc, size 3263252066), for each subject with both kidney_right and kidney_left masks of at least 500 nonzero voxels, compute the center of mass in world coordinates using the NIfTI sform if sform_code is nonzero, otherwise the qform. Superior is +Z in the NIfTI RAS world frame. The right kidney is higher when Z_right - Z_left > 5 mm. Units: if the median superior-inferior extent of a kidney (max Z minus min Z) falls between 0.04 and 0.20, treat coordinates as meters and multiply by 1000 before the 5 mm test; if the median extent falls between 40 and 200, treat them as millimeters. The human pattern agrees with the claim if at least 40 subjects qualify and the fraction with the right kidney higher is at least 0.95. That agreement does not confirm the claim for all animals. The joint universal is supported only if this human threshold is met and at least one other kidney-bearing class is measured the same way. No other class is in the planned file, so a human agreement is not a support of the universal.",
@@ -27,5 +27,44 @@
     "model": "grok-4.7",
     "run": "bc-379d5832-d98e-4d52-9a6a-8932cf4d582a",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "method": "Checked the zip against the publisher md5 and size, read only kidney_left and kidney_right masks, and compared center-of-mass Z in the NIfTI world frame. The median kidney length selected meters or millimeters before the 5 mm test. The side comparison was not used to choose the axis.",
+  "measured": {
+    "value": 0.23529411764705882,
+    "unit": "fraction of qualifying human CT subjects in whom the right kidney center of mass is more than 5 mm superior to the left",
+    "n": 85,
+    "uncertainty": "binary masks; 5 mm tie band; anomalies not removed",
+    "extra": {
+      "median_kidney_extent_native_units": 98.25,
+      "scale_to_mm": 1.0,
+      "n_right_higher": 20
+    }
+  },
+  "datasets": [
+    {
+      "id": "totalsegmentator-small-v2-zenodo-8367170",
+      "name": "Small subset of the TotalSegmentator CT dataset (102 subjects)",
+      "landing_url": "https://doi.org/10.5281/zenodo.8367170",
+      "doi": "10.5281/zenodo.8367170",
+      "version": "Totalsegmentator_dataset_small_v2.zip",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/api/records/8367170/files/Totalsegmentator_dataset_small_v2.zip/content",
+          "retrieved_at": "2026-11-02T00:44:22Z",
+          "byte_size": 3263252066,
+          "sha256": "c21b2eba98ef6a571f047d915084c575601ff2c6e16d90fe1cb85978e40e57ac",
+          "md5": "53c02c76a2ada07fd7c5c55aac5c91fc"
+        }
+      ],
+      "role": "left and right kidney segmentation masks"
+    }
+  ],
+  "results_summary": [
+    "Qualifying subjects: 85. Median native extent: 98.25. Scale to mm: 1.0.",
+    "Fraction with right kidney higher: 0.23529411764705882."
+  ]
 }
