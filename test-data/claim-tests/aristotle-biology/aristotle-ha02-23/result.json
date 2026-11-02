@@ -1,0 +1,233 @@
+{
+  "claim_id": "aristotle-ha02-23",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-23",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If no fish and no bird has kidneys or a urinary bladder, then a public archive of biological samples will contain no fish sample and no bird sample whose recorded tissue is kidney, pronephros, mesonephros, or metanephros, and none whose recorded tissue is a urinary bladder.",
+  "pass_criterion": "The claim is supported only by an explicit presence/absence matrix that codes kidney as absent in at least 20 fish species and at least 20 bird species and codes no presence. NCBI BioSample does not encode absence. Zero BioSample hits therefore do not support the claim.",
+  "fail_criterion": "Refutes if the validated count of fish kidney-tissue biosamples is at least 5, or the validated count of bird kidney-tissue biosamples is at least 5. A hit is validated only when the esummary title or sample attributes name kidney, pronephros, mesonephros, metanephros, or head kidney as an anatomical source. One to four validated samples in a clade is mixed (too few to rule out a stray annotation). Zero validated samples is inconclusive, reason data-unavailable, because a missing biosample is not evidence the organ is absent. Urinary-bladder counts are reported and do not rescue the claim if kidneys are present.",
+  "planned_datasets": [
+    "ncbi-biosample-fish-bird-kidney"
+  ],
+  "interpretation": "Aristotle's 'these organs' in the quoted sentence are the kidneys and the bladder named in the claim. 'Fish' is Actinopterygii or Chondrichthyes. 'Bird' is Aves. The claim is a universal negative: one clade with a kidney is enough to refute 'no fish or bird'. A biosample whose attribute says the tissue is kidney is a record that the organ was dissected, not an ontology assertion.",
+  "test_contract": {
+    "expected_observation": "No validated fish biosample and no validated bird biosample names kidney tissue, and an explicit absence matrix codes the organ absent across both clades.",
+    "disconfirming_observation": "At least five biosamples in fishes, or at least five in birds, name kidney, pronephros, mesonephros, or metanephros as the sampled organ.",
+    "admissible_datasets": "A public sample archive in which the organism and the anatomical source are fields, not a mention of the word kidney in an unrelated paper. NCBI BioSample is admissible. Absence of records is not admissible as proof of absence.",
+    "inference_method": "NCBI E-utilities esearch on db=biosample, then esummary of up to 30 ids per query. Fish query: (Actinopterygii[ORGN] OR Chondrichthyes[ORGN]) AND (kidney[ATTR] OR pronephros[ATTR] OR mesonephros[ATTR] OR \"head kidney\"[ATTR]). Bird query: Aves[ORGN] AND (kidney[ATTR] OR metanephros[ATTR]). Bladder queries replace the organ term with \"urinary bladder\"[ATTR] and are extra. Validated count, not the raw esearch count, sets the verdict."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "measured": {
+    "value": 58,
+    "unit": "validated kidney-tissue biosamples in the inspected fish sample plus the inspected bird sample",
+    "n": 60,
+    "uncertainty": "validated counts are a lower bound from the first 30 search ids, not a census",
+    "extra": {
+      "fish_kidney": {
+        "raw_count": 14998,
+        "validated_in_sample": 30,
+        "sample_checked": 30,
+        "examples": [
+          {
+            "uid": "64464021",
+            "accession": "SAMN64464021",
+            "organism": "Oncorhynchus mykiss",
+            "title": "CHK-1"
+          },
+          {
+            "uid": "64464020",
+            "accession": "SAMN64464020",
+            "organism": "Oncorhynchus mykiss",
+            "title": "CHK-2"
+          },
+          {
+            "uid": "64464019",
+            "accession": "SAMN64464019",
+            "organism": "Oncorhynchus mykiss",
+            "title": "CHK-3"
+          },
+          {
+            "uid": "64464018",
+            "accession": "SAMN64464018",
+            "organism": "Oncorhynchus mykiss",
+            "title": "THK-1"
+          },
+          {
+            "uid": "64464017",
+            "accession": "SAMN64464017",
+            "organism": "Oncorhynchus mykiss",
+            "title": "THK-2"
+          },
+          {
+            "uid": "64464016",
+            "accession": "SAMN64464016",
+            "organism": "Oncorhynchus mykiss",
+            "title": "THK-3"
+          },
+          {
+            "uid": "64464015",
+            "accession": "SAMN64464015",
+            "organism": "Oncorhynchus mykiss",
+            "title": "CHKs-1"
+          },
+          {
+            "uid": "64464014",
+            "accession": "SAMN64464014",
+            "organism": "Oncorhynchus mykiss",
+            "title": "CHKs-2"
+          }
+        ]
+      },
+      "bird_kidney": {
+        "raw_count": 972,
+        "validated_in_sample": 28,
+        "sample_checked": 30,
+        "examples": [
+          {
+            "uid": "64509823",
+            "accession": "SAMN64509823",
+            "organism": "Pygoscelis adeliae",
+            "title": "Adele penguin transcriptome"
+          },
+          {
+            "uid": "64169583",
+            "accession": "SAMN64169583",
+            "organism": "Manacus manacus",
+            "title": "Manacus manacus (IAvH CT-45973)"
+          },
+          {
+            "uid": "64108364",
+            "accession": "SAMD02040973",
+            "organism": "Gallus gallus",
+            "title": "scRNA-seq_SZ3 (SAMC5913043)"
+          },
+          {
+            "uid": "64108363",
+            "accession": "SAMD02040972",
+            "organism": "Gallus gallus",
+            "title": "scRNA-seq_SZ2 (SAMC5913042)"
+          },
+          {
+            "uid": "64108362",
+            "accession": "SAMD02040971",
+            "organism": "Gallus gallus",
+            "title": "scRNA-seq_SZ1 (SAMC5913041)"
+          },
+          {
+            "uid": "63845380",
+            "accession": "SAMEA123518706",
+            "organism": "Ichthyaetus melanocephalus",
+            "title": "198723-tol"
+          },
+          {
+            "uid": "63845348",
+            "accession": "SAMEA123518674",
+            "organism": "Psittacula krameri",
+            "title": "198691-tol"
+          },
+          {
+            "uid": "63448361",
+            "accession": "SAMN63448361",
+            "organism": "Hylocichla mustelina",
+            "title": "Animal sample from Hylocichla mustelina (wood thrush) for VGP reference genome, bHylMus1"
+          }
+        ]
+      },
+      "fish_bladder": {
+        "raw_count": 3,
+        "validated_in_sample": 3,
+        "sample_checked": 3,
+        "examples": [
+          {
+            "uid": "53136441",
+            "accession": "SAMD00656610",
+            "organism": "Plectropomus leopardus",
+            "title": "urinary bladder"
+          },
+          {
+            "uid": "33757965",
+            "accession": "SAMN33757965",
+            "organism": "Opsanus beta",
+            "title": "Multi-tissue Total RNA from single adult male and whole juvenile Opsanus beta"
+          },
+          {
+            "uid": "4520029",
+            "accession": "SAMN04520029",
+            "organism": "Opsanus beta",
+            "title": "Toadfish Opsanus beta Osmoregulatory tissues"
+          }
+        ]
+      },
+      "bird_bladder": {
+        "raw_count": 0,
+        "validated_in_sample": 0,
+        "sample_checked": 0,
+        "examples": []
+      }
+    }
+  },
+  "datasets": [
+    {
+      "id": "ncbi-biosample-fish-bird-kidney",
+      "name": "NCBI BioSample searches for fish and bird kidney and urinary bladder",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/biosample/",
+      "doi": null,
+      "version": "E-utilities, retrieved with this run",
+      "license": "NCBI public access",
+      "role": "organism and tissue text for kidney and urinary bladder",
+      "files": [
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&term=%28Actinopterygii%5BOrganism%5D%20OR%20Chondrichthyes%5BOrganism%5D%29%20AND%20%28kidney%5BAll%20Fields%5D%20OR%20pronephros%5BAll%20Fields%5D%20OR%20mesonephros%5BAll%20Fields%5D%20OR%20%22head%20kidney%22%5BAll%20Fields%5D%29&retmode=json&retmax=30",
+          "retrieved_at": "2026-11-02T00:57:25Z",
+          "byte_size": 1385,
+          "sha256": "2d5ad6732adea734c9673223827c2c5d2cc4bacf5860958bdea78764a4829dae",
+          "label": "(Actinopterygii[Organism] OR Chondrichthyes[Organism]) AND (kidney[All Fields] OR pronephros[All Fields] OR mesonephros[All Fields] OR \"head kidney\"[All Fields]"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&term=Aves%5BOrganism%5D%20AND%20%28kidney%5BAll%20Fields%5D%20OR%20metanephros%5BAll%20Fields%5D%29&retmode=json&retmax=30",
+          "retrieved_at": "2026-11-02T00:57:26Z",
+          "byte_size": 897,
+          "sha256": "176677110a44132468ffe2f58945018e90cbd4f39eb2708da90b915bee2e0964",
+          "label": "Aves[Organism] AND (kidney[All Fields] OR metanephros[All Fields])"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&term=%28Actinopterygii%5BOrganism%5D%20OR%20Chondrichthyes%5BOrganism%5D%29%20AND%20%22urinary%20bladder%22%5BAll%20Fields%5D&retmode=json&retmax=30",
+          "retrieved_at": "2026-11-02T00:57:27Z",
+          "byte_size": 741,
+          "sha256": "193baafa779ac0689d855d5675b426d45bd7302ce0e15eb5d20616a57c46c9a7",
+          "label": "(Actinopterygii[Organism] OR Chondrichthyes[Organism]) AND \"urinary bladder\"[All Fields]"
+        },
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&term=Aves%5BOrganism%5D%20AND%20%22urinary%20bladder%22%5BAll%20Fields%5D&retmode=json&retmax=30",
+          "retrieved_at": "2026-11-02T00:57:28Z",
+          "byte_size": 463,
+          "sha256": "bb4851c9d25b0698e396f2781e65585d2e2aa76e3a6bc76890fce070d499ec9f",
+          "label": "Aves[Organism] AND \"urinary bladder\"[All Fields]"
+        }
+      ]
+    }
+  ],
+  "method": "analysis.py runs four NCBI BioSample searches and validates up to 30 summaries each. A summary counts when its title or attribute text names the organ. Fish kidney validated 30 (raw 14998). Bird kidney validated 28 (raw 972). Fish urinary bladder raw 3, validated 3. Bird urinary bladder raw 0, validated 0. Five validated kidney samples in either clade refute the universal absence. Zero samples would not have supported it.",
+  "deviations": [
+    {
+      "field": "ncbi query syntax",
+      "change": "kidney[ATTR] and kidney[Attribute] returned phrasesnotfound. The searches use [All Fields] and then require the organ word in the title or attribute text. Thresholds are unchanged.",
+      "why": "E-utilities did not accept the pre-registered field abbreviation."
+    }
+  ],
+  "caveats": [
+    "A biosample shows that someone collected the named tissue. It is not a survey of how many species lack the organ.",
+    "Validation is on the first 30 ids, so the validated number is a lower bound on the raw count.",
+    "Urinary-bladder wording can be missed when a paper says only 'bladder'. Those counts are extra and do not rescue a kidney counterexample.",
+    "No absence matrix was in this archive, so the claim could not have been supported here."
+  ]
+}

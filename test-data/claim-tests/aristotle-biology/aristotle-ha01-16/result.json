@@ -1,0 +1,133 @@
+{
+  "claim_id": "aristotle-ha01-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-16",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If the ear's inner cavity has no passage to the brain but does have a passage to the palate, then a compiled vertebrate anatomy will relate the auditory tube to the middle-ear cavity and to the nasopharynx, and will not relate the ear cavity to the brain by an open passage.",
+  "pass_criterion": "Supports if both Uberon and the Foundational Model of Anatomy, retrieved by label search from the EBI OLS API, describe a pharyngotympanic (auditory, Eustachian) tube that is connected with, continuous with, or part of a path between the tympanic cavity (middle ear) and the nasopharynx or pharynx, AND neither ontology's term for the tympanic cavity or the tube states a normal open passage from that cavity into the brain or cranial cavity.",
+  "fail_criterion": "Refutes if either ontology states a normal open passage from the ear cavity into the brain, or if both ontologies return the tube and neither links it to the pharynx. Mixed if the two ontologies disagree, or if only one ontology is retrievable and it supports the claim. Inconclusive, reason data-unavailable, if neither ontology returns the tube. This test uses curated anatomical relations, not a sample of specimens; confidence stays at or below 0.7 even if the relations match the claim.",
+  "planned_datasets": [
+    "ebi-ols-uberon",
+    "ebi-ols-fma"
+  ],
+  "interpretation": "Aristotle's 'inner cavity of the ear' is read as the middle-ear cavity, not the membranous labyrinth, because the passage he describes to the palate is the auditory tube, which opens on the nasopharynx beside the palate. 'No passage to the brain' means no normal open lumen from that cavity into the cranial cavity. The ontologies are compilations of anatomical observations. They are not a count of dissected heads, and the result does not estimate how often the tube is patent.",
+  "test_contract": {
+    "expected_observation": "The auditory tube term is tied to the tympanic cavity and to the nasopharynx or pharynx, and the ear-cavity terms do not assert an open passage into the brain.",
+    "disconfirming_observation": "An ontology asserts a normal open ear-to-brain passage, or the tube is present but has no pharyngeal link.",
+    "admissible_datasets": "EBI Ontology Lookup Service records for Uberon and FMA retrieved by label (pharyngotympanic tube, auditory tube, Eustachian tube, tympanic cavity), including the term definition and direct relationships. No specimen imaging is in this test.",
+    "inference_method": "Label search, then read definition and relationship texts for nasopharynx, pharynx, palate, tympanic, middle ear, brain, and cranial cavity. Both sources must agree for support. One source is mixed. A stated ear-to-brain lumen refutes."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.6,
+  "measured": {
+    "value": 2,
+    "unit": "ontologies whose auditory-tube definition links middle ear and pharynx and states no brain passage",
+    "n": 2,
+    "uncertainty": "two curated ontologies, not a sample of heads",
+    "extra": {
+      "uberon_supports": true,
+      "fma_supports": true,
+      "uberon_tube_definition": "Organ with organ cavity which connects the cavity of the middle ear to the cavity of the pharynx. Examples: There are only two pharyngotympanic tubes, the right and the left pharyngotympanic tubes.[FMA].",
+      "fma_tube_definition": "Old definition: Organ with organ cavity which connects the cavity of the middle ear to the cavity of the pharynx. Examples: There are only two pharyngotympanic tubes, the right and the left pharyngotympanic tubes.",
+      "definitions_are_the_same_sentence": true,
+      "uberon_brain_passage": false,
+      "fma_brain_passage": false
+    }
+  },
+  "datasets": [
+    {
+      "id": "ebi-ols-uberon",
+      "name": "Uberon auditory-tube and tympanic-cavity terms from the EBI Ontology Lookup Service",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/uberon",
+      "doi": null,
+      "version": "OLS4 live terms",
+      "license": "CC BY 4.0",
+      "role": "definition of the pharyngotympanic tube",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=pharyngotympanic%20tube&ontology=uberon&rows=15",
+          "retrieved_at": "2026-11-02T01:01:49Z",
+          "byte_size": 8795,
+          "sha256": "29487f55a6705dda96bdc073cfef94fde1c055c08fb8934bccf456ccca37539c",
+          "label": "uberon-search-pharyngotympanic_tube.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=tympanic%20cavity&ontology=uberon&rows=15",
+          "retrieved_at": "2026-11-02T01:01:50Z",
+          "byte_size": 10872,
+          "sha256": "9600ba7b19ac6fe7ac97ba77e65abf620cbcb11b9d52e46f502256f5c8de809b",
+          "label": "uberon-search-tympanic_cavity.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/uberon/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FUBERON_0002393",
+          "retrieved_at": "2026-11-02T01:01:50Z",
+          "byte_size": 8141,
+          "sha256": "ca93f90e86d46c61e27a90eec76c4cb5ef23170b482e7a77bde5168c75119fb1",
+          "label": "uberon-term-UBERON_0002393.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/uberon/terms/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FUBERON_0004114",
+          "retrieved_at": "2026-11-02T01:01:51Z",
+          "byte_size": 5555,
+          "sha256": "d8796dccf4c1f86f1fff5eac696df1d8d1832952741f4ceb6d753bdfe7a60847",
+          "label": "uberon-term-UBERON_0004114.json"
+        }
+      ]
+    },
+    {
+      "id": "ebi-ols-fma",
+      "name": "Foundational Model of Anatomy terms from the EBI Ontology Lookup Service",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/fma",
+      "doi": null,
+      "version": "OLS4 live terms",
+      "license": "CC BY 4.0",
+      "role": "definition of the pharyngotympanic tube",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=pharyngotympanic%20tube&ontology=fma&rows=15",
+          "retrieved_at": "2026-11-02T01:01:51Z",
+          "byte_size": 4665,
+          "sha256": "c7607715507dbf6edf7c38a00bc3341367ca00978b9b35d5b81a7e15e02ee084",
+          "label": "fma-search-pharyngotympanic_tube.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=tympanic%20cavity&ontology=fma&rows=15",
+          "retrieved_at": "2026-11-02T01:01:52Z",
+          "byte_size": 3686,
+          "sha256": "b3ea1085d203f436e12babe47cf5f58a7855a11e311bea4bbdec55541dc5ff03",
+          "label": "fma-search-tympanic_cavity.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/fma/terms/http%253A%252F%252Fpurl.org%252Fsig%252Font%252Ffma%252Ffma9705",
+          "retrieved_at": "2026-11-02T01:01:52Z",
+          "byte_size": 4212,
+          "sha256": "bd443a97e13311d021523a6d79ff6350fe1f65d38c1a3128d4f5f1e190763e9a",
+          "label": "fma-term-fma9705.json"
+        },
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/fma/terms/http%253A%252F%252Fpurl.org%252Fsig%252Font%252Ffma%252Ffma56461",
+          "retrieved_at": "2026-11-02T01:01:53Z",
+          "byte_size": 2785,
+          "sha256": "19171cf1536ebbe0cd7192476615dea5e0da531eec5d19b20efb9a5e2724afe8",
+          "label": "fma-term-fma56461.json"
+        }
+      ]
+    }
+  ],
+  "method": "analysis.py searches OLS for the pharyngotympanic tube and the tympanic cavity in Uberon and FMA, then reads each term's definition, skipping EDITOR_NOTE lines. A source supports the claim when the tube definition names both the middle ear or tympanic cavity and the pharynx, and neither definition states a passage into the brain or cranial cavity. Both sources must agree for support. Confidence is capped at 0.7 because these are curated relations, not dissected heads.",
+  "caveats": [
+    "The ontologies compile anatomical descriptions. They do not count how often the tube is patent in living people.",
+    "Uberon's tube definition is the FMA sentence, so the two sources are not independent.",
+    "FMA's tympanic-cavity term returned no definition text, so that term does not state a brain passage because it states nothing. Uberon's tympanic-cavity definition does not mention the brain.",
+    "Aristotle's palate is read as the nasopharynx, where the auditory tube opens. The definitions say pharynx.",
+    "No imaging or dissection series was measured."
+  ]
+}

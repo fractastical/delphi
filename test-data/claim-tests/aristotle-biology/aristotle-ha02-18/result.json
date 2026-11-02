@@ -1,0 +1,161 @@
+{
+  "claim_id": "aristotle-ha02-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-18",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If fishes have neither hearing organs nor smell organs, and no passages for them, then a public table of fish specimens will contain no measured otolith (an inner-ear stone) and no measured olfactory structure or nostril.",
+  "pass_criterion": "The claim is supported only if a dataset explicitly codes the inner ear, otolith, olfactory organ, and nostrils as absent for at least 20 fish species. A table of positive measurements cannot support a universal absence by being empty.",
+  "fail_criterion": "Refutes if FishBase 24.07 otoliths.parquet contains otolith measurements (a numeric column whose name contains length, height, weight, or size, with a non-null positive value) for at least 10 species, or if a smell structure is measured for at least 10 species. Smell is read, in order, from brains.parquet columns whose names contain olfact, then morphdat.parquet columns whose names contain naris, nostril, or olfact, then NCBI BioSample (Actinopterygii[ORGN]) AND (olfactory[ATTR] OR \"olfactory epithelium\"[ATTR] OR \"olfactory rosette\"[ATTR] OR nares[ATTR] OR nostril[ATTR]) with the same title-validation rule as the kidney test (at least 5 validated samples). Either organ is enough to refute 'only eyes' and 'devoid alike of the organs'. If neither source yields 10 species or 5 validated samples: inconclusive, reason data-unavailable. One to nine otolith species, or one to four validated smell samples and no otoliths: mixed.",
+  "planned_datasets": [
+    "fishbase-24.07-otoliths",
+    "fishbase-24.07-brains",
+    "fishbase-24.07-morphdat",
+    "fishbase-24.07-species",
+    "ncbi-biosample-fish-olfaction"
+  ],
+  "interpretation": "Aristotle's 'organs of hearing' are read as the inner ear, of which the otolith (sagitta or other ear stone) is a measured part. 'Passages' for hearing are not separately required once the ear stone is present. 'Organs of smell' and their passages are the olfactory epithelium, olfactory rosette, olfactory bulb, or nostrils. Eyes are not tested. The claim is universal over fishes, so ten species with an ear stone refute it.",
+  "test_contract": {
+    "expected_observation": "No fish species in the otolith table has a measured ear stone, and no fish species has a measured olfactory structure or nostril, with absence coded explicitly.",
+    "disconfirming_observation": "At least ten fish species have a measured otolith, or at least ten have a measured olfactory structure, or at least five biosamples name an olfactory tissue.",
+    "admissible_datasets": "FishBase 24.07 parquet snapshot distributed on Source Cooperative (public, CC BY-NC), joined to the species table by SpecCode, and NCBI BioSample organism-plus-attribute records. Measurements must be of the organ, not a gene name in a title that fails validation.",
+    "inference_method": "Count distinct SpecCodes with a positive otolith measurement, and distinct species with a positive olfactory measurement. Thresholds are 10 species or 5 validated biosamples. Either sense refutes the joint claim that fishes lack both."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.93,
+  "measured": {
+    "value": 805,
+    "unit": "fish species with a positive otolith length or height",
+    "n": 805,
+    "uncertainty": "distinct SpecCode values; a species can have many otolith rows",
+    "extra": {
+      "otolith_numeric_columns": [
+        "LengthFish",
+        "LengthOtolith",
+        "HeightOtolith"
+      ],
+      "otolith_rows_with_positive_measurement": 3274,
+      "otolith_type_counts": {
+        "sagitta": 3238,
+        "asteriscus": 24,
+        "lapillus": 12
+      },
+      "brains_olfactory_columns": [],
+      "morphdat_olfactory_or_nostril_columns": [],
+      "smell_species_from_fishbase": 0,
+      "smell_fishbase_source": null,
+      "smell_biosample_raw_count": 565,
+      "smell_biosample_validated_in_sample": 25,
+      "smell_biosample_sample_size": 25
+    }
+  },
+  "datasets": [
+    {
+      "id": "fishbase-24.07-otoliths",
+      "name": "FishBase 24.07 otoliths.parquet",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "24.07",
+      "license": "CC BY-NC 3.0",
+      "role": "otoliths.parquet",
+      "files": [
+        {
+          "download_url": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/cboettig/fishbase/fb/v24.07/parquet/otoliths.parquet",
+          "retrieved_at": "2026-11-02T00:45:30Z",
+          "byte_size": 126518,
+          "sha256": "7f200360b39bc1ff8e9434e1f9365506ede05df181a0840f0e3b981a9fd029c1"
+        }
+      ]
+    },
+    {
+      "id": "fishbase-24.07-brains",
+      "name": "FishBase 24.07 brains.parquet",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "24.07",
+      "license": "CC BY-NC 3.0",
+      "role": "brains.parquet",
+      "files": [
+        {
+          "download_url": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/cboettig/fishbase/fb/v24.07/parquet/brains.parquet",
+          "retrieved_at": "2026-11-02T00:45:30Z",
+          "byte_size": 292973,
+          "sha256": "4833444a0dce2b882e425123b65703f3c65a18b5913117e6f160eab42a7b6b18"
+        }
+      ]
+    },
+    {
+      "id": "fishbase-24.07-morphdat",
+      "name": "FishBase 24.07 morphdat.parquet",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "24.07",
+      "license": "CC BY-NC 3.0",
+      "role": "morphdat.parquet",
+      "files": [
+        {
+          "download_url": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/cboettig/fishbase/fb/v24.07/parquet/morphdat.parquet",
+          "retrieved_at": "2026-11-02T00:45:42Z",
+          "byte_size": 7760461,
+          "sha256": "22b84f935686cc68619d53c073233a62434549e2bf8c959ae0d9dc52f4a83845"
+        }
+      ]
+    },
+    {
+      "id": "fishbase-24.07-species",
+      "name": "FishBase 24.07 species.parquet",
+      "landing_url": "https://source.coop/cboettig/fishbase/fb/v24.07",
+      "doi": null,
+      "version": "24.07",
+      "license": "CC BY-NC 3.0",
+      "role": "species.parquet",
+      "files": [
+        {
+          "download_url": "https://s3.us-west-2.amazonaws.com/us-west-2.opendata.source.coop/cboettig/fishbase/fb/v24.07/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:45:32Z",
+          "byte_size": 5469594,
+          "sha256": "571c60b0b47cf50ca28d49b01b6abc17ab0506d8233e7d703b2c87e3ff41fb3c"
+        }
+      ]
+    },
+    {
+      "id": "ncbi-biosample-fish-olfaction",
+      "name": "NCBI BioSample search for fish olfactory tissues",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/biosample/",
+      "doi": null,
+      "version": "E-utilities esearch/esummary",
+      "license": "NCBI public access",
+      "role": "olfactory epithelium, rosette, or nostril samples",
+      "files": [
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=biosample&term=Actinopterygii%5BOrganism%5D%20AND%20%28%22olfactory%20epithelium%22%5BAll%20Fields%5D%20OR%20%22olfactory%20rosette%22%5BAll%20Fields%5D%20OR%20nares%5BAll%20Fields%5D%20OR%20nostril%5BAll%20Fields%5D%29&retmode=json&retmax=25",
+          "retrieved_at": "2026-11-02T00:57:25Z",
+          "byte_size": 1152,
+          "sha256": "326bfa9dc2478ba9b4fd5f360cd005149483c72df5dc9a30503a075b629bee57",
+          "label": "esearch Actinopterygii[Organism] AND (\"olfactory epithelium\"[All Fields] OR \"olfactory rosette\"[All Fields] OR nares[All Fields] OR nostril[All Fields])"
+        }
+      ]
+    }
+  ],
+  "method": "analysis.py reads FishBase 24.07 otoliths, brains, morphdat, and species parquet files. An otolith row counts when a length, height, weight, or size column is positive. 805 species have such a row. Brains columns containing 'olfact': none. Morphdat columns containing naris, nostril, or olfact: none. The smell fallback is an NCBI BioSample search; a hit counts only when the summary names olfactory epithelium, an olfactory rosette, or a nostril. Validated in the first 25 ids: 25 (raw count 565). Either organ at the pre-registered threshold refutes the claim that fishes have only eyes.",
+  "deviations": [
+    {
+      "field": "ncbi query syntax",
+      "change": "The pre-registered smell query used [ATTR]. E-utilities returned phrasesnotfound for organ words qualified with [ATTR] or [Attribute] in a parallel kidney query, so this search uses [All Fields] and then validates the summary text. The threshold of 5 validated samples is unchanged.",
+      "why": "The field abbreviation was rejected by the search service."
+    }
+  ],
+  "caveats": [
+    "An otolith is the ear stone of the inner ear, not a test of whether the fish responds to sound.",
+    "Aristotle may have meant the absence of an external ear opening. The claim also says the organs themselves are absent. Measured ear stones are those organs' stones.",
+    "FishBase is CC BY-NC. The tables are not redistributed here.",
+    "Nostrils are not a column in the morphology table that was checked. Smell is reported from biosample text, which can include a word outside the sampled tissue."
+  ]
+}
