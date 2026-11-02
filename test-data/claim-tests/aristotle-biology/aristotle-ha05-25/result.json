@@ -1,0 +1,57 @@
+{
+  "claim_id": "aristotle-ha05-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-25",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If men are as a rule generative to about sixty-five and women capable of conception to about forty-five, with seventy and fifty only as rare outer limits, then the age at which fertility or births fall below a tenth of their peak is near those rule-ages, and the rate or count at the stated maxima is under a hundredth of the peak.",
+  "pass_criterion": "Pre-registered (claim supported). Both sexes support. Women, from Eurostat demo_frate age-specific fertility rates for EU27_2020 (code EU27_2020), age in completed years, latest year with single-year rates for ages 15 through 49: let p be the maximum rate at ages 15-49, and let a10 be the youngest age at or above 30 whose rate is below 0.10*p. Women support if a10 is between 42 and 48 inclusive, the rate at 45 is positive, and the rate at 50 (single year if present, otherwise the open-ended 50+ class, otherwise 0 when ages 47-49 are present and the series stops at 49) is below 0.01*p. Men, from the NCHS 2024 natality public-use file, father's combined age FAGECOMB (positions 147-148; 99 unknown excluded; ages 15-80): let p be the maximum single-year count and a10 the youngest age at or above 40 whose count is below 0.10*p. Men support if a10 is between 60 and 70 inclusive, the count at 65 is positive, and the count at 70 is below 0.01*p.",
+  "fail_criterion": "Pre-registered (claim refuted). The claim is refuted if either sex refutes. Women refute if the age-50 rate is at least 0.01*p, or a10 is 50 or older, or a10 is 40 or younger. Men refute if the count at 70 is at least 0.01*p, or a10 is 75 or older, or a10 is 55 or younger. If neither sex refutes and they do not both support, the verdict is mixed. If Eurostat cannot be retrieved, the same female thresholds are applied to US birth counts (MAGER, positions 75-76; code 50 is the pooled 50-and-over bin and is compared with the peak single year). If a required file cannot be retrieved and the sex that was retrieved does not refute, the verdict is inconclusive with reason data-unavailable. Fewer than 1,000,000 parsed US birth records, or a record length other than 1330 after stripping the line ending, is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "eurostat-demo-frate",
+    "nchs-natality-2024-us-public-use"
+  ],
+  "test_contract": {
+    "expected_observation": "Female age-specific fertility in the EU falls below a tenth of its peak between ages 42 and 48, is still positive at 45, and is under a hundredth of the peak at 50. In a complete US birth year, fatherhood falls below a tenth of its peak single-year count between 60 and 70, still occurs at 65, and the count at 70 is under a hundredth of the peak.",
+    "disconfirming_observation": "Fertility or fatherhood is still at least a hundredth of its peak at the stated maximum (50 for women, 70 for men), or the age at which it falls below a tenth of the peak is more than about five years away from 45 or 65 in the direction the fail_criterion states.",
+    "admissible_datasets": "A national or multi-country vital-statistics series of female age-specific fertility rates, and a national birth register with single-year age of father, both public, both independent of Aristotle's text, covering a recent complete year. Counts are used for fathers because the public-use file has no male population denominator.",
+    "inference_method": "Compare each single-year rate or count with the peak at ages of childbearing. a10 is the first age, at or above 30 for women and 40 for men, below 10 percent of that peak. The stated maximum is rare when it is below 1 percent of the peak. The claim is a conjunction of the two sexes."
+  },
+  "interpretation": "Aristotle's 'as a rule ... up to' is read as the age at which childbearing has become uncommon (under a tenth of the peak), not as the modal age of parents. 'At most ... and these are rare' is read as under a hundredth of the peak at 50 for women and at 70 for men. Female rates are births per woman. Male figures are birth counts by father's age: an observed birth shows that a man of that age was generative, but the count is not an age-specific rate and is shaped by who has a child in a given year. Mother's age in the US file collapses 50 and over into one code, so the EU rate series is the female measurement.",
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "eurostat-demo-frate",
+      "name": "Eurostat fertility rates by age (demo_frate)",
+      "landing_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_frate/default/table?lang=en",
+      "doi": null,
+      "version": null,
+      "license": "Reuse under Commission Decision 2011/833/EU, with attribution to Eurostat",
+      "files": [],
+      "role": "age-specific fertility rates of women by single year of age"
+    },
+    {
+      "id": "nchs-natality-2024-us-public-use",
+      "name": "NCHS 2024 natality public-use file (United States)",
+      "landing_url": "https://www.cdc.gov/nchs/data_access/vitalstatsonline.htm",
+      "doi": null,
+      "version": "2024",
+      "license": "US government work",
+      "files": [],
+      "role": "single-year age of father (FAGECOMB) and age of mother (MAGER) on 2024 US birth records"
+    }
+  ],
+  "caveats": [
+    "Before registration the 2024 user guide was read for record length (1330) and for the positions and value labels of MAGER and FAGECOMB. No birth record was read and no rate was retrieved.",
+    "The Eurostat statistics API answered HTTP 200 to a header request. The response body was not downloaded.",
+    "The US public-use file URL https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/DVS/natality/Nat2024us.zip answered HTTP 200 with content-length 231829759. The file was not downloaded.",
+    "Modern contraception and partnership patterns move the observed schedule earlier than biological capacity, especially for men. A male refutation on birth counts is a statement about ages at recorded fatherhood, not a semen analysis.",
+    "MAGER code 50 means 50 years and over, so the US file cannot separate 50 from later maternal ages. It is the fallback only."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-df92",
+    "date": "2026-11-01"
+  }
+}
