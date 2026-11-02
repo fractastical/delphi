@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha06-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-05",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Across bird species, incubation period increases with adult body size, and the interval from copulation to laying does so as well when that interval is recorded.",
+  "pass_criterion": "Pre-registered. Among species with class Aves and positive values for both adult body mass and incubation period, the Spearman rank correlation between log10(adult body mass) and incubation period must be positive with a two-sided p-value below 0.05 and n at least 50. If a separate column records days from copulation to laying for at least 30 bird species, that column must show the same positive significant Spearman correlation with log10(adult body mass). Supports when every tested association meets this threshold.",
+  "fail_criterion": "Pre-registered. Refutes if the incubation correlation is zero or negative, or if its two-sided p-value is 0.05 or higher, provided n is at least 50. Mixed if incubation passes and a recorded egg-formation interval fails the same threshold. Inconclusive, reason data-unavailable, if the table cannot be retrieved or has no incubation column for birds. Inconclusive, reason underpowered, if fewer than 50 bird species have both mass and incubation.",
+  "planned_datasets": [
+    "anage-build-dataset"
+  ],
+  "test_contract": {
+    "expected_observation": "Bird species with heavier adults have longer incubation periods, as a positive rank correlation, and the same pattern holds for the post-copulation egg-formation interval if that interval is in the table.",
+    "disconfirming_observation": "Incubation period does not increase with adult body mass: the rank correlation is not significantly positive. A failing egg-formation correlation contradicts only that clause.",
+    "admissible_datasets": "A public species-level life-history table with bird adult body mass and incubation period in stated units, one row per species, retrievable without authentication. Mammals and reptiles are not part of the correlation. Phylogenetic non-independence is reported as a caveat, not removed, because the claim is about the pattern across birds.",
+    "inference_method": "Spearman rho on log10(adult mass in grams) versus incubation in days, species as the unit, dropping non-positive values. The two-sided p-value is from the t approximation t = rho * sqrt((n-2)/(1-rho^2)) with n-2 degrees of freedom, or from an exact permutation test of the ranks if the t approximation is undefined. Passes if rho > 0, p < 0.05 and n >= 50. The egg-formation clause is scored only when its own column exists."
+  },
+  "interpretation": "The claim names two intervals: egg formation after copulation, and hatching of the chick. Adult body mass is the size of the parent. In a combined gestation-or-incubation column, values for class Aves are incubation, because birds do not gestate. The egg-formation interval is not that column and is scored only from a distinct field. Larger parents taking longer is the direction required by according to the size.",
+  "datasets": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-5da8",
+    "date": "2026-11-01"
+  }
+}
