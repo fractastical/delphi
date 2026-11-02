@@ -1,0 +1,99 @@
+{
+  "claim_id": "aristotle-ha08-33",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-33",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:25:35Z",
+  "hypothesis": "If the claim holds, reported rabies deaths of humans are absent, while the disease is still recorded in other animals.",
+  "pass_criterion": "Pre-registered. Supported only if the sum of reported human rabies deaths across Our World in Data rows with a three-letter Code is 0, at least 30 such rows exist, and the NNDSS 2022 national total for human rabies is 0 or missing. Animal case counts do not have to be zero.",
+  "fail_criterion": "Pre-registered. Refuted if that OWID country-row sum is >= 1, or if the NNDSS 2022 United States total row (reporting area TOTAL, else UNITED STATES, at the maximum MMWR week) has a numeric human cumulative count >= 1. Either source is enough, because the claim excepts man entirely and is not limited to one country or year. Aggregate OWID rows with a blank or non-ISO code are excluded so regions are not added on top of countries. If the cumulative cell is not numeric, the fallback is the sum of the human current-week column over TOTAL rows. If both sources fail to parse, the verdict is inconclusive with reason data-unavailable. Animal rabies counts are reported and are not a test of 'every bitten animal dies', because the tables have no denominator of bitten animals that survived. A pass is not available from animal counts alone.",
+  "planned_datasets": [
+    "owid-reported-human-rabies-deaths",
+    "nndss-table-1cc-2022-6uy5-4d9d"
+  ],
+  "test_contract": {
+    "expected_observation": "Surveillance tables that record rabies list no human deaths.",
+    "disconfirming_observation": "At least one reported human rabies death in the OWID country rows or in the NNDSS 2022 national total.",
+    "admissible_datasets": "Public surveillance counts of human rabies deaths, with a machine-readable table and no login. OWID's grapher file of reported human rabies deaths, and the CDC NNDSS 2022 Table 1CC provisional case counts for animal and human rabies. Clinical and laboratory diagnoses are both admissible because both are 'cases on record'.",
+    "inference_method": "A binary existence check against the claim's exception for man. The statistic is the sum of reported human deaths, not a rate and not a model of transmission. One positive count refutes the exception. The universal fatality clause for other animals is not scored."
+  },
+  "interpretation": "The sentence says rabies is fatal to the dog and to any animal it bites, man excepted. A recorded human death makes the exception false and therefore makes the sentence false. Counts of animal cases show that rabies is recorded in animals; they do not show that every bitten animal dies, and they are not asked to.",
+  "caveats": [
+    "While checking that the OWID URL returned CSV, a range request was not truncated and the first country rows were visible before this file was committed. The rule is the claim's own binary (any reported human death versus none) and was not adjusted to those rows. The NNDSS table had not been downloaded. The verdict must be the sum analysis.py computes over the whole files."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c447",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "data_kind": "biological",
+  "measured": {
+    "value": 33009.0,
+    "unit": "reported human rabies deaths, sum of OWID country rows",
+    "n": 1513,
+    "extra": {
+      "owid": {
+        "sum_deaths": 33009.0,
+        "n_country_rows": 1513,
+        "n_positive_rows": 599,
+        "max_cell": 2014.0
+      },
+      "nndss_2022": {
+        "human_cumulative": null,
+        "animal_cumulative": 53.0,
+        "human_from_week_sum": null,
+        "mmwr_week": 5.0,
+        "reporting_area": "TOTAL",
+        "human_column": "Rabies, Human, Cum 2022\u2020",
+        "animal_column": "Rabies, Animal, Cum 2022\u2020"
+      }
+    }
+  },
+  "method": "Summed reported human rabies deaths on OWID rows with a three-letter country code, and read the NNDSS 2022 national total cumulative human count at the last MMWR week. A positive count on either source refutes the exception for man. Animal counts were stored and not scored.",
+  "datasets": [
+    {
+      "id": "owid-reported-human-rabies-deaths",
+      "name": "Our World in Data, reported number of human rabies deaths",
+      "landing_url": "https://ourworldindata.org/grapher/reported-rabies-deaths",
+      "doi": null,
+      "version": "as retrieved",
+      "license": "CC BY",
+      "files": [
+        {
+          "name": "owid-reported-rabies-deaths.csv",
+          "download_url": "https://ourworldindata.org/grapher/reported-rabies-deaths.csv",
+          "retrieved_at": "2026-11-02T00:33:55Z",
+          "byte_size": 30829,
+          "sha256": "c9ee40af301da9c24085c153557d0876cef5047aa6cb4fd2f434c1e15b0d742f"
+        }
+      ],
+      "role": "country-year reported human rabies deaths"
+    },
+    {
+      "id": "nndss-table-1cc-2022-6uy5-4d9d",
+      "name": "NNDSS Table 1CC, Rabies animal and human, 2022",
+      "landing_url": "https://data.cdc.gov/d/6uy5-4d9d",
+      "doi": null,
+      "version": "2022",
+      "license": "public domain (U.S. government work)",
+      "files": [
+        {
+          "name": "nndss-1cc-2022.csv",
+          "download_url": "https://data.cdc.gov/api/views/6uy5-4d9d/rows.csv?accessType=DOWNLOAD",
+          "retrieved_at": "2026-11-02T00:33:55Z",
+          "byte_size": 37196,
+          "sha256": "eda22d4144ac76feb8eea7fad59d639f19ac99800bc9fe1d98e047ad336613c8"
+        }
+      ],
+      "role": "United States provisional cumulative human and animal rabies cases for 2022"
+    }
+  ],
+  "results_summary": [
+    "OWID country rows: sum of reported human rabies deaths = 33009.0 across 1513 rows, of which 599 are positive.",
+    "NNDSS 2022 national animal cumulative = 53.0; human cumulative = None. The NNDSS 2022 extract's human cumulative cells are blank and the file only contains early MMWR weeks, so it does not supply the US count."
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "claim_id": "aristotle-ha06-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-01",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:25:35Z",
+  "hypothesis": "If the claim holds, birds of prey have small clutches, and the common kestrel has a clutch of at least four eggs and a larger clutch than every other bird of prey.",
+  "pass_criterion": "Pre-registered. From AnAge build 15, raptors are Class Aves and Order in {Accipitriformes, Falconiformes, Strigiformes}. Clutch size is the numeric Litter/Clutch size; if a cell is a hyphenated range, use the upper endpoint. The kestrel is Genus Falco, Species tinnunculus. Supported only if all of: the kestrel clutch is >= 4; the kestrel clutch is strictly greater than every other raptor clutch; at least 80% of other raptors with a clutch size have clutch < 4; and at least 15 other raptors have a clutch size.",
+  "fail_criterion": "Pre-registered. Refuted if the kestrel clutch is < 4, or at least five other raptor species have a clutch strictly greater than the kestrel, or fewer than 50% of other raptors with a clutch size have clutch < 4 (the group is not unprolific). If the kestrel row or its clutch size is missing, or fewer than 15 other raptors have a clutch size, or the zip SHA-256 is not e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630, the verdict is inconclusive (data-unavailable, or underpowered when only the sample-size floor fails). Any other pattern, including a kestrel clutch of at least 4 that is tied or only narrowly the largest while most other raptors remain below 4, is mixed.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "Falco tinnunculus has a clutch of at least four and the unique maximum clutch among accipitriforms, falconiforms and owls, while at least four fifths of the other species in that set lay fewer than four eggs.",
+    "disconfirming_observation": "The kestrel lays fewer than four eggs, or five or more other raptors lay more eggs than the kestrel, or half or more of the other raptors lay four or more eggs.",
+    "admissible_datasets": "A public species-level clutch-size table covering diurnal raptors and owls, compiled independently of Aristotle. The project's scope list (Accipitriformes, Falconiformes, owls) defines the set. Cathartiformes and other orders are excluded.",
+    "inference_method": "Species are the units. Unprolific means clutch size below 4, the number the claim gives for the kestrel. 'Most prolific' means a unique maximum. No phylogenetic model. Ties are not uniqueness, so a tie cannot pass."
+  },
+  "interpretation": "Crooked-talon birds are mapped to the three orders named in the claim's scope, including owls. 'Unprolific' is operationalized as a clutch smaller than the four eggs the same sentence attributes to the kestrel. AnAge stores one clutch-size number per species; that number is treated as the species' recorded clutch, and a range is read at its upper end because the claim is about how many eggs are laid.",
+  "caveats": [
+    "Before this registration the zip SHA-256 and byte size were checked against test-data/organisms/darwin-origin/ch11-14/data/anage_build15_dataset.zip, and the header line of anage_data.txt was read. No clutch-size value or taxon row was read."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c447",
+    "date": "2026-11-01"
+  },
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.35,
+  "data_kind": "none",
+  "measured": {
+    "value": null,
+    "unit": "eggs per clutch",
+    "n": 49,
+    "extra": {
+      "n_raptors_with_clutch": 49,
+      "kestrel_row_present": true,
+      "kestrel_clutch_blank": true,
+      "kestrel_found": false,
+      "range_cells": 0
+    }
+  },
+  "method": "AnAge loaded, but the kestrel clutch or the minimum of 15 other raptor clutches was missing.",
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database, build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gkx1042",
+      "version": "build 15",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:32:31Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+          "source_used": "vendored",
+          "vendored_path": "test-data/organisms/darwin-origin/ch11-14/data/anage_build15_dataset.zip"
+        }
+      ],
+      "role": "litter/clutch size for birds of prey and the common kestrel"
+    }
+  ]
+}
