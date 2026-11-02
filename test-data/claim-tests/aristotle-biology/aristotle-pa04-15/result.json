@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-pa04-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-15",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "The neck of the wolf (Canis lupus) and the neck of the lion (Panthera leo) each consists of a single bone, whereas other animals with a neck have several cervical vertebrae.",
+  "pass_criterion": "Pre-registered, before any vertebral count was read. Supports only if both species have a cervical-element count of exactly 1 in every admissible source that records that species, and the vertebral-formula table records at least one other mammal with a cervical count of 2 or more. A count is the number of cervical vertebrae or separately identified cervical bones, not a length in millimetres. Names accepted are the binomials Canis lupus and Panthera leo only. Canis lupus familiaris, Canis latrans, Panthera pardus and Panthera tigris are not substitutes.",
+  "fail_criterion": "Pre-registered. Refutes if at least one of the two species has cervical-element count greater than 1 in every source that records it. Mixed if the sources that record a species disagree on whether the count is 1 or greater than 1, and neither species is greater than 1 in every source that records it. Inconclusive, reason underpowered, if either species has no count and the other is not greater than 1 in every source that records it. Inconclusive, reason data-unavailable, if none of the three sources returns a page or file that can be read. A source that loads but does not name the species contributes no count for it.",
+  "planned_datasets": [
+    "vertebral-pattern-cerbus-2024",
+    "imnh-grey-wolf-r884-cervicals",
+    "onwuama-lion-axial-skeleton-2021"
+  ],
+  "test_contract": {
+    "expected_observation": "Canis lupus and Panthera leo are each recorded with a single cervical bone, and at least one other mammal in the same vertebral-formula table has more than one cervical vertebra.",
+    "disconfirming_observation": "Either the wolf or the lion is recorded with more than one cervical vertebra or more than one separately catalogued cervical bone.",
+    "admissible_datasets": "Open compilations or specimen records that state a cervical count, or that list cervical bones as separate objects, for the named species, independent of Aristotle. Planned files, header-checked on 2026-11-02 UTC and not downloaded before this registration: the vertebral-formula tables of Cerbus, Hiratani and Kawaguchi at commit a766ce94587640a2654e33bff14a7ddaf00aa732 of https://github.com/dbkk/vertebral_pattern (vertebral/fullFormulaTree/vertebralData.csv, vertebral/fullFormulaTree/species.csv, and vertebral/constraintMaster.csv); the Idaho Museum of Natural History grey-wolf osteology page https://virtual.imnh.iri.isu.edu/Osteo/View/Grey_Wolf/614, which must contain the text Canis lupus to count; and https://doi.org/10.22271/veterinary.2021.v6.i2a.328, which counts only if the fetched page's title or first heading contains lion or Panthera leo. No species and no source may be added after a count is seen.",
+    "inference_method": "From a table, read the numeric cervical-count column, or the integer in a formula token C<number>, on rows whose scientific name is exactly Canis lupus or Panthera leo. From the museum page, count distinct labels that match 'Cervical Vertebra'. From the lion paper, read the integer in the row whose label is Cervical vertebra or Cervical vertebrae. A species is consensus_many if every non-missing count is greater than 1, consensus_one if every such count equals 1, and conflict otherwise. Refutes if either species is consensus_many. Mixed if either is conflict and neither is consensus_many. Supports if both are consensus_one and the formula table has another mammal with a cervical count of at least 2. Otherwise inconclusive, with the reason in fail_criterion."
+  },
+  "interpretation": "The quote contrasts a neck that 'contains several vertebrae' with a neck that 'contains only a single bone'. The measurement is therefore the number of cervical bones, not whether those bones are flexible, and not a modern claim about the usual mammalian count of seven applied to these species by taxonomy. A museum page that catalogues cervical vertebra 1, cervical vertebra 2 and further cervical vertebrae as separate objects is a count of bones. A formula C7 is seven cervical vertebrae. Either is more than one bone.",
+  "caveats": [
+    "Header checks only. No cervical count was read before this file was committed.",
+    "The Idaho page is one grey-wolf specimen, and the lion paper is one osteological description. A count above 1 on either source is enough to reject 'a single bone' for that species; it is not a survey of variation.",
+    "Domestic dogs and leopards are out of scope even if a file happens to contain them."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  }
+}
