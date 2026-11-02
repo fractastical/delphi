@@ -1,0 +1,328 @@
+{
+  "claim_id": "darwin1859-ch06-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch06-17",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If the structural agreement that defines a class is explained by common descent and is independent of habits of life, then species of the same class are closer in an independently estimated molecular sequence than species that only share a habit, and a species' nearest neighbor among different habits is a classmate far more often than its nearest neighbor among different classes shares its habit.",
+  "pass_criterion": "Pre-registered, on RAG1 protein 3-mer cosine distance. All of the following: at least 12 species yield a protein of length 600 to 1400; at least 4 class labels and at least 3 habits are each represented by 2 or more of those species; there are at least 10 same-class different-habit pairs and 10 same-habit different-class pairs; the mean distance of same-habit different-class pairs is at least 1.25 times the mean distance of same-class different-habit pairs; C_cross is at least 0.75; H_cross is at most 0.40. C_cross is the fraction of species whose nearest neighbor among species of a different habit has the same class. H_cross is the fraction whose nearest neighbor among species of a different class has the same habit. Ties count as a match only if every tied neighbor matches. The same inequalities on Open Tree topological distance (edges between tips), for at least 75% of the sequenced species, are a required replicate: if the sequence test passes and the tree replicate fails or is mixed, the verdict is mixed; if the tree cannot be built, the sequence verdict stands.",
+  "fail_criterion": "Pre-registered. The sequence test refutes the claim if the sample-size conditions in the pass criterion hold and either the mean same-habit different-class distance is strictly less than the mean same-class different-habit distance, or C_cross is strictly less than H_cross. If the sample-size conditions fail, the verdict is inconclusive (underpowered if some proteins were retrieved, data-unavailable if fewer than 4 proteins or the NCBI protein service cannot be queried). If the sample is large enough and the result is neither the pass nor the fail, the sequence result is mixed. A tree result alone does not refute and does not upgrade a mixed or failed sequence result.",
+  "planned_datasets": [
+    "ncbi-protein-rag1",
+    "opentree-synthetic-tree-api"
+  ],
+  "test_contract": {
+    "expected_observation": "Within this crossed set of classes and habits, RAG1 similarity groups species by class rather than by habit: classmates with different habits are closer than ecological analogues, the nearest different-habit neighbor is usually a classmate, and the nearest different-class neighbor usually does not share the habit.",
+    "disconfirming_observation": "Ecological analogues are closer in RAG1 sequence than different-habit classmates, or habit matches the nearest other-class neighbor more often than class matches the nearest other-habit neighbor.",
+    "admissible_datasets": "A homologous protein sequenced independently of the skeletal characters that define the classes, for living vertebrates whose class and habit were assigned before the sequences were read, plus an independently estimated phylogeny of the same species. Habit labels are the study design, not a measurement taken from the sequence. The sample has to cross class with habit so that unity of type and unity of habit make different predictions.",
+    "inference_method": "Cosine distance of amino-acid 3-mer counts. Compare mean distances of the two crossed pair types, and compare nearest-neighbor match rates C_cross and H_cross, against the thresholds in pass_criterion and fail_criterion. The Open Tree synthetic tree supplies topological distance as a replicate with the same thresholds."
+  },
+  "decision_rule": {
+    "protein_db": "protein",
+    "protein_term": "\"{binomial}\"[Organism] AND RAG1[Gene Name]",
+    "slen_min": 600,
+    "slen_max": 1400,
+    "accession_preference": [
+      "NP_",
+      "XP_",
+      "longest"
+    ],
+    "kmer_k": 3,
+    "min_species": 12,
+    "min_classes_with_two": 4,
+    "min_habits_with_two": 3,
+    "min_class_pairs": 10,
+    "min_habit_pairs": 10,
+    "min_ratio_habit_over_class": 1.25,
+    "min_c_cross": 0.75,
+    "max_h_cross": 0.4,
+    "min_proteins_else_data_unavailable": 4,
+    "tree_context": "Vertebrates",
+    "tree_min_mapped_fraction_of_sequenced": 0.75,
+    "tnrs_endpoint": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+    "subtree_endpoint": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+    "about_endpoint": "https://api.opentreeoflife.org/v3/tree_of_life/about"
+  },
+  "confidence_rubric": {
+    "supports_tree_agrees": 0.7,
+    "supports_tree_inconclusive": 0.55,
+    "supports_but_thin_margin": 0.55,
+    "thin_margin_if": "ratio < 1.5 or C_cross < 0.90",
+    "refutes_tree_also_fails": 0.7,
+    "refutes_otherwise": 0.55,
+    "mixed": 0.45,
+    "inconclusive": 0.3,
+    "note": "The cap is 0.70 because the sample is one protein and 29 species, not every member of the classes, and because habits were coded by the experimenter."
+  },
+  "species": [
+    {
+      "scientific_name": "Pteropus vampyrus",
+      "class_label": "Mammalia",
+      "habit": "aerial",
+      "habit_note": "powered flight"
+    },
+    {
+      "scientific_name": "Myotis lucifugus",
+      "class_label": "Mammalia",
+      "habit": "aerial",
+      "habit_note": "powered flight"
+    },
+    {
+      "scientific_name": "Tursiops truncatus",
+      "class_label": "Mammalia",
+      "habit": "aquatic",
+      "habit_note": "fully aquatic"
+    },
+    {
+      "scientific_name": "Balaenoptera musculus",
+      "class_label": "Mammalia",
+      "habit": "aquatic",
+      "habit_note": "fully aquatic"
+    },
+    {
+      "scientific_name": "Equus caballus",
+      "class_label": "Mammalia",
+      "habit": "terrestrial",
+      "habit_note": "land-living cursorial"
+    },
+    {
+      "scientific_name": "Canis lupus",
+      "class_label": "Mammalia",
+      "habit": "terrestrial",
+      "habit_note": "land-living"
+    },
+    {
+      "scientific_name": "Talpa europaea",
+      "class_label": "Mammalia",
+      "habit": "fossorial",
+      "habit_note": "burrowing"
+    },
+    {
+      "scientific_name": "Heterocephalus glaber",
+      "class_label": "Mammalia",
+      "habit": "fossorial",
+      "habit_note": "burrowing rodent"
+    },
+    {
+      "scientific_name": "Apus apus",
+      "class_label": "Aves",
+      "habit": "aerial",
+      "habit_note": "powered flight"
+    },
+    {
+      "scientific_name": "Chaetura pelagica",
+      "class_label": "Aves",
+      "habit": "aerial",
+      "habit_note": "powered flight"
+    },
+    {
+      "scientific_name": "Aptenodytes forsteri",
+      "class_label": "Aves",
+      "habit": "aquatic",
+      "habit_note": "wing-propelled swimmer"
+    },
+    {
+      "scientific_name": "Spheniscus demersus",
+      "class_label": "Aves",
+      "habit": "aquatic",
+      "habit_note": "wing-propelled swimmer"
+    },
+    {
+      "scientific_name": "Struthio camelus",
+      "class_label": "Aves",
+      "habit": "terrestrial",
+      "habit_note": "flightless land bird"
+    },
+    {
+      "scientific_name": "Apteryx australis",
+      "class_label": "Aves",
+      "habit": "terrestrial",
+      "habit_note": "flightless land bird"
+    },
+    {
+      "scientific_name": "Draco blanfordii",
+      "class_label": "Reptilia",
+      "habit": "aerial",
+      "habit_note": "gliding; coded aerial because the habit is locomotion through air. Gliding is not powered flight."
+    },
+    {
+      "scientific_name": "Chelonia mydas",
+      "class_label": "Reptilia",
+      "habit": "aquatic",
+      "habit_note": "marine turtle"
+    },
+    {
+      "scientific_name": "Alligator mississippiensis",
+      "class_label": "Reptilia",
+      "habit": "aquatic",
+      "habit_note": "semi-aquatic; foraging and locomotion are primarily in water. Darwin's Reptilia includes crocodilians and excludes birds."
+    },
+    {
+      "scientific_name": "Anolis carolinensis",
+      "class_label": "Reptilia",
+      "habit": "terrestrial",
+      "habit_note": "land-living; scansorial. Terrestrial here means not aerial, aquatic, or fossorial."
+    },
+    {
+      "scientific_name": "Python bivittatus",
+      "class_label": "Reptilia",
+      "habit": "terrestrial",
+      "habit_note": "land-living"
+    },
+    {
+      "scientific_name": "Rhineura floridana",
+      "class_label": "Reptilia",
+      "habit": "fossorial",
+      "habit_note": "burrowing amphisbaenian"
+    },
+    {
+      "scientific_name": "Xenopus tropicalis",
+      "class_label": "Amphibia",
+      "habit": "aquatic",
+      "habit_note": "fully aquatic frog"
+    },
+    {
+      "scientific_name": "Xenopus laevis",
+      "class_label": "Amphibia",
+      "habit": "aquatic",
+      "habit_note": "fully aquatic frog"
+    },
+    {
+      "scientific_name": "Rhinella marina",
+      "class_label": "Amphibia",
+      "habit": "terrestrial",
+      "habit_note": "land-living toad"
+    },
+    {
+      "scientific_name": "Bufo bufo",
+      "class_label": "Amphibia",
+      "habit": "terrestrial",
+      "habit_note": "land-living toad; breeds in water, adult habit coded terrestrial"
+    },
+    {
+      "scientific_name": "Rhinatrema bivittatum",
+      "class_label": "Amphibia",
+      "habit": "fossorial",
+      "habit_note": "burrowing caecilian"
+    },
+    {
+      "scientific_name": "Geotrypetes seraphini",
+      "class_label": "Amphibia",
+      "habit": "fossorial",
+      "habit_note": "burrowing caecilian"
+    },
+    {
+      "scientific_name": "Danio rerio",
+      "class_label": "Pisces",
+      "habit": "aquatic",
+      "habit_note": "ray-finned fish, fully aquatic. Class label Pisces is Darwin's class for fishes; the species is an actinopterygian."
+    },
+    {
+      "scientific_name": "Gadus morhua",
+      "class_label": "Pisces",
+      "habit": "aquatic",
+      "habit_note": "ray-finned fish, fully aquatic"
+    },
+    {
+      "scientific_name": "Periophthalmus magnuspinnatus",
+      "class_label": "Pisces",
+      "habit": "terrestrial",
+      "habit_note": "mudskipper; amphibious, locomotes on land"
+    }
+  ],
+  "habit_definitions": {
+    "aerial": "Locomotion through the air: powered flight or gliding.",
+    "aquatic": "Locomotion and foraging primarily in water, including fully marine species and semi-aquatic crocodilians.",
+    "terrestrial": "Land-living, neither aerial nor aquatic nor fossorial. Includes cursorial mammals and a scansorial lizard.",
+    "fossorial": "Burrowing as the habit of life."
+  },
+  "class_definitions": {
+    "Mammalia": "Darwin's class Mammalia",
+    "Aves": "Darwin's class of birds, kept separate from reptiles",
+    "Reptilia": "Darwin's Reptilia: turtles, crocodilians, lizards, snakes, amphisbaenians; birds excluded",
+    "Amphibia": "Darwin's class Amphibia",
+    "Pisces": "Darwin's fishes, here the ray-finned species in the list"
+  },
+  "repo_files": [
+    {
+      "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/equus-caballus.json",
+      "byte_size": 1741,
+      "sha256": "6385cceb918df2961af9d4ee2e3f2ec406aebfaa8c159495b75f92a4e5349e10",
+      "role": "accepted name Equus caballus"
+    },
+    {
+      "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/canis-lupus.json",
+      "byte_size": 1118,
+      "sha256": "2eeb55aa9a56866cf51f74e83c4de973b3e403a903af50bd3148d5fddba8a89b",
+      "role": "accepted name Canis lupus"
+    },
+    {
+      "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/struthio-camelus.json",
+      "byte_size": 1000,
+      "sha256": "6103f4bdb50bd940fc8b95752a633ea4a17202b98234e904e870854217a9fb8b",
+      "role": "accepted name Struthio camelus"
+    },
+    {
+      "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/alligator.json",
+      "byte_size": 875,
+      "sha256": "67a9df5f64dc75dda0fe900270ac6460f39f578bdbdf54c41885ef218185b99a",
+      "role": "genus Alligator as resolved from the book; the test uses Alligator mississippiensis"
+    },
+    {
+      "path": "test-data/organisms/darwin-origin/ch05-06/taxa/apteryx.json",
+      "byte_size": 802,
+      "sha256": "6b21d0884d8c45b04ce88649ba29179117b64aed724662d40f9266da0efc3b80",
+      "role": "genus Apteryx; the test uses Apteryx australis"
+    },
+    {
+      "path": "test-data/organisms/darwin-origin/ch11-14/taxa/talpa.json",
+      "byte_size": 1632,
+      "sha256": "506b123f85fb30c2e7cb1dcc4ef26ac6dd118066820c7351a8974685ca2a994d",
+      "role": "genus Talpa; the test uses Talpa europaea"
+    }
+  ],
+  "species_excluded_before_registration_on_sequence_length_not_on_distance": [
+    {
+      "scientific_name": "Crotalus horridus",
+      "reason": "only RAG1 protein slen 300, below 600"
+    },
+    {
+      "scientific_name": "Trogonophis wiegmanni",
+      "reason": "RAG1 slens 173, 280, 363"
+    },
+    {
+      "scientific_name": "Rhacophorus reinwardtii",
+      "reason": "RAG1 slen 464"
+    },
+    {
+      "scientific_name": "Exocoetus volitans",
+      "reason": "RAG1 slen 469"
+    },
+    {
+      "scientific_name": "Cheilopogon pinnatibarbatus",
+      "reason": "RAG1 slens 451 and 470"
+    },
+    {
+      "scientific_name": "Periophthalmus modestus",
+      "reason": "RAG1 slen 444"
+    },
+    {
+      "scientific_name": "Polypedates leucomystax",
+      "reason": "not aerial; arboreal frog, and RAG1 slen 464"
+    }
+  ],
+  "interpretation": "Darwin defines unity of type as the fundamental agreement in structure among organisms of the same class, quite independent of their habits of life, and says that agreement is explained by unity of descent. The classes in this test are those structural classes. The sequences are not the structures: RAG1 is used because a tree built from it does not use the skeletal characters that define the classes, which is the non-circular comparison the assessments ask for. Habits are assigned from natural history and crossed with class so that 'explained by descent' and 'explained by habits of life' predict different nearest neighbors. The test does not score a morphological character matrix. It asks whether the groups that morphology already carved \u2014 the classes \u2014 match an independent genealogy better than habits do. Gliding is coded with flight. A semi-aquatic alligator is coded aquatic. Terrestrial is a residual land-living bin, not one locomotor gait. No aerial amphibian and no aerial fish entered the frozen list, because the NCBI protein records for the gliding frogs and flying fishes that were checked are fragments shorter than 600 amino acids, and mixing those fragments with full-length RAG1 would change the 3-mer distance for a reason that is not biology. Python bivittatus replaces Crotalus horridus, which had no full-length RAG1, as the second terrestrial reptile.",
+  "caveats": [
+    "Before this registration, RAG1 protein record counts and sequence lengths (slen) were read from NCBI esummary for the candidate species, and species with no protein in the 600\u20131400 window were dropped. No FASTA sequence was downloaded, no 3-mer distance was computed, and the Open Tree induced subtree was not requested. The Open Tree 'about' record and the TNRS context list were requested only to confirm the service and the context name Vertebrates.",
+    "The author expects the classes to be recovered, because published molecular phylogenies already place mammals, birds, reptiles, amphibians and ray-finned fishes as separate clades. The habit contrast is the part that could still fail this particular distance. The thresholds were not adjusted after seeing any distance.",
+    "Three-mer cosine distance tracks amino-acid composition as well as shared peptides. It is not an aligned evolutionary distance. That is a property of the pre-registered method, not a reason to switch methods after the fact.",
+    "Two species in the same class and the same habit (the two swifts, the two penguins, the two Xenopus) are excluded from both mean-distance pair sets. Nearest neighbors are taken across the other factor so that those pairs do not force C_cross and H_cross to be equal.",
+    "Open Tree's synthetic tree is informed by taxonomy as well as by published trees, so a pass on the tree alone would be weaker than a pass on RAG1. The tree is a replicate and cannot by itself support the claim."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/darwin-ch06-17-intro-04-8f39",
+    "date": "2026-11-01"
+  }
+}

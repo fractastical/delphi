@@ -1,0 +1,2107 @@
+{
+  "claim_id": "darwin1859-intro-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-intro-04",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If species placed in one genus are lineal descendants of a single other species that is generally extinct, then on an independent mitochondrial marker the sampled species of each genus form one clade, their sequences are not identical, and, among living genera that have a fossil species record, most include at least one extinct species.",
+  "pass_criterion": "Pre-registered. Clause A (lineal descent) passes only if at least 8 Chordata genera from the frozen list each contribute 2 or 3 cytochrome-b sequences under the sampling rule, at least 75% of those genera are monophyletic on the neighbor-joining tree, and at least 90% of them have a non-zero within-genus distance (the sequences are not all identical). Clause B (generally extinct ancestor) passes only if at least 10 living genera are fossil-informative and at least 70% of them have one or more extinct accepted species in PBDB. The claim passes only if both clauses pass.",
+  "fail_criterion": "Pre-registered. Clause A fails if at least 8 genera are tested and either fewer than 50% are monophyletic or fewer than 50% have a non-zero within-genus distance. Clause B fails if at least 10 genera are fossil-informative and fewer than 50% have an extinct accepted species. The claim is refuted if either clause fails. If a clause is neither pass nor fail and has enough genera, it is mixed. If fewer than 8 genera can be sequenced (A) or fewer than 10 are fossil-informative (B), that clause is inconclusive (underpowered, or data-unavailable if the service cannot be queried). Overall: refutes if either clause fails; supports only if both pass; inconclusive if every clause that is not a pass is inconclusive; otherwise mixed.",
+  "planned_datasets": [
+    "ncbi-nuccore-cytb",
+    "paleobiology-database-taxa-list-1.2",
+    "darwin-origin-genus-inventory"
+  ],
+  "test_contract": {
+    "expected_observation": "Species of one genus cluster as a single clade on cytochrome b and are not genetically identical, and a clear majority of the living genera that have any fossil species also contain an extinct species.",
+    "disconfirming_observation": "Most tested genera are polyphyletic or their sampled sequences are identical, or, among living genera with a fossil species record, fewer than half contain any extinct species.",
+    "admissible_datasets": "Public nucleotide records of mitochondrial cytochrome b for animals, and an openly licensed taxon-level fossil record with an extant/extinct flag. Genus membership is frozen from the vendored Darwin organism inventory (rank genus), not chosen after seeing the tree. Plants are outside this measurement because that inventory is animals only.",
+    "inference_method": "Neighbor-joining on cosine distance of nucleotide 6-mer frequencies. A genus is monophyletic if its sampled tips are exactly one cluster of the unrooted tree. Extinct ancestry is the fraction of living, fossil-informative genera with at least one PBDB accepted species whose is_extant value is the extinct token. Thresholds are the pass_criterion and fail_criterion numbers."
+  },
+  "interpretation": "Darwin's sentence has three parts: species are not immutable; species of one genus are lineal descendants of some other species, as varieties descend from their species; and that other species is generally extinct. Clause A tests the descent and the change: congeners form one lineage on a marker that is not the classification itself, and their sequences differ. Clause B tests 'generally extinct' with the fossil record. This is a modern reinterpretation in four ways. (1) The genera are the accepted names in the 2026 organism inventory, which follow current taxonomy, so monophyly is partly circular for genera that were revised to match molecular trees; the caveat is recorded and confidence is capped for that reason. A pre-molecular checklist covering all 82 genera was not used. (2) 'A single parent' is read as monophyly of the sampled living species, which is stricter than mere shared ancestry and is the reading that independent creation of each species would fail. (3) 'Generally' is given the number 70%, and 'not generally' the number 50%; both were fixed before the fossil counts were known. (4) The ancestor itself is not identified; an extinct accepted species in the genus is the proxy that the lineage includes species that are gone. The horse-genus passage in chapter 5 (horse, ass, hemionus, quagga, zebra) is reported as a side case and does not decide the verdict. Plants, and animal genera Darwin names that are not in the inventory, are untested.",
+  "sampling": {
+    "clause_A_phylum": "Chordata",
+    "marker_gene": "CYTB",
+    "nuccore_term": "\"{binomial}\"[Organism] AND CYTB[Gene Name] AND 500:1200[SLEN]",
+    "slen_min": 500,
+    "slen_max": 1200,
+    "max_taxonomy_species_considered": 400,
+    "max_species_examined_per_genus": 12,
+    "max_sequences_per_genus": 3,
+    "binomial_tokens": 2,
+    "kmer_k": 6,
+    "min_genera_A": 8,
+    "monophyly_pass": 0.75,
+    "monophyly_fail": 0.5,
+    "nonidentical_pass": 0.9,
+    "nonidentical_fail": 0.5,
+    "min_genera_B": 10,
+    "extinct_fraction_pass": 0.7,
+    "extinct_fraction_fail": 0.5,
+    "min_species_with_recognized_status": 2,
+    "min_extant_species": 1,
+    "min_extinct_species_to_support": 1,
+    "pbdb_url": "https://paleobiodb.org/data1.2/taxa/list.json",
+    "pbdb_params": {
+      "rank": "species",
+      "taxon_status": "accepted",
+      "vocab": "pbdb",
+      "show": "attr,app,class",
+      "limit": "10000"
+    },
+    "extant_tokens": [
+      "true",
+      "yes",
+      "extant",
+      "1"
+    ],
+    "extinct_tokens": [
+      "false",
+      "no",
+      "extinct",
+      "0"
+    ],
+    "phylum_collision_rule": "If PBDB records include a phylum and fewer than half of the species with a phylum match the inventory phylum, the genus is a name collision and is not fossil-informative.",
+    "ncbi_taxonomy": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
+    "ncbi_fetch": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+  },
+  "equus_side_case_not_used_for_verdict": {
+    "genus": "Equus",
+    "species_darwin_names": [
+      "Equus caballus",
+      "Equus asinus",
+      "Equus hemionus",
+      "Equus quagga",
+      "Equus zebra"
+    ],
+    "outgroup_fallback_order": [
+      "Tapirus terrestris",
+      "Tapirus indicus",
+      "Tapirus pinchaque"
+    ],
+    "question": "Do the five equine species Darwin names in chapter 5 form a clade relative to a tapir, and does PBDB list an extinct Equus species?"
+  },
+  "genera": [
+    {
+      "accepted_name": "Alligator",
+      "phylum": "Chordata",
+      "class": "Crocodylia",
+      "ncbi_taxid": 8495,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Crocodylia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/alligator.json",
+          "byte_size": 976,
+          "sha256": "71ba89b5a39a807a92087de5769bbc0eec1340a6683b639f90d2d62d17dfa7b7"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/alligator.json",
+          "byte_size": 875,
+          "sha256": "67a9df5f64dc75dda0fe900270ac6460f39f578bdbdf54c41885ef218185b99a"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Amblyopsis",
+      "phylum": "Chordata",
+      "class": "Actinopterygii",
+      "ncbi_taxid": 940463,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Actinopterygii"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/amblyopsis.json",
+          "byte_size": 940,
+          "sha256": "ee63fc28c6967348670e2c2ae374eb07d05fb88fa6489bf41114dcb39a891007"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Ancylus",
+      "phylum": "Mollusca",
+      "class": "Gastropoda",
+      "ncbi_taxid": 153586,
+      "phylum_values": [
+        "Mollusca"
+      ],
+      "class_values": [
+        "Gastropoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/ancylus.json",
+          "byte_size": 1324,
+          "sha256": "fa8d81622a40d82e3576942bc114a5d1bac4599e952cf33b942bfa30dba6cda4"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/ancylus.json",
+          "byte_size": 1502,
+          "sha256": "adfb6eb5091de843d9e3a736df2cc90606cfff8ddacfa0095a1e15435bac8179"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Anser",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8842,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/anser.json",
+          "byte_size": 823,
+          "sha256": "420e3bc8d33257742bc9967c53cfdf0dcfa5b2456d65f08a978e5adfb95ee1cb"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Aphis",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 80764,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/aphis.json",
+          "byte_size": 1473,
+          "sha256": "7f29b5305d5f7cd6f07e6f5eee4302398e8fa008c0289d7589c54fbe6c3cb60d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/aphis.json",
+          "byte_size": 1239,
+          "sha256": "89cf9c5479e280d35e2c3c475fa8da39a2be295d2650843c7f4875ec8bf78903"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Apodemus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 10128,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/apodemus.json",
+          "byte_size": 1088,
+          "sha256": "a74eaec485f4f24a117967357b6c01127266ce9eb8aba1031418c6356149a120"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/apodemus.json",
+          "byte_size": 1168,
+          "sha256": "a4cd1e56b795302f952630a20629d00993ff7c538b040c937c5a04ad7953eaae"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Apteryx",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8821,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/apteryx.json",
+          "byte_size": 802,
+          "sha256": "6b21d0884d8c45b04ce88649ba29179117b64aed724662d40f9266da0efc3b80"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/apteryx.json",
+          "byte_size": 783,
+          "sha256": "94d59fd71337079d30eb48884e6c74e1ebb1646c640627d4c6e8debf571ce5bd"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Aquila",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8960,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/aquila.json",
+          "byte_size": 819,
+          "sha256": "76c0077cdac7d49ad2a851e4a1943db86d44e309c89e545b76f88f337f732e6b"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Balanus",
+      "phylum": "Arthropoda",
+      "class": "Maxillopoda",
+      "ncbi_taxid": 6677,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Maxillopoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/balanus.json",
+          "byte_size": 1076,
+          "sha256": "b9c640990aa558036e5616e6dea121eebf4d0d097b1cd79c000dc0488a3ab9de"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/balanus.json",
+          "byte_size": 801,
+          "sha256": "786eca7e868d9eeee27107bb76a3ce367cfbd953edc33fc18086af0a27a5f4b1"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Bombus",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": null,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/bombus.json",
+          "byte_size": 950,
+          "sha256": "07d455081c9a3704bc3911aeefac9812b943a17c262fb7784eb723c3d7bf0443"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/bombus.json",
+          "byte_size": 829,
+          "sha256": "308f1f68a3562959d81d79c42a2eff53ac3eecaaa1282faa2019143803c98bd4"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/bombus.json",
+          "byte_size": 1580,
+          "sha256": "a62aae144a5d68085509736394b486775696d59c37f11f6d36bed20378913c24"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/bombus.json",
+          "byte_size": 1027,
+          "sha256": "ed55440bfe7ce24140b96774d2d7368cd9324be6d50e6a31995792f66dd882a6"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Bos",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9903,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/bos.json",
+          "byte_size": 1573,
+          "sha256": "35e521dbbc6029759f3d8f620a1e20ce1f70b1d4dc3f3f88ed02f09f31111ea8"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/bos.json",
+          "byte_size": 1397,
+          "sha256": "d158bdccfc743f92bbdb3ccc07346d394c4ffad15362f488da502eb11f106e08"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Camelus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9836,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/camelus.json",
+          "byte_size": 790,
+          "sha256": "b78b7a578a77d8d04af6e06fa3f515c3c84a233706d5c6d814f430d5b88b2197"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/camelus.json",
+          "byte_size": 2412,
+          "sha256": "ecadfbd1a529187c9db1eb99a78847fe785762d290a57e90c3732b7e15895f5d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch02/taxa/camelus.json",
+          "byte_size": 1515,
+          "sha256": "a76a96368819b5fc046f8977f5939b2ee4536d285be5297aee92f653f7838e07"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/camelus.json",
+          "byte_size": 965,
+          "sha256": "e94c0b242a83433ac4f19805b0a659900393a05966dde342577e59264accf0b1"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Canis",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9611,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/canis.json",
+          "byte_size": 836,
+          "sha256": "d461cbfff0af43379c8bc75910ef19f86cc091c7e28ccf3252647fb665550850"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/canis.json",
+          "byte_size": 1554,
+          "sha256": "b582fb95a9939d01d96edd8cb44a3b1f8fae98a5afed630a8c0f6ac6b04d3afa"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/canis.json",
+          "byte_size": 1331,
+          "sha256": "6713fc8fc6379b172fff464cc05996973fa9cb57bc27e7883e770b10475047d9"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/canis.json",
+          "byte_size": 1092,
+          "sha256": "d1a23a46eb78a6f8323c7c2b58f1ede944d41116967d6b9bfde445c3d02f5ba5"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Castor",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 10184,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/castor.json",
+          "byte_size": 1283,
+          "sha256": "44232043248012fa18896ad30da43a0208d8374ec0773f6eefd71f2fe12b6462"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/castor.json",
+          "byte_size": 1620,
+          "sha256": "222989c9879e3e0bcc317b331401ecdc9ea1ddfca1e1bdf64fa8dda81ef11ef9"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Cephalotes",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 369112,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/cephalotes.json",
+          "byte_size": 775,
+          "sha256": "9758f7b3b35de3250adbaa36bb62bcdaadce91f5d09e968f10e0ac7146608121"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/cephalotes.json",
+          "byte_size": 1640,
+          "sha256": "6f59f4beb472a580105991d55ede2e22c7f3c97e2cdb21e40726bfc6fcaeed4c"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Certhia",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 73329,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/certhia.json",
+          "byte_size": 821,
+          "sha256": "5d0b7bd6796ba0c0da6aa07a7352e322d547e881a841fc1a19a990ccbd3e63a5"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Cervus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9859,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/cervus.json",
+          "byte_size": 937,
+          "sha256": "482b3b9a76d2d9a7106a7efa5457328a9cb36a6a0fed36c27da722528ea935df"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Chiton",
+      "phylum": "Mollusca",
+      "class": "Polyplacophora",
+      "ncbi_taxid": 256107,
+      "phylum_values": [
+        "Mollusca"
+      ],
+      "class_values": [
+        "Polyplacophora"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/chiton.json",
+          "byte_size": 773,
+          "sha256": "a3f07ca3a9ed8c16bc5f6e2adca9edabadfad80edc0559fc54e1599f41e4db48"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/chiton.json",
+          "byte_size": 2911,
+          "sha256": "255875fc9d0261d9144ba301b79c465bfe14381f25abc73fc6944a7e57f5a100"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Chloephaga",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8859,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/chloephaga.json",
+          "byte_size": 1617,
+          "sha256": "762857b8c61f55af5aa50162531545512221ae232766ba82a03442ee6506bad9"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Chthamalus",
+      "phylum": "Arthropoda",
+      "class": "Maxillopoda",
+      "ncbi_taxid": 37898,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Maxillopoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/chthamalus.json",
+          "byte_size": 838,
+          "sha256": "affb4b0b6648ac5e22ffb5d70b9fca729c56d755b73764847faaa9a10878a1da"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/chthamalus.json",
+          "byte_size": 3001,
+          "sha256": "d85bc8f5129cc2f2652d1dbefd93dbb4d32f9127e1252c21d745b05dc6998134"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Cinclus",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 127874,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/cinclus.json",
+          "byte_size": 1699,
+          "sha256": "cc95ef5d098f0044e083cfe13da8c829ae4c527047f3f76dd944547c235a91ad"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Cobitis",
+      "phylum": "Chordata",
+      "class": null,
+      "ncbi_taxid": 47718,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/cobitis.json",
+          "byte_size": 801,
+          "sha256": "d7ad7f962d0450c480d916bae7b5639216333db2e2b7069c1c669ba2977f5937"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/cobitis.json",
+          "byte_size": 762,
+          "sha256": "c8959110d4654e1a8039f6b8e8f977639f3bd90bb7f2e0f86d7fbd00925a284c"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Coccus",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 538669,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch02/taxa/coccus.json",
+          "byte_size": 1488,
+          "sha256": "bec15819933405942b680b2f4969b04940d1df49e5d665fe0d96354c97a6e11d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/coccus.json",
+          "byte_size": 888,
+          "sha256": "db0cf73e59c88cdb9abf7a8c5980f76db0449007a7ce749e253e36a1c707ce88"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Coccyzus",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 33602,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/coccyzus.json",
+          "byte_size": 953,
+          "sha256": "9077c64f4d4e5655f1a85ee18fa7c1cb9a6419977494905eb55c24b540745ac8"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/coccyzus.json",
+          "byte_size": 1709,
+          "sha256": "6bfaedc94a7f406f281c2bf3abaae65d145ea8315cf0d01a534367050c2b9014"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Columba",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8931,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/columba.json",
+          "byte_size": 1071,
+          "sha256": "2573f97f08a4793dd461a17b29b917b827db3c0d978d090c048ad282ec434e30"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Colymbetes",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 107792,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/colymbetes.json",
+          "byte_size": 1299,
+          "sha256": "fbf2eaca9af3d7667a2554faa6ad336e1243c013d42299acc620d865c83f1f28"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/colymbetes.json",
+          "byte_size": 1403,
+          "sha256": "e9da3d8e93299e06b5264acfbb128e1e9c882b1b1f0833bc7da1a7f3017adc53"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Crotalus",
+      "phylum": "Chordata",
+      "class": "Squamata",
+      "ncbi_taxid": 8728,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Squamata"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/crotalus.json",
+          "byte_size": 785,
+          "sha256": "f36b250254cf7d8529fdca82739e510abc10a36952f1b765dbfe2a7c53751994"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/crotalus.json",
+          "byte_size": 776,
+          "sha256": "f03a1ead3113f89d4001002863659cb8e47036ad3db15a7ae32556125b34f985"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Ctenomys",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 33551,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/ctenomys.json",
+          "byte_size": 860,
+          "sha256": "ee1543d467d4a69c19cab2050196aec238a8d4f19d93224a0aeca210fc14348c"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/ctenomys.json",
+          "byte_size": 1509,
+          "sha256": "49da85f07fb66fd816fffa9bd631b4eb010ba313f06988749815f052982a1e0e"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/ctenomys.json",
+          "byte_size": 1343,
+          "sha256": "adff23f08c1c9adc52687c5f2a26f48ac191a7b0befd0831e2a366a2d2c8cf65"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/ctenomys.json",
+          "byte_size": 943,
+          "sha256": "6356b108d32a03ef8f878c50c93474bed40f8ff7e5cb32143f9374f665da5bfe"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Dasyprocta",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 34845,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/dasyprocta.json",
+          "byte_size": 1271,
+          "sha256": "0e68c5f1a9ed0ef3ab35208abc44b5a8fe40ff8d9cb0ac78713feac144e71e52"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/dasyprocta.json",
+          "byte_size": 1529,
+          "sha256": "abdd46b0062507467867479c71aba9717dfa5779039d4d2c675577bd2e23a8b8"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Dorylus",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 227072,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/dorylus.json",
+          "byte_size": 812,
+          "sha256": "16b4a920901222bc7cd6784ba2c36db6079a2aa2af7a18182a1fd4144fb6bdb8"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/dorylus.json",
+          "byte_size": 1544,
+          "sha256": "3a5827a96ae6e70bb66940d244f8a8a23e1e96f3462a771e9af18ebf093c1bdf"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Dytiscus",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 107799,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/dytiscus.json",
+          "byte_size": 1392,
+          "sha256": "62dc96abc8337050b0f63ea79de2878f85c7054d3604b083ceef8a2f791fbc45"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/dytiscus.json",
+          "byte_size": 1484,
+          "sha256": "5f1f2371700a315e6d55193be015a68219aa7b5a1818583101d11b988ee150c6"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Eciton",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 213865,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/eciton.json",
+          "byte_size": 680,
+          "sha256": "9bef824bb8a8486ee39fb6505b9aa0ad21aef2cd6462a6fdd358ad7a039e7db6"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/eciton.json",
+          "byte_size": 1330,
+          "sha256": "c4e0f97936842621bfa9e6de5fda0c961c2836a5f5e8fbb710bceb9471d5c6de"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Equus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9789,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/equus.json",
+          "byte_size": 1402,
+          "sha256": "7e32d2fcf3027b9ffc8b31c02f83f0d8ef4a7379736ae6d9326f151298461fde"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/equus.json",
+          "byte_size": 2758,
+          "sha256": "a908f3fa84999a0f0ff721533bd27ca3375a40ac1dc92a04880546291dc9531c"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/equus.json",
+          "byte_size": 1624,
+          "sha256": "d7d14c35bda6309b552e9dfa1228a3db3c3fd862b508a2fe48ac7e5376305527"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/equus.json",
+          "byte_size": 1467,
+          "sha256": "64000bb28efad39877f782953d21b37d248682216817b90933c4f82522712d7b"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/equus.json",
+          "byte_size": 1304,
+          "sha256": "d6eff84eb6962556539aaada415f1f6ee588ded5723f4519d5c3f033d616f967"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Falco",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8952,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/falco.json",
+          "byte_size": 865,
+          "sha256": "ed6ee571bafd0e4e040a1998b8c985cd48f4402d1afa7bb2e6f7af591bd005c8"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/falco.json",
+          "byte_size": 791,
+          "sha256": "fc784245294920173310898c59ae662923d730bd673f11f718ea4cbb55aaf1d7"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Felis",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9682,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/felis.json",
+          "byte_size": 812,
+          "sha256": "a137bcdec15b5e62aff75c26e45ef8d21d4ca56fce99c8af456a5f72958e3e29"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/felis.json",
+          "byte_size": 1629,
+          "sha256": "3b46fe09add58588acb0c803406de066cd6ac33bc1488f7f9c9b54c77bcdf158"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Fregata",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 37041,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/fregata.json",
+          "byte_size": 948,
+          "sha256": "e285077daf51dd70de6a02b4f76ad2d5ce3b01f8a910361511d969c30dbc9fff"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/fregata.json",
+          "byte_size": 853,
+          "sha256": "6d4854b3f337ca439d77b65bd109a01064e889d407929b7ccb086921a1b5b8b9"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Fulica",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 9120,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/fulica.json",
+          "byte_size": 792,
+          "sha256": "8b2181eabf32588cf1fdccd64509dbc00549a1628b09cc563638a35db4c89909"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Giraffa",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9893,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/giraffa.json",
+          "byte_size": 1471,
+          "sha256": "5ca40623a4ded2cf0dbd74b701b2bb4bef2d4936d7d75c29bc14883ac8c92110"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Hippobosca",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 452745,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/hippobosca.json",
+          "byte_size": 789,
+          "sha256": "6af464b1c2e3a07bd4d03d5798d13ecd466f84230c3cf6544ea8d72aa29f33b1"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Hydra",
+      "phylum": "Cnidaria",
+      "class": "Hydrozoa",
+      "ncbi_taxid": 6083,
+      "phylum_values": [
+        "Cnidaria"
+      ],
+      "class_values": [
+        "Hydrozoa"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/hydra.json",
+          "byte_size": 855,
+          "sha256": "28d649c19b8301384f4589cd9e7a1fca5b006746801edfbcd2e99137aae61f6f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/hydra.json",
+          "byte_size": 665,
+          "sha256": "28e18c14801651af8d565bb2a1fe5c5adee7f65ea2e6130e70679ac63e6ea669"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Ibla",
+      "phylum": "Arthropoda",
+      "class": "Maxillopoda",
+      "ncbi_taxid": 58184,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Maxillopoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/ibla.json",
+          "byte_size": 701,
+          "sha256": "3f6976e04ba54dbc8dd9350c95e4f98dbaa4f92985c2ff9dd7c60e05f95a5ee2"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/ibla.json",
+          "byte_size": 811,
+          "sha256": "46183676b3b9d383d467065fe4c9172f7cf0b9376bc2fd4c80bf7b2081413705"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Lagidium",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 84622,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/lagidium.json",
+          "byte_size": 1335,
+          "sha256": "f08afc10fbb303e27a4e57b11876cd1d76165ec3f37da963cabe8fe0d12f4b2f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/lagidium.json",
+          "byte_size": 1560,
+          "sha256": "b133b58e397f81e49e94ae06a2a4e951ec7bf5c30654c853b1b6481d3a9311dd"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Leiopelma",
+      "phylum": "Chordata",
+      "class": "Amphibia",
+      "ncbi_taxid": 43507,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Amphibia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/leiopelma.json",
+          "byte_size": 1488,
+          "sha256": "5f4195a9fc1bb65164f7fae4a08e74280c7d279b9785e9be71611ed48b3820a4"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Lepidosiren",
+      "phylum": "Chordata",
+      "class": "Dipneusti",
+      "ncbi_taxid": 7881,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Dipneusti"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/lepidosiren.json",
+          "byte_size": 2552,
+          "sha256": "115b2a98f36f167ba64fbe6e2f3cfdb4f7a9f0173a99833a052b1f2a2bc928ae"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/lepidosiren.json",
+          "byte_size": 1469,
+          "sha256": "8d850b62b16407d582ef21d939927cadebe9cd59a92dc5ec3b10651030cdfd1c"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/lepidosiren.json",
+          "byte_size": 977,
+          "sha256": "1651766e65e4f74db6812894dcadc1a6b116dfe931e8b5add0fe601c76ea6ddc"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Lepus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9980,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/lepus.json",
+          "byte_size": 883,
+          "sha256": "3b6ff1a824fca4ce187388698137d1d7ce5fb6ede74b21e25648219014ae755d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/lepus.json",
+          "byte_size": 826,
+          "sha256": "d930f33b4130bcaefdc39130d7c5373b975866006d213359fcaf863ae4befe75"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/lepus.json",
+          "byte_size": 790,
+          "sha256": "681d9b1c5b78782ce54ead4bb3e1fbaf26d48ee344448bf98afa527dc6e87fa5"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/lepus.json",
+          "byte_size": 1536,
+          "sha256": "9c862604030c79bbce9c711bd83742057442b7100896bcae9570aa6658a7f817"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/lepus.json",
+          "byte_size": 1279,
+          "sha256": "4f35105902f22e8825b9748e2d020305cb1c2e53809eb4b5c20d8f869ebdc74c"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/lepus.json",
+          "byte_size": 1565,
+          "sha256": "6ef4a660ada38fe950d8ca5a2ca3da07fd4a21917c59facf944525c2acdeec18"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/lepus.json",
+          "byte_size": 1067,
+          "sha256": "0d6c8ebaa7da94c54721fcdeb50b5d1561c4808ff95ba0c8559f0e594f505978"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Lingula",
+      "phylum": "Brachiopoda",
+      "class": "Lingulata",
+      "ncbi_taxid": 7571,
+      "phylum_values": [
+        "Brachiopoda"
+      ],
+      "class_values": [
+        "Lingulata"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/lingula.json",
+          "byte_size": 834,
+          "sha256": "973720fa1d96b8e6700267584d873d20111a9bd1948418552866663cc8f1487f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/lingula.json",
+          "byte_size": 3198,
+          "sha256": "1531ba6dceedf4aaf2bed9401b658fed4aa19ae1631b88844cfc621470cb4888"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Lutra",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9656,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/lutra.json",
+          "byte_size": 916,
+          "sha256": "ab777dfcb0f3840a3be290cc23d90c998d06255c593c8602ae2fdc031f0432a1"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Macrauchenia",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 1563126,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/macrauchenia.json",
+          "byte_size": 748,
+          "sha256": "2c5e2d40b4ee1184299fba3953f480eba32d4646bb952ca01c89f682e40e88d3"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/macrauchenia.json",
+          "byte_size": 2338,
+          "sha256": "ec21a85b926cbd2c41ba52610d3c2dfde7eefbfe6a88cbebc4f5fdcd7ab4becb"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Mammut",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 39051,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/mammut.json",
+          "byte_size": 1009,
+          "sha256": "8553d639b8cc47082b17f7c9ba21f227e41db5f36d1dc3e817e44b27f3ef6035"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/mammut.json",
+          "byte_size": 2592,
+          "sha256": "ea8e3c2cf8f27ccb17d71ae289721a00f01bc47dc4b1cc007b6ad26e789e2b91"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Megatherium",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 2546650,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/megatherium.json",
+          "byte_size": 811,
+          "sha256": "e083645c29d455815fc6e2ef357b591582e8a3fe14866eadeea6ee526a6f6192"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/megatherium.json",
+          "byte_size": 2412,
+          "sha256": "c8dfea384d24ce74bcf881b715dd59dfc70c36222b1769d9cc4f432a6ff3c1b1"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Melipona",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 28651,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/melipona.json",
+          "byte_size": 914,
+          "sha256": "a8c155472f59f5cd4315d7fc0bfe1b761ea62a46f5407fcab2cdb5e5d74c863e"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/melipona.json",
+          "byte_size": 1590,
+          "sha256": "22d892cf90cc982934164606f8b907ad8eda7b26d96acb4e51527fc4bedba6ac"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Mimus",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 58200,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/mimus.json",
+          "byte_size": 1327,
+          "sha256": "4b7b4aa44ec3331484881edde1feb7b4545b242c1499f71b962a6f6f6a7cbdc6"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/mimus.json",
+          "byte_size": 1673,
+          "sha256": "ad66ff3000876bd1eb0ee40361ad4d853e8f56da92966a6a5c45115a90305eb6"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Mus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 10088,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/mus.json",
+          "byte_size": 950,
+          "sha256": "74315482b10e952f406b93e4bb88c97facce70b44cd4a3366b1c7904aedbc87c"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/mus.json",
+          "byte_size": 1166,
+          "sha256": "9c263f1069ac721f982e67b5fe933aab0617de9c26fb2d34f85195e34bf3e69f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/mus.json",
+          "byte_size": 1553,
+          "sha256": "d8b129fc4f6a1beecc142e4b68aa007ffc55ba49e79d621acc1f9d316a6aced5"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/mus.json",
+          "byte_size": 1456,
+          "sha256": "01821ef64b8bf7d3ba146ff3d7445f4c39a5deed0ea8d6a138dfcaea1492922a"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Mustela",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9665,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/mustela.json",
+          "byte_size": 965,
+          "sha256": "04b7614d01c24e9f0208f97a7cd2f5e84a27ddd4021da93541f97d4fad3a7893"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/mustela.json",
+          "byte_size": 837,
+          "sha256": "247f8e3b3c8cfe1e788a46483105e83accf0668cc1fe7942ba310eb8a6bd3c97"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Mylodon",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 48783,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/mylodon.json",
+          "byte_size": 731,
+          "sha256": "92879b3755c38d66ff782f949b7f94b7c521c38107a88cf625a2d9ef34aa7472"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/mylodon.json",
+          "byte_size": 2271,
+          "sha256": "ce23e58fb29b2e3c2ce8113675efc7895b880e754152791ee35efdde5c8a3f0e"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Myrmecocystus",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 211520,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/myrmecocystus.json",
+          "byte_size": 724,
+          "sha256": "b1d066d6e046892616f1ef6b3abfc3de3eee90980f7b0cb0cc5dcd8cb6a5185d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/myrmecocystus.json",
+          "byte_size": 1385,
+          "sha256": "5a1f37de1a9419e4bc0c5d3eae45a6fc56c9bb498c5c86718c1b4e59a27d5545"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Myrmica",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 27492,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/myrmica.json",
+          "byte_size": 683,
+          "sha256": "591990af606dee4197fbb91f613d66a59e9cbcb450b1b91b1376513ede2e807d"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/myrmica.json",
+          "byte_size": 1368,
+          "sha256": "42cfcc88bf97f72909f0d56104b9cb842fa6889f8824f3782331d3ab7b47164b"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Nautilus",
+      "phylum": "Mollusca",
+      "class": "Cephalopoda",
+      "ncbi_taxid": 34572,
+      "phylum_values": [
+        "Mollusca"
+      ],
+      "class_values": [
+        "Cephalopoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/nautilus.json",
+          "byte_size": 789,
+          "sha256": "53ae061ac312feb8d77016c4a5f4136039e6f61f6cce2d39aa374eb3f12e5761"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/nautilus.json",
+          "byte_size": 3073,
+          "sha256": "2e274101500df6f333c5abb59f079a513f852feb95adb01151eb9c0c0497df42"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Neotoma",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 42407,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/neotoma.json",
+          "byte_size": 960,
+          "sha256": "529e39fbae420956cf4a4ea65bf1b85f51bac43f596dd5aaa1bb9d3268791045"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/neotoma.json",
+          "byte_size": 1177,
+          "sha256": "b828ec617042a15e6db46a0255d7e7a4beb8edd31a2fa93e996a0f4a5c4b6fd8"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Onitis",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 166329,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/onitis.json",
+          "byte_size": 890,
+          "sha256": "9052e432459fe2dee13605cf63ef7bc66a502160318fd9e91c702c9b6499eab8"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/onitis.json",
+          "byte_size": 1042,
+          "sha256": "8432a7f6e227e7ba2754a50d78b9f606c5e52a0405ff1ec8e0f9a36d8f8604df"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Pelecanoides",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 37077,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/pelecanoides.json",
+          "byte_size": 916,
+          "sha256": "d7995449364c0d8968af17c6795c5b29ab06a991ab7d0b099accc325d5dfb924"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/pelecanoides.json",
+          "byte_size": 950,
+          "sha256": "8d080993d409feadaf8b95992283d1a453962d3bcee3c3a01e407e85c2fa9e19"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Pelecanus",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 33617,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/pelecanus.json",
+          "byte_size": 1321,
+          "sha256": "bd530c450226773af63164b8a1182c61d717b42e0f0438bc4df4b5f81c4b3a05"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/pelecanus.json",
+          "byte_size": 1595,
+          "sha256": "968622c507cf021a2af1146ee7e607abf726304fcd65e4ef1c7972faadae91e3"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Pieris",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": null,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/pieris.json",
+          "byte_size": 771,
+          "sha256": "e05159b3449d1c9f934f91ebc80baa160dfc1a97eb37367968e5eb2b2011b28f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/pieris.json",
+          "byte_size": 1652,
+          "sha256": "d1e1b9ef8b36bd7c0c6911d60ece9ae1a861761f97f56ba77eb9df7e546c3694"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Pongo",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9599,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/pongo.json",
+          "byte_size": 854,
+          "sha256": "74996e7207c15793b6db6743e94b1ff13d0c9036eb2995487f07d8530678856b"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Proteolepas",
+      "phylum": "Arthropoda",
+      "class": "Malacostraca",
+      "ncbi_taxid": null,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Malacostraca"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/proteolepas.json",
+          "byte_size": 975,
+          "sha256": "3ee34d30bd33a0c3917a838eecd4d59705b5d4c7f2d31e71c95dd3c860396c19"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Pyrgoma",
+      "phylum": "Arthropoda",
+      "class": "Maxillopoda",
+      "ncbi_taxid": 432342,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Maxillopoda"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/pyrgoma.json",
+          "byte_size": 777,
+          "sha256": "fab8014190970ec93452d3be3de2d26f9f01ecd29449143e8b986c6b5a5aea13"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/pyrgoma.json",
+          "byte_size": 858,
+          "sha256": "4e4be959441300a21be5a17cb33b043cba3f1dc16177cc46e8b7160f225d51a6"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Rangia",
+      "phylum": "Mollusca",
+      "class": "Bivalvia",
+      "ncbi_taxid": 43052,
+      "phylum_values": [
+        "Mollusca"
+      ],
+      "class_values": [
+        "Bivalvia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/rangia.json",
+          "byte_size": 1504,
+          "sha256": "133ca36787005ccc4bcea82c88533bba2cbfdb7f5d94b1d0608d90bc7423188c"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Rattus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 10114,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch03-04/taxa/rattus.json",
+          "byte_size": 932,
+          "sha256": "f45bc55ac2de189c76a1296e79088e6d76a885aad15dee8e17243a7e441eacb6"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/rattus.json",
+          "byte_size": 876,
+          "sha256": "6473d9032cd3c44975a49f4f29a09af8f61595315574d5c7d3f1f10d51c23ccd"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/rattus.json",
+          "byte_size": 1022,
+          "sha256": "9c91173b6b839457d703f250313bdeb48474859bb853adcb66991e665d05a231"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Rhea",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 8796,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-12/taxa/rhea.json",
+          "byte_size": 1368,
+          "sha256": "94c0f2cf715ee9cd48ad67c5ac1a6a304929c963ca99174f224afced486de322"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/rhea.json",
+          "byte_size": 1641,
+          "sha256": "8a41ff0d682558dfb4e00f2040457c27c55649068b46c0eaa81da06ffad6c829"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Sitta",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 50248,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/sitta.json",
+          "byte_size": 801,
+          "sha256": "7ca8f65c04cf0ee9ffb3db5cd8c0979a205b44b2c8a71c6f8abc7467b5d8fe26"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/sitta.json",
+          "byte_size": 777,
+          "sha256": "15a131f63726ec4867db4f8c3970383c837b46268a4b41ec723e8a8336c65795"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Sus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9822,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/sus.json",
+          "byte_size": 2090,
+          "sha256": "a3ac307c3c86439108defcf8ec8eb5187669defe4450da0b8de59a50b139e56b"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Tachyeres",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 75880,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch05-06/taxa/tachyeres.json",
+          "byte_size": 1121,
+          "sha256": "5b91f51deab97c41a7806c240c229d7ee2552cf5881efba21092ee903fc1a4b9"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/tachyeres.json",
+          "byte_size": 928,
+          "sha256": "4a1ee892a094f44b8729183b3a1381a6825b2f37b5bb7ce30b770522bda28069"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/tachyeres.json",
+          "byte_size": 1680,
+          "sha256": "d670cd392bd78ccac9648ee9f05d3536adce0c59705b5ca8f7bc2acf4e3ac6bc"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/tachyeres.json",
+          "byte_size": 1063,
+          "sha256": "f47f27d88f81833224edd948cab670e4491d620f760b6358ff0c2406cc86846c"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Tachytes",
+      "phylum": "Arthropoda",
+      "class": "Insecta",
+      "ncbi_taxid": 330858,
+      "phylum_values": [
+        "Arthropoda"
+      ],
+      "class_values": [
+        "Insecta"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/tachytes.json",
+          "byte_size": 1419,
+          "sha256": "363b3e33df39e63ccd1bb4ea7c4d455ee61135ce65fc5a41a164c3c24303d8aa"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Talpa",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9374,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/talpa.json",
+          "byte_size": 1632,
+          "sha256": "506b123f85fb30c2e7cb1dcc4ef26ac6dd118066820c7351a8974685ca2a994d"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Tapirus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9800,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/tapirus.json",
+          "byte_size": 793,
+          "sha256": "67a6ae77aa3523b62b07404d54748a4fb8d17f5b9b095be813dcd549405563ae"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/tapirus.json",
+          "byte_size": 2665,
+          "sha256": "ab54331e4ff501fa4adb26353db73494973aec814cb0fdd18e786712e48a4b34"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Toxodon",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 1563121,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/toxodon.json",
+          "byte_size": 710,
+          "sha256": "c792847cb256bf666f8cf87104e7a20990041da98e7566e23f114542bdca10e0"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/toxodon.json",
+          "byte_size": 2283,
+          "sha256": "4c24959b5561f459d33c0649e7aaca26a2b62bd612dde78c8a52b629ba808447"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Trichechus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9776,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/trichechus.json",
+          "byte_size": 1621,
+          "sha256": "1162c824e2cc61263b4e1479b2b939f9eeae5c25ec416fe5de9d6f04f4c4b105"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/trichechus.json",
+          "byte_size": 1531,
+          "sha256": "ce90007c74542061ac5c88e310f4edbf4d6b663b9784b0b74f7dda8bf1f3969c"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Trigonia",
+      "phylum": "Mollusca",
+      "class": "Bivalvia",
+      "ncbi_taxid": 82140,
+      "phylum_values": [
+        "Mollusca"
+      ],
+      "class_values": [
+        "Bivalvia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/trigonia.json",
+          "byte_size": 850,
+          "sha256": "2385a04b637f488b02ff95b00490a1f2bc408245f4a31df03ca73bb11edb59d9"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch09-10/taxa/trigonia.json",
+          "byte_size": 2729,
+          "sha256": "08ccc938153f56ebb72a21862b64a213e176e2966e797774c306830008346ff5"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Troglodytes",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 36277,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/troglodytes.json",
+          "byte_size": 941,
+          "sha256": "bf7012e576cc73fd4557059b230ca408241cccbedde3100509291871f9ae1a1f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/troglodytes.json",
+          "byte_size": 1781,
+          "sha256": "2b77b03b6fe30d36e01b6c6fedd7ca5c3fea37196bb84c5d006586169bd6ffdb"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Turdus",
+      "phylum": "Chordata",
+      "class": "Aves",
+      "ncbi_taxid": 9186,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Aves"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/turdus.json",
+          "byte_size": 865,
+          "sha256": "87df1f0985e733cb6aadcc13b78bec1618eab3f147d6d3396210ddeb13eefe7e"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/turdus.json",
+          "byte_size": 1690,
+          "sha256": "720faebc42ce50c5a6f38934dac682c569d2716b605474defcb5d4674fa3f83a"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/turdus.json",
+          "byte_size": 1678,
+          "sha256": "c9eb0fdd32fe423f1ca0ac67068250a5fdf077307811ce467c817495c33b1070"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/turdus.json",
+          "byte_size": 1311,
+          "sha256": "7a10d7022bced5f671c46ef5bcb8cffe37d378d958f45125c4e8739d09b87826"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Vombatus",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 29138,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/vombatus.json",
+          "byte_size": 1545,
+          "sha256": "5bb402cd9bcdeb408aa6666fc1bda5721526770fd356a2f7e4dcee736b072eed"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch13-14/taxa/vombatus.json",
+          "byte_size": 1480,
+          "sha256": "0dfdae52f5c984a2d0b8f54af5fa6745732d5dddc130a49a4fc352c6c89da3a5"
+        }
+      ]
+    },
+    {
+      "accepted_name": "Vulpes",
+      "phylum": "Chordata",
+      "class": "Mammalia",
+      "ncbi_taxid": 9625,
+      "phylum_values": [
+        "Chordata"
+      ],
+      "class_values": [
+        "Mammalia"
+      ],
+      "files": [
+        {
+          "path": "test-data/organisms/darwin-origin/ch06-10/taxa/vulpes.json",
+          "byte_size": 779,
+          "sha256": "c97b63078b40e66a6415674d98a4178634db485994dab97a3510b65d86af11bf"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch07-08/taxa/vulpes.json",
+          "byte_size": 1551,
+          "sha256": "4ad8e6d514bd55a80a6d17f6d1a79d1a91e7a9f4465a99355e8cae9c47160b12"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/ch11-14/taxa/vulpes.json",
+          "byte_size": 1680,
+          "sha256": "58b000254e535623e147c97db112347023d7b9c41d1284a085d8f44d5e5f50a1"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch02/taxa/vulpes.json",
+          "byte_size": 1520,
+          "sha256": "7faed75b09444e918ebf54252bc69a013b82af0e6198b803cb10a933ba7b976f"
+        },
+        {
+          "path": "test-data/organisms/darwin-origin/intro-ch05/taxa/vulpes.json",
+          "byte_size": 1126,
+          "sha256": "2db101112b64e624b95bf7d0d72fd0529b295bdb847cf6a75c1dcbfcd3974ad3"
+        }
+      ]
+    }
+  ],
+  "genus_resolution_rule": "Where duplicate taxon files disagree, the phylum, class and ncbi taxid are the unique non-null value. Hydra and Mus have a null lineage in one file and a filled lineage in the others; the filled value is used. A genus with two different non-null phyla would be dropped; none has that conflict.",
+  "caveats": [
+    "Before this registration, no cytochrome-b sequence, no neighbor-joining tree, and no PBDB species list for these genera was downloaded, and no monophyly fraction or extinct fraction was computed. NCBI taxonomy XML for Mylodon (taxid 48783) and Mylodon darwinii (48784) was fetched to see whether an extinct flag is present; those records do not carry one, so extant versus extinct is taken from PBDB only. A PBDB datainfo call on 2026-11-02 00:28 GMT returned data_license 'Creative Commons CC0'. One Equus caballus cytochrome-b hit count was requested to confirm the query syntax and was not used as a result.",
+    "Modern genus limits are often drawn so that the genus is monophyletic on the same mitochondrial genes used here. A high monophyly fraction is therefore partly built into the names. The fossil clause is the part that current taxonomy does not guarantee.",
+    "Alphabetical sampling of at most 12 species per genus will miss congeners that sort later and happen to be the only ones sequenced. Genera that drop out for that reason are a coverage limit, not evidence of polyphyly.",
+    "An extinct species in the same genus is not shown to be the ancestor of the living species. It shows that the genus, as currently named, includes species that are gone.",
+    "PBDB records fossils, so living genera with no fossil species are excluded rather than counted as lacking an extinct ancestor. The fraction is 'generally' among genera the fossil record speaks about, not among all genera.",
+    "The author expects, from the published fossil record of mammals and molluscs Darwin discusses, that many of these genera will contain extinct species, and expects genus monophyly on cytochrome b to be high. The 70% and 75% thresholds were not fit to any count from this run."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/darwin-ch06-17-intro-04-8f39",
+    "date": "2026-11-01"
+  }
+}
