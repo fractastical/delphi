@@ -1,0 +1,271 @@
+{
+  "claim_id": "aristotle-ha09-40",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-40",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If the redbreast and the redstart are one bird in two seasonal plumages, and the beccafico and the blackcap likewise, then each pair is a single accepted species and the two forms are not separate species present in Europe in the same months.",
+  "pass_criterion": "Pre-registered. Names are fixed to the claim's stated scope: Erithacus rubecula (redbreast), Phoenicurus phoenicurus (common redstart), Sylvia atricapilla (blackcap), Sylvia borin (beccafico / garden warbler). For each name, GBIF species/match must return a species-rank hit with matchType other than NONE. The accepted key is acceptedUsageKey if present, otherwise usageKey. A pair is one species if the two accepted keys are equal. European presence uses occurrence/search with that accepted taxonKey, continent=EUROPE, occurrenceStatus=PRESENT, facet=month, limit=0. A month counts only when its facet count is at least 20. A species is usable only if its European occurrence count is at least 100. Supports only if both pairs collapse to one accepted species. Refutes only if both pairs have two different accepted keys and each pair shares at least 3 counted months. Mixed if the pairs disagree, or both pairs are distinct species but at least one pair shares fewer than 3 counted months. Inconclusive with reason 'data-unavailable' if any match fails, the continent filter is rejected, or the facet block is missing. Inconclusive with reason 'underpowered' if any species has fewer than 100 European occurrences. Do not switch the continent or the names after seeing counts. Confidence: 0.85 if refutes, 0.40 if supports (a shared key would be a taxonomy collapse, which is unlikely to be the biological claim without a specimen series), 0.50 if mixed.",
+  "fail_criterion": "Pre-registered. The transformation claim is refuted when each pair is two accepted species in the GBIF backbone and, in Europe, each pair is recorded in at least three of the same calendar months with at least 20 occurrences of each species in that month. Distinct species with little month overlap are mixed, not a refutation, because seasonal separation alone does not show they are one bird.",
+  "planned_datasets": [
+    "gbif-species-match",
+    "gbif-occurrence-month-facet-europe"
+  ],
+  "test_contract": {
+    "expected_observation": "Each named pair resolves to one accepted GBIF species, rather than to two species that are both present in Europe across shared months.",
+    "disconfirming_observation": "Both pairs are distinct accepted species, and each pair has at least three European months in which both species have at least 20 occurrence records.",
+    "admissible_datasets": "A public taxonomic backbone and public occurrence records with month and continent, independent of Aristotle's text. Europe is the geographic scope because the claim's species are European. Counts, not media files, are the observation. Licences on individual occurrences are not re-published; only monthly totals are used.",
+    "inference_method": "Species match to an accepted usage key, then a month facet of European occurrences. Thresholds are equality of accepted keys and an overlap of at least three months with counts of at least 20, applied to both pairs, as stated in pass_criterion."
+  },
+  "interpretation": "Aristotle says the redbreast and the redstart change into one another and differ practically only in plumage colour, and that the beccafico and the blackcap do the same. The measurable reading uses the modern species named in this claim's scope. A shared accepted name would support one-bird identity. Two accepted species that occur in Europe in the same months cannot be seasonal plumages of one bird. Plumage photographs and genomes are not in this test. The ancient-name mapping is the scope's mapping and is an assumption of the test.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before any species/match or occurrence query. https://api.gbif.org/v1/ and https://api.gbif.org/v1/species/match returned HTTP 200 on HEAD. No taxon key, occurrence count, or month total was read."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "measured": {
+    "value": 12,
+    "unit": "calendar months in which both members of a pair have at least 20 European occurrences (minimum across the two pairs)",
+    "n": 21383784,
+    "uncertainty": null,
+    "extra": {
+      "pairs": [
+        {
+          "pair": "redbreast_redstart",
+          "left": {
+            "query": "Erithacus rubecula",
+            "scientificName": "Erithacus rubecula (Linnaeus, 1758)",
+            "acceptedScientificName": "Erithacus rubecula",
+            "usageKey": 2492462,
+            "acceptedUsageKey": 2492462,
+            "rank": "SPECIES",
+            "status": "ACCEPTED",
+            "matchType": "EXACT",
+            "synonym": null
+          },
+          "right": {
+            "query": "Phoenicurus phoenicurus",
+            "scientificName": "Phoenicurus phoenicurus (Linnaeus, 1758)",
+            "acceptedScientificName": "Phoenicurus phoenicurus",
+            "usageKey": 5739317,
+            "acceptedUsageKey": 5739317,
+            "rank": "SPECIES",
+            "status": "ACCEPTED",
+            "matchType": "EXACT",
+            "synonym": null
+          },
+          "same_species": false,
+          "europe_count_left": 11388146,
+          "europe_count_right": 1652237,
+          "months_left": {
+            "4": 1452260,
+            "10": 1380175,
+            "1": 1126127,
+            "9": 1049138,
+            "5": 1033734,
+            "3": 919716,
+            "12": 749067,
+            "11": 746820,
+            "6": 657363,
+            "2": 646660,
+            "8": 452533,
+            "7": 384321
+          },
+          "months_right": {
+            "5": 512442,
+            "6": 270872,
+            "4": 240041,
+            "9": 150571,
+            "8": 112903,
+            "7": 94309,
+            "10": 38332,
+            "3": 7877,
+            "11": 976,
+            "1": 953,
+            "2": 510,
+            "12": 405
+          },
+          "shared_months_count_at_least_20": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ]
+        },
+        {
+          "pair": "blackcap_beccafico",
+          "left": {
+            "query": "Sylvia atricapilla",
+            "scientificName": "Sylvia atricapilla (Linnaeus, 1758)",
+            "acceptedScientificName": "Sylvia atricapilla",
+            "usageKey": 2492956,
+            "acceptedUsageKey": 2492956,
+            "rank": "SPECIES",
+            "status": "ACCEPTED",
+            "matchType": "EXACT",
+            "synonym": null
+          },
+          "right": {
+            "query": "Sylvia borin",
+            "scientificName": "Sylvia borin (Boddaert, 1783)",
+            "acceptedScientificName": "Sylvia borin",
+            "usageKey": 2492942,
+            "acceptedUsageKey": 2492942,
+            "rank": "SPECIES",
+            "status": "ACCEPTED",
+            "matchType": "EXACT",
+            "synonym": null
+          },
+          "same_species": false,
+          "europe_count_left": 6585835,
+          "europe_count_right": 1757566,
+          "months_left": {
+            "5": 1343596,
+            "4": 1062805,
+            "6": 845819,
+            "9": 672219,
+            "10": 536776,
+            "7": 500725,
+            "8": 397056,
+            "3": 270456,
+            "1": 197167,
+            "11": 189072,
+            "12": 175894,
+            "2": 152052
+          },
+          "months_right": {
+            "5": 566665,
+            "6": 383108,
+            "8": 205232,
+            "9": 168604,
+            "7": 154652,
+            "4": 81327,
+            "10": 23605,
+            "11": 773,
+            "1": 745,
+            "2": 734,
+            "3": 686,
+            "12": 480
+          },
+          "shared_months_count_at_least_20": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12
+          ]
+        }
+      ]
+    }
+  },
+  "datasets": [
+    {
+      "id": "gbif-species-match",
+      "name": "GBIF backbone species match",
+      "landing_url": "https://www.gbif.org/species/search",
+      "doi": null,
+      "version": "GBIF backbone at retrieval",
+      "license": "GBIF API. Taxon records are from the GBIF backbone.",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Erithacus+rubecula&verbose=true",
+          "retrieved_at": "2026-11-02T00:50:04Z",
+          "byte_size": 564,
+          "sha256": "fc6580befb26c418857aa4aab0e5a90d74df3af64e83104f0f52ad19bb776ef1",
+          "name": "815918ed79a38908.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Phoenicurus+phoenicurus&verbose=true",
+          "retrieved_at": "2026-11-02T00:50:04Z",
+          "byte_size": 1169,
+          "sha256": "a1862419d0007a7b23840ec2032e2b1bc3e0258d2a477e2007a28669b78f07f7",
+          "name": "e4a7b3fbf8bd2ad7.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Sylvia+atricapilla&verbose=true",
+          "retrieved_at": "2026-11-02T00:50:05Z",
+          "byte_size": 558,
+          "sha256": "ad625074697aa11ba798f0c3745eba645eec0aa0d0b7db4f3b691faf0b3911e4",
+          "name": "c7809a431e8f53c3.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Sylvia+borin&verbose=true",
+          "retrieved_at": "2026-11-02T00:50:05Z",
+          "byte_size": 540,
+          "sha256": "091639f84318b2fb31c95d7c92f20589f739a77e2ee1df11a9fe1d72c41f6e78",
+          "name": "ea40a943689e051f.json"
+        }
+      ],
+      "role": "accepted species keys for the four names in the claim scope"
+    },
+    {
+      "id": "gbif-occurrence-month-facet-europe",
+      "name": "GBIF occurrence search, Europe, month facet",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": "GBIF occurrence index at retrieval",
+      "license": "GBIF API. Only monthly counts were used; individual occurrences were not downloaded.",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492462&continent=EUROPE&occurrenceStatus=PRESENT&facet=month&limit=0&facetLimit=12",
+          "retrieved_at": "2026-11-02T00:50:04Z",
+          "byte_size": 457,
+          "sha256": "9a0c32d3b88d224ca5d10d3ec62ee9f2de7e7d513b79ecd65b507ee013e5e542",
+          "name": "17e6fada5dd4d316.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=5739317&continent=EUROPE&occurrenceStatus=PRESENT&facet=month&limit=0&facetLimit=12",
+          "retrieved_at": "2026-11-02T00:50:05Z",
+          "byte_size": 435,
+          "sha256": "508ce45f3c9743a9f96320b94dbbe4bbea9cb8bbac585257f4608ca4975b02e9",
+          "name": "84838042d716b2c3.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492956&continent=EUROPE&occurrenceStatus=PRESENT&facet=month&limit=0&facetLimit=12",
+          "retrieved_at": "2026-11-02T00:50:05Z",
+          "byte_size": 453,
+          "sha256": "6b91bd4a6042035699cd5e37aa055d3cd224d350fa6eedb8536e56c02524b7a8",
+          "name": "828a3b43ae85599e.json"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492942&continent=EUROPE&occurrenceStatus=PRESENT&facet=month&limit=0&facetLimit=12",
+          "retrieved_at": "2026-11-02T00:50:06Z",
+          "byte_size": 434,
+          "sha256": "5f7648cd1707acdc22660253fd42793c17b5b5f9660238e82be57ba57c2a8a08",
+          "name": "4ae0204388403577.json"
+        }
+      ],
+      "role": "European monthly occurrence counts for each accepted species"
+    }
+  ],
+  "method": "Matched each of the four scope names on the GBIF backbone, then counted European present occurrences by month. Applied the pre-registered identity and three-month overlap rule to both pairs. The continent and the names were not changed.",
+  "results_summary": [
+    "redbreast_redstart: same_species=False, shared months with >=20 records=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], Europe counts 11388146 and 1652237.",
+    "blackcap_beccafico: same_species=False, shared months with >=20 records=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], Europe counts 6585835 and 1757566.",
+    "Minimum shared-month count across pairs: 12."
+  ]
+}

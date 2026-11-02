@@ -1,0 +1,93 @@
+{
+  "claim_id": "aristotle-ha07-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-02",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:42:19Z",
+  "hypothesis": "If girls begin to menstruate at about fourteen, the median recalled age at first menstrual period in a national sample of women and girls falls within a year of fourteen.",
+  "pass_criterion": "Pre-registered. NHANES 2017-2018 RHQ_J variable RHQ010, joined to DEMO_J on SEQN, interview weight WTINT2YR. Exact ages are the integers 6 through 19. Codes 0 (has not started), 20 (20 or older), 777, and 999 are excluded from the median. The weighted median is the smallest included age at which the cumulative positive interview weight reaches at least half of the total positive weight, after sorting ages ascending. The unweighted median uses the same rule with equal weights. Near means the median is in [13, 15]. Far means it is below 12 or above 16. Gray is everything else in between. Supports only if both medians are near and at least 200 exact ages are included. Refutes only if both medians are far and at least 200 exact ages are included. Mixed if the two medians are not in the same bin, or either is gray. Inconclusive with reason 'data-unavailable' if either file fails to download or WTINT2YR cannot be joined. Inconclusive with reason 'underpowered' if fewer than 200 exact ages remain. Inconclusive with reason 'other' if codes 0 and 20 together exceed 10 percent of non-missing RHQ010 values. Breast development is not in this file and is not given a verdict. Confidence: 0.75 if refutes, 0.50 if supports, 0.55 if mixed.",
+  "fail_criterion": "Pre-registered. The menarche clause is refuted when both the weighted and the unweighted medians of exact RHQ010 ages are below 12 or above 16. A median in the gray band, or disagreement between the weighted and unweighted medians, is mixed.",
+  "planned_datasets": [
+    "nhanes-2017-2018-rhq-j",
+    "nhanes-2017-2018-demo-j"
+  ],
+  "test_contract": {
+    "expected_observation": "The weighted and the unweighted median age at first menstrual period are both between 13 and 15 years inclusive.",
+    "disconfirming_observation": "Both medians are below 12 or above 16 years.",
+    "admissible_datasets": "A public survey that asks women the age in years of the first menstrual period, with a documented weight for the interview sample. One NHANES cycle, not a pool of cycles chosen after seeing the median. Girls who have not started and top-coded ages are excluded rather than imputed. Thelarche is not substituted from another study after the fact.",
+    "inference_method": "Weighted and unweighted medians of exact recalled ages, classified into near, far, and gray bins fixed above. Both medians must fall in the same decisive bin. No resolvability score enters the verdict."
+  },
+  "interpretation": "The sentence says that at about fourteen the breasts swell and the menses begin. One assessor marked the claim only partly resolvable because breast development and menarche need not coincide and because a modern median is a poor stand-in for one ancient age. This test measures only age at menarche, the clause with a direct public variable (RHQ010). It does not measure thelarche, and a support would not establish that the two events begin together. 'About fourteen' is pre-registered as a median in [13, 15], within one year of 14. The sample is United States residents in 2017-2018, which is inside the claim's scope of human females and is not a reconstruction of classical Athens.",
+  "caveats": [
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before RHQ_J.xpt or DEMO_J.xpt was downloaded. HEAD of the XPT URLs returned HTTP 200, content-length 1242960 and 3412720. The public codebook was read for variable names and value labels, and that HTML also prints frequency counts. Those counts are not measurements and were not used to place the [13, 15] window, which is the claim's 'about fourteen'. The XPT files, which are over 1 MB, will not be committed."
+  ],
+  "deviations": [],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-654f",
+    "date": "2026-11-01"
+  },
+  "verdict": "mixed",
+  "confidence": 0.55,
+  "data_kind": "biological",
+  "measured": {
+    "value": 12.0,
+    "unit": "years (weighted median age at first menstrual period, RHQ010)",
+    "n": 2948,
+    "uncertainty": null,
+    "extra": {
+      "weighted_median_years": 12.0,
+      "unweighted_median_years": 12.0,
+      "weighted_bin": "gray",
+      "unweighted_bin": "gray",
+      "n_nonmissing_rhq010": 3025,
+      "n_code_0_or_20": 6,
+      "thelarche_measured": false
+    }
+  },
+  "datasets": [
+    {
+      "id": "nhanes-2017-2018-rhq-j",
+      "name": "NHANES 2017-2018 Reproductive Health (RHQ_J)",
+      "landing_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/RHQ_J.htm",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "U.S. government public-use file (National Center for Health Statistics)",
+      "files": [
+        {
+          "name": "RHQ_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/RHQ_J.xpt",
+          "retrieved_at": "2026-11-02T00:47:15Z",
+          "byte_size": 1242960,
+          "sha256": "c919896216154ea207470dd84e428f5fdd65ced39735148c78fb6032e0b77a7b"
+        }
+      ],
+      "role": "recalled age at first menstrual period (RHQ010)"
+    },
+    {
+      "id": "nhanes-2017-2018-demo-j",
+      "name": "NHANES 2017-2018 Demographics (DEMO_J)",
+      "landing_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.htm",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "U.S. government public-use file (National Center for Health Statistics)",
+      "files": [
+        {
+          "name": "DEMO_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-11-02T00:47:16Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "interview weight WTINT2YR"
+    }
+  ],
+  "method": "Joined RHQ_J to DEMO_J on SEQN, kept exact RHQ010 ages 6 through 19, and computed the pre-registered weighted and unweighted medians with WTINT2YR. Breast development was not in the file and was not scored.",
+  "results_summary": [
+    "Weighted median 12.0 years (gray); unweighted median 12.0 years (gray); n=2948.",
+    "Thelarche was not measured."
+  ]
+}
