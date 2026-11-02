@@ -79,40 +79,50 @@ def sheet_matrix(sheet):
 
 
 def find_anchors(matrix, father_re, age_re):
+    """Father-axis labels only. A title that also names the mother is not the axis."""
     anchors = []
     for i, row in enumerate(matrix):
         for j, value in enumerate(row):
             text = cell_text(value)
-            if father_re.search(text) and age_re.search(text):
+            if father_re.search(text) and age_re.search(text) and not re.search(r"(?i)mother", text):
                 anchors.append((i, j, text))
     return anchors
 
 
-def ages_down(matrix, anchor_row):
-    """Return (start_row, age_col, list of (row, parsed age)) for the longest run below an anchor."""
+def ages_across(matrix, anchor_row, anchor_col):
+    """Longest age run on the header row at or just below an 'Age of father' label."""
     best = None
-    for col in range(len(matrix[0]) if matrix else 0):
+    for r in range(anchor_row, min(len(matrix), anchor_row + 4)):
         run = []
-        for r in range(anchor_row + 1, len(matrix)):
-            parsed = parse_age(matrix[r][col])
+        started = False
+        start_c = anchor_col if r == anchor_row else 0
+        width = len(matrix[r])
+        for c in range(start_c, width):
+            parsed = parse_age(matrix[r][c])
             if parsed and parsed[0] in ("exact", "bin"):
-                run.append((r, parsed))
-            elif run and cell_text(matrix[r][col]) == "":
+                run.append((c, parsed))
+                started = True
+            elif not started:
                 continue
-            elif run:
+            elif cell_text(matrix[r][c]) == "":
+                continue
+            else:
                 break
-        if len(run) >= 5 and (best is None or len(run) > len(best[2])):
-            best = (run[0][0], col, run)
+        if len(run) >= 5 and (best is None or len(run) > len(best[1])):
+            best = (r, run)
     return best
 
 
-def sum_row_except(matrix, row, skip_col):
+def sum_column(matrix, col, header_row):
+    """Births down a father-age column, excluding the age header and any Total row."""
     total = 0.0
     seen = False
-    for c, value in enumerate(matrix[row]):
-        if c == skip_col:
+    for r, row in enumerate(matrix):
+        if r <= header_row or col >= len(row):
             continue
-        n = numeric(value)
+        if cell_text(row[0]).lower() in ("total", "totals"):
+            continue
+        n = numeric(row[col])
         if n is not None and n >= 0:
             total += n
             seen = True
@@ -122,18 +132,23 @@ def sum_row_except(matrix, row, skip_col):
 def collect(matrix, anchors):
     tables = []
     for anchor_row, anchor_col, anchor_text in anchors:
-        found = ages_down(matrix, anchor_row)
+        found = ages_across(matrix, anchor_row, anchor_col)
         if not found:
             continue
-        _, age_col, run = found
+        header_row, run = found
         births = {}
-        for row, parsed in run:
-            total = sum_row_except(matrix, row, age_col)
+        for col, parsed in run:
+            total = sum_column(matrix, col, header_row)
             if total is None:
                 continue
-            births.setdefault(parsed, 0.0)
-            births[parsed] += total
-        tables.append({"anchor": anchor_text, "anchor_row": anchor_row, "n_ages": len(births), "births": births})
+            births[parsed] = births.get(parsed, 0.0) + total
+        tables.append({
+            "anchor": anchor_text,
+            "anchor_row": anchor_row,
+            "header_row": header_row,
+            "n_ages": len(births),
+            "births": births,
+        })
     return tables
 
 
@@ -172,29 +187,40 @@ def main():
     for sheet in book.sheets():
         matrix = sheet_matrix(sheet)
         anchors = find_anchors(matrix, father_re, age_re)
-        # Sheet name can identify the table if cells say only "Age".
-        if not anchors and father_re.search(sheet.name) and age_re.search(sheet.name):
-            anchors = [(0, 0, sheet.name)]
         for table in collect(matrix, anchors):
             table["sheet"] = sheet.name
             candidates.append(table)
-    candidates.sort(key=lambda t: t["n_ages"], reverse=True)
-    chosen = candidates[0] if candidates else None
+    births = {}
+    for table in candidates:
+        for parsed, total in table["births"].items():
+            births[parsed] = births.get(parsed, 0.0) + total
     layout = []
-    for table in candidates[:8]:
-        ages = []
-        for parsed, total in sorted(table["births"].items(), key=lambda kv: (kv[0][0], kv[0][1])):
-            ages.append({"kind": parsed[0], "age": parsed[1], "births": total})
-        layout.append({"sheet": table["sheet"], "anchor": table["anchor"], "n_ages": table["n_ages"], "ages": ages})
+    for table in candidates:
+        exacts = sorted(a for kind, a in table["births"] if kind == "exact")
+        bins = sorted(a for kind, a in table["births"] if kind == "bin")
+        layout.append({
+            "sheet": table["sheet"],
+            "anchor": table["anchor"],
+            "n_ages": table["n_ages"],
+            "exact_min": exacts[0] if exacts else None,
+            "exact_max": exacts[-1] if exacts else None,
+            "bin_lower_bounds": bins,
+        })
+    aggregated = [
+        {"kind": parsed[0], "age": parsed[1], "births": total}
+        for parsed, total in sorted(births.items(), key=lambda kv: (kv[0][0], kv[0][1]))
+    ]
     DERIVED.mkdir(exist_ok=True)
-    (DERIVED / "layout.json").write_text(json.dumps(layout, indent=2) + "\n")
-    if not chosen:
+    (DERIVED / "layout.json").write_text(json.dumps({"sheets": layout, "aggregated": aggregated}, indent=2) + "\n")
+    if not candidates:
         verdict, reason, conf = "inconclusive", "data-unavailable", rules["confidence_inconclusive"]
         measured = {"value": None, "unit": "live births to fathers aged 70", "n": 0, "extra": {"tables": 0}}
-        method = "No cell or sheet name matched both 'father' and 'age' with a run of at least five ages beneath it, so no birth counts were used."
-        summary = ["No father-age table found.", f"Sheets: {[s.name for s in book.sheets()]}"]
+        method = (
+            "No cell named the father's age without also naming the mother, and no horizontal "
+            "age header of at least five ages sat under such a label, so no birth counts were used."
+        )
+        summary = ["No father-age axis found.", f"Sheets: {[s.name for s in book.sheets()]}"]
     else:
-        births = chosen["births"]
         c60 = clause(births, 60)
         c70 = clause(births, 70)
         refute60 = can_refute(births, 60, rules)
@@ -211,30 +237,45 @@ def main():
             verdict, reason, conf = "refutes", None, rules["confidence_refutes"]
         else:
             verdict, reason, conf = "inconclusive", "data-unavailable", rules["confidence_inconclusive"]
+        exacts = sorted(a for kind, a in births if kind == "exact")
+        bins = sorted(a for kind, a in births if kind == "bin")
         measured = {
             "value": c70["births"],
             "unit": "live births on the father-age axis at 70 (exact year or bin starting at 70)",
-            "n": chosen["n_ages"],
+            "n": len(births),
             "extra": {
-                "sheet": chosen["sheet"],
-                "anchor": chosen["anchor"],
+                "anchor": candidates[0]["anchor"],
+                "n_year_sheets": len(candidates),
+                "exact_min": exacts[0] if exacts else None,
+                "exact_max": exacts[-1] if exacts else None,
+                "bin_lower_bounds": bins,
                 "age_60": c60,
                 "age_70": c70,
                 "refute_60": refute60,
                 "refute_70": refute70,
-                "n_candidate_tables": len(candidates),
             },
         }
         method = (
-            f"Opened the ONS workbook with xlrd. Used the father-age table with the most age rows "
-            f"(sheet {chosen['sheet']!r}, anchor {chosen['anchor']!r}), summed numeric cells on each age row "
-            "across the other columns, and applied the preregistered 60 and 70 thresholds."
+            "Opened the ONS workbook with xlrd. Each year sheet has a cell 'Age of father' and, on the "
+            "next row, father's age across columns. Births were summed down each of those columns, "
+            "excluding the Total row, then summed across the year sheets. A title that names both "
+            "mother and father was not used as the axis. The preregistered thresholds were applied: "
+            "an open bin counts only when its lower bound is 60 or 70."
         )
         summary = [
-            f"Sheet {chosen['sheet']}, anchor {chosen['anchor']}, age rows {chosen['n_ages']}.",
+            f"Father-age axis on {len(candidates)} year sheets, anchor {candidates[0]['anchor']!r}.",
+            f"Exact ages {exacts[0] if exacts else None}–{exacts[-1] if exacts else None}; open bins at {bins}.",
             f"Age 60: {c60}. Age 70: {c70}.",
             f"Verdict {verdict}.",
         ]
+        if not hold60 and not hold70 and bins and (not exacts or exacts[-1] < 60):
+            note = (
+                f"The father-age header lists exact ages {exacts[0] if exacts else 'none'}–"
+                f"{exacts[-1] if exacts else 'none'} and open bins whose lower bounds are {bins}. "
+                "A bin counts for age 60 or 70 only when its lower bound is that age, so these bins were not used as those counts."
+            )
+            if note not in result.get("caveats", []):
+                result.setdefault("caveats", []).append(note)
     result["status"] = "complete"
     result["verdict"] = verdict
     result["confidence"] = conf

@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-22",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-22",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If only fish eggs that have been sprinkled with milt produce young, a public egg-incubation table for an oviparous fish will show development or hatching in a milt-exposed group and none in a group that was not exposed to milt.",
   "pass_criterion": "Pre-registered. The file supports the claim if it has a column or factor that separates eggs exposed to milt or sperm from eggs not exposed, the unexposed group's hatch or developed-embryo count is 0, the exposed group's hatch or developed-embryo count is at least 1, and the unexposed group has at least 20 eggs. Confidence 0.75.",
@@ -23,7 +23,12 @@
   ],
   "rules": {
     "unexposed_column": "(?i)(no[_\\s-]?sperm|without[_\\s-]?milt|unexposed|no[_\\s-]?milt|sperm[_\\s-]?absent|without[_\\s-]?sperm)",
-    "not_an_unexposed_arm": ["Unfertilized_Removed", "Dead_or_unsuccesful_hatch", "Hatched", "Larval_Mortality"],
+    "not_an_unexposed_arm": [
+      "Unfertilized_Removed",
+      "Dead_or_unsuccesful_hatch",
+      "Hatched",
+      "Larval_Mortality"
+    ],
     "min_eggs": 20,
     "confidence_contrast": 0.75,
     "confidence_no_contrast": 0.7,
@@ -45,5 +50,57 @@
     "model": "grok-4.7",
     "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.7,
+  "data_kind": "none",
+  "measured": {
+    "value": null,
+    "unit": "hatch count in a no-milt arm",
+    "n": 1112,
+    "extra": {
+      "checksum_ok": true,
+      "columns": [
+        "Date",
+        "Collection_Site",
+        "Latitude",
+        "Longitude",
+        "Tray",
+        "Reef_Panel",
+        "Unfertilized_Removed",
+        "Dead_or_unsuccesful_hatch",
+        "Hatched",
+        "Larval_Mortality"
+      ],
+      "contrast_columns": [],
+      "contrast_present": false
+    }
+  },
+  "method": "Downloaded LakeTroutEggHatchData.csv and checked md5 and size against ScienceBase. The header has no column matching the preregistered unexposed-arm pattern. Unfertilized_Removed, dead, hatched, and larval-mortality columns were pre-registered as counts inside inseminated lots, so those counts were not summed.",
+  "datasets": [
+    {
+      "id": "usgs-lake-trout-hatch-p9h094s2",
+      "name": "Lake trout hatch rates, Northern Refuge, Lake Michigan, 2019",
+      "landing_url": "https://www.sciencebase.gov/catalog/item/61d5ac1dd34ed79293ffa314",
+      "doi": "10.5066/P9H094S2",
+      "version": "2022",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://www.sciencebase.gov/catalog/file/get/61d5ac1dd34ed79293ffa314?f=__disk__c3%2Fdc%2F87%2Fc3dc87f97fb144987214e5a7cb48c089f70f1af5",
+          "retrieved_at": "2026-11-02T00:36:28Z",
+          "byte_size": 74238,
+          "sha256": "fa7082a0b9ae26f49d9cd98ca371848458649771fbccaf3335bc01dede979e5c",
+          "md5": "192ab0d3c453a1d20ffc8af11b01193c"
+        }
+      ],
+      "role": "incubation counts checked for a no-milt arm"
+    }
+  ],
+  "results_summary": [
+    "Checksum match: True. Data rows: 1112.",
+    "Columns: Date, Collection_Site, Latitude, Longitude, Tray, Reef_Panel, Unfertilized_Removed, Dead_or_unsuccesful_hatch, Hatched, Larval_Mortality.",
+    "Unexposed-arm columns: none. Verdict inconclusive (data-unavailable)."
+  ]
 }

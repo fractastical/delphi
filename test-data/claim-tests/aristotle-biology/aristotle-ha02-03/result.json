@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha02-03",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-03",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If the great majority of horned animals are cloven-hoofed and no solid-hoofed animal has a pair of horns, then among extant species in the pre-registered ungulate families the horned ones are mostly cloven and the solid-hoofed family has no horns.",
   "pass_criterion": "Pre-registered. Antlers and ossicones count as horns. A great majority is a proportion strictly greater than 2/3 of extant species in horned families that belong to families coded cloven-hoofed. The universal holds if Equidae is coded solid-hoofed and hornless and no family in the panel is both solid-hoofed and horned. Both clauses must hold. Confidence 0.70.",
@@ -25,7 +25,12 @@
   "rules": {
     "majority_gt": 0.6666667,
     "bare_majority_gt": 0.5,
-    "decisive_families": ["Bovidae", "Cervidae", "Rhinocerotidae", "Equidae"],
+    "decisive_families": [
+      "Bovidae",
+      "Cervidae",
+      "Rhinocerotidae",
+      "Equidae"
+    ],
     "extant_code": "0",
     "extinct_code": "1",
     "unrecognized_limit": 0.05,
@@ -33,17 +38,96 @@
     "confidence_refutes": 0.65,
     "confidence_mixed": 0.55,
     "confidence_inconclusive": 0.4,
-    "families": ["Bovidae", "Cervidae", "Antilocapridae", "Giraffidae", "Rhinocerotidae", "Equidae", "Tapiridae", "Camelidae"],
-    "hoof": {"mode": "exclusive", "labels": [
-      ["solid", ["single hoof", "one hoof", "solid hoof", "single toe", "one toe", "a single digit"]],
-      ["other", ["three toes", "three-toed", "four toes", "four-toed", "three digits", "four digits"]],
-      ["cloven", ["cloven", "two toes", "two-toed", "split hoof", "split hooves", "even-toed"]]
-    ]},
-    "horns": {"mode": "priority", "labels": [
-      ["absent", ["hornless", "unhorned", "no horns", "without horns", "lack horns", "lacks horns", "do not have horns", "does not have horns", "not horned", "lack antlers", "no antlers"]],
-      ["paired", ["pair of horns", "two horns", "have horns", "has horns", "horned", "antlers", "have antlers", "ossicones", "ossicone"]],
-      ["single", ["single horn", "one horn"]]
-    ]}
+    "families": [
+      "Bovidae",
+      "Cervidae",
+      "Antilocapridae",
+      "Giraffidae",
+      "Rhinocerotidae",
+      "Equidae",
+      "Tapiridae",
+      "Camelidae"
+    ],
+    "hoof": {
+      "mode": "exclusive",
+      "labels": [
+        [
+          "solid",
+          [
+            "single hoof",
+            "one hoof",
+            "solid hoof",
+            "single toe",
+            "one toe",
+            "a single digit"
+          ]
+        ],
+        [
+          "other",
+          [
+            "three toes",
+            "three-toed",
+            "four toes",
+            "four-toed",
+            "three digits",
+            "four digits"
+          ]
+        ],
+        [
+          "cloven",
+          [
+            "cloven",
+            "two toes",
+            "two-toed",
+            "split hoof",
+            "split hooves",
+            "even-toed"
+          ]
+        ]
+      ]
+    },
+    "horns": {
+      "mode": "priority",
+      "labels": [
+        [
+          "absent",
+          [
+            "hornless",
+            "unhorned",
+            "no horns",
+            "without horns",
+            "lack horns",
+            "lacks horns",
+            "do not have horns",
+            "does not have horns",
+            "not horned",
+            "lack antlers",
+            "no antlers"
+          ]
+        ],
+        [
+          "paired",
+          [
+            "pair of horns",
+            "two horns",
+            "have horns",
+            "has horns",
+            "horned",
+            "antlers",
+            "have antlers",
+            "ossicones",
+            "ossicone"
+          ]
+        ],
+        [
+          "single",
+          [
+            "single horn",
+            "one horn"
+          ]
+        ]
+      ]
+    }
   },
   "test_contract": {
     "expected_observation": "More than two thirds of extant species in horned families of the panel are in cloven-hoofed families, and the solid-hoofed family (Equidae) is not horned.",
@@ -55,12 +139,211 @@
   "caveats": [
     "Family-level wording is not a measurement of every species. A family described as horned contributes all of its extant species.",
     "Recently extinct species are those the checklist marks extinct. Older fossils are absent.",
-    "Provider md5 and size for the checklist are from the Zenodo API."
+    "Provider md5 and size for the checklist are from the Zenodo API.",
+    "Equidae text includes 'only one functional digit' and 'one-toed horse', and Rhinocerotidae text includes 'The horns are dermal' and 'each digit with a small hoof'. Those wordings are not in the pre-registered phrase lists, so both families stayed uncoded and the decisive-family gate failed closed. Phrases were not added after reading the pages."
   ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.4,
+  "data_kind": "biological",
+  "reason": "underpowered",
+  "measured": {
+    "value": 1.0,
+    "unit": "share of extant species in horned panel families that are in cloven-hoofed families",
+    "n": 210,
+    "extra": {
+      "checksum_ok": true,
+      "n_cloven_horned": 210,
+      "universal_ok": false,
+      "solid_and_horned_families": [],
+      "missing_decisive_families": [
+        "Rhinocerotidae",
+        "Equidae"
+      ],
+      "extinct_value_counts": {
+        "0": 6640,
+        "1": 113
+      },
+      "family_counts": {
+        "Bovidae": {
+          "extant": 153,
+          "extinct": 3,
+          "other": 0
+        },
+        "Cervidae": {
+          "extant": 57,
+          "extinct": 1,
+          "other": 0
+        },
+        "Antilocapridae": {
+          "extant": 1,
+          "extinct": 0,
+          "other": 0
+        },
+        "Giraffidae": {
+          "extant": 5,
+          "extinct": 0,
+          "other": 0
+        },
+        "Rhinocerotidae": {
+          "extant": 5,
+          "extinct": 0,
+          "other": 0
+        },
+        "Equidae": {
+          "extant": 9,
+          "extinct": 0,
+          "other": 0
+        },
+        "Tapiridae": {
+          "extant": 4,
+          "extinct": 0,
+          "other": 0
+        },
+        "Camelidae": {
+          "extant": 7,
+          "extinct": 0,
+          "other": 0
+        }
+      },
+      "family_codes": {
+        "Bovidae": {
+          "hoof": "cloven",
+          "horns": "paired"
+        },
+        "Cervidae": {
+          "hoof": "cloven",
+          "horns": "paired"
+        },
+        "Antilocapridae": {
+          "hoof": "cloven",
+          "horns": null
+        },
+        "Giraffidae": {
+          "hoof": "cloven",
+          "horns": null
+        },
+        "Rhinocerotidae": {
+          "hoof": null,
+          "horns": null
+        },
+        "Equidae": {
+          "hoof": null,
+          "horns": null
+        },
+        "Tapiridae": {
+          "hoof": null,
+          "horns": null
+        },
+        "Camelidae": {
+          "hoof": "cloven",
+          "horns": "absent"
+        }
+      }
+    }
+  },
+  "method": "Downloaded Mammal Diversity Database v1.13 and checked its md5 and size. Counted extant species (extinct flag 0) in eight families. Coded hoof and horns from each Animal Diversity Web family account with the preregistered phrases, dropping contrast clauses, and applied the 2/3 and solid-hoof rules.",
+  "results_summary": [
+    "Bovidae: hoof cloven, horns paired, extant 153",
+    "Cervidae: hoof cloven, horns paired, extant 57",
+    "Antilocapridae: hoof cloven, horns None, extant 1",
+    "Giraffidae: hoof cloven, horns None, extant 5",
+    "Rhinocerotidae: hoof None, horns None, extant 5",
+    "Equidae: hoof None, horns None, extant 9",
+    "Tapiridae: hoof None, horns None, extant 4",
+    "Camelidae: hoof cloven, horns absent, extant 7",
+    "Proportion 1.0. Universal False. Verdict inconclusive."
+  ],
+  "datasets": [
+    {
+      "id": "mdd-v1.13-zenodo-12738010",
+      "name": "Mammal Diversity Database v1.13",
+      "landing_url": "https://zenodo.org/records/12738010",
+      "doi": "10.5281/zenodo.12738010",
+      "version": "1.13",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/api/records/12738010/files/MDD_v1.13_6753species.csv/content",
+          "retrieved_at": "2026-11-02T00:36:37Z",
+          "byte_size": 7821351,
+          "sha256": "cf2eff6866d2b217ff12e50603c89cc5a1d3ec6085feac3283b4d7e1dbf4af7f",
+          "md5": "7cc31a21cc388119f4fbda6cdfdf96da"
+        }
+      ],
+      "role": "extant species counts by family"
+    },
+    {
+      "id": "animal-diversity-web-family-accounts",
+      "name": "Animal Diversity Web family accounts",
+      "landing_url": "https://animaldiversity.org/",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://animaldiversity.org/accounts/Bovidae/",
+          "retrieved_at": "2026-11-02T00:36:37Z",
+          "byte_size": 217276,
+          "sha256": "fb915ecc57ad9ecf00a8bb0ea8591a75c3056eee0ff3339500648ecfd014d650",
+          "md5": "9942470063fb0b3520732434898e5887"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Cervidae/",
+          "retrieved_at": "2026-11-02T00:36:37Z",
+          "byte_size": 159122,
+          "sha256": "4598a901e0c3bbafd0eb8d159332035c8693700eb735e861a4f6888f73c89359",
+          "md5": "ae1cba9511a9f7c1de0db120b03881ec"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Antilocapridae/",
+          "retrieved_at": "2026-11-02T00:36:38Z",
+          "byte_size": 26202,
+          "sha256": "24e7e8d5268b96016f848529082309fb4529d933c88fcd4c01743813afc19a1c",
+          "md5": "3de5ef766958c1a03977b9612404ff07"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Giraffidae/",
+          "retrieved_at": "2026-11-02T00:36:38Z",
+          "byte_size": 26482,
+          "sha256": "f61317456183332012c08fea104c63d0be3512ab1eb845cba512c78e8abcde88",
+          "md5": "2a2f0d0962c0d1231c4d17dd9a9b7bc6"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Rhinocerotidae/",
+          "retrieved_at": "2026-11-02T00:36:38Z",
+          "byte_size": 27887,
+          "sha256": "537a2447d20c138c26fe6361e34007f5ea0ac17e5a65fa390c6dcfaca5406d35",
+          "md5": "30c94a252c55a639999dcc4ac553ceb2"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Equidae/",
+          "retrieved_at": "2026-11-02T00:36:38Z",
+          "byte_size": 28198,
+          "sha256": "c2253f2952e25aa16c0dfb4e0987fdcb8f8597712a7760b6996e646c1fb47c49",
+          "md5": "5754be14b15dd0134c33f3bb78961ac9"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Tapiridae/",
+          "retrieved_at": "2026-11-02T00:36:39Z",
+          "byte_size": 25671,
+          "sha256": "9a01273f8a69bac45a3c5c004feab01b6884f584261e07666da1ea97ff0ccc3d",
+          "md5": "563107fef64441f91765538364ed85cf"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Camelidae/",
+          "retrieved_at": "2026-11-02T00:36:39Z",
+          "byte_size": 27940,
+          "sha256": "db613726fd82d42e4841ebed4454083f5bc364a70143511e5bd5ecdc938ba738",
+          "md5": "0788d43f2457172ddab7b42c265acb51"
+        }
+      ],
+      "role": "family-level hoof and horn wording"
+    }
+  ]
 }

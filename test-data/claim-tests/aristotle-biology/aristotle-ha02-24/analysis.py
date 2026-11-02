@@ -18,23 +18,48 @@ UA = {"User-Agent": "delphisci-claim-test/aristotle-ha02-24"}
 
 
 class Extractor(HTMLParser):
+    """Account prose only. Glossary popovers and the References list are not trait statements."""
+
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.parts = []
         self.skip = 0
+        self.div_gloss = []
+        self.dl_gloss = []
+        self.in_refs = False
 
     def handle_starttag(self, tag, attrs):
+        ad = dict(attrs)
         if tag in ("script", "style", "noscript"):
             self.skip += 1
+        if tag == "div":
+            inside = bool(self.div_gloss and self.div_gloss[-1]) or ad.get("popover") is not None
+            self.div_gloss.append(inside)
+        if tag == "dl":
+            self.dl_gloss.append("gloss-item" in (ad.get("class") or "").split())
+        if tag == "h2" and ad.get("id") == "references":
+            self.in_refs = True
         if tag in ("p", "div", "br", "li", "h1", "h2", "h3", "tr"):
             self.parts.append("\n")
 
     def handle_endtag(self, tag):
         if tag in ("script", "style", "noscript") and self.skip:
             self.skip -= 1
+        if tag == "div" and self.div_gloss:
+            self.div_gloss.pop()
+        if tag == "dl" and self.dl_gloss:
+            self.dl_gloss.pop()
+
+    def _hidden(self):
+        return (
+            self.skip
+            or self.in_refs
+            or (self.div_gloss and self.div_gloss[-1])
+            or (self.dl_gloss and self.dl_gloss[-1])
+        )
 
     def handle_data(self, data):
-        if not self.skip:
+        if not self._hidden():
             self.parts.append(data)
 
 
@@ -204,7 +229,8 @@ def main():
     result["status"] = "complete"
     result["verdict"] = verdict
     result["confidence"] = conf
-    result["data_kind"] = "biological" if measured["n"] else "none"
+    accounts_read = any(page.get("account") for page in pages.values())
+    result["data_kind"] = "biological" if accounts_read else "none"
     if reason:
         result["reason"] = reason
     elif "reason" in result:
@@ -213,9 +239,18 @@ def main():
     result["method"] = (
         "Fetched the pre-registered Animal Diversity Web species and family accounts, "
         "coded four traits from phrases in the subject clause of each sentence, "
+        "skipping glossary popovers and everything after the References heading, "
         "filled a species gap from its family only when the family stated the trait, "
-        "and applied the counterexample and minimum-set rules."
+        "and applied the counterexample and minimum-set rules. Phrase lists were not extended."
     )
+    note = (
+        "Glossary popovers and the References section were excluded: a glossary example that "
+        "names antlers is not a statement that the species has antlers, and a citation title is "
+        "not a statement that the animal chews the cud. The registered token 'ruminant' does not "
+        "match the plural 'ruminants' under the word-boundary rule, and that token was not added."
+    )
+    if note not in result.get("caveats", []):
+        result.setdefault("caveats", []).append(note)
     result["results_summary"] = [
         f"{r['name']}: horns {r['horns']}, incisors {r['upper_incisors']}, chambers {r['chambers']}, ruminates {r['ruminates']}"
         for r in rows

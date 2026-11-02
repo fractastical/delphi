@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga05-16",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga05-16",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If white individuals occur in partridges, ravens, sparrows and bears that are ordinarily not white, iNaturalist has at least one research-grade, photographed observation of each named group whose description, tags or observation fields say the animal is albino, leucistic, or a white morph.",
   "pass_criterion": "Pre-registered. Support requires at least one qualifying observation in every group: partridge (Perdix perdix or Alectoris rufa), raven (Corvus corax), sparrow (Passer domesticus), and bear (Ursus arctos or Ursus americanus). A qualifying observation is research grade, has at least one photo, has a community taxon equal to the queried species or a subspecies of it, and contains a term below in the description, tags, or observation-field values, not negated in the 15 characters before the match. Confidence 0.70.",
@@ -17,16 +17,48 @@
     "max_pages": 2,
     "negation_chars": 15,
     "groups": {
-      "partridge": ["Perdix perdix", "Alectoris rufa"],
-      "raven": ["Corvus corax"],
-      "sparrow": ["Passer domesticus"],
-      "bear": ["Ursus arctos", "Ursus americanus"]
+      "partridge": [
+        "Perdix perdix",
+        "Alectoris rufa"
+      ],
+      "raven": [
+        "Corvus corax"
+      ],
+      "sparrow": [
+        "Passer domesticus"
+      ],
+      "bear": [
+        "Ursus arctos",
+        "Ursus americanus"
+      ]
     },
     "terms": {
-      "partridge": ["leucistic", "albino", "leucism", "white morph"],
-      "raven": ["leucistic", "albino", "leucism", "white morph"],
-      "sparrow": ["leucistic", "albino", "leucism", "white morph"],
-      "bear": ["leucistic", "albino", "leucism", "white morph", "spirit bear", "kermode"]
+      "partridge": [
+        "leucistic",
+        "albino",
+        "leucism",
+        "white morph"
+      ],
+      "raven": [
+        "leucistic",
+        "albino",
+        "leucism",
+        "white morph"
+      ],
+      "sparrow": [
+        "leucistic",
+        "albino",
+        "leucism",
+        "white morph"
+      ],
+      "bear": [
+        "leucistic",
+        "albino",
+        "leucism",
+        "white morph",
+        "spirit bear",
+        "kermode"
+      ]
     },
     "negation": "(?i)(?:\\bnot\\b|\\bno\\b|\\bnon|\\bisn't\\b|\\bisnt\\b|\\bis not\\b)\\W{0,15}$",
     "confidence_supports": 0.7,
@@ -43,12 +75,172 @@
   "caveats": [
     "White animals are photographed and described more often than ordinary ones, so this search can support existence and cannot estimate frequency.",
     "Research grade is a community identification, not a new identification made for this test. The photographs themselves are not re-scored.",
-    "General knowledge before the search is that white individuals of these groups are reported. The pass rule is still one qualifying record per group, not a count chosen after seeing the API."
+    "General knowledge before the search is that white individuals of these groups are reported. The pass rule is still one qualifying record per group, not a count chosen after seeing the API.",
+    "The partridge hit is observation 315665543, whose description is 'Possibly Leucistic?'. The pre-registered rule counts a term match, including a hedged one, and the observation was kept. It is a weaker identification than the raven, sparrow, and bear records."
   ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "supports",
+  "confidence": 0.7,
+  "data_kind": "biological",
+  "measured": {
+    "value": 4,
+    "unit": "named groups with at least one qualifying observation",
+    "n": 4,
+    "extra": {
+      "groups_with_match": {
+        "partridge": 1,
+        "raven": 1,
+        "sparrow": 1,
+        "bear": 1
+      },
+      "api_errors": [],
+      "observations": {
+        "partridge": [
+          {
+            "id": 315665543,
+            "uri": "https://www.inaturalist.org/observations/315665543",
+            "species": "Alectoris rufa",
+            "license_code": "cc0",
+            "quality_grade": "research",
+            "term": "leucistic",
+            "snippet": "Possibly Leucistic?"
+          }
+        ],
+        "raven": [
+          {
+            "id": 4515541,
+            "uri": "http://www.inaturalist.org/observations/4515541",
+            "species": "Corvus corax",
+            "license_code": "cc0",
+            "quality_grade": "research",
+            "term": "leucistic",
+            "snippet": "Not so common WHITE RAVEN, ie. leucistic. Never seen one before! Was scavenging with several other members of the flock "
+          }
+        ],
+        "sparrow": [
+          {
+            "id": 257472022,
+            "uri": "https://www.inaturalist.org/observations/257472022",
+            "species": "Passer domesticus",
+            "license_code": "cc-by-nc",
+            "quality_grade": "research",
+            "term": "leucistic",
+            "snippet": "Leucistic"
+          }
+        ],
+        "bear": [
+          {
+            "id": 82107298,
+            "uri": "https://www.inaturalist.org/observations/82107298",
+            "species": "Ursus arctos horribilis",
+            "license_code": null,
+            "quality_grade": "research",
+            "term": "white morph",
+            "snippet": "The rare white morph grizzly of Banff and Yoho National Parks, and its sibling behind it. Both bears"
+          }
+        ]
+      }
+    }
+  },
+  "method": "Queried the iNaturalist observations API for each pre-registered species and colour term, kept research-grade observations with a photo whose community taxon matched the species, and required the term in the description, tags, or observation fields without a negation in the preceding window.",
+  "results_summary": [
+    "Groups with a qualifying observation: 4 of 4 ({'partridge': 1, 'raven': 1, 'sparrow': 1, 'bear': 1}).",
+    "API calls: 11. Errors: 0.",
+    "Verdict supports."
+  ],
+  "datasets": [
+    {
+      "id": "inaturalist-observations-api",
+      "name": "iNaturalist observations API, research-grade text search",
+      "landing_url": "https://www.inaturalist.org/",
+      "doi": null,
+      "version": "api v1",
+      "license": "per-observation license_code in derived/measured.json",
+      "files": [
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Perdix+perdix&quality_grade=research&q=leucistic&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:28Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Perdix+perdix&quality_grade=research&q=albino&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:29Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Perdix+perdix&quality_grade=research&q=leucism&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:30Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Perdix+perdix&quality_grade=research&q=white+morph&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:31Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Alectoris+rufa&quality_grade=research&q=leucistic&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 106780,
+          "sha256": "0d17596ba1b1ce6fd88d01561c9eaa272160f811b795c2aded451339b152d7dd",
+          "retrieved_at": "2026-11-02T00:36:32Z",
+          "n_results": 1
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Corvus+corax&quality_grade=research&q=leucistic&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 2816359,
+          "sha256": "b3e48e22a171403fbce7b2ba07245a5dc5ac4945e2aad66c378d57fa05dfb355",
+          "retrieved_at": "2026-11-02T00:36:34Z",
+          "n_results": 23
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Passer+domesticus&quality_grade=research&q=leucistic&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 3196907,
+          "sha256": "4b7dc21cb29168ae63a82b231fd5a9c93d12f2f1fd568d698c01063fbf337336",
+          "retrieved_at": "2026-11-02T00:36:36Z",
+          "n_results": 50
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Ursus+arctos&quality_grade=research&q=leucistic&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:36Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Ursus+arctos&quality_grade=research&q=albino&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:37Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Ursus+arctos&quality_grade=research&q=leucism&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 55,
+          "sha256": "1736ff6ab7e0b647e37ad0798b458c83254d61ac7a9e1aedd2494565bd0b9bb4",
+          "retrieved_at": "2026-11-02T00:36:38Z",
+          "n_results": 0
+        },
+        {
+          "url": "https://api.inaturalist.org/v1/observations?taxon_name=Ursus+arctos&quality_grade=research&q=white+morph&per_page=50&page=1&order=desc&order_by=votes",
+          "byte_size": 375254,
+          "sha256": "11837bdb74b5a36f7b2bc56fe27a80aacc956eb299945cf6cc37244a5d7bcdbf",
+          "retrieved_at": "2026-11-02T00:36:39Z",
+          "n_results": 1
+        }
+      ],
+      "role": "photographed observations scored for white, albino, or leucistic wording"
+    }
+  ]
 }
