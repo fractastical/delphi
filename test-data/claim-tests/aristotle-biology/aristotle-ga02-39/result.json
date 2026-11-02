@@ -1,0 +1,283 @@
+{
+  "claim_id": "aristotle-ga02-39",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-39",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "Species-level gestation length of both the horse (Equus caballus) and the ass (Equus asinus) is one year, meaning it is closer to twelve months than to eleven or thirteen months.",
+  "pass_criterion": "Pre-registered, before any data file was downloaded. Let one year Y = 365.25 days and one month M = Y/12. A species-level gestation G (days) is inside the one-year bin when it is closer to 12 months than to 11 or 13 months, i.e. |G - Y| <= Y/24 (15.21875 days), equivalently G in [350.03125, 380.46875]. Supports only if both Equus caballus and Equus asinus are inside that bin in every admissible dataset that records the species, and each species is recorded in at least one dataset. The value used is the dataset's species-level gestation point estimate (AnAge column whose header is the combined gestation/incubation field; PanTHERIA column 9-1_GestationLen_d; Amniote column gestation_d). PanTHERIA values below 0 are missing (the archive's -999 code). Blank, non-numeric, and non-positive values are missing. If a dataset has more than one positive row for a species, G is the median of those rows. Names accepted: genus Equus with species epithet caballus, and genus Equus with species epithet asinus. Equus ferus, Equus africanus, Equus hemionus and Equus kiang are not substitutes.",
+  "fail_criterion": "Pre-registered. Refutes if at least one of the two species is outside the one-year bin in every dataset that records it (the claim says both gestate for one year). Mixed if the datasets that record a species disagree on whether it is inside the bin, and neither species is outside in every dataset that records it. Inconclusive, reason underpowered, if either species has no positive gestation value in any of the three datasets. Inconclusive, reason data-unavailable, if none of the three files can be retrieved or a retrieved file does not match the archive identity below (AnAge zip content-length 169150 and content-type application/zip; PanTHERIA content-length 2359096; Amniote CSV content-length 4728122), unless a deviation records a redirect to the same archive.",
+  "planned_datasets": [
+    "anage-hagr-dataset-zip",
+    "pantheria-1-0-wr05-aug2008",
+    "amniote-life-history-database-aug-2015"
+  ],
+  "test_contract": {
+    "expected_observation": "Both Equus caballus and Equus asinus have a published species-level gestation length closer to 365.25 days than to 11 months (334.8125 days) or 13 months (395.6875 days).",
+    "disconfirming_observation": "Either species has a species-level gestation closer to 11 months or to 13 months than to 12 months, in every admissible compilation that records it.",
+    "admissible_datasets": "Openly downloadable species-level mammal trait compilations that record gestation length in days, published independently of Aristotle's text, with a stable URL. The three planned files are the AnAge tab-delimited build inside https://genomics.senescence.info/species/dataset.zip (landing https://genomics.senescence.info/species/index.html), PanTHERIA 1.0 Wilson & Reeder 2005 file https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt (landing https://esapubs.org/archive/ecol/E090/184/, DOI 10.1890/08-1494.1), and the Amniote Life-History Database median table https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv (landing https://esapubs.org/archive/ecol/E096/269/, DOI 10.1890/15-0846.1). Each URL returned HTTP 200 on a header request on 2026-11-02 UTC; the bodies were not downloaded before this registration. No other dataset may be added after the values are seen.",
+    "inference_method": "For each species, classify each dataset's point estimate as inside or outside the one-year bin defined in pass_criterion. Consensus inside means every non-missing dataset is inside; consensus outside means every non-missing dataset is outside; otherwise the datasets conflict. Supports if both species are consensus inside. Refutes if either species is consensus outside. Mixed if any species is in conflict and neither is consensus outside. The fraction of conception dates that would fall in the same equal-length season (Y/4 days) is reported as max(0, 1 - |G - Y|/(Y/4)) and is not part of the verdict: the quote gives the one-year period as the reason for the seasonal coincidence, and the verdict tests that period."
+  },
+  "interpretation": "The claim states a duration, one year, for both the horse and the ass, and treats that duration as the reason birth falls in the season of conception. Gestation is mapped to the species-level gestation length in days in three public compilations. One year is mapped to 365.25 days, and the statement's precision is a whole number of months: the measurement confirms the claim only when it rounds to twelve months rather than eleven or thirteen. The domestic ass is Equus asinus as named in the claim's scope, not the other wild asses. The seasonal sentence is Aristotle's inference from the duration and is reported, not used as a second hurdle.",
+  "caveats": [
+    "Header requests confirmed the three URLs and their content lengths. No gestation value was read before this file was committed.",
+    "A tolerance of half a month is the boundary between 'twelve months' and 'eleven months'. It is not a veterinary normal range, and it is not widened to absorb a remembered textbook figure.",
+    "These compilations contribute one published point estimate per species, often a median of literature values, not a sample of mares and jennies with a confidence interval. Agreement across compilations is the replication, not a standard error.",
+    "The seasonal coincidence is not tested against dated conception and birth records. Only the duration those records would have to match is tested.",
+    "Equus asinus is inside the one-year bin in all three compilations. The refutation is Equus caballus alone: the claim requires both.",
+    "The three horse estimates differ by less than two days (337, 338.97, 337.985). The compilations may be repeating overlapping literature rather than three independent samples of mares. Every one of them still places the horse outside the bin.",
+    "Eleven months is 334.8125 days. The horse estimates sit 2 to 4 days above that figure and 26 to 28 days below 365.25, which is why they round to eleven months."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "measured": {
+    "value": 28.25,
+    "unit": "days; largest |gestation - 365.25| among species-level medians that entered the verdict",
+    "n": 6,
+    "uncertainty": "compilations publish one point estimate per species; no within-species standard error is in these files",
+    "extra": {
+      "year_days": 365.25,
+      "half_month_tolerance_days": 15.21875,
+      "one_year_bin_days": [
+        350.03125,
+        380.46875
+      ],
+      "species_consensus": {
+        "Equus caballus": "outside",
+        "Equus asinus": "inside"
+      },
+      "per_species": {
+        "Equus caballus": {
+          "by_dataset": {
+            "anage-hagr-dataset-zip": {
+              "n_rows": 1,
+              "values_d": [
+                337.0
+              ],
+              "median_d": 337.0,
+              "abs_deviation_from_365_25_d": 28.25,
+              "inside_one_year_bin": false,
+              "same_season_fraction": 0.6906,
+              "rows": [
+                {
+                  "species": "Equus caballus",
+                  "gestation_d": 337.0,
+                  "data_quality": "high",
+                  "genus": "Equus",
+                  "species_epithet": "caballus"
+                }
+              ]
+            },
+            "pantheria-1-0-wr05-aug2008": {
+              "n_rows": 1,
+              "values_d": [
+                338.97
+              ],
+              "median_d": 338.97,
+              "abs_deviation_from_365_25_d": 26.28,
+              "inside_one_year_bin": false,
+              "same_season_fraction": 0.7122,
+              "rows": [
+                {
+                  "species": "Equus caballus",
+                  "gestation_d": 338.97,
+                  "binomial": "Equus caballus"
+                }
+              ]
+            },
+            "amniote-life-history-database-aug-2015": {
+              "n_rows": 1,
+              "values_d": [
+                337.985
+              ],
+              "median_d": 337.985,
+              "abs_deviation_from_365_25_d": 27.265,
+              "inside_one_year_bin": false,
+              "same_season_fraction": 0.7014,
+              "rows": [
+                {
+                  "species": "Equus caballus",
+                  "gestation_d": 337.985,
+                  "genus": "Equus",
+                  "species_epithet": "caballus"
+                }
+              ]
+            }
+          },
+          "flags": [
+            false,
+            false,
+            false
+          ]
+        },
+        "Equus asinus": {
+          "by_dataset": {
+            "anage-hagr-dataset-zip": {
+              "n_rows": 1,
+              "values_d": [
+                359.0
+              ],
+              "median_d": 359.0,
+              "abs_deviation_from_365_25_d": 6.25,
+              "inside_one_year_bin": true,
+              "same_season_fraction": 0.9316,
+              "rows": [
+                {
+                  "species": "Equus asinus",
+                  "gestation_d": 359.0,
+                  "data_quality": "high",
+                  "genus": "Equus",
+                  "species_epithet": "asinus"
+                }
+              ]
+            },
+            "pantheria-1-0-wr05-aug2008": {
+              "n_rows": 1,
+              "values_d": [
+                367.0
+              ],
+              "median_d": 367.0,
+              "abs_deviation_from_365_25_d": 1.75,
+              "inside_one_year_bin": true,
+              "same_season_fraction": 0.9808,
+              "rows": [
+                {
+                  "species": "Equus asinus",
+                  "gestation_d": 367.0,
+                  "binomial": "Equus asinus"
+                }
+              ]
+            },
+            "amniote-life-history-database-aug-2015": {
+              "n_rows": 1,
+              "values_d": [
+                361.6595
+              ],
+              "median_d": 361.6595,
+              "abs_deviation_from_365_25_d": 3.5905,
+              "inside_one_year_bin": true,
+              "same_season_fraction": 0.9607,
+              "rows": [
+                {
+                  "species": "Equus asinus",
+                  "gestation_d": 361.65946,
+                  "genus": "Equus",
+                  "species_epithet": "asinus"
+                }
+              ]
+            }
+          },
+          "flags": [
+            true,
+            true,
+            true
+          ]
+        }
+      },
+      "records": [
+        {
+          "dataset": "anage-hagr-dataset-zip",
+          "species": "Equus caballus",
+          "gestation_d": 337.0,
+          "inside_one_year_bin": false
+        },
+        {
+          "dataset": "anage-hagr-dataset-zip",
+          "species": "Equus asinus",
+          "gestation_d": 359.0,
+          "inside_one_year_bin": true
+        },
+        {
+          "dataset": "pantheria-1-0-wr05-aug2008",
+          "species": "Equus caballus",
+          "gestation_d": 338.97,
+          "inside_one_year_bin": false
+        },
+        {
+          "dataset": "pantheria-1-0-wr05-aug2008",
+          "species": "Equus asinus",
+          "gestation_d": 367.0,
+          "inside_one_year_bin": true
+        },
+        {
+          "dataset": "amniote-life-history-database-aug-2015",
+          "species": "Equus caballus",
+          "gestation_d": 337.985,
+          "inside_one_year_bin": false
+        },
+        {
+          "dataset": "amniote-life-history-database-aug-2015",
+          "species": "Equus asinus",
+          "gestation_d": 361.6595,
+          "inside_one_year_bin": true
+        }
+      ]
+    }
+  },
+  "datasets": [
+    {
+      "id": "anage-hagr-dataset-zip",
+      "name": "AnAge: The Animal Ageing and Longevity Database (latest stable build, tab-delimited)",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": "10.1093/nar/gkx1042",
+      "version": "stable build served 2026-11-02 (zip last-modified 2023-07-03)",
+      "license": "Freely available under the HAGR license, as stated on https://genomics.senescence.info/species/index.html",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:23:35Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "species-level gestation/incubation length in days for Equus caballus and Equus asinus"
+    },
+    {
+      "id": "pantheria-1-0-wr05-aug2008",
+      "name": "PanTHERIA 1.0 (Wilson and Reeder 2005 taxonomy)",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "doi": "10.1890/08-1494.1",
+      "version": "PanTHERIA_1-0_WR05_Aug2008",
+      "license": "Published with Ecological Archives E090-184; redistribution with the data paper",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "retrieved_at": "2026-11-02T00:23:35Z",
+          "byte_size": 2359096,
+          "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a"
+        }
+      ],
+      "role": "species-level gestation length in days (column 9-1_GestationLen_d)"
+    },
+    {
+      "id": "amniote-life-history-database-aug-2015",
+      "name": "Amniote Life-History Database (Myhrvold et al. 2015), median table",
+      "landing_url": "https://esapubs.org/archive/ecol/E096/269/",
+      "doi": "10.1890/15-0846.1",
+      "version": "Aug 2015",
+      "license": "Published with Ecological Archives E096-269",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv",
+          "retrieved_at": "2026-11-02T00:23:35Z",
+          "byte_size": 4728122,
+          "sha256": "ae16377ebe8a172949c2b8c200a50c5d0c7fc04d34bd3c9704635da4a4d51f53"
+        }
+      ],
+      "role": "species-level median gestation length in days (column gestation_d)"
+    }
+  ],
+  "method": "Downloaded the three pre-registered compilations, checked byte size against the content-length recorded at pre-registration, and hashed each file. Kept Equus caballus and Equus asinus only. Read AnAge's combined gestation/incubation column, PanTHERIA 9-1_GestationLen_d (values below 0 treated as missing), and Amniote gestation_d. A value is inside the one-year bin when it is within half a month of 365.25 days. The verdict follows the pre-registered consensus rule. The same-season fraction is stored in measured.extra and is not used for the verdict.",
+  "results_summary": [
+    "The ass is inside the one-year bin in every compilation; the horse is outside in every compilation, nearer eleven months (334.8125 days) than twelve, so the claim that both gestate for one year is refuted.",
+    "Equus caballus (outside): anage-hagr-dataset-zip: 337.0 days (outside, |dev|=28.25); pantheria-1-0-wr05-aug2008: 338.97 days (outside, |dev|=26.28); amniote-life-history-database-aug-2015: 337.985 days (outside, |dev|=27.265)",
+    "Equus asinus (inside): anage-hagr-dataset-zip: 359.0 days (inside, |dev|=6.25); pantheria-1-0-wr05-aug2008: 367.0 days (inside, |dev|=1.75); amniote-life-history-database-aug-2015: 361.6595 days (inside, |dev|=3.5905)"
+  ]
+}
