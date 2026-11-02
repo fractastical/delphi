@@ -1,0 +1,40 @@
+{
+  "claim_id": "levin-2022-grn-learning-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:41:50Z",
+  "hypothesis": "If pharmacoresistance-as-habituation holds in the published ODE pathway models, then in every BioModels entry from Table S1 of Biswas, Clawson and Levin (2022) that this protocol can integrate, at least one stimulus–response pair shows a progressive drop of the response mean by a factor of 1/1.5 at each of six lengthening stimulations, and the share of such pairs in that model is between 1% and 50%.",
+  "pass_criterion": "Pre-registered (supports). Let a testable model be one of the 35 Table S1 BioModels whose SBML loads and for which every attempted unstimulated and clamped trajectory finishes inside the time budget with a finite sample, yielding at least one scored directed pair. Supports requires at least 10 testable models, every testable model has at least one habituating pair, and every testable model's habituating fraction (habituating pairs divided by scored directed pairs) lies in [0.01, 0.50] inclusive.",
+  "fail_criterion": "Pre-registered. If fewer than 10 models are testable, the verdict is inconclusive (reason underpowered if at least one model was testable, otherwise data-unavailable). If at least 10 are testable and both clauses fail — some model has zero habituating pairs, and some model's fraction lies outside [0.01, 0.50] — the verdict is refutes. If exactly one of the two clauses fails, the verdict is mixed. A regulation-status flip counted by the authors' MATLAB is recorded as a descriptive statistic and does not decide the verdict.",
+  "planned_datasets": [
+    "biswas2022-table-s1-biomodels",
+    "biomodels-sbml-table-s1"
+  ],
+  "test_contract": {
+    "expected_observation": "Each ODE model that integrates under the six-pulse protocol has at least one UCS–R pair whose stimulation-window means fall by a factor of 1/1.5 at every successive pulse, and between 1% and 50% of the scored directed pairs in that model do so.",
+    "disconfirming_observation": "A model that integrates has no such pair, or its share of such pairs is below 1% or above 50%. Either observation breaks the claim's universal statement about the testable BioModels set. Failure to integrate is not a counterexample; it removes the model from the testable set.",
+    "admissible_datasets": "The 35 curated BioModels identifiers listed in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (doi:10.3390/ijms24010285), fetched as public SBML from the BioModels repository. No author-saved result matrix. Random synthetic circuits are outside this claim. A model that does not load or does not finish within the pre-registered time budget is not testable.",
+    "inference_method": "Re-simulate each model from its SBML initial state. An unstimulated trajectory of 1010 time units sets the clamp levels (100 times the nonzero maximum, and the nonzero minimum divided by 100). Each other floating species is then clamped, up and down, on the paper's six lengthening pulses (50, 60, 70, 80, 90 and 100 time units) separated by relaxations equal to the next pulse. A directed pair habituates when the first five stimulation-window means are at least 0.001 and each later mean is at most 1/1.5 of the previous. The verdict is the rule in pass_criterion and fail_criterion. Confidence is 0.70 when at least 20 models are testable and reclassifying any one pair would not flip the verdict, 0.55 when fewer than 20 models are testable and the verdict is not single-pair fragile, 0.45 when it is single-pair fragile, and 0.60 when the verdict is inconclusive. Confidence is not raised above these values."
+  },
+  "interpretation": "The claim equates pharmacoresistance with habituation defined as a progressive 50% drop and, in the source sentence, as a ratio of 1:1.5. Section 4.5 states the operational ratio as 1/1.5 between successive stimulation-period means, across six stimulations whose lengths run from 5000 to 10000 steps of size 0.01, with relaxations equal to the following stimulation. This test uses that ratio, not a literal halving (1/2), and not the authors' MATLAB counter, which scores drug resistance when the first and last nonzero up/down labels differ. Nodes are the SBML floating species. The clamp is applied by resetting the stimulus after each 0.1 time unit, which is the restart interval in stimulateRelaxSingle.m and multiDrug.m. A stimulus direction whose clamped trajectory is non-finite is skipped and contributes no scored pairs. The unstimulated trajectory has to succeed. Parameters and reactions are never edited. The result is a property of these ODE models. It is not evidence that cells or patients habituate to drugs.",
+  "secondary_analyses_descriptive": [
+    "For each testable model, the fraction of scored pairs that the authors' MATLAB would label drug resistance: an initial up or down response against the pre-stimulus mean (thresholds 1.5 and 1/1.5) whose first and last nonzero labels differ. Not used for the verdict.",
+    "Species count, how many models failed to load, and how many hit the time budget."
+  ],
+  "caveats": [
+    "Before this registration, Table S1 in the paper's supplementary PDF was read to copy the 35 BioModels identifiers. Result figures in that PDF were not used, and no SBML file had been downloaded.",
+    "The authors' MATLAB sources on https://github.com/wesleypclawson/GRN_ODE (multiDrug.m, stimulateRelaxSingle.m, Find_DrugRes_Sensitize_SLURM1.m) were read to fix the pulse schedule. The repository's .mat result matrices were not downloaded.",
+    "Eight of the 35 models were untestable in the paper. This registration treats a model that fails to load or exceeds 240 seconds of integration as untestable in the same sense, and does not count it as a failure of the claim.",
+    "A longer averaging window can lower the mean of a short transient even when the peak does not fall. The test uses the mean because that is the quantity Section 4.5 names.",
+    "Solver absolute tolerance is 1e-3 on the first attempt, matching the paper's Abstol, with one pre-registered retry at absolute 1e-8 and relative 1e-6 if the loose tolerance does not return a finite trajectory. The 0.001 floor on the first five window means is that same absolute tolerance, so a drop that is only visible below the tolerance does not count."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/levin-grn-learning-tests-4186",
+    "date": "2026-11-01"
+  },
+  "deviations": []
+}
