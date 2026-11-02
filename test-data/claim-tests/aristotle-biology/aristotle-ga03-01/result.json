@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga03-01",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-01",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If cartilaginous fishes as a class form an internal egg and give birth to live young, then egg-laying is exceptional among sharks and rays with a coded reproductive mode.",
   "pass_criterion": "Pre-registered. This dataset has no column for shell softness or egg colour, so the verdict 'supports' is not available: a live-birth generalization that fits the file still leaves the shell clause untested, and the verdict is then mixed. The parity part is treated as fitting if the Wilson 95 percent interval for the proportion of species coded Egg-laying has an upper bound below 0.05. That outcome is recorded as mixed, not supports.",
   "fail_criterion": "Pre-registered (claim refuted). The claim is refuted if the Wilson 95 percent lower bound on the Egg-laying proportion is at least 0.10 (egg-laying is common in the class, not a rare exception). If the lower bound is below 0.10 and the upper bound is at least 0.05, the verdict is mixed. If fewer than 100 species have a non-missing mode, or shark_modepruned_E.csv cannot be retrieved, or it has no species and mode columns, the verdict is inconclusive with reason data-unavailable.",
@@ -25,7 +25,15 @@
       "doi": "10.5061/dryad.80gb5mm12",
       "version": "2025-02-24",
       "license": "CC0-1.0",
-      "files": [],
+      "files": [
+        {
+          "name": "shark_modepruned_E.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/4253777",
+          "retrieved_at": "2026-11-02T00:38:32Z",
+          "byte_size": 38424,
+          "sha256": "ea9d1b989bee8941eb0e9f89cb6457f22bd5e13b3d5b5777066a18eee709923d"
+        }
+      ],
       "role": "species-level reproductive mode of sharks and rays, corrected coding"
     }
   ],
@@ -40,5 +48,44 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-df92",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.86,
+  "measured": {
+    "value": 0.45559,
+    "unit": "proportion of coded species with mode Egg-laying",
+    "n": 957,
+    "uncertainty": "Wilson 95% CI [0.424277, 0.487258]",
+    "extra": {
+      "mode_counts": {
+        "Live-bearing_with_uterine_milk": 224,
+        "Yolk-only_viviparity": 200,
+        "Live-bearing_with_oophagy": 18,
+        "Egg-laying": 436,
+        "Placental_viviparity": 79
+      },
+      "n_egg_laying": 436,
+      "wilson_low": 0.424277,
+      "wilson_high": 0.487258,
+      "filenames_seen": [
+        "AllSharks1Tree.tre",
+        "README.md",
+        "keepspecies_main_D.csv",
+        "keepspecies_main_E.csv",
+        "keepspecies_main_F_nutrition.csv",
+        "keepspecies_main_F_parity.csv",
+        "shark_modepruned_D.csv",
+        "shark_modepruned_E.csv",
+        "shark_modepruned_F_nutrition.csv",
+        "shark_modepruned_F_parity.csv"
+      ],
+      "content_disposition": "attachment; filename=shark_modepruned_E.csv"
+    }
+  },
+  "method": "Passed Dryad's proof-of-work gate on one TLS connection, identified shark_modepruned_E.csv from the signed filename, hashed the bytes, and counted the mode column. The Wilson 95 percent interval for the Egg-laying proportion was compared with the pre-registered bounds 0.10 (lower) and 0.05 (upper). Shell softness and egg colour are not columns, so a parity fit is mixed.",
+  "results_summary": [
+    "Coded species: 957. Egg-laying: 436. Proportion: 0.45559. Wilson 95% CI [0.424277, 0.487258].",
+    "Mode counts: Egg-laying=436, Live-bearing_with_uterine_milk=224, Yolk-only_viviparity=200, Placental_viviparity=79, Live-bearing_with_oophagy=18",
+    "Verdict refutes."
+  ]
 }
