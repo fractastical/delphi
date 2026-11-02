@@ -1,0 +1,30 @@
+{
+  "claim_id": "aristotle-ha02-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-18",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If fishes have neither hearing organs nor smell organs, and no passages for them, then a public table of fish specimens will contain no measured otolith (an inner-ear stone) and no measured olfactory structure or nostril.",
+  "pass_criterion": "The claim is supported only if a dataset explicitly codes the inner ear, otolith, olfactory organ, and nostrils as absent for at least 20 fish species. A table of positive measurements cannot support a universal absence by being empty.",
+  "fail_criterion": "Refutes if FishBase 24.07 otoliths.parquet contains otolith measurements (a numeric column whose name contains length, height, weight, or size, with a non-null positive value) for at least 10 species, or if a smell structure is measured for at least 10 species. Smell is read, in order, from brains.parquet columns whose names contain olfact, then morphdat.parquet columns whose names contain naris, nostril, or olfact, then NCBI BioSample (Actinopterygii[ORGN]) AND (olfactory[ATTR] OR \"olfactory epithelium\"[ATTR] OR \"olfactory rosette\"[ATTR] OR nares[ATTR] OR nostril[ATTR]) with the same title-validation rule as the kidney test (at least 5 validated samples). Either organ is enough to refute 'only eyes' and 'devoid alike of the organs'. If neither source yields 10 species or 5 validated samples: inconclusive, reason data-unavailable. One to nine otolith species, or one to four validated smell samples and no otoliths: mixed.",
+  "planned_datasets": [
+    "fishbase-24.07-otoliths",
+    "fishbase-24.07-brains",
+    "fishbase-24.07-morphdat",
+    "fishbase-24.07-species",
+    "ncbi-biosample-fish-olfaction"
+  ],
+  "interpretation": "Aristotle's 'organs of hearing' are read as the inner ear, of which the otolith (sagitta or other ear stone) is a measured part. 'Passages' for hearing are not separately required once the ear stone is present. 'Organs of smell' and their passages are the olfactory epithelium, olfactory rosette, olfactory bulb, or nostrils. Eyes are not tested. The claim is universal over fishes, so ten species with an ear stone refute it.",
+  "test_contract": {
+    "expected_observation": "No fish species in the otolith table has a measured ear stone, and no fish species has a measured olfactory structure or nostril, with absence coded explicitly.",
+    "disconfirming_observation": "At least ten fish species have a measured otolith, or at least ten have a measured olfactory structure, or at least five biosamples name an olfactory tissue.",
+    "admissible_datasets": "FishBase 24.07 parquet snapshot distributed on Source Cooperative (public, CC BY-NC), joined to the species table by SpecCode, and NCBI BioSample organism-plus-attribute records. Measurements must be of the organ, not a gene name in a title that fails validation.",
+    "inference_method": "Count distinct SpecCodes with a positive otolith measurement, and distinct species with a positive olfactory measurement. Thresholds are 10 species or 5 validated biosamples. Either sense refutes the joint claim that fishes lack both."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  }
+}

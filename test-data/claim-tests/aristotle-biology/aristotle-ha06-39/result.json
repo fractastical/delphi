@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha06-39",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-39",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If the newborn bear is the smallest of all animals relative to its mother, larger than a mouse and smaller than a weasel, and born blind, then in a mammal life-history table the brown bear's neonate-to-adult mass ratio is less than or equal to every other mammal's ratio, the cub's mass sits between an adult mouse and an adult least weasel, and the cub's eyes open after birth.",
+  "pass_criterion": "Supports if all three hold for Ursus arctos in PanTHERIA 1.0 WR05. A: among species with both 5-1_AdultBodyMass_g and 5-3_NeonateBodyMass_g greater than 0 (missing code -999 excluded), the Ursus arctos neonate/adult ratio is less than or equal to every other species' ratio. Equality counts as holding. B: Ursus arctos neonate mass is greater than Mus musculus adult mass and less than Mustela nivalis adult mass. C: 2-1_AgeatEyeOpening_d for Ursus arctos is greater than 0. At least 30 mammal species must have both masses.",
+  "fail_criterion": "Refutes if A fails, that is if any other mammal has a strictly smaller ratio. Mixed if A holds but B fails, or A holds and C is present and fails. If C is missing (-999) and A and B hold, supports, and the blind clause is reported as untested. Inconclusive, reason underpowered, if Ursus arctos lacks a positive neonate mass or a positive adult mass, or fewer than 30 species have both masses. Hairless skin and unformed limbs are not columns in this table and do not enter the verdict. A placental-only recount, dropping Diprotodontia, Dasyuromorphia, Peramelemorphia, Didelphimorphia, Microbiotheria, Notoryctemorphia, and Paucituberculata, is extra and does not set the verdict. Adult mass is not female-only; that bias is a caveat, not a reason to change A.",
+  "planned_datasets": [
+    "pantheria-1.0-wr05"
+  ],
+  "interpretation": "The she-bear is Ursus arctos. 'Smallest in proportion to the mother' is neonate body mass divided by adult body mass. The dataset's adult mass is not sex-specific, so the ratio is neonate over a typical adult, not strictly the mother. 'All animals' is tested on the mammals PanTHERIA records; a smaller mammal refutes the universal, and a bear that is smallest among those mammals does not speak for birds or insects. The mouse is Mus musculus and the weasel is Mustela nivalis, compared as adult masses because Aristotle is giving the cub's absolute size against those animals. Born blind is an age at eye opening after day 0. Hairless and unformed limbs are outside this file.",
+  "test_contract": {
+    "expected_observation": "Ursus arctos has the minimum neonate/adult mass ratio among mammals with both measurements, its neonate mass is between the adult masses of Mus musculus and Mustela nivalis, and its age at eye opening is after birth.",
+    "disconfirming_observation": "Any other mammal has a smaller neonate/adult ratio. That alone refutes the superlative, whether or not the mouse and weasel comparison holds.",
+    "admissible_datasets": "PanTHERIA 1.0 WR05 text table from Ecological Archives E090-184, columns 5-1_AdultBodyMass_g, 5-3_NeonateBodyMass_g, and 2-1_AgeatEyeOpening_d, missing value -999. One row per species. No species may be dropped from the primary test because its ratio is inconvenient.",
+    "inference_method": "Ratio = neonate mass / adult mass on rows with both values positive. A is bear ratio <= minimum of the other ratios. B compares the bear neonate with the two named adult masses. C is age at eye opening > 0. The verdict rules are in the fail criterion. The placental recount is stored as extra."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  }
+}

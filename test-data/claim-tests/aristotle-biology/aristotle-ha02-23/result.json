@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha02-23",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-23",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If no fish and no bird has kidneys or a urinary bladder, then a public archive of biological samples will contain no fish sample and no bird sample whose recorded tissue is kidney, pronephros, mesonephros, or metanephros, and none whose recorded tissue is a urinary bladder.",
+  "pass_criterion": "The claim is supported only by an explicit presence/absence matrix that codes kidney as absent in at least 20 fish species and at least 20 bird species and codes no presence. NCBI BioSample does not encode absence. Zero BioSample hits therefore do not support the claim.",
+  "fail_criterion": "Refutes if the validated count of fish kidney-tissue biosamples is at least 5, or the validated count of bird kidney-tissue biosamples is at least 5. A hit is validated only when the esummary title or sample attributes name kidney, pronephros, mesonephros, metanephros, or head kidney as an anatomical source. One to four validated samples in a clade is mixed (too few to rule out a stray annotation). Zero validated samples is inconclusive, reason data-unavailable, because a missing biosample is not evidence the organ is absent. Urinary-bladder counts are reported and do not rescue the claim if kidneys are present.",
+  "planned_datasets": [
+    "ncbi-biosample-fish-bird-kidney"
+  ],
+  "interpretation": "Aristotle's 'these organs' in the quoted sentence are the kidneys and the bladder named in the claim. 'Fish' is Actinopterygii or Chondrichthyes. 'Bird' is Aves. The claim is a universal negative: one clade with a kidney is enough to refute 'no fish or bird'. A biosample whose attribute says the tissue is kidney is a record that the organ was dissected, not an ontology assertion.",
+  "test_contract": {
+    "expected_observation": "No validated fish biosample and no validated bird biosample names kidney tissue, and an explicit absence matrix codes the organ absent across both clades.",
+    "disconfirming_observation": "At least five biosamples in fishes, or at least five in birds, name kidney, pronephros, mesonephros, or metanephros as the sampled organ.",
+    "admissible_datasets": "A public sample archive in which the organism and the anatomical source are fields, not a mention of the word kidney in an unrelated paper. NCBI BioSample is admissible. Absence of records is not admissible as proof of absence.",
+    "inference_method": "NCBI E-utilities esearch on db=biosample, then esummary of up to 30 ids per query. Fish query: (Actinopterygii[ORGN] OR Chondrichthyes[ORGN]) AND (kidney[ATTR] OR pronephros[ATTR] OR mesonephros[ATTR] OR \"head kidney\"[ATTR]). Bird query: Aves[ORGN] AND (kidney[ATTR] OR metanephros[ATTR]). Bladder queries replace the organ term with \"urinary bladder\"[ATTR] and are extra. Validated count, not the raw esearch count, sets the verdict."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  }
+}

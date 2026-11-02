@@ -1,0 +1,27 @@
+{
+  "claim_id": "aristotle-ha01-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-16",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If the ear's inner cavity has no passage to the brain but does have a passage to the palate, then a compiled vertebrate anatomy will relate the auditory tube to the middle-ear cavity and to the nasopharynx, and will not relate the ear cavity to the brain by an open passage.",
+  "pass_criterion": "Supports if both Uberon and the Foundational Model of Anatomy, retrieved by label search from the EBI OLS API, describe a pharyngotympanic (auditory, Eustachian) tube that is connected with, continuous with, or part of a path between the tympanic cavity (middle ear) and the nasopharynx or pharynx, AND neither ontology's term for the tympanic cavity or the tube states a normal open passage from that cavity into the brain or cranial cavity.",
+  "fail_criterion": "Refutes if either ontology states a normal open passage from the ear cavity into the brain, or if both ontologies return the tube and neither links it to the pharynx. Mixed if the two ontologies disagree, or if only one ontology is retrievable and it supports the claim. Inconclusive, reason data-unavailable, if neither ontology returns the tube. This test uses curated anatomical relations, not a sample of specimens; confidence stays at or below 0.7 even if the relations match the claim.",
+  "planned_datasets": [
+    "ebi-ols-uberon",
+    "ebi-ols-fma"
+  ],
+  "interpretation": "Aristotle's 'inner cavity of the ear' is read as the middle-ear cavity, not the membranous labyrinth, because the passage he describes to the palate is the auditory tube, which opens on the nasopharynx beside the palate. 'No passage to the brain' means no normal open lumen from that cavity into the cranial cavity. The ontologies are compilations of anatomical observations. They are not a count of dissected heads, and the result does not estimate how often the tube is patent.",
+  "test_contract": {
+    "expected_observation": "The auditory tube term is tied to the tympanic cavity and to the nasopharynx or pharynx, and the ear-cavity terms do not assert an open passage into the brain.",
+    "disconfirming_observation": "An ontology asserts a normal open ear-to-brain passage, or the tube is present but has no pharyngeal link.",
+    "admissible_datasets": "EBI Ontology Lookup Service records for Uberon and FMA retrieved by label (pharyngotympanic tube, auditory tube, Eustachian tube, tympanic cavity), including the term definition and direct relationships. No specimen imaging is in this test.",
+    "inference_method": "Label search, then read definition and relationship texts for nasopharynx, pharynx, palate, tympanic, middle ear, brain, and cranial cavity. Both sources must agree for support. One source is mixed. A stated ear-to-brain lumen refutes."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  }
+}

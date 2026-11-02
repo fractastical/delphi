@@ -1,0 +1,29 @@
+{
+  "claim_id": "aristotle-ga02-21",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-21",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If eels are neither male nor female, then FishBase will not code any Anguilla species as having separate sexes, and NCBI BioSample will not contain both male and female Anguilla samples.",
+  "pass_criterion": "Supports if every Anguilla species that has a reproduction record is coded as having no differentiated sex (wording such as undifferentiated, no sexes, or neither male nor female) AND validated male biosamples and validated female biosamples are both zero.",
+  "fail_criterion": "Refutes if any Anguilla species is coded dioecious, gonochoristic, or separate sexes, or has a sex ratio that names both males and females, OR validated biosamples include at least 5 males and at least 5 females. Mixed if one source says separate sexes and the other says no sexes. Inconclusive, reason data-unavailable, if there is no Anguilla reproduction row and the biosample queries return no validated sex. The stagnant-water mullet is not identified in the claim. Mugil cephalus is reported as a pre-specified secondary example and does not change the eel verdict.",
+  "planned_datasets": [
+    "fishbase-24.07-reproduc",
+    "fishbase-24.07-species",
+    "fishbase-24.07-maturity",
+    "ncbi-biosample-anguilla-sex"
+  ],
+  "interpretation": "Aristotle's eels are the genus Anguilla. 'Neither male nor female' means no differentiated sexes, not sequential hermaphroditism and not a failure to notice small gonads. A dioecious or gonochoristic code, or deposited male and female specimens, refutes that reading. The mullet of stagnant waters is unnamed; it is not hunted for after the data are open. Mugil cephalus is reported only because it was named here, before the download, as the common Mediterranean mullet.",
+  "test_contract": {
+    "expected_observation": "Anguilla reproduction codes say the fish has no sex, and biosamples are not labelled male or female.",
+    "disconfirming_observation": "An Anguilla species is coded as having males and females, or at least five biosamples of each sex exist.",
+    "admissible_datasets": "FishBase 24.07 reproduc.parquet, maturity.parquet, and species.parquet from the Source Cooperative snapshot, plus NCBI BioSample for organism Anguilla with a sex attribute. The verdict follows Anguilla only.",
+    "inference_method": "Join reproduction and maturity rows to species on SpecCode, keep genus Anguilla, and read columns whose names contain repro, hermaphrod, sexual, sex, or gonad. Biosample queries: Anguilla[ORGN] AND male[ATTR], and the same with female. A biosample counts only if the summary text marks sex as male or female. Threshold five of each sex, or any explicit separate-sex code."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-c60f",
+    "date": "2026-11-01"
+  }
+}
