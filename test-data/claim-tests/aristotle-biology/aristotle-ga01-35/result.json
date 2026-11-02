@@ -1,0 +1,177 @@
+{
+  "claim_id": "aristotle-ga01-35",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-35",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:39:39Z",
+  "created": "2026-11-01",
+  "hypothesis": "If every animal that can move about has the sexes in separate individuals, then fishes, which locomote, will not be coded as protandrous, protogynous, truly hermaphroditic, or parthenogenetic.",
+  "pass_criterion": "Pre-registered. Supports is not awarded from this table. The claim covers all locomotory animals, and a fish reproduction table cannot show that motile invertebrates are gonochoric. A count of zero non-separate species, even with at least 500 classified fish species, is inconclusive with reason underpowered, not supports.",
+  "fail_criterion": "Pre-registered. Refutes if at least 100 fish species have a classified mode and at least 10 of them are non-separate (a mode string that, after lowercasing and collapsing whitespace, contains protand, protogyn, hermaphrod, or parthenogen). Mixed if at least 100 species are classified and the non-separate count is 1 to 9. Inconclusive with reason underpowered if fewer than 100 species are classified, or if the non-separate count is 0. Inconclusive with reason data-unavailable if the snapshot cannot be retrieved, if SpecCode or Mode cannot be identified, or if the chosen Mode column has no alphabetic values (the documented vocabulary is text, and integer codes are not remapped). The Mode column is the field named Mode, else a field whose name equals mode, else the first field whose name contains mode and not model. A species with any non-separate row is non-separate; otherwise a species with any dioecious row (value starting with dioec, or equal to gonochorism or gonochoristic) is separate; any other non-blank mode is other and is excluded from the classified count. Blank modes are ignored. Confidence if refutes: 0.80 when the non-separate count is at least 50 and at least 90% of non-blank mode values are exactly one of dioecism, protandry, protogyny, true hermaphroditism, parthenogenesis; 0.55 when more than 10% of species with a non-blank mode fall in other; otherwise 0.65. Confidence if mixed: 0.45. Confidence if inconclusive: 0.35.",
+  "planned_datasets": [
+    "fishbase-reproduc-v26.06"
+  ],
+  "thresholds": {
+    "min_classified_species": 100,
+    "refute_min_nonseparate_species": 10,
+    "high_confidence_min_nonseparate_species": 50,
+    "documented_vocabulary_min_fraction": 0.9,
+    "other_species_confidence_cap_fraction": 0.1
+  },
+  "test_contract": {
+    "expected_observation": "Every fish species with a coded reproductive mode is dioecious: separate male and female individuals, with no protandry, protogyny, true hermaphroditism, or parthenogenesis.",
+    "disconfirming_observation": "At least 10 fish species are coded with a mode in which one individual is not stably one sex, or in which there are not separate sexes. Fishes move about, so they are inside the claim's scope, and the universal fails if they fail.",
+    "admissible_datasets": "A public, versioned compilation of fish reproductive modes, coded independently of Aristotle's text, with one row per stock or species and a mode field whose vocabulary is documented. Fishes count as animals that move about. The table must not be a private extract and must be retrievable by URL.",
+    "inference_method": "From FishBase snapshot fb/v26.06 table reproduc, count distinct SpecCode. Classify each non-blank Mode by the substring rules in fail_criterion. Compare the non-separate species count with 10 and the classified species count with 100. Species names, if joined from the species table, are reported and do not enter the count. No model is fit."
+  },
+  "interpretation": "Separate sexes means one individual is male and another is female, which is FishBase dioecism. Protandry and protogyny are sequential hermaphroditism of one individual, and true hermaphroditism is simultaneous; both contradict separate sexes. Parthenogenesis is reproduction without a separate male and female pair, so it is scored against the claim as well and reported as its own count. The test does not use sessile animals and does not claim to have surveyed invertebrates. Plants are outside the dataset and outside the part of the sentence under test.",
+  "caveats": [
+    "Before this registration the Source Cooperative bucket listing was read (versions through v26.06; reproduc.parquet listed at 381404 bytes). The parquet body and its column values were not read. The mode vocabulary is taken from the FishBase REPRODUCTION table manual.",
+    "The registration was written in the knowledge that hermaphroditism is widely reported in fishes. Thresholds were not fitted to a count from this snapshot.",
+    "A refutation applies to the universal claim because fishes locomote. It does not estimate the frequency of hermaphroditism among all animals."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-tests-a821",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "datasets": [
+    {
+      "id": "fishbase-reproduc-v26.06",
+      "name": "FishBase reproduction table, parquet snapshot fb/v26.06",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v26.06",
+      "license": "CC-BY-NC (FishBase.org Team, as stated on the Source Cooperative dataset card)",
+      "files": [
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "final_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:56:54Z",
+          "byte_size": 381404,
+          "sha256": "b631704f0f4972acdb2edb5d3105f0a6172adb4c473d73e505113f8288418247"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "final_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:56:55Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101",
+          "role_note": "Joined for binomials of example species only. Not used in the count and not committed (over 1 MB)."
+        }
+      ],
+      "role": "reproductive mode of fishes, counted as distinct SpecCode"
+    }
+  ],
+  "measured": {
+    "value": 522,
+    "unit": "fish species with a non-separate reproductive mode",
+    "n": 14299,
+    "uncertainty": null,
+    "extra": {
+      "separate_species": 13777,
+      "other_species": 0,
+      "nonblank_mode_values": 14299,
+      "documented_vocabulary_fraction": 1.0,
+      "other_species_fraction": 0.0,
+      "mode_value_counts": {
+        "dioecism": 13777,
+        "protogyny": 394,
+        "protandry": 69,
+        "true hermaphroditism": 57,
+        "parthenogenesis": 2
+      },
+      "nonseparate_mode_row_counts": {
+        "protogyny": 394,
+        "true hermaphroditism": 57,
+        "protandry": 69,
+        "parthenogenesis": 2
+      },
+      "example_nonseparate_species": [
+        {
+          "spec_code": "12",
+          "name": "Cephalopholis cruentata"
+        },
+        {
+          "spec_code": "14",
+          "name": "Epinephelus adscensionis"
+        },
+        {
+          "spec_code": "15",
+          "name": "Epinephelus guttatus"
+        },
+        {
+          "spec_code": "16",
+          "name": "Epinephelus itajara"
+        },
+        {
+          "spec_code": "17",
+          "name": "Epinephelus morio"
+        },
+        {
+          "spec_code": "58",
+          "name": "Coris julis"
+        },
+        {
+          "spec_code": "59",
+          "name": "Symphodus melops"
+        },
+        {
+          "spec_code": "99",
+          "name": "Alepisaurus ferox"
+        },
+        {
+          "spec_code": "203",
+          "name": "Boops boops"
+        },
+        {
+          "spec_code": "204",
+          "name": "Sarpa salpa"
+        },
+        {
+          "spec_code": "340",
+          "name": "Eleutheronema tetradactylum"
+        },
+        {
+          "spec_code": "341",
+          "name": "Galeoides decadactylus"
+        },
+        {
+          "spec_code": "345",
+          "name": "Centropomus undecimalis"
+        },
+        {
+          "spec_code": "346",
+          "name": "Lates calcarifer"
+        },
+        {
+          "spec_code": "348",
+          "name": "Epinephelus analogus"
+        }
+      ],
+      "mode_column": "ReproMode",
+      "spec_column": "SpecCode",
+      "species_names_joined": true,
+      "species_table_error": null
+    }
+  },
+  "method": "Downloaded the pinned FishBase v26.06 reproduc parquet, hashed it, and classified each SpecCode from its Mode strings using the pre-registered substring rules. Distinct species, not rows, were counted. The species parquet was joined only to name examples and was not used in the verdict. The decision rule in fail_criterion was applied unchanged.",
+  "results_summary": [
+    "Classified species (separate or non-separate): 14299. Non-separate: 522. Separate: 13777. Other: 0.",
+    "Non-blank mode values in the documented five-word vocabulary: 14299 of 14299 (1.0000).",
+    "Mode value counts: dioecism=13777, protogyny=394, protandry=69, true hermaphroditism=57, parthenogenesis=2."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "change": "column name only",
+      "note": "The snapshot has no column named Mode. The pre-registered fallback (a name containing mode and not model) selected ReproMode. Thresholds were not changed."
+    }
+  ]
+}
