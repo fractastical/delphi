@@ -1,0 +1,34 @@
+{
+  "claim_id": "aristotle-ga02-39",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-39",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Species-level gestation length of both the horse (Equus caballus) and the ass (Equus asinus) is one year, meaning it is closer to twelve months than to eleven or thirteen months.",
+  "pass_criterion": "Pre-registered, before any data file was downloaded. Let one year Y = 365.25 days and one month M = Y/12. A species-level gestation G (days) is inside the one-year bin when it is closer to 12 months than to 11 or 13 months, i.e. |G - Y| <= Y/24 (15.21875 days), equivalently G in [350.03125, 380.46875]. Supports only if both Equus caballus and Equus asinus are inside that bin in every admissible dataset that records the species, and each species is recorded in at least one dataset. The value used is the dataset's species-level gestation point estimate (AnAge column whose header is the combined gestation/incubation field; PanTHERIA column 9-1_GestationLen_d; Amniote column gestation_d). PanTHERIA values below 0 are missing (the archive's -999 code). Blank, non-numeric, and non-positive values are missing. If a dataset has more than one positive row for a species, G is the median of those rows. Names accepted: genus Equus with species epithet caballus, and genus Equus with species epithet asinus. Equus ferus, Equus africanus, Equus hemionus and Equus kiang are not substitutes.",
+  "fail_criterion": "Pre-registered. Refutes if at least one of the two species is outside the one-year bin in every dataset that records it (the claim says both gestate for one year). Mixed if the datasets that record a species disagree on whether it is inside the bin, and neither species is outside in every dataset that records it. Inconclusive, reason underpowered, if either species has no positive gestation value in any of the three datasets. Inconclusive, reason data-unavailable, if none of the three files can be retrieved or a retrieved file does not match the archive identity below (AnAge zip content-length 169150 and content-type application/zip; PanTHERIA content-length 2359096; Amniote CSV content-length 4728122), unless a deviation records a redirect to the same archive.",
+  "planned_datasets": [
+    "anage-hagr-dataset-zip",
+    "pantheria-1-0-wr05-aug2008",
+    "amniote-life-history-database-aug-2015"
+  ],
+  "test_contract": {
+    "expected_observation": "Both Equus caballus and Equus asinus have a published species-level gestation length closer to 365.25 days than to 11 months (334.8125 days) or 13 months (395.6875 days).",
+    "disconfirming_observation": "Either species has a species-level gestation closer to 11 months or to 13 months than to 12 months, in every admissible compilation that records it.",
+    "admissible_datasets": "Openly downloadable species-level mammal trait compilations that record gestation length in days, published independently of Aristotle's text, with a stable URL. The three planned files are the AnAge tab-delimited build inside https://genomics.senescence.info/species/dataset.zip (landing https://genomics.senescence.info/species/index.html), PanTHERIA 1.0 Wilson & Reeder 2005 file https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt (landing https://esapubs.org/archive/ecol/E090/184/, DOI 10.1890/08-1494.1), and the Amniote Life-History Database median table https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv (landing https://esapubs.org/archive/ecol/E096/269/, DOI 10.1890/15-0846.1). Each URL returned HTTP 200 on a header request on 2026-11-02 UTC; the bodies were not downloaded before this registration. No other dataset may be added after the values are seen.",
+    "inference_method": "For each species, classify each dataset's point estimate as inside or outside the one-year bin defined in pass_criterion. Consensus inside means every non-missing dataset is inside; consensus outside means every non-missing dataset is outside; otherwise the datasets conflict. Supports if both species are consensus inside. Refutes if either species is consensus outside. Mixed if any species is in conflict and neither is consensus outside. The fraction of conception dates that would fall in the same equal-length season (Y/4 days) is reported as max(0, 1 - |G - Y|/(Y/4)) and is not part of the verdict: the quote gives the one-year period as the reason for the seasonal coincidence, and the verdict tests that period."
+  },
+  "interpretation": "The claim states a duration, one year, for both the horse and the ass, and treats that duration as the reason birth falls in the season of conception. Gestation is mapped to the species-level gestation length in days in three public compilations. One year is mapped to 365.25 days, and the statement's precision is a whole number of months: the measurement confirms the claim only when it rounds to twelve months rather than eleven or thirteen. The domestic ass is Equus asinus as named in the claim's scope, not the other wild asses. The seasonal sentence is Aristotle's inference from the duration and is reported, not used as a second hurdle.",
+  "caveats": [
+    "Header requests confirmed the three URLs and their content lengths. No gestation value was read before this file was committed.",
+    "A tolerance of half a month is the boundary between 'twelve months' and 'eleven months'. It is not a veterinary normal range, and it is not widened to absorb a remembered textbook figure.",
+    "These compilations contribute one published point estimate per species, often a median of literature values, not a sample of mares and jennies with a confidence interval. Agreement across compilations is the replication, not a standard error.",
+    "The seasonal coincidence is not tested against dated conception and birth records. Only the duration those records would have to match is tested."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  }
+}
