@@ -1,0 +1,403 @@
+{
+  "claim_id": "aristotle-ha04-28",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha04-28",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:40:23Z",
+  "hypothesis": "If the claim holds, the European eel Anguilla anguilla has no separate sexes and no recorded eggs, fecundity or larval stage in a public ichthyological compilation.",
+  "pass_criterion": "Pre-registered. Using FishBase v25.04, the primary species is Anguilla anguilla. The claim passes only if the reproduc Mode text is populated and explicitly denies a sex (it matches 'no sex', 'sexless' or 'neither male') and does not match any closed Mode choice from the FishBase manual (dioecism, protandry, protogyny, hermaphroditism, parthenogenesis), and the eggs table has zero rows for its SpecCode, the larvae table has zero rows, larvaepresence does not mark larvae as present, and fecundity has no positive fecundity value. Blank fields are not a pass. Other Anguilla species are tabulated and do not decide the verdict. A pass also requires that an OBIS life-stage count, if a complete filtered count is obtained, shows zero larval Anguilla anguilla records.",
+  "fail_criterion": "Pre-registered. The claim is refuted if Anguilla anguilla has either a positive sex record or a positive offspring record. A positive sex record is a reproduc Mode value matching dioecism, protandry, protogyny, hermaphroditism or parthenogenesis (the manual's closed list: each of these states a sex system), or a Mode value that names males and females, or fecundity rows that include both male and female. A positive offspring record is at least one eggs-table row, or at least one larvae-table row, or larvaepresence marking larvae present, or a positive fecundity value. Either arm is enough, because the sentence says the eel is neither male nor female and engenders nothing. OBIS can add an offspring record only from a complete count: a statistics or facet total, or a full export, of Anguilla anguilla occurrences whose lifeStage is larval or whose scientific name contains leptocephalus. A partial page of occurrences is not evidence. If the species is missing, or every field is blank and no complete OBIS larval count is available, the verdict is inconclusive with reason data-unavailable. Genus-level totals are reported and do not override a species-level result.",
+  "planned_datasets": [
+    "fishbase-v25.04-reproduc-eggs-larvae-fecundity",
+    "obis-anguilla-anguilla-lifestage"
+  ],
+  "test_contract": {
+    "expected_observation": "The European eel's reproduction fields are filled in and state that it has no separate sexes, no eggs and no larvae.",
+    "disconfirming_observation": "A coded reproductive mode of separate sexes, or any positive record of eggs, fecundity or larvae, for Anguilla anguilla.",
+    "admissible_datasets": "A public, literature-compiled fish database that stores reproductive mode, eggs, fecundity or larval presence at species level, plus a public occurrence index that can return a complete larval count. Blank fields are missing data, not a record that eggs were looked for and not found.",
+    "inference_method": "Join Anguilla anguilla to SpecCode and apply the boolean checks above. One positive arm refutes the universal negative. No rate is estimated and no threshold other than zero versus at least one is used."
+  },
+  "interpretation": "The eel of the Greek rivers and the Mediterranean is Anguilla anguilla. 'Neither male nor female' is read as the absence of separate sexes, which FishBase codes as Mode = dioecism when males and females both exist. 'Engenders nothing' and the accompanying statement that no egg has been seen are read as the absence of eggs, fecundity and a larval stage. River-caught silver eels are immature; a dataset that only sampled rivers could mimic Aristotle's observation, so a larval or egg record is counted wherever the compilation recorded it, including the sea. The test does not ask whether Aristotle could have seen the Sargasso spawning aggregation.",
+  "caveats": [
+    "Before registration, the FishBase manual's definition of Mode (dioecism versus forms of hermaphroditism) was read, and the parquet URLs were checked with HTTP HEAD. The reproduc, eggs, larvae, larvaepresence and fecundity tables had not been opened.",
+    "The OBIS manual lists lifeStage as a Darwin Core field and not as a documented v3 query filter. If no complete filtered count is available, OBIS is not used, and that absence is not itself a verdict.",
+    "A refutation shows that the universal negative is false for Anguilla anguilla. It does not reconstruct when the sexes and the eggs were first described."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-cf1c",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "method": "Joined Anguilla anguilla to its FishBase SpecCode and counted reproduc Mode, eggs rows, larvae rows, larvaepresence and positive fecundity. Any of the manual's sex-system codes, or any offspring row, refutes the claim. OBIS was queried for a complete larval count and used only if that count was explicit; an unfiltered occurrence total was stored and not treated as offspring.",
+  "measured": {
+    "value": 2,
+    "unit": "positive arms (sex, offspring) for Anguilla anguilla",
+    "n": 1,
+    "uncertainty": null,
+    "extra": {
+      "anguilla_anguilla": {
+        "mode": "dioecism",
+        "sex_positive": true,
+        "n_egg_rows": 1,
+        "n_larva_rows": 1,
+        "larvae_present": false,
+        "larvaepresence_values": [],
+        "n_positive_fecundity": 3,
+        "fecundity_sexes": [],
+        "offspring_positive": true,
+        "explicit_negative": false,
+        "species_found": true,
+        "spec_code": 35
+      },
+      "anguilla_genus": [
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 1,
+          "n_larva_rows": 1,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 3,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla anguilla"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 1,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 3,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla australis"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla bengalensis"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla bicolor"
+        },
+        {
+          "mode": null,
+          "sex_positive": false,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla borneensis"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla celebesensis"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla dieffenbachii"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla interioris"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 1,
+          "larvae_present": false,
+          "larvaepresence_values": [
+            "LarvalRefNo=54416",
+            "LarvalRefNo=54488",
+            "Larvalarea=Tanshui River Estuary, Shalung (1997-1999)",
+            "Larvalarea=Western islands"
+          ],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla japonica"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla labiata"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla luzonensis"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla malgumora"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 1,
+          "larvae_present": false,
+          "larvaepresence_values": [
+            "LarvalRefNo=9902",
+            "Larvalarea=to be filled"
+          ],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla marmorata"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla megastoma"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla mossambica"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla nebulosa"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 0,
+          "fecundity_sexes": [],
+          "offspring_positive": false,
+          "explicit_negative": false,
+          "binomial": "Anguilla obscura"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 0,
+          "larvae_present": false,
+          "larvaepresence_values": [],
+          "n_positive_fecundity": 3,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla reinhardtii"
+        },
+        {
+          "mode": "dioecism",
+          "sex_positive": true,
+          "n_egg_rows": 0,
+          "n_larva_rows": 1,
+          "larvae_present": false,
+          "larvaepresence_values": [
+            "LarvalRefNo=39467",
+            "Larvalarea=Straits of Florida"
+          ],
+          "n_positive_fecundity": 17,
+          "fecundity_sexes": [],
+          "offspring_positive": true,
+          "explicit_negative": false,
+          "binomial": "Anguilla rostrata"
+        }
+      ],
+      "obis": {
+        "used": false,
+        "reason": "OBIS returned an unfiltered occurrence total. lifeStage is not a documented query filter and no facet total was usable, so OBIS does not enter the verdict.",
+        "facet_status": 400,
+        "facet_url": "https://api.obis.org/v3/facet?scientificname=Anguilla%20anguilla&facet=lifeStage",
+        "total_status": 200,
+        "anguilla_anguilla_occurrence_total_unfiltered": 373759
+      }
+    }
+  },
+  "results_summary": [
+    "Anguilla anguilla found=True; sex_positive=True; offspring_positive=True.",
+    "Mode='dioecism'; eggs=1; larvae=1; larvaepresence=False; positive_fecundity_rows=3.",
+    "Other Anguilla species in the species table: 19.",
+    "OBIS used=False. OBIS returned an unfiltered occurrence total. lifeStage is not a documented query filter and no facet total was usable, so OBIS does not enter the verdict.",
+    "Verdict refutes."
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-v25.04-reproduc-eggs-larvae-fecundity",
+      "name": "FishBase v25.04 species, reproduc, eggs, larvae, larvaepresence and fecundity",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:45:04Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:45:04Z",
+          "byte_size": 566805,
+          "sha256": "43e1f115ebbd2bf72fb754c402c1f8ad172ea340cee3cddd581d932b2667987e"
+        },
+        {
+          "name": "eggs.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/eggs.parquet",
+          "retrieved_at": "2026-11-02T00:45:05Z",
+          "byte_size": 193466,
+          "sha256": "3798904f9869c9f84f9cfb19dccd9c9702f7dbd5c76edb2cc18e43d65c3e9102"
+        },
+        {
+          "name": "larvae.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/larvae.parquet",
+          "retrieved_at": "2026-11-02T00:45:05Z",
+          "byte_size": 509818,
+          "sha256": "1a08040b385bd5f6bf392c251202bfc4073d526b486a9d26a01903fe61b063b5"
+        },
+        {
+          "name": "larvaepresence.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/larvaepresence.parquet",
+          "retrieved_at": "2026-11-02T00:45:05Z",
+          "byte_size": 34084,
+          "sha256": "92f941c63c98a826d839ca018d8508ac795ce76470c680216d080318d9055cdd"
+        },
+        {
+          "name": "fecundity.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/fecundity.parquet",
+          "retrieved_at": "2026-11-02T00:45:06Z",
+          "byte_size": 361529,
+          "sha256": "a80778e28bd4584b60b2d34d52ff5db2509839fc25121256df15844f4cbd2e91"
+        }
+      ],
+      "role": "sex system, eggs, larvae and fecundity of Anguilla"
+    },
+    {
+      "id": "obis-anguilla-anguilla-lifestage",
+      "name": "OBIS occurrence API for Anguilla anguilla",
+      "landing_url": "https://obis.org/",
+      "doi": null,
+      "version": "api-v3",
+      "license": "occurrence records retain their source licences; the API is public",
+      "files": [],
+      "role": "attempted complete larval count; not used unless a filtered total was returned",
+      "note": "OBIS returned an unfiltered occurrence total. lifeStage is not a documented query filter and no facet total was usable, so OBIS does not enter the verdict."
+    }
+  ],
+  "deviations": [
+    "OBIS is not used. A facet URL can return HTTP 200 JSON that is not a larval total; the first run left reason null in that case. The script now records why no explicit larval count was accepted. An unfiltered occurrence total is still not offspring. FishBase sex and offspring counts are unchanged."
+  ]
+}

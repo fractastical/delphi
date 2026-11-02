@@ -1,0 +1,139 @@
+{
+  "claim_id": "aristotle-ha05-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-25",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:40:23Z",
+  "hypothesis": "If the claim holds, women in high-fertility populations still bear children at ages 40-44, births at 45-49 are uncommon and births at 50 and over are rare, and men still father children in their early sixties while births to fathers of 65 and over are a rare tail.",
+  "pass_criterion": "Pre-registered. Female schedule: UN World Population Prospects 2024 single-year age-specific fertility (file WPP2024_Fertility_by_Age1.csv.gz). Keep country or area rows (ISO3 present; drop locations whose names are the standard UN aggregates or income groups). Use calendar year 1950 if the file is annual, otherwise the 1950-1955 period. If the maximum age-specific rate in that slice is greater than 5, rates are per 1,000 women and are divided by 1,000. A country is in the natural-fertility-like set when its total fertility (sum of the age-specific rates) is at least 6.0. Need at least 10 such countries. S4044, S4549 and S50 are the unweighted medians of each country's share of total fertility at ages 40-44, 45-49 and 50 through the oldest age in the file. The female clause passes if S4044 >= 0.02, S4549 <= 0.03, and S50 <= 0.005. If the file stops at age 49, the female clause cannot fully pass. Male clause: UN Demographic Yearbook 2024 Table 11 (live births by age of father). Keep each country's latest year with at least 10,000 births, total area, age bins summing to the stated total within 2 percent. Drop a country whose name cell is italic when the workbook exposes font formatting (the Yearbook's mark for incomplete registration). Pool birth counts. The male clause passes on this coarse binning if births at 60-64 are greater than 0, births at 65+ are greater than 0, the 65+ share of births of known father-age is below 0.005, and the share at ages 50-64 is at least 0.005. The claim passes only if both the female clause and the male clause pass. Confidence for a pass is capped at 0.55 because the father table does not split 65-69 from 70 and over.",
+  "fail_criterion": "Pre-registered. The female clause is refuted if S50 > 0.02, or S4549 > 0.08, or (S4044 < 0.005 and the oldest age at which the median age-specific rate is at least 0.001 per woman is 40 or below). The male clause is refuted if the pooled 65+ share is at least 0.02, or if a pool of at least 500,000 births contains no births to fathers aged 50 or over. Either refuted clause refutes the claim. If a clause meets neither its pass nor its fail rule, it is mixed. The claim is mixed if at least one clause is mixed and neither is refuted. The claim is inconclusive with reason underpowered if fewer than 10 countries meet the female fertility floor, or with reason data-unavailable if the fertility file or the father-age table cannot be read. A modern year (2023, or the latest year in the file) is computed the same way and stored, and it does not decide the verdict, because contraception truncates the observed schedule below biological capacity.",
+  "planned_datasets": [
+    "un-wpp-2024-fertility-by-single-age",
+    "un-dyb-2024-table11-births-by-age-of-father"
+  ],
+  "test_contract": {
+    "expected_observation": "In populations with total fertility of at least 6 in 1950, about 2 percent or more of fertility sits at maternal ages 40-44, under 3 percent at 45-49 and under 0.5 percent at 50 and over; in complete civil registers, fathers aged 60-64 and 65+ occur, the 65+ share is under 0.5 percent, and fathers aged 50-64 account for at least 0.5 percent of births.",
+    "disconfirming_observation": "A natural-fertility female schedule that is already finished by 40, or that still puts more than 2 percent of fertility at 50 and over or more than 8 percent at 45-49; or a large civil register in which fathers of 65 and over are 2 percent or more of births, or fathers of 50 and over are entirely absent.",
+    "admissible_datasets": "Official vital-statistics or UN estimates of births by age of mother and of father, for many populations, not a sample Aristotle himself could have seen. The female test uses high-fertility country schedules so that contraception in low-fertility countries is not mistaken for the end of biological capacity. The male test uses birth counts, not the Yearbook's age-specific rates, because the published notes recompute the oldest male rates on the wrong population base.",
+    "inference_method": "Unweighted median of country fertility shares for women; pooled birth counts for men. Fixed share thresholds as stated. No regression. The 2023 female schedule is descriptive only."
+  },
+  "interpretation": "'As a rule ... up to' is read as the age through which reproduction still contributes a real share of births, and 'at most ... and these are rare' as the outer tail. For women that is a natural-fertility schedule ending around 45 and not continuing in any numbers past 50. For men the only public multi-country table located before registration bins everyone 65 and over together, so a pass supports a rare tail after 65 and does not isolate 70. The claim is about capacity ('can beget', 'capable of conception'), so a contracepting modern schedule is not allowed to refute the female ages. Aristotle's figures are for humans as a kind, not for one city, so the test uses many populations rather than one.",
+  "caveats": [
+    "Before registration, the female file URL returned HTTP 200 with a content length of 301907467 bytes and the father-age workbook URL returned HTTP 200 with a content length of 765231 bytes. Neither body had been read.",
+    "A UNdata HTML preview of table 270 showed \u00c5land Islands counts for several father-age bins, including zeros at 65+. The pool used here excludes populations under 10,000 births, and the thresholds were not set from \u00c5land.",
+    "Year 1950 schedules with total fertility of at least 6 are a proxy for natural fertility, not a measured absence of birth control.",
+    "Passing both clauses still leaves the male limit of seventy unresolved inside the 65+ bin, which is why confidence cannot exceed 0.55 on a pass.",
+    "The test says nothing about assisted reproduction after 1990; the deciding female year is 1950."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-cf1c",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.5,
+  "method": "Streamed WPP 2024 single-year age-specific fertility, kept country rows with an ISO3 code for 1950, converted rates per 1,000 women when the raw maximum exceeded 5, and took the unweighted median share of fertility at 40-44, 45-49 and 50+ among countries with total fertility at least 6. Parsed Demographic Yearbook 2024 Table 11 birth counts, pooled the latest year with at least 10,000 births per country, and applied the registered share rules. The 2023 female schedule was computed and not used for the verdict.",
+  "measured": {
+    "value": 0.071233,
+    "unit": "median share of 1950 fertility at maternal ages 40-44, countries with TFR >= 6",
+    "n": 103,
+    "uncertainty": null,
+    "extra": {
+      "female": {
+        "scale_divisor": 1000.0,
+        "max_rate_raw": 471.121,
+        "n_rows_scanned": 25207350,
+        "by_year": {
+          "1950": {
+            "n_countries": 237,
+            "n_tfr_ge_6": 103,
+            "median_tfr_high": 6.648172,
+            "S4044": 0.071233,
+            "S4549": 0.015782,
+            "S50": 0.0,
+            "median_oldest_rate_ge_0.001": 49,
+            "max_age_seen": 49
+          },
+          "2023": {
+            "n_countries": 237,
+            "n_tfr_ge_6": 4,
+            "median_tfr_high": 6.062318,
+            "S4044": 0.075576,
+            "S4549": 0.023393,
+            "S50": 0.0,
+            "median_oldest_rate_ge_0.001": 49.0,
+            "max_age_seen": 49
+          }
+        },
+        "call": "mixed",
+        "primary_year": 1950
+      },
+      "male": {
+        "call": "supports",
+        "n_countries": 51,
+        "pooled_births_known_age": 11118899.0,
+        "pooled_bins": {
+          "50-54": 116201.0,
+          "55-59": 37240.0,
+          "60-64": 12692.0,
+          "65+": 5408.0
+        },
+        "share_65_plus": 0.000486,
+        "share_50_64": 0.014941,
+        "dropped_unbalanced": 0,
+        "n_country_years_read": 51
+      }
+    }
+  },
+  "results_summary": [
+    "Female 1950 call mixed: n_TFR>=6 = 103, S40-44=0.071233, S45-49=0.015782, S50+=0.0.",
+    "Female 2023 (not used for the verdict): {'n_countries': 237, 'n_tfr_ge_6': 4, 'median_tfr_high': 6.062318, 'S4044': 0.075576, 'S4549': 0.023393, 'S50': 0.0, 'median_oldest_rate_ge_0.001': 49.0, 'max_age_seen': 49}.",
+    "Male call supports: countries=51, births=11118899.0, share_65+=0.000486, share_50-64=0.014941.",
+    "Verdict mixed."
+  ],
+  "deviations": [
+    "WPP columns used: {'location': 'Location', 'iso3': 'ISO3_code', 'variant': 'Variant', 'year': 'Time', 'age': 'AgeGrpStart', 'span': 'AgeGrpSpan', 'rate': 'ASFR'}. All columns: ['SortOrder', 'LocID', 'Notes', 'ISO3_code', 'ISO2_code', 'SDMX_code', 'LocTypeID', 'LocTypeName', 'ParentID', 'Location', 'VarID', 'Variant', 'Time', 'MidPeriod', 'AgeGrp', 'AgeGrpStart', 'AgeGrpSpan', 'ASFR', 'PASFR', 'Births']",
+    "Table 11 is Office SpreadsheetML (it begins with an XML declaration, not a BIFF workbook). Counts were read from that XML. Incomplete registration is the italic integer style sDataIntegerItalic on the Total row, and those country-years were dropped."
+  ],
+  "datasets": [
+    {
+      "id": "un-wpp-2024-fertility-by-single-age",
+      "name": "World Population Prospects 2024, fertility by single age of mother",
+      "landing_url": "https://population.un.org/wpp/",
+      "doi": null,
+      "version": "2024",
+      "license": null,
+      "files": [
+        {
+          "name": "WPP2024_Fertility_by_Age1.csv.gz",
+          "download_url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Fertility_by_Age1.csv.gz",
+          "retrieved_at": "2026-11-02T00:45:06Z",
+          "byte_size": 301907467,
+          "sha256": "b2a1ab1f6dff7c7bc2ae90323486b5ab086f48c21ad99ae95aed127cc2e7a985"
+        }
+      ],
+      "role": "age-specific fertility of women in 1950 and, descriptively, 2023"
+    },
+    {
+      "id": "un-dyb-2024-table11-births-by-age-of-father",
+      "name": "United Nations Demographic Yearbook 2024, Table 11",
+      "landing_url": "https://unstats.un.org/unsd/demographic-social/products/dyb/dyb_2024/",
+      "doi": null,
+      "version": "2024",
+      "license": null,
+      "files": [
+        {
+          "name": "table11.xls",
+          "download_url": "https://unstats.un.org/unsd/demographic-social/products/dyb/documents/DYB2024/table11.xls",
+          "retrieved_at": "2026-11-02T00:45:07Z",
+          "byte_size": 765231,
+          "sha256": "0d6414dcede97a729f823ca2d33268fdc6a6956b1e3628b998c8b78a0630b55e"
+        }
+      ],
+      "role": "live births by age of father"
+    }
+  ]
+}
