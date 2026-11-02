@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha08-27",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-27",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "The birds Aristotle says hide through the winter, rather than migrate to warmer countries, are recorded in the same latitudes in December–February as in June–August.",
+  "pass_criterion": "Pre-registered. For each of eight named species, query GBIF occurrence counts with coordinates, no geospatial issue, occurrence status PRESENT, basis of record HUMAN_OBSERVATION or OBSERVATION, year 2000 through 2026, in 5-degree latitude bins from -55 to 70. Summer is months 6–8; winter is months 12, 1 and 2. The seasonal median latitude is interpolated from that histogram. A species counts only if both seasons have at least 200 occurrences and the summer median latitude is at least 25 degrees north. It stays if the absolute difference of the two medians is under 5 degrees. It migrates south if the summer median minus the winter median is at least 10 degrees. The claim is supported if at least 6 of the 8 species stay. It is refuted if at least 6 migrate south. If fewer than 4 species count, the verdict is inconclusive with reason underpowered. Otherwise the verdict is mixed.",
+  "fail_criterion": "Pre-registered. Refutes 'they do not migrate to warmer countries but hide where they are' if at least 6 of the 8 species have a winter median latitude at least 10 degrees south of the summer median, with the sample-size gates in pass_criterion.",
+  "planned_datasets": [
+    "gbif-occurrence-api"
+  ],
+  "test_contract": {
+    "expected_observation": "Winter and summer occurrence centroids of the eight named species stay within 5 degrees of latitude, so the birds are recorded where they breed rather than in warmer countries.",
+    "disconfirming_observation": "The winter centroid lies at least 10 degrees south of the summer centroid for at least six of the eight species: the birds are recorded in warmer countries in winter.",
+    "admissible_datasets": "Georeferenced, dated occurrence records of the named species from a public aggregator, restricted to human observations from 2000 onward with coordinates that GBIF does not flag as geospatial issues. Tracking studies are admissible but are not required. Records without coordinates do not count.",
+    "inference_method": "Median latitude from 5-degree GBIF count histograms, summer (Jun–Aug) minus winter (Dec–Feb). Species mappings, gates and the 6-of-8 rule are fixed in pass_criterion. The owl and the cushat are queried and reported and are not part of the 8."
+  },
+  "interpretation": "Species are fixed before any count is requested. Swallow = Hirundo rustica; kite = Milvus migrans (the common kite of Greece); stork = Ciconia ciconia; owzel = Turdus merula (ouzel as the English name of the blackbird); turtle-dove = Streptopelia turtur; lark = Alauda arvensis; thrush = Turdus philomelos; starling = Sturnus vulgaris. Athene noctua is the little owl, which the text says hides only for a few days, and Columba palumbus is the cushat, which the text says sometimes hides and sometimes migrates. Neither enters the 6-of-8 rule. The test decides whether the eight are recorded in warmer countries in winter. It does not test featherless torpor in holes: absence of a latitude shift is compatible with ordinary residency as well as with hiding.",
+  "caveats": [
+    "No GBIF count for these species was requested before this registration.",
+    "GBIF records follow where observers are. A latitude shift can be exaggerated or hidden by seasonal effort. The summer-median gate (at least 25 N) drops a species whose summer records are not northern.",
+    "Hiding in a hole would remove the bird from view. This design can refute hiding-in-place by showing the bird in a warmer country. It cannot prove torpor."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  }
+}

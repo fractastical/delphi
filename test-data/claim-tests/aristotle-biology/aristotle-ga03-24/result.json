@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ga03-24",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-24",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "Accepted species of shelled molluscs (gastropods, bivalves, chitons and scaphopods) are few on land relative to the sea: terrestrial species number less than a tenth of marine species.",
+  "pass_criterion": "Pre-registered. Count accepted species in Gastropoda, Bivalvia, Polyplacophora and Scaphopoda. Let R be terrestrial count divided by marine count. A source qualifies if marine count is at least 500. The GBIF backbone also requires that the fraction of accepted species carrying a habitat value is at least 0.40, and that the terrestrial count and the marine count are each different from the unfiltered total (otherwise the habitat filter was ignored and GBIF is disqualified). MolluscaBase qualifies if the statistics page yields marine, terrestrial and freshwater accepted-species counts. The claim is supported only if every qualifying source has R < 0.10. It is refuted if every qualifying source has R >= 0.25. If sources disagree, or any qualifying source has R in [0.10, 0.25), the verdict is mixed. If no source qualifies, the verdict is inconclusive with reason data-unavailable.",
+  "fail_criterion": "Pre-registered. Refutes 'few or no kinds live on land' if every qualifying source has at least one terrestrial species per four marine species (R >= 0.25), with marine n >= 500.",
+  "planned_datasets": [
+    "gbif-backbone-species-habitat",
+    "molluscabase-stats"
+  ],
+  "test_contract": {
+    "expected_observation": "Accepted shelled-mollusc species flagged terrestrial are fewer than one tenth of those flagged marine.",
+    "disconfirming_observation": "Terrestrial species are at least a quarter as numerous as marine species, in every source that qualifies.",
+    "admissible_datasets": "Global taxonomic registers that flag environment for molluscs and include terrestrial snails, not a marine-only list. Cephalopods are excluded because Aristotle treated them apart from testaceans. Counts of occurrences are not a substitute for species counts.",
+    "inference_method": "Ratio of accepted terrestrial species to accepted marine species, summed over the four classes. Two sources are compared with the agreement rule in pass_criterion. Freshwater is reported and is not in the ratio."
+  },
+  "interpretation": "Testaceans are shelled molluscs: Gastropoda, Bivalvia, Polyplacophora and Scaphopoda. Land snails and terrestrial slugs both fall in Gastropoda; the dataset has no shell flag, so shell-less slugs remain inside the terrestrial count. That biases terrestrial richness upward, against the claim. 'Few or none, snails excepted' is read as terrestrial richness under 10 percent of marine richness. The middle band is mixed rather than forced into few or many. Cephalopods are out of scope.",
+  "caveats": [
+    "No species counts were requested before this registration. The MolluscaBase statistics page and the GBIF species API were checked only for an HTTP status.",
+    "GBIF backbone habitat is one label per species and is often blank. A marine-heavy label set could make land snails look rare. The agreement rule with MolluscaBase is there so a marine-biased source cannot support the claim alone when the molluscan register disagrees.",
+    "Taxonomic effort differs by habitat. Richness is not abundance and is not the number of kinds Aristotle could see in Greece."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  }
+}

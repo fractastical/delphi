@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ga05-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga05-25",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "In a cross-section of examined people, the age at which third molars have erupted in half of those who will show them by the late twenties is about twenty years.",
+  "pass_criterion": "Pre-registered. Pool NHANES 2015–2016 and 2017–2018 oral-health and demographic examinations. An erupted third molar is tooth-count code 2 (permanent tooth present) on OHX01TC, OHX16TC, OHX17TC or OHX32TC. A person counts if OHDEXSTS is 1 and at least one of those four codes is in {1, 2, 3, 4, 5}. Prevalence at integer age a (12 through 29) is the exam-weighted proportion with at least one erupted third molar, weights WTMEC2YR divided by 2 because two cycles are pooled. The plateau is the unweighted mean of prevalence at ages 25, 26, 27, 28 and 29. The eruption-age proxy is the youngest age at which prevalence reaches half the plateau. The claim is supported if that age is in 17 through 23 inclusive. It is refuted if the age is 15 or younger, or 26 or older. Ages 16, 24 and 25 are mixed. The verdict is inconclusive with reason underpowered if the plateau is below 0.15, or the proxy is undefined, or the unweighted number of counted people aged 15–25 is below 400. If WTMEC2YR is absent the verdict is inconclusive with reason data-unavailable. If OHDEXSTS is absent, the exam-status filter is skipped and recorded as a deviation; the tooth-code rule is unchanged.",
+  "fail_criterion": "Pre-registered. Refutes 'cutting the gum at about twenty years of age' if the half-plateau age is 15 or below, or 26 or above.",
+  "planned_datasets": [
+    "nhanes-2015-2016-ohxden-demo",
+    "nhanes-2017-2018-ohxden-demo"
+  ],
+  "test_contract": {
+    "expected_observation": "The age at which weighted prevalence of at least one erupted third molar reaches half its late-twenties level falls between 17 and 23 years.",
+    "disconfirming_observation": "That half-plateau age falls at 15 or earlier, or at 26 or later.",
+    "admissible_datasets": "Public dental examinations that record age in years and the presence of each third molar in the mouth, with an examination weight. Studies that report only a mean eruption age in a table, without the age-specific counts, are not used for the verdict.",
+    "inference_method": "Exam-weighted prevalence by single year of age, plateau averaged over ages 25–29, proxy equal to the first age at or above half that plateau. Thresholds are in pass_criterion. The clause about eruption in old age is not tested: a cross-section cannot separate late eruption from extraction."
+  },
+  "interpretation": "The last grinders are the four third molars (Universal numbers 1, 16, 17 and 32). 'Cutting the gum' is read as a permanent tooth coded present in the mouth, not as a radiograph of an unerupted tooth and not as a root fragment. 'About twenty' is the interval 17–23. People who never erupt a third molar, and people whose teeth were extracted, pull prevalence down at older ages; using half the late-twenties plateau, rather than 50 percent of all people, is the pre-registered allowance for agenesis. It does not correct extraction between eruption and the examination.",
+  "caveats": [
+    "Code 2 was fixed from the published NHANES tooth-count labels before these XPT files were opened. If code 2 does not occur in the files, the script stops and the label is corrected as a deviation. The age thresholds are not revised after seeing the prevalence curve.",
+    "NHANES is a United States sample. It does not by itself describe every human population.",
+    "Eruption in old age is a separate clause and is not measured here."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-202d",
+    "date": "2026-11-01"
+  }
+}
