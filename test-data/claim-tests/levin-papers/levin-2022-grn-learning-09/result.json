@@ -1,0 +1,45 @@
+{
+  "claim_id": "levin-2022-grn-learning-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-09",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:55Z",
+  "hypothesis": "If the published claim holds for the surveyed BioModels pathway ODEs, memory counts are stable across clamp amplitudes of 10, 50 and 100 times baseline: most models keep the same count at all three amplitudes, at most a small minority have fewer memories at a weaker amplitude than at 100 times, and at least one model has more memories at a weaker amplitude.",
+  "pass_criterion": "Pre-registered. For each completed model let c10, c50 and c100 be the memory counts at clamp scales 10, 50 and 100. Let N be the number of models with all three counts. Let same be the fraction of those N with c10 = c50 = c100. Let lost be the fraction with c10 < c100 or c50 < c100. Let gained be the number with c10 > c100 or c50 > c100. Supports if and only if N >= 12, same >= 0.50, lost <= 0.20, and gained >= 1.",
+  "fail_criterion": "Pre-registered. Refutes if and only if N >= 12 and either lost >= 0.40, or gained = 0 and same < 0.50. If N >= 12 but neither the pass nor the fail rule holds, the verdict is mixed. If the Table S1 identifier list or the SBML files cannot be retrieved, or no ODE engine can be imported, the verdict is inconclusive with reason data-unavailable. If N < 12, or more than half of the size-eligible models fail to integrate or exceed the per-model time limit, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "biswas2023-table-s1",
+    "biomodels-sbml"
+  ],
+  "test_contract": {
+    "expected_observation": "At least half of the completed surveyed pathway models have an identical memory count at 10×, 50× and 100× baseline clamps, no more than 20% have a lower count at a weaker clamp than at 100×, and at least one model has a higher count at a weaker clamp.",
+    "disconfirming_observation": "At least 40% of models lose memories when the clamp is weakened from 100×, or no model gains memories at a weaker clamp and fewer than half keep the same count at all three amplitudes.",
+    "admissible_datasets": "The pathway models whose BioModels identifiers are listed in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (supplement ijms-24-00285-s001), simulated from the public SBML with topology and parameters left at the deposited values. Generated random gene circuits do not count for this claim. Models with fewer than 3 or more than 12 floating species are outside the pre-registered computational bound and are excluded before scoring.",
+    "inference_method": "Memory count at a scale is the number of UCS-based memories plus the number of associative memories, defined in protocol. Fractions same and lost and the count gained are compared with the fixed thresholds in pass_criterion and fail_criterion. No assessor score is used."
+  },
+  "interpretation": "The claim is a simulation result about memory counts in the surveyed ODE pathway models at training amplitudes 10×, 50× and 100× baseline (Results 2.2). It is not a statement that pathway memory in cells is dose-robust. A UCS-based memory follows Test_US_Memory.m and DetectMem.m: the clamped node regulates the response by a factor of at least 2 during a 50-time-unit clamp (RscaleUp = 2 in MEMORY_EVALUATOR_ODE_SLURM1.m), and after a 50-time-unit release the response mean stays at least halfway from the baseline mean to the clamped mean. An associative memory follows UCS_NS_Asso.m: the neutral node does not regulate the response before pairing, the unconditioned and neutral nodes are clamped together for 50 time units, and after a 50-time-unit release the neutral node alone regulates the response by a factor of 2 relative to that release. Baseline max and min are the maximum and minimum of each floating species over the first 50 time units of an unforced trajectory from the SBML initial state, including zeros, as in the memory script. Up-clamp is scale times that maximum; down-clamp is the minimum divided by scale. A direction with a zero clamp level is skipped. Counts use every ordered pair of distinct floating species and both directions. The same adaptive one-integration-per-epoch clamp used for levin-2022-grn-learning-18 is used here; it is part of this registration.",
+  "protocol": {
+    "scales": [10, 50, 100],
+    "regulation_factor": 2.0,
+    "epoch_duration": 50.0,
+    "max_floating_species": 12,
+    "min_floating_species": 3,
+    "per_model_timeout_seconds": 240,
+    "solver": "scipy.integrate.solve_ivp method BDF, rtol 1e-4, atol 1e-6",
+    "sbml_engine": "libroadrunner getRatesOfChange, clamped species rate set to 0 and value held",
+    "epoch_samples": 21,
+    "memory_count": "ucs_memories + associative_memories"
+  },
+  "caveats": [
+    "Written before any SBML file was downloaded and before any trajectory was generated. The MATLAB sources in GRN_ODE were read as the protocol; the repository's .mat result files were not opened.",
+    "A simulation of deposited pathway models does not show that stimulus amplitude leaves memory intact in cells.",
+    "The paper's 52% and 10% figures pool memory phenotypes on the authors' MATLAB screen. This registration counts UCS-based and associative memories only, with the numerical bands above fixed before the run. Pairing, transfer and consolidation memories are not in the count.",
+    "Models outside 3–12 floating species, and models that fail to integrate or exceed 240 seconds, are excluded. Timeout exclusion can favour models that settle quickly; if it removes more than half of the size-eligible models the test is underpowered."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/test-levin-grn-learning-5674",
+    "date": "2026-11-01"
+  }
+}

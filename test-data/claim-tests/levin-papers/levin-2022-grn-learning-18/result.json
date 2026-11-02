@@ -1,0 +1,45 @@
+{
+  "claim_id": "levin-2022-grn-learning-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-18",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:55Z",
+  "hypothesis": "If the published claim holds for the surveyed BioModels pathway ODEs, a third-node clamp breaks sensitization in only a minority of the sensitizing models (about 8 of 27), most of those models have a break in fewer than 5% of their sensitizing stimulus–response pairs, and sensitization is broken in a smaller fraction of models than habituation is.",
+  "pass_criterion": "Pre-registered. Let S be the completed models with at least one sensitizing UCS–R pair and Sb the subset in which at least one such pair is breakable by a third node. Let H and Hb be the same for habituation. Let mostly_under_5 be the fraction of models in S whose (breakable sensitizing pairs)/(sensitizing pairs) is strictly below 0.05. Supports if and only if S >= 8, H >= 8, 0.15 <= Sb/S <= 0.45, mostly_under_5 >= 0.50, and Hb/H > Sb/S.",
+  "fail_criterion": "Pre-registered. Refutes if and only if S >= 8, H >= 8, and at least one of: Sb/S >= 0.50, mostly_under_5 < 0.25, or Hb/H <= Sb/S. If S >= 8 and H >= 8 but neither the pass nor the fail rule holds, the verdict is mixed. If the Table S1 identifier list or the SBML files cannot be retrieved, or no ODE engine can be imported, the verdict is inconclusive with reason data-unavailable. If S < 8 or H < 8, or more than half of the size-eligible models fail to integrate or exceed the per-model time limit, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "biswas2023-table-s1",
+    "biomodels-sbml"
+  ],
+  "test_contract": {
+    "expected_observation": "Among surveyed pathway ODEs that sensitize under the six-epoch 1.5-fold rule, only a minority (rate between 0.15 and 0.45) have any third-node clamp that stops the 1.5-fold rise, most of those models break fewer than 5% of their sensitizing pairs, and the habituation-break rate is higher.",
+    "disconfirming_observation": "A sensitization-break rate of at least half the sensitizing models, a break in 5% or more of pairs in most models, or a sensitization-break rate at least as high as the habituation-break rate.",
+    "admissible_datasets": "The pathway models whose BioModels identifiers are listed in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (supplement ijms-24-00285-s001), simulated from the public SBML with topology and parameters left at the deposited values. Generated random gene circuits do not count for this claim. Models with fewer than 3 or more than 15 floating species are outside the pre-registered computational bound and are excluded before scoring.",
+    "inference_method": "Each ordered pair of distinct floating species is clamped up and down across six lengthening epochs. Sensitization is a 1.5-fold rise of the response mean on every successive stimulation epoch; habituation is a fall to 1/1.5 or below on every successive epoch. A pair is breakable if any other species, clamped up or down for two epochs, makes the two following UCS epochs fail that same ratio. Model rates Sb/S and Hb/H and the per-model pair fractions are compared with the fixed thresholds in pass_criterion and fail_criterion. No assessor score is used."
+  },
+  "interpretation": "The claim is a simulation result about the 27 sensitizing ODE pathway models in the Biswas, Clawson and Levin survey, not a statement that cells break sensitization less readily than habituation. Sensitization and habituation are the paper's ratio rules (Methods 4.5 and 4.6): six successive stimulation epochs must each move the response mean by a factor of 1.5. A third-node break is the failure of that ratio on two UCS test epochs after the third node is clamped twice. Therapeutic wording in the claim is not given a separate measurement. Clamp levels are 100 times the nonzero maximum (up) or the nonzero minimum divided by 100 (down), taken from an unforced trajectory, matching USscaleUp = 100 in Find_DrugRes_Sensitize_SLURM1.m of https://github.com/wesleypclawson/GRN_ODE. Epoch boundaries in time units are the MATLAB call-index boundaries times 0.1 (each ode23tb call in that script advances 0.1 time): relax 0–500, then stimulation windows [500,1000], [1600,2200], [2900,3600], [4400,5200], [6100,7000], [8000,9000], with the gaps as relaxations. Breaking epochs last 100 time units, which is simCnt = 10000 samples at h = 0.01 in stimulateRelaxSingle.m. One adaptive integration per epoch with the clamped species held fixed is the continuous-clamp limit of their per-step reset; that substitution is part of this registration, not a later deviation. Means are arithmetic means of 21 evenly spaced samples on each epoch.",
+  "protocol": {
+    "scale_up": 100,
+    "ratio": 1.5,
+    "n_stimuli": 6,
+    "max_floating_species": 15,
+    "min_floating_species": 3,
+    "per_model_timeout_seconds": 180,
+    "solver": "scipy.integrate.solve_ivp method BDF, rtol 1e-4, atol 1e-6",
+    "sbml_engine": "libroadrunner getRatesOfChange, clamped species rate set to 0 and value held",
+    "epoch_samples": 21,
+    "stop_third_node_search_at_first_break": true
+  },
+  "caveats": [
+    "Written before any SBML file was downloaded and before any trajectory was generated. The MATLAB sources in GRN_ODE were read as the protocol; the repository's .mat result files were not opened.",
+    "A simulation of deposited pathway models does not show that organisms break sensitization less readily than habituation.",
+    "Models outside 3–15 floating species, and models that fail to integrate or exceed 180 seconds, are excluded by this registration. If that exclusion removes more than half of the size-eligible models, the test is underpowered.",
+    "The published prose requires the 1.5-fold trend on all six epochs. The MATLAB counter uses nonzeros and range, which can ignore epochs that do not move by 1.5. This test follows the prose."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/test-levin-grn-learning-5674",
+    "date": "2026-11-01"
+  }
+}
