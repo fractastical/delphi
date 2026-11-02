@@ -1,0 +1,656 @@
+{
+  "claim_id": "thompson1917-ch14-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-02",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "On a sunflower capitulum the two locally conspicuous opposed parastichies cross at an angle that stays about the same from the inner disc to the rim, and a right-angle crossing is an uncommon special case rather than the typical one.",
+  "pass_criterion": "Pre-registered (supports). After the method gate below passes: among usable capitula, at least 70% have a radial range of band-mean intersection angles \u2264 15\u00b0, and at most 25% have a head-mean intersection angle \u2265 85\u00b0. At least 5 usable capitula are required.",
+  "fail_criterion": "Pre-registered (refutes). After the method gate passes and with at least 5 usable capitula: either at least 70% of usable capitula have a radial range \u2265 30\u00b0 (the crossing angle is not constant), or at least 70% have range \u2264 15\u00b0 and at least 50% have head-mean \u2265 85\u00b0 (the crossing is constant and typically orthogonal). If at least 5 capitula are usable and neither the pass nor the fail rule is met, the verdict is mixed. If the method gate fails, the verdict is inconclusive with reason other and the biological counts are not interpreted. If no capitulum is usable, inconclusive with reason data-unavailable. If 1 to 4 capitula are usable, inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "wikimedia-commons-category-helianthus-annuus-fruit",
+    "turings-sunflowers-dryad-f9k77-annotated-images-fallback"
+  ],
+  "interpretation": "Thompson's sentence is read as a claim about the spirals on a sunflower disc, which is the case he is contrasting with Church: they cross isogonally (one angle along the disc), and a right angle is only a particular, uncommon case of two logarithmic spirals about one pole. 'The spirals' are operationalized as the two locally conspicuous contact directions at each seed: the two shortest distinct nearest-neighbour lattice directions. Their intersection angle is the smaller angle between those two undirected lines, in (0, 90] degrees. 'Isogonal' means that angle's band means change by at most 15\u00b0 from the inner band to the outer band. 'Orthogonal' means a head-mean of at least 85\u00b0 (within 5\u00b0 of a right angle). This is the crossing a viewer sees between the parastichies that are actually in contact at that radius. It is not the angle of one fixed index-step family followed from centre to rim; that reading is not used, because assigning a generative index from a photograph is unstable once seeds are missed, and it was set aside before any photograph was measured. The same measurement on a Vogel (equal-area, golden-angle) lattice is nearly constant and near 78\u00b0, so it counts as isogonal and not orthogonal; a logarithmic spiral with plastochron ratio 1.02 is isogonal and orthogonal. Those two synthetics are the method gate, not evidence about sunflowers. Scope is Helianthus annuus capitula. Other inflorescences are not tested. No assessment score is used.",
+  "test_contract": {
+    "expected_observation": "On real sunflower seed heads, the angle between the two shortest contact directions is steady across radius (band-mean range \u2264 15\u00b0 on at least 70% of usable heads) and the head-mean is below 85\u00b0 for more than 75% of usable heads.",
+    "disconfirming_observation": "Either the band-mean range is at least 30\u00b0 on at least 70% of usable heads, or the angle is steady and the head-mean is at least 85\u00b0 on at least half of usable heads. A lattice that cannot be resolved, or fewer than 5 usable heads, does not confirm or refute the claim.",
+    "admissible_datasets": "Openly licensed photographs of Helianthus annuus capitula in which individual seeds or florets are visible, taken independently of Thompson's text. The primary source is every JPEG or PNG in Wikimedia Commons category 'Helianthus annuus (fruit)' whose shorter side is at least 800 pixels. The Dryad Turing's Sunflowers annotated-image zip (doi:10.5061/dryad.f9k77) is admissible only as a pre-registered fallback if the Wikimedia category yields fewer than 5 usable heads, and then only the first 40 raster images in alphabetical path order. Counts without positions are not admissible. Images are not hand-picked.",
+    "inference_method": "At each detected seed between 0.40 R and 0.90 R (R = 95th percentile of distance from the mean of the points), take the 6 nearest neighbours, cluster their undirected directions at 18\u00b0, and record the smaller angle between the lines of the two shortest clusters. Average that angle in three radial bands [0.40, 0.567), [0.567, 0.733), [0.733, 0.90). A head is usable only if both dark-blob and bright-blob detectors are tried and at least one yields \u2265 150 points, \u2265 25 angles in every band, every band's sample standard deviation \u2264 18\u00b0, and at least 15% of points inside 0.5 R. If both polarities are usable, keep the one with more points. Thresholds are those in pass_criterion and fail_criterion. A synthetic method gate must pass before those thresholds are applied to photographs."
+  },
+  "method_gate": {
+    "role": "The gate checks the measurer. It is not evidence about sunflowers. Biological rules are applied only if every item passes.",
+    "fermat_coordinates": "N=450 points, r=sqrt(k), golden angle 2\u03c0/\u03c6^2, \u03c6=(1+sqrt(5))/2, k=1..450. Require range of the three band means in [4, 12] degrees and head-mean in [74, 83], with each band's sample standard deviation \u2264 12.",
+    "log_orthogonal_coordinates": "N=240 points, r = 1.02^k, same golden angle, k=0..239. Require range \u2264 2\u00b0 and head-mean \u2265 88\u00b0.",
+    "log_oblique_coordinates": "N=160 points, r = 1.04^k, same golden angle, k=0..159. Require range \u2264 2\u00b0 and head-mean in [50, 65].",
+    "fermat_rendered_image": "Render the same Fermat points as dark Gaussian dots (scale 7 px per coordinate unit, dot sigma 2.0 px, image smoothed with a Gaussian of sigma 0.6 px, then pixel noise N(0, 0.01) from numpy Generator seed 0) and detect dark blobs (high-pass: smooth sigma 1.0 minus smooth sigma 8; minima of a size-5 filter darker than -0.05; greedy non-maximum suppression at 5 px). Require the detected count within 10% of 450, the range within 4\u00b0 of the coordinate-analysis range, and the head-mean within 4\u00b0 of the coordinate-analysis head-mean."
+  },
+  "detector": {
+    "decode": "ffmpeg to 8-bit gray raw video, one frame. Shorter side below 800 pixels, from Wikimedia imageinfo, is skipped as below resolution and is not a detection failure.",
+    "polarities": "Dark blobs: local minima of (smooth_1 - smooth_8) below -0.05. Bright blobs: local maxima of (smooth_1 - smooth_8) above +0.05. Minimum filter or maximum filter size 5. Non-maximum suppression distance is 0.6% of the shorter image side, but at least 4 pixels.",
+    "center": "Arithmetic mean of the kept points. R is the 95th percentile of distance to that mean.",
+    "fallback": "If fewer than 5 Wikimedia images are usable, download doi:10.5061/dryad.f9k77 file 'Annotated seedhead images 20160205.zip' (Dryad file id 4661), walk raster images (jpeg, png, tiff) inside the zip and any embedded pptx/ppt in alphabetical path order, and measure the first 40 with the same rules. Pool them with the Wikimedia usable heads. Annotation strokes may make a head fail the lattice standard deviation; that failure stays a failure."
+  },
+  "secondary_analyses_descriptive": [
+    "The list of head-means and ranges, and the median head-mean, reported in measured.extra and not used to choose the verdict.",
+    "How many images were skipped for resolution, failed detection, or failed the lattice quality rule."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/thompson-ch14-spiral-angle-ecd6",
+    "date": "2026-11-01"
+  },
+  "deviations": [
+    {
+      "field": "detector scale",
+      "change": "Each downloaded photograph is resized so its shorter side is 900 pixels before the high-pass. The pre-registered smoothing widths (1 px and 8 px) and the threshold 0.05 were fixed on a synthetic disc about 320 px wide. On a multi-thousand-pixel original those widths sit below the seed scale. The resize is the same for every image and does not depend on the measured angle. Pass and fail thresholds are unchanged.",
+      "decided": "before any photograph was measured"
+    },
+    {
+      "field": "blob spacing",
+      "change": "The first measurement, with non-maximum suppression at 0.6% of the shorter side (about 5 px), kept several thousand blobs on every file, including files that are not capitula, and no file met the pre-registered band standard-deviation cap of 18\u00b0. That is over-segmentation of texture, not a parastichy lattice. Photographs are therefore remeasured at background widths 12, 18, 24, 36 and 48 px, with suppression 0.55 times the width, in both polarities. The candidate with between 150 and 2500 points and the smallest coefficient of variation of nearest-neighbour distance is kept. The intersection angle is not used to choose the scale. The usable-head rules, the 15\u00b0/30\u00b0/85\u00b0 thresholds and the 70%/25%/50% fractions are unchanged. The synthetic method gate still uses the original sigma-8, 5 px detector.",
+      "decided": "after the first run showed over-segmentation and before the angles from the new scale were used for a verdict"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "wikimedia-commons-category-helianthus-annuus-fruit",
+      "name": "Wikimedia Commons category Helianthus annuus (fruit)",
+      "landing_url": "https://commons.wikimedia.org/wiki/Category:Helianthus_annuus_(fruit)",
+      "doi": null,
+      "version": "category listing retrieved at analysis time",
+      "license": "per-file; see files",
+      "files": [
+        {
+          "name": "File:(((\u0627\u0641\u062a\u0627\u0628\u06af\u0631\u062f\u0627\u0646 ))) - panoramio.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/a/a1/%28%28%28%D8%A7%D9%81%D8%AA%D8%A7%D8%A8%DA%AF%D8%B1%D8%AF%D8%A7%D9%86_%29%29%29_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:42Z",
+          "byte_size": 1831656,
+          "sha256": "21ac08f87edce216720eaf5ac96604f17ed765a2f88cad320258e69a586836a4",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:2013-365-247 Packed With Seeds (9678568718).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/2013-365-247_Packed_With_Seeds_%289678568718%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:44Z",
+          "byte_size": 7596935,
+          "sha256": "95db2482fcb49081617bd3517900388705620e33c3d565899070fcb3e12aae1e",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:2013-365-258 Bag o' Sunflower Seeds (9782621911).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/0e/2013-365-258_Bag_o%27_Sunflower_Seeds_%289782621911%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:48Z",
+          "byte_size": 5748480,
+          "sha256": "b62a689de39467acc57c49c8c37552e57d299fb82fc24748f01eb3287df22a61",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:20150317Helianthus annuus1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/69/20150317Helianthus_annuus1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:50Z",
+          "byte_size": 1803729,
+          "sha256": "ac7e4b5391436453a5ff9d296a65822836290611ace1f69e88432f4654671f8b",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:20150317Helianthus annuus2.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/3c/20150317Helianthus_annuus2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:52Z",
+          "byte_size": 2054696,
+          "sha256": "c6a7195ac5af1fb83d0ae00c092886115dc7e9e9969b2157bf0f0383add1461a",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:20150317Helianthus annuus3.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/42/20150317Helianthus_annuus3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:54Z",
+          "byte_size": 1675356,
+          "sha256": "6747477edc71f29a816776560e1df4450110951c986331d98df26b0e438456ad",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:20161129Helianthus annuus1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/20161129Helianthus_annuus1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:57Z",
+          "byte_size": 1480333,
+          "sha256": "918c1c05c0be90db1820fd7e32901ecec9e2b0267c12bbd907a627c6ba94d236",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:20161129Helianthus annuus4.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/63/20161129Helianthus_annuus4.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:04:59Z",
+          "byte_size": 1085938,
+          "sha256": "48f2a1083271b4a78dbe3c56f15c5a376ca4f4b4f044b5c29667ee3b80844ed3",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:20161129Helianthus annuus5.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/24/20161129Helianthus_annuus5.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:00Z",
+          "byte_size": 1129110,
+          "sha256": "5bd3eadb6e7c22e35415e74fc6155fcee39df735dbd3cd3271952fcfde3e88a0",
+          "license": "CC0",
+          "usable": false
+        },
+        {
+          "name": "File:Achenio e seme di Helianthus annuus.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Achenio_e_seme_di_Helianthus_annuus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:02Z",
+          "byte_size": 1137167,
+          "sha256": "554e1715d1b22371e647e101b1c90fa6cd68096ef2e1d886c34a5ba520271580",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:Asterales - Helianthus annuus experiment - 1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Asterales_-_Helianthus_annuus_experiment_-_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:04Z",
+          "byte_size": 1151254,
+          "sha256": "1e90b100e385966b6316544543c0b6d188ffa9fda146633ba6dbcc7f651ece1a",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:Behold The Seeds (9675320969).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/05/Behold_The_Seeds_%289675320969%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:06Z",
+          "byte_size": 5209281,
+          "sha256": "9979d57646c11269e7cfcc5be9d8add1d59684e7150129d83fa1c917b309f33c",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Black Helianthus annuus seeds 2.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Black_Helianthus_annuus_seeds_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:09Z",
+          "byte_size": 635578,
+          "sha256": "d5f9de6da8ca206e7cc9b83bc331b1a6ea22e2029b57f79f3e02efa2ff75b71c",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Black Helianthus annuus seeds.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/89/Black_Helianthus_annuus_seeds.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:10Z",
+          "byte_size": 1850032,
+          "sha256": "6781dc27b4c260fb7919adc2e0bc4ebf4f34e844c3c5587ccf3fe917002754f3",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Brush the Rest of these Seeds Out (9675327867).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Brush_the_Rest_of_these_Seeds_Out_%289675327867%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:13Z",
+          "byte_size": 4425653,
+          "sha256": "e53993cb25aba6c3d553b0fb75f2ec83d4969b4bd36bba2a1ab21fe0d66c7773",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Brushing the Seeds Out (9675322823).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Brushing_the_Seeds_Out_%289675322823%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:15Z",
+          "byte_size": 4788697,
+          "sha256": "c8dff40388681776fffb150fede2ac956aeacdbf05b8d6a7e0d8c95889f8cb28",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Chimalxochitl.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/Chimalxochitl.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:16Z",
+          "byte_size": 381384,
+          "sha256": "d57ac4b16354a7a76ecb21371a64e199024a75f4a854db261a20fd8b184daa41",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:Dead Sunflower.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/cb/Dead_Sunflower.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:19Z",
+          "byte_size": 1954466,
+          "sha256": "1da0247ca43d34f9c3c40c31bb39def6c5d7ea903b491e38477ace2d12128e6b",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:First Remove the Petals (9675317133).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/03/First_Remove_the_Petals_%289675317133%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:20Z",
+          "byte_size": 7284342,
+          "sha256": "f059998fdcab74dc8a6e37fb67868cc268ab1c17d77af522e2d9a0dfc73ba013",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:First Vancouver Sunflower Seeds (9497544111).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/9/93/First_Vancouver_Sunflower_Seeds_%289497544111%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:23Z",
+          "byte_size": 2311517,
+          "sha256": "3ba13195f7d294bfa09f90a90cf1bb887f7498b7861b04b24be3e2dc27cc39ed",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:For Each Seed a Well Formed Pocket (9678557920).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/52/For_Each_Seed_a_Well_Formed_Pocket_%289678557920%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:25Z",
+          "byte_size": 4443809,
+          "sha256": "1abe38cbf3848df04530ee021653d571379d5080a310139217fabf70492ef11f",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Freeing the Seeds (9675330051).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Freeing_the_Seeds_%289675330051%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:27Z",
+          "byte_size": 6070258,
+          "sha256": "a480baef4da96863359094fdcf287cf2c21cc6fe2288301f3d61ac8493febd9a",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Gonna Drop Some Big Seeds (9471214146).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Gonna_Drop_Some_Big_Seeds_%289471214146%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:29Z",
+          "byte_size": 2126131,
+          "sha256": "8af6d0e3d9953f69562c7e205854f9ae7ca4c593f64e83687e0072069be86efd",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Harvesting Sunflower Seeds (9484254184).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Harvesting_Sunflower_Seeds_%289484254184%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:31Z",
+          "byte_size": 5324010,
+          "sha256": "ee295d97446859ae43bb36ea604b3b87ce4688abdaf7d4ef09e8d2c7ad2dd9be",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Helianthus annuus (6463165497).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/Helianthus_annuus_%286463165497%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:33Z",
+          "byte_size": 2771074,
+          "sha256": "5e922907dc240a634755d8af08770fc275d69f4f6372da10845df50994a885cb",
+          "license": "CC BY-SA 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Helianthus annuus a1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Helianthus_annuus_a1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:35Z",
+          "byte_size": 276896,
+          "sha256": "69b388eea002642cdf47e1fe2167a9413cd1cf86edd528aeb9ecc553c178f3d6",
+          "license": "CC BY 2.5",
+          "usable": false
+        },
+        {
+          "name": "File:Hot cousin of Sun.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Hot_cousin_of_Sun.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:37Z",
+          "byte_size": 995735,
+          "sha256": "cdc85617bb17c19bdb1e96c8d6206cf90b5e189f6691ecd701a51a0498499729",
+          "license": "CC BY-SA 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:My supply of sunflower seeds harvested from the smaller plants. Today's load will cover the bucket. (9675314939).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/37/My_supply_of_sunflower_seeds_harvested_from_the_smaller_plants._Today%27s_load_will_cover_the_bucket._%289675314939%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:39Z",
+          "byte_size": 4625820,
+          "sha256": "b90219c8a29e899b637f74eca8a9b1085871f00dccdcf3cac3e774ddaa7c927f",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:One of the Vancouver sprouted sunflowers lurking around the corner of the shed, (9575514036).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/d/df/One_of_the_Vancouver_sprouted_sunflowers_lurking_around_the_corner_of_the_shed%2C_%289575514036%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:41Z",
+          "byte_size": 4069995,
+          "sha256": "56823fcf7fe70fe70cd32481d1fc868e6d1d820ac53ec03812216dc45764364d",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Pflanze-Sonnenblume1-Asio (cropped).JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Pflanze-Sonnenblume1-Asio_%28cropped%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:43Z",
+          "byte_size": 931731,
+          "sha256": "0026e6b484fa4db8e7628880a3bc92277563b8bb66435991000be509cdd7dc16",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Pflanze-Sonnenblume1-Asio.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Pflanze-Sonnenblume1-Asio.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:45Z",
+          "byte_size": 3951677,
+          "sha256": "6d7a000b9ddcec369369fde204569266a98a1d6d096d1f59dba20acbf1e7aece",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Pflanze-Sonnenblume2-Asio.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Pflanze-Sonnenblume2-Asio.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:47Z",
+          "byte_size": 2176428,
+          "sha256": "dc921c182c56bf93e19480e0296b03b04fa7deee6a4d8d0ec679e6e56a93f287",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Pipas de girasol peladas, 2021-01-05, DD 041-080 FS.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Pipas_de_girasol_peladas%2C_2021-01-05%2C_DD_041-080_FS.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:49Z",
+          "byte_size": 8335977,
+          "sha256": "760170e0a60a1262071646ba3f7f0a8162332ec5b8e81b33826aed04ddb10bc0",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:Praha, Sm\u00edchov, And\u011bl, Farm\u00e1\u0159sk\u00e9 trhy, Slune\u010dnice III.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Praha%2C_Sm%C3%ADchov%2C_And%C4%9Bl%2C_Farm%C3%A1%C5%99sk%C3%A9_trhy%2C_Slune%C4%8Dnice_III.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:53Z",
+          "byte_size": 2048691,
+          "sha256": "26804bbcc440c770ec0322e4155123509588f18891c3fdc3c41faf2ed64f2751",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Praha, Sm\u00edchov, And\u011bl, Farm\u00e1\u0159sk\u00e9 trhy, slune\u010dnice II.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/49/Praha%2C_Sm%C3%ADchov%2C_And%C4%9Bl%2C_Farm%C3%A1%C5%99sk%C3%A9_trhy%2C_slune%C4%8Dnice_II.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:55Z",
+          "byte_size": 2417706,
+          "sha256": "cea16e981f3cb80548875564098a5ef1f085873fc66674c0827457f0efe41027",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Praha, Sm\u00edchov, And\u011bl, Farm\u00e1\u0159sk\u00e9 trhy, slune\u010dnice.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Praha%2C_Sm%C3%ADchov%2C_And%C4%9Bl%2C_Farm%C3%A1%C5%99sk%C3%A9_trhy%2C_slune%C4%8Dnice.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:57Z",
+          "byte_size": 2490217,
+          "sha256": "c2c7a9857d419c42cb9da0ea3ec7b8b6554ab93674db2b1ec1c2c35213db2dff",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Seeds of sunflower.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/a/af/Seeds_of_sunflower.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:05:59Z",
+          "byte_size": 861538,
+          "sha256": "9ffc8742442a71dfbcb8045028887d507248b5d656d7519db9b97f0ebf84caad",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Slune\u010dnice-crop.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/59/Slune%C4%8Dnice-crop.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:01Z",
+          "byte_size": 216186,
+          "sha256": "f75200148d96fd9a3f4f327f65df2a342c00097b09cc0680977150a083077c7e",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Slune\u010dnice.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/8/88/Slune%C4%8Dnice.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:04Z",
+          "byte_size": 1584132,
+          "sha256": "c2ffc566b21a0ed493271dc6fc489a0e4646f7d15e6657454cc284b36158bf81",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sonnenblume fibonacci89 144sr.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Sonnenblume_fibonacci89_144sr.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:05Z",
+          "byte_size": 1052999,
+          "sha256": "595e645373b84fe601654c6bbb402ca887e733d91c67dc3f6bc63ceadaf903fc",
+          "license": "Public domain",
+          "usable": false
+        },
+        {
+          "name": "File:Sonnenblume mit geohumus gewachsen11.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Sonnenblume_mit_geohumus_gewachsen11.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:07Z",
+          "byte_size": 1054828,
+          "sha256": "7f31907268214c8685f8317a38037e4aad09903b3571ef13c02b7f4cd3e77c64",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sonnenblume ready to harvest.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Sonnenblume_ready_to_harvest.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:09Z",
+          "byte_size": 2561744,
+          "sha256": "edd4b7e2a4be0e6114199d0a6922a4385c8be3a7cc5d9f64c67944fb5d76a6ac",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Starr 081031-0375 Helianthus annuus.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Starr_081031-0375_Helianthus_annuus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:11Z",
+          "byte_size": 2930786,
+          "sha256": "a51949b57b8e087fa2a1db9217c0c6eee963f0d2fb2c87c2935438f74ae5b689",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower - Girasole - Foto Giovanni Dall'Orto - 14- Aug-2004 01.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Sunflower_-_Girasole_-_Foto_Giovanni_Dall%27Orto_-_14-_Aug-2004_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:14Z",
+          "byte_size": 2194039,
+          "sha256": "e3766f6cc95444b8ea32e59518d8f978923fddd629ebd203c0d2c16b842a0dbc",
+          "license": "Attribution",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower - Girasole - Foto Giovanni Dall'Orto - 14- Aug-2004 02.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Sunflower_-_Girasole_-_Foto_Giovanni_Dall%27Orto_-_14-_Aug-2004_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:16Z",
+          "byte_size": 2286412,
+          "sha256": "c104c299a058617486a9adbdedd710c8b0a02641334a80d9dc30f5416b16d63d",
+          "license": "Attribution",
+          "usable": true
+        },
+        {
+          "name": "File:Sunflower Number One Reporting for Duty (9678544806).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Sunflower_Number_One_Reporting_for_Duty_%289678544806%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:19Z",
+          "byte_size": 4087626,
+          "sha256": "542257fc9b9e70dcc4f317f7709bc44053433ee73a73ebda85ffa19a773d4e48",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower Number Two (9678566196).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Sunflower_Number_Two_%289678566196%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:21Z",
+          "byte_size": 5919228,
+          "sha256": "92cf18e3e718d2578577597a4b6db9d05e981be5b64f32e305b68f39c7fa272e",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower Seeds (86760079).jpeg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/5/58/Sunflower_Seeds_%2886760079%29.jpeg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:23Z",
+          "byte_size": 729558,
+          "sha256": "3d1f4eda2d96e6f95792fa7dd27aa4a057211deb60a99992dc3ea197ec72b318",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower Seeds Almost Ready (9649716295).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Sunflower_Seeds_Almost_Ready_%289649716295%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:25Z",
+          "byte_size": 5947641,
+          "sha256": "f634911e7b0ffe422f4e716019b85eec6dc342b3ddf5a18a277c216314c01804",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower Seeds Kaldari.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/39/Sunflower_Seeds_Kaldari.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:28Z",
+          "byte_size": 567167,
+          "sha256": "2bd54331314288ad619327fa7a56c3f607e7c3349dd21a225a3bb951a681761c",
+          "license": "Public domain",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower Seeds to Share Next Spring (9782814315).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Sunflower_Seeds_to_Share_Next_Spring_%289782814315%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:30Z",
+          "byte_size": 4723092,
+          "sha256": "534b961428e8e143fcc83ac820c640761f6a9c7f5f23ee8b5b94f1fb0cfa1452",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower fibonacci jg 89 144.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Sunflower_fibonacci_jg_89_144.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:32Z",
+          "byte_size": 1054259,
+          "sha256": "b80d15b2dfd4c3e4e896c36eabfcc6e4635d6ae33e99599cb046774c57c5fa7b",
+          "license": "CC BY 2.0 de",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower head snack.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Sunflower_head_snack.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:34Z",
+          "byte_size": 3315216,
+          "sha256": "64fe28403221d39d464857a6d0f7f5749708cebf58c39aa8a11fa4a5667a30b5",
+          "license": "CC BY-SA 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower seed whole and kernel.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/2/29/Sunflower_seed_whole_and_kernel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:36Z",
+          "byte_size": 522983,
+          "sha256": "871aa92a53010a2cf73f08c6faa52c5170ac61a12775e39cea4ce47af9186037",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Sunflower with black seeds.png",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Sunflower_with_black_seeds.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:38Z",
+          "byte_size": 7545690,
+          "sha256": "6dfeff7c8713ea3c9369a909f19e99548eaba38d979cb7decb80653a57c9d982",
+          "license": "CC BY 3.0",
+          "usable": false
+        },
+        {
+          "name": "File:Tournesol Capitule avant r\u00e9colte-3-cliche Jean Weber (24001503781).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Tournesol_Capitule_avant_r%C3%A9colte-3-cliche_Jean_Weber_%2824001503781%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:40Z",
+          "byte_size": 2424195,
+          "sha256": "94463c60d14c0132210a5374d0f1ed3da2b12c5256f7d31b63fcbd85a663d00c",
+          "license": "CC BY 2.0",
+          "usable": false
+        },
+        {
+          "name": "File:Tukhme 1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/00/Tukhme_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:42Z",
+          "byte_size": 478880,
+          "sha256": "3ac292346b0c5c7f5a63005704f8ffed532c13cfa12d317b5075dac8aadf13bf",
+          "license": "CC BY-SA 4.0",
+          "usable": true
+        },
+        {
+          "name": "File:Zonnebloem (Helianthus annuus) in verval. (d.j.b.).jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Zonnebloem_%28Helianthus_annuus%29_in_verval._%28d.j.b.%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:44Z",
+          "byte_size": 7039028,
+          "sha256": "33b27444db52dd56fb338a1a76e1652e21af52d5229377e7f24b234317795bd9",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:\u041a\u04e9\u043d\u0431\u0430\u0493\u044b\u0448 \u043e\u0440\u043b\u043e\u0493\u043e \u04e9\u043b\u0433\u04e9\u0440\u0499\u04e9.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/6/66/%D0%9A%D3%A9%D0%BD%D0%B1%D0%B0%D2%93%D1%8B%D1%88_%D0%BE%D1%80%D0%BB%D0%BE%D2%93%D0%BE_%D3%A9%D0%BB%D0%B3%D3%A9%D1%80%D2%99%D3%A9.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:46Z",
+          "byte_size": 496449,
+          "sha256": "0de6d872b1e173916a217c0979c5bcf85175f64c5ffb39bdfe1d161db9aa0f15",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:\u0531\u0580\u0587\u0561\u056e\u0561\u0572\u056b\u056f\u0576\u0565\u0580.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/08/%D4%B1%D6%80%D6%87%D5%A1%D5%AE%D5%A1%D5%B2%D5%AB%D5%AF%D5%B6%D5%A5%D6%80.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:48Z",
+          "byte_size": 4236149,
+          "sha256": "cb3095d938d77b48965421e9d3d48df1e3f14b98e64b3f02572ed49e987294ff",
+          "license": "CC BY-SA 4.0",
+          "usable": false
+        },
+        {
+          "name": "File:\u67af\u308c\u305f\u30d2\u30de\u30ef\u30ea\u306e\u82b1.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/0/06/%E6%9E%AF%E3%82%8C%E3%81%9F%E3%83%92%E3%83%9E%E3%83%AF%E3%83%AA%E3%81%AE%E8%8A%B1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+          "retrieved_at": "2026-11-02T01:06:51Z",
+          "byte_size": 344026,
+          "sha256": "a43fd1eceb68483127ca63b5a669898c7b4f418138d5243b9b87bfa370087452",
+          "license": "CC BY-SA 3.0",
+          "usable": false
+        }
+      ],
+      "role": "unannotated photographs of sunflower fruits and capitula"
+    }
+  ],
+  "measured": {
+    "value": 67.514,
+    "unit": "median head-mean intersection angle, degrees",
+    "n": 2,
+    "uncertainty": "head-mean min 66.69, max 68.34; range-of-bands median 4.66",
+    "extra": {
+      "n_usable": 2,
+      "n_isogonal": 2,
+      "n_nonisogonal": 0,
+      "n_orthogonal": 0,
+      "fraction_isogonal": 1.0,
+      "fraction_nonisogonal": 0.0,
+      "fraction_orthogonal": 0.0,
+      "median_range_deg": 4.656,
+      "method_gate_passed": true
+    }
+  },
+  "verdict": "inconclusive",
+  "reason": "underpowered",
+  "data_kind": "biological",
+  "confidence": 0.72,
+  "method": "The synthetic gate was run first and passed. Every JPEG or PNG in the Wikimedia Commons category Helianthus annuus (fruit) with a shorter side of at least 800 pixels was downloaded, hashed, resized to a shorter side of 900 pixels, and decoded to gray with ffmpeg. Blob scale was then chosen by the smallest coefficient of variation of nearest-neighbour distance among background widths 12, 18, 24, 36 and 48 pixels and both polarities, restricted to detections of 150 to 2500 points. The intersection angle is the smaller angle between the two shortest nearest-neighbour directions, averaged in three radial bands. A head counted only if it met the pre-registered lattice rules. Dryad file 4661, the pre-registered fallback, returned HTTP 401, so it was not measured. The verdict is the pre-registered rule applied to the two heads that passed.",
+  "caveats": [
+    "The angle is the crossing of the two locally shortest contact directions, not the angle of one fixed parastichy family followed from the centre to the rim.",
+    "Seed centres are automatic blobs. A head whose seeds are occluded, glossy, or not seen face-on fails the lattice standard-deviation rule and is not counted.",
+    "The sample is whatever the open category contained on the retrieval day, mostly cultivated Helianthus annuus, not a designed sample of capitula.",
+    "Resizing to 900 pixels on the short side was fixed before measurement so that the pre-registered pixel-scale filters match the synthetic disc they were written for.",
+    "A head-mean of 85° is the pre-registered boundary of 'orthogonal'. Angles near that boundary are not reclassified.",
+    "Two heads passed the lattice rule (head-means 66.7° and 68.3°, band ranges 0.4° and 8.9°). Both are inside the isogonal band and outside the orthogonal band, but two heads are below the pre-registered minimum of five, so they are not a support.",
+    "The Dryad annotation zip (file 4661) returned HTTP 401 to a scripted download, so the fallback sample was not measured.",
+    "Confidence 0.72 is confidence that the registered sample-size rule makes the verdict inconclusive, not a confidence that the crossing angle has been settled."
+  ],
+  "results_summary": [
+    "Method gate passed: True.",
+    "Wikimedia images downloaded: 61; usable: 2; skipped before download: 5.",
+    "Usable capitula in the verdict: 2; isogonal 2; non-isogonal 0; orthogonal 0.",
+    "Verdict: inconclusive (underpowered)."
+  ]
+}
