@@ -1,0 +1,36 @@
+{
+  "claim_id": "aristotle-pa04-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-18",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, wolves, lions, dogs and leopards each have five digits on the forefoot and four digits on the hind foot.",
+  "pass_criterion": "Supports if at least three of the four named species have an explicit forefoot digit count of 5 and an explicit hind-foot digit count of 4 in the Animal Diversity Web account, and no scored species has any other pair of counts. A dewclaw is a digit: if the account says four toes on a foot and also says that foot has a dewclaw, the count for that foot is 5. If it says the dewclaw is absent, it is not added.",
+  "fail_criterion": "Refutes if two or more scored species have an explicit count other than five on the forefoot or other than four on the hind foot. Mixed if exactly one scored species fails and at least one other species passes. Inconclusive, reason data-unavailable, if fewer than three species have both a fore count and a hind count explicitly stated. A species is unscored if the account does not state both counts, if two sentences give conflicting counts, or if the domestic-dog account is only a redirect to the wolf account and no sentence distinguishes the dog's digits from the wolf's. Unscored species are not failures.",
+  "planned_datasets": [
+    "adw-carnivore-digit-accounts"
+  ],
+  "test_contract": {
+    "expected_observation": "For Canis lupus, Panthera leo, Canis lupus familiaris and Panthera pardus, the account states five fore digits and four hind digits, counting a dewclaw when the account includes it.",
+    "disconfirming_observation": "An explicit digit count, dewclaw rule applied, of something other than 5 in front or other than 4 behind, for two or more of those species.",
+    "admissible_datasets": "The Animal Diversity Web species accounts for those four names, fetched live. Counts must be integers or number-words in the account text tied to a fore foot and a hind foot. A general remark that carnivores have claws, with no number, is not a count. No other website is consulted for the verdict.",
+    "inference_method": "Strip HTML. Prefer the Physical Description section when that heading exists; otherwise use the whole account. Apply the dewclaw rule, then the thresholds in pass_criterion and fail_criterion. Domestic dog and wolf are separate species only when their digit sentences are not the same undifferentiated account. Confidence is 0.75 if all four species are scored and agree, 0.60 if the verdict rests on exactly three scored species, 0.70 if refutes, 0.50 if mixed, and 0.60 if inconclusive."
+  },
+  "species": [
+    {"name": "Canis lupus", "role": "wolf", "url": "https://animaldiversity.org/accounts/Canis_lupus/"},
+    {"name": "Panthera leo", "role": "lion", "url": "https://animaldiversity.org/accounts/Panthera_leo/"},
+    {"name": "Canis lupus familiaris", "role": "dog", "url": "https://animaldiversity.org/accounts/Canis_lupus_familiaris/"},
+    {"name": "Panthera pardus", "role": "leopard", "url": "https://animaldiversity.org/accounts/Panthera_pardus/"}
+  ],
+  "interpretation": "The claim names wolves, lions, dogs and leopards and gives one formula for all of them: five digits on each forefoot and four on each hind foot. The dewclaw is included because the claim's 'five' on the forefoot is the count that includes it; dropping it would test a different sentence. The test does not ask whether other polydactylous quadrupeds share the formula.",
+  "caveats": [
+    "No Animal Diversity Web account was read before this commit. A wolf page had been downloaded to a temporary file during a URL check; its text was not used to write these criteria.",
+    "Accounts are secondary natural-history statements, not a specimen-by-specimen count. One account per species is one published description, not a sample size of individuals."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  }
+}

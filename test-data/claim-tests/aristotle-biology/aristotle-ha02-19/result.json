@@ -1,0 +1,38 @@
+{
+  "claim_id": "aristotle-ha02-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-19",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, every scaly bony fish with a coded reproductive guild in FishBase is an egg-layer, every cartilaginous fish with a coded guild gives birth to live young, and the fishing-frog (Lophius) is an egg-layer rather than a live-bearer.",
+  "pass_criterion": "Supports only if all three hold: (1) among Actinopterygii with a coded guild, the number of internal-live-bearer species is 0 and at least 100 species are coded; (2) among Elasmobranchii and Holocephali (or a class string containing chondrichthyes) with a coded guild, the number of egg-laying species is 0 and at least 30 species are coded; (3) at least one Lophius species is coded and none of them is an internal live bearer. Egg-laying guilds are RepGuild2 values containing 'egg scatter', 'brood hider', 'clutch tender', 'nester', or 'external brood'. Live-bearing is RepGuild2 containing 'internal live bear', 'internal bearer', or 'live bearer'. RepGuild1 alone does not code either mode, because both external brooders and live-bearers can be 'bearers'.",
+  "fail_criterion": "A bony counterexample is an actinopterygian species coded as an internal live bearer. A cartilaginous counterexample is an elasmobranch or holocephalan species coded as an egg-layer. Lophius is not removed from the bony tally if FishBase places it in Actinopterygii; it is the named exception only inside the cartilaginous tally, and only if FishBase itself places that species in a cartilaginous class. A clause fails if it has at least 5 counterexample species. Refutes if both the bony clause and the cartilaginous clause fail. Mixed if one of those two clauses fails and the other passes, or if either clause has 1 to 4 counterexample species, or if both clauses pass but a scored Lophius species is an internal live bearer. Inconclusive, reason underpowered, if a clause has fewer scored species than its minimum and the other clause does not fail. Inconclusive, reason data-unavailable, if the reproduc table has no RepGuild2 column or the class crosswalk cannot be joined.",
+  "planned_datasets": [
+    "fishbase-v25.04-species",
+    "fishbase-v25.04-families",
+    "fishbase-v25.04-reproduc"
+  ],
+  "test_contract": {
+    "expected_observation": "No coded ray-finned fish is an internal live bearer, no coded shark, ray, or chimaera is an egg-layer, and every coded Lophius species is an egg-layer.",
+    "disconfirming_observation": "Five or more ray-finned species coded as internal live bearers, or five or more sharks, rays, or chimaeras coded as egg-layers.",
+    "admissible_datasets": "FishBase snapshot v25.04 distributed as parquet by the rfishbase Hugging Face dataset: species, families (for class via FamCode), and reproduc. One species is one species, even if reproduc has several rows: any internal-live-bearer row makes the species viviparous; otherwise an egg-laying row makes it oviparous. Species with no matching guild phrase are unscored and are not counterexamples. The fishing-frog is the genus Lophius.",
+    "inference_method": "Join species to families on FamCode, aggregate reproduc by SpecCode, and apply the thresholds in pass_criterion and fail_criterion. The 1-to-4 band is a pre-registered allowance for single-row coding errors, not a softening of 'all' into 'most': zero is the only pass. Confidence is 0.80 if refutes with both minima met, 0.75 if supports, 0.55 if mixed, and 0.60 if inconclusive."
+  },
+  "dataset_urls": {
+    "fishbase-v25.04-species": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+    "fishbase-v25.04-families": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+    "fishbase-v25.04-reproduc": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/reproduc.parquet"
+  },
+  "interpretation": "Scaly fishes are mapped to FishBase class Actinopterygii, and cartilaginous fishes to Elasmobranchii plus Holocephali. That is the modern bony-versus-cartilaginous split the scope line names. It is wider than 'fishes that bear scales': scaleless ray-finned fishes stay in the bony clause. Aristotle's fishing-frog is Lophius. Mouth-brooders and other external brooders are egg-layers for this claim, because the eggs leave the ovary before the young are born; only internal live bearers count as his viviparous fishes. Lampreys, hagfish, and lobe-finned fishes are in neither clause.",
+  "caveats": [
+    "Column names below are the FishBase names documented for these tables (SpecCode, Genus, Species, FamCode, Class, RepGuild1, RepGuild2). No row of v25.04 was opened before this commit. If a snapshot uses a different column name for the same Balon guild field, the script may use that column and must record the rename as a deviation. The thresholds do not change.",
+    "FishBase guilds are compiled literature codes, not a new examination of each species. A refutation is a refutation of the universal claim against those codes.",
+    "'Invariably' and 'all' are treated as universals with a five-species floor before a clause is called failed, so that one miscoded row cannot by itself refute the claim. One to four counterexamples are mixed, not a pass."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  }
+}

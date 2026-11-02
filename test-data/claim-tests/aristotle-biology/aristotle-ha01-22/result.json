@@ -1,0 +1,47 @@
+{
+  "claim_id": "aristotle-ha01-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, anatomical descriptions of the adult heart of humans and of larger mammals (horse and ox) will enumerate three blood-filled cavities, with the right-hand one largest, the left-hand one smallest, and a middle one intermediate in size.",
+  "pass_criterion": "Supports only if every independent source group that enumerates a chamber count gives 3, at least two groups enumerate a count, and at least one source states a size order of those cavities with the right largest, the left smallest, and the middle one between them. A cavity is an atrium or a ventricle. Valves, septa, auricular appendages, and great vessels are not extra cavities. 'Right auricle' is the same cavity as 'right atrium' when both are named.",
+  "fail_criterion": "Refutes if at least two independent source groups enumerate a count other than 3 for the adult human heart or for the heart of the horse, ox, or mammals generally. The size ranking is not required once the count is not 3, because the claim's size order is an order among three cavities. Mixed if the groups disagree on the count, or if all enumerating groups say 3 but no source states the right-middle-left size order, or only one group enumerates 3 and another is silent. Inconclusive, reason data-unavailable, if fewer than two groups yield a page that states a count or names at least three of the four chamber terms (right atrium, left atrium, right ventricle, left ventricle). A page that states a number and also names a conflicting set of chambers is discordant and does not vote.",
+  "planned_datasets": [
+    "open-mammal-heart-anatomy-texts"
+  ],
+  "test_contract": {
+    "expected_observation": "Texts describing the adult heart of humans and of horses or cattle name three cavities and rank them right larger than middle larger than left.",
+    "disconfirming_observation": "Two independent anatomical sources enumerate four atria-plus-ventricles, or some other count that is not three, for the mammalian, human, equine, or bovine heart.",
+    "admissible_datasets": "Open texts whose subject is the heart of mammals, humans, horses, or cattle. Sentences explicitly about fish, amphibian, or reptile hearts are ignored. The OpenStax page and pages that say they are adapted from OpenStax count as one source group. A dissection guide of pony and calf hearts is a separate group. A teaching slide that names cow heart chambers is a separate group. Wikibooks is a separate group unless its page says it is adapted from OpenStax, in which case it joins that group.",
+    "inference_method": "From each fetched page, record a stated number ('three chambers', 'four chambers', 'four-chambered', and the digit forms) and the set of named chambers. Map auricle of a side onto the atrium of that side. Tally one vote per independent group. Apply pass_criterion and fail_criterion. Confidence is 0.80 if the verdict is refutes, 0.60 if supports, 0.45 if mixed, and 0.55 if inconclusive. These texts are descriptions, not a measured series of chamber volumes."
+  },
+  "source_groups": {
+    "openstax_tradition": [
+      "https://openstax.org/books/anatomy-and-physiology-2e/pages/19-1-heart-anatomy",
+      "https://opentext.uoregon.edu/animalphysiology/chapter/6-3-mammalian-heart-and-blood-vessels/",
+      "https://organismalbio.biosci.gatech.edu/nutrition-transport-and-homeostasis/the-mammalian-cardiac-cycle/"
+    ],
+    "wikibooks_animal_heart": [
+      "https://en.wikibooks.org/wiki/Anatomy_and_Physiology_of_Animals/Cardiovascular_System/The_Heart"
+    ],
+    "umn_ungulate_dissection": [
+      "https://pressbooks.umn.edu/ungulateanatomylabguide/chapter/part-5-heart-and-major-vessels/"
+    ],
+    "mgccc_cow_heart_chambers": [
+      "https://mgccc.edu/learning_lab/science/heart2/tsld026.htm"
+    ]
+  },
+  "interpretation": "Scope is man and the larger blooded animals, so the test uses humans and the horse and ox (pony and calf in the ungulate guide). Aristotle's cavity is mapped to a blood-filled chamber of the adult heart, the atrium or the ventricle. Wall thickness is not cavity size. A remark that one side of the heart has thicker muscle is not the size ranking of cavities. This mapping is a modern anatomical reading of 'cavity'; it is stated here so the count is auditable. It is not a claim that Aristotle meant the modern four-chamber scheme.",
+  "caveats": [
+    "A web search used to find open heart pages displayed excerpts saying how many chambers mammals have, before this file was committed. The rule remains the claim's number, three, and was not adjusted to those excerpts.",
+    "No page in source_groups was fetched for this test before this commit.",
+    "Textbook agreement is not a sample of dissected hearts. Confidence is capped by the formula in the contract for that reason."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha05-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-17",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, among these four pigeons the wood pigeon (ring-dove) is largest, the stock dove next and only a little larger than the rock pigeon (common pigeon), and the turtle dove smallest.",
+  "pass_criterion": "Supports if both body mass and wing length, as species means, are strictly ordered Columba palumbus > Columba oenas > Columba livia > Streptopelia turtur, and the mass ratio Columba oenas / Columba livia is greater than 1.01 and at most 1.25. 'A little larger' is that mass-ratio band. A comparison is a tie, not a strict difference, when the ratio of the two means is between 0.99 and 1.01 inclusive. Strictly larger means the ratio of the claimed-larger species to the other is greater than 1.01.",
+  "fail_criterion": "Refutes if neither mass nor wing length has the order above, and at least one adjacent pair is reversed (ratio of claimed-larger to claimed-smaller below 0.99) in each of the two measurements. Mixed if the two measurements disagree, or if the only departures from the order are ties, or if the order holds in both measurements but the oenas/livia mass ratio is outside (1.01, 1.25]. Inconclusive, reason data-unavailable, if any of the four species lacks a Species1 row, a positive Mass, or a positive Wing.Length in the AVONET BirdLife sheet. Exact Species1 strings only: Columba palumbus, Columba oenas, Columba livia, Streptopelia turtur. No synonym is substituted after the file is opened.",
+  "planned_datasets": [
+    "avonet-tobias2022-eledata-birdlife"
+  ],
+  "test_contract": {
+    "expected_observation": "Species-mean mass and wing length decrease in the order wood pigeon, stock dove, rock pigeon, turtle dove, and the stock dove's mass exceeds the rock pigeon's by at most a quarter.",
+    "disconfirming_observation": "Both mass and wing length reverse at least one adjacent pair in that order.",
+    "admissible_datasets": "AVONET species means in ELEData/TraitData/AVONET1_BirdLife.csv (Species1, Mass in grams, Wing.Length in millimetres), from the figshare ELEData zip of Tobias et al. 2022. One row per species. The sheet is the BirdLife taxonomy version. No other bird-size source is used for the verdict.",
+    "inference_method": "Read the four rows, compare adjacent pairs with the 1.01 ratio rule, test the oenas/livia mass ratio against 1.25, and apply pass_criterion and fail_criterion. Confidence is 0.85 if supports and every adjacent mass ratio is at least 1.10, 0.65 if supports but some adjacent mass ratio is below 1.10, 0.85 if refutes, 0.60 if mixed, and 0.70 if inconclusive."
+  },
+  "dataset_urls": {
+    "avonet-tobias2022-eledata-birdlife": "https://ndownloader.figshare.com/files/38429873"
+  },
+  "interpretation": "The ring-dove (phatta) is the wood pigeon Columba palumbus, the stock-dove (oenas) is Columba oenas, the common pigeon is the rock pigeon Columba livia, and the turtle-dove is Streptopelia turtur. Size is species-mean body mass, checked with wing length so that a mass order that wing length reverses is not treated as settled. 'A little larger' is pre-registered as a mass excess of more than 1 percent and at most 25 percent. Individual, sex, and seasonal variation are not in the species means.",
+  "caveats": [
+    "The AVONET file path and column names are taken from earlier tests in this repository (darwin1859-ch13-08 and darwin1859-ch12-18). The four pigeon rows were not read before this commit.",
+    "Species means can hide overlap between stock dove and rock pigeon. The test uses the means the claim's ranking of kinds requires, and the tie band records means that are not separated."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  }
+}
