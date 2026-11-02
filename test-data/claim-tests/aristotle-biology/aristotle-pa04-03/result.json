@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-pa04-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-03",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, a compiled anatomical list records no gall bladder in the horse, the ass, deer, the roe deer, seals and dolphins, and records the camel as lacking a gall bladder or as having only small biliary vessels. The mule is scored only when the list names it.",
+  "pass_criterion": "Pre-registered. Download the Internet Archive OCR text of Gorham and Ivy 1938 (identifier generalfunctiono223gorh, file generalfunctiono223gorh_djvu.txt). Score eight groups — horse, ass, mule, deer, roe, camel, seal, dolphin — as matches, contradicts, or not_recorded, using the rules in test_contract. Supported if at least 6 groups match and zero groups contradict.",
+  "fail_criterion": "Pre-registered. Refuted if 2 or more groups contradict (a gall bladder is recorded as present; for the camel, a gall bladder is recorded and the text does not call the biliary vessels small or the bladder reduced). Mixed if exactly 1 group contradicts and at least 3 match. Inconclusive with reason underpowered if fewer than 4 groups are scored either way. Inconclusive with reason data-unavailable if the OCR text cannot be downloaded. Inconclusive with reason other if the file downloads but neither the symbol legend nor the keyword windows score any group. Uberon never_in_taxon annotations are confirmatory only: a missing annotation is not_recorded, not a contradiction, and Uberon alone cannot carry a support or refute verdict.",
+  "planned_datasets": [
+    "gorham-ivy-1938-bhl-ia-ocr",
+    "uberon-gallbladder-taxon-constraints"
+  ],
+  "test_contract": {
+    "expected_observation": "Horse, ass, deer, roe deer, seal and dolphin are recorded without a gall bladder, and the camel is recorded without one or with only small biliary vessels.",
+    "disconfirming_observation": "A normal gall bladder recorded for two or more of those groups. One contradicting group is a partial miss (mixed), not a full refutation.",
+    "admissible_datasets": "A public species-by-species anatomical compilation that states gall-bladder presence or absence and is independent of Aristotle, plus the Uberon gall-bladder term (UBERON:0002110) taxon restrictions as a second, non-decisive source. Login-walled matrices are not admissible. Deer means Cervidae, scored on the family or on its listed species, and roe deer (Capreolus) is a separate group. Seal means Phocidae. Dolphin means Delphinidae. Camel means Camelus, not Lama or Vicugna. Mule means a named mule, hinny, or horse-ass hybrid.",
+    "inference_method": "On each OCR line, match word-boundary names (horse: Equus caballus or horse; ass: Equus asinus, Equus africanus, donkey, or ass; mule: mule, hinny, or Equus mulus; deer: Cervidae, Cervus, Odocoileus, Alces, Rangifer, Muntiacus, or deer, excluding Capreolus; roe: Capreolus or roe; camel: Camelus or camel; seal: Phocidae, Phoca, Halichoerus, Mirounga, or seal; dolphin: Delphinidae, Delphinus, Tursiops, or dolphin). If a legend sentence defines a present-mark and an absent-mark, apply the mark on that line. Otherwise a 120-character window scores absent on 'absent', 'without', 'lacks', or 'no gall', and present on 'present', 'possesses', or 'has a gall'. Camel additionally matches on 'small' within 80 characters of 'duct', 'vessel', or 'biliary'. Deer, seal and dolphin match only if at least one member is absent and none is present; they contradict if any member is present. Groups with no hit are not_recorded. Thresholds are in pass_criterion and fail_criterion."
+  },
+  "interpretation": "The claim lists animals with no gall bladder at all, and qualifies the camel as having only small biliary vessels rather than none. 'Deer' and 'the roe' are kept as separate groups. 'Seal' is scored as true seals (Phocidae) and 'dolphin' as Delphinidae. A modern species inside a named group that has a gall bladder contradicts that group. The test does not ask why the bladder is absent.",
+  "caveats": [
+    "This file was committed before the OCR text or the Uberon term JSON was downloaded or read for this test.",
+    "The Biodiversity Heritage Library item page returned HTTP 403 to a scripted request. The same 1938 scan is the Internet Archive item generalfunctiono223gorh, whose DjVu text file returned HTTP 200 and is the file the analysis fetches.",
+    "OCR can drop table marks. The keyword window is the pre-registered fallback, not a second look at a different book.",
+    "Morph·D·Base MaTrics names a gall-bladder character but requires an account, so it is not used."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-4b39",
+    "date": "2026-11-01"
+  }
+}

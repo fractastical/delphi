@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ga03-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-15",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, fishes are not recorded as conceiving by milt that travels from the mouth through the intestine to the uterus, and in a documented teleost the mouth opens into the digestive tract rather than into the ovary.",
+  "pass_criterion": "Pre-registered. From FishBase reproduc (Source Cooperative snapshot v26.06, table reproduc) count distinct SpecCode values whose Fertilization cell is non-empty. Normalize by stripping, casefolding, and collapsing whitespace. A value is refuting if it contains intestin, gut, swallow, ingest, or uterus. Otherwise it is compatible if it is exactly one of: external; internal; internal (in the oviduct); in the mouth; in a brood pouch; in a brood pouch or similar structure; elsewhere; or if it starts with 'external', 'internal', or 'in a brood pouch'. Any other non-empty value is unclassified. 'In the mouth' is compatible: it places the meeting of egg and sperm in the buccal cavity and does not send milt through the intestine to the uterus, which is the route Aristotle calls impossible. Supported only if refuting species = 0, unclassified species = 0, species with a fertilization code >= 200, and the zebrafish anatomy subtest affirms separation.",
+  "fail_criterion": "Pre-registered. Refuted if one or more species carry a refuting fertilization code, or if the zebrafish anatomy file records a continuous_with or connected_to relationship between a mouth or oral-cavity term and an ovary, uterus, or gonad term. Mixed if the fertilization counts meet the support thresholds but the anatomy file lacks a mouth term and an intestine term, or if unclassified species are more than zero while refuting species are zero. Inconclusive with reason underpowered if the number of coded species is between 1 and 199. Inconclusive with reason data-unavailable if the parquet file or a Fertilization column cannot be read.",
+  "planned_datasets": [
+    "fishbase-v26.06-reproduc",
+    "zfin-anatomy-relationship"
+  ],
+  "test_contract": {
+    "expected_observation": "No FishBase fertilization code describes conception via the gut to the uterus, and the zebrafish mouth is part of the digestive tract while the ovary is not directly connected to the mouth.",
+    "disconfirming_observation": "Any species coded as fertilizing through the intestine, gut, or by swallowed milt, or an ontology link that joins the oral cavity directly to the ovary or uterus.",
+    "admissible_datasets": "The public FishBase reproduction table, which is a database of fishes independent of Aristotle, and the ZFIN anatomy relationship table for Danio rerio, a teleost with an explicit anatomical graph. Buccal fertilization and mouth brooding are admissible observations but are a different event from milt reaching the uterus through the gut. A login-walled source is not admissible.",
+    "inference_method": "Distinct species are counted by SpecCode under the closed code list in pass_criterion. The anatomical subtest passes if some mouth or oral-cavity item and some intestine item share a part_of or is_a chain into one digestive or alimentary item, and no continuous_with or connected_to edge joins a mouth item to an ovary, uterus, or gonad item. Thresholds are in pass_criterion and fail_criterion."
+  },
+  "interpretation": "The sentence under test is Aristotle's denial: fish are not conceived by the female swallowing the male's milt, because the passage from the mouth leads to the intestine and not to the uterus. The denial is about that path. Fertilization 'in the mouth' is pre-registered as a different event and is counted separately. One zebrafish graph does not survey every fish; it tests the anatomical clause in a species whose anatomy is coded, while FishBase tests the fertilization clause across the species that have a code.",
+  "caveats": [
+    "This file was committed before the FishBase parquet or the ZFIN relationship file was downloaded or read for this test.",
+    "The retired Ruby endpoint https://fishbase.ropensci.org/reproduc returned HTTP 404. The planned file is the v26.06 parquet at data.source.coop, whose HEAD response gave Content-Length 381404.",
+    "Unclassified codes are not silently folded into 'external'. They block a support verdict.",
+    "The anatomical clause is tested in Danio rerio only. A pass does not prove the same graph for every fish lineage."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-4b39",
+    "date": "2026-11-01"
+  }
+}

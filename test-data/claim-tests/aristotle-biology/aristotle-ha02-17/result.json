@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-ha02-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-17",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, dolphins are recorded as giving birth to live young, and females are recorded with two mammary glands opening by slits beside the genital slit rather than as teats high on the chest.",
+  "pass_criterion": "Pre-registered. Viviparity is affirmed if AnAge (genomics.senescence.info species dataset.zip) contains at least one Delphinidae row whose 'Gestation/Incubation (days)' is a number >= 180, or if at least one admissible narrative page says live young, gives birth, calf, or viviparous and does not say the species lays eggs. Mammary anatomy is affirmed if at least one narrative page matches a two-gland pattern ('two mammary', 'pair of mammary', 'mammary slits', or 'three slits') and a genital-position pattern ('mammary' within 120 characters of 'genital', or 'slit' within 80 characters of 'tail'). Supported only if viviparity is affirmed, mammary anatomy is affirmed, and no page contradicts.",
+  "fail_criterion": "Pre-registered. A contradiction is: a statement that dolphins lay eggs; a single mammary gland; mammary glands or teats on the chest or thorax; or the word teat/teats with no slit on the same page. Refuted if any contradiction is present. Mixed if viviparity is affirmed and no contradiction is present, but no page affirms the mammary pattern. Inconclusive with reason data-unavailable if the AnAge zip and every narrative page fail to load, or if none of them states a birth mode or a mammary fact. A narrative page whose body is under 2000 characters or does not contain 'dolphin' or 'cetacean' is treated as not loaded.",
+  "planned_datasets": [
+    "anage-species-dataset",
+    "adw-tursiops-truncatus",
+    "adw-delphinus-delphis",
+    "noaa-ocean-today-dolphin-anatomy",
+    "mmapl-cetacean-gender"
+  ],
+  "test_contract": {
+    "expected_observation": "Delphinids have a gestation measured in months and give birth to a calf, and the female has two mammary slits beside the genital opening rather than thoracic teats.",
+    "disconfirming_observation": "Egg-laying, a single mammary gland, or teats placed high on the chest.",
+    "admissible_datasets": "The public AnAge life-history table for a numeric gestation, and public anatomical prose about dolphins that can be fetched without a login. Scope is dolphins (Delphinidae), represented here by Delphinus, Tursiops, and pages that state the delphinid pattern. Skeletal scans that omit soft tissue are not admissible for the mammary clause.",
+    "inference_method": "AnAge rows are filtered to Family Delphinidae and the gestation column is read as days, as labeled. Narrative pages are scored by the fixed phrases in pass_criterion and fail_criterion. Both the birth clause and the mammary clause must hold, and any contradiction refutes."
+  },
+  "interpretation": "Aristotle's clauses kept distinct are: direct viviparity; two breasts; placement beside the genitals rather than high on the body; and slits rather than visible teats, with milk leaving through the slits. 'Three slits' on a female (one genital slit and two mammary slits) is pre-registered as the two-gland pattern. Nursing itself is not given a separate threshold beyond the slits being mammary.",
+  "caveats": [
+    "This file was committed before the AnAge zip or the narrative pages were downloaded or read for this test.",
+    "AnAge has no mammary-position column. The position clause depends on the prose pages.",
+    "The MMAPL URL returned HTTP 202 to a HEAD request. The analysis keeps the page only if the fetched body meets the length and keyword rule above."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-4b39",
+    "date": "2026-11-01"
+  }
+}
