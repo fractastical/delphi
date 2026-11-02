@@ -110,6 +110,13 @@ def main():
             }
         ]
         (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2) + "\n")
+        extra = measured.get("extra") or {}
+        result["results_summary"] = [
+            f"Homo sapiens maximum longevity is {measured.get('value')} years (quality {extra.get('human_quality')}).",
+            f"Credible non-elephant species at or above that value: {extra.get('n_non_elephant_ge_human')} of {extra.get('n_credible_nonhuman')}.",
+            f"Among mammals the same count is {extra.get('mammal_n_ge_human')} of {extra.get('mammal_n')}.",
+            "AnAge includes plants. The refutation does not depend on them: the exceedance list contains animals, including a mammal.",
+        ]
         RESULT.write_text(json.dumps(result, indent=2) + "\n")
         print(verdict, measured.get("value"), measured.get("n"))
 

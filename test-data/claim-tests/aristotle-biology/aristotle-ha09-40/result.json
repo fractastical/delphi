@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-40",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-40",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:35Z",
   "hypothesis": "If the claim holds, the European robin and the common redstart are one species that replaces itself seasonally, and the same is true of the blackcap and the garden warbler.",
   "pass_criterion": "Pre-registered. Each pair is supported only if the GBIF backbone assigns both names the same accepted species key. The claim is supported only if both pairs are supported. Pairs: Erithacus rubecula with Phoenicurus phoenicurus, and Sylvia atricapilla with Sylvia borin.",
@@ -26,5 +26,223 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-c447",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "measured": {
+    "value": 6,
+    "unit": "joint months across tested pairs in the region used",
+    "n": 2,
+    "extra": {
+      "pairs": [
+        {
+          "pair": "robin-redstart",
+          "pair_verdict": "refutes",
+          "same_accepted_species": false,
+          "name_a": "Erithacus rubecula",
+          "key_a": 2492462,
+          "name_b": "Phoenicurus phoenicurus",
+          "key_b": 5739317,
+          "region_used": "Greece",
+          "regions": [
+            {
+              "region": "Greece",
+              "skipped": null,
+              "joint_months": [
+                4,
+                5,
+                10
+              ],
+              "floor_a": 1274.3500000000001,
+              "floor_b": 149.3,
+              "total_a": 25633,
+              "total_b": 3111,
+              "months_a": {
+                "1": 3077,
+                "2": 2561,
+                "3": 2681,
+                "4": 1451,
+                "5": 1393,
+                "6": 723,
+                "7": 408,
+                "8": 510,
+                "9": 1171,
+                "10": 4385,
+                "11": 3874,
+                "12": 3253
+              },
+              "months_b": {
+                "1": 2,
+                "2": 2,
+                "3": 139,
+                "4": 892,
+                "5": 279,
+                "6": 22,
+                "7": 17,
+                "8": 258,
+                "9": 975,
+                "10": 387,
+                "11": 13,
+                "12": 0
+              }
+            }
+          ]
+        },
+        {
+          "pair": "blackcap-garden-warbler",
+          "pair_verdict": "refutes",
+          "same_accepted_species": false,
+          "name_a": "Sylvia atricapilla",
+          "key_a": 2492956,
+          "name_b": "Sylvia borin",
+          "key_b": 2492942,
+          "region_used": "Greece",
+          "regions": [
+            {
+              "region": "Greece",
+              "skipped": null,
+              "joint_months": [
+                4,
+                5,
+                9
+              ],
+              "floor_a": 972.7,
+              "floor_b": 69.05,
+              "total_a": 19580,
+              "total_b": 1504,
+              "months_a": {
+                "1": 1503,
+                "2": 1438,
+                "3": 2702,
+                "4": 3350,
+                "5": 1915,
+                "6": 733,
+                "7": 379,
+                "8": 347,
+                "9": 1668,
+                "10": 2596,
+                "11": 1500,
+                "12": 1323
+              },
+              "months_b": {
+                "1": 0,
+                "2": 0,
+                "3": 0,
+                "4": 305,
+                "5": 359,
+                "6": 10,
+                "7": 13,
+                "8": 165,
+                "9": 469,
+                "10": 60,
+                "11": 0,
+                "12": 0
+              }
+            }
+          ]
+        }
+      ],
+      "ncbi_taxonomy_check": [
+        {
+          "name": "Erithacus rubecula",
+          "taxid": "37610",
+          "byte_size": 295,
+          "sha256": "d3ccc25f4c68f6b0e11465e42433601716fd0f2538c277105aa08b76926154da"
+        },
+        {
+          "name": "Phoenicurus phoenicurus",
+          "taxid": "121423",
+          "byte_size": 306,
+          "sha256": "34bcd593470f2eecd3a6efe648d8637d943f5475d1fe234a538c2ddc3d393212"
+        },
+        {
+          "name": "Sylvia atricapilla",
+          "taxid": "48155",
+          "byte_size": 295,
+          "sha256": "220ccaf1c989e8faaaa1b0ac558a74da9a588a319bc6f9dec9303562510d4004"
+        },
+        {
+          "name": "Sylvia borin",
+          "taxid": "73324",
+          "byte_size": 283,
+          "sha256": "8c36dc436497251196b644f85ad0db23ae9a7adebcae3646b316d14cfc24623c"
+        }
+      ]
+    }
+  },
+  "method": "Resolved each name on the GBIF backbone, then counted non-fossil occurrences by month in Greece, falling back to Europe when a species had fewer than 30 Greek records. A pair of different accepted species with a month in which both cleared max(5, 5% of month-tagged records) refutes that pair; the claim is refuted if either pair is.",
+  "datasets": [
+    {
+      "id": "gbif-backbone-and-occurrences",
+      "name": "GBIF species backbone and occurrence index",
+      "landing_url": "https://www.gbif.org/",
+      "doi": null,
+      "version": "API as retrieved on the run date",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Erithacus+rubecula&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T00:30:00Z",
+          "byte_size": 458,
+          "sha256": "cd0cdb90e91bcd356910d3f13011313d7f59253518f60f3d6d52746883d5f310",
+          "name": "species-match:Erithacus rubecula"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Phoenicurus+phoenicurus&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T00:30:00Z",
+          "byte_size": 475,
+          "sha256": "0bef049bf29aed499f1f257b6276639b2061bec914e0b328531f55dc17ca0b81",
+          "name": "species-match:Phoenicurus phoenicurus"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492462&facet=month&facetLimit=20&limit=0&country=GR&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-11-02T00:30:00Z",
+          "byte_size": 422,
+          "sha256": "67ed520f1e2ba05549d70e98ae705f2c2fdbdd318d1cb916cf42158880dde6fe",
+          "name": "occurrences:robin-redstart:Greece:a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=5739317&facet=month&facetLimit=20&limit=0&country=GR&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 379,
+          "sha256": "fa07f6a82256217eca0d8509487b9ca3203c13e07b62c84296aa8b4fd722218a",
+          "name": "occurrences:robin-redstart:Greece:b"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Sylvia+atricapilla&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 452,
+          "sha256": "d70c17c7a87bbc6601b81cb0b9a1b753115831c653b58420a2a8f8ecad14ac51",
+          "name": "species-match:Sylvia atricapilla"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Sylvia+borin&kingdom=Animalia",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 434,
+          "sha256": "62e4db280634d097bf382dff71b2ffa2566674f894c6da77142f4777488b0a0b",
+          "name": "species-match:Sylvia borin"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492956&facet=month&facetLimit=20&limit=0&country=GR&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-11-02T00:30:02Z",
+          "byte_size": 422,
+          "sha256": "8f4c08939db37cf729c67cbdb1e6899953153a5c3f72822228617b980cd731d7",
+          "name": "occurrences:blackcap-garden-warbler:Greece:a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=2492942&facet=month&facetLimit=20&limit=0&country=GR&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-11-02T00:30:02Z",
+          "byte_size": 282,
+          "sha256": "5f2ecd433b8a5b83cbaaf5c97c3067f4c9691d92feb2808c481493d0a90077ff",
+          "name": "occurrences:blackcap-garden-warbler:Greece:b"
+        }
+      ],
+      "role": "accepted species keys and monthly occurrence counts for the two named pairs"
+    }
+  ],
+  "results_summary": [
+    "robin-redstart: refutes (Erithacus rubecula key 2492462 vs Phoenicurus phoenicurus key 5739317, region Greece)",
+    "blackcap-garden-warbler: refutes (Sylvia atricapilla key 2492956 vs Sylvia borin key 2492942, region Greece)"
+  ]
 }

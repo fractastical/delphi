@@ -124,7 +124,14 @@ def main():
         return n, k, (k / n if n else None)
 
     n_el, k_el, p_el = proportion("elasmobranchii", "viviparous")
-    n_act, k_act, p_act = proportion("actinopterygii", "oviparous")
+    # Schema deviation, recorded below: this snapshot has no Class value "Actinopterygii".
+    # Ray-finned fishes are Teleostei, Holostei, Chondrostei and Cladistii.
+    ray = {"teleostei", "holostei", "chondrostei", "cladistii"}
+    ray_sub = species[species["class_key"].isin(ray) & (species["mode"] != "unknown")]
+    n_act = int(ray_sub.shape[0])
+    k_act = int((ray_sub["mode"] == "oviparous").sum())
+    p_act = (k_act / n_act) if n_act else None
+    n_label, k_label, p_label = proportion("actinopterygii", "oviparous")
     holo = species[(species["class_key"] == "holocephali") & (species["mode"] != "unknown")]
     lophius = species[(species["genus_key"] == "lophius") & (species["mode"] != "unknown")]
     lophius_modes = sorted(lophius["mode"].unique().tolist())
@@ -142,10 +149,12 @@ def main():
             "elasmobranch_viviparous": k_el,
             "elasmobranch_proportion_viviparous": None if p_el is None else round(p_el, 4),
             "elasmobranch_mode_counts": counts("elasmobranchii"),
-            "actinopterygii_n": n_act,
-            "actinopterygii_oviparous": k_act,
+            "actinopterygii_label_n": n_label,
+            "ray_finned_n": n_act,
+            "ray_finned_oviparous": k_act,
+            "ray_finned_proportion_oviparous": None if p_act is None else round(p_act, 4),
+            "ray_finned_classes": sorted(ray),
             "actinopterygii_proportion_oviparous": None if p_act is None else round(p_act, 4),
-            "actinopterygii_mode_counts": counts("actinopterygii"),
             "holocephali_mode_counts": {m: int((holo["mode"] == m).sum()) for m in ["viviparous", "oviparous", "mixed"]} if len(holo) else {},
             "lophius_n_with_mode": int(len(lophius)),
             "lophius_modes": lophius_modes,
@@ -175,8 +184,16 @@ def main():
     result["method"] = (
         "Joined FishBase v26.06 species to families for class and to reproduc for RepGuild1 and RepGuild2. "
         "Internal live-bearing is a guild string with internal and bear, or vivip. Other non-empty guilds are oviparous. "
-        "Species proportions were compared with the pre-registered thresholds. Holocephali were not in the elasmobranch denominator."
+        "Species proportions were compared with the pre-registered thresholds. Holocephali were not in the elasmobranch denominator. "
+        "The class label Actinopterygii is absent; the bony-fish proportion uses Teleostei, Holostei, Chondrostei and Cladistii."
     )
+    result["deviations"] = [{
+        "date": "2026-11-01",
+        "field": "class label for other fishes",
+        "change": "The pre-registered class string Actinopterygii does not occur in families.Class. The bony-fish proportion uses the ray-finned classes present in the file: Teleostei, Holostei, Chondrostei and Cladistii.",
+        "thresholds_unchanged": True,
+        "why": "Schema label, found when the class column was tabulated. Thresholds 0.90/0.95 and 0.70/0.80 were not changed.",
+    }]
     result["datasets"] = [{
         "id": "fishbase-v26.06-species-families-reproduc",
         "name": "FishBase snapshot v26.06 (species, families, reproduc), via the rfishbase parquet mirror",
@@ -189,7 +206,7 @@ def main():
     }]
     result["results_summary"] = [
         f"Elasmobranchs with a mode: {k_el}/{n_el} internal live-bearing (proportion {measured['extra']['elasmobranch_proportion_viviparous']}).",
-        f"Actinopterygians with a mode: {k_act}/{n_act} oviparous (proportion {measured['extra']['actinopterygii_proportion_oviparous']}).",
+        f"Ray-finned fishes with a mode (Teleostei, Holostei, Chondrostei, Cladistii): {k_act}/{n_act} oviparous (proportion {measured['extra']['ray_finned_proportion_oviparous']}). The class label Actinopterygii matched {n_label} species.",
         f"Lophius species with a mode: {int(len(lophius))}, modes {lophius_modes}.",
     ]
     (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2) + "\n")

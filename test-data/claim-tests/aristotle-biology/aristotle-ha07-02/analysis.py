@@ -88,17 +88,21 @@ def main():
         verdict, reason, conf = "inconclusive", "underpowered", 0.35
         median = None
     else:
-        median = weighted_quantile(df["RHQ010"].to_numpy(), df["WTINT2YR"].to_numpy(), 0.5)
-        unweighted = float(np.median(df["RHQ010"].to_numpy()))
+        ages = df["RHQ010"].to_numpy()
+        weights = df["WTINT2YR"].to_numpy()
+        median = weighted_quantile(ages, weights, 0.5)
+        unweighted = float(np.median(ages))
+        at_or_below = float(weights[ages <= median].sum() / weights.sum())
         measured = {
             "value": round(median, 4),
             "unit": "years, survey-weighted median age at menarche",
             "n": n,
             "extra": {
                 "unweighted_median_years": unweighted,
-                "weight_sum": float(df["WTINT2YR"].sum()),
-                "min_years": float(df["RHQ010"].min()),
-                "max_years": float(df["RHQ010"].max()),
+                "weight_sum": float(weights.sum()),
+                "cumulative_weight_share_at_or_below_median": round(at_or_below, 6),
+                "min_years": float(ages.min()),
+                "max_years": float(ages.max()),
             },
         }
         if 13.0 <= median <= 15.0:
@@ -109,6 +113,10 @@ def main():
             verdict, reason, conf = "mixed", None, 0.55
         if abs(median - 13) < 0.25 or abs(median - 15) < 0.25 or abs(median - 12) < 0.25 or abs(median - 16) < 0.25:
             conf = min(conf, 0.45)
+        if 0.49 <= at_or_below <= 0.52:
+            result.setdefault("caveats", []).append(
+                "The cumulative interview weight first reaches one half inside the median age year, within 0.02 of one half, so the weighted median sits on a boundary between two integer ages."
+            )
 
     result.update({
         "status": "complete",

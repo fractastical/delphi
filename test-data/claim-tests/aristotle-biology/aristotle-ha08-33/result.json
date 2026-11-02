@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha08-33",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-33",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:35Z",
   "hypothesis": "If the claim holds, reported rabies deaths of humans are absent, while the disease is still recorded in other animals.",
   "pass_criterion": "Pre-registered. Supported only if the sum of reported human rabies deaths across Our World in Data rows with a three-letter Code is 0, at least 30 such rows exist, and the NNDSS 2022 national total for human rabies is 0 or missing. Animal case counts do not have to be zero.",
@@ -27,5 +27,73 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-c447",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "data_kind": "biological",
+  "measured": {
+    "value": 33009.0,
+    "unit": "reported human rabies deaths, sum of OWID country rows",
+    "n": 1513,
+    "extra": {
+      "owid": {
+        "sum_deaths": 33009.0,
+        "n_country_rows": 1513,
+        "n_positive_rows": 599,
+        "max_cell": 2014.0
+      },
+      "nndss_2022": {
+        "human_cumulative": null,
+        "animal_cumulative": 53.0,
+        "human_from_week_sum": null,
+        "mmwr_week": 5.0,
+        "reporting_area": "TOTAL",
+        "human_column": "Rabies, Human, Cum 2022\u2020",
+        "animal_column": "Rabies, Animal, Cum 2022\u2020"
+      }
+    }
+  },
+  "method": "Summed reported human rabies deaths on OWID rows with a three-letter country code, and read the NNDSS 2022 national total cumulative human count at the last MMWR week. A positive count on either source refutes the exception for man. Animal counts were stored and not scored.",
+  "datasets": [
+    {
+      "id": "owid-reported-human-rabies-deaths",
+      "name": "Our World in Data, reported number of human rabies deaths",
+      "landing_url": "https://ourworldindata.org/grapher/reported-rabies-deaths",
+      "doi": null,
+      "version": "as retrieved",
+      "license": "CC BY",
+      "files": [
+        {
+          "name": "owid-reported-rabies-deaths.csv",
+          "download_url": "https://ourworldindata.org/grapher/reported-rabies-deaths.csv",
+          "retrieved_at": "2026-11-02T00:33:55Z",
+          "byte_size": 30829,
+          "sha256": "c9ee40af301da9c24085c153557d0876cef5047aa6cb4fd2f434c1e15b0d742f"
+        }
+      ],
+      "role": "country-year reported human rabies deaths"
+    },
+    {
+      "id": "nndss-table-1cc-2022-6uy5-4d9d",
+      "name": "NNDSS Table 1CC, Rabies animal and human, 2022",
+      "landing_url": "https://data.cdc.gov/d/6uy5-4d9d",
+      "doi": null,
+      "version": "2022",
+      "license": "public domain (U.S. government work)",
+      "files": [
+        {
+          "name": "nndss-1cc-2022.csv",
+          "download_url": "https://data.cdc.gov/api/views/6uy5-4d9d/rows.csv?accessType=DOWNLOAD",
+          "retrieved_at": "2026-11-02T00:33:55Z",
+          "byte_size": 37196,
+          "sha256": "eda22d4144ac76feb8eea7fad59d639f19ac99800bc9fe1d98e047ad336613c8"
+        }
+      ],
+      "role": "United States provisional cumulative human and animal rabies cases for 2022"
+    }
+  ],
+  "results_summary": [
+    "OWID country rows: sum of reported human rabies deaths = 33009.0 across 1513 rows, of which 599 are positive.",
+    "NNDSS 2022 national animal cumulative = 53.0; human cumulative = None. The NNDSS 2022 extract's human cumulative cells are blank and the file only contains early MMWR weeks, so it does not supply the US count."
+  ]
 }

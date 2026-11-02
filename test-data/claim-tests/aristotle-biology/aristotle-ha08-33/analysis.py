@@ -82,10 +82,17 @@ def nndss_totals(path):
         rows = list(csv.DictReader(f))
     if not rows:
         return None
-    fields = rows[0].keys()
-    human_cum = next((c for c in fields if c.lower().startswith("rabies_human_cum_") and "flag" not in c.lower()), None)
-    animal_cum = next((c for c in fields if c.lower().startswith("rabies_animal_cum_") and "flag" not in c.lower()), None)
-    human_week = next((c for c in fields if "rabies_human_current_week" in c.lower() and "flag" not in c.lower()), None)
+    fields = list(rows[0].keys())
+
+    def norm(name):
+        return "".join(ch for ch in name.casefold() if ch.isalnum())
+
+    def pick(pred):
+        return next((c for c in fields if pred(norm(c))), None)
+
+    human_cum = pick(lambda n: n.startswith("rabieshumancum2022") and "flag" not in n)
+    animal_cum = pick(lambda n: n.startswith("rabiesanimalcum2022") and "flag" not in n)
+    human_week = pick(lambda n: "rabieshumancurrentweek" in n and "flag" not in n)
     area_col = "Reporting Area" if "Reporting Area" in fields else "reporting_area"
     week_col = "MMWR Week" if "MMWR Week" in fields else "mmwr_week"
 
@@ -185,6 +192,13 @@ def main():
     })
     if reason:
         result["reason"] = reason
+    nndss_note = ""
+    if nndss and nndss.get("human_cumulative") is None:
+        nndss_note = " The NNDSS 2022 extract's human cumulative cells are blank and the file only contains early MMWR weeks, so it does not supply the US count."
+    result["results_summary"] = [
+        f"OWID country rows: sum of reported human rabies deaths = {None if owid is None else owid['sum_deaths']} across {None if owid is None else owid['n_country_rows']} rows, of which {None if owid is None else owid['n_positive_rows']} are positive.",
+        f"NNDSS 2022 national animal cumulative = {None if not nndss else nndss.get('animal_cumulative')}; human cumulative = {None if not nndss else nndss.get('human_cumulative')}.{nndss_note}",
+    ]
     (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2) + "\n")
     RESULT.write_text(json.dumps(result, indent=2) + "\n")
     print(verdict, measured["value"])

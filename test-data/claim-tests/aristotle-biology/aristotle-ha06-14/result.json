@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-14",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:35Z",
   "hypothesis": "If the claim holds, elasmobranchs bear live young after internal eggs, actinopterygian fishes lay eggs, and Lophius is oviparous.",
   "pass_criterion": "Pre-registered. Using the FishBase v26.06 snapshot tables species, families and reproduc: a reproduc row is internal live-bearing if casefolded RepGuild2 contains both 'internal' and 'bear', or contains 'vivip'. A row with a non-empty RepGuild1 or RepGuild2 that is not internal live-bearing is oviparous. RepGuild1 'bearers' with no internal/viviparous RepGuild2 is unknown, not viviparous, so mouth-brooders are not counted as live-bearing. A species is viviparous if it has an internal-live-bearing row and no oviparous row, oviparous if the reverse, and mixed if it has both. Mixed species count in the denominator and as neither mode. Supported only if at least 50 elasmobranch species and at least 500 actinopterygian species have a mode, the viviparous proportion among elasmobranchs is >= 0.90, the oviparous proportion among actinopterygians is >= 0.95, and every Lophius species with a mode is oviparous (at least one Lophius species must have a mode).",
@@ -26,5 +26,106 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-c447",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "measured": {
+    "value": 0.5863,
+    "unit": "proportion of coded elasmobranch species that are internal live-bearers",
+    "n": 846,
+    "extra": {
+      "elasmobranch_viviparous": 496,
+      "elasmobranch_proportion_viviparous": 0.5863,
+      "elasmobranch_mode_counts": {
+        "viviparous": 496,
+        "oviparous": 350,
+        "mixed": 0,
+        "unknown": 453
+      },
+      "actinopterygii_label_n": 0,
+      "ray_finned_n": 12330,
+      "ray_finned_oviparous": 11874,
+      "ray_finned_proportion_oviparous": 0.963,
+      "ray_finned_classes": [
+        "chondrostei",
+        "cladistii",
+        "holostei",
+        "teleostei"
+      ],
+      "actinopterygii_proportion_oviparous": 0.963,
+      "holocephali_mode_counts": {
+        "viviparous": 0,
+        "oviparous": 33,
+        "mixed": 0
+      },
+      "lophius_n_with_mode": 7,
+      "lophius_modes": [
+        "oviparous"
+      ],
+      "lophius_all_oviparous": true,
+      "classes_seen": [
+        "chondrostei",
+        "cladistii",
+        "class",
+        "coelacanthi",
+        "dipneusti",
+        "elasmobranchii",
+        "holocephali",
+        "holostei",
+        "myxini",
+        "petromyzonti",
+        "teleostei"
+      ]
+    }
+  },
+  "method": "Joined FishBase v26.06 species to families for class and to reproduc for RepGuild1 and RepGuild2. Internal live-bearing is a guild string with internal and bear, or vivip. Other non-empty guilds are oviparous. Species proportions were compared with the pre-registered thresholds. Holocephali were not in the elasmobranch denominator. The class label Actinopterygii is absent; the bony-fish proportion uses Teleostei, Holostei, Chondrostei and Cladistii.",
+  "datasets": [
+    {
+      "id": "fishbase-v26.06-species-families-reproduc",
+      "name": "FishBase snapshot v26.06 (species, families, reproduc), via the rfishbase parquet mirror",
+      "landing_url": "https://www.fishbase.se/",
+      "doi": null,
+      "version": "v26.06",
+      "license": "CC BY-NC",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:29:59Z",
+          "byte_size": 3469911,
+          "sha256": "87c99bc57f368c6102ea4042e7e6c8019c7405d5a352ead840f06244609ab101"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:29:59Z",
+          "byte_size": 274721,
+          "sha256": "2f5e806d0af38aa4fe5422d29cdff94a2532382203b0d6b60412e48f4f4b4147"
+        },
+        {
+          "name": "reproduc.parquet",
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:29:59Z",
+          "byte_size": 381404,
+          "sha256": "b631704f0f4972acdb2edb5d3105f0a6172adb4c473d73e505113f8288418247"
+        }
+      ],
+      "role": "class membership and reproductive guild for elasmobranchs, actinopterygians and Lophius"
+    }
+  ],
+  "results_summary": [
+    "Elasmobranchs with a mode: 496/846 internal live-bearing (proportion 0.5863).",
+    "Ray-finned fishes with a mode (Teleostei, Holostei, Chondrostei, Cladistii): 11874/12330 oviparous (proportion 0.963). The class label Actinopterygii matched 0 species.",
+    "Lophius species with a mode: 7, modes ['oviparous']."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "field": "class label for other fishes",
+      "change": "The pre-registered class string Actinopterygii does not occur in families.Class. The bony-fish proportion uses the ray-finned classes present in the file: Teleostei, Holostei, Chondrostei and Cladistii.",
+      "thresholds_unchanged": true,
+      "why": "Schema label, found when the class column was tabulated. Thresholds 0.90/0.95 and 0.70/0.80 were not changed."
+    }
+  ]
 }

@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha03-07",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-07",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:35Z",
   "hypothesis": "If the claim holds, the aorta and the vena cava are anatomically continuous with the heart, and neither is recorded as developing from the brain or the head.",
   "pass_criterion": "Pre-registered. In Uberon basic release v2026-10-01, the term named aorta has a continuity relation to a heart structure, and at least one term named exactly posterior vena cava, caudal vena cava, vena cava, anterior vena cava or cranial vena cava has a continuity relation to a heart structure, and neither the aorta nor those vena-cava terms has develops_from pointing at a brain or head term. Continuity predicates are continuous_with, connected_to, connects, adjacent_to, supplies, drains, branches_from, tributary_of, and the relation ids RO:0002150, RO:0002170, RO:0002176. develops_from includes RO:0002202. A heart structure is a term whose name is heart or contains heart, ventricle, atrium, cardiac, bulbus arteriosus or conus arteriosus. A brain or head term has name brain or head, or contains brain.",
@@ -26,5 +26,82 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-c447",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "supports",
+  "confidence": 0.55,
+  "data_kind": "biological",
+  "measured": {
+    "value": 2,
+    "unit": "great-vessel groups (aorta, vena cava) with a heart-continuity relation",
+    "n": 3,
+    "extra": {
+      "relation_rows_parsed": 34252,
+      "aorta": {
+        "id": "UBERON:0000947",
+        "name": "aorta",
+        "heart": [
+          {
+            "predicate": "is_a",
+            "id": "UBERON:0013768",
+            "name": "great vessel of heart"
+          }
+        ],
+        "brain_continuity": [],
+        "develops_from_brain_or_head": []
+      },
+      "vena_cava_terms": [
+        {
+          "id": "UBERON:0001585",
+          "name": "anterior vena cava",
+          "heart": [],
+          "brain_continuity": [],
+          "develops_from_brain_or_head": []
+        },
+        {
+          "id": "UBERON:0004087",
+          "name": "vena cava",
+          "heart": [
+            {
+              "predicate": "is_a",
+              "id": "UBERON:0013768",
+              "name": "great vessel of heart"
+            }
+          ],
+          "brain_continuity": [],
+          "develops_from_brain_or_head": []
+        }
+      ],
+      "n_vena_cava_terms_found": 2
+    }
+  },
+  "method": "Parsed Uberon basic v2026-10-01 term blocks, matched the aorta and the listed vena-cava names, and scored continuity with heart structures against develops_from brain or head, using the predicates fixed in the pre-registration.",
+  "datasets": [
+    {
+      "id": "uberon-basic-v2026-10-01",
+      "name": "Uberon basic anatomy ontology, release v2026-10-01",
+      "landing_url": "https://obophenotype.github.io/uberon/",
+      "doi": null,
+      "version": "v2026-10-01",
+      "license": null,
+      "files": [
+        {
+          "name": "uberon-basic.obo",
+          "download_url": "https://github.com/obophenotype/uberon/releases/download/v2026-10-01/uberon-basic.obo",
+          "retrieved_at": "2026-11-02T00:34:11Z",
+          "byte_size": 12155980,
+          "sha256": "5e1eff802a4d99f7a072f6cd239f50cffdb70aec2b11e33edf00e66746a0a75b"
+        }
+      ],
+      "role": "cross-species relations of the aorta and the vena cava to the heart and the brain"
+    }
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "field": "heart-attachment predicate",
+      "change": "is_a is counted as a heart attachment when the parent class name contains heart, in particular 'great vessel of heart'.",
+      "thresholds_unchanged": true,
+      "why": "The first parse found the aorta and vena cava terms but no continuous_with or connected_to edges. In uberon-basic those vessels are subclasses of great vessel of heart rather than continuous_with a chamber."
+    }
+  ]
 }

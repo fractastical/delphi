@@ -125,14 +125,21 @@ def main():
             "common": (r.get("Common name") or "").strip(),
             "clutch": size,
         })
-    kestrels = [p for p in raptors if p["binomial"].lower() == "falco tinnunculus" and p["clutch"] is not None]
+    kestrel_rows = [p for p in raptors if p["binomial"].lower() == "falco tinnunculus"]
+    kestrels = [p for p in kestrel_rows if p["clutch"] is not None]
     others = [p for p in raptors if p["binomial"].lower() != "falco tinnunculus" and p["clutch"] is not None]
     if not kestrels or len(others) < 15:
         measured = {
             "value": kestrels[0]["clutch"] if kestrels else None,
             "unit": "eggs per clutch",
             "n": len(others),
-            "extra": {"n_raptors_with_clutch": len(others) + len(kestrels), "kestrel_found": bool(kestrels), "range_cells": range_used},
+            "extra": {
+                "n_raptors_with_clutch": len(others) + (1 if kestrels else 0),
+                "kestrel_row_present": bool(kestrel_rows),
+                "kestrel_clutch_blank": bool(kestrel_rows) and not kestrels,
+                "kestrel_found": bool(kestrels),
+                "range_cells": range_used,
+            },
         }
         reason = "underpowered" if kestrels and len(others) < 15 else "data-unavailable"
         finish("inconclusive", reason, 0.35, measured, "AnAge loaded, but the kestrel clutch or the minimum of 15 other raptor clutches was missing.")

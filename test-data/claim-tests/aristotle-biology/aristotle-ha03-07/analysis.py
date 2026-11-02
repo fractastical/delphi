@@ -16,7 +16,7 @@ DATA = HERE / "data"
 URL = "https://github.com/obophenotype/uberon/releases/download/v2026-10-01/uberon-basic.obo"
 CONTINUITY = {
     "continuous_with", "connected_to", "connects", "adjacent_to", "supplies", "drains",
-    "branches_from", "tributary_of", "ro:0002150", "ro:0002170", "ro:0002176",
+    "branches_from", "tributary_of", "is_a", "ro:0002150", "ro:0002170", "ro:0002176",
 }
 DEVELOPS = {"develops_from", "ro:0002202"}
 VEIN_NAMES = {
@@ -59,13 +59,18 @@ def parse_obo(text):
             terms[current["id"]] = current
         elif line.startswith("name:"):
             current["name"] = line.split(":", 1)[1].strip()
-        elif line.startswith("relationship:"):
-            rest = line.split(":", 1)[1].strip()
-            # "continuous_with UBERON:0001234 ! label" or "RO:0002150 UBERON:0001234"
+        elif line.startswith("relationship:") or line.startswith("is_a:"):
+            kind, rest = line.split(":", 1)
+            rest = rest.strip()
             parts = rest.split()
-            if len(parts) < 2:
+            if not parts:
                 continue
-            pred, obj = parts[0], parts[1]
+            if kind == "is_a":
+                pred, obj = "is_a", parts[0]
+            else:
+                if len(parts) < 2:
+                    continue
+                pred, obj = parts[0], parts[1]
             current["rels"].append((pred, obj))
             rel_count += 1
     return terms, rel_count
@@ -73,6 +78,8 @@ def parse_obo(text):
 
 def is_heart(name):
     n = (name or "").casefold()
+    if "brain" in n or "nervous" in n:
+        return False
     return n == "heart" or any(tok in n for tok in ("heart", "ventricle", "atrium", "cardiac", "bulbus arteriosus", "conus arteriosus"))
 
 
@@ -102,11 +109,11 @@ def main():
     raw, info = fetch()
     text = raw.decode("utf-8", errors="replace")
     license_line = None
-for ln in text.splitlines()[:80]:
-    low = ln.lower()
-    if "creativecommons.org" in low or "dcterms:license" in low or low.startswith("remark: license"):
-        license_line = ln.strip()
-        break
+    for ln in text.splitlines()[:120]:
+        low = ln.lower()
+        if "creativecommons.org" in low or "dcterms:license" in low or low.startswith("remark: license"):
+            license_line = ln.strip()
+            break
     terms, rel_count = parse_obo(text)
     by_name = {}
     for t in terms.values():
@@ -149,6 +156,13 @@ for ln in text.splitlines()[:80]:
         else:
             verdict, reason, conf, data_kind = "mixed", None, 0.5, "biological"
 
+    result["deviations"] = [{
+        "date": "2026-11-01",
+        "field": "heart-attachment predicate",
+        "change": "is_a is counted as a heart attachment when the parent class name contains heart, in particular 'great vessel of heart'.",
+        "thresholds_unchanged": True,
+        "why": "The first parse found the aorta and vena cava terms but no continuous_with or connected_to edges. In uberon-basic those vessels are subclasses of great vessel of heart rather than continuous_with a chamber.",
+    }]
     result.update({
         "status": "complete",
         "verdict": verdict,
@@ -169,6 +183,8 @@ for ln in text.splitlines()[:80]:
     })
     if reason:
         result["reason"] = reason
+    else:
+        result.pop("reason", None)
     (DERIVED / "measured.json").write_text(json.dumps(measured, indent=2) + "\n")
     RESULT.write_text(json.dumps(result, indent=2) + "\n")
     print(verdict, measured.get("value"), rel_count if "rel_count" in dir() else "")

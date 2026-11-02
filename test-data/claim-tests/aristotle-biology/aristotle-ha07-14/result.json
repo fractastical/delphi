@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha07-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-14",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:35Z",
   "hypothesis": "If the claim holds, most women stop menstruating at about forty, with a tail that reaches about fifty, and childbearing is recorded through the forties.",
   "pass_criterion": "Pre-registered. This test cannot return supports. The NCHS birth-rate table's oldest age group is 45-49 years, so it has no bin for births beyond fifty, and a universal negative ('no case on record' past that age) is unscored. A menopause pattern that matches the claim is therefore mixed, not a pass. Match would have required, and is reported but not allowed to pass: weighted median of RHQ060 in [38, 43] and weighted 90th percentile in [48, 55], among women with RHD043 = 7 (Menopause/Change of life) and RHQ060 in 20-59, age at interview >= 20, WTINT2YR > 0, n >= 100. The weighted percentile is the smallest age at which cumulative interview weight reaches the stated fraction of total weight.",
@@ -27,5 +27,86 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-c447",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "measured": {
+    "value": 50.0,
+    "unit": "years, survey-weighted median age at last menstrual period among natural menopause",
+    "n": 771,
+    "extra": {
+      "weighted_p90_years": 55.0,
+      "unweighted_median_years": 50.0,
+      "pattern_would_match_pass_description": false,
+      "births_descriptive": {
+        "columns": [
+          "Year",
+          "Age Group",
+          "Birth Rate"
+        ],
+        "latest_year": 2018,
+        "rates": {
+          "40-44 Years": 11.8,
+          "45-49 Years": 0.9
+        },
+        "age_groups": [
+          "10-14 Years",
+          "15-19 Years",
+          "20-24 Years",
+          "25-29 Years",
+          "30-34 Years",
+          "35-39 Years",
+          "40-44 Years",
+          "45-49 Years"
+        ]
+      }
+    }
+  },
+  "method": "Restricted NHANES 2017-2018 to women with RHD043 = 7 and RHQ060 in 20-59, computed the weighted median and 90th percentile, and applied the pre-registered median thresholds. NCHS birth rates were summarized for the latest year and not used for the verdict.",
+  "datasets": [
+    {
+      "id": "nhanes-2017-2018-rhq-demo",
+      "name": "NHANES 2017-2018 reproductive health questionnaire and demographics",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire&Cycle=2017-2018",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "public domain (U.S. government work)",
+      "files": [
+        {
+          "name": "RHQ_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/RHQ_J.xpt",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 1242960,
+          "sha256": "c919896216154ea207470dd84e428f5fdd65ced39735148c78fb6032e0b77a7b"
+        },
+        {
+          "name": "DEMO_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "age at last menstrual period among women coded as menopause"
+    },
+    {
+      "id": "nchs-birth-rates-by-age-yt7u-eiyg",
+      "name": "NCHS - Birth Rates for Females by Age Group: United States",
+      "landing_url": "https://data.cdc.gov/d/yt7u-eiyg",
+      "doi": null,
+      "version": "as retrieved",
+      "license": "public domain (U.S. government work)",
+      "files": [
+        {
+          "name": "nchs-birth-rates-by-age.csv",
+          "download_url": "https://data.cdc.gov/api/views/yt7u-eiyg/rows.csv?accessType=DOWNLOAD",
+          "retrieved_at": "2026-11-02T00:30:01Z",
+          "byte_size": 13902,
+          "sha256": "ffd01792f2e7e2d3c7f0d1381f14673f9967a8f08ab43b09a9c3590dbb606d91"
+        }
+      ],
+      "role": "descriptive birth rates at 40-44 and 45-49; no age bin past 49"
+    }
+  ]
 }
