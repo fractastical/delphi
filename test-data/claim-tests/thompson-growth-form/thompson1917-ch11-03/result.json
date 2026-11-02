@@ -1,0 +1,39 @@
+{
+  "claim_id": "thompson1917-ch11-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-03",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If a constant ratio of longitudinal to transverse growth produces a logarithmic spiral, and the magnitude of that ratio fixes the spiral's constant angle, then ammonoid species whose whorl-height index drifts through ontogeny will also show a drifting whorl expansion rate, and species whose whorl-height index stays steady will keep a steady expansion rate.",
+  "pass_criterion": "Pre-registered (claim supported). From Walton and Korn's ontogenetic table (Dryad 10.5061/dryad.c17p8, file Ontogenetic_Conch_Parameter_Data.xlsx, registered md5 0302022d2f622b73754cf0e66c54f2ac, 215182 bytes), keep a species only if it has at least 8 rows with finite WER > 0 and UWI in [0, 1). Set WHI = (1 - UWI) / 2. CV is the sample standard deviation (divisor n - 1) divided by the mean. Let rho be the Spearman rank correlation, across eligible species, between CV(WHI) and CV(WER): average ranks for ties, then the Pearson correlation of the ranks. The two-sided p-value is from t = rho * sqrt((n - 2) / (1 - rho^2)) with n - 2 degrees of freedom, or p = 0 when |rho| = 1. Supported only if n >= 40, rho >= 0.30 and p < 0.01.",
+  "fail_criterion": "Pre-registered (claim refuted). Refuted if n >= 40 and rho <= 0.10. If 0.10 < rho < 0.30, or if rho >= 0.30 but p >= 0.01, the verdict is mixed. If rho is not finite, the verdict is inconclusive with reason other. If fewer than 40 species are eligible, the verdict is inconclusive with reason underpowered. If the file is missing a per-species ontogenetic series of both WER and UWI, or its md5 or byte size differs from the values registered above, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "walton-korn-2018-ontogenetic-conch-dryad-c17p8"
+  ],
+  "test_contract": {
+    "expected_observation": "Across ammonoid species, ontogenetic variation in the whorl-height index (transverse aperture size relative to diameter) is positively associated with ontogenetic variation in the whorl expansion rate (the quantity that fixes the equiangular-spiral angle): Spearman rho at least 0.30, n at least 40, two-sided p below 0.01.",
+    "disconfirming_observation": "A Spearman rho of 0.10 or below: species whose transverse proportion drifts are not the species whose expansion rate drifts, so a constant growth-rate ratio does not predict a constant spiral angle in these shells.",
+    "admissible_datasets": "An openly licensed table of ontogenetic measurements of ammonoid or other tubular shells, taken independently of Thompson's text, with at least a species identifier, Korn's whorl expansion rate, and an umbilical-width or whorl-height index at successive growth stages. Horns are inside the claim's scope but are not required for this test. Images and login-gated scans are not admissible.",
+    "inference_method": "One CV(WHI) and one CV(WER) per species; Spearman rank correlation of those pairs; two-sided p from the t approximation stated in pass_criterion. Thresholds in pass_criterion and fail_criterion are the verdict. No other statistic changes the verdict."
+  },
+  "interpretation": "Thompson's 'vertical' direction is elongation of the tube and his 'transverse' direction is expansion of the aperture in the plane of coiling. In a planispiral median section the standard identity uw = dm - wh1 - wh2 gives, when the two whorl heights are equal, wh/dm = (1 - UWI) / 2. That ratio is WHI here: the integrated transverse-to-longitudinal proportion, not a pair of instantaneous rates. Korn's WER = (dm1/dm2)^2, with dm1 and dm2 half a whorl apart, equals the diameter ratio over a full whorl when the spiral is logarithmic, and the constant angle satisfies tan(alpha) = 2*pi / ln(WER). Constancy of WER is constancy of alpha. The test asks whether variation in the transverse proportion predicts variation in that angle. It does not test the bending-couple mechanism, and it does not include horns.",
+  "secondary_analyses_descriptive": [
+    "The same Spearman correlation with CWI (conch width index, width perpendicular to the coiling plane) in place of WHI, reported and not used for the verdict.",
+    "Among eligible species with CV(WHI) <= 0.05 and at least 15 such species, the ordinary least-squares R^2 of species-mean ln(WER) on species-mean WHI, as a check on whether the magnitude of the ratio fixes the angle. Not used for the verdict.",
+    "For eligible species with mean WER > 1, alpha = arctan(2*pi / ln(mean WER)) in degrees: median, minimum and maximum. The circle is the limit alpha -> 90 degrees (WER -> 1) and the straight line is alpha -> 0 (WER -> infinity). Not used for the verdict."
+  ],
+  "caveats": [
+    "Before this registration the Dryad API record was read: file name, byte size 215182, md5 0302022d2f622b73754cf0e66c54f2ac, CC0, publication date 2018-05-16, and the file description naming CWI, UWI and WER. The workbook was not downloaded and no cell value was read.",
+    "The Dryad abstract states that CWI and UWI commonly change through ontogeny in a few recurring phases (C-mode and M-mode). That is prior knowledge that those two indices are often not constant. No WER statistic and no correlation were stated there, and none has been computed.",
+    "The half-whorl definition WER = (dm1/dm2)^2 is the standard one restated in the readme of Hoffmann et al.'s Kosmoceras table (Zenodo 10.5281/zenodo.5011159), which was read as documentation and is not the dataset for this test. It was not checked against Walton and Korn's cells.",
+    "WHI derived from UWI assumes the two whorl heights on one diameter are equal. A shell with wh1 different from wh2 makes (1 - UWI)/2 an average relative height, not one margin's growth rate.",
+    "A positive correlation of coefficients of variation can be produced by measurement noise that differs among species. The test does not separate that from a biological link.",
+    "Ammonoids are tubular shells in the sense of this chapter. The claim also names horns, which this table does not contain."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/thompson-ch11-shell-tests-f00f",
+    "date": "2026-11-01"
+  }
+}
