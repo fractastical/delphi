@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha05-26",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-26",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:45:00Z",
   "hypothesis": "If the dromedary carries its young for twelve months and bears one at a time, the life-history tables give Camelus dromedarius a gestation within one month of 365.25 days and a litter size of one.",
   "pass_criterion": "Pre-registered (claim supported). In every database that reports the value, Camelus dromedarius gestation falls in the open interval (334.813, 395.687) days, which is 12 months of 30.437 days, plus or minus one such month, around 365.25 days; and litter size falls in [1.0, 1.05]. At least one database must report both a gestation and a litter size. Where both databases report the same quantity, they fall in the same band.",
@@ -19,7 +19,10 @@
   },
   "interpretation": "The claim says twelve months, so the tolerance is one month, not the year-wide window used for the elephant's 'two years'. 'Never more than one' is read as a species-typical litter of one. A mean of at most 1.05 still counts as one. A mean of 1.5 or more means more than one is usual. A mean below 1 is not a pass: it is not 'one young'. The scope note names the Arabian dromedary, so the Bactrian camel is not part of the verdict.",
   "caveats": [
-    "The dromedary rows in these two tables have not been read. The bands above were fixed from the wording 'twelve months' and from the litter bands already used for elephants, including an explicit band for a mean below 1."
+    "The dromedary rows in these two tables had not been read when the bands were fixed.",
+    "AnAge gives 405 days (13.3 months of 30.437 days), which is past the one-month edge at 395.687 days and short of the two-month refute edge at 426.118 days. PanTHERIA gives 386.51 days (12.7 months), inside the one-month band. The two tables therefore do not share a gestation band.",
+    "PanTHERIA litter size is 0.98, which misses the pass interval [1.0, 1.05] by 0.02 and falls in the pre-registered below-1 band. AnAge litter size is 1. The verdict uses those bands. It does not average the two gestations and then re-test the average.",
+    "Camelus bactrianus is in both tables and does not vote. Its values are stored beside the dromedary rows."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -27,5 +30,106 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-ha-claim-tests-665a",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.64,
+  "datasets": [
+    {
+      "id": "anage-dataset-zip",
+      "name": "AnAge life-history table (build 15)",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gkx1042",
+      "version": "build 15",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "final_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:29:45Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "gestation and litter size for Camelus dromedarius"
+    },
+    {
+      "id": "pantheria-1-0-wr05-aug2008",
+      "name": "PanTHERIA 1.0 WR05 August 2008",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "doi": "10.1890/08-1494.1",
+      "version": "1.0 (WR05, Aug 2008)",
+      "license": "Ecological Archives; copyright restrictions stated as none",
+      "files": [
+        {
+          "name": "PanTHERIA_1-0_WR05_Aug2008.txt",
+          "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "final_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "retrieved_at": "2026-11-02T00:29:45Z",
+          "byte_size": 2359096,
+          "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a"
+        }
+      ],
+      "role": "independent gestation and litter size for Camelus dromedarius"
+    }
+  ],
+  "measured": {
+    "value": 395.75,
+    "unit": "days, mean of reported Camelus dromedarius gestation values",
+    "n": 2,
+    "uncertainty": "gestation clause mixed; litter clause mixed; days [405.0, 386.51]; litter [1.0, 0.98]",
+    "extra": {
+      "rows": [
+        {
+          "database": "anage",
+          "species": "Camelus bactrianus",
+          "gestation_days": 395.0,
+          "litter_size": 1.0,
+          "gestation_band": "pass",
+          "litter_band": "pass",
+          "gestation_months": 12.978,
+          "votes": false
+        },
+        {
+          "database": "anage",
+          "species": "Camelus dromedarius",
+          "gestation_days": 405.0,
+          "litter_size": 1.0,
+          "gestation_band": "mixed",
+          "litter_band": "pass",
+          "gestation_months": 13.306,
+          "votes": true
+        },
+        {
+          "database": "pantheria",
+          "species": "Camelus dromedarius",
+          "gestation_days": 386.51,
+          "litter_size": 0.98,
+          "gestation_band": "pass",
+          "litter_band": "mixed",
+          "gestation_months": 12.699,
+          "votes": true
+        },
+        {
+          "database": "pantheria",
+          "species": "Camelus bactrianus",
+          "gestation_days": 397.99,
+          "litter_size": 1.39,
+          "gestation_band": "mixed",
+          "litter_band": "mixed",
+          "gestation_months": 13.076,
+          "votes": false
+        }
+      ],
+      "gestation_clause": "mixed",
+      "litter_clause": "mixed"
+    }
+  },
+  "deviations": [],
+  "method": "Downloaded AnAge and PanTHERIA, kept genus Camelus, and scored only Camelus dromedarius. Gestation clause mixed. Litter clause mixed. Camelus bactrianus is listed in measured.extra and does not vote.",
+  "results_summary": [
+    "Dromedary gestation days: [405.0, 386.51]. Litter sizes: [1.0, 0.98].",
+    "Gestation clause mixed; litter clause mixed; verdict mixed."
+  ]
 }

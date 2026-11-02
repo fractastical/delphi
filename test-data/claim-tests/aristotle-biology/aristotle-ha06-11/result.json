@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha06-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-11",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T01:00:00Z",
+  "hypothesis": "If the cuckoo is not a hawk, and hawks prey on it, which they do not do to their own species, the common cuckoo and the Eurasian sparrowhawk fall in different families, at least one public interaction records a hawk eating a common cuckoo, and no public interaction records a sparrowhawk eating a sparrowhawk.",
+  "pass_criterion": "Pre-registered (claim supported). Open Tree of Life assigns Cuculus canorus and Accipiter nisus to different families, the GloBI query of Accipitridae preying on Cuculus canorus returns at least one interaction, and the GloBI query of Accipiter nisus preying on Accipiter nisus returns none.",
+  "fail_criterion": "Pre-registered (claim refuted). The same family for both birds refutes 'not a hawk'. A successful predation query that returns zero interactions of Accipitridae on Cuculus canorus refutes 'has been seen to be preyed on by the hawk'. If the families differ and at least one cuckoo predation is recorded and at least one conspecific sparrowhawk predation is recorded, the verdict is mixed: they are not one kind, and the premise that this never happens within a species fails. If either API does not return a readable result, the verdict is inconclusive with reason data-unavailable. Talon shape and resemblance to a pigeon are not in these two sources and are not scored.",
+  "planned_datasets": [
+    "opentree-taxonomy-v3",
+    "globi-interactions"
+  ],
+  "test_contract": {
+    "expected_observation": "The common cuckoo and the sparrowhawk are in different families, a hawk is recorded eating a common cuckoo, and the sparrowhawk is not recorded eating its own species.",
+    "disconfirming_observation": "The two birds placed in one family, or a completed search that finds no hawk eating a common cuckoo. A record of a sparrowhawk eating a sparrowhawk removes the premise that such predation never happens within a species, which yields mixed rather than a simple refutation of the cuckoo's distinctness.",
+    "admissible_datasets": "The Open Tree of Life taxonomy for the family of Cuculus canorus and Accipiter nisus, and Global Biotic Interactions records whose source is in Accipitridae and whose target is Cuculus canorus, plus the same service for Accipiter nisus on itself. Interaction types counted as predation are preysOn, eats, and kills. Aristotle's sentence is not a source. Beak and claw measurements are not in these sources and are out of scope for this test.",
+    "inference_method": "Read the family from each Open Tree taxon record. Count GloBI interaction records of the two queries. Support only if the families differ, the cuckoo-predation count is at least 1, and the conspecific count is 0. Refute if the families match or the cuckoo-predation count is 0. Mixed if the families differ, the cuckoo count is at least 1, and the conspecific count is at least 1. No resolvability score is used."
+  },
+  "interpretation": "The quote's argument is that a hawk has been seen to eat a cuckoo, and that birds do not prey on their own species, so the cuckoo is not a hawk. 'Hawk' is read as Accipiter, and the sparrowhawk Accipiter nisus is the species used for the conspecific query. 'Not the same kind' is read as a different family in the Open Tree taxonomy, which is a modern classification and not Aristotle's. The claim's remarks on crooked talons and a pigeon-like head are not measured here.",
+  "caveats": [
+    "The two services were not queried for these taxa before this file was committed. Family names and interaction counts will be whatever the services return."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-ha-claim-tests-665a",
+    "date": "2026-11-01"
+  }
+}
