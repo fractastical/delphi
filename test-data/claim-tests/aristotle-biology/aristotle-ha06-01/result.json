@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-01",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-01",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:42:19Z",
   "hypothesis": "If birds with crooked talons are unprolific except the kestrel, which is the most prolific of them and lays four eggs and occasionally more, then among raptors and owls the common kestrel has the strictly highest median clutch and a recorded maximum of at least 5, and every other species in that set has a median clutch of at most 3.",
   "pass_criterion": "Pre-registered. Use species-level rows only (subspecies blank or the missing code -999) in class Aves whose order is Accipitriformes, Falconiformes, or Strigiformes, with litter_or_clutch_size_n greater than 0 (values below 0 are the dataset's missing code and are dropped). One row per genus+species; if a genus+species is duplicated at species level, drop that species. The kestrel is genus Falco and species tinnunculus, not Falco naumanni. Kmed is its median clutch. Kmax is max_litter_clutch_size from Amniote_Range_Count_Aug_2015.csv for that same species (values below 0 are missing). Others are the remaining species with a positive median. Let C1 be: every other median is less than or equal to 3. Let C2 be: Kmed is strictly greater than every other median. Let C3 be: Kmax is greater than or equal to 5. Supports only if C1, C2, and C3 all hold and n_other is at least 30. Refutes if Kmax is less than 4, or if any other median is greater than or equal to Kmed. Mixed if Kmax is at least 4 and C2 holds, but C1 fails or Kmax is exactly 4 (four eggs are recorded, but not 'occasionally more', or not every other raptor is unprolific). Inconclusive with reason 'data-unavailable' if the zip or either CSV is missing or the published MD5 does not match (database file 10e7c14395d95ed7f53258f96fadb4f7, range file 8095602c7d10befc52feaf22db8e6c76). Inconclusive with reason 'underpowered' if Falco tinnunculus has no species-level median or n_other is below 30. Inconclusive with reason 'other' if more than one species-level row remains for Falco tinnunculus. Do not add orders after seeing clutch sizes. Confidence: 0.80 if supports or refutes, 0.55 if mixed.",
@@ -18,7 +18,8 @@
   },
   "interpretation": "Crooked-talon birds are the orders named in the claim's scope: Accipitriformes, Falconiformes, and owls (Strigiformes). The kestrel is the common kestrel, Falco tinnunculus. 'Unprolific' has no number in the sentence; the cutoff of 3 eggs is this test's measurable reading of a small clutch, set before seeing the table. The median ranks typical clutch size. The maximum is what 'as many as four, and occasionally more' refers to. A species-level median cannot by itself show an occasional larger clutch, which is why the range file is required.",
   "caveats": [
-    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the figshare zip was downloaded. https://api.figshare.com/v2/articles/3563457 lists ECOL_96_269.zip (6539535 bytes) at https://ndownloader.figshare.com/files/8067269, licence CC0, doi 10.6084/m9.figshare.3563457.v1. The direct Ecological Archives CSV URL returned HTTP 404, so the figshare copy of the same release is the file. Column names and the -999 missing code were read from the Ecological Archives metadata page. MD5 strings were copied from that page's file list. No clutch size was read."
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the figshare zip was downloaded. https://api.figshare.com/v2/articles/3563457 lists ECOL_96_269.zip (6539535 bytes) at https://ndownloader.figshare.com/files/8067269, licence CC0, doi 10.6084/m9.figshare.3563457.v1. The direct Ecological Archives CSV URL returned HTTP 404, so the figshare copy of the same release is the file. Column names and the -999 missing code were read from the Ecological Archives metadata page. MD5 strings were copied from that page's file list. No clutch size was read.",
+    "Recorded maxima of species other than the kestrel are not used in the verdict. At least one of those maxima is 15 or above, which is left as published in the range file."
   ],
   "deviations": [],
   "created": "2026-11-01",
@@ -27,5 +28,232 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-654f",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "measured": {
+    "value": 4.5,
+    "unit": "eggs (median clutch of Falco tinnunculus)",
+    "n": 434,
+    "uncertainty": null,
+    "extra": {
+      "kestrel_median": 4.5,
+      "kestrel_maximum": 5.1,
+      "n_other": 433,
+      "max_other_median": 8.0,
+      "n_other_median_above_3": 134,
+      "n_other_median_ge_kestrel": 39,
+      "c1_all_others_median_le_3": false,
+      "c2_kestrel_strictly_highest_median": false,
+      "c3_kestrel_maximum_ge_5": true,
+      "others_at_or_above_kestrel": [
+        {
+          "binomial": "Athene cunicularia",
+          "order": "Strigiformes",
+          "median": 8.0,
+          "maximum": 8.1,
+          "common_name": "Burrowing Owl"
+        },
+        {
+          "binomial": "Surnia ulula",
+          "order": "Strigiformes",
+          "median": 7.0,
+          "maximum": 8.0,
+          "common_name": "Northern Hawk-Owl"
+        },
+        {
+          "binomial": "Falco rupicoloides",
+          "order": "Falconiformes",
+          "median": 6.5,
+          "maximum": 22.0,
+          "common_name": "Greater Kestrel"
+        },
+        {
+          "binomial": "Asio flammeus",
+          "order": "Strigiformes",
+          "median": 6.0,
+          "maximum": 7.1,
+          "common_name": "Short-eared Owl"
+        },
+        {
+          "binomial": "Bubo scandiacus",
+          "order": "Strigiformes",
+          "median": 6.0,
+          "maximum": 7.0,
+          "common_name": "Snowy Owl"
+        },
+        {
+          "binomial": "Aegolius acadicus",
+          "order": "Strigiformes",
+          "median": 5.5,
+          "maximum": 5.9,
+          "common_name": "Northern Saw-whet Owl"
+        },
+        {
+          "binomial": "Aegolius ridgwayi",
+          "order": "Strigiformes",
+          "median": 5.5,
+          "maximum": 5.5,
+          "common_name": "Unspotted Saw-whet Owl"
+        },
+        {
+          "binomial": "Tyto alba",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "maximum": 6.0,
+          "common_name": "Western Barn Owl"
+        },
+        {
+          "binomial": "Tyto delicatula",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "maximum": 6.0,
+          "common_name": "Eastern Barn Owl"
+        },
+        {
+          "binomial": "Tyto deroepstorffi",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "maximum": 6.0,
+          "common_name": "Andaman Masked Owl"
+        },
+        {
+          "binomial": "Tyto glaucops",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "maximum": 6.0,
+          "common_name": "Ashy-faced Owl"
+        },
+        {
+          "binomial": "Aegolius funereus",
+          "order": "Strigiformes",
+          "median": 5.145,
+          "maximum": 5.7,
+          "common_name": "Boreal Owl"
+        },
+        {
+          "binomial": "Glaucidium passerinum",
+          "order": "Strigiformes",
+          "median": 5.0,
+          "maximum": 5.3,
+          "common_name": "Eurasian Pygmy Owl"
+        },
+        {
+          "binomial": "Strix butleri",
+          "order": "Strigiformes",
+          "median": 5.0,
+          "maximum": 5.0,
+          "common_name": "Hume's Owl"
+        },
+        {
+          "binomial": "Tyto longimembris",
+          "order": "Strigiformes",
+          "median": 4.9,
+          "maximum": 4.9,
+          "common_name": "Eastern Grass Owl"
+        }
+      ],
+      "largest_other_clutches": [
+        {
+          "binomial": "Athene cunicularia",
+          "order": "Strigiformes",
+          "median": 8.0,
+          "common_name": "Burrowing Owl"
+        },
+        {
+          "binomial": "Surnia ulula",
+          "order": "Strigiformes",
+          "median": 7.0,
+          "common_name": "Northern Hawk-Owl"
+        },
+        {
+          "binomial": "Falco rupicoloides",
+          "order": "Falconiformes",
+          "median": 6.5,
+          "common_name": "Greater Kestrel"
+        },
+        {
+          "binomial": "Asio flammeus",
+          "order": "Strigiformes",
+          "median": 6.0,
+          "common_name": "Short-eared Owl"
+        },
+        {
+          "binomial": "Bubo scandiacus",
+          "order": "Strigiformes",
+          "median": 6.0,
+          "common_name": "Snowy Owl"
+        },
+        {
+          "binomial": "Aegolius acadicus",
+          "order": "Strigiformes",
+          "median": 5.5,
+          "common_name": "Northern Saw-whet Owl"
+        },
+        {
+          "binomial": "Aegolius ridgwayi",
+          "order": "Strigiformes",
+          "median": 5.5,
+          "common_name": "Unspotted Saw-whet Owl"
+        },
+        {
+          "binomial": "Tyto alba",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "common_name": "Western Barn Owl"
+        },
+        {
+          "binomial": "Tyto delicatula",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "common_name": "Eastern Barn Owl"
+        },
+        {
+          "binomial": "Tyto deroepstorffi",
+          "order": "Strigiformes",
+          "median": 5.15,
+          "common_name": "Andaman Masked Owl"
+        }
+      ]
+    }
+  },
+  "datasets": [
+    {
+      "id": "myhrvold-2015-amniote-figshare-3563457-v1",
+      "name": "An amniote life-history database (Myhrvold et al. 2015), figshare Full Archive",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.3563457.v1",
+      "doi": "10.6084/m9.figshare.3563457.v1",
+      "version": "v1",
+      "license": "CC0",
+      "files": [
+        {
+          "name": "ECOL_96_269.zip",
+          "download_url": "https://ndownloader.figshare.com/files/8067269",
+          "retrieved_at": "2026-11-02T00:47:16Z",
+          "byte_size": 6539535,
+          "sha256": "f7a8973452625422868ff33cc6fc2362e965eede173b2fd4262ed1668abe0f2f"
+        },
+        {
+          "name": "Data_Files/Amniote_Database_Aug_2015.csv",
+          "byte_size": 4728122,
+          "md5": "10e7c14395d95ed7f53258f96fadb4f7",
+          "sha256": "ae16377ebe8a172949c2b8c200a50c5d0c7fc04d34bd3c9704635da4a4d51f53"
+        },
+        {
+          "name": "Data_Files/Amniote_Range_Count_Aug_2015.csv",
+          "byte_size": 8708516,
+          "md5": "8095602c7d10befc52feaf22db8e6c76",
+          "sha256": "d9ef8d1d33b2ff9e0cef93919491151446887eba09037c24c663f61e4d030516"
+        }
+      ],
+      "role": "species-level median clutch size and recorded clutch-size maximum for birds"
+    }
+  ],
+  "method": "Downloaded the figshare archive, checked both CSV files against the Ecological Archives MD5 values, and compared species-level median clutch size for Aves in Accipitriformes, Falconiformes, and Strigiformes. The kestrel maximum came from the range file. Orders were not added after the values were read.",
+  "results_summary": [
+    "Falco tinnunculus median 4.5, maximum 5.1. Other species with a median: 433. Largest other median: 8.0.",
+    "C1 all others <= 3: False. C2 kestrel strictly highest: False. C3 maximum >= 5: True.",
+    "Other species with median > 3: 134. Other species with median >= kestrel: 39."
+  ]
 }

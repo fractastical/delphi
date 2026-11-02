@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha08-33",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-33",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:42:19Z",
   "hypothesis": "If rabies is fatal to every bitten animal except man, then public surveillance records no human death from rabies.",
   "pass_criterion": "Pre-registered. Primary series: WHO GHO indicator NTD_RAB2 via https://apps.who.int/gho/athena/api/GHO/NTD_RAB2.json?profile=simple . Keep country-year rows and drop aggregates whose geography code is GLOBAL, AFR, AMR, EMR, EUR, SEAR, or WPR, or whose spatial dimension type is REGION. A positive country-year has a numeric death count of at least 1. Concordance series: the Our World in Data CSV of the same chart, rows whose country code matches three letters, with the same positive rule; blank codes and the entity World are aggregates and are dropped. Refutes if WHO has at least one positive country-year and OWID, if it parses, also has at least one. If OWID does not parse, the verdict still follows WHO and the failed check is recorded in caveats. If WHO has at least one positive country-year and OWID parses to zero positive country-years, the verdict is mixed. Supports is not available from a run of zeros: if WHO returns at least 50 country-year rows and every numeric value is 0, the verdict is inconclusive with reason 'underpowered', because absent reports do not show that man cannot die of rabies. Inconclusive with reason 'data-unavailable' if the WHO file cannot be fetched or no country-year numeric values can be identified. Animal fatality and canine fatality are not scored. Confidence: 0.88 if refutes and WHO positive country-years are at least 10; 0.70 if refutes and that count is 1 to 9; 0.40 if mixed.",
@@ -28,5 +28,42 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-654f",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.3,
+  "data_kind": "none",
+  "measured": {
+    "value": null,
+    "unit": "WHO country-years with at least one reported human rabies death",
+    "n": 0,
+    "uncertainty": null,
+    "extra": {
+      "error": "WHO response was not JSON; it begins with <!DOCTYPE html> <html lang=\"en\"> <head> "
+    }
+  },
+  "method": "The pre-registered WHO athena URL was fetched. The body was not a JSON series, so no death count was computed and the OWID file was not used as a substitute.",
+  "results_summary": [
+    "WHO request failed: WHO response was not JSON; it begins with <!DOCTYPE html> <html lang=\"en\"> <head> "
+  ],
+  "datasets": [
+    {
+      "id": "who-gho-ntd-rab2",
+      "name": "WHO GHO athena request for NTD_RAB2",
+      "landing_url": "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/reported-number-of-human-rabies-deaths",
+      "doi": null,
+      "version": "athena profile=simple at retrieval",
+      "license": "WHO Global Health Observatory",
+      "files": [
+        {
+          "name": "ntd_rab2.json",
+          "download_url": "https://apps.who.int/gho/athena/api/GHO/NTD_RAB2.json?profile=simple",
+          "retrieved_at": "2026-11-02T00:50:54Z",
+          "byte_size": 75892,
+          "sha256": "171dbcada10dd1ff79d80103b6ec6544753a8faf357069a6a5358b8d02d30a64"
+        }
+      ],
+      "role": "intended country-year death series; the body received was not JSON"
+    }
+  ]
 }

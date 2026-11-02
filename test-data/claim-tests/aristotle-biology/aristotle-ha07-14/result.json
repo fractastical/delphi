@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha07-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-14",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:42:19Z",
   "hypothesis": "If menstruation ceases in most women at about forty, and in some lasts to about fifty, and women of about that age bear children, then the median recalled age at natural menopause is within two years of forty, a minority of those ages fall around fifty, and civil registration records live births at ages 48 and 49.",
   "pass_criterion": "Pre-registered. Menopause: NHANES 2017-2018 RHQ_J, women with RHD043 equal to 7 (Menopause/Change of life), exact RHQ060 ages from 20 through 59 inclusive. Codes 19, 60, 777, and 999 are excluded from the median. Weighted median uses DEMO_J WTINT2YR by the same cumulative-weight rule as the menarche test (smallest age at which cumulative positive weight reaches half the total). Unweighted median uses equal weights. Near means both medians are in [38, 42]. Far means a median is less than or equal to 35 or greater than or equal to 45. The tail condition holds if at least 10 included women have an exact age in [48, 52] and that count is at most half of the included women. Births: Eurostat demo_fagec, ages Y48 and Y49 only, summing the marital-status total if a total category is present and otherwise summing the non-total marital categories, and summing only geographic codes of length 2 (aggregates such as EU, EA, EEA, and codes containing an underscore are excluded). Supports only if both menopause medians are near, the tail condition holds, at least 100 included menopause ages remain, and the summed Y48 plus Y49 births are at least 1. Refutes if both medians are far and at least 100 included ages remain. The far rule wins over the support rule. Mixed if the medians are gray or disagree, or the medians are near but the tail or the Eurostat birth count fails the support rule, or Eurostat cannot be fetched when the medians are near. Inconclusive with reason 'data-unavailable' if the NHANES files or WTINT2YR cannot be used. Inconclusive with reason 'underpowered' if fewer than 100 included menopause ages remain. Inconclusive with reason 'other' if code 60 or code 19 exceeds 5 percent of RHQ060 values among RHD043=7. Y_GE50 is downloaded and reported and is not used in the verdict, because that bin includes age 50 and cannot show a birth after 50. NHANES RHD190 is not used, because the public code 45 means '45 years or older' and cannot separate age 50 from later ages. Confidence: 0.75 if refutes, 0.50 if supports, 0.55 if mixed.",
@@ -20,14 +20,122 @@
   },
   "interpretation": "The quote says menstrual discharge ceases in most women about the fortieth year, lasts to the fiftieth in some, that women of that age have borne children, and that beyond that age there is no case on record. Qwen's partial verdict was that births to women past fifty are too sparse to settle the last clause. That clause is not measurable in the public files checked before registration: NHANES top-codes age at last live birth at '45 or older', Eurostat's open age is Y_GE50, and the Human Fertility Database zip redirects to a login. The test therefore scores the menstrual clause and the existence of births at 48 and 49, and it says so. It does not claim to have tested the absence of births after 50. The sample for menopause is United States residents interviewed in 2017-2018 who gave menopause as the reason periods had stopped.",
   "caveats": [
-    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the XPT files and the Eurostat data query were downloaded. Codebook labels, including RHD043 code 7 and the RHQ060 and RHD190 special codes, were read from the NHANES HTML documentation, which also prints frequencies. Those frequencies are not the measurements. Age cutoffs are the claim's fortieth and fiftieth years. https://www.humanfertility.org/File/Download/Files/zip/USA.zip redirects to /Account/Login and is not a planned file."
+    "Registered at 2026-11-02T00:42:19Z (7:42 PM America/New_York on 2026-11-01), before the XPT files and the Eurostat data query were downloaded. Codebook labels, including RHD043 code 7 and the RHQ060 and RHD190 special codes, were read from the NHANES HTML documentation, which also prints frequencies. Those frequencies are not the measurements. Age cutoffs are the claim's fortieth and fiftieth years. https://www.humanfertility.org/File/Download/Files/zip/USA.zip redirects to /Account/Login and is not a planned file.",
+    "Eurostat two-letter geography codes include both FR and FX, so France can contribute twice to the birth sum. The support rule uses only whether that sum is at least 1."
   ],
-  "deviations": [],
+  "deviations": [
+    {
+      "date": "2026-11-02",
+      "text": "Deviation, 2026-11-02: the first run of this script summed every indic_de category. The pre-registered rule is to use the total category when one is present. In demo_fagec that total is coded LBIRTH ('Live births - total'), not TOTAL. This run keeps only categories whose label contains 'total'. The menopause medians, which decide a refute, do not use this sum."
+    }
+  ],
   "created": "2026-11-01",
   "agent": {
     "kind": "cloud-agent",
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-654f",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.75,
+  "data_kind": "biological",
+  "measured": {
+    "value": 50.0,
+    "unit": "years (weighted median age at natural menopause, RHQ060 among RHD043=7)",
+    "n": 771,
+    "uncertainty": null,
+    "extra": {
+      "weighted_median_years": 50.0,
+      "unweighted_median_years": 50.0,
+      "both_near": false,
+      "both_far": true,
+      "n_age_48_to_52": 336,
+      "tail_condition": true,
+      "maximum_exact_age": 59.0,
+      "minimum_exact_age": 30.0,
+      "eurostat": {
+        "births_y48_plus_y49": 78354.0,
+        "positive_cells_y48_y49": 3098,
+        "births_y_ge50_not_used": 50956.0,
+        "suspicious_cell": false,
+        "dimensions": [
+          "freq",
+          "unit",
+          "age",
+          "indic_de",
+          "geo",
+          "time"
+        ],
+        "marital_dimension": "indic_de",
+        "used_total_codes": [
+          "LBIRTH"
+        ],
+        "used_marital_total": true
+      },
+      "eurostat_error": null,
+      "beyond_age_50_births_scored": false
+    }
+  },
+  "datasets": [
+    {
+      "id": "nhanes-2017-2018-rhq-j",
+      "name": "NHANES 2017-2018 Reproductive Health (RHQ_J)",
+      "landing_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/RHQ_J.htm",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "U.S. government public-use file (National Center for Health Statistics)",
+      "files": [
+        {
+          "name": "RHQ_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/RHQ_J.xpt",
+          "retrieved_at": "2026-11-02T00:47:16Z",
+          "byte_size": 1242960,
+          "sha256": "c919896216154ea207470dd84e428f5fdd65ced39735148c78fb6032e0b77a7b"
+        }
+      ],
+      "role": "age at last menstrual period among women who gave menopause as the reason periods had stopped"
+    },
+    {
+      "id": "nhanes-2017-2018-demo-j",
+      "name": "NHANES 2017-2018 Demographics (DEMO_J)",
+      "landing_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.htm",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "U.S. government public-use file (National Center for Health Statistics)",
+      "files": [
+        {
+          "name": "DEMO_J.xpt",
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-11-02T00:47:16Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "interview weight WTINT2YR"
+    },
+    {
+      "id": "eurostat-demo-fagec",
+      "name": "Eurostat live births by mother's age and legal marital status (demo_fagec)",
+      "landing_url": "https://ec.europa.eu/eurostat/databrowser/view/demo_fagec/default/table",
+      "doi": null,
+      "version": "dissemination API at retrieval",
+      "license": "Eurostat copyright; reuse under the Eurostat reuse policy",
+      "files": [
+        {
+          "name": "demo_fagec.json",
+          "download_url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fagec?format=JSON&lang=en&age=Y48&age=Y49&age=Y_GE50",
+          "retrieved_at": "2026-11-02T00:47:18Z",
+          "byte_size": 207331,
+          "sha256": "e60216d2b66e4ddb17f4e98b135459b081922a75e27b2ee5a93150108193a6de"
+        }
+      ],
+      "role": "live births at mother's ages 48 and 49; the Y_GE50 bin is stored and not scored"
+    }
+  ],
+  "method": "Restricted RHQ_J to RHD043=7, kept exact RHQ060 ages 20-59, and computed weighted and unweighted medians with WTINT2YR. Separately summed Eurostat demo_fagec live births at ages Y48 and Y49 for two-letter geographies. Y_GE50 was not used in the verdict.",
+  "results_summary": [
+    "Weighted median 50.0 years; unweighted median 50.0 years; n=771; ages 48-52: 336.",
+    "Eurostat births at 48 plus 49: 78354.0. Y_GE50 sum (not scored): 50956.0.",
+    "Births after the fiftieth birthday were not scored."
+  ]
 }

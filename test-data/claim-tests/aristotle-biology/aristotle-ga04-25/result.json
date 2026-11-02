@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga04-25",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-25",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:42:19Z",
   "hypothesis": "If man lives longer than any animal of which there is credible experience, except the elephant, then in a curated maximum-longevity table the human record exceeds every non-elephant animal record that the table itself marks as credible, and an elephant record is at least as long as the human record.",
   "pass_criterion": "Pre-registered. From AnAge rows with Kingdom Animalia (if that column is present), a parseable maximum longevity in years greater than 0, and Data quality exactly 'high' or 'acceptable' (case-insensitive). Homo sapiens is the human row (genus Homo, species sapiens); if several admissible human rows exist, the human record is their maximum. Elephants are genus Elephas or Loxodonta only. Let n_exceed be the number of admissible non-human, non-elephant rows whose maximum longevity is greater than or equal to the human record. Supports only if n_exceed is 0, at least one admissible elephant row exists, and the maximum elephant longevity is greater than or equal to the human record. Refutes if n_exceed is at least 1. Mixed if n_exceed is 0 and either no admissible elephant row exists or the elephant maximum is strictly below the human record. Inconclusive with reason 'underpowered' if fewer than 100 admissible animal rows remain, and with reason 'data-unavailable' if the zip cannot be fetched or Homo sapiens has no admissible longevity. If the Data quality column does not contain the tokens high and acceptable, do not relabel other tokens; inconclusive with reason 'other'. Confidence, set with the verdict and not by revising this rule: 0.85 if refutes and n_exceed is at least 3; 0.60 if refutes and n_exceed is 1 or 2; 0.70 if supports; 0.55 if mixed.",
@@ -27,5 +27,168 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-claim-tests-654f",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "anage-build-dataset-zip",
+      "name": "AnAge: The Animal Ageing and Longevity Database (latest stable build, dataset.zip)",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "stable build served on the HAGR download page at retrieval",
+      "license": "HAGR licence; the download page states the file is freely available. See https://genomics.senescence.info/legal.html",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:47:15Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+          "name": "dataset.zip",
+          "inner_file": "anage_data.txt"
+        }
+      ],
+      "role": "maximum longevity, data quality, and taxonomy for humans, elephants, and other animals"
+    }
+  ],
+  "method": "Downloaded the AnAge zip, opened the tab-separated table inside it, and kept Animalia rows with data quality high or acceptable and a positive maximum longevity. Compared the maximum Homo sapiens value with every other admissible species, leaving out Elephas and Loxodonta, and applied the pre-registered rule.",
+  "measured": {
+    "value": 17,
+    "unit": "non-elephant species with credible maximum longevity >= Homo sapiens",
+    "n": 4028,
+    "uncertainty": null,
+    "extra": {
+      "human_maximum_longevity_years": 122.5,
+      "n_human_rows": 1,
+      "elephant_maximum_longevity_years": 79.6,
+      "elephant_rows": [
+        {
+          "binomial": "Elephas maximus",
+          "years": 79.6,
+          "quality": "acceptable",
+          "origin": "captivity"
+        },
+        {
+          "binomial": "Loxodonta africana",
+          "years": 65.0,
+          "quality": "acceptable",
+          "origin": "captivity"
+        }
+      ],
+      "n_exceed": 17,
+      "exceeding_species": [
+        {
+          "binomial": "Arctica islandica",
+          "common_name": "Ocean quahog clam",
+          "years": 507.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Somniosus microcephalus",
+          "common_name": "Greenland shark",
+          "years": 392.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Escarpia laminata",
+          "common_name": "Escarpia laminata",
+          "years": 300.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Seepiophila jonesi",
+          "common_name": "Seepiophila jonesi",
+          "years": 300.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Lamellibrachia luymesi",
+          "common_name": "Lamellibrachia luymesi",
+          "years": 250.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Balaena mysticetus",
+          "common_name": "Bowhead whale",
+          "years": 211.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Sebastes aleutianus",
+          "common_name": "Rougheye rockfish",
+          "years": 205.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Strongylocentrotus franciscanus",
+          "common_name": "Red sea urchin",
+          "years": 200.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Chelonoidis nigra",
+          "common_name": "Galapagos tortoise",
+          "years": 177.0,
+          "quality": "acceptable",
+          "origin": "captivity"
+        },
+        {
+          "binomial": "Panopea generosa",
+          "common_name": "Pacific geoduck",
+          "years": 168.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Sebastes borealis",
+          "common_name": "Shortraker rockfish",
+          "years": 157.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Acipenser fulvescens",
+          "common_name": "Lake sturgeon",
+          "years": 152.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Aldabrachelys gigantea",
+          "common_name": "Aldabra tortoise",
+          "years": 152.0,
+          "quality": "acceptable",
+          "origin": "captivity"
+        },
+        {
+          "binomial": "Hoplostethus atlanticus",
+          "common_name": "Orange roughy",
+          "years": 149.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        },
+        {
+          "binomial": "Allocyttus verrucosus",
+          "common_name": "Warty oreo",
+          "years": 140.0,
+          "quality": "acceptable",
+          "origin": "wild"
+        }
+      ]
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "results_summary": [
+    "Admissible rows: 4028. Human maximum: 122.5 years. elephant maximum 79.6 years.",
+    "Non-elephant species at or above the human record: 17.",
+    "Verdict follows the pre-registered comparison and does not use assessor scores."
+  ]
 }
