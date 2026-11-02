@@ -1,0 +1,974 @@
+{
+  "claim_id": "levin-2022-grn-learning-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-11",
+  "project": "levin-papers",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T01:05:00Z",
+  "hypothesis": "If UCS-based memory in these pathway ODEs is stable, then among Table S1 models that form at least one such memory, most keep more than half of those memories after a wait of 100 times the training relax, a recall test in the middle of that wait usually does not remove them, and a recall that increases the number kept is uncommon.",
+  "pass_criterion": "Pre-registered (supports). A model counts only if its SBML loads and the memory screen finishes inside 240 seconds. Among models with at least one UCS memory, let n be the number whose retention arms also finish. Supports requires n >= 10 and all three of the following: (A) more than n/2 models keep a retained fraction strictly above 0.5 on an uninterrupted wait of 100 times the base relax; (B) on at least 80% of the n models, the fraction kept after a recall at 10 times followed by a further wait of 90 times is at least the uninterrupted fraction minus 0.10; (C) the share of models whose recalled fraction exceeds the uninterrupted fraction by more than 0.05 is strictly under 0.20.",
+  "fail_criterion": "Pre-registered. If n < 10, the verdict is inconclusive (underpowered if n > 0, data-unavailable if n = 0). If n >= 10 and A, B and C are all false, the verdict is refutes. If n >= 10 and some but not all of A, B and C hold, the verdict is mixed. Models with no UCS memory are outside the claim and are not failures.",
+  "planned_datasets": [
+    "biswas2022-table-s1-biomodels",
+    "biomodels-sbml-table-s1"
+  ],
+  "test_contract": {
+    "expected_observation": "Most models that form a UCS memory still pass that memory test for more than half of those pairs after a 100-fold wait, recalling the memory once along the way usually costs no more than 10 percentage points, and a recall that raises the count by more than 5 percentage points is limited to under one model in five.",
+    "disconfirming_observation": "Half or fewer of those models keep more than half their memories at the 100-fold wait, or recall lowers the kept fraction by more than 10 percentage points in more than 20% of models, or recall raises it by more than 5 percentage points in 20% or more of models.",
+    "admissible_datasets": "The same 35 curated BioModels identifiers as Table S1 of Biswas, Clawson and Levin, doi:10.3390/ijms24010285, integrated from the public SBML. No author result matrix. A model that does not load or that exceeds 240 seconds is not in n.",
+    "inference_method": "UCS memory follows the paper's memory evaluator: base relax 50 time units (5000 steps of 0.01), clamp at 100 times the baseline maximum or the baseline minimum divided by 100, response up if the stimulation mean is at least twice both the baseline mean and the following free-run mean, down if it is at most half of both, and retained if after a further 50 time units the mean still holds at least half the excursion (DetectMem). The 100-fold wait is 5000 time units from the post-training state, then the same stim-and-relax test. The recall arm waits 500, runs that test, waits another 4500, and tests again. Thresholds are the three clauses in pass_criterion. Confidence is 0.45 when moving one model across the majority boundary of clause A would change A, otherwise 0.70 when n >= 20 and 0.55 when n < 20. Inconclusive uses 0.60."
+  },
+  "interpretation": "The claim is about ODE models that already show UCS-based memory, not about every BioModels file and not about cells. 'The bulk' is read as the paper's own line that a loss under 50% is not a significant loss, so a model keeps the bulk when the retained fraction is strictly above one half. 'Most' means strictly more than half of those models. 'Testing does not destroy' is the chained re-stimulation at 10 times the base relax, compared with an uninterrupted wait of 100 times. 'Rare' is pre-registered as under 20% of models gaining more than 5 percentage points. The network parameters and reactions are not edited. A pass would show the behaviour in the ODEs only.",
+  "caveats": [
+    "Table S1 identifiers were already copied for the habituation test. No retention trajectory is generated before this registration.",
+    "The authors' MATLAB (MEMORY_EVALUATOR_ODE_SLURM1.m, Test_US_Memory.m, DetectMem.m, UCS_Mem_Eval_After_Time_Lag_For_Review_SLURM.m) fixes simCnt = 5000, RscaleUp = 2 and the lags 10 and 100. Their lag script retests each lag from the original post-training state rather than chaining the 10-fold test into the 100-fold test. The chained arm here is the paper's prose description of a test that might destroy the memory, which that file does not implement.",
+    "Restoring a saved concentration vector uses reset and then overwrites the concentrations, so model time restarts. An autonomous ODE is unchanged. A model with an explicit time event can differ.",
+    "Window means are averages of samples every 0.1 time unit. The long waits are averaged from samples every 0.5 time unit.",
+    "This is a property of the ODE models. It does not show that cells retain a memory for 100 times a training interval.",
+    "Clause C passes with 5 of 29 models, and 6 of 29 would have failed the 'under 20%' cap. Clause A does not sit on that kind of boundary: 27 of 29 models keep the bulk.",
+    "A few long waits in BIOMD0000000697 and BIOMD0000000035 printed CVODE convergence errors. Those individual retests were counted as not retained, which can only lower the retention fractions.",
+    "Two integrable models formed no UCS memory and are outside the claim: BIOMD0000000483 and BIOMD0000000036."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/levin-grn-learning-tests-4186",
+    "date": "2026-11-01"
+  },
+  "deviations": [],
+  "data_kind": "computational",
+  "datasets": [
+    {
+      "id": "biswas2022-table-s1",
+      "name": "Supplementary PDF of Biswas, Clawson and Levin 2022, Table S1 (35 BioModels identifiers)",
+      "landing_url": "https://www.mdpi.com/article/10.3390/ijms24010285/s1",
+      "doi": "10.3390/ijms24010285",
+      "version": "ijms-24-00285-s001",
+      "license": "CC BY (article)",
+      "files": [
+        {
+          "name": "ijms-24-00285-s001.zip",
+          "download_url": "https://mdpi-res.com/d_attachment/ijms/ijms-24-00285/article_deploy/ijms-24-00285-s001.zip?version=1672829351",
+          "retrieved_at": "2026-11-02T00:35:45Z",
+          "byte_size": 2886027,
+          "sha256": "292a7f33bcb3a9589614507114de8c1a7a5f5d8bc11e382d546c3d08da381e39"
+        }
+      ],
+      "role": "Source of the 35 BioModels identifiers. Result figures were not used. The zip is over 1 MB and is not committed."
+    },
+    {
+      "id": "biomodels-sbml-table-s1",
+      "name": "Curated SBML for the 35 BioModels identifiers in Table S1",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "doi": null,
+      "version": "retrieved 2026-11-02",
+      "license": "CC0 1.0 where the SBML says so (25 of 35 files). Ten files do not state a license in the XML: BIOMD0000000017, BIOMD0000000021, BIOMD0000000026, BIOMD0000000029, BIOMD0000000031, BIOMD0000000035, BIOMD0000000038, BIOMD0000000050, BIOMD0000000069, BIOMD0000000539.",
+      "files": [
+        {
+          "name": "BIOMD0000000001.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000001?filename=BIOMD0000000001_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000001?filename=BIOMD0000000001_url.xml",
+          "retrieved_at": "2026-11-02T00:58:34Z",
+          "byte_size": 50538,
+          "sha256": "407fccc883f80e6d120e34d8b0810a206a5cc6535a26d4574611504e683beb08"
+        },
+        {
+          "name": "BIOMD0000000002.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000002?filename=BIOMD0000000002_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000002?filename=BIOMD0000000002_url.xml",
+          "retrieved_at": "2026-11-02T00:58:35Z",
+          "byte_size": 46871,
+          "sha256": "7f7ee585a886f9cd88199887a9e674e070ce368b2884ceeee65dd437f3edca7f"
+        },
+        {
+          "name": "BIOMD0000000003.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000003?filename=BIOMD0000000003_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000003?filename=BIOMD0000000003_url.xml",
+          "retrieved_at": "2026-11-02T00:58:44Z",
+          "byte_size": 20587,
+          "sha256": "a633872e4c602922e85ac487ef52ac8bd8ead762ec7c0f86f9e93032a84c90f5"
+        },
+        {
+          "name": "BIOMD0000000004.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000004?filename=BIOMD0000000004_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000004?filename=BIOMD0000000004_url.xml",
+          "retrieved_at": "2026-11-02T00:58:45Z",
+          "byte_size": 20171,
+          "sha256": "504dc54b5697b4183bd0046fb11f0991702961e3dee0baf15ac1ecaad5009eb6"
+        },
+        {
+          "name": "BIOMD0000000005.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000005?filename=BIOMD0000000005_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000005?filename=BIOMD0000000005_url.xml",
+          "retrieved_at": "2026-11-02T00:58:28Z",
+          "byte_size": 24470,
+          "sha256": "5a4f44b5a0bc8f32d3206f460f748236539de593be0fb016da2ed7cddd098e36"
+        },
+        {
+          "name": "BIOMD0000000006.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000006?filename=BIOMD0000000006_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000006?filename=BIOMD0000000006_url.xml",
+          "retrieved_at": "2026-11-02T00:58:47Z",
+          "byte_size": 14408,
+          "sha256": "c3cd0b2dfc738565fe72be3208eec28023e623297e198015df1df77a7e430820"
+        },
+        {
+          "name": "BIOMD0000000010.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010?filename=BIOMD0000000010_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000010?filename=BIOMD0000000010_url.xml",
+          "retrieved_at": "2026-11-02T00:58:47Z",
+          "byte_size": 29295,
+          "sha256": "906964e07ffd570ad94a03c1222e230b54b913cd536b008392bfb6155930a966"
+        },
+        {
+          "name": "BIOMD0000000069.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000069?filename=BIOMD0000000069_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000069?filename=BIOMD0000000069_url.xml",
+          "retrieved_at": "2026-11-02T00:58:48Z",
+          "byte_size": 21477,
+          "sha256": "ac4f36293662123205a8d5f9f1346982d9e020abd095d9df5765ea7641ef4713"
+        },
+        {
+          "name": "BIOMD0000000016.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000016?filename=BIOMD0000000016_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000016?filename=BIOMD0000000016_url.xml",
+          "retrieved_at": "2026-11-02T00:58:51Z",
+          "byte_size": 29255,
+          "sha256": "35ad538383991b45273e2a767c0325d996d188dba10ce959de9635564813f703"
+        },
+        {
+          "name": "BIOMD0000000017.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000017?filename=BIOMD0000000017_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000017?filename=BIOMD0000000017_url.xml",
+          "retrieved_at": "2026-11-02T00:58:52Z",
+          "byte_size": 63765,
+          "sha256": "b75db9f5e0b418d7eb015e44565c992ebcda10f56f8934747a2677e222b16148"
+        },
+        {
+          "name": "BIOMD0000000022.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000022?filename=BIOMD0000000022_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000022?filename=BIOMD0000000022_url.xml",
+          "retrieved_at": "2026-11-02T00:58:53Z",
+          "byte_size": 66297,
+          "sha256": "0b569c675eaed0226dc4c1dcd7f7e2e210a7cbd1b5562da97e55f47c255cdf04"
+        },
+        {
+          "name": "BIOMD0000000021.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000021?filename=BIOMD0000000021_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000021?filename=BIOMD0000000021_url.xml",
+          "retrieved_at": "2026-11-02T00:58:57Z",
+          "byte_size": 50938,
+          "sha256": "02376379c0270208b2fd72529a50ccefcdd68c8b23a40585bfdcdd0926a4c8da"
+        },
+        {
+          "name": "BIOMD0000000023.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml",
+          "retrieved_at": "2026-11-02T00:59:00Z",
+          "byte_size": 52851,
+          "sha256": "dccd31fe46f4fb06484a9e3b95718aad788692e9abad1dc68fd368d7c8247066"
+        },
+        {
+          "name": "BIOMD0000000024.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000024?filename=BIOMD0000000024_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000024?filename=BIOMD0000000024_url.xml",
+          "retrieved_at": "2026-11-02T00:59:01Z",
+          "byte_size": 12534,
+          "sha256": "748514f402eea94c49346701a30f2b429c9c7d5de922cd450e5a155d5f69dbe1"
+        },
+        {
+          "name": "BIOMD0000000026.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000026?filename=BIOMD0000000026_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000026?filename=BIOMD0000000026_url.xml",
+          "retrieved_at": "2026-11-02T00:59:01Z",
+          "byte_size": 26398,
+          "sha256": "d293eb11fdd65b3150999c68edaf690a9449ea9e070a8f61878b3a4648eff7c5"
+        },
+        {
+          "name": "BIOMD0000000027.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000027?filename=BIOMD0000000027_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000027?filename=BIOMD0000000027_url.xml",
+          "retrieved_at": "2026-11-02T00:59:05Z",
+          "byte_size": 18368,
+          "sha256": "56d8acc83add5a262b6785b18f2e905e606b9072625e25ba1520306bc4d586bb"
+        },
+        {
+          "name": "BIOMD0000000483.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000483?filename=BIOMD0000000483_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000483?filename=BIOMD0000000483_url.xml",
+          "retrieved_at": "2026-11-02T00:59:06Z",
+          "byte_size": 20997,
+          "sha256": "50f2d7cf4cd14c4c1953ef8ae07a3efe35cea2af7e84baf5ab35ad188fa23406"
+        },
+        {
+          "name": "BIOMD0000000029.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000029?filename=BIOMD0000000029_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000029?filename=BIOMD0000000029_url.xml",
+          "retrieved_at": "2026-11-02T00:59:06Z",
+          "byte_size": 28068,
+          "sha256": "c1eb117678b7d423b8e1d2fd7f493c865fb66559980256f3544938f5a431b530"
+        },
+        {
+          "name": "BIOMD0000000031.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000031?filename=BIOMD0000000031_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000031?filename=BIOMD0000000031_url.xml",
+          "retrieved_at": "2026-11-02T00:59:07Z",
+          "byte_size": 18712,
+          "sha256": "56ddd4cc0a0cf51c55a27fa386e0ee670c798ea69151ad39fadf363d0c0297a1"
+        },
+        {
+          "name": "BIOMD0000000631.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000631?filename=BIOMD0000000631_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000631?filename=BIOMD0000000631_url.xml",
+          "retrieved_at": "2026-11-02T00:59:08Z",
+          "byte_size": 87080,
+          "sha256": "b527328fbc3d8c57f41bc15615c115f156c2ae80d6a7f3ef0be069cad3a84df2"
+        },
+        {
+          "name": "BIOMD0000000203.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000203?filename=BIOMD0000000203_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000203?filename=BIOMD0000000203_url.xml",
+          "retrieved_at": "2026-11-02T00:59:10Z",
+          "byte_size": 33654,
+          "sha256": "1a6b8afba805b78e72f3b825626f4b10d1ce3cd92e3feab1d29781822ec2d4cf"
+        },
+        {
+          "name": "BIOMD0000000204.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000204?filename=BIOMD0000000204_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000204?filename=BIOMD0000000204_url.xml",
+          "retrieved_at": "2026-11-02T00:59:10Z",
+          "byte_size": 33257,
+          "sha256": "fd4669b73014455d7d0ae1c6099000e3055999436080ca247aae381688bba14f"
+        },
+        {
+          "name": "BIOMD0000000209.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000209?filename=BIOMD0000000209_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000209?filename=BIOMD0000000209_url.xml",
+          "retrieved_at": "2026-11-02T00:59:11Z",
+          "byte_size": 44126,
+          "sha256": "a688c8883b5d3913348766830d109a9a83b378e03735eb9f59139484463bfb72"
+        },
+        {
+          "name": "BIOMD0000000210.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000210?filename=BIOMD0000000210_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000210?filename=BIOMD0000000210_url.xml",
+          "retrieved_at": "2026-11-02T00:59:13Z",
+          "byte_size": 42092,
+          "sha256": "fa698cc484dd1b46bb80aff07609a4c50a933c5e6f88cdbef79c61c927215dec"
+        },
+        {
+          "name": "BIOMD0000000539.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000539?filename=BIOMD0000000539_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000539?filename=BIOMD0000000539_url.xml",
+          "retrieved_at": "2026-11-02T00:59:14Z",
+          "byte_size": 39265,
+          "sha256": "ea0689f4ed3342219eaf79d7f9c1058a5f51a0cec417d47fd22e9b7aa6ab1518"
+        },
+        {
+          "name": "BIOMD0000000664.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000664?filename=BIOMD0000000664_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000664?filename=BIOMD0000000664_url.xml",
+          "retrieved_at": "2026-11-02T00:59:15Z",
+          "byte_size": 77094,
+          "sha256": "382a22cca6d338f7f614406343cd86189d30370ec98ee49df22310b32566b538"
+        },
+        {
+          "name": "BIOMD0000000275.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000275?filename=BIOMD0000000275_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000275?filename=BIOMD0000000275_url.xml",
+          "retrieved_at": "2026-11-02T00:59:15Z",
+          "byte_size": 27145,
+          "sha256": "600e2c173146c24f77c738c9117aa684a0acf9aeedea227126efaf033f641e70"
+        },
+        {
+          "name": "BIOMD0000000697.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000697?filename=BIOMD0000000697_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000697?filename=BIOMD0000000697_url.xml",
+          "retrieved_at": "2026-11-02T00:59:16Z",
+          "byte_size": 143510,
+          "sha256": "49fa7d62694291db1d001a1c8c0a77c3f2c183e6def7d352b57a9714c542be33"
+        },
+        {
+          "name": "BIOMD0000000600.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000600?filename=BIOMD0000000600_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000600?filename=BIOMD0000000600_url.xml",
+          "retrieved_at": "2026-11-02T00:59:23Z",
+          "byte_size": 236464,
+          "sha256": "0f6d241fdf1e0ffd46fbb0f203c0b83c135e23c6bb0ae81d3dfad7fd4a9c1827"
+        },
+        {
+          "name": "BIOMD0000000039.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000039?filename=BIOMD0000000039_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000039?filename=BIOMD0000000039_url.xml",
+          "retrieved_at": "2026-11-02T00:59:31Z",
+          "byte_size": 21681,
+          "sha256": "6b221222be03747b11454cc4f2a6218697d9c6367d3578a170c7cc5c34ad3b12"
+        },
+        {
+          "name": "BIOMD0000000050.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000050?filename=BIOMD0000000050_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000050?filename=BIOMD0000000050_url.xml",
+          "retrieved_at": "2026-11-02T00:59:32Z",
+          "byte_size": 25527,
+          "sha256": "4846396a6621661b5faa775f7f7b48aefe36c3396bb2da41aeb96f3319d084ad"
+        },
+        {
+          "name": "BIOMD0000000035.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000035?filename=BIOMD0000000035_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000035?filename=BIOMD0000000035_url.xml",
+          "retrieved_at": "2026-11-02T00:59:35Z",
+          "byte_size": 36048,
+          "sha256": "3303169fdd9a672fa25c26586822c9a1b91ac461744d1926d317f493e6981237"
+        },
+        {
+          "name": "BIOMD0000000036.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000036?filename=BIOMD0000000036_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000036?filename=BIOMD0000000036_url.xml",
+          "retrieved_at": "2026-11-02T00:59:39Z",
+          "byte_size": 15168,
+          "sha256": "c95e89456a74ebf7bbef76e648ac4e83f59a913b894b01a69387458ae77802f4"
+        },
+        {
+          "name": "BIOMD0000000037.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000037?filename=BIOMD0000000037_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000037?filename=BIOMD0000000037_url.xml",
+          "retrieved_at": "2026-11-02T00:59:39Z",
+          "byte_size": 19565,
+          "sha256": "2a8f7a68ac7efd45e09f42a1a5f5e30c9a47b9c039fb79ecf86ef7e3def17c07"
+        },
+        {
+          "name": "BIOMD0000000038.xml",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000038?filename=BIOMD0000000038_url.xml",
+          "final_url": "https://www.biomodels.org/model/download/BIOMD0000000038?filename=BIOMD0000000038_url.xml",
+          "retrieved_at": "2026-11-02T00:59:41Z",
+          "byte_size": 40811,
+          "sha256": "33708cec1fad44db6958c3ac6255397ad79b45564a296d29732fd934608d787b"
+        }
+      ],
+      "role": "ODE models integrated by analysis.py. Cached under cache/sbml/ and not committed."
+    }
+  ],
+  "measured": {
+    "value": 27,
+    "unit": "models with UCS memory that keep more than half of those memories after a 100-fold wait",
+    "n": 29,
+    "uncertainty": "deterministic given libroadrunner, the SBML files, and the tolerances recorded per model",
+    "extra": {
+      "verdict": "supports",
+      "reason": null,
+      "confidence": 0.7,
+      "n_models_with_memory_and_retention": 29,
+      "n_bulk": 27,
+      "n_recall_ok": 28,
+      "n_strengthened": 5,
+      "clause_A_most_keep_the_bulk": true,
+      "clause_B_recall_usually_spares": true,
+      "clause_C_strengthening_is_uncommon": true,
+      "n_testable": 31,
+      "n_with_any_memory": 29,
+      "n_memories": 724,
+      "per_model": [
+        {
+          "biomodel_id": "BIOMD0000000001",
+          "table_s1_index": 1,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 12,
+          "n_memories": 7,
+          "n_stable_100": 7,
+          "n_recalled_100": 7,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000002",
+          "table_s1_index": 2,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 13,
+          "n_memories": 111,
+          "n_stable_100": 75,
+          "n_recalled_100": 73,
+          "fraction_stable": 0.6756756756756757,
+          "fraction_recalled": 0.6576576576576577,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000003",
+          "table_s1_index": 3,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 3,
+          "n_memories": 3,
+          "n_stable_100": 1,
+          "n_recalled_100": 3,
+          "fraction_stable": 0.3333333333333333,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000004",
+          "table_s1_index": 4,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 5,
+          "n_memories": 12,
+          "n_stable_100": 8,
+          "n_recalled_100": 7,
+          "fraction_stable": 0.6666666666666666,
+          "fraction_recalled": 0.5833333333333334,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000005",
+          "table_s1_index": 5,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 6,
+          "n_memories": 8,
+          "n_stable_100": 6,
+          "n_recalled_100": 7,
+          "fraction_stable": 0.75,
+          "fraction_recalled": 0.875,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000006",
+          "table_s1_index": 6,
+          "testable": false,
+          "retention_done": false,
+          "reason": "fewer-than-two-floating-species",
+          "n_species": 0,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000010",
+          "table_s1_index": 7,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 8,
+          "n_memories": 3,
+          "n_stable_100": 3,
+          "n_recalled_100": 3,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000069",
+          "table_s1_index": 8,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 10,
+          "n_memories": 38,
+          "n_stable_100": 29,
+          "n_recalled_100": 28,
+          "fraction_stable": 0.7631578947368421,
+          "fraction_recalled": 0.7368421052631579,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000016",
+          "table_s1_index": 9,
+          "testable": false,
+          "retention_done": false,
+          "reason": "integration-failed",
+          "n_species": 6,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": {
+            "absolute": 1e-08,
+            "relative": 1e-06
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000017",
+          "table_s1_index": 10,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 11,
+          "n_memories": 15,
+          "n_stable_100": 9,
+          "n_recalled_100": 7,
+          "fraction_stable": 0.6,
+          "fraction_recalled": 0.4666666666666667,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000022",
+          "table_s1_index": 11,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 10,
+          "n_memories": 30,
+          "n_stable_100": 30,
+          "n_recalled_100": 30,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000021",
+          "table_s1_index": 12,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 10,
+          "n_memories": 24,
+          "n_stable_100": 24,
+          "n_recalled_100": 24,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000023",
+          "table_s1_index": 13,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 5,
+          "n_memories": 4,
+          "n_stable_100": 4,
+          "n_recalled_100": 4,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000024",
+          "table_s1_index": 14,
+          "testable": false,
+          "retention_done": false,
+          "reason": "integration-failed",
+          "n_species": null,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": null
+        },
+        {
+          "biomodel_id": "BIOMD0000000026",
+          "table_s1_index": 15,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 11,
+          "n_memories": 51,
+          "n_stable_100": 34,
+          "n_recalled_100": 33,
+          "fraction_stable": 0.6666666666666666,
+          "fraction_recalled": 0.6470588235294118,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000027",
+          "table_s1_index": 16,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 3,
+          "n_memories": 4,
+          "n_stable_100": 3,
+          "n_recalled_100": 3,
+          "fraction_stable": 0.75,
+          "fraction_recalled": 0.75,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000483",
+          "table_s1_index": 17,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 8,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000029",
+          "table_s1_index": 18,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 4,
+          "n_memories": 2,
+          "n_stable_100": 2,
+          "n_recalled_100": 2,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000031",
+          "table_s1_index": 19,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 3,
+          "n_memories": 5,
+          "n_stable_100": 5,
+          "n_recalled_100": 5,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000631",
+          "table_s1_index": 20,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 12,
+          "n_memories": 7,
+          "n_stable_100": 5,
+          "n_recalled_100": 5,
+          "fraction_stable": 0.7142857142857143,
+          "fraction_recalled": 0.7142857142857143,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000203",
+          "table_s1_index": 21,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 5,
+          "n_memories": 2,
+          "n_stable_100": 2,
+          "n_recalled_100": 2,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000204",
+          "table_s1_index": 22,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 5,
+          "n_memories": 5,
+          "n_stable_100": 5,
+          "n_recalled_100": 5,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000209",
+          "table_s1_index": 23,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 8,
+          "n_memories": 5,
+          "n_stable_100": 5,
+          "n_recalled_100": 5,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000210",
+          "table_s1_index": 24,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 8,
+          "n_memories": 1,
+          "n_stable_100": 1,
+          "n_recalled_100": 1,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000539",
+          "table_s1_index": 25,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 6,
+          "n_memories": 8,
+          "n_stable_100": 7,
+          "n_recalled_100": 8,
+          "fraction_stable": 0.875,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000664",
+          "table_s1_index": 26,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 6,
+          "n_memories": 1,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": 0.0,
+          "fraction_recalled": 0.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000275",
+          "table_s1_index": 27,
+          "testable": false,
+          "retention_done": false,
+          "reason": "integration-failed",
+          "n_species": 5,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": {
+            "absolute": 1e-08,
+            "relative": 1e-06
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000697",
+          "table_s1_index": 28,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 13,
+          "n_memories": 59,
+          "n_stable_100": 33,
+          "n_recalled_100": 37,
+          "fraction_stable": 0.559322033898305,
+          "fraction_recalled": 0.6271186440677966,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000600",
+          "table_s1_index": 29,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 17,
+          "n_memories": 90,
+          "n_stable_100": 54,
+          "n_recalled_100": 54,
+          "fraction_stable": 0.6,
+          "fraction_recalled": 0.6,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000039",
+          "table_s1_index": 30,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 5,
+          "n_memories": 12,
+          "n_stable_100": 7,
+          "n_recalled_100": 7,
+          "fraction_stable": 0.5833333333333334,
+          "fraction_recalled": 0.5833333333333334,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000050",
+          "table_s1_index": 31,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 14,
+          "n_memories": 35,
+          "n_stable_100": 31,
+          "n_recalled_100": 31,
+          "fraction_stable": 0.8857142857142857,
+          "fraction_recalled": 0.8857142857142857,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000035",
+          "table_s1_index": 32,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 9,
+          "n_memories": 36,
+          "n_stable_100": 24,
+          "n_recalled_100": 31,
+          "fraction_stable": 0.6666666666666666,
+          "fraction_recalled": 0.8611111111111112,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000036",
+          "table_s1_index": 33,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 2,
+          "n_memories": 0,
+          "n_stable_100": 0,
+          "n_recalled_100": 0,
+          "fraction_stable": null,
+          "fraction_recalled": null,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000037",
+          "table_s1_index": 34,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 11,
+          "n_memories": 11,
+          "n_stable_100": 11,
+          "n_recalled_100": 11,
+          "fraction_stable": 1.0,
+          "fraction_recalled": 1.0,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        },
+        {
+          "biomodel_id": "BIOMD0000000038",
+          "table_s1_index": 35,
+          "testable": true,
+          "retention_done": true,
+          "reason": null,
+          "n_species": 13,
+          "n_memories": 135,
+          "n_stable_100": 95,
+          "n_recalled_100": 83,
+          "fraction_stable": 0.7037037037037037,
+          "fraction_recalled": 0.6148148148148148,
+          "tolerances": {
+            "absolute": 0.001,
+            "relative": 0.001
+          }
+        }
+      ]
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.7,
+  "method": "analysis.py loads each Table S1 SBML file in libroadrunner 2.11.0 and looks for UCS memory: a 50-time-unit baseline, a clamp at 100 times the baseline maximum or the baseline minimum divided by 100, regulation by a factor of two against both that baseline and the next free 50 time units, and retention of at least half the excursion over the following 50 time units. Each such memory is then retested after an uninterrupted wait of 5000 time units, and again on a chained arm that recalls it after 500 time units and retests after a further 4500. The pre-registered clauses A, B and C are applied to the 29 models that formed at least one memory. Parameters and reactions are not edited.",
+  "results_summary": [
+    "31 of 35 models integrated. 29 formed at least one UCS memory (724 memories in all). Of those 29, 27 kept more than half after the 100-fold wait.",
+    "Recall stayed within 10 percentage points of the uninterrupted wait on 28 of 29 models. Recall raised the kept fraction by more than 5 percentage points on 5 of 29, which is under the 20% cap.",
+    "All three pre-registered clauses hold, so the verdict is supports. Four models did not integrate: BIOMD0000000006 has no floating species, and BIOMD0000000016, BIOMD0000000024 and BIOMD0000000275 failed in the solver. BIOMD0000000024 is a delay equation."
+  ]
+}
