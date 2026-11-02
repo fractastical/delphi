@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ga05-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga05-16",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If white individuals occur in otherwise dark-coloured partridges, ravens, sparrows and bears, research-grade photographed observations filed as albino or leucistic will include at least one species in each of those four groups.",
+  "pass_criterion": "Pre-registered. Each of the four groups has at least one qualifying observation. A qualifying observation is research grade, has at least one photo, is not marked captive, and matches the group. It must also either belong to the iNaturalist project albino-leucistic-birds, or contain the word albino, albinism, albinistic, leucistic, leucism, leukistic or leukism in an observation-field value, a tag, or the description. An observation whose text matches melanism, melanistic or melanic and does not match one of those white-aberration words does not qualify. Groups: ravens are observations whose scientific name is Corvus corax or whose preferred common name contains the word Raven; sparrows are genus Passer (scientific name beginning with 'Passer '); partridges are genera Alectoris and Perdix; bears are family Ursidae excluding Ursus maritimus and excluding any taxon whose preferred common name is Polar Bear.",
+  "fail_criterion": "Pre-registered. This project sample cannot refute the claim: a zero count is not evidence that no white individual exists. The verdict is mixed if one, two or three groups have at least one qualifying observation and the others have zero. The verdict is inconclusive with reason data-unavailable if the iNaturalist API does not return observation pages. The verdict is inconclusive with reason underpowered if the API returns pages and every group has zero qualifying observations. There is no refutation branch.",
+  "planned_datasets": [
+    "inaturalist-project-albino-leucistic-birds",
+    "inaturalist-project-albino-leucistic-melanistic-animals"
+  ],
+  "test_contract": {
+    "expected_observation": "At least one research-grade photographed observation of a raven, a Passer sparrow, an Alectoris or Perdix partridge, and a non-polar bear, each tied to an albino or leucistic label as defined in the pass criterion.",
+    "disconfirming_observation": "Nothing in these two projects would show that white individuals do not occur. A complete census of each species with zero aberrant individuals would be required to refute the existential claim, and these projects are not that census.",
+    "admissible_datasets": "Public observation records with a species identification, a photograph, and an explicit albino or leucistic label, or membership in a project whose stated subject is albino and leucistic birds. Normally white species, captive animals, and melanistic-only records are excluded. The projects must be independent of Aristotle's text.",
+    "inference_method": "Page the iNaturalist observations API for each group inside each project. Count qualifying observations per group. Support requires a positive count in all four groups. A positive count in some but not all groups is mixed. Zeros across all groups, or an API failure, are inconclusive and are not a refutation."
+  },
+  "interpretation": "The claim is existential: white individuals have been observed among partridges, ravens, sparrows and bears, in kinds that are otherwise of one colour. 'Development is perverted' is Aristotle's cause and is not tested. Seasonal whitening and species that are normally white are excluded by the polar-bear rule and by requiring an albino or leucistic label rather than any pale pixel. Greek partridges are mapped to Alectoris and Perdix, sparrows to Passer, and ravens to birds named raven, including Corvus corax. House sparrows and their congeners are the sparrow group; New World sparrows are not.",
+  "caveats": [
+    "Observation records were not queried before this registration. Project pages were identified from their public titles. The iNaturalist API host returned HTTP 200 for a taxon-name request; the observation search itself is part of the analysis.",
+    "Project membership and free-text labels are observer-supplied. Research grade supports the species identification, not a veterinary diagnosis of albinism.",
+    "A single mis-tagged photograph can satisfy an existential count. The confidence rule is therefore capped: 0.70 only if every group has at least three qualifying observations, otherwise 0.55 if all four groups are positive, 0.45 if mixed, 0.30 if inconclusive."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-f1f3",
+    "date": "2026-11-01"
+  }
+}

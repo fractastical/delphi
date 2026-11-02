@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha07-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-15",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If men have fathered children at seventy, and also through the sixties, a single-year table of registered live births by age of father will show at least 10 births at integer ages 70 and above and at least 10 births at ages 60 to 64 in its latest year.",
+  "pass_criterion": "Pre-registered. Primary file: the pinned CSV of Australian registered births by age of father (nuptiality_code TOT, all births). Let Y be the maximum numeric year in that file. A70 is the sum of births in year Y at integer ages greater than or equal to 70. A60 is the sum at integer ages 60, 61, 62, 63 and 64. The claim's procreation clause is supported only if A70 is at least 10 and A60 is at least 10. Ages coded as ranges, open ends, totals, or not stated are not added into A70 or A60. An open bin whose lower bound is below 70, including 65 and over, does not contribute to A70.",
+  "fail_criterion": "Pre-registered. Refuted if year Y contains at least one integer age greater than or equal to 70, the sum of births at all stated ages in year Y is at least 10000, and A70 is 0. Mixed if A60 is at least 10 and A70 is from 1 to 9. Mixed if the Australian file has no integer age greater than or equal to 70 and the UN Demographic Yearbook 2024 Table 11, restricted to source code C (civil registration estimated over 90 percent complete), has a summed birth count of at least 100 in closed age classes contained in 60 to 64. Refuted on the UN table alone only if Australia does not resolve age 70 and at least 20 code-C countries report a class whose lower bound is at least 70 and the sum of births in those classes is 0. Inconclusive, reason data-unavailable, if neither file can be fetched or the Australian columns are not the documented schema (year, nuptiality_code, age_of_father, births). Inconclusive, reason underpowered, if the Australian year Y total of stated-age births is below 1000.",
+  "planned_datasets": [
+    "abs-births-age-father-publicdata-2026-10-03",
+    "un-dyb-2024-table11-age-of-father"
+  ],
+  "test_contract": {
+    "expected_observation": "In the latest year of Australian registrations, at least 10 live births are attributed to fathers aged 70 or older and at least 10 to fathers aged 60 to 64, with age read as a single integer year.",
+    "disconfirming_observation": "The same table distinguishes integer ages at or above 70, the year has at least 10000 births with a stated father age, and none of those births is at age 70 or older.",
+    "admissible_datasets": "Official or openly licensed civil-registration counts of live births by age of the father, not survey samples and not Aristotle's text. An age class counts as age 70 only when its lower bound is at least 70. Sexual-competence surveys are out of scope for this registration.",
+    "inference_method": "Sum births in the latest Australian year for nuptiality total at integer ages. Support requires A70 >= 10 and A60 >= 10. A zero at ages >= 70 in a year with at least 10000 stated-age births refutes. Counts from 1 to 9 at ages >= 70 are mixed. The UN table is used only when Australia has no integer age >= 70, and a 65-and-over bin never counts as age 70."
+  },
+  "interpretation": "The sentence tested is the procreation clause: men have fathered children at seventy, with fatherhood through age sixty checked in the same table. 'Most men remain sexually competent until sixty' is not in a birth register and is not scored. Age is the age of the father as published. Australian rows are registration-year counts, as the redistribution page states, not necessarily the year of the birth. The UN table's published standard classes run through 60-64 and then 65 and over; that open class is excluded from the age-70 sum even if a country uses it.",
+  "caveats": [
+    "Birth counts were not read before this registration. The Australian landing page was read for schema, licence, row count of the table as a whole (7050 rows, 6 fields), and the statement that ages include single years plus the publisher's rows for the oldest ages, totals, and age not stated. The UN Table 11 notes were read for the standard age classification and the source-code legend. A search snippet of the UNdata preview showed age bins and a few counts for one small territory; those counts were not used to set thresholds.",
+    "The Australian CSV is a third-party typed conversion of ABS table BIRTHS_AGE_FATHER. The converter states that the ABS has not endorsed the conversion. Column names must match the documented schema or the file is not used.",
+    "A birth attributed to a father aged 70 does not measure whether most men are sexually competent at 60."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-f1f3",
+    "date": "2026-11-01"
+  }
+}
