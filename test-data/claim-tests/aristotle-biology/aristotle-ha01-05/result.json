@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha01-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-05",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Each named domesticated kind — horse, cattle, swine, sheep, goat and dog — still has an extant wild progenitor or wild conspecific population.",
+  "pass_criterion": "Supports only if all six wild taxa below are extant: Wikidata IUCN conservation status (P141) is one of least concern, near threatened, vulnerable, endangered or critically endangered, and the GBIF species record matched from that name is not marked extinct. Names that GBIF treats as synonyms are followed to the accepted species, and both the extinct flag and the Wikidata status are read for that accepted species.",
+  "fail_criterion": "Refutes if at least one of the six is IUCN Extinct or Extinct in the Wild, or GBIF marks the matched species extinct. Inconclusive, reason other, if none is extinct but at least one name cannot be matched or has no IUCN status other than data deficient or not evaluated. Feral populations of the domestic form do not count as the wild kind.",
+  "planned_datasets": [
+    "wikidata-iucn-p141",
+    "gbif-species-match"
+  ],
+  "test_contract": {
+    "expected_observation": "Equus ferus, Bos primigenius, Sus scrofa, Ovis orientalis, Capra aegagrus and Canis lupus are each still extant in the wild.",
+    "disconfirming_observation": "At least one of those six taxa is extinct or extinct in the wild.",
+    "admissible_datasets": "Wikidata statements of IUCN status (property P141) and GBIF backbone species records, both public and queried live. The wild taxon is the progenitor or the wild conspecific, not a feral domestic population. The translator's bracketed 'man' is outside the claim sentence and is not a tested kind.",
+    "inference_method": "Pre-registered name list, one wild taxon per named domesticate. Resolve synonyms through GBIF. Extant means a threatened-or-better IUCN category and GBIF extinct not true. The universal 'always' supports only if all six are extant; one extinct taxon refutes it."
+  },
+  "interpretation": "The claim sentence names horses, cattle, swine, sheep, goats and dogs. Wild counterparts are fixed before the lookup as Equus ferus (horse), Bos primigenius (cattle), Sus scrofa (swine, wild boar of the same species), Ovis orientalis (sheep), Capra aegagrus (goat) and Canis lupus (dog). 'Found in a wild condition' means an extant wild taxon, not a feral herd of the domesticate. Domestic animals that are the same species as a living wild population (boar, wolf) count as found wild.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7800",
+    "date": "2026-11-01"
+  }
+}

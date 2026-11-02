@@ -1,0 +1,25 @@
+{
+  "claim_id": "aristotle-ga03-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-25",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Accepted extant species of shelled molluscs, cephalopods and crustaceans are exceptional in fresh water and are present in brackish water.",
+  "pass_criterion": "Supports only if all three groups pass. A group passes when, among accepted extant species with any aquatic flag, the fraction that are fresh and not marine is below 0.05, and at least one species is flagged brackish. Groups: testaceans = Mollusca excluding Cephalopoda; cephalopods = Cephalopoda; crustaceans = Crustacea.",
+  "fail_criterion": "A group refutes when that fresh-and-not-marine fraction is at least 0.15. The claim refutes if at least two groups refute. Mixed if exactly one group refutes and at least one group passes. Inconclusive, reason data-unavailable or underpowered, otherwise (crawl incomplete, or no group refutes and not all groups pass). Species with no marine, brackish or freshwater flag are left out of the denominator. Terrestrial-only species are not counted as freshwater.",
+  "planned_datasets": [
+    "worms-aphia-environment-flags"
+  ],
+  "test_contract": {
+    "expected_observation": "For shelled molluscs, cephalopods and crustaceans, fewer than 5 percent of aquatic accepted extant species are fresh and not marine, and brackish species are recorded in each group.",
+    "disconfirming_observation": "In a group, at least 15 percent of aquatic accepted extant species are fresh and not marine.",
+    "admissible_datasets": "World Register of Marine Species Aphia records with isMarine, isBrackish and isFreshwater flags, accepted species rank, extant. WoRMS catalogues non-marine taxa when marine_only is off. Testaceans are Mollusca other than Cephalopoda, because cephalopods are named separately in the claim.",
+    "inference_method": "Count accepted extant species by environment flag from the WoRMS REST API. Fresh-and-not-marine fraction = species with isFreshwater true and isMarine not true, divided by species with any of the three aquatic flags. Below 0.05 and brackish count at least 1 passes a group; at least 0.15 refutes a group. Two refuted groups refute the claim; one refuted and one passed is mixed."
+  },
+  "interpretation": "Bloodless aquatic animals in the quote are testaceans, cephalopods and crustaceans. 'Not found in lakes or the fresher brackish waters, except exceptionally' is read as a fresh-and-not-marine share under 5 percent of aquatic species. Fifteen percent or more is not exceptional. 'Estuaries and river mouths' requires the brackish flag to be used at least once. Terrestrial snails are outside this claim.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7800",
+    "date": "2026-11-01"
+  }
+}
