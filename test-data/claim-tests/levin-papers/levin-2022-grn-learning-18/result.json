@@ -1,0 +1,470 @@
+{
+  "claim_id": "levin-2022-grn-learning-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-18",
+  "project": "levin-papers",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:39:55Z",
+  "hypothesis": "If the published claim holds for the surveyed BioModels pathway ODEs, a third-node clamp breaks sensitization in only a minority of the sensitizing models (about 8 of 27), most of those models have a break in fewer than 5% of their sensitizing stimulus\u2013response pairs, and sensitization is broken in a smaller fraction of models than habituation is.",
+  "pass_criterion": "Pre-registered. Let S be the completed models with at least one sensitizing UCS\u2013R pair and Sb the subset in which at least one such pair is breakable by a third node. Let H and Hb be the same for habituation. Let mostly_under_5 be the fraction of models in S whose (breakable sensitizing pairs)/(sensitizing pairs) is strictly below 0.05. Supports if and only if S >= 8, H >= 8, 0.15 <= Sb/S <= 0.45, mostly_under_5 >= 0.50, and Hb/H > Sb/S.",
+  "fail_criterion": "Pre-registered. Refutes if and only if S >= 8, H >= 8, and at least one of: Sb/S >= 0.50, mostly_under_5 < 0.25, or Hb/H <= Sb/S. If S >= 8 and H >= 8 but neither the pass nor the fail rule holds, the verdict is mixed. If the Table S1 identifier list or the SBML files cannot be retrieved, or no ODE engine can be imported, the verdict is inconclusive with reason data-unavailable. If S < 8 or H < 8, or more than half of the size-eligible models fail to integrate or exceed the per-model time limit, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "biswas2023-table-s1",
+    "biomodels-sbml"
+  ],
+  "test_contract": {
+    "expected_observation": "Among surveyed pathway ODEs that sensitize under the six-epoch 1.5-fold rule, only a minority (rate between 0.15 and 0.45) have any third-node clamp that stops the 1.5-fold rise, most of those models break fewer than 5% of their sensitizing pairs, and the habituation-break rate is higher.",
+    "disconfirming_observation": "A sensitization-break rate of at least half the sensitizing models, a break in 5% or more of pairs in most models, or a sensitization-break rate at least as high as the habituation-break rate.",
+    "admissible_datasets": "The pathway models whose BioModels identifiers are listed in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (supplement ijms-24-00285-s001), simulated from the public SBML with topology and parameters left at the deposited values. Generated random gene circuits do not count for this claim. Models with fewer than 3 or more than 15 floating species are outside the pre-registered computational bound and are excluded before scoring.",
+    "inference_method": "Each ordered pair of distinct floating species is clamped up and down across six lengthening epochs. Sensitization is a 1.5-fold rise of the response mean on every successive stimulation epoch; habituation is a fall to 1/1.5 or below on every successive epoch. A pair is breakable if any other species, clamped up or down for two epochs, makes the two following UCS epochs fail that same ratio. Model rates Sb/S and Hb/H and the per-model pair fractions are compared with the fixed thresholds in pass_criterion and fail_criterion. No assessor score is used."
+  },
+  "interpretation": "The claim is a simulation result about the 27 sensitizing ODE pathway models in the Biswas, Clawson and Levin survey, not a statement that cells break sensitization less readily than habituation. Sensitization and habituation are the paper's ratio rules (Methods 4.5 and 4.6): six successive stimulation epochs must each move the response mean by a factor of 1.5. A third-node break is the failure of that ratio on two UCS test epochs after the third node is clamped twice. Therapeutic wording in the claim is not given a separate measurement. Clamp levels are 100 times the nonzero maximum (up) or the nonzero minimum divided by 100 (down), taken from an unforced trajectory, matching USscaleUp = 100 in Find_DrugRes_Sensitize_SLURM1.m of https://github.com/wesleypclawson/GRN_ODE. Epoch boundaries in time units are the MATLAB call-index boundaries times 0.1 (each ode23tb call in that script advances 0.1 time): relax 0\u2013500, then stimulation windows [500,1000], [1600,2200], [2900,3600], [4400,5200], [6100,7000], [8000,9000], with the gaps as relaxations. Breaking epochs last 100 time units, which is simCnt = 10000 samples at h = 0.01 in stimulateRelaxSingle.m. One adaptive integration per epoch with the clamped species held fixed is the continuous-clamp limit of their per-step reset; that substitution is part of this registration, not a later deviation. Means are arithmetic means of 21 evenly spaced samples on each epoch.",
+  "protocol": {
+    "scale_up": 100,
+    "ratio": 1.5,
+    "n_stimuli": 6,
+    "max_floating_species": 15,
+    "min_floating_species": 3,
+    "per_model_timeout_seconds": 180,
+    "solver": "scipy.integrate.solve_ivp method BDF, rtol 1e-4, atol 1e-6",
+    "sbml_engine": "libroadrunner getRatesOfChange, clamped species rate set to 0 and value held",
+    "epoch_samples": 21,
+    "stop_third_node_search_at_first_break": true
+  },
+  "preregistration_amendments": [
+    {
+      "date": "2026-11-02T00:50:00Z",
+      "before_results": true,
+      "text": "Two clarifications made while implementing the integrator, before any model was scored. (1) A 1.5-fold rise requires mean_k >= 1.5 * mean_{k-1} and mean_k > mean_{k-1}; a fall requires mean_k <= mean_{k-1} / 1.5 and mean_k < mean_{k-1}. Equality of two zero means satisfies the ratio algebra and is not a rise or a fall. (2) A pair counts as broken by a third node only if the two UCS test epochs fail that ratio after the two third-node clamps, and a control of the same two UCS epochs with no third-node clamp, started from the same post-training state, still satisfies the ratio. Without the control, two equal pulses that have stopped growing would be scored as broken even though no third node was responsible."
+    }
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-02T00:59:00Z",
+      "text": "Pass and fail thresholds were not edited. decide() originally omitted counts when S < 8 or H < 8, so derived/measured.json first stored stats as {}. After the screen, --redecide ran the same decide() on the saved per-model rows and stored S, Sb, H, Hb, completed, size_eligible, failed_size_eligible, and the per-model pair counts. The rate comparison was not applied."
+    }
+  ],
+  "datasets": [
+    {
+      "id": "biswas2023-table-s1",
+      "name": "Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285, supplement ijms-24-00285-s001, Table S1 model identifiers",
+      "landing_url": "https://www.mdpi.com/1422-0067/24/1/285",
+      "doi": "10.3390/ijms24010285",
+      "version": "ijms-24-00285-s001.zip?version=1672829351",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://mdpi-res.com/d_attachment/ijms/ijms-24-00285/article_deploy/ijms-24-00285-s001.zip?version=1672829351",
+          "retrieved_at": "2026-11-02T00:40:54Z",
+          "byte_size": 2886027,
+          "sha256": "292a7f33bcb3a9589614507114de8c1a7a5f5d8bc11e382d546c3d08da381e39"
+        }
+      ],
+      "role": "Table S1 lists the BioModels identifiers in the surveyed pathway set. The zip is not committed (over 1 MB). Result figures in the supplement were not used as measurements."
+    },
+    {
+      "id": "biomodels-sbml",
+      "name": "EBI BioModels SBML for the Table S1 identifiers",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "doi": null,
+      "version": "files retrieved 2026-11-02",
+      "license": "CC0 1.0 on files whose SBML text contains CC0; otherwise unstated in the file",
+      "files": [
+        {
+          "id": "BIOMD0000000001",
+          "name": "Edelstein1996 - EPSP ACh event",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000001?filename=BIOMD0000000001_url.xml",
+          "retrieved_at": "2026-11-02T00:47:44Z",
+          "byte_size": 50538,
+          "sha256": "407fccc883f80e6d120e34d8b0810a206a5cc6535a26d4574611504e683beb08",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000002",
+          "name": "Edelstein1996 - EPSP ACh species",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000002?filename=BIOMD0000000002_url.xml",
+          "retrieved_at": "2026-11-02T00:47:47Z",
+          "byte_size": 46871,
+          "sha256": "7f7ee585a886f9cd88199887a9e674e070ce368b2884ceeee65dd437f3edca7f",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000003",
+          "name": "Goldbeter1991 - Min Mit Oscil",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000003?filename=BIOMD0000000003_url.xml",
+          "retrieved_at": "2026-11-02T00:47:49Z",
+          "byte_size": 20587,
+          "sha256": "a633872e4c602922e85ac487ef52ac8bd8ead762ec7c0f86f9e93032a84c90f5",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000004",
+          "name": "Goldbeter1991 - Min Mit Oscil, Expl Inact",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000004?filename=BIOMD0000000004_url.xml",
+          "retrieved_at": "2026-11-02T00:48:05Z",
+          "byte_size": 20171,
+          "sha256": "504dc54b5697b4183bd0046fb11f0991702961e3dee0baf15ac1ecaad5009eb6",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000005",
+          "name": "Tyson1991 - Cell Cycle 6 var",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000005?filename=BIOMD0000000005_url.xml",
+          "retrieved_at": "2026-11-02T00:48:31Z",
+          "byte_size": 24470,
+          "sha256": "5a4f44b5a0bc8f32d3206f460f748236539de593be0fb016da2ed7cddd098e36",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000006",
+          "name": "Tyson1991 - Cell Cycle 2 var",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000006?filename=BIOMD0000000006_url.xml",
+          "retrieved_at": "2026-11-02T00:48:45Z",
+          "byte_size": 14408,
+          "sha256": "c3cd0b2dfc738565fe72be3208eec28023e623297e198015df1df77a7e430820",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000010",
+          "name": "Kholodenko2000 - Ultrasensitivity and negative feedback bring oscillations in MAPK cascade",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010?filename=BIOMD0000000010_url.xml",
+          "retrieved_at": "2026-11-02T00:48:46Z",
+          "byte_size": 29295,
+          "sha256": "906964e07ffd570ad94a03c1222e230b54b913cd536b008392bfb6155930a966",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000069",
+          "name": "Fuss2006_MitoticActivation",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000069?filename=BIOMD0000000069_url.xml",
+          "retrieved_at": "2026-11-02T00:48:48Z",
+          "byte_size": 21477,
+          "sha256": "ac4f36293662123205a8d5f9f1346982d9e020abd095d9df5765ea7641ef4713",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000016",
+          "name": "Goldbeter1995_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000016?filename=BIOMD0000000016_url.xml",
+          "retrieved_at": "2026-11-02T00:48:49Z",
+          "byte_size": 29255,
+          "sha256": "35ad538383991b45273e2a767c0325d996d188dba10ce959de9635564813f703",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000017",
+          "name": "Hoefnagel2002_PyruvateBranches",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000017?filename=BIOMD0000000017_url.xml",
+          "retrieved_at": "2026-11-02T00:48:50Z",
+          "byte_size": 63765,
+          "sha256": "b75db9f5e0b418d7eb015e44565c992ebcda10f56f8934747a2677e222b16148",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000022",
+          "name": "Ueda2001_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000022?filename=BIOMD0000000022_url.xml",
+          "retrieved_at": "2026-11-02T00:48:52Z",
+          "byte_size": 66297,
+          "sha256": "0b569c675eaed0226dc4c1dcd7f7e2e210a7cbd1b5562da97e55f47c255cdf04",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000021",
+          "name": "Leloup1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000021?filename=BIOMD0000000021_url.xml",
+          "retrieved_at": "2026-11-02T00:49:56Z",
+          "byte_size": 50938,
+          "sha256": "02376379c0270208b2fd72529a50ccefcdd68c8b23a40585bfdcdd0926a4c8da",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000023",
+          "name": "Rohwer2001_Sucrose",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml",
+          "retrieved_at": "2026-11-02T00:50:25Z",
+          "byte_size": 52851,
+          "sha256": "dccd31fe46f4fb06484a9e3b95718aad788692e9abad1dc68fd368d7c8247066",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000024",
+          "name": "Scheper1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000024?filename=BIOMD0000000024_url.xml",
+          "retrieved_at": "2026-11-02T00:50:27Z",
+          "byte_size": 12534,
+          "sha256": "748514f402eea94c49346701a30f2b429c9c7d5de922cd450e5a155d5f69dbe1",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000026",
+          "name": "Markevich2004_MAPK_orderedElementary",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000026?filename=BIOMD0000000026_url.xml",
+          "retrieved_at": "2026-11-02T00:50:28Z",
+          "byte_size": 26398,
+          "sha256": "d293eb11fdd65b3150999c68edaf690a9449ea9e070a8f61878b3a4648eff7c5",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000027",
+          "name": "Markevich2004 - MAPK double phosphorylation,  ordered Michaelis-Menton",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000027?filename=BIOMD0000000027_url.xml",
+          "retrieved_at": "2026-11-02T00:50:30Z",
+          "byte_size": 18368,
+          "sha256": "56d8acc83add5a262b6785b18f2e905e606b9072625e25ba1520306bc4d586bb",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000483",
+          "name": "Cao2008 - Network of a toggle switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000483?filename=BIOMD0000000483_url.xml",
+          "retrieved_at": "2026-11-02T00:50:32Z",
+          "byte_size": 20997,
+          "sha256": "50f2d7cf4cd14c4c1953ef8ae07a3efe35cea2af7e84baf5ab35ad188fa23406",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000029",
+          "name": "Markevich2004_MAPK_phosphoRandomMM",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000029?filename=BIOMD0000000029_url.xml",
+          "retrieved_at": "2026-11-02T00:50:32Z",
+          "byte_size": 28068,
+          "sha256": "c1eb117678b7d423b8e1d2fd7f493c865fb66559980256f3544938f5a431b530",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000031",
+          "name": "Markevich2004_MAPK_orderedMM2kinases",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000031?filename=BIOMD0000000031_url.xml",
+          "retrieved_at": "2026-11-02T00:50:34Z",
+          "byte_size": 18712,
+          "sha256": "56ddd4cc0a0cf51c55a27fa386e0ee670c798ea69151ad39fadf363d0c0297a1",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000631",
+          "name": "DeCaluwe2016 - Circadian Clock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000631?filename=BIOMD0000000631_url.xml",
+          "retrieved_at": "2026-11-02T00:50:35Z",
+          "byte_size": 87080,
+          "sha256": "b527328fbc3d8c57f41bc15615c115f156c2ae80d6a7f3ef0be069cad3a84df2",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000203",
+          "name": "Chickarmane2006 - Stem cell switch reversible",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000203?filename=BIOMD0000000203_url.xml",
+          "retrieved_at": "2026-11-02T00:51:09Z",
+          "byte_size": 33654,
+          "sha256": "1a6b8afba805b78e72f3b825626f4b10d1ce3cd92e3feab1d29781822ec2d4cf",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000204",
+          "name": "Chickarmane2006 - Stem cell switch irreversible",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000204?filename=BIOMD0000000204_url.xml",
+          "retrieved_at": "2026-11-02T00:51:11Z",
+          "byte_size": 33257,
+          "sha256": "fd4669b73014455d7d0ae1c6099000e3055999436080ca247aae381688bba14f",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000209",
+          "name": "Chickarmane2008 - Stem cell lineage determination",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000209?filename=BIOMD0000000209_url.xml",
+          "retrieved_at": "2026-11-02T00:51:13Z",
+          "byte_size": 44126,
+          "sha256": "a688c8883b5d3913348766830d109a9a83b378e03735eb9f59139484463bfb72",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000210",
+          "name": "Chickarmane2008 - Stem cell lineage - NANOG GATA-6 switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000210?filename=BIOMD0000000210_url.xml",
+          "retrieved_at": "2026-11-02T00:51:15Z",
+          "byte_size": 42092,
+          "sha256": "fa698cc484dd1b46bb80aff07609a4c50a933c5e6f88cdbef79c61c927215dec",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000539",
+          "name": "Fran\u00e7ois2005 - Mixed Feedback Loop (two-gene network)",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000539?filename=BIOMD0000000539_url.xml",
+          "retrieved_at": "2026-11-02T00:51:17Z",
+          "byte_size": 39265,
+          "sha256": "ea0689f4ed3342219eaf79d7f9c1058a5f51a0cec417d47fd22e9b7aa6ab1518",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000664",
+          "name": "Muller2008 - Simplified MAPK activation Dynamics (Model B)",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000664?filename=BIOMD0000000664_url.xml",
+          "retrieved_at": "2026-11-02T00:51:28Z",
+          "byte_size": 77094,
+          "sha256": "382a22cca6d338f7f614406343cd86189d30370ec98ee49df22310b32566b538",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000275",
+          "name": "Goldbeter2007_Somitogenesis_Switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000275?filename=BIOMD0000000275_url.xml",
+          "retrieved_at": "2026-11-02T00:51:35Z",
+          "byte_size": 27145,
+          "sha256": "600e2c173146c24f77c738c9117aa684a0acf9aeedea227126efaf033f641e70",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000697",
+          "name": "Ciliberto2003 - CyclinE / Cdk2 timer in the cell cycle of Xenopus laevis embryo",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000697?filename=BIOMD0000000697_url.xml",
+          "retrieved_at": "2026-11-02T00:51:36Z",
+          "byte_size": 143510,
+          "sha256": "49fa7d62694291db1d001a1c8c0a77c3f2c183e6def7d352b57a9714c542be33",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000600",
+          "name": "Celli\u00e8re2011 - Plasticity of TGF-\u03b2 Signalling",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000600?filename=BIOMD0000000600_url.xml",
+          "retrieved_at": "2026-11-02T00:51:51Z",
+          "byte_size": 236464,
+          "sha256": "0f6d241fdf1e0ffd46fbb0f203c0b83c135e23c6bb0ae81d3dfad7fd4a9c1827",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000039",
+          "name": "Marhl2000_CaOscillations",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000039?filename=BIOMD0000000039_url.xml",
+          "retrieved_at": "2026-11-02T00:51:52Z",
+          "byte_size": 21681,
+          "sha256": "6b221222be03747b11454cc4f2a6218697d9c6367d3578a170c7cc5c34ad3b12",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000050",
+          "name": "Martins2003_AmadoriDegradation",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000050?filename=BIOMD0000000050_url.xml",
+          "retrieved_at": "2026-11-02T00:52:06Z",
+          "byte_size": 25527,
+          "sha256": "4846396a6621661b5faa775f7f7b48aefe36c3396bb2da41aeb96f3319d084ad",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000035",
+          "name": "Vilar2002_Oscillator",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000035?filename=BIOMD0000000035_url.xml",
+          "retrieved_at": "2026-11-02T00:52:08Z",
+          "byte_size": 36048,
+          "sha256": "3303169fdd9a672fa25c26586822c9a1b91ac461744d1926d317f493e6981237",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000036",
+          "name": "Tyson1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000036?filename=BIOMD0000000036_url.xml",
+          "retrieved_at": "2026-11-02T00:52:34Z",
+          "byte_size": 15168,
+          "sha256": "c95e89456a74ebf7bbef76e648ac4e83f59a913b894b01a69387458ae77802f4",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000037",
+          "name": "Marwan2003 - Genetics, regulatory hierarchy between genes",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000037?filename=BIOMD0000000037_url.xml",
+          "retrieved_at": "2026-11-02T00:52:36Z",
+          "byte_size": 19565,
+          "sha256": "2a8f7a68ac7efd45e09f42a1a5f5e30c9a47b9c039fb79ecf86ef7e3def17c07",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000038",
+          "name": "Rohwer2000_Phosphotransferase_System",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000038?filename=BIOMD0000000038_url.xml",
+          "retrieved_at": "2026-11-02T00:52:40Z",
+          "byte_size": 40811,
+          "sha256": "33708cec1fad44db6958c3ac6255397ad79b45564a296d29732fd934608d787b",
+          "license": null
+        }
+      ],
+      "role": "Deposited pathway ODEs. Trajectories were generated from these files; the authors' .mat result files were not opened."
+    }
+  ],
+  "method": "analysis.py fetches each Table S1 SBML file from EBI BioModels and integrates it with scipy BDF (rtol 1e-4, atol 1e-6) using libroadrunner rates, one model per subprocess. Sensitization is a strict 1.5-fold rise of the response mean on all six stimulation epochs; habituation is a strict fall to 1/1.5 or below. A third-node break requires the two following UCS epochs to fail that ratio after two clamps, while the same two epochs without the third-node clamp still satisfy it. Models outside 3\u201315 floating species are excluded before scoring. decide() returns inconclusive/underpowered when fewer than 8 completed models sensitize or fewer than 8 habituate. After the screen, --redecide reapplied decide() to the saved per-model rows and wrote those counts into derived/measured.json without integrating again.",
+  "measured": {
+    "value": 2,
+    "unit": "completed models with at least one sensitizing stimulus\u2013response pair",
+    "n": 26,
+    "uncertainty": "deterministic given the SBML bytes, the BDF tolerances, and the pre-registered epoch rules; per-model wall time is not a measurement",
+    "extra": {
+      "S": 2,
+      "Sb": 0,
+      "H": 5,
+      "Hb": 1,
+      "completed": 26,
+      "size_eligible": 31,
+      "failed_size_eligible": 5,
+      "sensitizing_ids": [
+        "BIOMD0000000001",
+        "BIOMD0000000002"
+      ],
+      "habituating_ids": [
+        "BIOMD0000000026",
+        "BIOMD0000000664",
+        "BIOMD0000000039",
+        "BIOMD0000000050",
+        "BIOMD0000000037"
+      ],
+      "sens_pairs_breakable": {
+        "BIOMD0000000001": [
+          184,
+          0
+        ],
+        "BIOMD0000000002": [
+          199,
+          0
+        ]
+      },
+      "hab_pairs_breakable": {
+        "BIOMD0000000026": [
+          8,
+          0
+        ],
+        "BIOMD0000000664": [
+          9,
+          0
+        ],
+        "BIOMD0000000039": [
+          1,
+          0
+        ],
+        "BIOMD0000000050": [
+          60,
+          0
+        ],
+        "BIOMD0000000037": [
+          12,
+          1
+        ]
+      },
+      "verdict_by_preregistered_rule": "inconclusive",
+      "reason": "underpowered"
+    }
+  },
+  "data_kind": "computational",
+  "verdict": "inconclusive",
+  "reason": "underpowered",
+  "confidence": 0.85,
+  "caveats": [
+    "A simulation of deposited pathway models does not show that cells break sensitization less readily than habituation.",
+    "The pre-registered power floor was not met: S = 2 sensitizing models and H = 5 habituating models, both below 8, among 26 completed size-eligible models (5 of 31 size-eligible models failed to integrate). The comparison with 8 of 27, with a break in under 5% of pairs, and with the habituation-break rate was not applied. The verdict is inconclusive. It is not support and it is not a refutation.",
+    "The published MATLAB counter uses nonzeros and range and can ignore epochs that do not move by a factor of 1.5. This test follows the methods prose: all six epochs, with a strict rise or fall. That choice was registered before scoring and can classify fewer models as sensitizing than the MATLAB counter.",
+    "Each epoch is one adaptive integration with the clamped species held fixed, the continuous-clamp limit of the MATLAB per-step reset. libroadrunner getRatesOfChange does not fire SBML events. Models whose species are fixed by an assignment rule (BIOMD0000000016, BIOMD0000000275) and the delay model BIOMD0000000024 could not be clamped and were excluded.",
+    "BIOMD0000000001 had 184 sensitizing pairs and BIOMD0000000002 had 199, with no break in either model. Those pair counts did not enter a rate test, because S is below 8.",
+    "Therapeutic wording in the claim was not given a separate measurement."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/test-levin-grn-learning-5674",
+    "date": "2026-11-01"
+  }
+}
