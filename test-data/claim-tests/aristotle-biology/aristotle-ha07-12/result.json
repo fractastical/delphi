@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha07-12",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-12",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "No woman has given birth to more than five children at one delivery.",
+  "pass_criterion": "Pre-registered, before any plurality count or abstract was downloaded. The maximum of five would be supported only by a vital-registration table that separates five from six or more and records zero deliveries of six or more across its covered population and years. This run does not include such a table. A support verdict is not available from an abstract search aimed at higher-order births, because failing to retrieve a paper is not a census. This run must not report supports.",
+  "fail_criterion": "Pre-registered. Refutes if at least one Europe PMC title or abstract, from the query below, states a human delivery of six or more infants. The words that count are sextuplet, sextuplets, septuplet, septuplets, octuplet, octuplets, nonuplet and nonuplets, in a title or abstract that also refers to a human birth (birth, born, delivery, infant, baby or mother). A hit does not count if the same title or abstract negates it (no sextuplet, not a sextuplet, without septuplets, or the same for the other words). Inconclusive, reason underpowered, if the search returns results but none meet that pattern: the search was built to find counterexamples, and a miss does not show that five is the maximum. Inconclusive, reason data-unavailable, if the Europe PMC request fails.",
+  "planned_datasets": [
+    "europepmc-higher-order-human-births"
+  ],
+  "test_contract": {
+    "expected_observation": "Published titles and abstracts do not describe a human delivery of six or more infants.",
+    "disconfirming_observation": "A title or abstract describes a human sextuplet, septuplet, octuplet or nonuplet birth.",
+    "admissible_datasets": "Europe PMC title-and-abstract search on https://www.ebi.ac.uk/europepmc/webservices/rest/search, format=json, pageSize=25. The query is TITLE_ABS:(sextuplets OR septuplets OR octuplets OR nonuplets OR sextuplet OR septuplet OR octuplet OR nonuplet) AND (birth OR born OR delivery OR deliveries). resultType=core is required because an earlier test showed that resultType=lite omits abstractText; that deviation is declared here, before this search is run. No abstract from this query was read before this registration. No vital-statistics file may be added after the abstracts are read.",
+    "inference_method": "Keep a hit only when its own title or abstract contains one of the eight plurality words, also contains a human-birth word, and does not contain a negation of that plurality word. One such hit refutes the claim that five is the maximum. Zero such hits is inconclusive, reason underpowered. Supports is not a reachable verdict of this search."
+  },
+  "interpretation": "The quote states the largest number brought forth at one birth, and says five has been seen more than once. The test is the maximum, not the existence of quintuplets. Six or more at one delivery refutes five as the maximum. The scope is human births, so the abstract must be about a human delivery. An abstract search can find a counterexample. It cannot prove that no larger birth has occurred, so it cannot support the claim.",
+  "caveats": [
+    "The query was not run before this file was committed.",
+    "A case report is one delivery, not a rate. One delivery above five is enough to reject the stated maximum.",
+    "Abstracts can mention a higher-order birth without being the clinical record of it. The pattern accepts that mention. It does not accept a negated mention."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  }
+}
