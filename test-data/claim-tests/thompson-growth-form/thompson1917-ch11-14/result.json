@@ -1,0 +1,244 @@
+{
+  "claim_id": "thompson1917-ch11-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-14",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:24:44Z",
+  "hypothesis": "Along the shell of the ammonoids Thompson names, the local spiral angle changes in the direction he states: it increases where the whorls narrow (Oekotraustes / Oecotraustes), and it decreases toward a gentle, nearly straight curve where the coil opens (Scaphites, Ancyloceras, Lituites).",
+  "pass_criterion": "Pre-registered (supports). For each genus that yields a usable lateral or median-section outline of one whole shell, estimate the local spiral angle alpha as the median angle, in degrees, between the radius from the coiling pole and the tangent of the ventral outline. Compare alpha_early (middle of the coiled portion: arc-length fraction 0.25 to 0.50, starting at the inner whorls) with alpha_late (the last 0.25 of arc length toward the aperture). Oekotraustes/Oecotraustes matches if alpha_late > alpha_early + 10 degrees. Scaphites, Ancyloceras and Lituites each match if alpha_late < alpha_early - 15 degrees and alpha_late < 60 degrees. The claim is supported if at least two genera are usable and every usable genus matches.",
+  "fail_criterion": "Pre-registered (refutes). At least two genera are usable, and at least two of them change by the stated margin in the opposite direction (Oekotraustes/Oecotraustes decreasing by more than 10 degrees, or an uncoiling genus increasing by more than 15 degrees). If at least two genera are usable and the outcomes are split, the verdict is mixed. If fewer than two genera yield a usable outline, or every open image fails the quality gate, or the only files are behind a login, the verdict is inconclusive with reason data-unavailable. A juvenile whorl-expansion series that the source says stops before the adult hook or the narrowing body chamber is not a usable series for this claim. Outlines are not traced by hand and angles are not guessed from a photograph.",
+  "planned_datasets": [
+    "wikimedia-commons-files-for-oekotraustes-scaphites-ancyloceras-lituites",
+    "idigbio-media-for-those-genera",
+    "morphosource-media-search-for-those-genera"
+  ],
+  "test_contract": {
+    "expected_observation": "On whole shells of the named genera, local spiral angle increases through growth in Oekotraustes and decreases toward a small angle on the opened coil of Scaphites, Ancyloceras and Lituites.",
+    "disconfirming_observation": "The measured late angle moves the other way by the pre-registered margin in at least two of those genera.",
+    "admissible_datasets": "Open lateral or median-section images or vector drawings of one whole shell per genus, showing the coiled whorls and, for the uncoiling genera, the shaft or hook. Not Thompson's own figures. Not a login-walled mesh. Not an ontogenetic table limited to juvenile whorls before the morphology he describes.",
+    "inference_method": "Coiling pole fitted on the inner half of the ventral outline by minimising the variance of the tangent-radius angle. Local alpha is the median tangent-radius angle on the early window and on the late window. Match and mismatch use the margins in pass_criterion and fail_criterion. Fewer than two usable genera is data-unavailable rather than a refutation."
+  },
+  "interpretation": "Thompson's alpha is the angle between the tangent and the radius vector of the spiral, the same angle he tabulates against the whorl-breadth ratio (large alpha, near 80 to 85 degrees, is a slowly expanding coil; alpha falling toward 0 opens the coil). An increase of alpha narrows successive whorls; a decrease opens them, as in the hooked or straightened body chambers of Scaphites, Ancyloceras and Lituites. He spells the narrowing genus Oekotraustes; the same genus is searched under the later spelling Oecotraustes. The claim is that this change of angle is what those outlines are, so the test follows alpha along one shell of each named genus. It does not test whether every ammonoid changes angle, and a dataset of normally coiled juveniles is a different question.",
+  "planned_method": "Search Wikimedia Commons, then iDigBio media, then MorphoSource, for each genus. Record HTTP status. If MorphoSource or another host requires a login, do not authenticate and do not estimate an angle. Prefer an SVG path if one is returned; otherwise a JPEG or PNG under 8 MB. Segment or parse to one outline. Quality gate: a single spiral-bearing component whose contour length and bounding box are consistent with a side view of a shell (aspect ratio of the bounding box between 0.4 and 4, component area 5 to 90 percent of the image, solidity at least 0.4 to allow a coiled shell with an umbilicus). Fit the pole on the inner half. If the inner-half angle variance stays above 400 square degrees after the fit, the outline is unusable. Choose the file deterministically: SVG first, else the largest byte size that passes the gate. Do not commit images over 1 MB; commit only derived angle tables under 200 KB. The Springer supplement of Tajika and colleagues (10.1186/s13358-025-00397-y, MOESM2) was considered and is excluded before download because that paper's methods restrict the analysed diameters to about 2.5\u20139.5 mm, which is before the adult uncoiled body chamber the claim is about.",
+  "caveats_before_data": [
+    "Before this file was committed, no shell image was downloaded and no angle was measured. The decision to exclude the 2025 juvenile WER supplement uses that paper's stated size window, not the spreadsheet.",
+    "One shell per genus is a thin sample. The criterion therefore requires the named pattern in every genus that can be measured, and it refuses a verdict when fewer than two genera can be measured.",
+    "Automatic outlines of fossils fail often. A failed outline is data-unavailable, not evidence that the angle did not change."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.35,
+  "measured": {
+    "value": 15.88,
+    "unit": "degrees, late spiral angle minus early spiral angle, median across usable selected shells",
+    "n": 2,
+    "uncertainty": "one outline per genus; pole grid is 16 by 16",
+    "extra": {
+      "genera": [
+        {
+          "genus": "Oekotraustes",
+          "call": "unusable"
+        },
+        {
+          "genus": "Scaphites",
+          "call": "wrong-way",
+          "file": "Scaphites_whitfieldi.jpg",
+          "byte_size": 853816,
+          "alpha_early_deg": 47.85,
+          "alpha_late_deg": 77.31,
+          "delta_deg": 29.45,
+          "inner_half_variance_deg2": 40.91,
+          "sha256": "a429633750ecd500a66886491ce6cb5d4fa430a0966186e45d6a9d50ed0f9c64"
+        },
+        {
+          "genus": "Ancyloceras",
+          "call": "no-margin",
+          "file": "Ancyloceras_rochi,_sp.n.,_Lower_Aptian,_Katselovo,_Popovo_Municipality_at_the_Sofia_University_'St._Kliment_Ohridski'_Museum_of_Paleontology_and_Historical_Geology_-_2.jpg",
+          "byte_size": 4023310,
+          "alpha_early_deg": 62.68,
+          "alpha_late_deg": 65.0,
+          "delta_deg": 2.32,
+          "inner_half_variance_deg2": 128.19,
+          "sha256": "a2f3f027153356d0a011c5f336ac8e3cf03116aee073e75da4191ba56a539fb9"
+        },
+        {
+          "genus": "Lituites",
+          "call": "unusable"
+        }
+      ],
+      "n_matching": 0,
+      "n_wrong_way": 1
+    }
+  },
+  "datasets": [
+    {
+      "id": "wikimedia-and-idigbio-oekotraustes",
+      "name": "Open images searched for Oekotraustes",
+      "landing_url": "https://commons.wikimedia.org/",
+      "doi": null,
+      "version": "Wikimedia Commons imageinfo plus iDigBio media search, retrieved with this run",
+      "license": "per-file on Wikimedia Commons or the source repository; images are not redistributed",
+      "files": [],
+      "role": "Oekotraustes lateral shell candidates"
+    },
+    {
+      "id": "wikimedia-and-idigbio-scaphites",
+      "name": "Open images searched for Scaphites",
+      "landing_url": "https://commons.wikimedia.org/",
+      "doi": null,
+      "version": "Wikimedia Commons imageinfo plus iDigBio media search, retrieved with this run",
+      "license": "per-file on Wikimedia Commons or the source repository; images are not redistributed",
+      "files": [
+        {
+          "name": "Scaphites_gulosus.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Scaphites_gulosus.jpg",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 186616,
+          "sha256": "a74991d38c4418f32a271b1e5c07f72e584bf9af8f91f7aa21b7ea2cf873c248"
+        },
+        {
+          "name": "Scaphites_whitfieldi.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/3/3a/Scaphites_whitfieldi.jpg",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 853816,
+          "sha256": "a429633750ecd500a66886491ce6cb5d4fa430a0966186e45d6a9d50ed0f9c64"
+        },
+        {
+          "name": "SmallScaphites.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/c/cc/SmallScaphites.jpg",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 157802,
+          "sha256": "83e0edb2827f778b8161cb60b266d4810eeaf12798769aaeee419b05145f0dfa"
+        },
+        {
+          "name": "default.jpg",
+          "download_url": "https://images.collections.yale.edu/iiif/2/ypm:b021f5ad-77d3-496f-a3a4-dd8b32030e27/full/full/0/default.jpg",
+          "retrieved_at": "2026-11-02T00:56:08Z",
+          "byte_size": 230871,
+          "sha256": "94dba1f8c9df4b651bd3dae954de43e8beb5e27464b0e9a6bc961cb855a4598e"
+        },
+        {
+          "name": "default.jpg",
+          "download_url": "https://images.collections.yale.edu/iiif/2/ypm:f6d82f89-ccba-4c6a-ba0e-58d58b32b4e5/full/full/0/default.jpg",
+          "retrieved_at": "2026-11-02T00:56:08Z",
+          "byte_size": 230871,
+          "sha256": "94dba1f8c9df4b651bd3dae954de43e8beb5e27464b0e9a6bc961cb855a4598e"
+        }
+      ],
+      "role": "Scaphites lateral shell candidates"
+    },
+    {
+      "id": "wikimedia-and-idigbio-ancyloceras",
+      "name": "Open images searched for Ancyloceras",
+      "landing_url": "https://commons.wikimedia.org/",
+      "doi": null,
+      "version": "Wikimedia Commons imageinfo plus iDigBio media search, retrieved with this run",
+      "license": "per-file on Wikimedia Commons or the source repository; images are not redistributed",
+      "files": [
+        {
+          "name": "Ancyloceras.JPG",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Ancyloceras.JPG",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 2425350,
+          "sha256": "41ba6a0a15379b87e80bc69fdda2c2f8e9bd479e4a6afd989bb43727dfcab8a8"
+        },
+        {
+          "name": "Ancyloceras_covatschevici_sp.n.,_Lower_Aptian,_Kovatchevets,_Popovo_Municipality,_Cr1_1587X1_at_the_Sofia_University_'St._Kliment_Ohridski'_Museum_of_Paleontology_and_Historical_Geology.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Ancyloceras_covatschevici_sp.n.%2C_Lower_Aptian%2C_Kovatchevets%2C_Popovo_Municipality%2C_Cr1_1587X1_at_the_Sofia_University_%27St._Kliment_Ohridski%27_Museum_of_Paleontology_and_Historical_Geology.jpg",
+          "retrieved_at": "2026-11-02T00:56:12Z",
+          "byte_size": 2087454,
+          "sha256": "73eaf574fbca306221c19e6269ef5d6233994926efa58e197821b90dfca92158"
+        },
+        {
+          "name": "Ancyloceras_rochi,_sp.n.,_Lower_Aptian,_Katselovo,_Popovo_Municipality_at_the_Sofia_University_'St._Kliment_Ohridski'_Museum_of_Paleontology_and_Historical_Geology_-_2.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Ancyloceras_rochi%2C_sp.n.%2C_Lower_Aptian%2C_Katselovo%2C_Popovo_Municipality_at_the_Sofia_University_%27St._Kliment_Ohridski%27_Museum_of_Paleontology_and_Historical_Geology_-_2.jpg",
+          "retrieved_at": "2026-11-02T00:56:14Z",
+          "byte_size": 4023310,
+          "sha256": "a2f3f027153356d0a011c5f336ac8e3cf03116aee073e75da4191ba56a539fb9"
+        },
+        {
+          "name": "default.jpg",
+          "download_url": "https://images.collections.yale.edu/iiif/2/ypm:f882a29d-8099-4e4c-89aa-e3d9411ea59d/full/!1920,1920/0/default.jpg",
+          "retrieved_at": "2026-11-02T00:56:08Z",
+          "byte_size": 230871,
+          "sha256": "94dba1f8c9df4b651bd3dae954de43e8beb5e27464b0e9a6bc961cb855a4598e"
+        },
+        {
+          "name": "default.jpg",
+          "download_url": "https://images.collections.yale.edu/iiif/2/ypm:e0f96485-3430-46bf-bbd9-ccbe7b26fa93/full/!1920,1920/0/default.jpg",
+          "retrieved_at": "2026-11-02T00:56:08Z",
+          "byte_size": 230871,
+          "sha256": "94dba1f8c9df4b651bd3dae954de43e8beb5e27464b0e9a6bc961cb855a4598e"
+        }
+      ],
+      "role": "Ancyloceras lateral shell candidates"
+    },
+    {
+      "id": "wikimedia-and-idigbio-lituites",
+      "name": "Open images searched for Lituites",
+      "landing_url": "https://commons.wikimedia.org/",
+      "doi": null,
+      "version": "Wikimedia Commons imageinfo plus iDigBio media search, retrieved with this run",
+      "license": "per-file on Wikimedia Commons or the source repository; images are not redistributed",
+      "files": [
+        {
+          "name": "Lituites.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Lituites.jpg",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 411415,
+          "sha256": "06f8b4e9d04c5d01f24d64d21017ca46862e8aa6fefbe1dc4013e3a730aaf69b"
+        },
+        {
+          "name": "Lituites_lituus_01.jpg",
+          "download_url": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Lituites_lituus_01.jpg",
+          "retrieved_at": "2026-11-02T00:54:57Z",
+          "byte_size": 713622,
+          "sha256": "f8a376c03cfa0de553e0680a76cb4cc43dc96f077d42b9d84a9b282cf03ba7b3"
+        },
+        {
+          "name": "PE76944_label.JPG",
+          "download_url": "https://fm-digital-assets.fieldmuseum.org/1180/670/PE76944_label.JPG",
+          "retrieved_at": "2026-11-02T00:56:29Z",
+          "byte_size": 1413486,
+          "sha256": "57052a2f3da8336cb2fc5c1b4e0c1a8f698492057bd21a764d31005032576e9a"
+        },
+        {
+          "name": "PE76944_F.jpg",
+          "download_url": "https://fm-digital-assets.fieldmuseum.org/1189/339/PE76944_F.jpg",
+          "retrieved_at": "2026-11-02T00:56:30Z",
+          "byte_size": 1335846,
+          "sha256": "87f25b6a160bbd93bbd3b816ffb9d20d3ee7f2eec4c2daa7d22355ef5cbae216"
+        }
+      ],
+      "role": "Lituites lateral shell candidates"
+    }
+  ],
+  "method": "Commons JPEG search and iDigBio media search were queried for each genus, and the MorphoSource search page was requested without logging in. Each obtained image was resized to a long side of at most 700 pixels. Otsu components that touch the image border were dropped as the surround. The largest remaining component was kept when its area was 5 to 90 percent, its box aspect was 0.4 to 4, and its solidity was 0.4 to 0.95. The external contour was traced and the coiling pole was the grid point inside the mask that minimised the variance of the tangent-radius angle on the inner half of the outer envelope, running from the near side of the pole toward the far side. Alpha is the acute angle between that tangent and the radius. Early is arc fraction 0.25 to 0.50 and late is the last quarter. The largest usable file for each genus is the one that counts.",
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Components that touch the image border are discarded, and a mask with solidity above 0.95 is discarded. The pole is chosen on a 16 by 16 grid. Images are resized to 700 pixels on the long side.",
+      "why": "The pre-registration requires one shell outline and a pole fit, and it sets a solidity floor of 0.4 so a coiled shell with an umbilicus can pass. It does not say what to do with the mounting board or the photograph's margin, which otherwise become the largest component. A filled rectangle has solidity near 1. These filters do not change the 10 degree or 15 degree margins or the 400 square-degree variance cap."
+    }
+  ],
+  "caveats": [
+    "Oekotraustes and Oecotraustes returned no JPEG on Commons and no media on iDigBio.",
+    "MorphoSource answered with a bot-check page. No account was used and no mesh was measured.",
+    "Lituites photographs in the Commons sample are slabs or fragments; none left an interior component inside the gate.",
+    "The size rule selects Scaphites_whitfieldi.jpg. That shell is two-toned, so the dark mask covers part of the whorl and its cast shadow rather than the whole ventral outline.",
+    "The largest Ancyloceras file is a display-case photograph of a worn fragment. A smaller photograph of a whole hooked shell was measured and was not selected, because the pre-registered rule keeps the largest file that passes the gate.",
+    "One shell per genus is the whole sample. A near miss of the 15 degree margin is not rounded into a match.",
+    "The 2025 juvenile whorl-expansion spreadsheet was not opened."
+  ],
+  "results_summary": [
+    "Oekotraustes unusable; Scaphites wrong-way (Scaphites_whitfieldi.jpg: 47.85\u00b0 to 77.31\u00b0); Ancyloceras no-margin (Ancyloceras_rochi,_sp.n.,_Lower_Aptian,_Katselovo,_Popovo_Municipality_at_the_Sofia_University_'St._Kliment_Ohridski'_Museum_of_Paleontology_and_Historical_Geology_-_2.jpg: 62.68\u00b0 to 65.0\u00b0); Lituites unusable.",
+    "Verdict mixed."
+  ]
+}

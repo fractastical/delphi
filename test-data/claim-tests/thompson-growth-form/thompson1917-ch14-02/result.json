@@ -1,0 +1,90 @@
+{
+  "claim_id": "thompson1917-ch14-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-02",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:24:44Z",
+  "hypothesis": "On real Helianthus annuus seedheads, the opposed (clockwise and anticlockwise) parastichies cross at one roughly constant angle across the disc, and that angle is orthogonal (near 90 degrees) only rarely.",
+  "pass_criterion": "Pre-registered (supports). Using reviewer-drawn parastichy strokes extracted from the annotated PowerPoint files, and only heads that yield at least 6 opposed-family crossings: (1) at least 40 such heads; (2) the median across heads of the within-head interquartile range of the acute intersection angle is at most 20 degrees; (3) the median across heads of the within-head median angle is at most 75 degrees; (4) the fraction of heads whose within-head median angle is at least 80 degrees is below 0.25. The acute intersection angle is the smaller angle between the two tangents, in (0, 90] degrees, so 90 degrees is orthogonal.",
+  "fail_criterion": "Pre-registered (refutes). With at least 40 heads that each yield at least 6 crossings: the median within-head interquartile range is greater than 35 degrees (the crossing angle is not approximately constant), or the fraction of heads whose median angle is at least 80 degrees is at least 0.50 (orthogonal crossing is common). If at least 40 heads qualify but neither the pass rule nor the fail rule holds, the verdict is mixed. If vector strokes or seed-point markers cannot be read from the slides, the verdict is inconclusive with reason data-unavailable. If strokes exist but fewer than 40 heads yield 6 crossings, the verdict is inconclusive with reason underpowered. Raster photographs are not traced by eye and are not segmented into spirals.",
+  "planned_datasets": [
+    "swinton-ochu-2016-turings-sunflowers-dryad-f9k77"
+  ],
+  "test_contract": {
+    "expected_observation": "Opposed parastichies on a sunflower disc cross at an angle that stays within a narrow range on that disc, and the typical angle across discs is well below 90 degrees.",
+    "disconfirming_observation": "Crossing angles wander by tens of degrees across a single disc, or most discs cross near 90 degrees.",
+    "admissible_datasets": "Open measurements or traced drawings of parastichies on real Helianthus annuus capitula, made independently of Thompson's text, with enough heads to estimate both within-head constancy and the rate of near-orthogonal crossing. Model-derived angles computed from parastichy counts alone do not count.",
+    "inference_method": "Acute angle between local tangents of opposed traced families at their crossings. Isogonality is the median within-head interquartile range, threshold 20 degrees to pass and 35 degrees to fail. Orthogonality is the fraction of head-median angles at or above 80 degrees, infrequent if below 0.25 and common if at least 0.50. Heads need at least 6 crossings; the test needs at least 40 such heads."
+  },
+  "interpretation": "Thompson's sentence is about the spirals in a sunflower disc: they intersect isogonally, and orthogonal intersection is only a special case and probably infrequent. Isogonal is read as a crossing angle that is approximately constant across one disc, not as each spiral making a constant angle with the radius. Orthogonal is a crossing angle of 90 degrees. The test uses the photoreviewer's freehand traces of the seed rows (Swinton and Ochu 2016 supplement: lines drawn along physically adjacent seeds), which are observations of those rows, with the caveat that a smoothed freehand line can make a curve look steadier than the seeds. Parastichy counts by themselves are not converted into an angle by a packing model. The claim is not read as a statement about Fibonacci numbers.",
+  "planned_method": "Download Dryad file 4661 (Annotated seedhead images 20160205.zip; API md5 987a93b54a9e0c4703f177dff4865b65; 314590945 bytes) and, for slide identity only, file 4662 (JS annotations xlsx; API md5 977cde65dc0be6b7ceab33b704f18f42; 53848 bytes). Do not commit either file. From each ppt/pptx slide, read vector geometry in this order: freeform, curve, connector, or ink polylines; if a slide has none of those but has point markers, use the points as seed positions and connect successive nearest neighbours within each winding family. Estimate the disc centre as the geometric median of the stroke vertices, then split strokes into clockwise and anticlockwise by the sign of the angular momentum about that centre. A crossing is a closest approach, below 3 percent of the disc radius, between one stroke of each winding. Tangents are chords spanning about 5 percent of each stroke after a moving-average smooth of window 5 vertices. Record every number that enters measured from this script. No threshold above is to be edited after the angles are seen; any change of procedure goes in deviations.",
+  "caveats_before_data": [
+    "Before this file was committed, the Dryad version API was read for file names, byte sizes, md5 digests, and the dataset page's CC0-1.0 statement. The zip and the workbooks were not downloaded, and no angle was computed.",
+    "The Royal Society supplement text was read for how the reviewer drew parastichies (freehand lines on photographs, colours grouping a family, outer families preferred). That description is method, not a measurement of angles.",
+    "A separate test of thompson1917-ch14-05 already used the count workbooks from this deposit. This test does not use those counts as a substitute for angles, and it does not edit that test."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.55,
+  "measured": {
+    "value": 13.513,
+    "unit": "degrees, median across heads of the within-head IQR of the acute crossing angle",
+    "n": 273,
+    "uncertainty": "cross-head spread of the within-head IQRs; not a standard error",
+    "extra": {
+      "median_within_head_iqr_deg": 13.513,
+      "median_of_head_median_angle_deg": 73.466,
+      "fraction_heads_median_at_least_80": 0.1941,
+      "n_heads_with_at_least_6_crossings": 273,
+      "n_heads_after_dedupe": 427,
+      "n_slides_with_strokes": 428
+    }
+  },
+  "datasets": [
+    {
+      "id": "swinton-ochu-2016-turings-sunflowers-dryad-f9k77",
+      "name": "Turing's Sunflowers: annotated seedhead images (Swinton and Ochu)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "doi": "10.5061/dryad.f9k77",
+      "version": "Dryad version id 818, file 4661, API md5 987a93b54a9e0c4703f177dff4865b65",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "Annotated seedhead images 20160205.zip",
+          "download_url": "https://datadryad.org/downloads/file_stream/4661",
+          "retrieved_at": "2026-11-02T00:35:48Z",
+          "byte_size": 314590945,
+          "sha256": "71537e93a9bdbf434b17b19e362c8ea8f9dbbba90e7ff80bbb1919022de0af11",
+          "md5": "987a93b54a9e0c4703f177dff4865b65"
+        }
+      ],
+      "role": "reviewer freehand parastichy strokes on Helianthus annuus photographs"
+    }
+  ],
+  "method": "Opened each PowerPoint slide inside Dryad file 4661 and read freeform custGeom paths (line segments and sampled cubic beziers), mapped through shape and group transforms. The disc centre is the geometric median of the stroke vertices and the disc radius is the 90th percentile of vertex distances from that centre. Strokes shorter than 15 percent of that radius are dropped. Each remaining stroke is smoothed with a 5-vertex moving average, oriented from the inner end to the outer end, and classed clockwise or anticlockwise by the sign of r cross dr. A stroke whose mean |sin| against the radius is below 0.15 is dropped. A crossing is the closest approach of one clockwise and one anticlockwise stroke when that distance is below 3 percent of the radius. The tangent is the chord spanning 5 percent of the smoothed stroke about that point. The acute angle is arccos of the absolute cosine, in (0, 90] degrees. Heads need at least 6 crossings. Slides that share a leading integer in the title are one head; the drawing with more crossings is kept.",
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Disc radius is the 90th percentile of vertex distances from the geometric median. Strokes shorter than 0.15 radii, and strokes whose tangent stays within about 9 degrees of the radius (|mean sin| < 0.15), are not treated as parastichies. Slides whose title starts with the same integer are one head.",
+      "why": "The pre-registration named the centre, the 3 percent approach, the 5-vertex smooth and the 5 percent chord, and it named heads rather than slides. It did not define the radius, a minimum stroke length, or how a repeated head number is counted. These choices do not change the 20 degree, 35 degree, 75 degree, 80 degree or 0.25 thresholds. Colours are not used: a methods slide in the same decks says colours are not significant, and the pre-registration splits families by winding."
+    }
+  ],
+  "caveats": [
+    "The strokes are a reviewer's freehand lines on photographs. A smoothed line can look steadier than the seeds, which biases this test toward the claim.",
+    "Clockwise is the deck's own definition: the curve goes clockwise as it radiates outward, evaluated in slide coordinates.",
+    "One closest approach is kept per pair of strokes. Broken pieces of one spiral can contribute more than one approach.",
+    "Parastichy counts are not turned into angles. The count workbooks in this Dryad deposit are not used.",
+    "The zip md5 matches the Dryad file record 987a93b54a9e0c4703f177dff4865b65."
+  ],
+  "results_summary": [
+    "Qualified heads 273 of 427 after collapsing 1 repeat slides. Median within-head IQR 13.51 degrees. Median of head-median angles 73.47 degrees. Fraction of heads with median angle at least 80 degrees: 0.194.",
+    "Verdict supports."
+  ]
+}
