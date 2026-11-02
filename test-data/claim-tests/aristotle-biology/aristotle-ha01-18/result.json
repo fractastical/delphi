@@ -1,0 +1,75 @@
+{
+  "claim_id": "aristotle-ha01-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-18",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the river crocodile moves only its upper jaw, then during feeding the lower jaw does not rotate relative to the braincase, while the cranium rotates relative to the body.",
+  "pass_criterion": "Pre-registered. Using degree values extracted from the open-access feeding-kinematics paper on Alligator mississippiensis (PMC4280508), support only if every reported mean lower-jaw displacement is at most 5 degrees and every reported mean cranial rotation is at least 10 degrees. Values in a sentence or column that mentions slope, scaling, or per-unit change are not excursions and are ignored. Log-transformed numbers are ignored. If only log-transformed values or slopes are published, the verdict is inconclusive with reason not-operationalizable.",
+  "fail_criterion": "Pre-registered. Refute if any reported group mean of lower-jaw displacement, in degrees, is greater than 10. That is the mandible rotating relative to the neurocranium, so the lower jaw is not the immobile element. If lower-jaw means are all at most 10 degrees but at least one exceeds 5, or if lower-jaw means are at most 5 but cranial rotation is not at least 10 in every reported group, the verdict is mixed. If no degree excursions can be extracted, the verdict is inconclusive with reason data-unavailable. If the paper states fewer than 5 individuals, the verdict is inconclusive with reason underpowered. Precedence: data-unavailable or not-operationalizable or underpowered first; else refutes if any lower-jaw mean exceeds 10 degrees; else supports if the pass rule holds; else mixed.",
+  "planned_datasets": [
+    "pmc4280508-alligator-feeding-kinematics"
+  ],
+  "test_contract": {
+    "expected_observation": "Lower-jaw angular displacement relative to the neurocranium stays within 5 degrees while the cranium rotates at least 10 degrees relative to the body.",
+    "disconfirming_observation": "A reported mean lower-jaw displacement above 10 degrees during mouth opening.",
+    "admissible_datasets": "A public kinematic study that separates lower-jaw rotation relative to the skull from rotation of the whole head, in degrees, on a crocodilian. Narrative assertions without numbers do not count.",
+    "inference_method": "Extract every group mean excursion in degrees for lower-jaw displacement and for cranial rotation, ignoring slopes and log values. Compare each mean with the pre-registered 5-degree and 10-degree cuts. The individual-count threshold is 5."
+  },
+  "interpretation": "Aristotle names the river crocodile, Crocodylus niloticus. The planned measurements are on Alligator mississippiensis, a different genus in the same order. The test treats the alligator as a proxy for the crocodilian jaw joint, in which the mandible rotates on the quadrate and the upper jaw is sutured to the braincase. Cranial rotation relative to the body is the head lift that can look like an upper jaw moving. It is not independent motion of the upper jaw on the skull. The verdict is about that kinematic reading.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7efa",
+    "date": "2026-11-01"
+  },
+  "data_kind": "none",
+  "verdict": "inconclusive",
+  "confidence": 0.35,
+  "measured": {
+    "value": null,
+    "unit": "degrees, largest reported mean lower-jaw displacement",
+    "n": 36,
+    "uncertainty": null,
+    "extra": {
+      "lower_jaw_means_degrees": [],
+      "cranial_rotation_means_degrees": [],
+      "n_individuals": 36,
+      "n_lower_jaw_means": 0,
+      "n_cranial_means": 0,
+      "ignored_log_degree_labels": [
+        "log Cranial Rotation (degree)",
+        "log Lower Jaw Displacement (degree)"
+      ],
+      "rule_based_verdict": "inconclusive"
+    }
+  },
+  "datasets": [
+    {
+      "id": "pmc4280508-alligator-feeding-kinematics",
+      "name": "Scaling the Feeding Mechanism of Captive Alligator mississippiensis from Hatchling to Juvenile",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4280508/",
+      "doi": "10.3390/biology3040724",
+      "version": null,
+      "license": "This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution license (http://creativecommons.org/licenses/by/4.0/).",
+      "files": [
+        {
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=4280508&retmode=xml",
+          "retrieved_at": "2026-11-02T01:02:00Z",
+          "byte_size": 83055,
+          "sha256": "c1e97d8d176c380253cd73e374846f44211bb3524b4b5ec551fe5a6de1e0bb06",
+          "note": "PMC JATS XML via efetch"
+        }
+      ],
+      "role": "lower-jaw displacement and cranial rotation during feeding"
+    }
+  ],
+  "method": "Downloaded the JATS XML of PMC4280508. A degree mean was kept only when the variable name is lower-jaw displacement or cranial rotation, the cell is an average written with a \u00b1 uncertainty, and the name is not a log, a slope, or a velocity. Found 0 raw lower-jaw means and 0 raw cranial-rotation means. Ignored 2 log-transformed degree rows. The individual count is the number in the sentence that says individuals were randomly sampled.",
+  "caveats": [
+    "The animals are American alligators, not the Nile crocodile named in the claim. The measurement is a proxy for the crocodilian jaw joint.",
+    "Cranial rotation is rotation of the head relative to the body. It is not a joint inside the upper jaw.",
+    "Log-transformed averages and slopes were not converted back into degrees and were not compared with the 5-degree and 10-degree cuts.",
+    "A unit such as degree s\u22121 is a velocity. The exponent was not read as an angle.",
+    "Published group means are used. The raw trial table is not in the XML if the authors did not include it."
+  ],
+  "reason": "not-operationalizable"
+}
