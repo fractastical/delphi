@@ -1,0 +1,92 @@
+{
+  "claim_id": "aristotle-ha08-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-19",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If camels live for about thirty years and some reach a hundred, the maximum longevities recorded for Camelus species should sit near thirty years and the longest of those records should reach about a hundred years.",
+  "pass_criterion": "Pre-registered. From AnAge rows with Genus 'Camelus' (case-insensitive) and a positive Maximum longevity (yrs), let M be the species-level maximum longevities. Clause 'about thirty' holds if and only if 20 <= median(M) <= 45. Clause 'to a hundred' holds if and only if max(M) >= 90. The claim is supported only if both clauses hold. AnAge records maximum longevity, so 'live for about thirty years' is tested as: the longest recorded lives are about thirty years (the scale of camel life in this compilation), and the hundred-year clause is tested directly against that maximum.",
+  "fail_criterion": "Pre-registered. A clause fails when its holding condition is false. Both clauses failing refutes the claim. One holding and one failing is mixed. If no Camelus row has a positive maximum longevity, or the table cannot be read, the verdict is inconclusive with reason data-unavailable. There is no undecided band: a median outside [20, 45] fails the thirty-year clause, and a maximum under 90 fails the hundred-year clause.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "The median of Camelus maximum longevities lies between 20 and 45 years, and at least one Camelus maximum is at least 90 years.",
+    "disconfirming_observation": "Camelus maxima are not on a thirty-year scale (median under 20 or over 45) and none reaches 90 years, or one of those two failures occurs while the other clause holds (mixed).",
+    "admissible_datasets": "A public longevity compilation with a species-level maximum lifespan in years for the genus Camelus, retrievable as a file with a licence and checksum, and not taken from Aristotle's text. Questionable-quality rows stay in the primary set.",
+    "inference_method": "One number per Camelus species, the published maximum longevity in years. Median and maximum of that list are compared with the fixed windows above. Dropping rows whose Data quality is 'questionable' is reported as a sensitivity and does not change the verdict."
+  },
+  "interpretation": "The sentence has two clauses: an ordinary lifespan of about thirty years, and exceptional cases of about a hundred. AnAge does not publish a mean or modal lifespan, so the ordinary clause is operationalized on the maximum, which is an upper description of how long camels are recorded to live. A maximum near thirty supports 'about thirty' and leaves little room for a much longer exceptional life; a maximum of 90 or more is required before the hundred-year clause holds. Lamas and other camelids outside genus Camelus are out of scope.",
+  "caveats": [
+    "Written before this session downloaded or read anage_data.txt. No Camelus longevity value has been looked up for this registration.",
+    "Assessments were hints only. They are not measurements.",
+    "Confidence rule, fixed now: 0.62 for any supports, refutes, or mixed verdict, because the ordinary-lifespan clause is being read off a maximum; 0.40 if inconclusive."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database, build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gks1155",
+      "version": "build 15",
+      "license": "CC BY 3.0 (Human Ageing Genomic Resources terms)",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:46:31Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "maximum longevity of Camelus species"
+    }
+  ],
+  "verdict": "mixed",
+  "data_kind": "biological",
+  "confidence": 0.62,
+  "measured": {
+    "value": 31.9,
+    "unit": "years (median of Camelus maximum longevities)",
+    "n": 2,
+    "uncertainty": null,
+    "extra": {
+      "maximum_yrs": 35.4,
+      "clause_about_thirty_holds": true,
+      "clause_to_a_hundred_holds": false,
+      "species": [
+        {
+          "binomial": "Camelus bactrianus",
+          "common_name": "Bactrian camel",
+          "maximum_longevity_yrs": 35.4,
+          "data_quality": "high",
+          "specimen_origin": "captivity"
+        },
+        {
+          "binomial": "Camelus dromedarius",
+          "common_name": "Dromedary",
+          "maximum_longevity_yrs": 28.4,
+          "data_quality": "acceptable",
+          "specimen_origin": "captivity"
+        }
+      ],
+      "excluding_questionable": {
+        "n": 2,
+        "median": 31.9,
+        "maximum": 35.4
+      }
+    }
+  },
+  "method": "Downloaded the AnAge build zip, kept genus Camelus rows with a positive maximum longevity in years, and applied the pre-registered windows: median in [20, 45] for the thirty-year clause and maximum >= 90 for the hundred-year clause. Both clauses must hold to support; a split is mixed; both failing refutes.",
+  "results_summary": [
+    "Camelus species n=2, median maximum longevity 31.9 years, maximum 35.4 years.",
+    "About-thirty clause holds: True. Hundred-year clause holds: False. Verdict mixed."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "claim_id": "aristotle-ha06-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-08",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If very few birds breed within their first year, then among bird species with a recorded female age at sexual maturity, the share whose maturity falls before 365 days is small.",
+  "pass_criterion": "Pre-registered. Using AnAge rows with Class 'Aves' (case-insensitive) and a positive numeric Female maturity (days): let p be the proportion with maturity strictly under 365 days, and n the number of such species. The claim is supported if n >= 40 and p <= 0.15. Maturity of exactly 365 days is the first birthday and does not count as within the first year.",
+  "fail_criterion": "Pre-registered. The claim is refuted if n >= 40 and p >= 0.40. If n >= 40 and 0.15 < p < 0.40, the verdict is mixed. If n < 40, or the AnAge table lacks the maturity or class columns, the verdict is inconclusive with reason underpowered or data-unavailable.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "At most 15 percent of bird species with a recorded female maturity age in AnAge reach sexual maturity before 365 days.",
+    "disconfirming_observation": "At least 40 percent of those bird species have female maturity under 365 days, so breeding within the first year is common rather than very rare.",
+    "admissible_datasets": "A public species-level life-history compilation, independent of Aristotle's text, that records age at female sexual maturity in days for birds, with a retrievable file, licence, and checksum. Captive and wild records are both admissible; the claim does not restrict origin.",
+    "inference_method": "Species are the unit. p = (number of Aves rows with female maturity days < 365) / (number of Aves rows with female maturity days > 0). Thresholds are the pre-registered 0.15 and 0.40 cutoffs. No model is fitted. A second proportion that drops rows whose Data quality is 'questionable', and proportions with maturity <= 365 days and < 730 days, are reported and do not set the verdict."
+  },
+  "interpretation": "Aristotle's 'propagate within their first year' is read as female sexual maturity strictly before the first birthday (365 days). AnAge's female maturity field is the measurable stand-in for age at first breeding. 'Very few' is fixed in advance as at most 15 percent of species with data; 40 percent or more is common enough to refute that wording. This is a species compilation, not a count of individual birds, and it does not weight species by abundance.",
+  "caveats": [
+    "Written before this session downloaded or read anage_data.txt. Column names are taken from the AnAge schema documented by the datawookie/anage reader and from the HAGR download page, not from the trait values.",
+    "Assessments were read only as hints for which public database to use. No assessor number is a measurement.",
+    "Many AnAge maturity records are from captivity. The primary proportion does not drop them.",
+    "Confidence rule, fixed now: 0.80 if the verdict is supports and p <= 0.10, or refutes and p >= 0.50; 0.68 if supports or refutes closer to the cutoff; 0.55 if mixed; 0.40 if inconclusive."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database, build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gks1155",
+      "version": "build 15",
+      "license": "CC BY 3.0 (Human Ageing Genomic Resources terms)",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:46:31Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "female age at sexual maturity for bird species"
+    }
+  ],
+  "verdict": "supports",
+  "data_kind": "biological",
+  "confidence": 0.68,
+  "measured": {
+    "value": 0.11458333333333333,
+    "unit": "proportion of bird species with female maturity under 365 days",
+    "n": 864,
+    "uncertainty": null,
+    "extra": {
+      "n_maturity_under_365": 99,
+      "proportion_maturity_le_365": 0.6076388888888888,
+      "proportion_maturity_under_730": 0.6481481481481481,
+      "n_excluding_questionable": 849,
+      "proportion_excluding_questionable": 0.11425206124852769,
+      "specimen_origin_counts": {
+        "wild": 642,
+        "captivity": 128,
+        "unknown": 94
+      },
+      "min_maturity_days": 60.0,
+      "max_maturity_days": 4383.0
+    }
+  },
+  "method": "Downloaded the AnAge build zip, read anage_data.txt, kept Class Aves rows with a positive female maturity in days, and computed the proportion under 365 days. The pre-registered cutoffs 0.15 and 0.40 set the verdict. Proportions that drop questionable rows, or that use 365 and 730 days, are reported and were not used for the verdict.",
+  "results_summary": [
+    "Bird species with female maturity: n=864, of which 99 are under 365 days (p=0.11458333333333333).",
+    "Excluding questionable data quality: n=849, p=0.11425206124852769.",
+    "Verdict supports under the pre-registered cutoffs."
+  ]
+}

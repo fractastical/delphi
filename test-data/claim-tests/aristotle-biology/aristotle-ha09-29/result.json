@@ -1,0 +1,102 @@
+{
+  "claim_id": "aristotle-ha09-29",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-29",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If older honey-bee workers do the indoor work and young workers do the outside carrying, bees should begin foraging early in life rather than in the second half of it. If older workers are the hairy ones, hairiness should increase with age.",
+  "pass_criterion": "Pre-registered. Task clause, from the Requier figshare life-history table, rows with age at onset of foraging (AOF, days) > 0 and lifespan (days) > 0 and AOF <= lifespan. The task clause holds if n >= 100 and the median of AOF/lifespan <= 0.35. If a lifespan column is absent but AOF is present, the task clause instead holds if n >= 100 and median AOF <= 7 days. Hair clause, only if the same table has a hairiness column and a worker-age column that is not AOF: it holds if n >= 100 and Spearman correlation of age with hairiness >= 0.20 with two-sided p < 0.05. The claim is supported only when every clause that the file can score holds, and both the task clause and the hair clause are scored. Hairiness that is simply absent is not a scored failure.",
+  "fail_criterion": "Pre-registered. The task clause fails if n >= 100 and median AOF/lifespan >= 0.50, or, in the no-lifespan fallback, median AOF >= 14 days. Between the hold and fail cutoffs the task clause is mixed as a verdict by itself when hair cannot be scored: task mixed and hair absent gives verdict mixed. The hair clause fails if it can be scored and Spearman rho <= -0.20 with p < 0.05. Combination: among scored clauses, all failing gives refutes; a mix of holding and failing gives mixed; a single holding clause with the other absent gives inconclusive with reason other (the absent hair clause blocks a full support); task or hair data with n < 100, or no AOF column, gives inconclusive with reason underpowered or data-unavailable. A task failure with hair absent refutes, because that scored clause is false.",
+  "planned_datasets": [
+    "requier-2020-honeybee-lht-figshare-12187398"
+  ],
+  "test_contract": {
+    "expected_observation": "The median bee begins outside foraging in the young part of life (AOF at or before 35 percent of lifespan), and, if hairiness is in the same table, hairiness rises with worker age.",
+    "disconfirming_observation": "Foraging begins at or after half of lifespan, so the outside carriers are the older bees, or hairiness falls with age. A task reversal refutes the claim even when hairiness was not measured.",
+    "admissible_datasets": "A public table of individually monitored Apis mellifera workers with age at onset of foraging, and lifespan if published, under an open licence. The workers should be known-age bees, not an unmarked hive average. One apiary is admissible; it is not a global sample, and that limit is a caveat rather than a reason to discard the file.",
+    "inference_method": "Median of AOF divided by lifespan, with fixed cutoffs 0.35 (hold) and 0.50 (fail). The 7-day and 14-day absolute cutoffs are used only if the file has AOF and no lifespan. Hairiness, if a column exists, is a Spearman correlation against worker age. No threshold is changed after the header is seen; an unrecognised header makes the test inconclusive rather than retargeted."
+  },
+  "interpretation": "Aristotle assigns indoor work to older bees and outside carrying to young bees, and says the indoor bees are rougher and hairier. Outside carrying is operationalized as the onset of foraging (AOF) in the Requier RFID life-history table. 'Young' means the first portion of the worker's recorded life, not a modern textbook age in days, which is why the primary cutoff is a fraction of lifespan. The absolute-day fallback is used only when lifespan is missing. Hairiness is scored only if the file actually contains it.",
+  "caveats": [
+    "Written before the figshare CSV was downloaded. The article record names AOF, age of first exit, and lifespan as the calculated variables, and licences the file CC BY 4.0. The column header and the values have not been read.",
+    "The file is one French apiary in 2011, three colonies, sisters from one source colony. A result there does not by itself describe every honey-bee population.",
+    "Assessments were hints only.",
+    "Confidence rule, fixed now: 0.70 if refutes or supports; 0.55 if mixed; 0.40 if inconclusive."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "requier-2020-honeybee-lht-figshare-12187398",
+      "name": "Data from: Measuring ontogenetic shifts in central-place foragers: a case study with honey bees",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.12187398.v2",
+      "doi": "10.6084/m9.figshare.12187398.v2",
+      "version": "v2",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "dataLHT_Requier et al.csv",
+          "download_url": "https://ndownloader.figshare.com/files/22408710",
+          "retrieved_at": "2026-11-02T00:46:32Z",
+          "byte_size": 171175,
+          "sha256": "9f447f1b0cb83c8e69f03a02fa7e6a20bd937146fe7166c246d9e78419867402"
+        }
+      ],
+      "role": "age at onset of foraging and lifespan of individually monitored honey-bee workers"
+    }
+  ],
+  "verdict": "refutes",
+  "data_kind": "biological",
+  "confidence": 0.7,
+  "measured": {
+    "value": 0.7173850440285361,
+    "unit": "median of AOF/lifespan",
+    "n": 865,
+    "uncertainty": null,
+    "extra": {
+      "task": {
+        "column_aof": "AOF",
+        "column_lifespan": "LSP",
+        "n": 865,
+        "used_lifespan": true,
+        "median_aof_over_lifespan": 0.7173850440285361,
+        "median_aof_days": 20.0,
+        "median_lifespan_days": 28.539849537037,
+        "state": "fail"
+      },
+      "hair": {
+        "column": null,
+        "age_column": null,
+        "state": "absent"
+      },
+      "headers": [
+        "Bee_name",
+        "Site",
+        "Cohort",
+        "AFE",
+        "AOF",
+        "LSP",
+        "LEARN",
+        "FORAG"
+      ]
+    }
+  },
+  "method": "Downloaded the Requier figshare life-history CSV. Decimal commas were parsed as decimal marks. The lifespan column is named LSP and is the lifespan variable named in the figshare description, so the primary rule is the median of AOF/LSP with cutoffs 0.35 and 0.50. Hairiness is scored only when a hairiness column and a separate worker-age column are both present. Thresholds were not changed.",
+  "results_summary": [
+    "Task state fail on n=865 using lifespan=True; median ratio=0.7173850440285361; median AOF days=20.0.",
+    "Hair state absent.",
+    "Verdict refutes."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-02",
+      "thresholds_unchanged": true,
+      "reason": "Two parser fixes after the file header was read, before the verdict was kept. The CSV uses semicolon separators and decimal commas. A first execution stripped commas, so 47,5 became 475 and the median AOF was the fabricated value 46 days; that execution was discarded and is not the recorded measurement. The lifespan column is headed LSP, an abbreviation the original header list did not contain. LSP is mapped to lifespan so the pre-registered primary statistic, median AOF/lifespan, is the one that sets the verdict. The 0.35 and 0.50 cutoffs are unchanged."
+    }
+  ]
+}

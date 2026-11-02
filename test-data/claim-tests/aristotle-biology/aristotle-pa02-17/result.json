@@ -1,0 +1,625 @@
+{
+  "claim_id": "aristotle-pa02-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-17",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:41:36Z",
+  "hypothesis": "If man has the largest brain in proportion to his size, the human brain-mass/body-mass ratio is strictly greater than that of every other species in a broad mammal sample and a broad bird sample; and if the brain is larger in men than in women, male human brain mass exceeds female human brain mass.",
+  "pass_criterion": "Pre-registered. Two clauses. Proportion holds only if Homo sapiens has a strictly higher species-median brain/body mass ratio than every other species in the mammal file (at least 200 species) and a strictly higher ratio than every species in a bird file (at least 100 species). Sex holds only if the mammal file has either (i) at least 5 male and 5 female adult Homo sapiens brain-mass values with the male arithmetic mean greater and a two-sided Welch p < 0.05, or (ii) exactly one male and one female aggregate value with the male value greater. The claim is supported only when both clauses hold. Files that contain Homo sapiens are ranked internally. A file without Homo sapiens is compared with the mammal-file human ratio, which is dimensionless when brain and body are in the same mass unit inside each file. Rows marked juvenile, neonate, infant, fetal, newborn, or subadult are dropped when an age column exists.",
+  "fail_criterion": "Pre-registered. Proportion fails if any non-human species in an admissible file has a species-median ratio greater than or equal to the human ratio used for that file. One counterexample is enough; the sample-size floors apply only to support. Sex fails if a sufficient male/female comparison exists and the male brain mass is not greater (aggregate case) or the male mean is not both greater and significant at 0.05 (individual case). Combination rule: score only clauses that can be scored. If every scored clause fails, the verdict is refutes. If at least one scored clause holds and at least one fails, the verdict is mixed. If the only scored clause holds, or neither clause can be scored, the verdict is inconclusive with reason other, or underpowered when the only obstacle is a sample-size floor, or data-unavailable when the mammal file cannot be read. A modern encephalization residual is computed for description and does not enter this rule.",
+  "planned_datasets": [
+    "burger-2019-mammal-brain-dryad-2r62k7s",
+    "jimenez-ortega-2020-bird-brain-dryad-sqv9s4n27",
+    "font-2019-reptile-bird-brain-dryad-pd5hh46"
+  ],
+  "test_contract": {
+    "expected_observation": "The species-median human brain/body mass ratio is strictly the largest among at least 200 mammal species and larger than every species in a bird sample of at least 100, and male human brain mass exceeds female human brain mass on the pre-registered test.",
+    "disconfirming_observation": "Any non-human species whose brain/body mass ratio is at least as high as the human ratio, or a male human brain mass that is not larger than the female one. Either conjunct failing while the other holds is mixed; a single measured failure with the other clause unscored refutes the conjunction.",
+    "admissible_datasets": "Public species-level brain and body masses, compiled independently of Aristotle, with brain and body in the same mass unit within each file (or both headers silent, in which case the file's published description as masses is accepted and the ratio is treated as dimensionless). A header that puts brain and body in different units, or pairs a volume with a mass, makes that file inadmissible. The mammal file must be the Burger Dryad table; birds are the Jim\u00e9nez-Ortega Dryad table; the Font Dryad table is an additional reptile-and-bird check that can refute but is not required for support.",
+    "inference_method": "Species median of brain mass divided by body mass. Homo sapiens is the exact binomial, excluding names that contain neanderthal, erectus, habilis, or floresiensis. Support needs strict inequality against every other species in the mammal and bird sets. The sex clause uses absolute brain mass, which is what 'larger in men than in women' says, not the ratio. The log-log residual of brain on body among mammals is reported and ignored by the verdict."
+  },
+  "interpretation": "'In proportion to his size' is the raw brain/body mass ratio, the quantity Aristotle's wording names. An allometric residual, or encephalization quotient, is a modern reinterpretation and is not the test. 'Larger in men than in women' is absolute brain mass. The samples are vertebrates that have published brain masses, not literally every animal. Support still requires both a large mammal set and a large bird set so the superlative is not scored on mammals alone. A single non-human species at or above the human ratio refutes the superlative inside these data.",
+  "secondary_analyses_descriptive": [
+    "Ordinary least-squares residual of log10(brain mass) on log10(body mass) fitted to non-human mammals, and the human residual's rank. Not used for the verdict."
+  ],
+  "caveats": [
+    "Written before any of the three Dryad files was downloaded. The landing pages were checked: Burger 2019 states brain size and body size in grams with sex when reported; Jim\u00e9nez-Ortega 2020 states brain size and body mass for birds; Font 2019 states brain mass and body mass for reptiles and birds. No species ratio was computed.",
+    "The Willerman 1991 student MRI table and the SOCR brain-to-body table were not used, because their values appeared in search snippets before this registration.",
+    "Assessments were hints only.",
+    "Confidence rule, fixed now: 0.72 if supports or refutes; 0.60 if mixed; 0.40 if inconclusive. The superlative cannot be stronger than the taxonomic coverage of the files."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-a5fd",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "burger-2019-mammal-brain-dryad-2r62k7s",
+      "name": "Data from: The allometry of brain size in mammals",
+      "landing_url": "https://doi.org/10.5061/dryad.2r62k7s",
+      "doi": "10.5061/dryad.2r62k7s",
+      "version": null,
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "BrainAllometry_Supplement_Data.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/94072",
+          "retrieved_at": "2026-11-02T00:46:32Z",
+          "byte_size": 203795,
+          "sha256": "1f3fd6458813e4b78cdd9e3ed042cf75838bf85dc613381a8a7f03f014798caa"
+        }
+      ],
+      "role": "mammals"
+    },
+    {
+      "id": "jimenez-ortega-2020-bird-brain-dryad-sqv9s4n27",
+      "name": "Brain size and life history variables in birds",
+      "landing_url": "https://doi.org/10.5061/dryad.sqv9s4n27",
+      "doi": "10.5061/dryad.sqv9s4n27",
+      "version": null,
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "Brain_size_and_life_history_variables_in_birds.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/401942",
+          "retrieved_at": "2026-11-02T00:46:33Z",
+          "byte_size": 82792,
+          "sha256": "97b9253f53f335b68a330177dde7f79ff1bd74e99091113175b7488c65471e4d"
+        }
+      ],
+      "role": "birds"
+    },
+    {
+      "id": "font-2019-reptile-bird-brain-dryad-pd5hh46",
+      "name": "Data on brain mass and body mass for reptiles and birds (Font et al. 2019)",
+      "landing_url": "https://doi.org/10.5061/dryad.pd5hh46",
+      "doi": "10.5061/dryad.pd5hh46",
+      "version": null,
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "font2019_brain_body.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/108959",
+          "retrieved_at": "2026-11-02T00:46:34Z",
+          "byte_size": 85790,
+          "sha256": "f9ddd7b035e7eff1375b77abbc444696039e58c800049bf03b4e1dee257a229a"
+        }
+      ],
+      "role": "font"
+    }
+  ],
+  "verdict": "refutes",
+  "confidence": 0.72,
+  "data_kind": "biological",
+  "measured": {
+    "value": 0.01919519652652647,
+    "unit": "species-median brain mass / body mass for Homo sapiens in the mammal file",
+    "n": 1552,
+    "uncertainty": null,
+    "extra": {
+      "proportion_clause": "fail",
+      "sex_clause": {
+        "n_male": 0,
+        "n_female": 0,
+        "state": "unknown",
+        "unknown_reason": "no sex-labelled Homo sapiens brain masses"
+      },
+      "sets": [
+        {
+          "label": "burger-2019-mammal-brain-dryad-2r62k7s:mammals",
+          "n_species": 1552,
+          "n_human_buckets": 1,
+          "human_ratio_within": 0.01919519652652647,
+          "reference_human_ratio": 0.01919519652652647,
+          "n_counterexamples": 514,
+          "highest_other": {
+            "name": "Mus musculoides",
+            "n_rows": 1,
+            "ratio": 0.11664641555285539,
+            "median_brain": 0.96,
+            "median_body": 8.23,
+            "human": false
+          },
+          "counterexamples_top": [
+            {
+              "name": "Mus musculoides",
+              "n_rows": 1,
+              "ratio": 0.11664641555285539,
+              "median_brain": 0.96,
+              "median_body": 8.23,
+              "human": false
+            },
+            {
+              "name": "Neurotrichus gibbsii",
+              "n_rows": 1,
+              "ratio": 0.091,
+              "median_brain": 0.91,
+              "median_body": 10.0,
+              "human": false
+            },
+            {
+              "name": "Pseudomys hermannsburgensis",
+              "n_rows": 1,
+              "ratio": 0.08071748878923767,
+              "median_brain": 1.08,
+              "median_body": 13.38,
+              "human": false
+            },
+            {
+              "name": "Dipodillus dasyurus",
+              "n_rows": 1,
+              "ratio": 0.06439024390243903,
+              "median_brain": 1.32,
+              "median_body": 20.5,
+              "human": false
+            },
+            {
+              "name": "Choeroniscus godmani",
+              "n_rows": 1,
+              "ratio": 0.055737704918032795,
+              "median_brain": 0.34,
+              "median_body": 6.1,
+              "human": false
+            },
+            {
+              "name": "Tscherskia triton",
+              "n_rows": 1,
+              "ratio": 0.0516,
+              "median_brain": 1.29,
+              "median_body": 25.0,
+              "human": false
+            },
+            {
+              "name": "Cercartetus lepidus",
+              "n_rows": 1,
+              "ratio": 0.05142857142857143,
+              "median_brain": 0.36,
+              "median_body": 7.0,
+              "human": false
+            },
+            {
+              "name": "Thyroptera tricolor",
+              "n_rows": 1,
+              "ratio": 0.051111111111111114,
+              "median_brain": 0.23,
+              "median_body": 4.5,
+              "human": false
+            }
+          ],
+          "human_buckets": [
+            {
+              "name": "Homo sapiens",
+              "n_rows": 1,
+              "ratio": 0.01919519652652647,
+              "median_brain": 1250.43,
+              "median_body": 65142.86,
+              "human": true
+            }
+          ],
+          "top5": [
+            {
+              "name": "Mus musculoides",
+              "n_rows": 1,
+              "ratio": 0.11664641555285539,
+              "median_brain": 0.96,
+              "median_body": 8.23,
+              "human": false
+            },
+            {
+              "name": "Neurotrichus gibbsii",
+              "n_rows": 1,
+              "ratio": 0.091,
+              "median_brain": 0.91,
+              "median_body": 10.0,
+              "human": false
+            },
+            {
+              "name": "Pseudomys hermannsburgensis",
+              "n_rows": 1,
+              "ratio": 0.08071748878923767,
+              "median_brain": 1.08,
+              "median_body": 13.38,
+              "human": false
+            },
+            {
+              "name": "Dipodillus dasyurus",
+              "n_rows": 1,
+              "ratio": 0.06439024390243903,
+              "median_brain": 1.32,
+              "median_body": 20.5,
+              "human": false
+            },
+            {
+              "name": "Choeroniscus godmani",
+              "n_rows": 1,
+              "ratio": 0.055737704918032795,
+              "median_brain": 0.34,
+              "median_body": 6.1,
+              "human": false
+            }
+          ],
+          "columns": {
+            "brain": "Mean_brain_mass_g",
+            "body": "Mean_body_mass_g",
+            "sex": "Sex",
+            "genus": "genus",
+            "species": "species",
+            "binomial": "Binomial"
+          }
+        },
+        {
+          "label": "jimenez-ortega-2020-bird-brain-dryad-sqv9s4n27:birds",
+          "n_species": 620,
+          "n_human_buckets": 0,
+          "human_ratio_within": null,
+          "reference_human_ratio": 0.01919519652652647,
+          "n_counterexamples": 302,
+          "highest_other": {
+            "name": "Parus hudsonicus",
+            "n_rows": 1,
+            "ratio": 0.07505714285714285,
+            "median_brain": 0.73556,
+            "median_body": 9.8,
+            "human": false
+          },
+          "counterexamples_top": [
+            {
+              "name": "Parus hudsonicus",
+              "n_rows": 1,
+              "ratio": 0.07505714285714285,
+              "median_brain": 0.73556,
+              "median_body": 9.8,
+              "human": false
+            },
+            {
+              "name": "Parus atricapillus",
+              "n_rows": 1,
+              "ratio": 0.07290370370370369,
+              "median_brain": 0.78736,
+              "median_body": 10.8,
+              "human": false
+            },
+            {
+              "name": "Todus mexicanus",
+              "n_rows": 1,
+              "ratio": 0.06964705882352941,
+              "median_brain": 0.4144,
+              "median_body": 5.95,
+              "human": false
+            },
+            {
+              "name": "Psaltriparus minimus",
+              "n_rows": 1,
+              "ratio": 0.06841509433962265,
+              "median_brain": 0.3626,
+              "median_body": 5.3,
+              "human": false
+            },
+            {
+              "name": "Parus gambeli",
+              "n_rows": 1,
+              "ratio": 0.0674567000911577,
+              "median_brain": 0.777,
+              "median_body": 11.5185,
+              "human": false
+            },
+            {
+              "name": "Auriparus flaviceps",
+              "n_rows": 1,
+              "ratio": 0.06512,
+              "median_brain": 0.45584,
+              "median_body": 7.0,
+              "human": false
+            },
+            {
+              "name": "Sericornis frontalis",
+              "n_rows": 1,
+              "ratio": 0.06318850631779702,
+              "median_brain": 0.833907448,
+              "median_body": 13.19713816,
+              "human": false
+            },
+            {
+              "name": "Cyanoramphus auriceps",
+              "n_rows": 1,
+              "ratio": 0.06264448069603044,
+              "median_brain": 2.88008,
+              "median_body": 45.975,
+              "human": false
+            }
+          ],
+          "human_buckets": [],
+          "top5": [
+            {
+              "name": "Parus hudsonicus",
+              "n_rows": 1,
+              "ratio": 0.07505714285714285,
+              "median_brain": 0.73556,
+              "median_body": 9.8,
+              "human": false
+            },
+            {
+              "name": "Parus atricapillus",
+              "n_rows": 1,
+              "ratio": 0.07290370370370369,
+              "median_brain": 0.78736,
+              "median_body": 10.8,
+              "human": false
+            },
+            {
+              "name": "Todus mexicanus",
+              "n_rows": 1,
+              "ratio": 0.06964705882352941,
+              "median_brain": 0.4144,
+              "median_body": 5.95,
+              "human": false
+            },
+            {
+              "name": "Psaltriparus minimus",
+              "n_rows": 1,
+              "ratio": 0.06841509433962265,
+              "median_brain": 0.3626,
+              "median_body": 5.3,
+              "human": false
+            },
+            {
+              "name": "Parus gambeli",
+              "n_rows": 1,
+              "ratio": 0.0674567000911577,
+              "median_brain": 0.777,
+              "median_body": 11.5185,
+              "human": false
+            }
+          ],
+          "columns": {
+            "brain": "brain.mass",
+            "body": "body.mass",
+            "genus": "genus",
+            "species": "species",
+            "class": "class"
+          }
+        },
+        {
+          "label": "font-2019-reptile-bird-brain-dryad-pd5hh46:reptiles",
+          "n_species": 175,
+          "n_human_buckets": 0,
+          "human_ratio_within": null,
+          "reference_human_ratio": 0.01919519652652647,
+          "n_counterexamples": 2,
+          "highest_other": {
+            "name": "Phyllodactylus gerrophygus",
+            "n_rows": 1,
+            "ratio": 0.026470588235294114,
+            "median_brain": 0.018,
+            "median_body": 0.68,
+            "human": false
+          },
+          "counterexamples_top": [
+            {
+              "name": "Phyllodactylus gerrophygus",
+              "n_rows": 1,
+              "ratio": 0.026470588235294114,
+              "median_brain": 0.018,
+              "median_body": 0.68,
+              "human": false
+            },
+            {
+              "name": "Carlia foliorum",
+              "n_rows": 1,
+              "ratio": 0.0251,
+              "median_brain": 0.0251,
+              "median_body": 1.0,
+              "human": false
+            }
+          ],
+          "human_buckets": [],
+          "top5": [
+            {
+              "name": "Phyllodactylus gerrophygus",
+              "n_rows": 1,
+              "ratio": 0.026470588235294114,
+              "median_brain": 0.018,
+              "median_body": 0.68,
+              "human": false
+            },
+            {
+              "name": "Carlia foliorum",
+              "n_rows": 1,
+              "ratio": 0.0251,
+              "median_brain": 0.0251,
+              "median_body": 1.0,
+              "human": false
+            },
+            {
+              "name": "Amphibolurus fordi",
+              "n_rows": 1,
+              "ratio": 0.01776,
+              "median_brain": 0.0444,
+              "median_body": 2.5,
+              "human": false
+            },
+            {
+              "name": "Bronchocela cristatella (=Calotes cristatellus)",
+              "n_rows": 1,
+              "ratio": 0.017058823529411765,
+              "median_brain": 0.028999999999999998,
+              "median_body": 1.7,
+              "human": false
+            },
+            {
+              "name": "Carlia amax",
+              "n_rows": 1,
+              "ratio": 0.017,
+              "median_brain": 0.017,
+              "median_body": 1.0,
+              "human": false
+            }
+          ],
+          "columns": {
+            "brain": "Brain mass (g)",
+            "body": "Body mass (g)",
+            "species": "Species",
+            "class": "Class"
+          }
+        },
+        {
+          "label": "font-2019-reptile-bird-brain-dryad-pd5hh46:birds",
+          "n_species": 924,
+          "n_human_buckets": 0,
+          "human_ratio_within": null,
+          "reference_human_ratio": 0.01919519652652647,
+          "n_counterexamples": 370,
+          "highest_other": {
+            "name": "Pyrenestes sanguineus",
+            "n_rows": 1,
+            "ratio": 0.06797477224947442,
+            "median_brain": 0.97,
+            "median_body": 14.27,
+            "human": false
+          },
+          "counterexamples_top": [
+            {
+              "name": "Pyrenestes sanguineus",
+              "n_rows": 1,
+              "ratio": 0.06797477224947442,
+              "median_brain": 0.97,
+              "median_body": 14.27,
+              "human": false
+            },
+            {
+              "name": "Parus montanus",
+              "n_rows": 1,
+              "ratio": 0.06781115879828327,
+              "median_brain": 0.79,
+              "median_body": 11.65,
+              "human": false
+            },
+            {
+              "name": "Parus ater",
+              "n_rows": 1,
+              "ratio": 0.06685714285714285,
+              "median_brain": 0.585,
+              "median_body": 8.75,
+              "human": false
+            },
+            {
+              "name": "Parus cyanus",
+              "n_rows": 1,
+              "ratio": 0.06633165829145729,
+              "median_brain": 0.66,
+              "median_body": 9.95,
+              "human": false
+            },
+            {
+              "name": "Leiothrix lutea",
+              "n_rows": 1,
+              "ratio": 0.06484848484848485,
+              "median_brain": 1.07,
+              "median_body": 16.5,
+              "human": false
+            },
+            {
+              "name": "Estrilda troglodytes",
+              "n_rows": 1,
+              "ratio": 0.0642857142857143,
+              "median_brain": 0.36,
+              "median_body": 5.6,
+              "human": false
+            },
+            {
+              "name": "Certhia brachydactyla",
+              "n_rows": 1,
+              "ratio": 0.0630952380952381,
+              "median_brain": 0.53,
+              "median_body": 8.4,
+              "human": false
+            },
+            {
+              "name": "Nectarinia venusta",
+              "n_rows": 1,
+              "ratio": 0.0625,
+              "median_brain": 0.31,
+              "median_body": 4.96,
+              "human": false
+            }
+          ],
+          "human_buckets": [],
+          "top5": [
+            {
+              "name": "Pyrenestes sanguineus",
+              "n_rows": 1,
+              "ratio": 0.06797477224947442,
+              "median_brain": 0.97,
+              "median_body": 14.27,
+              "human": false
+            },
+            {
+              "name": "Parus montanus",
+              "n_rows": 1,
+              "ratio": 0.06781115879828327,
+              "median_brain": 0.79,
+              "median_body": 11.65,
+              "human": false
+            },
+            {
+              "name": "Parus ater",
+              "n_rows": 1,
+              "ratio": 0.06685714285714285,
+              "median_brain": 0.585,
+              "median_body": 8.75,
+              "human": false
+            },
+            {
+              "name": "Parus cyanus",
+              "n_rows": 1,
+              "ratio": 0.06633165829145729,
+              "median_brain": 0.66,
+              "median_body": 9.95,
+              "human": false
+            },
+            {
+              "name": "Leiothrix lutea",
+              "n_rows": 1,
+              "ratio": 0.06484848484848485,
+              "median_brain": 1.07,
+              "median_body": 16.5,
+              "human": false
+            }
+          ],
+          "columns": {
+            "brain": "Brain mass (g)",
+            "body": "Body mass (g)",
+            "species": "Species",
+            "class": "Class"
+          }
+        }
+      ],
+      "parse_errors": [],
+      "descriptive_log_residual": {
+        "note": "descriptive only; not used for the verdict",
+        "n_nonhuman_species": 1551,
+        "ols_slope": 0.7495342007751912,
+        "ols_intercept": -1.259053491997669,
+        "ols_r": 0.9778298743155952,
+        "human_log10_residual": 0.7479550557772998,
+        "human_residual_rank_1_is_largest": 1
+      }
+    }
+  },
+  "method": "Downloaded the three Dryad files, solved the Dryad download challenge when it was presented, and read brain and body masses. Species ratios are medians of brain/body. Homo sapiens was compared with every other species under the pre-registered strict-superlative rule. Male and female human brain masses were compared only when the sex sample met the pre-registered floor. The mammal log-log residual is stored and was not read by the verdict rule.",
+  "results_summary": [
+    "Human mammal-file ratio 0.01919519652652647. Proportion clause fail. Sex clause unknown.",
+    "burger-2019-mammal-brain-dryad-2r62k7s:mammals counterexamples=514 highest=[{'name': 'Mus musculoides', 'n_rows': 1, 'ratio': 0.11664641555285539, 'median_brain': 0.96, 'median_body': 8.23, 'human': False}] jimenez-ortega-2020-bird-brain-dryad-sqv9s4n27:birds counterexamples=302 highest=[{'name': 'Parus hudsonicus', 'n_rows': 1, 'ratio': 0.07505714285714285, 'median_brain': 0.73556, 'median_body': 9.8, 'human': False}] font-2019-reptile-bird-brain-dryad-pd5hh46:reptiles counterexamples=2 highest=[{'name': 'Phyllodactylus gerrophygus', 'n_rows': 1, 'ratio': 0.026470588235294114, 'median_brain': 0.018, 'median_body': 0.68, 'human': False}] font-2019-reptile-bird-brain-dryad-pd5hh46:birds counterexamples=370 highest=[{'name': 'Pyrenestes sanguineus', 'n_rows': 1, 'ratio': 0.06797477224947442, 'median_brain': 0.97, 'median_body': 14.27, 'human': False}]",
+    "Verdict refutes."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-02",
+      "thresholds_unchanged": true,
+      "reason": "The first execution matched the columns Sample_size.brain and Sample_size.body, because the word size outranked mass when the gram unit was written as an underscore suffix, and the quoted sample-size field '>2,<12' was also split by the CSV sniffer. That run found no Homo sapiens row and is not the recorded measurement. The reader now keeps quote characters and prefers a mass column over a sample-size column. The pass and fail thresholds are unchanged."
+    }
+  ]
+}
