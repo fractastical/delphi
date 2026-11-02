@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha03-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-15",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If the elephant has no nails at all, a paper that records the tissue collected from named elephants will not record keratinous toenails taken from them.",
+  "pass_criterion": "Pre-registered. This dataset cannot support the claim. It is a study of elephant toenails, so a count of zero parsed donors is a failure to find the sample table, not a measurement that nails are absent. The clause 'all other toed animals have nails' is not in this dataset and is not scored. There is no pass outcome.",
+  "fail_criterion": "Pre-registered. The claim is refuted if the full text records toenail tissue collected from at least one elephant of Loxodonta or Elephas. Count an individual when a table row names that species, or names an African or Asian elephant, and either the row or that table's caption contains 'toenail' or 'toe nail'. If no table matches, count individuals in a sample table of elephants when the article text states that the samples from those animals were toenail trimmings. If the XML cannot be retrieved, or neither a matching table nor an explicit collection statement with identifiable elephants is present, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "europepmc-PMC11295213-elephant-toenail"
+  ],
+  "interpretation": "The sentence says two things: every toed animal has nails, and the elephant is the exception and has no nails whatsoever. This test scores only the exception. Keratinous toenail tissue taken from an elephant is a nail. One such animal refutes 'no nails whatsoever', and with it the claim as stated. It does not test whether frogs or other toed animals lack nails. 'Undivided and slightly jointed' toes are not scored.",
+  "test_contract": {
+    "expected_observation": "No elephant in the sample is a source of toenail tissue. This dataset, whose subject is toenails, cannot produce that observation; it can only fail to be parsed.",
+    "disconfirming_observation": "At least one Loxodonta or Elephas individual from which toenail tissue was collected.",
+    "admissible_datasets": "A public primary account that names the elephants and the tissue taken from them. A closed PDF that this run cannot retrieve does not count. Occurrence records and photographs are not used.",
+    "inference_method": "Parse the Europe PMC JATS XML. Count donor elephants under the rule in fail_criterion. One donor refutes the universal absence. No support path is defined."
+  },
+  "caveats": [
+    "A search snippet of the open-access article, seen before registration, says toenail trimmings were collected from African and Asian elephants. A refutation is therefore the expected outcome. The count used for the verdict is computed by analysis.py from the XML, not copied from the snippet.",
+    "Parker and Graham's toenail counts of 689 African elephants (doi:10.2982/028.106.0101) were not used: OpenAlex marks that article closed, and the AJOL download URL returned HTTP 202 with an empty body from this environment.",
+    "Captive elephants trimmed for foot care are still elephants. The result does not estimate how many nails a wild foot carries."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  }
+}

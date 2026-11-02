@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-pa04-32",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-32",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If most fishes have an operculum and selachians have none because their skeleton is cartilage, then in the FishBase morphology table the operculum is present in most scored species, absent in every scored elasmobranch, and likewise absent in other fishes whose skeleton is cartilaginous.",
+  "pass_criterion": "Pre-registered. Collapse morphdat to one value per SpecCode: present if any admissible row is 1, absent if every admissible row is 0. Admissible values are 0 and 1 only. Join species to families and drop families with Synonym = 1. Let p_all be the proportion present among all scored species, p_elas among species whose family Class contains 'elasmobranch' (case-insensitive), n_all and n_elas the corresponding counts. The distributional claim is supported only if n_all >= 100, n_elas >= 20, p_all > 0.5 and p_elas = 0, and the causal clause is not contradicted: either the cartilaginous comparison groups below are missing, or they also have p = 0. When those groups are missing, the verdict may still be supports, at the lower confidence fixed in the analysis.",
+  "fail_criterion": "Pre-registered. Refute if n_all >= 100 and n_elas >= 20 and (p_elas >= 0.5 or p_all <= 0.5). Mixed if n_all >= 100 and n_elas >= 20 and p_all > 0.5 and 0 < p_elas < 0.5. Mixed also if the distributional pass holds but a cartilaginous comparison group has an operculum: Holocephali (Class contains 'holocephal', or Order contains 'chimaer') with n >= 5 and p > 0.5, or sturgeons (Order contains 'acipenser') with n >= 5 and p > 0.5. If n_all < 100 or n_elas < 20, inconclusive with reason underpowered. If no Class value contains 'elasmobranch', inconclusive with reason not-operationalizable. If more than 5% of non-null OperculumPresent values are outside {0, 1}, inconclusive with reason other. If the files cannot be fetched or the column is entirely null, inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-rfishbase-snapshot-v24.07-morphdat"
+  ],
+  "interpretation": "Aristotle says that in most fishes the gills are covered by opercula, and that selachians have no such coverings because the skeleton is cartilage. Selachians are scored as Elasmobranchii, the class of sharks and rays, not as every fish with a soft skeleton. The causal clause is scored separately on chimaeras and sturgeons, which have cartilaginous skeletons and are not selachians. An operculum in those groups leaves the selachian contrast standing and rejects cartilage as the reason. 'Most' is a proportion above one half of species that have a coded operculum, not of every fish in FishBase.",
+  "test_contract": {
+    "expected_observation": "Operculum present in more than half of scored fish species and in none of the scored elasmobranchs, and not present in a majority of scored chimaeras or sturgeons.",
+    "disconfirming_observation": "Either most scored fishes lack an operculum, or at least half of scored elasmobranchs have one. A majority of scored chimaeras or sturgeons with an operculum disconfirms only the 'because cartilage' clause.",
+    "admissible_datasets": "A public morphology table that codes operculum presence for fishes identified to species, joinable to a class and order, compiled independently of Aristotle. Uncoded species are missing data, not absences.",
+    "inference_method": "Species-level 0/1 collapse, class and order filters by the substrings above, and the thresholds in the pass and fail criteria. No phylogenetic model. Conflicts within a species are resolved as present."
+  },
+  "caveats": [
+    "Before registration the parquet schemas of morphdat, species and families were read, including the column OperculumPresent and the Class and Order columns. No value of OperculumPresent, Class or Order was queried, and no species was counted.",
+    "FishBase codes an operculum as a tinyint. The admissible codes 0 and 1 are an assumption about that column, fixed here, and the rule sends the test to inconclusive if other codes dominate.",
+    "A coded sample can over-represent fishes whose morphology was worth entering. The selachian contrast is the part of the test that can actually refute the claim."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  }
+}

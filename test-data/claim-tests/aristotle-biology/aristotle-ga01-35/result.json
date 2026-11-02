@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ga01-35",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-35",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If every animal that can move about has the sexes in separate individuals, then no fish species in the FishBase reproduction table has a recorded mode of simultaneous or sequential hermaphroditism, because a fish is an animal that moves about and a hermaphroditic fish is one individual that is both male and female.",
+  "pass_criterion": "Pre-registered. Among distinct FishBase SpecCode values whose ReproMode is non-empty, let n_mode be the count, n_herm the count whose mode string (lower-cased) contains 'hermaphrod', 'protandr' or 'protogyn', and n_dioec the count whose mode string contains 'dioec'. The claim is supported only if n_mode >= 100, n_herm = 0 and n_dioec >= 50. Parthenogenesis is counted and reported but is not a counterexample and is not required for the pass.",
+  "fail_criterion": "Pre-registered. The claim is refuted if n_herm >= 1. If n_herm = 0 and n_mode < 100, the verdict is inconclusive with reason underpowered. If the reproduc snapshot cannot be fetched, ReproMode is absent, or n_mode = 0, the verdict is inconclusive with reason data-unavailable. A species with both a hermaphrodite record and a dioecious record counts as hermaphrodite.",
+  "planned_datasets": [
+    "fishbase-rfishbase-snapshot-v24.07-reproduc"
+  ],
+  "interpretation": "Aristotle's scope is animals that move about, contrasted with plants and with animals that stay fixed. Every species in FishBase is a fish, and fishes swim, so they are inside the scope. 'The sexes are separated, one individual being male and one female' is read as gonochorism: male and female are different individuals. Protandry, protogyny and true hermaphroditism, the three non-dioecious sexual modes named in the FishBase REPRODUCTION manual, put both sexes in one individual and are counterexamples. Parthenogenesis is a different departure (no second sex) and is not used for the verdict. The test does not speak to sessile animals or to plants.",
+  "test_contract": {
+    "expected_observation": "Every fish species with a filled reproduction mode is dioecious: the number of species coded protandrous, protogynous or truly hermaphroditic is zero, in a table that actually contains mode codes for at least 100 species.",
+    "disconfirming_observation": "At least one fish species whose reproduction mode is simultaneous or sequential hermaphroditism. One such species is enough, because the claim says all animals that move about.",
+    "admissible_datasets": "A public species-level compilation of fish reproductive mode, assembled independently of Aristotle's text, in which hermaphroditism is a coded field rather than a free-text aside. Fishes count as animals that move about. Records with a blank mode do not count as dioecious.",
+    "inference_method": "Count distinct SpecCode values by the pre-registered string classes of ReproMode. Refute on one or more hermaphrodite species. Support only on a large all-dioecious coded set. No statistical test: the claim is universal."
+  },
+  "caveats": [
+    "Before this registration the parquet schema (column names and types) of reproduc.parquet and species.parquet was read. No ReproMode value, no species name and no row count of modes was queried.",
+    "The FishBase manual says the mode field is incomplete and that a plot of hermaphroditism by latitude had to assume blank modes were dioecious. Blanks are excluded here. A pass would therefore describe coded species only, and would be weak evidence for the universal.",
+    "Sequential hermaphrodites are one sex at a time. They still contradict 'one individual being male and one female', because the same individual is both."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  }
+}

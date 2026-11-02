@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha09-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-26",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If a honey bee never visits a second kind of flower on one foraging trip, then every corbicular pollen load taken from Apis mellifera in the Dryad pollen-load table is a single pollen morphotype, once morphotypes that are only a trace of the grains are set aside.",
+  "pass_criterion": "Pre-registered. Restrict to rows with species code hb (honey bee). One load is one combination of period, day, site and bee. A morphotype counts in that load when its proportion of counted grains is at least 0.05, using the prop column, or count/total_count when prop is blank. Let n be the number of loads and p the proportion of loads with two or more counted morphotypes. The claim is supported only if n >= 30 and p = 0.",
+  "fail_criterion": "Pre-registered. The claim is refuted if n >= 30 and p > 0, because Aristotle says the bee never meddles with another flower until it has returned to the hive. If n < 30 the verdict is inconclusive with reason underpowered. If the CSV cannot be fetched or lacks the columns species, period, day, site, bee, morphotype and either prop or both count and total_count, the verdict is inconclusive with reason data-unavailable. The proportion of loads with two or more morphotypes at any abundance, with no 5% floor, is reported and is not used for the verdict.",
+  "planned_datasets": [
+    "dryad-10.5061-dryad.tdz08kq88-dataset-pollen-raw"
+  ],
+  "interpretation": "The claim is about the honey bee on one expedition, not about bumble bees and not about colony-level honey. A corbicular pollen sac is the pollen the bee carried back from a trip. The Dryad dictionary says a sac with more than one pollen morphotype has more than one row, and that bee numbers do not correspond across days, so the load key includes period, day, site and bee. Bumble-bee rows (bb) are ignored. A 5% grain floor is the pre-registered allowance for stray grains; it is not in Aristotle.",
+  "test_contract": {
+    "expected_observation": "Every honey-bee pollen load with a scored composition is at least 95% one morphotype: no load has two morphotypes each at or above 5% of the counted grains.",
+    "disconfirming_observation": "At least one honey-bee load in which two pollen morphotypes each contribute at least 5% of the counted grains. That load is a trip that was not confined to one kind.",
+    "admissible_datasets": "Individual honey-bee corbicular loads, not colony mixtures and not visitation networks that drop the trip boundary, with pollen identified to morphotype and a grain count or proportion per morphotype. Public, with a licence that allows reuse.",
+    "inference_method": "Group honey-bee rows into loads, apply the 5% grain floor, and compute the proportion of mixed loads. The claim is universal, so one mixed load refutes it and only a clean sample of at least 30 loads supports it. No significance test."
+  },
+  "caveats": [
+    "Before this registration the Dryad landing page and its README dictionary were read, including the column names and the statement that a multi-morphotype sac has more than one row. The CSV itself was not downloaded.",
+    "A mixed load can include contamination or pollen picked up inside the hive. The 5% floor is meant to drop traces. A refutation that rests on a very small proportion of loads is weaker than one that rests on a common mixture, and the confidence rule is fixed in the analysis: 0.80 if p >= 0.05, 0.45 if 0 < p < 0.05, 0.40 if p = 0 (one landscape cannot establish a universal never).",
+    "The dataset is one research station in southern Wisconsin in 2016. It can refute 'never'. It cannot show that constancy holds in every landscape."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ga02-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-10",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If the parts of an embryo come into being in succession, the named organs of the zebrafish do not share a single start stage in the ZFIN anatomy table: some are recorded as present from an earlier stage than others.",
+  "pass_criterion": "Pre-registered. Match anatomy-item names, case-insensitive and exact, to this list: heart, liver, eye, intestine, pectoral fin, kidney, pancreas, swim bladder, brain, notochord. Drop a match whose start stage has the name Unknown or whose stage spans more than 1000 hours. Let n be the number of remaining matches and s the number of distinct start-stage identifiers. The claim is supported if n >= 5 and s >= 2.",
+  "fail_criterion": "Pre-registered. The claim is refuted if n >= 5 and s = 1: every named organ that can be scored is already present from the same stage. If 1 <= n < 5 the verdict is inconclusive with reason underpowered. If either file cannot be fetched, or fewer than half of the matched organs join to the stage table, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "zfin-anatomy-item-and-stage-series"
+  ],
+  "interpretation": "Aristotle is denying that every part is present from the beginning of development: some parts are visible in the embryo while others are not yet formed. The zebrafish staging table is a modern embryo series, not his chick. Exact names are required so that 'heart' does not silently match 'heart tube' or 'heart primordium'. Organs that first appear after hatching still count as parts that were not present when earlier organs appeared. The test is about one species. It does not show that every animal embryo is built this way, and it does not order the organs into Aristotle's own sequence.",
+  "test_contract": {
+    "expected_observation": "At least five of the ten named organs have a specific start stage, and those start stages are not all the same.",
+    "disconfirming_observation": "At least five named organs, all first recorded at one and the same stage, which is what simultaneous formation would look like in this table.",
+    "admissible_datasets": "A public, species-specific anatomical ontology or staging atlas that gives a start stage for organs, curated from embryos of that species, not a model invented for this test.",
+    "inference_method": "Exact name match, drop placeholder stages, count distinct start stages. Support on two or more stages among at least five organs; refute on a single shared stage. No statistical test."
+  },
+  "caveats": [
+    "The ZFIN downloads page was read before registration (column order and file sizes). The first line of each file was counted for fields and bytes only; the line text was not stored. A web-search tool had already returned the full stage-series file, so the stage names and hour bounds were known before registration. They are a lookup table. The anatomy-item file, which pairs organs with start stages, was not read, and the organ list was fixed without it.",
+    "Start stage in ZFIN is the earliest stage at which the structure is recorded, which can be a precursor. Two organs can differ by a precursor annotation rather than by the appearance of the finished organ.",
+    "The author knows the standard embryological fact that these organs do not appear in the same hour. A pass is the expected outcome."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  }
+}
