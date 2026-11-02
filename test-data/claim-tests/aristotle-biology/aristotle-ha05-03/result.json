@@ -1,0 +1,173 @@
+{
+  "claim_id": "aristotle-ha05-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-03",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, every shark and dogfish species that has been scored for specialized sex organs has two claspers in the male and none in the female.",
+  "pass_criterion": "Pre-registered (supports). Using FishBase v25.04 morphdat.SexualAttributes joined to species and families: restrict to class Elasmobranchii, excluding batoid orders (order scientific name matching rajiformes|myliobatiformes|torpediniformes|rhinopristiformes|rhinobatiformes|pristiformes|platyrhiniformes, or order common name matching rays, skates, guitarfish, sawfish, or torpedo). A species is scored if at least one morphdat row has non-empty SexualAttributes. A row is a male-clasper code if the lowercased value contains 'clasper' and a male marker ('(m)' or the word male) and does not match 'one clasper', 'single clasper', or 'unpaired clasper'. A row is disconfirming if it matches those unpaired phrases, or contains 'clasper' together with a female marker ('(f)' or 'female') and no male marker, or is non-empty and contains neither 'clasper' nor an explicit statement that the character was not examined. A species passes if it has at least one male-clasper row and no disconfirming row; otherwise, if it is scored, it fails. Supports only if the number of scored shark species is at least 30 and the pass rate is at least 0.95.",
+  "fail_criterion": "Pre-registered (refutes). The pass rate among scored shark species is below 0.80, or at least three scored species are disconfirming because claspers are coded for females, coded as unpaired, or the specialized-organ field is filled without claspers. If the pass rate is at least 0.80 and below 0.95, the verdict is mixed (the quote's 'in some species' can hold while the claim's 'all species' does not). If no row contains the token clasper, the verdict is inconclusive with reason data-unavailable. If the token occurs but fewer than 30 shark species are scored, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "fishbase-v25.04-morphdat",
+    "fishbase-v25.04-species",
+    "fishbase-v25.04-families",
+    "fishbase-v25.04-orders",
+    "fishbase-v25.04-classes"
+  ],
+  "test_contract": {
+    "expected_observation": "In scored sharks and dogfish, the specialized sex-organ field records claspers as a male character, which is FishBase's name for the paired appendages by the vent, and does not record them for females.",
+    "disconfirming_observation": "A substantial share of scored shark or dogfish species lack a male-clasper code, or any species is coded with claspers in females or with a single unpaired clasper.",
+    "admissible_datasets": "A public species-level compilation of chondrichthyan external anatomy, assembled independently of Aristotle's text, that scores specialized sex organs for both sexes and can be restricted to sharks rather than rays. Family and order tables are used only to apply that scope.",
+    "inference_method": "Species-level pass rate on the pre-registered male-clasper code, among Elasmobranchii excluding batoids, with thresholds 0.95 (supports), below 0.80 (refutes), and the interval between them mixed. Unscored species are excluded from the rate, not counted as failures. Holocephalans are reported and not included in the rate."
+  },
+  "interpretation": "The quote says cartilaginous fishes 'in some species' show this male character; the claim sentence extends it to all sharks and dogfish. Both readings are scored by the same pass rate: at least 0.95 supports both, 0.80 to 0.95 is mixed, below 0.80 refutes the universal claim. 'Two appendages hanging down near the vent' is mapped to FishBase SexualAttributes values containing claspers marked male. The database does not count the appendages; the plural organ name is accepted unless the text says one, single, or unpaired. Rays are outside the claim's 'sharks and dogfish' and are excluded. Dogfish are sharks in this table and are not separated. This does not test whether the appendages are intromittent organs, only whether the sex difference is recorded.",
+  "caveats": [
+    "Before this registration, only parquet column names were read (footer schema of FishBase v25.04 morphdat, species, families, orders, and classes). No SexualAttributes values and no species counts were read.",
+    "A web-search snippet of the FishBase morphology page for Raja clavata, a ray, displayed 'Specialized organs: claspers (m)'. That one rendered page identified the field. It is not a shark and is not part of the measured sample.",
+    "Blank SexualAttributes is treated as unscored. A filled value that never mentions claspers is treated as a scored absence, which can refute the universal claim if it is common.",
+    "After the run, SexualAttributes is filled for 6 of 566 non-batoid elasmobranch species, so the pre-registered minimum of 30 scored species is not met. Rays account for most elasmobranch clasper codes and are outside the verdict. Galeus priapus is coded 'gonopodium (m)' and Megachasma pelagios is coded 'no special organs'; both are scored non-passes, and neither code is a count of appendages."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "inconclusive",
+  "confidence": 0.4,
+  "reason": "underpowered",
+  "datasets": [
+    {
+      "id": "fishbase-v25.04-parquet-mirror",
+      "name": "FishBase v25.04 tables (morphdat, species, families, orders, classes), parquet mirror distributed with rfishbase",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "morphdat.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/morphdat.parquet",
+          "retrieved_at": "2026-11-02T00:22:41Z",
+          "byte_size": 7551020,
+          "sha256": "7078e696cec600ff6243c0088c0dfcf3a829ec02caeea5b6ec83a3178321d5ef"
+        },
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "families.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 427298,
+          "sha256": "3f09bbb09c1c10219277f35b4f8c42aebedd5f1b8e00ebdfdeb0e16574b0e090"
+        },
+        {
+          "name": "orders.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/orders.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 49042,
+          "sha256": "a0f33b60ffbc1950ae8b57f652fd0b327f7d00713602c0f4e847ca1d8c8f69a0"
+        },
+        {
+          "name": "classes.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/classes.parquet",
+          "retrieved_at": "2026-11-02T00:22:42Z",
+          "byte_size": 8155,
+          "sha256": "c893e3a8eee9f3f8ccdc8f3f0bafb3deeab674c705bc70f992a14bc9bf17c28e"
+        }
+      ],
+      "role": "specialized sex organs (SexualAttributes) for fishes, restricted to sharks with the family and order tables"
+    }
+  ],
+  "method": "Downloaded the five FishBase v25.04 parquet tables, hashed them, and joined morphdat to species, families, and orders on SpecCode, FamCode, and Ordnum. Sharks and dogfish are Elasmobranchii excluding batoid orders named in the pre-registration. Each non-empty SexualAttributes value was classed as a male-clasper code or as disconfirming, and the species pass rate was compared with the pre-registered thresholds. Rays and holocephalans are counted in extra and are not in the verdict.",
+  "measured": {
+    "value": 0.6667,
+    "unit": "proportion of scored shark species with a male-clasper code and no disconfirming row",
+    "n": 6,
+    "uncertainty": null,
+    "extra": {
+      "n_shark_species_in_fishbase": 566,
+      "n_ray_species_in_fishbase": 720,
+      "n_pass": 4,
+      "n_fail": 2,
+      "scored_sharks": [
+        {
+          "binomial": "Asymbolus submaculatus",
+          "family": "Pentanchidae",
+          "order": "Carcharhiniformes",
+          "passed": true,
+          "values": [
+            "claspers (m)"
+          ]
+        },
+        {
+          "binomial": "Cetorhinus maximus",
+          "family": "Cetorhinidae",
+          "order": "Lamniformes",
+          "passed": true,
+          "values": [
+            "claspers (m)"
+          ]
+        },
+        {
+          "binomial": "Galeus priapus",
+          "family": "Pentanchidae",
+          "order": "Carcharhiniformes",
+          "passed": false,
+          "values": [
+            "gonopodium (m)"
+          ]
+        },
+        {
+          "binomial": "Megachasma pelagios",
+          "family": "Megachasmidae",
+          "order": "Lamniformes",
+          "passed": false,
+          "values": [
+            "no special organs"
+          ]
+        },
+        {
+          "binomial": "Scoliodon macrorhynchos",
+          "family": "Carcharhinidae",
+          "order": "Carcharhiniformes",
+          "passed": true,
+          "values": [
+            "claspers (m)"
+          ]
+        },
+        {
+          "binomial": "Squatina david",
+          "family": "Squatinidae",
+          "order": "Squatiniformes",
+          "passed": true,
+          "values": [
+            "claspers (m)"
+          ]
+        }
+      ],
+      "n_female_only_clasper_species": 0,
+      "n_unpaired_clasper_species": 0,
+      "n_scored_without_clasper_token": 2,
+      "n_both_sex_markers": 0,
+      "rays_scored": 20,
+      "rays_pass_rate": 0.95,
+      "holocephali_scored": 0,
+      "holocephali_pass_rate": null
+    }
+  },
+  "results_summary": [
+    "Scored sharks and dogfish: 4 of 6 pass (0.667), out of 566 non-batoid elasmobranch species in FishBase.",
+    "Scored species: Asymbolus submaculatus (claspers (m)), Cetorhinus maximus (claspers (m)), Galeus priapus (gonopodium (m)), Megachasma pelagios (no special organs), Scoliodon macrorhynchos (claspers (m)), Squatina david (claspers (m)).",
+    "Female-only clasper codes: 0. Unpaired clasper codes: 0. Scored without the token clasper: 2. Both-sex markers: 0.",
+    "Rays scored 20 (pass rate 0.950); holocephalans scored 0 (pass rate unscored). Those groups are outside the verdict.",
+    "The pre-registered rule does not apply the 0.95 or 0.80 rate thresholds because only 6 shark species are scored (minimum 30). The reported proportion is descriptive.",
+    "Failures include: Galeus priapus, Megachasma pelagios."
+  ]
+}

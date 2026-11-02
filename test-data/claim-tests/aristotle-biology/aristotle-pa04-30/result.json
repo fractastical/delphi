@@ -1,0 +1,126 @@
+{
+  "claim_id": "aristotle-pa04-30",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-30",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, Jynx torquilla is the only bird with two toes forward and two back, and every other bird has three toes forward and one back.",
+  "pass_criterion": "Pre-registered (supports). Source of the foot coding: the open text of Botelho et al. 2014, Proceedings of the Royal Society B, doi:10.1098/rspb.2014.0765. A named taxon is coded two-forward-two-back if the text applies zygodactyl, semi-zygodactyl, facultative zygodactyl, or heterodactyl to it, or says two toes point forward and two backward. The wryneck has the arrangement if the text names Jynx or wryneck, or if GBIF places Jynx torquilla in a family or order the text codes that way. Supports only if every taxon the text codes two-forward-two-back is the genus Jynx or the species Jynx torquilla, and the text describes other birds as three forward and one back.",
+  "fail_criterion": "Pre-registered. Refutes if the text codes any taxon other than the genus Jynx as two-forward-two-back, and the GBIF backbone count of accepted species in that taxon, minus Jynx torquilla if it falls inside the taxon, is at least 1. Inconclusive with reason data-unavailable if the article text cannot be fetched. Inconclusive with reason not-operationalizable if the fetched text names no taxon for a toe arrangement. Species counts come from GBIF species search on the matched taxon key, rank SPECIES, status ACCEPTED, limit 0, using the count field.",
+  "planned_datasets": [
+    "botelho-2014-rspb-20140765-text",
+    "gbif-backbone-species-counts"
+  ],
+  "test_contract": {
+    "expected_observation": "The comparative statement in the paper assigns two toes forward and two back only to the wryneck, and three forward and one back to other birds.",
+    "disconfirming_observation": "The same statement assigns that toe arrangement, including a facultative one, to a named bird group that contains at least one accepted species other than Jynx torquilla.",
+    "admissible_datasets": "An open peer-reviewed anatomical text that names bird taxa together with toe arrangements, plus a public taxonomic backbone that can count accepted species in a named family or order. A checklist with no toe field is not enough on its own.",
+    "inference_method": "Extract taxon-to-arrangement assignments from the article text by the patterns in the pass criterion, resolve Jynx torquilla and each other taxon on GBIF, and refute uniqueness when any other assignment covers at least one accepted species besides the wryneck. The test does not re-score museum skins."
+  },
+  "interpretation": "The quote says that in the wryneck alone two toes are in front and two behind, and that every other bird has the arrangement described for birds generally, which the claim states as three in front and one behind. Facultative and semi-zygodactyl feet put two toes back some of the time, so they are inside the claim's 'arranged two in front and two behind' and outside 'three in front and one behind'. Heterodactyl feet also have two forward and two back, with a different toe reversed, and count against uniqueness. The test uses one paper's explicit assignments plus a species count. It is not a specimen-by-specimen survey.",
+  "caveats": [
+    "A web-search snippet of Botelho et al. 2014 named more than one bird group in connection with zygodactyl feet before this registration. The rule is the claim's own uniqueness test. It was not written to fit a count, and the analysis has to extract the assignments from the fetched text rather than from the snippet.",
+    "GBIF counts change. The retrieval time will be recorded. The count is a taxonomic total, not a count of feet that were examined.",
+    "If the publisher returns a paywall or a block, the verdict is data-unavailable. No arrangement will be filled in from memory.",
+    "After the run, the assignments are the paper's explicit lists, not a survey of skins. Facultative and heterodactyl feet are inside the pre-registered two-and-two rule. A taxon the paper discusses only as an ancestor, or as having lost the arrangement, is not in these frames. A species-rank GBIF search with higherTaxonKey returned 0 for Melopsittacus undulatus, Leptosomus discolor, so those names did not meet the pre-registered count of at least 1. The family and order counts are what the verdict uses."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.72,
+  "datasets": [
+    {
+      "id": "botelho-2014-rspb-20140765",
+      "name": "The developmental origin of zygodactyl feet and its possible loss in the evolution of Passeriformes.",
+      "landing_url": "https://doi.org/10.1098/rspb.2014.0765",
+      "doi": "10.1098/rspb.2014.0765",
+      "version": "PMC4083792",
+      "license": "The Europe PMC record marks an HTML full text as free; the publisher copy is also listed as subscription",
+      "files": [
+        {
+          "name": "europepmc-botelho.json",
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1098/rspb.2014.0765&format=json&resultType=core",
+          "retrieved_at": "2026-11-02T00:48:14Z",
+          "byte_size": 7694,
+          "sha256": "bc91cd8695130185b3487c6d7443bab931dd464aab8e4c5aa8687271cf5d0fd5"
+        },
+        {
+          "name": "pmc4083792.html",
+          "download_url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4083792/",
+          "retrieved_at": "2026-11-02T00:48:14Z",
+          "byte_size": 194083,
+          "sha256": "aac0567a3b5aa49de2e80a04e5edbac8e8afda86845a33170f8004f3960a7427"
+        }
+      ],
+      "role": "open text that names bird taxa together with toe arrangements"
+    },
+    {
+      "id": "gbif-backbone",
+      "name": "GBIF backbone taxonomy species counts",
+      "landing_url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "doi": null,
+      "version": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "license": "GBIF backbone, queried live",
+      "files": [],
+      "role": "accepted-species counts for each taxon the paper codes two-forward-two-back"
+    }
+  ],
+  "method": "Fetched the Europe PMC record for doi:10.1098/rspb.2014.0765 and the open PMC HTML it points to. Taxa were taken only from sentences that apply zygodactyl, semi-zygodactyl, or heterodactyl to a following scientific name: the extant-clade list, the three-origins list, the semi-zygodactyl 'like' list, the heterodactyl 'evolved in' clause, 'zygodactyl birds like', a zygodactyl bird or foot named in parentheses, and a binomial said to be a fourth independent origin. Pamprodactyl and anisodactyl clauses were not used. Each name was matched on GBIF and counted with species search, rank SPECIES, status ACCEPTED, limit 0. Jynx torquilla was subtracted when its GBIF key sits inside that taxon.",
+  "measured": {
+    "value": 8,
+    "unit": "named non-Jynx taxa with at least one other accepted species",
+    "n": 10,
+    "uncertainty": null,
+    "extra": {
+      "taxa": [
+        "Cuculidae",
+        "Psittaciformes",
+        "Piciformes",
+        "Musophagidae",
+        "Pandionidae",
+        "Strigiformes",
+        "Coliidae",
+        "Trogoniformes",
+        "Melopsittacus undulatus",
+        "Leptosomus discolor"
+      ],
+      "refuting_taxa": [
+        "Cuculidae",
+        "Psittaciformes",
+        "Piciformes",
+        "Musophagidae",
+        "Pandionidae",
+        "Strigiformes",
+        "Coliidae",
+        "Trogoniformes"
+      ],
+      "accepted_species_besides_wryneck_by_taxon": {
+        "Cuculidae": 185,
+        "Psittaciformes": 491,
+        "Piciformes": 531,
+        "Musophagidae": 23,
+        "Pandionidae": 5,
+        "Strigiformes": 350,
+        "Coliidae": 17,
+        "Trogoniformes": 52,
+        "Melopsittacus undulatus": 0,
+        "Leptosomus discolor": 0
+      },
+      "sum_of_refuting_species_counts": 1654,
+      "three_forward_described": true,
+      "wryneck_or_jynx_named": false,
+      "jynx_torquilla_order": "Piciformes",
+      "jynx_torquilla_family": "Picidae"
+    }
+  },
+  "results_summary": [
+    "The paper names 10 taxa in a two-forward-two-back frame. Non-Jynx taxa with at least one other accepted species: 8 (Cuculidae 185, Psittaciformes 491, Piciformes 531, Musophagidae 23, Pandionidae 5, Strigiformes 350, Coliidae 17, Trogoniformes 52).",
+    "Jynx or wryneck named in the text: False. GBIF places Jynx torquilla in Picidae , Piciformes.",
+    "Three forward and one back is described for the anisodactyl foot: True."
+  ]
+}
