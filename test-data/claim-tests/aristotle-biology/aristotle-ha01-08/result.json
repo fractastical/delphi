@@ -1,0 +1,115 @@
+{
+  "claim_id": "aristotle-ha01-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-08",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If every animal with more than four feet is bloodless, and every blooded animal has no feet, two feet or four feet, then squamates (blooded) have only 0, 2 or 4 limbs and every arthropod specimen with more than four walking legs is outside the vertebrates.",
+  "pass_criterion": "Both of the following. (1) In SquamBase, at least 5000 species have a limb count mapped to a number, and none of those counts is outside {0, 2, 4}. (2) In the arthropod feet dataset, at least 30 specimens have a walking-leg count strictly greater than 4, and none of those specimens is coded in a vertebrate class, phylum or order. Mammals, birds, amphibians and fishes are outside these two files and do not have to be present for a pass; their absence is a coverage caveat, not a fail.",
+  "fail_criterion": "Any mapped squamate limb count is outside {0, 2, 4}, or any specimen with more than four walking legs is coded as a vertebrate. If either file cannot be retrieved, or fewer than 5000 squamates map, or fewer than 30 many-legged arthropod specimens are present, and no counterexample has already been found, the verdict is inconclusive with reason data-unavailable or underpowered as appropriate. Unmapped limb strings that are more than 1% of SquamBase rows and that do not themselves state a count outside {0, 2, 4} make the verdict inconclusive with reason other, unless a mapped counterexample is already present, in which case the verdict is refutes.",
+  "planned_datasets": [
+    "squambase-1.0-dryad",
+    "arthropod-feet-dryad"
+  ],
+  "interpretation": "Scope maps 'blooded' to vertebrates and 'bloodless' to invertebrates. 'Feet' are paired locomotory limbs or walking legs, not digits. SquamBase categories follow Meiri's codebook: a numeric cell is that count; 'limbless' or 'absent' or 'none' maps to 0; 'forelimb only', 'hindlimb only', 'front only', 'hind only' or 'one pair' maps to 2; 'fully limbed', 'four', 'both pairs' or 'reduced' (short limbs, not an extra pair) maps to 4. A tiny vestige that the dataset itself calls limbless stays 0. Digit counts are ignored. Vertebrate coding in the arthropod file is a taxonomic field containing Vertebrata, Mammalia, Aves, Reptilia, Amphibia, Actinopterygii, Chondrichthyes, or an order in {Primates, Carnivora, Rodentia, Cetacea, Artiodactyla, Perissodactyla, Chiroptera, Squamata, Testudines, Crocodylia, Anura, Caudata, Gymnophiona, Perciformes, Cypriniformes, Siluriformes, Salmoniformes, Squaliformes, Rajiformes}.",
+  "test_contract": {
+    "expected_observation": "Every coded squamate has 0, 2 or 4 limbs, and every arthropod specimen with more than four walking legs is non-vertebrate.",
+    "disconfirming_observation": "A squamate with a limb count other than 0, 2 or 4, or a vertebrate specimen with more than four walking legs.",
+    "admissible_datasets": "Species- or specimen-level public tables that state a limb or walking-leg count and a taxon name, assembled independently of this claim, with a licence that permits download. The squamate table must cover snakes and lizards, not a single genus. The many-legged table must state walking-leg counts rather than a presence/absence of limbs.",
+    "inference_method": "Map each row to a limb count with the codebook above. A universal is refuted by one counterexample. A pass requires both sample-size floors and zero counterexamples. No phylogenetic model."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.78,
+  "datasets": [
+    {
+      "id": "squambase-1.0-dryad",
+      "name": "SquamBase 1.0 – a dataset of squamate species traits",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.76hdr7t3b",
+      "doi": "10.5061/dryad.76hdr7t3b",
+      "version": "2024-01-31",
+      "license": "https://spdx.org/licenses/CC0-1.0.html",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/downloads/file_stream/2884612",
+          "retrieved_at": "2026-11-02T01:17:22Z",
+          "byte_size": 7290045,
+          "sha256": "e850eb807240e1012d0af3e5f2c33a84dab406d50e86a8e3dc591f51a64912af",
+          "content_type": "application/octet-stream",
+          "final_url": "https://dryad-assetstore-merritt-west.s3.us-west-2.amazonaws.com/ark%3A/13030/m5136vzw%7C3%7Cproducer/Supplementary_Table_S1_-_squamBase1.xlsx?response-content-disposition=attachment%3B%20filename%3DSupplementary_Table_S1_-_squamBase1.xlsx&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2KERHV5E3OITXZXC%2F20261102%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261102T011721Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=06737b3ceae00563d0969d984f4a685998bf280c465f7fd7c8bca5fca8892876"
+        }
+      ],
+      "role": "limb category for each squamate species"
+    },
+    {
+      "id": "arthropod-feet-dryad",
+      "name": "Data from: Which arthropods have feet and why? Addressing an argument for aquatic fossil scorpions",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.98sf7m0tk",
+      "doi": "10.5061/dryad.98sf7m0tk",
+      "version": "2025-08-07",
+      "license": "https://spdx.org/licenses/CC0-1.0.html",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/downloads/file_stream/4221035",
+          "retrieved_at": "2026-11-02T01:17:23Z",
+          "byte_size": 113722,
+          "sha256": "0ca5307235e1ce60306fa2d3fd6535bdb011f2b08f172b6eb52fddf2edfa110c",
+          "content_type": "text/csv",
+          "final_url": "https://dryad-assetstore-merritt-west.s3.us-west-2.amazonaws.com/v3/380199/data/521a3505-2c2b-4bd7-9bd8-e83e3decaae7.csv?response-content-disposition=attachment%3B%20filename%3DData_1_-_Body_Size_Measurements.csv&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA2KERHV5E3OITXZXC%2F20261102%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20261102T011722Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=bb49cf9c04acf99d56094b82f4748371e02fa7f9dd7f3e9274edc075975d2885"
+        }
+      ],
+      "role": "walking-leg count and taxonomic class or order for each specimen"
+    }
+  ],
+  "method": "Each Dryad file was retrieved by solving the Anubis fast challenge and following the redirect to the object store. SquamBase Limbs values were mapped with the pre-registered codebook: a leading integer is that count, limbless is 0, forelimbs-only or hindlimbs-only is 2, and reduced or four well-developed limbs is 4. Arthropod rows with Leg count greater than 4 were checked for a vertebrate class or order from the pre-registered list.",
+  "measured": {
+    "value": 0,
+    "unit": "counterexamples (squamate limb counts outside {0, 2, 4}, plus many-legged specimens coded vertebrate)",
+    "n": 11744,
+    "uncertainty": "category strings mapped with the pre-registered codebook; leading integer wins when the cell starts with a digit",
+    "extra": {
+      "squamate_rows": 11744,
+      "squamate_species_mapped": 11744,
+      "squamate_rows_mapped": 11744,
+      "limb_label_counts": {
+        "limbless": 4521,
+        "forelimbs only": 8,
+        "4 well developed limbs": 6957,
+        "hindlimbs only": 63,
+        "reduced": 195
+      },
+      "unmapped_rows": 0,
+      "unmapped_fraction": 0.0,
+      "limb_counts_outside_0_2_4": [],
+      "n_limb_counts_outside": 0,
+      "arthropod_specimens_with_more_than_4_walking_legs": 445,
+      "many_legged_class_counts": {
+        "Arachnida": 202,
+        "Insecta": 93,
+        "Malacostraca": 68,
+        "Entognatha": 22,
+        "Diplopoda": 22,
+        "Pycnogonida": 20,
+        "Xiphosurida": 8,
+        "Chilopoda": 6,
+        "Pauropoda": 2,
+        "Symphyla": 2
+      },
+      "many_legged_coded_vertebrate": 0,
+      "vertebrate_examples": [],
+      "download_errors": {},
+      "verdict_by_rule": "supports"
+    }
+  },
+  "caveats": [
+    "Mammals, birds, amphibians and fishes are not in these two files. The pre-registration treats that absence as coverage, not as a failure.",
+    "SquamBase 'reduced' is mapped to 4 because the codebook says reduced means short limbs, not an extra pair. Digit counts are not a separate column in this file.",
+    "The arthropod table is a comparative specimen sample, not a census of arthropods."
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "claim_id": "aristotle-ha06-37",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-37",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If a female mule can be impregnated and that impregnation is not followed by birth, and this is the situation the sentence describes rather than one case among others, then the open case literature will contain pregnancies of female mules that do not end in a live birth and will not contain a live birth to a female mule.",
+  "pass_criterion": "At least one Europe PMC record is classified as a female-mule or female-hinny pregnancy that did not end in a live birth, and zero records are classified as a live birth to a female mule or female hinny.",
+  "fail_criterion": "At least one record is classified as a live birth to a female mule or female hinny and zero records are classified as a pregnancy that did not end in a live birth. If both classes have at least one record, the verdict is mixed. If the search succeeds and both classes have zero records, the verdict is inconclusive with reason other. If the search itself fails, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "europepmc-female-mule-pregnancy"
+  ],
+  "interpretation": "The claim sentence says a female mule has been impregnated without the impregnation being followed by birth. Read as a generalization about female mules (Equus caballus × E. asinus), a live birth contradicts the 'without birth' half and a documented pregnancy that does not end in birth supports that half. The two together are mixed. Female hinnies are the reciprocal hybrid and are counted separately in the measured output; they enter the verdict because the same sterility claim is the one the veterinary literature tests. Papers that only restate Aristotle are not outcomes. 'Sterile' without a pregnancy term is not a non-birth pregnancy.",
+  "test_contract": {
+    "expected_observation": "Open abstracts record at least one female-mule pregnancy that does not produce a live foal, and none record a live foal born to a female mule.",
+    "disconfirming_observation": "An abstract records a live foal whose dam is a female mule or female hinny, with no abstract recording a pregnancy that failed to end in birth. Both kinds of outcome together are mixed.",
+    "admissible_datasets": "Europe PMC title-and-abstract records returned by the pre-registered query, which requires the words for a female mule or fertile mule and a reproductive outcome. Full texts are not required. Records must be the search result, not a hand-picked list of famous cases.",
+    "inference_method": "Deduplicate by PMID or Europe PMC id. Classify each title plus abstract with the pre-registered patterns: live birth if the dam is a female mule or hinny and the text reports a foal, offspring or parturition; non-birth if a conception or pregnancy term co-occurs with abortion, resorption, failure to give birth, or impregnation not followed by parturition. One paper may fall in both classes. The verdict follows the two counts."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.72,
+  "datasets": [
+    {
+      "id": "europepmc-female-mule-pregnancy",
+      "name": "Europe PMC search for female-mule and female-hinny reproductive outcomes",
+      "landing_url": "https://europepmc.org/search?query=%28%22female%20mule%22%20OR%20%22fertile%20mule%22%20OR%20%22mule%20mare%22%20OR%20%22she-mule%22%20OR%20%22female%20hinny%22%20OR%20%22fertile%20hinny%22%20OR%20%22offspring%20of%20a%20female%20mule%22%20OR%20%22offspring%20of%20a%20hinny%22%20OR%20%22hinny%20and%20her%20offspring%22%20OR%20%22recipient%20mule%22%20OR%20%22recipient%20mules%22%29%20AND%20%28foal%20OR%20pregnan%2A%20OR%20parturition%20OR%20abort%2A%20OR%20impregnat%2A%20OR%20conception%20OR%20offspring%20OR%20birth%20OR%20foaled%20OR%20foaling%29%20NOT%20%28duck%2A%20OR%20%22mule%20deer%22%20OR%20Odocoileus%20OR%20Cairina%20OR%20Anas%20OR%20Muscovy%29",
+      "doi": null,
+      "version": "REST search resultType=core",
+      "license": "Europe PMC metadata and abstracts, retrieved from the public API",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%28%22female%20mule%22%20OR%20%22fertile%20mule%22%20OR%20%22mule%20mare%22%20OR%20%22she-mule%22%20OR%20%22female%20hinny%22%20OR%20%22fertile%20hinny%22%20OR%20%22offspring%20of%20a%20female%20mule%22%20OR%20%22offspring%20of%20a%20hinny%22%20OR%20%22hinny%20and%20her%20offspring%22%20OR%20%22recipient%20mule%22%20OR%20%22recipient%20mules%22%29%20AND%20%28foal%20OR%20pregnan%2A%20OR%20parturition%20OR%20abort%2A%20OR%20impregnat%2A%20OR%20conception%20OR%20offspring%20OR%20birth%20OR%20foaled%20OR%20foaling%29%20NOT%20%28duck%2A%20OR%20%22mule%20deer%22%20OR%20Odocoileus%20OR%20Cairina%20OR%20Anas%20OR%20Muscovy%29&format=json&resultType=core",
+          "retrieved_at": "2026-11-02T01:16:34Z",
+          "byte_size": 225334,
+          "sha256": "1200f3c95907f243ce731541938bf8e828fc0b7b4088ea09e698bcc12cfac257",
+          "content_type": "application/json",
+          "pages": 1,
+          "hit_count": 45
+        }
+      ],
+      "role": "titles and abstracts returned by the pre-registered query"
+    }
+  ],
+  "method": "Europe PMC was searched with a query that requires a female mule, fertile mule, female hinny, or recipient mule, and a reproductive-outcome word, and that excludes mule deer and ducks. Records were deduplicated by PMID or Europe PMC id. A live birth is a sentence with foal, offspring, parturition, or birth and without a negation. A non-birth pregnancy is a sentence that has both a conception or pregnancy term and an abortion, resorption, or failure-to-give-birth term. The word sterile alone is not a non-birth pregnancy.",
+  "measured": {
+    "value": 8,
+    "unit": "deduplicated Europe PMC records classified as a live birth to a female mule or female hinny",
+    "n": 8,
+    "uncertainty": "title and abstract only; one paper may be in both classes",
+    "extra": {
+      "query": "(\"female mule\" OR \"fertile mule\" OR \"mule mare\" OR \"she-mule\" OR \"female hinny\" OR \"fertile hinny\" OR \"offspring of a female mule\" OR \"offspring of a hinny\" OR \"hinny and her offspring\" OR \"recipient mule\" OR \"recipient mules\") AND (foal OR pregnan* OR parturition OR abort* OR impregnat* OR conception OR offspring OR birth OR foaled OR foaling) NOT (duck* OR \"mule deer\" OR Odocoileus OR Cairina OR Anas OR Muscovy)",
+      "records_returned": 45,
+      "records_deduplicated": 45,
+      "n_live_birth": 8,
+      "n_nonbirth_pregnancy": 0,
+      "n_female_mule_live": 7,
+      "n_female_hinny_live": 3,
+      "n_female_mule_nonbirth": 0,
+      "n_female_hinny_nonbirth": 0,
+      "live_records": [
+        {
+          "id": "38891633",
+          "pmid": "38891633",
+          "year": "2024",
+          "title": "Report on a Milking Mule: Milk Qualitative Characteristics during Lactation.",
+          "live_sentence": "The aim of this investigation was to increase our knowledge of the qualitative composition of mule's milk and its variations throughout the whole lactation period-namely, from 6 h after foaling to 180 days in milk (DIM)."
+        },
+        {
+          "id": "IND607785661",
+          "pmid": null,
+          "year": "2022",
+          "title": "First report of mule-in-mule pregnancies with live births following embryo transfer",
+          "live_sentence": "First report of mule-in-mule pregnancies with live births following embryo transfer."
+        },
+        {
+          "id": "17177697",
+          "pmid": "17177697",
+          "year": "2006",
+          "title": "Molecular and cytogenetic paternity testing of a male offspring of a hinny.",
+          "live_sentence": "Molecular and cytogenetic paternity testing of a male offspring of a hinny.."
+        },
+        {
+          "id": "303951",
+          "pmid": null,
+          "year": "1997",
+          "title": "A genetical study of DNA fingerprints, serum protein and esterase contents in a case of female hinny and her offspring",
+          "live_sentence": "A genetical study of DNA fingerprints, serum protein and esterase contents in a case of female hinny and her offspring."
+        },
+        {
+          "id": "12950689",
+          "pmid": "12950689",
+          "year": "2003",
+          "title": "Successful non-surgical transfer of horse embryos to mule recipients.",
+          "live_sentence": "Parturition occurred spontaneously on day 348 of gestation in both mules and the resulting colt foals developed normally to weaning."
+        },
+        {
+          "id": "3378453",
+          "pmid": "3378453",
+          "year": "1988",
+          "title": "A fertile mule and hinny in China.",
+          "live_sentence": "Each had mated with a donkey and produced a filly foal."
+        },
+        {
+          "id": "4056372",
+          "pmid": "4056372",
+          "year": "1985",
+          "title": "Male mule foal qualifies as the offspring of a female mule and jack donkey.",
+          "live_sentence": "Male mule foal qualifies as the offspring of a female mule and jack donkey.."
+        },
+        {
+          "id": "4045884",
+          "pmid": "4045884",
+          "year": "1985",
+          "title": "Fertile mule in China and her unusual foal.",
+          "live_sentence": "Fertile mule in China and her unusual foal.."
+        }
+      ],
+      "nonbirth_records": [],
+      "verdict_by_rule": "refutes"
+    }
+  },
+  "caveats": [
+    "Classification uses titles and abstracts, not full texts. A birth reported only in the paper body is missed.",
+    "Embryo-transfer foals born to a recipient mule match the pre-registered live-birth pattern and are counted.",
+    "Female hinnies are counted, as the pre-registration requires, and are also reported separately.",
+    "Papers that only restate sterility, without a pregnancy that failed, are not in the non-birth class."
+  ]
+}

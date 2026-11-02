@@ -1,0 +1,387 @@
+{
+  "claim_id": "aristotle-ga01-21",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-21",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If semen is not drawn from every part of the body, then the genes that build sperm and seminal-plasma proteins will be expressed most strongly in the testis, epididymis, prostate or seminal vesicle, far above the other tissues, and genes that mark liver, muscle, pancreas and brain will not.",
+  "pass_criterion": "At least six of the semen genes that are found in the consensus file have their maximum nTPM in {testis, epididymis, prostate, seminal vesicle}, and that maximum is at least 10 times the median nTPM of the tissues outside those four. At least five semen genes must be found. Fewer than two of the four control genes may have their maximum in those four tissues.",
+  "fail_criterion": "Three or more semen genes have their maximum nTPM outside {testis, epididymis, prostate, seminal vesicle}. If the pass rule fails and the fail rule also fails, the verdict is mixed. If fewer than five semen genes are found, or two or more control genes peak in the semen tissues, the verdict is inconclusive with reason other. If the expression file cannot be retrieved, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "hpa-rna-tissue-consensus",
+    "ensembl-symbol-lookup"
+  ],
+  "interpretation": "The claim denies the view that semen is secreted from all parts of the parent's body. It is read as a claim about where semen is made, not about whether the nutrients in it once passed through other organs. Semen here is spermatozoa plus the proteins of seminal plasma. The pre-registered markers are PRM1, PRM2, TNP1, ODF1 and AKAP4 for sperm, and SEMG1, SEMG2 and KLK3 for seminal plasma. The producing organs are testis, epididymis, prostate and seminal vesicle, the four male reproductive tissues in the Human Protein Atlas consensus list. Controls are ALB, TTN, INS and GFAP. Humans stand in for 'animals that emit semen' because this file is human; that limit is a caveat, not a reinterpretation of the claim as a claim about humans only.",
+  "test_contract": {
+    "expected_observation": "Each semen marker peaks in testis, epididymis, prostate or seminal vesicle at a level at least ten times the median of the other tissues, and liver, muscle, pancreas and brain markers do not peak in those four organs.",
+    "disconfirming_observation": "Three or more semen markers peak in some other tissue, which is what a draw from many body parts would look like in this file.",
+    "admissible_datasets": "The Human Protein Atlas consensus RNA file for normal tissues, with gene identities taken from Ensembl symbol lookup and not from a search of which tissues look semen-specific. No gene is added after the file is opened.",
+    "inference_method": "For each gene, take the tissue with the highest nTPM. A tie that includes a tissue outside the four semen organs does not count as a semen peak. The median uses tissues outside the four. Thresholds are six of the found semen genes, a tenfold ratio, and three genes peaking outside as a refutation. Controls are a specificity check, not part of the biological sample size."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.8,
+  "datasets": [
+    {
+      "id": "hpa-rna-tissue-consensus",
+      "name": "Human Protein Atlas consensus RNA by tissue",
+      "landing_url": "https://www.proteinatlas.org/humanproteome/tissue/data",
+      "doi": null,
+      "version": "rna_tissue_consensus.tsv.zip as served on the retrieval date",
+      "license": "Creative Commons Attribution 4.0 International License",
+      "files": [
+        {
+          "download_url": "https://www.proteinatlas.org/download/tsv/rna_tissue_consensus.tsv.zip",
+          "retrieved_at": "2026-11-02T01:20:18Z",
+          "byte_size": 5293680,
+          "sha256": "b001903da23f802c8dfbd1b6b3a8c20b831fedd4932f4bb721b06622d83ae60b",
+          "content_type": "application/zip",
+          "final_url": "https://www.proteinatlas.org/download/tsv/rna_tissue_consensus.tsv.zip"
+        }
+      ],
+      "role": "nTPM by gene and normal tissue"
+    },
+    {
+      "id": "ensembl-symbol-lookup",
+      "name": "Ensembl REST symbol lookup, homo_sapiens",
+      "landing_url": "https://rest.ensembl.org/",
+      "doi": null,
+      "version": "lookup/symbol/homo_sapiens",
+      "license": "not retrieved; the responses are the public symbol-lookup JSON",
+      "files": [
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/PRM1",
+          "retrieved_at": "2026-11-02T01:20:19Z",
+          "byte_size": 420,
+          "sha256": "24e3a0579614f8aa905b390a7715ec2f382e87019087972965ec3a69baeb7ff3"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/PRM2",
+          "retrieved_at": "2026-11-02T01:20:19Z",
+          "byte_size": 421,
+          "sha256": "68855c5ba3cc71ee9fd9bf7a9de2f2a18beb43073233c8e3ed11894cbad00eeb"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/TNP1",
+          "retrieved_at": "2026-11-02T01:20:20Z",
+          "byte_size": 431,
+          "sha256": "e10c2bee787a536ba28cbc14226b458271396b8273d221dab1678f7b77615d9a"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/ODF1",
+          "retrieved_at": "2026-11-02T01:20:21Z",
+          "byte_size": 443,
+          "sha256": "8eb5c2ad202557877a5f14b87d7fe08ddb6b8859471a31dad350dac6d026928e"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/AKAP4",
+          "retrieved_at": "2026-11-02T01:20:21Z",
+          "byte_size": 437,
+          "sha256": "23fda42ede0f995945ee009575842d4ea9d7b1db7d1b82ddb3b66f9680c5aca4"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/SEMG1",
+          "retrieved_at": "2026-11-02T01:20:22Z",
+          "byte_size": 424,
+          "sha256": "cd592ef1c0c0c91daae407aef59e313d693f36fcab4daf5f937f49e6f8a32cfd"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/SEMG2",
+          "retrieved_at": "2026-11-02T01:20:22Z",
+          "byte_size": 423,
+          "sha256": "406fc51b361e05189d52521d7a275ab47120f619b10971fbdf6adc3a5d4cb5e9"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/KLK3",
+          "retrieved_at": "2026-11-02T01:20:23Z",
+          "byte_size": 10135,
+          "sha256": "353c0504c258b849476a7c7b51b2b6c933e34da02742653adc635c25cba1cc45"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/ALB",
+          "retrieved_at": "2026-11-02T01:20:23Z",
+          "byte_size": 10135,
+          "sha256": "353c0504c258b849476a7c7b51b2b6c933e34da02742653adc635c25cba1cc45"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/TTN",
+          "retrieved_at": "2026-11-02T01:20:24Z",
+          "byte_size": 10135,
+          "sha256": "353c0504c258b849476a7c7b51b2b6c933e34da02742653adc635c25cba1cc45"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/INS",
+          "retrieved_at": "2026-11-02T01:20:25Z",
+          "byte_size": 10135,
+          "sha256": "353c0504c258b849476a7c7b51b2b6c933e34da02742653adc635c25cba1cc45"
+        },
+        {
+          "download_url": "https://rest.ensembl.org/lookup/symbol/homo_sapiens/GFAP",
+          "retrieved_at": "2026-11-02T01:20:25Z",
+          "byte_size": 10135,
+          "sha256": "353c0504c258b849476a7c7b51b2b6c933e34da02742653adc635c25cba1cc45"
+        }
+      ],
+      "role": "map the pre-registered symbols to Ensembl gene ids"
+    }
+  ],
+  "method": "The consensus zip was opened and the nTPM column was read. Each pre-registered symbol was resolved through Ensembl and matched to that gene id. The tissue of maximum nTPM was taken. A tie that includes a tissue outside testis, epididymis, prostate and seminal vesicle is not a semen peak. The tenfold test compares that maximum with the median nTPM of tissues outside those four. No gene was added after the file was opened.",
+  "measured": {
+    "value": 8,
+    "unit": "semen genes whose maximum nTPM is in testis, epididymis, prostate or seminal vesicle and at least 10 times the median of the other tissues",
+    "n": 8,
+    "uncertainty": "maximum per tissue; a tie that includes a tissue outside the four is not a semen peak",
+    "extra": {
+      "genes": [
+        {
+          "max_ntpm": 15140.1,
+          "max_tissues": [
+            "testis"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 1.3,
+          "ratio_to_median_outside": 11646.231,
+          "ratio_infinite": false,
+          "tenfold": true,
+          "symbol": "PRM1",
+          "ensembl_id": "ENSG00000175646",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 11179.1,
+          "max_tissues": [
+            "testis"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.8,
+          "ratio_to_median_outside": 13973.875,
+          "ratio_infinite": false,
+          "tenfold": true,
+          "symbol": "PRM2",
+          "ensembl_id": "ENSG00000122304",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 5763.6,
+          "max_tissues": [
+            "testis"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.5,
+          "ratio_to_median_outside": 11527.2,
+          "ratio_infinite": false,
+          "tenfold": true,
+          "symbol": "TNP1",
+          "ensembl_id": "ENSG00000118245",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 333.0,
+          "max_tissues": [
+            "testis"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.0,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": true,
+          "tenfold": true,
+          "symbol": "ODF1",
+          "ensembl_id": "ENSG00000155087",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 187.4,
+          "max_tissues": [
+            "testis"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.0,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": true,
+          "tenfold": true,
+          "symbol": "AKAP4",
+          "ensembl_id": "ENSG00000147081",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 28650.3,
+          "max_tissues": [
+            "seminal vesicle"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.0,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": true,
+          "tenfold": true,
+          "symbol": "SEMG1",
+          "ensembl_id": "ENSG00000124233",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 9810.7,
+          "max_tissues": [
+            "seminal vesicle"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.0,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": true,
+          "tenfold": true,
+          "symbol": "SEMG2",
+          "ensembl_id": "ENSG00000124157",
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 7518.2,
+          "max_tissues": [
+            "prostate"
+          ],
+          "semen_peak": true,
+          "outside_peak": false,
+          "tie_includes_outside": false,
+          "median_outside": 0.4,
+          "ratio_to_median_outside": 18795.5,
+          "ratio_infinite": false,
+          "tenfold": true,
+          "symbol": "KLK3",
+          "ensembl_id": null,
+          "found": true,
+          "n_tissues": 51,
+          "role": "semen"
+        },
+        {
+          "max_ntpm": 198523.8,
+          "max_tissues": [
+            "liver"
+          ],
+          "semen_peak": false,
+          "outside_peak": true,
+          "tie_includes_outside": false,
+          "median_outside": 2.4,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": false,
+          "tenfold": false,
+          "symbol": "ALB",
+          "ensembl_id": null,
+          "found": true,
+          "n_tissues": 51,
+          "role": "control"
+        },
+        {
+          "max_ntpm": 861.9,
+          "max_tissues": [
+            "skeletal muscle"
+          ],
+          "semen_peak": false,
+          "outside_peak": true,
+          "tie_includes_outside": false,
+          "median_outside": 0.4,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": false,
+          "tenfold": false,
+          "symbol": "TTN",
+          "ensembl_id": null,
+          "found": true,
+          "n_tissues": 51,
+          "role": "control"
+        },
+        {
+          "max_ntpm": 12197.1,
+          "max_tissues": [
+            "pancreas"
+          ],
+          "semen_peak": false,
+          "outside_peak": true,
+          "tie_includes_outside": false,
+          "median_outside": 1.1,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": false,
+          "tenfold": false,
+          "symbol": "INS",
+          "ensembl_id": null,
+          "found": true,
+          "n_tissues": 51,
+          "role": "control"
+        },
+        {
+          "max_ntpm": 15929.3,
+          "max_tissues": [
+            "spinal cord"
+          ],
+          "semen_peak": false,
+          "outside_peak": true,
+          "tie_includes_outside": false,
+          "median_outside": 1.8,
+          "ratio_to_median_outside": null,
+          "ratio_infinite": false,
+          "tenfold": false,
+          "symbol": "GFAP",
+          "ensembl_id": null,
+          "found": true,
+          "n_tissues": 51,
+          "role": "control"
+        }
+      ],
+      "semen_tenfold": [
+        "PRM1",
+        "PRM2",
+        "TNP1",
+        "ODF1",
+        "AKAP4",
+        "SEMG1",
+        "SEMG2",
+        "KLK3"
+      ],
+      "semen_max_outside_or_tie": [],
+      "controls_peaking_in_semen_tissues": [],
+      "columns": {
+        "gene": "Gene",
+        "tissue": "Tissue",
+        "level": "nTPM",
+        "symbol": "Gene name"
+      },
+      "zip_member": "rna_tissue_consensus.tsv",
+      "verdict_by_rule": "supports"
+    }
+  },
+  "caveats": [
+    "The file is human. It stands in for animals that emit semen, which is the pre-registered limit.",
+    "Where the median nTPM outside the four semen tissues is 0, a positive semen-tissue maximum meets the tenfold rule because it is greater than ten times zero.",
+    "The markers are sperm and seminal-plasma genes, not a sample of every transcript in semen.",
+    "A peak in the four organs does not show that no nutrient in semen ever passed through another organ. That reading was set aside before the test."
+  ]
+}
