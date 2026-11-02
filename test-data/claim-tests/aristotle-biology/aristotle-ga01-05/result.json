@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ga01-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-05",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:40:00Z",
+  "hypothesis": "If fishes have no testes, the FishBase reproduction table will not record a reproductive mode that the FishBase manual defines as males developing testes, or as hermaphroditism that includes testicular tissue.",
+  "pass_criterion": "Pre-registered. Using FishBase snapshot fb/v26.06 table reproduc.parquet, identify the mode column as the column whose non-null values intersect the manual's vocabulary (dioecism, protandry, protogyny, true hermaphroditism, parthenogenesis), allowing case and spacing differences. The unit is a distinct SpecCode. A species is recognized if any row has a vocabulary mode. A species is testicular if any row has dioecism, protandry, protogyny, or true hermaphroditism. Parthenogenesis does not count as testicular. The fish component supports 'no testes' only if the number of recognized species is at least 100 and the number of testicular species is 0. The joint claim (fishes and serpents) is supported only if the fish component supports it and a serpent dataset with the same rule also supports it. No serpent dataset is planned in this registration, so a fish pass does not by itself support the joint claim.",
+  "fail_criterion": "Pre-registered. Refutes the joint claim if the number of testicular fish species is at least 100, because the claim says fishes have no testes at all and fishes are inside its scope. Mixed if the testicular count is between 1 and 99 inclusive. Inconclusive with reason underpowered if fewer than 100 species have a recognized mode. Inconclusive with reason data-unavailable if the parquet cannot be fetched or no column matches the vocabulary. Inconclusive with reason other if there is no SpecCode column. A fish pass with serpents unmeasured is inconclusive with reason underpowered for the joint claim, and the fish count is still reported.",
+  "planned_datasets": [
+    "fishbase-fb-v26.06-reproduc"
+  ],
+  "test_contract": {
+    "expected_observation": "At least 100 FishBase species have a recognized reproductive mode and none of those modes is dioecism or a hermaphroditism that includes testicular tissue.",
+    "disconfirming_observation": "At least 100 species are coded dioecious or hermaphroditic in a mode the FishBase manual ties to testicular tissue.",
+    "admissible_datasets": "A public FishBase reproduction table, CC-BY-NC, not written from Aristotle, with one row-group per stock or species and a mode field using the manual's vocabulary. The raw table is not committed. Serpent data would have to be a separate public table; none is substituted from FishBase.",
+    "inference_method": "Count distinct SpecCode values by mode class. The manual's definition of dioecism (males develop testes, females develop ovaries) is the mapping from mode to 'testes present'. Thresholds are 0 versus at least 100 testicular species, as stated in the pass and fail criteria. Rows are not double-counted within a SpecCode."
+  },
+  "interpretation": "Aristotle treated the elongate male organs of fishes as spermatic ducts rather than testes. This test asks whether the public fish-reproduction compilation records modes that its own manual defines as involving testes. It does not re-section the gonad. A refutation from fishes refutes the joint statement. Snakes are not in FishBase and are not measured here.",
+  "caveats": [
+    "The parquet URL returned HTTP 200 on HEAD (about 381404 bytes in the bucket listing). The table was not opened, and no mode counts were computed.",
+    "The mode-to-testis mapping is the FishBase manual's definition, read from the manual page during dataset selection, not a histological measurement.",
+    "License is CC-BY-NC. The file is used for this non-commercial test and is not redistributed."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-379d5832-d98e-4d52-9a6a-8932cf4d582a",
+    "date": "2026-11-01"
+  }
+}

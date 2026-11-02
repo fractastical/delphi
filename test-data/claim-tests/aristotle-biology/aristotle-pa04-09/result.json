@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-pa04-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-09",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:40:00Z",
+  "hypothesis": "If every sea urchin has five gonads ('eggs'), five teeth and five stomach compartments, published specimen descriptions will give the count five for each of those structures and no other count.",
+  "pass_criterion": "Pre-registered. From the open-access article Ziegler et al. 2008, BMC Biology (PMC2500006), extract explicit counts. A count is an integer written as a digit 1-10 or as the word one through ten, in the same sentence as a structure word, within six tokens, and not part of a figure, table, file, page or year reference. Structure words: gonad, gonads, ova, ovum for gonads; tooth, teeth for teeth; stomach, stomachs for stomach compartments. The claim is supported only if at least three species have a gonad count, every extracted gonad count is 5, at least one tooth count is present and every tooth count is 5, and at least one stomach-compartment count is present and every stomach count is 5.",
+  "fail_criterion": "Pre-registered. Refutes if any extracted gonad count, tooth count or stomach-compartment count is an integer other than 5. A non-five gonad count refutes even when teeth or stomachs were not extracted, because the claim says the number of ova is five in all sea urchins. Mixed if every extracted gonad count is 5, at least two species have a gonad count, and tooth or stomach counts are missing. Inconclusive with reason underpowered if fewer than two species have an extracted gonad count and no non-five count was extracted. Inconclusive with reason data-unavailable if the article text cannot be fetched. A second file, Dryad 10.5061/dryad.7h44j0zr3 morphological nexus SI_File_4, is used only if the download is a NEXUS file: characters whose labels match gonad, tooth, teeth, lantern or stomach and whose states are numeric counts are scored with the same five-rule. If the download is not a NEXUS file, that file is unavailable and does not change the article verdict.",
+  "planned_datasets": [
+    "ziegler2008-pmc2500006",
+    "dryad-10.5061/dryad.7h44j0zr3-morphological-nexus"
+  ],
+  "test_contract": {
+    "expected_observation": "Every species or specimen with an explicit count has five gonads, five teeth and five stomach compartments.",
+    "disconfirming_observation": "Any explicit count of gonads, teeth or stomach compartments is an integer other than five.",
+    "admissible_datasets": "Published anatomical descriptions or a morphological character matrix of echinoids, with counts of gonads, lantern teeth or gut compartments, independent of Aristotle. Irregular and regular echinoids both count: the claim says all sea urchins.",
+    "inference_method": "Token-window extraction of integers next to structure words, excluding figure and table numbers. The universal is refuted by one non-five count. Support requires all three structures. Species identity is the Latin binomial in the same sentence or, if absent, the specimen name in that sentence."
+  },
+  "interpretation": "Aristotle's eggs are the gonads, his teeth are the five teeth of Aristotle's lantern, and his stomachs are the five gut compartments. A species without a lantern has no five-tooth lantern. Juvenile or abnormal specimens are not separable in the text and are not removed unless the sentence itself calls the count abnormal.",
+  "caveats": [
+    "A web-search snippet of this paper was visible while the dataset was being chosen. The snippet described pentamery in two regular urchins and a gonad count other than five in irregular urchins. The decision rule is the claim's own integer, five, and was not adjusted to that snippet. The measurement is whatever the script extracts from a fresh download of the article, not the snippet.",
+    "The article HTML returned HTTP 200 on a status check. The body was not used to set the rule. The Dryad nexus was not downloaded; file-stream requests to Dryad returned a bot-challenge page on a header probe."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-379d5832-d98e-4d52-9a6a-8932cf4d582a",
+    "date": "2026-11-01"
+  }
+}
