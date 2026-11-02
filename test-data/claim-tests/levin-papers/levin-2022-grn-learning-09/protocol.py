@@ -183,6 +183,17 @@ def structure_ok(rr, params, reactions) -> bool:
     return now_p == params and now_r == reactions
 
 
+def structure_ids_ok(rr, params, reactions) -> bool:
+    """True when the test has not added or removed parameters or reactions.
+
+    Parameter values are allowed to move when the deposited model itself has
+    events or rules that assign them. That is not an edit of edge strengths.
+    """
+    now_ids = tuple(rr.model.getGlobalParameterIds())
+    now_r = tuple(rr.model.getReactionIds())
+    return now_ids == tuple(k for k, _ in params) and now_r == reactions
+
+
 def selections(ids: list[str]) -> list[str]:
     return ["time"] + [f"[{s}]" for s in ids]
 
@@ -294,7 +305,13 @@ def evenly(items: list, k: int) -> list:
     return chosen
 
 
-def probe_horizon(rr, ids, horizons, original_boundary):
+def probe_horizon(rr, ids, horizons, original_boundary, params, reactions):
+    """Longest finite horizon that still has the deposited parameter values.
+
+    Some models fire events that rewrite rate constants late in a run. A horizon
+    that has already done that is not a test of the deposited network.
+    """
+    drifted = False
     for H in horizons:
         try:
             rr.resetToOrigin()
@@ -304,10 +321,13 @@ def probe_horizon(rr, ids, horizons, original_boundary):
             data = rr.simulate(0, float(H), 31)
             if not finite_table(data):
                 continue
-            return float(H), np.asarray(data, dtype=float)
+            if not structure_ok(rr, params, reactions):
+                drifted = True
+                continue
+            return float(H), np.asarray(data, dtype=float), drifted
         except Exception:
             continue
-    return None, None
+    return None, None, drifted
 
 
 def baseline_stats(data, ids, cfg):
@@ -359,9 +379,10 @@ class Budget:
 def analyze_loaded(rr, ids, boundary, params, reactions, cfg, budget: Budget):
     original_boundary = set(boundary)
     horizons = [float(h) for h in cfg["horizons"]]
-    H, data = probe_horizon(rr, ids, horizons, original_boundary)
+    H, data, drifted = probe_horizon(rr, ids, horizons, original_boundary, params, reactions)
     if H is None:
-        return {"baseline_ok": False, "skip_reason": "baseline-failed"}
+        reason = "parameters-drift-on-baseline" if drifted else "baseline-failed"
+        return {"baseline_ok": False, "skip_reason": reason}
     late, peak, bmin, end_state, t_end = baseline_stats(data, ids, cfg)
     if not structure_ok(rr, params, reactions):
         return {"baseline_ok": False, "skip_reason": "structure-changed-during-baseline"}
@@ -410,8 +431,8 @@ def analyze_loaded(rr, ids, boundary, params, reactions, cfg, budget: Budget):
                                 "ucs": ucs, "response": resp, "direction": direction,
                                 "factor": factor, "during": kind,
                             })
-                    if not structure_ok(rr, params, reactions):
-                        raise RuntimeError("parameters or reactions changed")
+                    if not structure_ids_ok(rr, params, reactions):
+                        raise RuntimeError("parameter or reaction identifiers changed")
                 except Exception:
                     memory_errors += 1
             if not memory_complete:
@@ -474,8 +495,8 @@ def analyze_loaded(rr, ids, boundary, params, reactions, cfg, budget: Budget):
                         "ucs": ucs, "response": resp, "direction": direction,
                         "end_state": stim_end, "end_time": stim_t,
                     })
-                if not structure_ok(rr, params, reactions):
-                    raise RuntimeError("parameters or reactions changed")
+                if not structure_ids_ok(rr, params, reactions):
+                    raise RuntimeError("parameter or reaction identifiers changed")
             except Exception:
                 phenotype_errors += 1
         if not phenotype_complete:
@@ -674,8 +695,8 @@ def analyze_loaded(rr, ids, boundary, params, reactions, cfg, budget: Budget):
                         "ucs_effect": ucs_kind,
                     })
             unclamp(rr, [ns], original_boundary)
-            if not structure_ok(rr, params, reactions):
-                raise RuntimeError("parameters or reactions changed")
+            if not structure_ids_ok(rr, params, reactions):
+                raise RuntimeError("parameter or reaction identifiers changed")
         except Exception:
             assoc_errors += 1
     if assoc_attempts and assoc_errors > 0.5 * assoc_attempts:
@@ -710,7 +731,8 @@ def analyze_loaded(rr, ids, boundary, params, reactions, cfg, budget: Budget):
         "associative_examples": assoc_examples if assoc_complete else [],
         "associative_screen_complete": assoc_complete,
         "associative_errors": assoc_errors,
-        "structure_unchanged": structure_ok(rr, params, reactions),
+        "structure_unchanged": structure_ids_ok(rr, params, reactions),
+        "parameter_values_match_deposited": structure_ok(rr, params, reactions),
         "wall_seconds": round(budget.used(), 3),
     }
 
@@ -745,18 +767,73 @@ def analyze_sbml_file(path: Path, cfg: dict) -> dict:
     return out
 
 
+def _is_sbml(blob: bytes) -> bool:
+    return b"<sbml" in blob[:8000].lower()
+
+
 def download_sbml(mid: str, dest: Path, log: list):
+    """Fetch the main SBML file for a curated BioModels id.
+
+    The files?format=xml URL is a manifest, and the bare download URL is a zip.
+    The SBML member named in the manifest is fetched with the filename query.
+    A zip member is used only if that query does not return SBML.
+    """
+    import io
+    import zipfile
+
     dest.parent.mkdir(parents=True, exist_ok=True)
-    for template in BIOMOD_URLS:
-        url = template.format(mid=mid)
+    manifest_url = BIOMD_URLS[0].format(mid=mid)
+    manifest = http_get(manifest_url, f"manifest:{mid}", log)
+    if manifest and _is_sbml(manifest):
+        dest.write_bytes(manifest)
+        log.append({
+            "download_url": manifest_url,
+            "retrieved_at": now_utc(),
+            "byte_size": len(manifest),
+            "sha256": sha256_bytes(manifest),
+            "http_status": 200,
+            "role": f"sbml:{mid}",
+            "final_url": manifest_url,
+            "error": None,
+        })
+        return manifest_url, manifest
+    name = None
+    if manifest:
+        match = re.search(rb"<main>.*?<name>([^<]+)</name>", manifest, re.DOTALL)
+        if match:
+            name = match.group(1).decode("utf-8", "replace").strip()
+    if name:
+        url = "https://www.ebi.ac.uk/biomodels/model/download/" + mid + "?filename=" + requests.utils.quote(name)
         blob = http_get(url, f"sbml:{mid}", log)
-        if not blob:
-            continue
-        head = blob.lstrip()[:200].lower()
-        if b"<sbml" not in head and b"<?xml" not in head and b"<sbml" not in blob[:2000].lower():
-            continue
-        dest.write_bytes(blob)
-        return url, blob
+        if blob and _is_sbml(blob):
+            dest.write_bytes(blob)
+            return url, blob
+    zurl = BIOMD_URLS[1].format(mid=mid)
+    zblob = http_get(zurl, f"zip:{mid}", log, max_bytes=25_000_000)
+    if zblob and zblob[:2] == b"PK":
+        try:
+            with zipfile.ZipFile(io.BytesIO(zblob)) as zf:
+                members = [n for n in zf.namelist() if n.lower().endswith(".xml")]
+                preferred = [n for n in members if n.endswith("_url.xml") or (name and n.endswith(name))]
+                for member in preferred + [n for n in members if n not in preferred]:
+                    data = zf.read(member)
+                    if not _is_sbml(data):
+                        continue
+                    dest.write_bytes(data)
+                    log.append({
+                        "download_url": zurl,
+                        "retrieved_at": now_utc(),
+                        "byte_size": len(data),
+                        "sha256": sha256_bytes(data),
+                        "http_status": 200,
+                        "role": f"sbml:{mid}",
+                        "final_url": zurl,
+                        "error": None,
+                        "zip_member": member,
+                    })
+                    return zurl, data
+        except Exception:
+            return None, None
     return None, None
 
 
@@ -906,12 +983,16 @@ def decide(claim_id: str, models: list[dict], panel: str, cfg: dict) -> dict:
         hab = sum(1 for m in completed if (m.get("habituation_pairs") or 0) > 0)
         sens = sum(1 for m in completed if (m.get("sensitization_pairs") or 0) > 0)
         assoc = sum(1 for m in completed if (m.get("associative_hits") or 0) > 0)
+        ids_ok = all(m.get("structure_unchanged") for m in completed) if completed else False
+        values_ok = all(m.get("parameter_values_match_deposited") is True for m in completed) if completed else False
         extra.update({
             "habituation_models": hab,
             "sensitization_models": sens,
             "associative_models": assoc,
             "models": [_assoc_row(m) for m in completed],
-            "topology_and_parameters_unchanged": all(m.get("structure_unchanged") for m in completed) if completed else False,
+            "parameter_identifiers_unchanged": ids_ok,
+            "parameter_values_match_deposited": values_ok,
+            "topology_and_parameters_unchanged": ids_ok and values_ok,
         })
         if hab >= 1 and sens >= 1 and assoc >= 1 and extra["topology_and_parameters_unchanged"]:
             return _pack("supports", None, extra, cfg, claim_id, panel)
@@ -944,6 +1025,7 @@ def _assoc_row(m):
         "associative_hits": m.get("associative_hits"),
         "associative_examples": m.get("associative_examples", [])[:4],
         "structure_unchanged": m.get("structure_unchanged"),
+        "parameter_values_match_deposited": m.get("parameter_values_match_deposited"),
     }
 
 
@@ -1022,7 +1104,8 @@ def summary_lines(claim_id: str, decision: dict) -> list[str]:
         lines.append(
             f"Models with habituation {e.get('habituation_models')}, sensitization {e.get('sensitization_models')}, "
             f"associative conditioning {e.get('associative_models')}. "
-            f"Parameters and reactions unchanged: {e.get('topology_and_parameters_unchanged')}."
+            f"Parameter identifiers unchanged: {e.get('parameter_identifiers_unchanged')}. "
+            f"Deposited parameter values unchanged: {e.get('parameter_values_match_deposited')}."
         )
     lines.append(f"Verdict {decision['verdict']}" + (f" ({decision['reason']})" if decision.get("reason") else "") + f", confidence {decision['confidence']}.")
     return lines
@@ -1035,6 +1118,7 @@ def run(spec: dict, here: Path) -> dict:
     data_dir = here / "data" / "sbml"
     data_dir.mkdir(parents=True, exist_ok=True)
     table_ids, table_files = discover_table_ids(cfg, log)
+    print(f"table-s1 identifiers: {len(table_ids)}", flush=True)
     order = [(mid, "table-s1") for mid in table_ids]
     for mid in sequential_ids(int(cfg["sequential_start"]), int(cfg["sequential_count"])):
         if mid not in table_ids:
@@ -1054,9 +1138,11 @@ def run(spec: dict, here: Path) -> dict:
         dest = data_dir / f"{mid}.xml"
         url = None
         blob = None
+        print(f"attempt {attempts} {mid} ({source})", flush=True)
         url, blob = download_sbml(mid, dest, log)
         if blob is None:
             skipped.append({"id": mid, "reason": "download-failed", "source": source})
+            print(f"skip {mid} download-failed", flush=True)
             continue
         meta_blob = http_get(META_URL.format(mid=mid), f"meta:{mid}", log, max_bytes=2_000_000)
         license_name = license_from_meta(meta_blob) if meta_blob else None
@@ -1064,6 +1150,7 @@ def run(spec: dict, here: Path) -> dict:
             result = analyze_sbml_file(dest, cfg)
         except Exception as exc:
             skipped.append({"id": mid, "reason": "load-failed", "error": str(exc)[:200], "source": source})
+            print(f"skip {mid} load-failed {exc}"[:240], flush=True)
             continue
         if not result.get("baseline_ok"):
             skipped.append({
@@ -1072,6 +1159,7 @@ def run(spec: dict, here: Path) -> dict:
                 "n_floating": result.get("n_floating"),
                 "source": source,
             })
+            print(f"skip {mid} {result.get('skip_reason')} n={result.get('n_floating')}", flush=True)
             continue
         file_rec = next((r for r in reversed(log) if r["role"] == f"sbml:{mid}" and r["http_status"] == 200), None)
         result["biomodels_id"] = mid
@@ -1082,6 +1170,13 @@ def run(spec: dict, here: Path) -> dict:
         result["sha256"] = file_rec["sha256"] if file_rec else sha256_bytes(blob)
         result["license"] = license_name
         models.append(result)
+        print(
+            f"kept {mid} n={result.get('n_floating')} H={result.get('horizon')} "
+            f"wall={result.get('wall_seconds')} memory={result.get('memory')} "
+            f"hab={result.get('habituation_pairs')} sens={result.get('sensitization_pairs')} "
+            f"assoc={result.get('associative_hits')}",
+            flush=True,
+        )
 
     panel = panel_name(table_ids, models)
     if not models:
@@ -1144,11 +1239,17 @@ def run(spec: dict, here: Path) -> dict:
 
     run_notes = [
         f"Run panel was {panel}. Table S1 identifier strings found: {len(table_ids)}. Download attempts: {attempts}. Baseline-ok models: {len(models)}.",
-        "Stimuli were temporary boundary clamps of existing species. Global parameters and reaction identifiers were checked after the screens and did not change.",
+        "Stimuli were temporary boundary clamps of existing species. The test does not assign parameter values and does not add or remove reactions.",
         "This computation does not show that the claim holds in organisms.",
     ]
     if any(not m.get("structure_unchanged", False) for m in models):
-        run_notes.append("At least one model reported a parameter or reaction change; those associative counts are not treated as fixed-topology hits.")
+        run_notes.append("At least one model gained or lost a parameter or a reaction during the screens. Those models are not treated as fixed-topology hits.")
+    elif models:
+        run_notes.append("Parameter identifiers and reaction identifiers matched the deposited models after the screens.")
+    if any(m.get("parameter_values_match_deposited") is False for m in models):
+        run_notes.append("On at least one model, global parameter values at the end of the screens differed from the deposited values. The test never assigns parameters; the difference is left to the model's own rules and events. For levin-2025-wisdom-04 that difference counts as a changed parameter.")
+    elif models:
+        run_notes.append("Global parameter values at the end of the screens matched the deposited values.")
 
     return {
         "datasets": datasets,
@@ -1246,6 +1347,7 @@ def self_test() -> None:
             "associative_hits": assoc,
             "associative_screen_complete": True,
             "structure_unchanged": True,
+            "parameter_values_match_deposited": True,
         }
     # Sensitization rarely broken, habituation often broken.
     group = []
@@ -1263,6 +1365,12 @@ def self_test() -> None:
     group = [pheno(i, 1, 1, 1, 0, 1, 0, 0) for i in range(6)]
     d = decide("levin-2025-wisdom-04", group, "sequential-biomodels", fake_cfg)
     assert d["verdict"] == "refutes", d
+    # Deposited parameter values that differ still count as a changed parameter.
+    drifted = [pheno(i, 1, 1, 1, 0, 1, 0, 1) for i in range(6)]
+    for row in drifted:
+        row["parameter_values_match_deposited"] = False
+    d = decide("levin-2025-wisdom-04", drifted, "sequential-biomodels", fake_cfg)
+    assert d["verdict"] == "refutes" and d["extra"]["topology_and_parameters_unchanged"] is False, d
     # Phenotypes that do not survive the two-pulse retest are not a rate comparison.
     group = [pheno(i, 2, 2, 0, 0, 0, 0, 1) for i in range(4)]
     d = decide("levin-2022-grn-learning-18", group, "table-s1", fake_cfg)
