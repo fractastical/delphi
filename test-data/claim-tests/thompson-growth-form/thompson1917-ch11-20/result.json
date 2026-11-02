@@ -1,0 +1,135 @@
+{
+  "claim_id": "thompson1917-ch11-20",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-20",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If a cephalopod septum is the soap-film surface of minimal area spanned by its suture, then on a measured septal mesh the median absolute mean curvature on the face, away from a boundary strip, is near zero; a spherical cap, which Thompson also predicts for a straight cone with a planar suture, has constant non-zero mean curvature and is recorded separately rather than counted as minimal.",
+  "pass_criterion": "Pre-registered. This curvature test runs only on an admissible mesh: a septal surface segmented from a scan or physical specimen of a nautiloid, orthocone or ammonoid, under a licence that allows anonymous download. It is inadmissible if the published method says the surface was built as a hemisphere, extruded and then smoothed toward a minimum-curvature surface, or is a finite-element stress table without node coordinates, or is one smoothed mesh of a whole fossil from which a septum would have to be cut by a rule that was not registered. On an admissible mesh, sample mean curvature H at face vertices after discarding a boundary strip 5% of the diameter wide. The minimal-area reading is supported if the median of |H| times the mesh diameter is at most 0.05 and at least 80% of face vertices lie within twice that median. The spherical reading, scored only for sutures whose boundary is within 10% of planar and circular, is supported if a best-fit sphere leaves a median radial residual below 2% of the radius and beats the best-fit plane by at least a factor of two in residual. The claim is supported only when the minimal-area reading holds. The spherical reading is reported beside it.",
+  "fail_criterion": "Pre-registered. On an admissible mesh the minimal-area reading is refuted if the median of |H| times diameter exceeds 0.20. A value between 0.05 and 0.20 is mixed. If no admissible mesh can be downloaded without an account, the verdict is inconclusive with reason data-unavailable. A surface that was constructed to be minimal is not counted as a refutation or a confirmation.",
+  "planned_datasets": [
+    "morphosource-media-000101204-spirula-ct",
+    "zenodo-4308813-peterman-septa-camerae-stl",
+    "zenodo-5539406-cherns-sigaloceras-stl-filenames",
+    "figshare-3475058-lemanis-fea-nodal-stress"
+  ],
+  "test_contract": {
+    "expected_observation": "A septal surface measured from a specimen has mean curvature near zero on its face, the discrete analogue of a soap film of minimal area spanned by the suture.",
+    "disconfirming_observation": "Face mean curvature that stays large compared with the septum's diameter, including a spherical cap, which is a surface of constant non-zero mean curvature rather than a minimal surface.",
+    "admissible_datasets": "Anonymously downloadable coordinates of a real septal surface. Account-gated archives, stress-only finite-element tables, and surfaces the authors generated as minimum-curvature or hemispherical models are not admissible. Book figures are not admissible.",
+    "inference_method": "Discrete mean curvature on the face, scaled by diameter, with the thresholds in pass_criterion and fail_criterion. If the admissibility checks find no such mesh, the verdict is data-unavailable and no curvature is imputed."
+  },
+  "interpretation": "Thompson equates an isotropic membrane under uniform pressure with a soap-bubble surface and then with a surface of minimal area, and he also says a perpendicular septum in a straight circular cone is a spherical cap. A spherical cap has constant non-zero mean curvature; the minimal surface on a planar circular suture is the flat disk. The registered test scores the minimal-area sentence, which is the sentence in the claim, and reports the spherical sentence separately so the two are not treated as the same observation. MorphoSource is the archive named in the assessments; its download API requires an API key. The other three records are the open files found by a metadata search and are checked for admissibility rather than assumed to be septal scans. No mesh was downloaded before this registration.",
+  "caveats": [
+    "The curvature thresholds stay as pre-registered and were not applied. No admissible mesh was downloaded, so no median mean curvature is reported.",
+    "MorphoSource's download host did not resolve from this environment, and the public media page is a bot wall. An account with an API key would be a different access route than the one this test allows.",
+    "Zenodo 4308813 is inadmissible because the record describes virtual models with smoothed versions, and the registered rule excludes a surface built toward minimum curvature or as a hemisphere. The zip was not opened. The construction detail is the one named in analysis.py (Scientific Reports, s41598-021-87379-5); this run re-read the Zenodo description, not the paper PDF.",
+    "Cherns mesh names were read from the ZIP central directory only. The 49 names are listed in derived/measured.json. None contains 'sept'.",
+    "Figshare 3475058 file sizes are the API sizes. The workbooks were not downloaded. Book figures were not measured."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/thompson-ch11-03-16-20-6ab6",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "morphosource-media-000101204-spirula-ct",
+      "name": "MorphoSource media 000101204",
+      "landing_url": "https://www.morphosource.org/concern/media/000101204",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [],
+      "role": "Planned Spirula CT. Page HTTP 200, 7478 bytes, bot wall. Download API did not resolve.",
+      "check": {
+        "page_status": 200,
+        "page_bytes": 7478,
+        "mentions_bot_wall": true,
+        "download_error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+        "retrieved_at": "2026-11-02T00:36:43Z"
+      }
+    },
+    {
+      "id": "zenodo-4308813-peterman-septa-camerae-stl",
+      "name": "Septa and camerae models for cameral liquid retention experiments",
+      "landing_url": "https://zenodo.org/api/records/4308813",
+      "doi": "10.5281/zenodo.4308813",
+      "version": null,
+      "license": "cc-by-3.0",
+      "files": [],
+      "role": "Metadata only. Virtual STL models, including smoothed versions. The zip was not downloaded. Inadmissible as a constructed surface."
+    },
+    {
+      "id": "zenodo-5539406-cherns-sigaloceras-stl-filenames",
+      "name": "SI for Cherns et al \"Correlative tomography of exceptionally preserved Jurassic ammonite implies hyponome-propelled swimming\"",
+      "landing_url": "https://zenodo.org/api/records/5539406",
+      "doi": "10.5281/zenodo.5539406",
+      "version": null,
+    "license": "cc-by-4.0",
+    "files": [],
+      "role": "Filenames of meshes inside stl_model_meshes.zip. None is a septum."
+    },
+    {
+      "id": "figshare-3475058-lemanis-fea-nodal-stress",
+      "name": "Raw Data for FEA models of the labeled Shells",
+      "landing_url": "https://api.figshare.com/v2/articles/3475058",
+      "doi": "10.6084/m9.figshare.3475058.v1",
+      "version": "v1",
+      "license": null,
+      "files": [],
+      "role": "Metadata only. Nodal displacement and principal stress, not septal coordinates. The workbooks were not downloaded."
+    }
+  ],
+  "method": "Queried the four planned records and did not download any mesh or workbook. MorphoSource media page returned HTTP 200 and 7478 bytes and mentions a bot wall. api.morphosource.org returned URLError: <urlopen error [Errno -2] Name or service not known>. Zenodo 4308813 (cc-by-3.0) lists CameralLiquidRetentionModels.zip at 250811286 bytes; the description calls the contents virtual models, including smoothed versions. The ZIP central directory of Zenodo 5539406 stl_model_meshes.zip (311952540 bytes, HTTP 206) has 49 names and 0 containing 'sept'. Figshare 3475058 describes nodal displacement and principal stress. No mean curvature was computed.",
+  "measured": {
+    "value": 0,
+    "unit": "admissible septal meshes",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "n_admissible": 0,
+      "note": "No anonymously downloadable mesh of a real septum was found.",
+      "morphosource_page_status": 200,
+      "morphosource_page_bytes": 7478,
+      "morphosource_bot_wall": true,
+      "morphosource_download_error": "URLError: <urlopen error [Errno -2] Name or service not known>",
+      "peterman_zip_bytes": 250811286,
+      "peterman_license": "cc-by-3.0",
+      "cherns_n_names": 49,
+      "cherns_septal_names": [],
+      "cherns_stl_zip_bytes": 311952540,
+      "cherns_license": "cc-by-4.0",
+      "figshare_files": [
+        {
+          "name": "Raw Data Nautilus.xlsx",
+          "size": 289727021
+        },
+        {
+          "name": "Raw Data Spirula.xlsx",
+          "size": 123010428
+        },
+        {
+          "name": "Raw Data Cadoceras 5 septa.xlsx",
+          "size": 88913932
+        },
+        {
+          "name": "Raw Data Cadoceras 10 septa.xlsx",
+          "size": 106874647
+        }
+      ],
+      "curvature_computed": false
+    }
+  },
+  "data_kind": "none",
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.8,
+  "deviations": [],
+  "results_summary": [
+    "Verdict inconclusive, reason data-unavailable. Zero of the four planned records is an anonymously downloadable mesh of a real septum.",
+    "MorphoSource page 7478 bytes, bot wall True; download error: URLError: <urlopen error [Errno -2] Name or service not known>.",
+    "Peterman zip 250811286 bytes, license cc-by-3.0, not downloaded. Cherns central directory 49 names, septal names []."
+  ]
+}
