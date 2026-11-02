@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha03-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-01",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If no fish, no other gill-bearing animal and no serpent has testes, then public BioSample records will not label testis tissue from any actinopterygian or chondrichthyan fish, from the gilled amphibian Ambystoma mexicanum, or from any snake.",
+  "pass_criterion": "Pre-registered. This presence-only search cannot confirm the claim. A pass would require an explicit anatomical survey that scores male gonads for at least 20 fish species and at least 5 snake species and records testes as absent in every male. No such survey is in the planned datasets. Do not return supports from a negative search.",
+  "fail_criterion": "Pre-registered. Refute if at least one species whose NCBI lineage contains Actinopterygii or Chondrichthyes, or at least one species whose lineage contains Serpentes, or Ambystoma mexicanum, has at least one BioSample whose tissue or organism-part attribute value matches testis, testes, testicle or testicles. The value rule: the attribute name matches organism part, tissue or isolation source; the value contains that word, is at most 60 characters, and does not contain no, not, without, absent or lacking. Cell lines count. Queries that fail to load are not evidence of absence. If every planned query fails, the verdict is inconclusive with reason data-unavailable. If the queries succeed and no qualifying sample is found, the verdict is inconclusive with reason other, because a missing sample is not a recorded absence.",
+  "planned_datasets": [
+    "ebi-biosamples",
+    "ncbi-biosample"
+  ],
+  "test_contract": {
+    "expected_observation": "No BioSample from a fish, from Ambystoma mexicanum, or from a snake carries a testis or testes tissue label. That observation would still not confirm the claim, because the databases do not record absence.",
+    "disconfirming_observation": "One or more BioSamples whose structured tissue attribute is testis or testes, from a species in Actinopterygii, Chondrichthyes, Serpentes, or from Ambystoma mexicanum.",
+    "admissible_datasets": "Public sample registries that state the anatomical source of a biological sample and the organism, with a taxonomy lineage that can be checked. Species accounts that merely use the word in a narrative are not counted. The pre-registered organism panel is Danio rerio, Oryzias latipes, Takifugu rubripes, Gasterosteus aculeatus, Oreochromis niloticus, Salmo salar, Gadus morhua, Sparus aurata, Scyliorhinus canicula, Raja clavata, Python bivittatus, Thamnophis sirtalis, Pantherophis guttatus, Vipera berus, Naja naja, Crotalus viridis and Ambystoma mexicanum, plus up to 10 pages of an open EBI organism-part=testis search.",
+    "inference_method": "A species counts once if any retrieved sample passes the attribute rule and the lineage rule. One such species refutes the universal negative. Zero such species, after successful queries, is inconclusive rather than support. Precedence: data-unavailable if the services cannot be read; else refutes if the species count is at least 1; else inconclusive."
+  },
+  "interpretation": "The claim's own measurable quantity is presence or absence of testes in male fishes and snakes. Testis is read as the male gonad, which is what modern sample registries label, not as an external scrotum. Aristotle's word can mean the scrotal organ; that narrower reading is not what this test measures and is stated as a limit, not as a second verdict. Ambystoma mexicanum stands in for the clause about gill-bearing animals other than fishes. Cetaceans, which the claim excepts, are not queried.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7efa",
+    "date": "2026-11-01"
+  }
+}
