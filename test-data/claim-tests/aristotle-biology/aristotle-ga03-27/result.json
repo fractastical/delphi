@@ -2,8 +2,9 @@
   "claim_id": "aristotle-ga03-27",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-27",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:39:45Z",
+  "preregistration_commit": "063e6e8e6845fe2d4aa5d72d9ee5b8ede3dc6a08",
   "hypothesis": "If every testacean arises spontaneously from putrefying mud, then testacean species that have a recorded reproductive mode are recorded as arising without parents, and are not recorded as reproducing by eggs, larvae, or sexual spawning.",
   "pass_criterion": "Pre-registered. Score each in-scope species once. A species is in scope when its class is Bivalvia, Gastropoda, Polyplacophora, Scaphopoda, Monoplacophora, Thecostraca, Cirripedia, or Hexanauplia, or when its order is a barnacle order (name contains Cirripedia, Sessilia, Pedunculata, Balanomorpha, Lepadomorpha, Thoracica, Kentrogonida, or Rhizocephala). Class Cephalopoda is always out of scope. A species is scored when the SeaLifeBase reproduc or larvae tables contain a non-empty letter-bearing value in a reproductive-mode field (column name contains repro, fertil, spawn, larva, egg, or guild, and does not contain ref, author, date, or remark). Scored species are parental if that text does not match spontaneous generation, abiogenesis, or putrefaction, because those fields record a parental mode (dioecy, hermaphroditism, eggs, spawning, fertilization, or a larval stage). They are spontaneous only if the text matches spontaneous, abiogenesis, putref, or arising from mud. share_parental = n_parental / n_scored, with n_scored = n_parental + n_spontaneous. SUPPORTS if n_scored >= 30 and share_parental <= 0.05.",
   "fail_criterion": "Pre-registered. REFUTES if n_scored >= 30 and share_parental >= 0.50. MIXED if n_scored >= 30 and 0.05 < share_parental < 0.50. INCONCLUSIVE, reason underpowered, if the tables are retrieved but n_scored < 30. INCONCLUSIVE, reason data-unavailable, if the SeaLifeBase tables cannot be retrieved.",
@@ -17,6 +18,90 @@
     "admissible_datasets": "A public, versioned life-history table of marine invertebrates that records reproductive mode or larval development for named species, with a taxonomy that can place those species in the classes above, independent of Aristotle's text. Licence must allow research reuse.",
     "inference_method": "One row per species. Denominator is species with a non-empty letter-bearing reproductive-mode or larval-mode field. Numerator is those whose text records a parental mode rather than spontaneous generation, abiogenesis, or putrefaction. Thresholds: support at share_parental <= 0.05 with n_scored >= 30; refute at share_parental >= 0.50 with n_scored >= 30; mixed in between; underpowered below 30 scored species."
   },
+  "datasets": [
+    {
+      "id": "sealifebase-slb-v26.06",
+      "name": "SeaLifeBase slb/v26.06 parquet snapshot (species, species_hierarchy, reproduc, larvae)",
+      "landing_url": "https://www.sealifebase.se/",
+      "doi": null,
+      "version": "slb/v26.06",
+      "license": "CC-BY-NC-4.0 (declared in the snapshot README at https://data.source.coop/cboettig/fishbase/README.md)",
+      "files": [
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/slb/v26.06/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:45:24Z",
+          "byte_size": 3890724,
+          "sha256": "ed34c481f06e7b81af0fdca8f38309b13184b83afc87ed357710f5ff3e369df6"
+        },
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/slb/v26.06/parquet/species_hierarchy.parquet",
+          "retrieved_at": "2026-11-02T00:45:25Z",
+          "byte_size": 57068,
+          "sha256": "21abd2bebab883c42b04c0819fc3b2f1128290b31ef433ebd04d35775f9fc201"
+        },
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/slb/v26.06/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T00:45:25Z",
+          "byte_size": 504550,
+          "sha256": "4d5fecaae59fdbc10d5844be60d31b7e9c40dd8eea4c9d2d0a0aca9e1acb6bb6"
+        },
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/slb/v26.06/parquet/larvae.parquet",
+          "retrieved_at": "2026-11-02T00:45:26Z",
+          "byte_size": 59444,
+          "sha256": "e08a500221098e1f25a42447d5974e64c79808e61db3576e6fd0f9e80c195c78"
+        }
+      ],
+      "role": "reproductive mode and class/order for shelled molluscs and barnacles"
+    }
+  ],
+  "method": "analysis.py downloads the four SeaLifeBase parquet tables, joins species to species_hierarchy on FamCode, and keeps the pre-registered classes plus barnacle orders. For each in-scope species it concatenates letter-bearing values from mode columns in reproduc and larvae (column name contains repro, fertil, spawn, larva, egg, or guild, and not ref, author, date, or remark). A species is spontaneous if that text matches spontaneous, abiogenesis, putref, or 'from mud'; otherwise it is parental. share_parental is n_parental / n_scored. Counts are written to derived/measured.json, derived/by_class.csv, derived/fouling.csv, and derived/mode_values.csv.",
+  "measured": {
+    "value": 1.0,
+    "unit": "share of scored testacean species with a parental reproductive mode",
+    "n": 14297,
+    "uncertainty": null,
+    "extra": {
+      "n_in_scope": 28644,
+      "n_parental": 14297,
+      "n_spontaneous": 0,
+      "share_parental": 1.0,
+      "n_scored_with_reproduc_text": 14292,
+      "n_scored_larvae_only": 5,
+      "n_fouling_species_in_scope": 199,
+      "n_fouling_scored": 112,
+      "n_fouling_parental": 112,
+      "n_scored_excluding_gastropoda": 6480,
+      "n_parental_excluding_gastropoda": 6480,
+      "n_scored_excluding_shell_less_orders": 14295,
+      "n_parental_excluding_shell_less_orders": 14295,
+      "n_in_scope_repromode_dioecism": 12749,
+      "n_in_scope_repromode_protandry": 34,
+      "n_in_scope_repromode_protogyny": 0,
+      "n_in_scope_repromode_hermaphroditism": 2,
+      "n_in_scope_repromode_parthenogenesis": 1,
+      "n_in_scope_repromode_binary_fission": 0,
+      "n_in_scope_fertilization_external": 6380,
+      "n_in_scope_fertilization_internal": 7880,
+      "larva_only_names": [
+        "Architectonica perspectiva",
+        "Cancellaria cooperii",
+        "Concholepas concholepas",
+        "Tetraclita rubescens",
+        "Thais bufo"
+      ]
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.92,
+  "caveats": [
+    "14,297 of 28,644 in-scope species are scored, and all 14,297 are parental (share_parental = 1.0, above the 0.50 refute line). The other 14,347 have no letter-bearing mode field. A blank is not a record of origin from mud.",
+    "The reproduc values that score species are dioecism (12,749 species), protandry (34), true hermaphroditism (2), parthenogenesis (1), external fertilization (6,380), internal fertilization (7,880), plus smaller guild and spawning-season fields. None of the scored text matched spontaneous generation, abiogenesis, putrefaction, or arising from mud. The table has no controlled term for spontaneous generation, so the refute is the positive parental records.",
+    "Five species are scored only because larvae.LarvalArea holds a place name. Dropping them leaves the 14,292 species with reproduc text, still all parental. Excluding Gastropoda leaves 6,480/6,480 parental. Excluding shell-less gastropod orders leaves 14,295/14,295.",
+    "Of 199 in-scope species in the pre-registered fouling genera, 112 are scored and all 112 are parental. Crepidula (46 species) has no scored mode in this snapshot. Animals on boat sides are the quote's illustration; the verdict is the universal, not that subset.",
+    "Barnacles entered as class Thecostraca (989 in scope, 664 scored). Cirripedia and Hexanauplia were not class names in this snapshot. Cephalopods were excluded as pre-registered. SeaLifeBase is denser for fished and fouling species than for the whole fauna, and the snapshot is CC-BY-NC-4.0."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "Grok 4.7",
