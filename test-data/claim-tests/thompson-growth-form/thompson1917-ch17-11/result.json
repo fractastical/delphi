@@ -1,0 +1,34 @@
+{
+  "claim_id": "thompson1917-ch17-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch17-11",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:44Z",
+  "hypothesis": "A single smooth deformation that leaves the head fixed and increases toward the tail carries the body outline of a Diodon onto the body outline of Mola (Orthagoriscus), closely enough that separate warps of body regions are unnecessary.",
+  "pass_criterion": "Pre-registered (supports). After the pre-registered alignment and head-depth scaling, the symmetric mean nearest-point distance D_map of the best three-parameter posterior stretch (vertical quadratic expansion and linear axial compression behind the head, plus one vertical translation t) must be <= 0.35 head-depth units, <= 0.60 times the distance D_sim of head-scaled alignment with no stretch, and <= 1.40 times the distance D_flex of a four-bin modular vertical warp of the posterior body. The fitted head shift must satisfy |t| <= 0.15 head-depth units.",
+  "fail_criterion": "Pre-registered (refutes). D_map > 0.70 head-depth units, or D_map > 0.90 times D_sim. If the outline quality gates pass but neither the support rule nor the refute rule holds, including a map that would otherwise support but has |t| > 0.15, the verdict is mixed. If either species yields no image that passes the mask quality gate, the verdict is inconclusive with reason data-unavailable. Landmarks are not placed by hand.",
+  "planned_datasets": [
+    "fishbase-photographs-diodon-hystrix-speccode-1022",
+    "fishbase-photographs-mola-mola-speccode-1732"
+  ],
+  "test_contract": {
+    "expected_observation": "One head-fixed posterior stretch of the Diodon outline lands on the Mola outline nearly as well as a warp that scales four body regions separately, and much better than head-scaled alignment with no stretch.",
+    "disconfirming_observation": "The same one-parameter-family stretch leaves a large outline residual, or barely improves on alignment without a stretch.",
+    "admissible_datasets": "Open lateral whole-body photographs or silhouettes of a living or preserved Diodon (hystrix first, otherwise another Diodon species) and of Mola mola, not copied from Thompson's figures. The image must segment into one simple side-view body under the quality gate below. Museum meshes behind a login are not used.",
+    "inference_method": "Isotropic scaling so that mean absolute outline height over the anterior quarter equals 1. Fit of y' = y*(1+a*u+b*u^2) and x' = x_h+(x-x_h)*(1+c*u) on the posterior three quarters, plus a translation t, minimising symmetric mean nearest-point distance. Compared with t-only alignment and with four independent posterior vertical scales. Thresholds as in pass_criterion and fail_criterion."
+  },
+  "interpretation": "Thompson starts from a typical Diodon, deforms its vertical coordinates into concentric circles and its horizontal coordinates into curves like hyperbolas, and says the carried-over outline is an Orthagoriscus, by one integral transformation, with the head, opercular opening and pectoral fin nearly unchanged and the modification increasing toward the periphery: rounded body, tall dorsal and ventral fins, truncated tail. The test uses external body outlines only, not the skeleton he also mentions. The fitted family is the part of that description that is a single map fixed on the head and growing toward the tail. It is not a claim that every tetraodontiform is an affine copy of every other. Spines are smoothed because his figure follows the body, not each spine. Matching head depth implements 'head size unchanged'; total length is not the scale.",
+  "planned_method": "From each FishBase ThumbnailsSummary page (speccode 1022 and 1732), download the species JPEGs linked as images/species/. Do not commit them. If Diodon hystrix has no image passing the gate, the script may take the FishBase page for Diodon holocanthus, found by name from the genus list, under the same gate. Mask: grayscale, Otsu threshold, keep the polarity whose largest component meets the gate, drop components under 1 percent of the image. Gate: one component at least five times the next, area 8 to 85 percent of the image, bounding-box width/height between 0.8 and 3.5, solidity at least 0.7. If several pass, take the highest solidity. Orient major axis horizontal, snout to the left by the pointier end or by an eye-like dark blob, and try both dorsal-up reflections, keeping the lower distance. Smooth the contour with a moving average of one fiftieth of the perimeter, resample to 300 points. Fit a, b, c, t by bounded Nelder-Mead from ten pre-set starts. Bounds: a and b in [-0.5, 6], c in [-0.8, 1.5], t in [-0.5, 0.5]; modular bin scales in [0.3, 6]. Distances and parameters written by the script are the only numbers in measured.",
+  "caveats_before_data": [
+    "Before this file was committed, FishBase summary pages were requested only far enough to confirm that speccode 1732 is Mola mola and speccode 1022 is Diodon hystrix and that ThumbnailsSummary.php lists species JPEGs. No image file was downloaded and no outline was computed.",
+    "A photograph's background can fail the quality gate. That failure is data-unavailable, not a biological result.",
+    "The map family was chosen from Thompson's prose (head fixed, change increasing posteriorly, one transformation). It is not a reproduction of the particular circles-and-hyperbolas drawing, which cannot be recovered from the prose alone without his figure."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "claim_id": "thompson1917-ch11-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-14",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:44Z",
+  "hypothesis": "Along the shell of the ammonoids Thompson names, the local spiral angle changes in the direction he states: it increases where the whorls narrow (Oekotraustes / Oecotraustes), and it decreases toward a gentle, nearly straight curve where the coil opens (Scaphites, Ancyloceras, Lituites).",
+  "pass_criterion": "Pre-registered (supports). For each genus that yields a usable lateral or median-section outline of one whole shell, estimate the local spiral angle alpha as the median angle, in degrees, between the radius from the coiling pole and the tangent of the ventral outline. Compare alpha_early (middle of the coiled portion: arc-length fraction 0.25 to 0.50, starting at the inner whorls) with alpha_late (the last 0.25 of arc length toward the aperture). Oekotraustes/Oecotraustes matches if alpha_late > alpha_early + 10 degrees. Scaphites, Ancyloceras and Lituites each match if alpha_late < alpha_early - 15 degrees and alpha_late < 60 degrees. The claim is supported if at least two genera are usable and every usable genus matches.",
+  "fail_criterion": "Pre-registered (refutes). At least two genera are usable, and at least two of them change by the stated margin in the opposite direction (Oekotraustes/Oecotraustes decreasing by more than 10 degrees, or an uncoiling genus increasing by more than 15 degrees). If at least two genera are usable and the outcomes are split, the verdict is mixed. If fewer than two genera yield a usable outline, or every open image fails the quality gate, or the only files are behind a login, the verdict is inconclusive with reason data-unavailable. A juvenile whorl-expansion series that the source says stops before the adult hook or the narrowing body chamber is not a usable series for this claim. Outlines are not traced by hand and angles are not guessed from a photograph.",
+  "planned_datasets": [
+    "wikimedia-commons-files-for-oekotraustes-scaphites-ancyloceras-lituites",
+    "idigbio-media-for-those-genera",
+    "morphosource-media-search-for-those-genera"
+  ],
+  "test_contract": {
+    "expected_observation": "On whole shells of the named genera, local spiral angle increases through growth in Oekotraustes and decreases toward a small angle on the opened coil of Scaphites, Ancyloceras and Lituites.",
+    "disconfirming_observation": "The measured late angle moves the other way by the pre-registered margin in at least two of those genera.",
+    "admissible_datasets": "Open lateral or median-section images or vector drawings of one whole shell per genus, showing the coiled whorls and, for the uncoiling genera, the shaft or hook. Not Thompson's own figures. Not a login-walled mesh. Not an ontogenetic table limited to juvenile whorls before the morphology he describes.",
+    "inference_method": "Coiling pole fitted on the inner half of the ventral outline by minimising the variance of the tangent-radius angle. Local alpha is the median tangent-radius angle on the early window and on the late window. Match and mismatch use the margins in pass_criterion and fail_criterion. Fewer than two usable genera is data-unavailable rather than a refutation."
+  },
+  "interpretation": "Thompson's alpha is the angle between the tangent and the radius vector of the spiral, the same angle he tabulates against the whorl-breadth ratio (large alpha, near 80 to 85 degrees, is a slowly expanding coil; alpha falling toward 0 opens the coil). An increase of alpha narrows successive whorls; a decrease opens them, as in the hooked or straightened body chambers of Scaphites, Ancyloceras and Lituites. He spells the narrowing genus Oekotraustes; the same genus is searched under the later spelling Oecotraustes. The claim is that this change of angle is what those outlines are, so the test follows alpha along one shell of each named genus. It does not test whether every ammonoid changes angle, and a dataset of normally coiled juveniles is a different question.",
+  "planned_method": "Search Wikimedia Commons, then iDigBio media, then MorphoSource, for each genus. Record HTTP status. If MorphoSource or another host requires a login, do not authenticate and do not estimate an angle. Prefer an SVG path if one is returned; otherwise a JPEG or PNG under 8 MB. Segment or parse to one outline. Quality gate: a single spiral-bearing component whose contour length and bounding box are consistent with a side view of a shell (aspect ratio of the bounding box between 0.4 and 4, component area 5 to 90 percent of the image, solidity at least 0.4 to allow a coiled shell with an umbilicus). Fit the pole on the inner half. If the inner-half angle variance stays above 400 square degrees after the fit, the outline is unusable. Choose the file deterministically: SVG first, else the largest byte size that passes the gate. Do not commit images over 1 MB; commit only derived angle tables under 200 KB. The Springer supplement of Tajika and colleagues (10.1186/s13358-025-00397-y, MOESM2) was considered and is excluded before download because that paper's methods restrict the analysed diameters to about 2.5–9.5 mm, which is before the adult uncoiled body chamber the claim is about.",
+  "caveats_before_data": [
+    "Before this file was committed, no shell image was downloaded and no angle was measured. The decision to exclude the 2025 juvenile WER supplement uses that paper's stated size window, not the spreadsheet.",
+    "One shell per genus is a thin sample. The criterion therefore requires the named pattern in every genus that can be measured, and it refuses a verdict when fewer than two genera can be measured.",
+    "Automatic outlines of fossils fail often. A failed outline is data-unavailable, not evidence that the angle did not change."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
+    "date": "2026-11-01"
+  }
+}
