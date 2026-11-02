@@ -1,0 +1,151 @@
+{
+  "claim_id": "aristotle-ha06-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-11",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T01:00:00Z",
+  "hypothesis": "If the cuckoo is not a hawk, and hawks prey on it, which they do not do to their own species, the common cuckoo and the Eurasian sparrowhawk fall in different families, at least one public interaction records a hawk eating a common cuckoo, and no public interaction records a sparrowhawk eating a sparrowhawk.",
+  "pass_criterion": "Pre-registered (claim supported). Open Tree of Life assigns Cuculus canorus and Accipiter nisus to different families, the GloBI query of Accipitridae preying on Cuculus canorus returns at least one interaction, and the GloBI query of Accipiter nisus preying on Accipiter nisus returns none.",
+  "fail_criterion": "Pre-registered (claim refuted). The same family for both birds refutes 'not a hawk'. A successful predation query that returns zero interactions of Accipitridae on Cuculus canorus refutes 'has been seen to be preyed on by the hawk'. If the families differ and at least one cuckoo predation is recorded and at least one conspecific sparrowhawk predation is recorded, the verdict is mixed: they are not one kind, and the premise that this never happens within a species fails. If either API does not return a readable result, the verdict is inconclusive with reason data-unavailable. Talon shape and resemblance to a pigeon are not in these two sources and are not scored.",
+  "planned_datasets": [
+    "opentree-taxonomy-v3",
+    "globi-interactions"
+  ],
+  "test_contract": {
+    "expected_observation": "The common cuckoo and the sparrowhawk are in different families, a hawk is recorded eating a common cuckoo, and the sparrowhawk is not recorded eating its own species.",
+    "disconfirming_observation": "The two birds placed in one family, or a completed search that finds no hawk eating a common cuckoo. A record of a sparrowhawk eating a sparrowhawk removes the premise that such predation never happens within a species, which yields mixed rather than a simple refutation of the cuckoo's distinctness.",
+    "admissible_datasets": "The Open Tree of Life taxonomy for the family of Cuculus canorus and Accipiter nisus, and Global Biotic Interactions records whose source is in Accipitridae and whose target is Cuculus canorus, plus the same service for Accipiter nisus on itself. Interaction types counted as predation are preysOn, eats, and kills. Aristotle's sentence is not a source. Beak and claw measurements are not in these sources and are out of scope for this test.",
+    "inference_method": "Read the family from each Open Tree taxon record. Count GloBI interaction records of the two queries. Support only if the families differ, the cuckoo-predation count is at least 1, and the conspecific count is 0. Refute if the families match or the cuckoo-predation count is 0. Mixed if the families differ, the cuckoo count is at least 1, and the conspecific count is at least 1. No resolvability score is used."
+  },
+  "interpretation": "The quote's argument is that a hawk has been seen to eat a cuckoo, and that birds do not prey on their own species, so the cuckoo is not a hawk. 'Hawk' is read as Accipiter, and the sparrowhawk Accipiter nisus is the species used for the conspecific query. 'Not the same kind' is read as a different family in the Open Tree taxonomy, which is a modern classification and not Aristotle's. The claim's remarks on crooked talons and a pigeon-like head are not measured here.",
+  "caveats": [
+    "The two services were not queried for these taxa before the pass and fail rules were committed.",
+    "Open Tree places Cuculus canorus in Cuculidae (Cuculiformes) and Accipiter nisus in Accipitridae (Accipitriformes).",
+    "GloBI returned two preysOn rows for Accipitridae on Cuculus canorus (Accipiter nisus and Hieraaetus pennatus) and one preysOn row of Accipiter nisus on itself. Every returned study_title is null, so the count is of GloBI records, not of a paper read here.",
+    "Crooked talons and a pigeon-like head were not measured. The verdict is about family membership and the predation records only."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-ha-claim-tests-665a",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.6,
+  "datasets": [
+    {
+      "id": "opentree-taxonomy-v3",
+      "name": "Open Tree of Life taxonomy",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "doi": null,
+      "version": "ott3.7draft3",
+      "license": "not stated in the API response",
+      "files": [
+        {
+          "name": "tnrs-match-names.json",
+          "download_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+          "final_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+          "retrieved_at": "2026-11-02T00:32:07Z",
+          "byte_size": 1972,
+          "sha256": "2b7b7a021d9a21852de7fce806bb0aff57b38f3d2cc82995f2425c4a94d179cb"
+        },
+        {
+          "name": "taxon-info-792628.json",
+          "download_url": "https://api.opentreeoflife.org/v3/taxonomy/taxon_info",
+          "final_url": "https://api.opentreeoflife.org/v3/taxonomy/taxon_info",
+          "retrieved_at": "2026-11-02T00:32:08Z",
+          "byte_size": 10699,
+          "sha256": "a62ccd75f05fb12c2a455a9dd3b19b85b726f3ed649a430e34166d9b22e6992c"
+        },
+        {
+          "name": "taxon-info-238460.json",
+          "download_url": "https://api.opentreeoflife.org/v3/taxonomy/taxon_info",
+          "final_url": "https://api.opentreeoflife.org/v3/taxonomy/taxon_info",
+          "retrieved_at": "2026-11-02T00:32:08Z",
+          "byte_size": 10919,
+          "sha256": "efabd41c36f51dbe295713497ea60cc619b3ceeae09f165c13b24cc0da3bca8d"
+        }
+      ],
+      "role": "family and order of Cuculus canorus and Accipiter nisus"
+    },
+    {
+      "id": "globi-interactions",
+      "name": "Global Biotic Interactions",
+      "landing_url": "https://www.globalbioticinteractions.org/",
+      "doi": null,
+      "version": null,
+      "license": "not stated in the API response",
+      "files": [
+        {
+          "name": "accipitridae-on-cuculus.json",
+          "download_url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=Accipitridae&targetTaxon=Cuculus%20canorus&interactionType=preysOn",
+          "final_url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=Accipitridae&targetTaxon=Cuculus%20canorus&interactionType=preysOn",
+          "retrieved_at": "2026-11-02T00:32:08Z",
+          "byte_size": 1532,
+          "sha256": "dcb610a3f543689f0ef3c6118be0006f9d73e5d8faa16e51dc864af853bf111d"
+        },
+        {
+          "name": "accipiter-nisus-on-itself.json",
+          "download_url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=Accipiter%20nisus&targetTaxon=Accipiter%20nisus&interactionType=preysOn",
+          "final_url": "https://api.globalbioticinteractions.org/interaction?sourceTaxon=Accipiter%20nisus&targetTaxon=Accipiter%20nisus&interactionType=preysOn",
+          "retrieved_at": "2026-11-02T00:32:08Z",
+          "byte_size": 1071,
+          "sha256": "1a6eafa082402d051b6392c0519a2caded33313f8920708c9e741890683cc2b8"
+        }
+      ],
+      "role": "predation records of hawks on the common cuckoo, and of the sparrowhawk on itself"
+    }
+  ],
+  "measured": {
+    "value": 2,
+    "unit": "GloBI predation records of Accipitridae on Cuculus canorus",
+    "n": 3,
+    "uncertainty": "families {'Cuculus canorus': 'Cuculidae', 'Accipiter nisus': 'Accipitridae'}; conspecific Accipiter nisus records 1",
+    "extra": {
+      "families": {
+        "Cuculus canorus": "Cuculidae",
+        "Accipiter nisus": "Accipitridae"
+      },
+      "orders": {
+        "Cuculus canorus": "Cuculiformes",
+        "Accipiter nisus": "Accipitriformes"
+      },
+      "ott_id": {
+        "Cuculus canorus": 792628,
+        "Accipiter nisus": 238460
+      },
+      "cuckoo_predation": [
+        {
+          "source": "Accipiter nisus",
+          "interaction_type": "preysOn",
+          "target": "Cuculus canorus",
+          "study_title": null
+        },
+        {
+          "source": "Hieraaetus pennatus",
+          "interaction_type": "preysOn",
+          "target": "Cuculus canorus",
+          "study_title": null
+        }
+      ],
+      "conspecific_predation": [
+        {
+          "source": "Accipiter nisus",
+          "interaction_type": "preysOn",
+          "target": "Accipiter nisus",
+          "study_title": null
+        }
+      ],
+      "same_family": false
+    }
+  },
+  "deviations": [],
+  "method": "Matched both species in the Open Tree taxonomy and read the first family and the first order in each lineage. Counted GloBI rows whose interaction type is preysOn, eats, or kills for Accipitridae on Cuculus canorus and for Accipiter nisus on itself. Families: {'Cuculus canorus': 'Cuculidae', 'Accipiter nisus': 'Accipitridae'}. Cuckoo-predation rows: 2. Conspecific rows: 1.",
+  "results_summary": [
+    "Open Tree families: {'Cuculus canorus': 'Cuculidae', 'Accipiter nisus': 'Accipitridae'}. Orders: {'Cuculus canorus': 'Cuculiformes', 'Accipiter nisus': 'Accipitriformes'}.",
+    "Accipitridae on Cuculus canorus: 2 predation rows. Accipiter nisus on Accipiter nisus: 1.",
+    "Verdict mixed. Talon shape and pigeon resemblance were not scored."
+  ]
+}
