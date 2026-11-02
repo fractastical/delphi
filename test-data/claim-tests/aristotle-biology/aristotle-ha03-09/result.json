@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha03-09",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-09",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, brain tissue itself contains no blood vessels: endothelial-cell rows in parenchymal brain tissues of the Human Protein Atlas immunohistochemistry table are Not detected for the vessel-wall markers PECAM1, VWF and CD34.",
   "pass_criterion": "Pre-registered. This dataset cannot support the claim. The claim is a universal negative (in all animals the brain is bloodless and no vein runs within it). A Not detected result in human tissue does not establish that universal, so Not detected is not a pass. There is no pass_criterion that returns supports.",
   "fail_criterion": "Pre-registered (claim refuted). Among rows in normal_ihc_data.tsv whose Gene is ENSG00000261371 (PECAM1), ENSG00000110799 (VWF) or ENSG00000174059 (CD34), whose Tissue is a brain tissue in the Atlas cell-type codebook other than pituitary, choroid plexus, meninges, pia, dura, arachnoid or spinal cord, whose Cell type contains the substring endothelial (case-insensitive), and whose Reliability is Enhanced, Supported or Approved: the claim is refuted if at least one such row has Level Low, Medium or High. Not detected does not refute. Reliability Uncertain does not count. If the zip cannot be downloaded, the verdict is inconclusive with reason data-unavailable. If the file downloads but no endothelial row in an included brain tissue exists for any of the three genes, the verdict is inconclusive with reason underpowered. If every counted row is Not detected, the verdict is inconclusive with reason underpowered, not supports.",
@@ -17,9 +17,18 @@
   },
   "interpretation": "The sentence says two things: the brain itself has no blood, and no vein, large or small, runs inside it; veins stop in the membrane around the brain. The test uses the second clause. Endothelial proteins (PECAM1/CD31, von Willebrand factor, CD34) mark the vessel wall. Staining of endothelial cells in the cerebral cortex, cerebellum, hippocampus or another parenchymal brain tissue is a vein or capillary inside the brain, which the sentence denies. Staining limited to meninges or choroid plexus would not count. The dataset is human immunohistochemistry, so a positive result refutes 'in all animals' by a human counterexample, and a negative result does not show that every animal brain lacks vessels. Blood volume and flowing blood are not in the table; the measurement is the vessel wall.",
   "markers_preregistered": [
-    {"symbol": "PECAM1", "ensembl": "ENSG00000261371"},
-    {"symbol": "VWF", "ensembl": "ENSG00000110799"},
-    {"symbol": "CD34", "ensembl": "ENSG00000174059"}
+    {
+      "symbol": "PECAM1",
+      "ensembl": "ENSG00000261371"
+    },
+    {
+      "symbol": "VWF",
+      "ensembl": "ENSG00000110799"
+    },
+    {
+      "symbol": "CD34",
+      "ensembl": "ENSG00000174059"
+    }
   ],
   "excluded_tissues_preregistered": [
     "pituitary",
@@ -34,7 +43,8 @@
   "caveats": [
     "Criteria were written before normal_ihc_data.tsv.zip was downloaded and before any Level for these genes was read. Ensembl ids were checked with the lookup service only (symbol, id, biotype, description).",
     "The Atlas codebook lists endothelial cells as an annotated cell type in cerebral cortex. That listing is the sampling frame, not the staining result, and it is not used as a measurement.",
-    "A human counterexample can refute a claim about all animals. It cannot, by itself, prove the same anatomy in every other animal."
+    "A human counterexample can refute a claim about all animals. It cannot, by itself, prove the same anatomy in every other animal.",
+    "The standard codebook annotates endothelial cells for the brain only in the cerebral cortex. Cerebellum, caudate and hippocampus are in the codebook but have no endothelial row. Staining of glial cells, neurons, neuropil and Purkinje cells for these three genes is Not detected and is not used as the verdict."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -42,5 +52,358 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claim-tests-2a8b",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "measured": {
+    "value": 3,
+    "unit": "endothelial marker genes detected inside a brain tissue, of 3",
+    "n": 3,
+    "uncertainty": "PECAM1=Medium; VWF=High; CD34=High",
+    "extra": {
+      "included_tissues": [
+        "Caudate",
+        "Cerebellum",
+        "Cerebral cortex",
+        "Hippocampus"
+      ],
+      "genes_detected": [
+        "CD34",
+        "PECAM1",
+        "VWF"
+      ],
+      "genes_medium_or_high": [
+        "CD34",
+        "PECAM1",
+        "VWF"
+      ],
+      "genes_low_only": [],
+      "counted_endothelial_rows": [
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "High",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "Medium",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "High",
+          "Reliability": "Supported"
+        }
+      ],
+      "other_marker_rows_in_included_tissues": [
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Caudate",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Caudate",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebellum",
+          "Cell type": "Purkinje cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in granular layer",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in molecular layer",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "High",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuropil",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Hippocampus",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000174059",
+          "Gene name": "CD34",
+          "Tissue": "Hippocampus",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Caudate",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Caudate",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebellum",
+          "Cell type": "Purkinje cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in granular layer",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in molecular layer",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "Medium",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuropil",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Hippocampus",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000261371",
+          "Gene name": "PECAM1",
+          "Tissue": "Hippocampus",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Enhanced"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Caudate",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Caudate",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebellum",
+          "Cell type": "Purkinje cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in granular layer",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebellum",
+          "Cell type": "cells in molecular layer",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "endothelial cells",
+          "Level": "High",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Cerebral cortex",
+          "Cell type": "neuropil",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Hippocampus",
+          "Cell type": "glial cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        },
+        {
+          "Gene": "ENSG00000110799",
+          "Gene name": "VWF",
+          "Tissue": "Hippocampus",
+          "Cell type": "neuronal cells",
+          "Level": "Not detected",
+          "Reliability": "Supported"
+        }
+      ]
+    }
+  },
+  "method": "Downloaded Human Protein Atlas normal_ihc_data.tsv.zip (version 25.1) and the standard cell-type codebook, and checked both SHA-256 values. Brain tissues are those with Organ = Brain in the codebook, minus pituitary, choroid plexus, meninges and spinal cord. Rows for the three pre-registered Ensembl genes were kept when the cell type contained 'endothelial' and reliability was Enhanced, Supported or Approved. Any Low, Medium or High level refutes the universal; Not detected does not support it.",
+  "results_summary": [
+    "Refuting rows: CD34 High in Cerebral cortex endothelial cells (Enhanced), PECAM1 Medium in Cerebral cortex endothelial cells (Enhanced), VWF High in Cerebral cortex endothelial cells (Supported).",
+    "3 of the three markers are Medium or High in cerebral-cortex endothelial cells.",
+    "Other cell types in the included brain tissues are Not detected for these three proteins, so the positive stain is the endothelial row."
+  ],
+  "datasets": [
+    {
+      "id": "human-protein-atlas-v25.1-normal-ihc",
+      "name": "Human Protein Atlas normal tissue immunohistochemistry, version 25.1",
+      "landing_url": "https://www.proteinatlas.org/humanproteome/tissue/data",
+      "doi": null,
+      "version": "25.1",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "normal_ihc_data.tsv.zip",
+          "download_url": "https://www.proteinatlas.org/download/tsv/normal_ihc_data.tsv.zip",
+          "retrieved_at": "2026-11-02T00:27:15Z",
+          "byte_size": 5732831,
+          "sha256": "fa2315e5a53ecffd9427a5bfe219c8cc41b54089ef6f6be7b5d79b5455e0677f"
+        },
+        {
+          "name": "normal_ihc_cell_types.tsv.zip",
+          "download_url": "https://www.proteinatlas.org/download/tsv/normal_ihc_cell_types.tsv.zip",
+          "retrieved_at": "2026-11-02T00:27:15Z",
+          "byte_size": 1115,
+          "sha256": "04fc18dacc29c3bf5ad6440e46990a97e8cb3ed2b4b96d62102d5062c9edd011"
+        }
+      ],
+      "role": "cell-type-resolved staining levels of PECAM1, VWF and CD34 in normal human brain tissues"
+    }
+  ]
 }
