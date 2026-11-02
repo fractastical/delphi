@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha08-38",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-38",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, a public wolf-dog genotype panel contains at least one wolf-dog hybrid or wolf-dog breed individual alongside wolves and dogs, and the dog and red-fox chromosome counts are close enough that a fox-dog cross could found a dog breed.",
   "pass_criterion": "Pre-registered (claim supported). Both components are supported. Wolf-dog component: in the PLINK ped file of Dryad 10.5061/dryad.76hdr7stk, at least one row is classed hybrid and at least one row is classed wolf and at least one row is classed dog. Fox-dog component: the Ensembl diploid counts of Canis lupus familiaris and Vulpes vulpes differ by at most 2, and the ped file also contains a row classed fox-dog. Classing uses the FID and IID strings, casefolded, in this order: fox-dog if the string contains fox and also dog, hybrid or hyb; hybrid if it contains hybrid, hyb, suspected, wolfdog, wolf-dog, wolf_dog, saarloos or czechoslovak; fox if it contains fox; jackal if it contains jackal; wolf if it contains wolf and not dog; dog if it contains dog. A row is a class if either FID or IID matches that class.",
   "fail_criterion": "Pre-registered. The wolf-dog component is refuted only if at least 100 rows class as wolf or dog and zero rows class as hybrid. Otherwise, if the hybrid class is missing or fewer than 100 rows class as wolf or dog, the wolf-dog component is inconclusive (underpowered), not refuted. The fox-dog component is refuted if the absolute difference of the two diploid counts is 8 or greater. Diploid count from the Ensembl karyotype list: drop blank names; if X is present and Y is absent, diploid = 2 times the number of names; if both X and Y are present, diploid = 2 times the number of non-sex names plus 2; if neither sex chromosome is listed, that species is not scored. The fox-dog component is supported only when the difference is at most 2 and a ped row classes as fox-dog. A difference from 3 to 7, or a missing assembly, makes the fox-dog component inconclusive. Overall: both supported → supports; both refuted → refutes; one supported and one refuted → mixed; any inconclusive component → inconclusive. If the ped or an assembly cannot be downloaded, or a re-download does not match the first SHA-256, the verdict is inconclusive with reason data-unavailable.",
@@ -21,7 +21,8 @@
   "caveats": [
     "Criteria were fixed before the ped file was downloaded and before the Ensembl karyotype arrays were parsed. The assembly URLs were requested once while checking that they answered; the bodies were not read and were not kept.",
     "The Dryad usage note, which states how many wolves, dogs, hybrids, jackals and foxes are in the file, was read as the codebook. Those prose counts are not the measurement. The script counts rows.",
-    "A chromosome-count gap refutes a fox-dog breed. It does not by itself identify what the historical Laconian hound was."
+    "A chromosome-count gap refutes a fox-dog breed. It does not by itself identify what the historical Laconian hound was.",
+    "The Dryad file_stream URL answered HTTP 200 with an HTML bot-challenge page (about 4 KB, title Validating), and the API download URL did not return the ped bytes. The SHA-256 in the Dryad file metadata was therefore never checked against a genotype file. The dog assembly karyotype is 38 autosomes plus X and Y, which the pre-registered rule turns into diploid 78. The red-fox assembly VulVul2.2 returns an empty karyotype list, so the fox is not scored. Neither diagnostic is the verdict."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -29,5 +30,108 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claim-tests-2a8b",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.35,
+  "data_kind": "none",
+  "reason": "data-unavailable",
+  "measured": {
+    "value": null,
+    "unit": "labeled wolf-dog hybrid rows in the ped file",
+    "n": 0,
+    "uncertainty": "HTTP 200 body was an HTML challenge page, not the ped file",
+    "extra": {
+      "ped_attempts": [
+        {
+          "url": "https://datadryad.org/downloads/file_stream/684548",
+          "http_status": 200,
+          "byte_size": 4313,
+          "html_challenge": true
+        },
+        {
+          "url": "https://datadryad.org/api/v2/files/684548/download",
+          "http_status": 401,
+          "byte_size": 56,
+          "html_challenge": false
+        }
+      ],
+      "map_attempts": [
+        {
+          "url": "https://datadryad.org/downloads/file_stream/684547",
+          "http_status": 200,
+          "byte_size": 4313,
+          "html_challenge": true
+        },
+        {
+          "url": "https://datadryad.org/api/v2/files/684547/download",
+          "http_status": 401,
+          "byte_size": 56,
+          "html_challenge": false
+        }
+      ],
+      "ped_sha256_ok": false,
+      "ped_class_counts": null,
+      "dog_diploid_diagnostic": 78,
+      "dog_karyotype_n": 40,
+      "dog_rule": "both X and Y listed",
+      "fox_karyotype_n": 0,
+      "fox_scored": false,
+      "fox_rule": "neither sex chromosome listed; species not scored",
+      "diagnostics_not_used_for_verdict": true
+    }
+  },
+  "method": "Requested the Dryad ped and map files at the file_stream URL and the API download URL. A response that is not HTTP 200, or whose SHA-256 is not the digest in the Dryad file metadata, does not count as the file. Ensembl assembly documents for Canis lupus familiaris and Vulpes vulpes were downloaded and the pre-registered diploid rule was applied to the karyotype list. The ped-download stop in the pre-registration sets the verdict; the diploid numbers are recorded and do not replace that stop.",
+  "results_summary": [
+    "Ped download: HTTP 200 body was an HTML challenge page, not the ped file. Attempts: https://datadryad.org/downloads/file_stream/684548 -> HTTP 200, https://datadryad.org/api/v2/files/684548/download -> HTTP 401.",
+    "Dog karyotype diagnostic: 40 names, diploid 78 (both X and Y listed). Fox karyotype list length 0; scored=False.",
+    "Verdict is inconclusive with reason data-unavailable because the genotype file could not be fetched."
+  ],
+  "datasets": [
+    {
+      "id": "dryad-10.5061-dryad.76hdr7stk-wolf-dog-snp-ped",
+      "name": "SNP genotypes for wolf-dog hybrid detection (Harmoinen et al.)",
+      "landing_url": "https://doi.org/10.5061/dryad.76hdr7stk",
+      "doi": "10.5061/dryad.76hdr7stk",
+      "version": "4",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "GTIC-D-20-00312R1.ped",
+          "download_url": "https://datadryad.org/downloads/file_stream/684548",
+          "retrieved_at": "2026-11-02T00:36:36Z",
+          "byte_size": null,
+          "sha256": null,
+          "http_status": 200,
+          "metadata_sha256": "9303839150f13d4b945c554f3be42efede4c902c85073ca3968a2a259fe976d3",
+          "note": "Bytes not retrieved. metadata_sha256 is the digest Dryad publishes for the file."
+        }
+      ],
+      "role": "individual canid genotypes whose identifiers were to be classed as wolf, dog or hybrid"
+    },
+    {
+      "id": "ensembl-assembly-karyotype-dog-and-red-fox",
+      "name": "Ensembl assembly karyotypes, domestic dog ROS_Cfam_1.0 and red fox VulVul2.2",
+      "landing_url": "https://rest.ensembl.org/",
+      "doi": null,
+      "version": "as served 2026-11-01",
+      "license": "Ensembl public REST data",
+      "files": [
+        {
+          "name": "canis_lupus_familiaris.json",
+          "download_url": "https://rest.ensembl.org/info/assembly/canis_lupus_familiaris?content-type=application/json",
+          "retrieved_at": "2026-11-02T00:36:36Z",
+          "byte_size": 29512,
+          "sha256": "1a0f1bc21a3c32c757325e04416f5d67d6e5eff4f9e3274d72580220ddf54956"
+        },
+        {
+          "name": "vulpes_vulpes.json",
+          "download_url": "https://rest.ensembl.org/info/assembly/vulpes_vulpes?content-type=application/json",
+          "retrieved_at": "2026-11-02T00:36:36Z",
+          "byte_size": 6032152,
+          "sha256": "235d343af2cbcc47dd7bfbdcb30224751d8c39decddee31edc5b5fb5f02c350b"
+        }
+      ],
+      "role": "diagnostic chromosome lists; not used to set the verdict while the ped file is unavailable"
+    }
+  ]
 }
