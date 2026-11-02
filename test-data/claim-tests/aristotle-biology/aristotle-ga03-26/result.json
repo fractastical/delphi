@@ -1,0 +1,27 @@
+{
+  "claim_id": "aristotle-ga03-26",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-26",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If eels arise without parents from earth entrails, then Anguilla anguilla will lack a sexual reproductive record and will have no occurrence cluster in the Sargasso Sea.",
+  "pass_criterion": "The FishBase reproduction row for Anguilla anguilla matches a spontaneous or parentless pattern and does not match a parental pattern, and the GBIF occurrence count inside the Sargasso box (latitude 20 to 35, longitude -80 to -40) is 0.",
+  "fail_criterion": "The reproduction row matches a parental pattern (eggs, spawning, fertilization, oviparity, dioecy, leptocephalus, larva or Sargasso) and the GBIF count inside the Sargasso box is at least 10. If the reproduction row is parental but the Sargasso count is below 10, the verdict is mixed. If the row is spontaneous and the Sargasso count is at least 10, the verdict is mixed. If the species cannot be found in FishBase or the GBIF count cannot be retrieved, the verdict is inconclusive with reason data-unavailable. The unnamed mullet and other river fishes are not in the verdict.",
+  "planned_datasets": [
+    "fishbase-v24.07-anguilla-reproduc",
+    "gbif-anguilla-anguilla-sargasso"
+  ],
+  "interpretation": "The claim says some blooded animals, including eels, arise without parents, and that the eel body comes into being in the 'entrails of earth', a scolex-like generation in mud. The named species is the eel, read as the European eel Anguilla anguilla, the species whose life cycle answers that Mediterranean and Atlantic claim. Parental reproduction is eggs, spawning, a larva or a named breeding place. The Sargasso box is the published oceanic spawning region, not a river. A mullet is not identified to a species in the claim and is not tested.",
+  "test_contract": {
+    "expected_observation": "FishBase describes Anguilla anguilla as arising without parents or by a spontaneous mode, and GBIF has no occurrences inside the Sargasso box.",
+    "disconfirming_observation": "FishBase describes eggs, spawning, fertilization, a larva or the Sargasso, and GBIF has at least 10 georeferenced occurrences of the species inside the box.",
+    "admissible_datasets": "The FishBase v24.07 species and reproduction tables for the binomial Anguilla anguilla, and GBIF occurrence records for that same accepted taxon restricted to the pre-registered box. Occurrences without coordinates are not counted.",
+    "inference_method": "Join the binomial to a species code, concatenate the reproduction fields for that code, and apply the two patterns. The Sargasso count is the number of GBIF occurrences with coordinates inside the box, taken from the API count if the first 20 returned records all fall inside the box, otherwise by paging and counting. Thresholds are the pass and fail rules above."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  }
+}

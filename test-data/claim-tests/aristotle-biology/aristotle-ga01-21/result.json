@@ -1,0 +1,27 @@
+{
+  "claim_id": "aristotle-ga01-21",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-21",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If semen is not drawn from every part of the body, then the genes that build sperm and seminal-plasma proteins will be expressed most strongly in the testis, epididymis, prostate or seminal vesicle, far above the other tissues, and genes that mark liver, muscle, pancreas and brain will not.",
+  "pass_criterion": "At least six of the semen genes that are found in the consensus file have their maximum nTPM in {testis, epididymis, prostate, seminal vesicle}, and that maximum is at least 10 times the median nTPM of the tissues outside those four. At least five semen genes must be found. Fewer than two of the four control genes may have their maximum in those four tissues.",
+  "fail_criterion": "Three or more semen genes have their maximum nTPM outside {testis, epididymis, prostate, seminal vesicle}. If the pass rule fails and the fail rule also fails, the verdict is mixed. If fewer than five semen genes are found, or two or more control genes peak in the semen tissues, the verdict is inconclusive with reason other. If the expression file cannot be retrieved, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "hpa-rna-tissue-consensus",
+    "ensembl-symbol-lookup"
+  ],
+  "interpretation": "The claim denies the view that semen is secreted from all parts of the parent's body. It is read as a claim about where semen is made, not about whether the nutrients in it once passed through other organs. Semen here is spermatozoa plus the proteins of seminal plasma. The pre-registered markers are PRM1, PRM2, TNP1, ODF1 and AKAP4 for sperm, and SEMG1, SEMG2 and KLK3 for seminal plasma. The producing organs are testis, epididymis, prostate and seminal vesicle, the four male reproductive tissues in the Human Protein Atlas consensus list. Controls are ALB, TTN, INS and GFAP. Humans stand in for 'animals that emit semen' because this file is human; that limit is a caveat, not a reinterpretation of the claim as a claim about humans only.",
+  "test_contract": {
+    "expected_observation": "Each semen marker peaks in testis, epididymis, prostate or seminal vesicle at a level at least ten times the median of the other tissues, and liver, muscle, pancreas and brain markers do not peak in those four organs.",
+    "disconfirming_observation": "Three or more semen markers peak in some other tissue, which is what a draw from many body parts would look like in this file.",
+    "admissible_datasets": "The Human Protein Atlas consensus RNA file for normal tissues, with gene identities taken from Ensembl symbol lookup and not from a search of which tissues look semen-specific. No gene is added after the file is opened.",
+    "inference_method": "For each gene, take the tissue with the highest nTPM. A tie that includes a tissue outside the four semen organs does not count as a semen peak. The median uses tissues outside the four. Thresholds are six of the found semen genes, a tenfold ratio, and three genes peaking outside as a refutation. Controls are a specificity check, not part of the biological sample size."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  }
+}

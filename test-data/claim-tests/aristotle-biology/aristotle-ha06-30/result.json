@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ha06-30",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-30",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If fish gestation always lasts thirty days or less and always a number of days divisible by seven, then every FishBase egg-development duration is at most 30 days and within 0.05 day of a multiple of 7.",
+  "pass_criterion": "At least 20 species have a positive egg-development time, and every positive time is <= 30 days and within 0.05 day of a multiple of 7.",
+  "fail_criterion": "At least one positive egg-development time is greater than 30 days, or is more than 0.05 day away from the nearest multiple of 7. One such record refutes the universal even if fewer than 20 species are present. If every positive time complies but fewer than 20 species are present, the verdict is inconclusive with reason underpowered. If the table or the duration column cannot be retrieved, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-v24.07-eggdev"
+  ],
+  "interpretation": "Aristotle's 'gestation' in fishes is read as the time from fertilization or spawning to hatching, which is what can be counted in days for the oviparous fishes that make up most of the class. The FishBase field is egg development time in days. Temperature is not adjusted: the claim states a number of days, not a degree-day total, so each reported duration is tested as printed. A range is not in the criterion; if the table stores a single number per row, that number is the duration. Zero, negative and missing values are not durations.",
+  "test_contract": {
+    "expected_observation": "Every reported egg-development time is a positive number of at most 30 days and lies within 0.05 day of a multiple of 7, across at least 20 species.",
+    "disconfirming_observation": "Any positive reported duration is over 30 days or is not within 0.05 day of a multiple of 7.",
+    "admissible_datasets": "A public snapshot of the FishBase egg-development table that gives a duration in days and a species identifier. Rows are observations, not a species mean, because the claim says the time always falls on those days.",
+    "inference_method": "Select the numeric duration column by the pre-registered name rule (egg and dev, or dev and time, or duration, or days; prefer a name containing time or day). A row refutes if its value v > 0 and (v > 30 or the absolute distance from v to the nearest multiple of 7 exceeds 0.05). Species count is the number of distinct species identifiers among positive rows."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "claim_id": "aristotle-ha01-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-08",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:45:00Z",
+  "hypothesis": "If every animal with more than four feet is bloodless, and every blooded animal has no feet, two feet or four feet, then squamates (blooded) have only 0, 2 or 4 limbs and every arthropod specimen with more than four walking legs is outside the vertebrates.",
+  "pass_criterion": "Both of the following. (1) In SquamBase, at least 5000 species have a limb count mapped to a number, and none of those counts is outside {0, 2, 4}. (2) In the arthropod feet dataset, at least 30 specimens have a walking-leg count strictly greater than 4, and none of those specimens is coded in a vertebrate class, phylum or order. Mammals, birds, amphibians and fishes are outside these two files and do not have to be present for a pass; their absence is a coverage caveat, not a fail.",
+  "fail_criterion": "Any mapped squamate limb count is outside {0, 2, 4}, or any specimen with more than four walking legs is coded as a vertebrate. If either file cannot be retrieved, or fewer than 5000 squamates map, or fewer than 30 many-legged arthropod specimens are present, and no counterexample has already been found, the verdict is inconclusive with reason data-unavailable or underpowered as appropriate. Unmapped limb strings that are more than 1% of SquamBase rows and that do not themselves state a count outside {0, 2, 4} make the verdict inconclusive with reason other, unless a mapped counterexample is already present, in which case the verdict is refutes.",
+  "planned_datasets": [
+    "squambase-1.0-dryad",
+    "arthropod-feet-dryad"
+  ],
+  "interpretation": "Scope maps 'blooded' to vertebrates and 'bloodless' to invertebrates. 'Feet' are paired locomotory limbs or walking legs, not digits. SquamBase categories follow Meiri's codebook: a numeric cell is that count; 'limbless' or 'absent' or 'none' maps to 0; 'forelimb only', 'hindlimb only', 'front only', 'hind only' or 'one pair' maps to 2; 'fully limbed', 'four', 'both pairs' or 'reduced' (short limbs, not an extra pair) maps to 4. A tiny vestige that the dataset itself calls limbless stays 0. Digit counts are ignored. Vertebrate coding in the arthropod file is a taxonomic field containing Vertebrata, Mammalia, Aves, Reptilia, Amphibia, Actinopterygii, Chondrichthyes, or an order in {Primates, Carnivora, Rodentia, Cetacea, Artiodactyla, Perissodactyla, Chiroptera, Squamata, Testudines, Crocodylia, Anura, Caudata, Gymnophiona, Perciformes, Cypriniformes, Siluriformes, Salmoniformes, Squaliformes, Rajiformes}.",
+  "test_contract": {
+    "expected_observation": "Every coded squamate has 0, 2 or 4 limbs, and every arthropod specimen with more than four walking legs is non-vertebrate.",
+    "disconfirming_observation": "A squamate with a limb count other than 0, 2 or 4, or a vertebrate specimen with more than four walking legs.",
+    "admissible_datasets": "Species- or specimen-level public tables that state a limb or walking-leg count and a taxon name, assembled independently of this claim, with a licence that permits download. The squamate table must cover snakes and lizards, not a single genus. The many-legged table must state walking-leg counts rather than a presence/absence of limbs.",
+    "inference_method": "Map each row to a limb count with the codebook above. A universal is refuted by one counterexample. A pass requires both sample-size floors and zero counterexamples. No phylogenetic model."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-4186",
+    "date": "2026-11-01"
+  }
+}
