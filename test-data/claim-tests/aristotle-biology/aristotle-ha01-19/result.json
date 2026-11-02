@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha01-19",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-19",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the human trunk has eight ribs on each side, a canonical human skeletal partonomy and a public-domain anatomical description will each enumerate eight distinct rib bones on a side, and not some other count.",
   "pass_criterion": "Pre-registered. The per-side count of distinct rib ordinals is exactly 8 in every admissible source that returns a count. A source is admissible only when its labels or sentences give a contiguous series of rib ordinals from 1 through N with no gaps, or an explicit typical number of ribs on one side. Grouping classes (true rib, false rib, rib cage, set of ribs), costal cartilages, and named variants (cervical rib, lumbar rib, bifid rib, supernumerary rib) do not add an ordinal and do not remove one. Left and right, when both are present, must each equal 8. Supports only if every admissible source agrees on 8.",
   "fail_criterion": "Pre-registered. Refutes if every admissible source gives a per-side count other than 8 and the sources agree with each other. Mixed if two admissible sources give different counts, or if left and right differ inside one source. Inconclusive with reason data-unavailable if no admissible source can be retrieved. Inconclusive with reason not-operationalizable if a source lists ribs but not as a contiguous per-side ordinal series and states no typical number.",
@@ -19,7 +19,8 @@
   "interpretation": "The claim is the normal human count, eight ribs on each side, not a modern claim about the frequency of cervical or lumbar ribs. 'Ribs' are mapped to the bony ribs of the thoracic cage, not to costal cartilages and not to the classes 'true', 'false' or 'floating', which are groupings of those bones. Eight is not re-read as seven vertebrosternal ribs. The test uses the canonical body those sources describe. It does not estimate how often living people depart from that canon.",
   "caveats": [
     "Before this file was committed, a web-search snippet of a third-party HTML copy of Gray (1918) on the ribs was visible and included a stated count. The pass and fail rules above were taken from the claim text (the count is eight, or it is not) and were not changed after that snippet. The FMA service had not been queried.",
-    "A canonical partonomy is one anatomical model, not a sample of skeletons. A count other than eight refutes the claim as a statement of normal human anatomy even if some people have eight ribs."
+    "A canonical partonomy is one anatomical model, not a sample of skeletons. A count other than eight refutes the claim as a statement of normal human anatomy even if some people have eight ribs.",
+    "Gray 1918 gives twelve as the typical number and then says that number may be increased by a cervical or lumbar rib or diminished to eleven. Those variants are not the typical count, and eight is not among them. Neither source is a sample of living people, so the test does not estimate how often a person has a rib count other than the canonical one."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -27,5 +28,93 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claims-906a",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "datasets": [
+    {
+      "id": "fma-ols-human-ribs",
+      "name": "Foundational Model of Anatomy, queried through the EMBL-EBI Ontology Lookup Service",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/fma",
+      "doi": null,
+      "version": "5.1.0",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "name": "fma-ontology.json",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/fma",
+          "retrieved_at": "2026-11-02T00:23:28Z",
+          "byte_size": 1738,
+          "sha256": "75fe4a75b1fdbbe17ccf092a7a08f6766dc6f67dad79305a189d839477794b8c"
+        },
+        {
+          "name": "fma-search-ordinal-ribs.json (14 OLS responses, concatenated in ordinal order for the checksum)",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?ontology=fma",
+          "retrieved_at": "2026-11-02T00:23:38Z",
+          "byte_size": 320468,
+          "sha256": "3639f29b2ddeb813aabc5f2b1c262cf0f47b05987a148068cc11fb30ba07d00b"
+        }
+      ],
+      "role": "canonical human skeletal partonomy: one class per rib bone, including left and right"
+    },
+    {
+      "id": "gray-1918-osteology-ribs",
+      "name": "Henry Gray, Anatomy of the Human Body, 20th edition (1918), Internet Archive plain text",
+      "landing_url": "https://archive.org/details/anatomyofhumanbo1918gray",
+      "doi": null,
+      "version": "1918",
+      "license": "public domain",
+      "files": [
+        {
+          "name": "anatomyofhumanbo1918gray_djvu.txt",
+          "download_url": "https://archive.org/download/anatomyofhumanbo1918gray/anatomyofhumanbo1918gray_djvu.txt",
+          "retrieved_at": "2026-11-02T00:23:39Z",
+          "byte_size": 4743022,
+          "sha256": "0a12f47784dfa17b349dd39bdfa0ac24a6876e9e74c481f1e217e36e3ade07a6"
+        }
+      ],
+      "role": "public-domain statement of how many ribs the human trunk has on either side"
+    }
+  ],
+  "method": "For each ordinal from first through fourteenth, the Ontology Lookup Service was queried for that phrase plus 'rib' in FMA. A hit counted only when the label was exactly '{ordinal} rib', 'Left {ordinal} rib' or 'Right {ordinal} rib', excluding cartilages and cervical, lumbar, bifid or supernumerary variants. The per-side count is the length of the contiguous run that starts at the first rib. Gray 1918 was fetched from the Internet Archive and the first sentence of the form 'N in number on either side' in the ribs chapter was read as the typical count. The pre-registered rule was then applied: agreement on 8 supports, agreement on any other integer refutes, disagreement is mixed.",
+  "measured": {
+    "value": 12,
+    "unit": "bony ribs on one side of the canonical human trunk",
+    "n": 2,
+    "uncertainty": null,
+    "extra": {
+      "fma_per_side": 12,
+      "fma_left": 12,
+      "fma_right": 12,
+      "fma_contiguous_ordinals": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "fma_version": "5.1.0",
+      "gray_per_side": 12,
+      "gray_matches": [
+        {
+          "value": 12,
+          "sentence": "They are twelve in number on either side; but this number mav be increased by the development of a cervical or lumbar rib, or may be diminished to eleven."
+        }
+      ],
+      "sources_agree": true
+    }
+  },
+  "results_summary": [
+    "FMA 5.1.0: contiguous bony rib ordinals [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], per side 12, left classes in that run 12, right classes 12.",
+    "Gray 1918: typical number on either side 12. Matches: [{'value': 12, 'sentence': 'They are twelve in number on either side; but this number mav be increased by the development of a cervical or lumbar rib, or may be diminished to eleven.'}].",
+    "Verdict refutes under the pre-registered rule (support only if every admissible source says 8)."
+  ]
 }
