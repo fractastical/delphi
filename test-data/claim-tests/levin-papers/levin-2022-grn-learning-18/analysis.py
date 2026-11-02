@@ -8,6 +8,7 @@ One model per subprocess so a solver crash does not stop the batch.
 Usage:
   python3 analysis.py           # screen every model and write derived/measured.json
   python3 analysis.py --one BIOMD0000000010
+  python3 analysis.py --redecide  # recompute verdict and counts from derived/measured.json
 """
 
 from __future__ import annotations
@@ -353,7 +354,27 @@ def decide(rows):
     sensitizing = [r for r in completed if r["sens_pairs"] >= 1]
     habituating = [r for r in completed if r["hab_pairs"] >= 1]
     if len(sensitizing) < 8 or len(habituating) < 8:
-        return "inconclusive", "underpowered"
+        # Descriptive counts only. The rate comparison is not applied.
+        sb = [r for r in sensitizing if r["sens_breakable"] >= 1]
+        hb = [r for r in habituating if r["hab_breakable"] >= 1]
+        stats = {
+            "S": len(sensitizing),
+            "Sb": len(sb),
+            "H": len(habituating),
+            "Hb": len(hb),
+            "completed": len(completed),
+            "size_eligible": len(size_ok),
+            "failed_size_eligible": len(failed),
+            "sensitizing_ids": [r["id"] for r in sensitizing],
+            "habituating_ids": [r["id"] for r in habituating],
+            "sens_pairs_breakable": {
+                r["id"]: [r["sens_pairs"], r["sens_breakable"]] for r in sensitizing
+            },
+            "hab_pairs_breakable": {
+                r["id"]: [r["hab_pairs"], r["hab_breakable"]] for r in habituating
+            },
+        }
+        return "inconclusive", "underpowered", stats
     sb = [r for r in sensitizing if r["sens_breakable"] >= 1]
     hb = [r for r in habituating if r["hab_breakable"] >= 1]
     rate_s = len(sb) / len(sensitizing)
@@ -405,6 +426,34 @@ def strip_private(row):
 
 
 def main(argv):
+    if len(argv) >= 2 and argv[1] == "--redecide":
+        # Recompute the verdict from derived/measured.json. Does not integrate.
+        dest = os.path.join(HERE, "derived", "measured.json")
+        with open(dest, encoding="utf-8") as fh:
+            payload = json.load(fh)
+        files = {f["id"]: f for f in payload["files"]}
+        rows = []
+        for model in payload["models"]:
+            row = dict(model)
+            row["file"] = files.get(model["id"])
+            rows.append(row)
+        verdict = decide(rows)
+        if len(verdict) == 2:
+            verdict_name, reason = verdict
+            stats = {}
+        else:
+            verdict_name, reason, stats = verdict
+        if (verdict_name, reason) != (payload["verdict"], payload["reason"]):
+            raise SystemExit(
+                f"redecide changed the verdict: {verdict_name} {reason} "
+                f"from {payload['verdict']} {payload['reason']}"
+            )
+        payload["stats"] = stats
+        with open(dest, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, indent=2)
+            fh.write("\n")
+        print(json.dumps({"verdict": verdict_name, "reason": reason, "stats": stats}, indent=2))
+        return 0
     if len(argv) >= 3 and argv[1] == "--one":
         row = screen(argv[2])
         row.pop("traceback", None)

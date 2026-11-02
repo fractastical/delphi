@@ -2,7 +2,7 @@
   "claim_id": "levin-2022-grn-learning-09",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-09",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:39:55Z",
   "hypothesis": "If the published claim holds for the surveyed BioModels pathway ODEs, memory counts are stable across clamp amplitudes of 10, 50 and 100 times baseline: most models keep the same count at all three amplitudes, at most a small minority have fewer memories at a weaker amplitude than at 100 times, and at least one model has more memories at a weaker amplitude.",
   "pass_criterion": "Pre-registered. For each completed model let c10, c50 and c100 be the memory counts at clamp scales 10, 50 and 100. Let N be the number of models with all three counts. Let same be the fraction of those N with c10 = c50 = c100. Let lost be the fraction with c10 < c100 or c50 < c100. Let gained be the number with c10 > c100 or c50 > c100. Supports if and only if N >= 12, same >= 0.50, lost <= 0.20, and gained >= 1.",
@@ -12,14 +12,18 @@
     "biomodels-sbml"
   ],
   "test_contract": {
-    "expected_observation": "At least half of the completed surveyed pathway models have an identical memory count at 10×, 50× and 100× baseline clamps, no more than 20% have a lower count at a weaker clamp than at 100×, and at least one model has a higher count at a weaker clamp.",
-    "disconfirming_observation": "At least 40% of models lose memories when the clamp is weakened from 100×, or no model gains memories at a weaker clamp and fewer than half keep the same count at all three amplitudes.",
+    "expected_observation": "At least half of the completed surveyed pathway models have an identical memory count at 10\u00d7, 50\u00d7 and 100\u00d7 baseline clamps, no more than 20% have a lower count at a weaker clamp than at 100\u00d7, and at least one model has a higher count at a weaker clamp.",
+    "disconfirming_observation": "At least 40% of models lose memories when the clamp is weakened from 100\u00d7, or no model gains memories at a weaker clamp and fewer than half keep the same count at all three amplitudes.",
     "admissible_datasets": "The pathway models whose BioModels identifiers are listed in Table S1 of Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285 (supplement ijms-24-00285-s001), simulated from the public SBML with topology and parameters left at the deposited values. Generated random gene circuits do not count for this claim. Models with fewer than 3 or more than 12 floating species are outside the pre-registered computational bound and are excluded before scoring.",
     "inference_method": "Memory count at a scale is the number of UCS-based memories plus the number of associative memories, defined in protocol. Fractions same and lost and the count gained are compared with the fixed thresholds in pass_criterion and fail_criterion. No assessor score is used."
   },
-  "interpretation": "The claim is a simulation result about memory counts in the surveyed ODE pathway models at training amplitudes 10×, 50× and 100× baseline (Results 2.2). It is not a statement that pathway memory in cells is dose-robust. A UCS-based memory follows Test_US_Memory.m and DetectMem.m: the clamped node regulates the response by a factor of at least 2 during a 50-time-unit clamp (RscaleUp = 2 in MEMORY_EVALUATOR_ODE_SLURM1.m), and after a 50-time-unit release the response mean stays at least halfway from the baseline mean to the clamped mean. An associative memory follows UCS_NS_Asso.m: the neutral node does not regulate the response before pairing, the unconditioned and neutral nodes are clamped together for 50 time units, and after a 50-time-unit release the neutral node alone regulates the response by a factor of 2 relative to that release. Baseline max and min are the maximum and minimum of each floating species over the first 50 time units of an unforced trajectory from the SBML initial state, including zeros, as in the memory script. Up-clamp is scale times that maximum; down-clamp is the minimum divided by scale. A direction with a zero clamp level is skipped. Counts use every ordered pair of distinct floating species and both directions. The same adaptive one-integration-per-epoch clamp used for levin-2022-grn-learning-18 is used here; it is part of this registration.",
+  "interpretation": "The claim is a simulation result about memory counts in the surveyed ODE pathway models at training amplitudes 10\u00d7, 50\u00d7 and 100\u00d7 baseline (Results 2.2). It is not a statement that pathway memory in cells is dose-robust. A UCS-based memory follows Test_US_Memory.m and DetectMem.m: the clamped node regulates the response by a factor of at least 2 during a 50-time-unit clamp (RscaleUp = 2 in MEMORY_EVALUATOR_ODE_SLURM1.m), and after a 50-time-unit release the response mean stays at least halfway from the baseline mean to the clamped mean. An associative memory follows UCS_NS_Asso.m: the neutral node does not regulate the response before pairing, the unconditioned and neutral nodes are clamped together for 50 time units, and after a 50-time-unit release the neutral node alone regulates the response by a factor of 2 relative to that release. Baseline max and min are the maximum and minimum of each floating species over the first 50 time units of an unforced trajectory from the SBML initial state, including zeros, as in the memory script. Up-clamp is scale times that maximum; down-clamp is the minimum divided by scale. A direction with a zero clamp level is skipped. Counts use every ordered pair of distinct floating species and both directions. The same adaptive one-integration-per-epoch clamp used for levin-2022-grn-learning-18 is used here; it is part of this registration.",
   "protocol": {
-    "scales": [10, 50, 100],
+    "scales": [
+      10,
+      50,
+      100
+    ],
     "regulation_factor": 2.0,
     "epoch_duration": 50.0,
     "max_floating_species": 12,
@@ -37,11 +41,817 @@
       "text": "A factor-of-2 regulation requires a strict change in the response mean, not only the ratio algebra. Up-regulation is stimulated mean >= 2 times the baseline mean and stimulated mean > baseline mean. Down-regulation is stimulated mean <= half the baseline mean and stimulated mean < baseline mean. A flat zero trajectory satisfies 0 >= 2*0 and is not regulation. This was fixed before any memory count was computed."
     }
   ],
+  "datasets": [
+    {
+      "id": "biswas2023-table-s1",
+      "name": "Biswas, Clawson and Levin, Int. J. Mol. Sci. 2023, 24, 285, supplement ijms-24-00285-s001, Table S1 model identifiers",
+      "landing_url": "https://www.mdpi.com/1422-0067/24/1/285",
+      "doi": "10.3390/ijms24010285",
+      "version": "ijms-24-00285-s001.zip?version=1672829351",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://mdpi-res.com/d_attachment/ijms/ijms-24-00285/article_deploy/ijms-24-00285-s001.zip?version=1672829351",
+          "retrieved_at": "2026-11-02T00:40:54Z",
+          "byte_size": 2886027,
+          "sha256": "292a7f33bcb3a9589614507114de8c1a7a5f5d8bc11e382d546c3d08da381e39"
+        }
+      ],
+      "role": "Table S1 lists the BioModels identifiers. The zip is not committed. Result figures in the supplement were not used as measurements."
+    },
+    {
+      "id": "biomodels-sbml",
+      "name": "EBI BioModels SBML for the Table S1 identifiers",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "doi": null,
+      "version": "files retrieved 2026-11-02",
+      "license": "CC0 1.0 on files whose SBML text contains CC0; otherwise unstated in the file",
+      "files": [
+        {
+          "id": "BIOMD0000000001",
+          "name": "Edelstein1996 - EPSP ACh event",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000001?filename=BIOMD0000000001_url.xml",
+          "retrieved_at": "2026-11-02T00:58:12Z",
+          "byte_size": 50538,
+          "sha256": "407fccc883f80e6d120e34d8b0810a206a5cc6535a26d4574611504e683beb08",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000002",
+          "name": "Edelstein1996 - EPSP ACh species",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000002?filename=BIOMD0000000002_url.xml",
+          "retrieved_at": "2026-11-02T00:58:13Z",
+          "byte_size": 46871,
+          "sha256": "7f7ee585a886f9cd88199887a9e674e070ce368b2884ceeee65dd437f3edca7f",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000003",
+          "name": "Goldbeter1991 - Min Mit Oscil",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000003?filename=BIOMD0000000003_url.xml",
+          "retrieved_at": "2026-11-02T00:58:14Z",
+          "byte_size": 20587,
+          "sha256": "a633872e4c602922e85ac487ef52ac8bd8ead762ec7c0f86f9e93032a84c90f5",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000004",
+          "name": "Goldbeter1991 - Min Mit Oscil, Expl Inact",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000004?filename=BIOMD0000000004_url.xml",
+          "retrieved_at": "2026-11-02T00:58:16Z",
+          "byte_size": 20171,
+          "sha256": "504dc54b5697b4183bd0046fb11f0991702961e3dee0baf15ac1ecaad5009eb6",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000005",
+          "name": "Tyson1991 - Cell Cycle 6 var",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000005?filename=BIOMD0000000005_url.xml",
+          "retrieved_at": "2026-11-02T00:58:22Z",
+          "byte_size": 24470,
+          "sha256": "5a4f44b5a0bc8f32d3206f460f748236539de593be0fb016da2ed7cddd098e36",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000006",
+          "name": "Tyson1991 - Cell Cycle 2 var",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000006?filename=BIOMD0000000006_url.xml",
+          "retrieved_at": "2026-11-02T00:58:26Z",
+          "byte_size": 14408,
+          "sha256": "c3cd0b2dfc738565fe72be3208eec28023e623297e198015df1df77a7e430820",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000010",
+          "name": "Kholodenko2000 - Ultrasensitivity and negative feedback bring oscillations in MAPK cascade",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010?filename=BIOMD0000000010_url.xml",
+          "retrieved_at": "2026-11-02T00:58:27Z",
+          "byte_size": 29295,
+          "sha256": "906964e07ffd570ad94a03c1222e230b54b913cd536b008392bfb6155930a966",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000069",
+          "name": "Fuss2006_MitoticActivation",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000069?filename=BIOMD0000000069_url.xml",
+          "retrieved_at": "2026-11-02T00:58:33Z",
+          "byte_size": 21477,
+          "sha256": "ac4f36293662123205a8d5f9f1346982d9e020abd095d9df5765ea7641ef4713",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000016",
+          "name": "Goldbeter1995_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000016?filename=BIOMD0000000016_url.xml",
+          "retrieved_at": "2026-11-02T00:58:35Z",
+          "byte_size": 29255,
+          "sha256": "35ad538383991b45273e2a767c0325d996d188dba10ce959de9635564813f703",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000017",
+          "name": "Hoefnagel2002_PyruvateBranches",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000017?filename=BIOMD0000000017_url.xml",
+          "retrieved_at": "2026-11-02T00:58:35Z",
+          "byte_size": 63765,
+          "sha256": "b75db9f5e0b418d7eb015e44565c992ebcda10f56f8934747a2677e222b16148",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000022",
+          "name": "Ueda2001_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000022?filename=BIOMD0000000022_url.xml",
+          "retrieved_at": "2026-11-02T00:58:54Z",
+          "byte_size": 66297,
+          "sha256": "0b569c675eaed0226dc4c1dcd7f7e2e210a7cbd1b5562da97e55f47c255cdf04",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000021",
+          "name": "Leloup1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000021?filename=BIOMD0000000021_url.xml",
+          "retrieved_at": "2026-11-02T00:59:24Z",
+          "byte_size": 50938,
+          "sha256": "02376379c0270208b2fd72529a50ccefcdd68c8b23a40585bfdcdd0926a4c8da",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000023",
+          "name": "Rohwer2001_Sucrose",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023_url.xml",
+          "retrieved_at": "2026-11-02T00:59:30Z",
+          "byte_size": 52851,
+          "sha256": "dccd31fe46f4fb06484a9e3b95718aad788692e9abad1dc68fd368d7c8247066",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000024",
+          "name": "Scheper1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000024?filename=BIOMD0000000024_url.xml",
+          "retrieved_at": "2026-11-02T00:59:32Z",
+          "byte_size": 12534,
+          "sha256": "748514f402eea94c49346701a30f2b429c9c7d5de922cd450e5a155d5f69dbe1",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000026",
+          "name": "Markevich2004_MAPK_orderedElementary",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000026?filename=BIOMD0000000026_url.xml",
+          "retrieved_at": "2026-11-02T00:59:33Z",
+          "byte_size": 26398,
+          "sha256": "d293eb11fdd65b3150999c68edaf690a9449ea9e070a8f61878b3a4648eff7c5",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000027",
+          "name": "Markevich2004 - MAPK double phosphorylation,  ordered Michaelis-Menton",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000027?filename=BIOMD0000000027_url.xml",
+          "retrieved_at": "2026-11-02T00:59:44Z",
+          "byte_size": 18368,
+          "sha256": "56d8acc83add5a262b6785b18f2e905e606b9072625e25ba1520306bc4d586bb",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000483",
+          "name": "Cao2008 - Network of a toggle switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000483?filename=BIOMD0000000483_url.xml",
+          "retrieved_at": "2026-11-02T00:59:45Z",
+          "byte_size": 20997,
+          "sha256": "50f2d7cf4cd14c4c1953ef8ae07a3efe35cea2af7e84baf5ab35ad188fa23406",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000029",
+          "name": "Markevich2004_MAPK_phosphoRandomMM",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000029?filename=BIOMD0000000029_url.xml",
+          "retrieved_at": "2026-11-02T00:59:45Z",
+          "byte_size": 28068,
+          "sha256": "c1eb117678b7d423b8e1d2fd7f493c865fb66559980256f3544938f5a431b530",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000031",
+          "name": "Markevich2004_MAPK_orderedMM2kinases",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000031?filename=BIOMD0000000031_url.xml",
+          "retrieved_at": "2026-11-02T00:59:47Z",
+          "byte_size": 18712,
+          "sha256": "56ddd4cc0a0cf51c55a27fa386e0ee670c798ea69151ad39fadf363d0c0297a1",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000631",
+          "name": "DeCaluwe2016 - Circadian Clock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000631?filename=BIOMD0000000631_url.xml",
+          "retrieved_at": "2026-11-02T00:59:48Z",
+          "byte_size": 87080,
+          "sha256": "b527328fbc3d8c57f41bc15615c115f156c2ae80d6a7f3ef0be069cad3a84df2",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000203",
+          "name": "Chickarmane2006 - Stem cell switch reversible",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000203?filename=BIOMD0000000203_url.xml",
+          "retrieved_at": "2026-11-02T01:00:24Z",
+          "byte_size": 33654,
+          "sha256": "1a6b8afba805b78e72f3b825626f4b10d1ce3cd92e3feab1d29781822ec2d4cf",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000204",
+          "name": "Chickarmane2006 - Stem cell switch irreversible",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000204?filename=BIOMD0000000204_url.xml",
+          "retrieved_at": "2026-11-02T01:00:27Z",
+          "byte_size": 33257,
+          "sha256": "fd4669b73014455d7d0ae1c6099000e3055999436080ca247aae381688bba14f",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000209",
+          "name": "Chickarmane2008 - Stem cell lineage determination",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000209?filename=BIOMD0000000209_url.xml",
+          "retrieved_at": "2026-11-02T01:00:30Z",
+          "byte_size": 44126,
+          "sha256": "a688c8883b5d3913348766830d109a9a83b378e03735eb9f59139484463bfb72",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000210",
+          "name": "Chickarmane2008 - Stem cell lineage - NANOG GATA-6 switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000210?filename=BIOMD0000000210_url.xml",
+          "retrieved_at": "2026-11-02T01:00:33Z",
+          "byte_size": 42092,
+          "sha256": "fa698cc484dd1b46bb80aff07609a4c50a933c5e6f88cdbef79c61c927215dec",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000539",
+          "name": "Fran\u00e7ois2005 - Mixed Feedback Loop (two-gene network)",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000539?filename=BIOMD0000000539_url.xml",
+          "retrieved_at": "2026-11-02T01:00:36Z",
+          "byte_size": 39265,
+          "sha256": "ea0689f4ed3342219eaf79d7f9c1058a5f51a0cec417d47fd22e9b7aa6ab1518",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000664",
+          "name": "Muller2008 - Simplified MAPK activation Dynamics (Model B)",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000664?filename=BIOMD0000000664_url.xml",
+          "retrieved_at": "2026-11-02T01:00:38Z",
+          "byte_size": 77094,
+          "sha256": "382a22cca6d338f7f614406343cd86189d30370ec98ee49df22310b32566b538",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000275",
+          "name": "Goldbeter2007_Somitogenesis_Switch",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000275?filename=BIOMD0000000275_url.xml",
+          "retrieved_at": "2026-11-02T01:01:11Z",
+          "byte_size": 27145,
+          "sha256": "600e2c173146c24f77c738c9117aa684a0acf9aeedea227126efaf033f641e70",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000697",
+          "name": "Ciliberto2003 - CyclinE / Cdk2 timer in the cell cycle of Xenopus laevis embryo",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000697?filename=BIOMD0000000697_url.xml",
+          "retrieved_at": "2026-11-02T01:01:12Z",
+          "byte_size": 143510,
+          "sha256": "49fa7d62694291db1d001a1c8c0a77c3f2c183e6def7d352b57a9714c542be33",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000600",
+          "name": "Celli\u00e8re2011 - Plasticity of TGF-\u03b2 Signalling",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000600?filename=BIOMD0000000600_url.xml",
+          "retrieved_at": "2026-11-02T01:01:13Z",
+          "byte_size": 236464,
+          "sha256": "0f6d241fdf1e0ffd46fbb0f203c0b83c135e23c6bb0ae81d3dfad7fd4a9c1827",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000039",
+          "name": "Marhl2000_CaOscillations",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000039?filename=BIOMD0000000039_url.xml",
+          "retrieved_at": "2026-11-02T01:01:14Z",
+          "byte_size": 21681,
+          "sha256": "6b221222be03747b11454cc4f2a6218697d9c6367d3578a170c7cc5c34ad3b12",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000050",
+          "name": "Martins2003_AmadoriDegradation",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000050?filename=BIOMD0000000050_url.xml",
+          "retrieved_at": "2026-11-02T01:01:18Z",
+          "byte_size": 25527,
+          "sha256": "4846396a6621661b5faa775f7f7b48aefe36c3396bb2da41aeb96f3319d084ad",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000035",
+          "name": "Vilar2002_Oscillator",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000035?filename=BIOMD0000000035_url.xml",
+          "retrieved_at": "2026-11-02T01:01:19Z",
+          "byte_size": 36048,
+          "sha256": "3303169fdd9a672fa25c26586822c9a1b91ac461744d1926d317f493e6981237",
+          "license": null
+        },
+        {
+          "id": "BIOMD0000000036",
+          "name": "Tyson1999_CircClock",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000036?filename=BIOMD0000000036_url.xml",
+          "retrieved_at": "2026-11-02T01:01:22Z",
+          "byte_size": 15168,
+          "sha256": "c95e89456a74ebf7bbef76e648ac4e83f59a913b894b01a69387458ae77802f4",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000037",
+          "name": "Marwan2003 - Genetics, regulatory hierarchy between genes",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000037?filename=BIOMD0000000037_url.xml",
+          "retrieved_at": "2026-11-02T01:01:23Z",
+          "byte_size": 19565,
+          "sha256": "2a8f7a68ac7efd45e09f42a1a5f5e30c9a47b9c039fb79ecf86ef7e3def17c07",
+          "license": "CC0 1.0"
+        },
+        {
+          "id": "BIOMD0000000038",
+          "name": "Rohwer2000_Phosphotransferase_System",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000038?filename=BIOMD0000000038_url.xml",
+          "retrieved_at": "2026-11-02T01:01:28Z",
+          "byte_size": 40811,
+          "sha256": "33708cec1fad44db6958c3ac6255397ad79b45564a296d29732fd934608d787b",
+          "license": null
+        }
+      ],
+      "role": "Deposited pathway ODEs. Memory counts were computed from these files. The authors' .mat result files were not opened."
+    }
+  ],
+  "method": "analysis.py fetches each Table S1 SBML file from EBI BioModels and, for clamp scales 10, 50 and 100, counts UCS-based memories plus associative memories. A UCS memory is a factor-of-2 regulation during a 50-time-unit clamp that is still at least halfway from the baseline mean after a 50-time-unit release. An associative memory is a node that does not regulate the response, then does so by a factor of 2 after a paired clamp with a node that does. Integration is scipy BDF on libroadrunner rates, one model per subprocess, 240 second limit, models outside 3\u201312 floating species excluded before scoring. decide() compared the fractions same and lost and the count gained with the pre-registered thresholds.",
+  "measured": {
+    "value": 0.6086956521739131,
+    "unit": "fraction of completed models with fewer memories at scale 10 or scale 50 than at scale 100",
+    "n": 23,
+    "uncertainty": "deterministic given the SBML bytes, the BDF tolerances, and the pre-registered memory rules",
+    "extra": {
+      "N": 23,
+      "same": 0.2608695652173913,
+      "lost": 0.6086956521739131,
+      "gained": 6,
+      "size_eligible": 27,
+      "failed_size_eligible": 4,
+      "memory_counts": [
+        {
+          "id": "BIOMD0000000001",
+          "n_species": 12,
+          "memory_count": {
+            "10": 121,
+            "50": 121,
+            "100": 121
+          },
+          "ucs_memories": {
+            "10": 121,
+            "50": 121,
+            "100": 121
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000003",
+          "n_species": 3,
+          "memory_count": {
+            "10": 0,
+            "50": 2,
+            "100": 3
+          },
+          "ucs_memories": {
+            "10": 0,
+            "50": 2,
+            "100": 3
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000004",
+          "n_species": 5,
+          "memory_count": {
+            "10": 26,
+            "50": 26,
+            "100": 27
+          },
+          "ucs_memories": {
+            "10": 8,
+            "50": 12,
+            "100": 14
+          },
+          "associative_memories": {
+            "10": 18,
+            "50": 14,
+            "100": 13
+          }
+        },
+        {
+          "id": "BIOMD0000000005",
+          "n_species": 6,
+          "memory_count": {
+            "10": 27,
+            "50": 30,
+            "100": 36
+          },
+          "ucs_memories": {
+            "10": 8,
+            "50": 8,
+            "100": 8
+          },
+          "associative_memories": {
+            "10": 19,
+            "50": 22,
+            "100": 28
+          }
+        },
+        {
+          "id": "BIOMD0000000010",
+          "n_species": 8,
+          "memory_count": {
+            "10": 79,
+            "50": 70,
+            "100": 70
+          },
+          "ucs_memories": {
+            "10": 29,
+            "50": 29,
+            "100": 29
+          },
+          "associative_memories": {
+            "10": 50,
+            "50": 41,
+            "100": 41
+          }
+        },
+        {
+          "id": "BIOMD0000000017",
+          "n_species": 11,
+          "memory_count": {
+            "10": 52,
+            "50": 69,
+            "100": 83
+          },
+          "ucs_memories": {
+            "10": 14,
+            "50": 17,
+            "100": 20
+          },
+          "associative_memories": {
+            "10": 38,
+            "50": 52,
+            "100": 63
+          }
+        },
+        {
+          "id": "BIOMD0000000022",
+          "n_species": 10,
+          "memory_count": {
+            "10": 230,
+            "50": 253,
+            "100": 189
+          },
+          "ucs_memories": {
+            "10": 34,
+            "50": 41,
+            "100": 48
+          },
+          "associative_memories": {
+            "10": 196,
+            "50": 212,
+            "100": 141
+          }
+        },
+        {
+          "id": "BIOMD0000000021",
+          "n_species": 10,
+          "memory_count": {
+            "10": 46,
+            "50": 62,
+            "100": 52
+          },
+          "ucs_memories": {
+            "10": 10,
+            "50": 16,
+            "100": 18
+          },
+          "associative_memories": {
+            "10": 36,
+            "50": 46,
+            "100": 34
+          }
+        },
+        {
+          "id": "BIOMD0000000023",
+          "n_species": 5,
+          "memory_count": {
+            "10": 14,
+            "50": 14,
+            "100": 14
+          },
+          "ucs_memories": {
+            "10": 14,
+            "50": 14,
+            "100": 14
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000026",
+          "n_species": 11,
+          "memory_count": {
+            "10": 115,
+            "50": 106,
+            "100": 111
+          },
+          "ucs_memories": {
+            "10": 53,
+            "50": 50,
+            "100": 48
+          },
+          "associative_memories": {
+            "10": 62,
+            "50": 56,
+            "100": 63
+          }
+        },
+        {
+          "id": "BIOMD0000000027",
+          "n_species": 3,
+          "memory_count": {
+            "10": 4,
+            "50": 5,
+            "100": 5
+          },
+          "ucs_memories": {
+            "10": 4,
+            "50": 5,
+            "100": 5
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000483",
+          "n_species": 8,
+          "memory_count": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          },
+          "ucs_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000029",
+          "n_species": 4,
+          "memory_count": {
+            "10": 8,
+            "50": 8,
+            "100": 8
+          },
+          "ucs_memories": {
+            "10": 8,
+            "50": 8,
+            "100": 8
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000031",
+          "n_species": 3,
+          "memory_count": {
+            "10": 6,
+            "50": 6,
+            "100": 6
+          },
+          "ucs_memories": {
+            "10": 6,
+            "50": 6,
+            "100": 6
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 0,
+            "100": 0
+          }
+        },
+        {
+          "id": "BIOMD0000000631",
+          "n_species": 12,
+          "memory_count": {
+            "10": 366,
+            "50": 379,
+            "100": 385
+          },
+          "ucs_memories": {
+            "10": 27,
+            "50": 29,
+            "100": 31
+          },
+          "associative_memories": {
+            "10": 339,
+            "50": 350,
+            "100": 354
+          }
+        },
+        {
+          "id": "BIOMD0000000203",
+          "n_species": 5,
+          "memory_count": {
+            "10": 4,
+            "50": 5,
+            "100": 7
+          },
+          "ucs_memories": {
+            "10": 4,
+            "50": 4,
+            "100": 4
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 1,
+            "100": 3
+          }
+        },
+        {
+          "id": "BIOMD0000000204",
+          "n_species": 5,
+          "memory_count": {
+            "10": 4,
+            "50": 8,
+            "100": 8
+          },
+          "ucs_memories": {
+            "10": 4,
+            "50": 6,
+            "100": 6
+          },
+          "associative_memories": {
+            "10": 0,
+            "50": 2,
+            "100": 2
+          }
+        },
+        {
+          "id": "BIOMD0000000209",
+          "n_species": 8,
+          "memory_count": {
+            "10": 45,
+            "50": 58,
+            "100": 69
+          },
+          "ucs_memories": {
+            "10": 8,
+            "50": 9,
+            "100": 10
+          },
+          "associative_memories": {
+            "10": 37,
+            "50": 49,
+            "100": 59
+          }
+        },
+        {
+          "id": "BIOMD0000000210",
+          "n_species": 8,
+          "memory_count": {
+            "10": 21,
+            "50": 46,
+            "100": 46
+          },
+          "ucs_memories": {
+            "10": 13,
+            "50": 15,
+            "100": 16
+          },
+          "associative_memories": {
+            "10": 8,
+            "50": 31,
+            "100": 30
+          }
+        },
+        {
+          "id": "BIOMD0000000539",
+          "n_species": 6,
+          "memory_count": {
+            "10": 29,
+            "50": 26,
+            "100": 26
+          },
+          "ucs_memories": {
+            "10": 17,
+            "50": 18,
+            "100": 18
+          },
+          "associative_memories": {
+            "10": 12,
+            "50": 8,
+            "100": 8
+          }
+        },
+        {
+          "id": "BIOMD0000000664",
+          "n_species": 6,
+          "memory_count": {
+            "10": 9,
+            "50": 9,
+            "100": 9
+          },
+          "ucs_memories": {
+            "10": 1,
+            "50": 1,
+            "100": 1
+          },
+          "associative_memories": {
+            "10": 8,
+            "50": 8,
+            "100": 8
+          }
+        },
+        {
+          "id": "BIOMD0000000039",
+          "n_species": 5,
+          "memory_count": {
+            "10": 18,
+            "50": 22,
+            "100": 21
+          },
+          "ucs_memories": {
+            "10": 12,
+            "50": 12,
+            "100": 13
+          },
+          "associative_memories": {
+            "10": 6,
+            "50": 10,
+            "100": 8
+          }
+        },
+        {
+          "id": "BIOMD0000000037",
+          "n_species": 11,
+          "memory_count": {
+            "10": 54,
+            "50": 66,
+            "100": 66
+          },
+          "ucs_memories": {
+            "10": 31,
+            "50": 33,
+            "100": 33
+          },
+          "associative_memories": {
+            "10": 23,
+            "50": 33,
+            "100": 33
+          }
+        }
+      ],
+      "verdict_by_preregistered_rule": "refutes",
+      "reason": null
+    }
+  },
+  "data_kind": "computational",
+  "verdict": "refutes",
+  "confidence": 0.75,
   "caveats": [
-    "Written before any SBML file was downloaded and before any trajectory was generated. The MATLAB sources in GRN_ODE were read as the protocol; the repository's .mat result files were not opened.",
     "A simulation of deposited pathway models does not show that stimulus amplitude leaves memory intact in cells.",
-    "The paper's 52% and 10% figures pool memory phenotypes on the authors' MATLAB screen. This registration counts UCS-based and associative memories only, with the numerical bands above fixed before the run. Pairing, transfer and consolidation memories are not in the count.",
-    "Models outside 3–12 floating species, and models that fail to integrate or exceed 240 seconds, are excluded. Timeout exclusion can favour models that settle quickly; if it removes more than half of the size-eligible models the test is underpowered."
+    "The pre-registered rule refutes the claim: N = 23 completed models, same = 0.2608695652173913, lost = 0.6086956521739131, gained = 6. Refutation requires N >= 12 and lost >= 0.40. That holds. The pass rule also required same >= 0.50 and lost <= 0.20.",
+    "gained = 6 means six models had a higher memory count at scale 10 or 50 than at scale 100. That is the direction of the claim's remark that some models formed more memories under weaker stimulation. The registered rule still refutes, because the lost fraction is above 0.40.",
+    "The count is UCS-based memories plus associative memories only. Pairing, transfer and consolidation memories are not included. The paper's pooled percentages can use a wider set of memory phenotypes. This exclusion was stated before the run.",
+    "One completed model, BIOMD0000000483, has a memory count of zero at all three scales and is included in the same fraction. The registration did not drop zero counts.",
+    "Four of 27 size-eligible models failed to integrate, below the pre-registered half-failure cutoff. Assignment-rule species and a collapsed solver step are the failures. libroadrunner getRatesOfChange does not fire SBML events. Each epoch is one adaptive integration with the clamped species held fixed."
   ],
   "agent": {
     "kind": "cloud-agent",
