@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-pa04-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-14",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the claim holds for the cuttlefish, squid and octopus named in it, those three kinds each have eight arms, and the arms are short relative to the mantle in cuttlefish and squid and longer relative to the mantle in the octopus.",
+  "pass_criterion": "Pre-registered. Count clause passes if an admissible anatomical source states that cuttlefish, squid and octopus each have eight arms. Tentacles or proboscises, when the same source distinguishes them, are not added to the arm count. Length clause passes if, on specimen or species-mean measurements, the group median of (arm length / mantle length) for octopus exceeds the cuttlefish median and the squid median by at least 0.50 mantle-lengths each. Arm length for an individual is the median of its measured arms; a species value is the median of individual ratios, or the ratio of published mean arm length to mean mantle length when only means are given. A group median is the median of its species values. Each group needs at least 5 individuals or 2 species, else the length clause is unscored. Both clauses must pass for the verdict 'supports'.",
+  "fail_criterion": "Pre-registered. Verdict 'refutes' if the count clause fails (any of the three kinds is stated to have an arm count other than 8, tentacles excluded) or if the count clause passes and the length clause fails (octopus group median is less than or equal to both the cuttlefish median and the squid median). Verdict 'mixed' if the count clause passes and the length clause is partial: the octopus median exceeds only one of the other two groups, or it exceeds both but by less than 0.50 for at least one comparison. Verdict 'inconclusive' with reason 'data-unavailable' if the count source cannot be read, or if the count clause passes and the length clause is unscored because a group's measurements cannot be obtained or fall below the minimum n. Verdict 'inconclusive' with reason 'underpowered' if length measurements exist but every group is below the minimum n. Confidence, set by this rule and not revised after the numbers: 0.72 when both clauses are scored and each group has at least 2 species or 10 individuals; 0.60 when the verdict rests on the count clause alone; 0.55 for mixed; 0.35 for inconclusive.",
+  "planned_datasets": [
+    "treatise-online-17-anatomy-of-recent-coleoids",
+    "guerra-2001-sepia-morphometrics",
+    "hosono-2024-heterololigo-arm-lengths",
+    "voss-mehta-2022-octopus-arm-measurements",
+    "sealifebase-v26.06-morphdat-if-arm-fields-exist"
+  ],
+  "interpretation": "The sentence under test is the eight-feet count and the length contrast among Sepias, Calamaries and Poulps. In the same paragraph Aristotle separates two long proboscises of cuttlefish and squid from the eight feet, and says the poulp has no proboscises. Feet are therefore the arms, and proboscises are the tentacles. Short and long are read relative to the trunk, measured as arm length divided by mantle length. Nautiluses and other cephalopods outside cuttlefish, squid and octopus are outside the stated scope and are not scored. This is not a test of whether Aristotle's material-redistribution explanation is true.",
+  "test_contract": {
+    "expected_observation": "Cuttlefish, squid and octopus are each described as having eight arms, and the median arm-length/mantle-length of octopuses exceeds that of cuttlefish and of squid by at least half a mantle length.",
+    "disconfirming_observation": "Any of the three kinds has an arm count other than eight, tentacles excluded, or the octopus arm-length/mantle-length median is not greater than both of the other two.",
+    "admissible_datasets": "Open anatomical descriptions or specimen tables that state arm counts or measure arm length and mantle length of sepiids, squid and octopods, independent of Aristotle's text. A SeaLifeBase morphometrics table counts only if it actually has an arm-count field or numeric arm length and mantle length; otherwise it is not used.",
+    "inference_method": "Code arm counts from the anatomical text, tentacles excluded. For lengths, reduce arms within an individual to their median, individuals within a species to their median ratio (or the ratio of published means), and species within a kind to the group median. Compare those three medians with the fixed margin 0.50. Apply the verdict table in fail_criterion."
+  },
+  "caveats": [
+    "Before this file was committed, landing pages and documentation for the planned datasets were checked to confirm that the URLs respond and that arm count or arm length is the kind of variable they carry. No specimen table was downloaded and no arm-length ratio was computed.",
+    "Search snippets had already described the Treatise chapter as stating that decapodiform coleoids have four pairs of arms plus a pair of tentacles. That sentence is not used as a measurement; the script must extract it from the fetched text."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-05bb",
+    "date": "2026-11-01"
+  }
+}
