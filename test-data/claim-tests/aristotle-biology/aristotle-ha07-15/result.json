@@ -1,0 +1,55 @@
+{
+  "claim_id": "aristotle-ha07-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-15",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If men have fathered children at sixty and at seventy, the England and Wales live-birth registration table by single year of father's age records at least one birth at father's age 60 and at least one at father's age 70, or in a bin whose lower bound is that age.",
+  "pass_criterion": "Pre-registered. Support requires a table anchored by a cell whose text matches father and age (and is the age axis, not only the mother's), with births summed across years and across mother's age. The age-60 clause holds if the exact age 60 sums to at least 1, or, when exact ages stop before 60, a bin whose lower bound is 60 sums to at least 1. The age-70 clause is the same at 70. Both clauses must hold. Confidence 0.70. This does not measure whether most men remain sexually competent.",
+  "fail_criterion": "Pre-registered. Refute an age clause only if exact single-year ages run from 20 through 75, the sum of births at father's ages 25 through 39 is greater than 0, and the sum at that age and every higher listed exact age is 0. If one clause holds and the other is refuted, the verdict is mixed (confidence 0.60). If no father-age anchor is found, ages do not isolate 60 and 70, or the file is not a readable spreadsheet, the verdict is inconclusive with reason data-unavailable (confidence 0.40).",
+  "planned_datasets": [
+    "ons-live-births-age-mother-father-2000-2016"
+  ],
+  "expected_files": [
+    {
+      "name": "livebirthsbyageofmotherandfather2000to2016.xls",
+      "download_url": "https://www.ons.gov.uk/file?uri=/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/adhocs/008072livebirthsbyageofmotherandfather2000to2016englandandwales/livebirthsbyageofmotherandfather2000to2016.xls",
+      "landing_url": "https://www.ons.gov.uk/peoplepopulationandcommunity/birthsdeathsandmarriages/livebirths/adhocs/008072livebirthsbyageofmotherandfather2000to2016englandandwales",
+      "doi": null,
+      "byte_size": null,
+      "md5": null,
+      "license": null
+    }
+  ],
+  "rules": {
+    "anchor_pattern": "(?i)father",
+    "age_pattern": "(?i)age",
+    "support_min_births": 1,
+    "exact_ages": [60, 70],
+    "refute_age_min": 20,
+    "refute_age_max": 75,
+    "young_min": 25,
+    "young_max": 39,
+    "confidence_supports": 0.7,
+    "confidence_refutes": 0.65,
+    "confidence_mixed": 0.6,
+    "confidence_inconclusive": 0.4
+  },
+  "test_contract": {
+    "expected_observation": "Registered live births in England and Wales, 2000 to 2016, include fathers aged 60 and fathers aged 70.",
+    "disconfirming_observation": "The same complete registration table lists every father's age from 20 through 75, has births at ages 25 to 39, and has none at 60 or above, or none at 70 or above.",
+    "admissible_datasets": "A civil-registration table of live births by single year of father's age, or by bins whose lower bound is exactly 60 or exactly 70, for a defined population and set of years. Maternal-age tables, and bins such as 55 and over that mix ages below the target, do not isolate the claim.",
+    "inference_method": "Find the father-age anchor, sum births on that age axis, and apply the thresholds in pass_criterion and fail_criterion. Do not treat a mother-age margin as the father."
+  },
+  "interpretation": "The tested clauses are the ones a birth register can measure: men have procreated at about sixty and at seventy. 'Sexually competent' and 'in most cases' are not read off birth counts, because a man can be fertile and not appear as a registered father. A bin that starts at 70 counts as fathers aged at least 70, which is the upper-age example in the claim, and is labelled as a bin rather than as exact age 70.",
+  "caveats": [
+    "The population is births registered in England and Wales from 2000 to 2016, not men in Aristotle's world and not a measure of sexual function.",
+    "From 1 September 2009 the age of a second female parent can be included with father's age. That is a property of the registration system and is not removed here."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}

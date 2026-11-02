@@ -1,0 +1,54 @@
+{
+  "claim_id": "aristotle-ga05-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga05-16",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If white individuals occur in partridges, ravens, sparrows and bears that are ordinarily not white, iNaturalist has at least one research-grade, photographed observation of each named group whose description, tags or observation fields say the animal is albino, leucistic, or a white morph.",
+  "pass_criterion": "Pre-registered. Support requires at least one qualifying observation in every group: partridge (Perdix perdix or Alectoris rufa), raven (Corvus corax), sparrow (Passer domesticus), and bear (Ursus arctos or Ursus americanus). A qualifying observation is research grade, has at least one photo, has a community taxon equal to the queried species or a subspecies of it, and contains a term below in the description, tags, or observation-field values, not negated in the 15 characters before the match. Confidence 0.70.",
+  "fail_criterion": "Pre-registered. Zero qualifying observations do not refute an existence claim, because iNaturalist is not a complete survey. If one, two, or three groups have a qualifying observation and the others have none after the search limits below, the verdict is mixed (confidence 0.55). If every group has none, or the API does not return results, the verdict is inconclusive with reason underpowered or data-unavailable (confidence 0.45). Seasonal white species and the polar bear are not in the groups.",
+  "planned_datasets": [
+    "inaturalist-observations-api"
+  ],
+  "rules": {
+    "endpoint": "https://api.inaturalist.org/v1/observations",
+    "quality_grade": "research",
+    "per_page": 50,
+    "max_pages": 2,
+    "negation_chars": 15,
+    "groups": {
+      "partridge": ["Perdix perdix", "Alectoris rufa"],
+      "raven": ["Corvus corax"],
+      "sparrow": ["Passer domesticus"],
+      "bear": ["Ursus arctos", "Ursus americanus"]
+    },
+    "terms": {
+      "partridge": ["leucistic", "albino", "leucism", "white morph"],
+      "raven": ["leucistic", "albino", "leucism", "white morph"],
+      "sparrow": ["leucistic", "albino", "leucism", "white morph"],
+      "bear": ["leucistic", "albino", "leucism", "white morph", "spirit bear", "kermode"]
+    },
+    "negation": "(?i)(?:\\bnot\\b|\\bno\\b|\\bnon|\\bisn't\\b|\\bisnt\\b|\\bis not\\b)\\W{0,15}$",
+    "confidence_supports": 0.7,
+    "confidence_mixed": 0.55,
+    "confidence_inconclusive": 0.45
+  },
+  "test_contract": {
+    "expected_observation": "Each of the four named groups has a research-grade photograph identified as that species and described as albino, leucistic, or a white morph.",
+    "disconfirming_observation": "A complete survey of those species with no white individual. This iNaturalist search cannot show that, so absence is not a refutation.",
+    "admissible_datasets": "Public, georeferenced or photographed occurrence records with a species identification and a text field that states colour. The species must be ones that are ordinarily dark: red-legged and grey partridge, common raven, house sparrow, brown bear and American black bear. Polar bears, ptarmigan, and other normally white species are out of scope.",
+    "inference_method": "Query the iNaturalist observations API once per species and term, up to two pages of 50 research-grade observations, filter text client-side with the negation window, and score groups by whether any observation remains."
+  },
+  "interpretation": "The claim says white individuals have been observed in uniformly coloured kinds, naming partridges, ravens, sparrows and bears. It does not give a frequency, and the phrase 'development is perverted' is not tested by a photograph. Partridge is read as Perdix perdix and Alectoris rufa, not as seasonally white grouse. Sparrow is the house sparrow. Bears are brown and black bears, including the Kermode white morph, which is a white individual of a normally dark species. Ursus maritimus is excluded.",
+  "caveats": [
+    "White animals are photographed and described more often than ordinary ones, so this search can support existence and cannot estimate frequency.",
+    "Research grade is a community identification, not a new identification made for this test. The photographs themselves are not re-scored.",
+    "General knowledge before the search is that white individuals of these groups are reported. The pass rule is still one qualifying record per group, not a count chosen after seeing the API."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}

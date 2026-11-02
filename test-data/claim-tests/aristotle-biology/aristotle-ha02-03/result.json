@@ -1,0 +1,66 @@
+{
+  "claim_id": "aristotle-ha02-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-03",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the great majority of horned animals are cloven-hoofed and no solid-hoofed animal has a pair of horns, then among extant species in the pre-registered ungulate families the horned ones are mostly cloven and the solid-hoofed family has no horns.",
+  "pass_criterion": "Pre-registered. Antlers and ossicones count as horns. A great majority is a proportion strictly greater than 2/3 of extant species in horned families that belong to families coded cloven-hoofed. The universal holds if Equidae is coded solid-hoofed and hornless and no family in the panel is both solid-hoofed and horned. Both clauses must hold. Confidence 0.70.",
+  "fail_criterion": "Pre-registered. Refute if any panel family is solid-hoofed and horned, or if the cloven proportion among horned extant species is 1/2 or less (confidence 0.65). If the proportion is greater than 1/2 and at most 2/3 and the universal holds, the verdict is mixed (confidence 0.55). If Bovidae, Cervidae, Rhinocerotidae or Equidae lacks a hoof or horn code, or the Mammal Diversity Database file does not match the provider md5, the verdict is inconclusive (confidence 0.40) with reason data-unavailable or underpowered.",
+  "planned_datasets": [
+    "mdd-v1.13-zenodo-12738010",
+    "animal-diversity-web-family-accounts"
+  ],
+  "expected_files": [
+    {
+      "name": "MDD_v1.13_6753species.csv",
+      "download_url": "https://zenodo.org/api/records/12738010/files/MDD_v1.13_6753species.csv/content",
+      "landing_url": "https://zenodo.org/records/12738010",
+      "doi": "10.5281/zenodo.12738010",
+      "byte_size": 7821351,
+      "md5": "7cc31a21cc388119f4fbda6cdfdf96da",
+      "license": "CC BY 4.0"
+    }
+  ],
+  "rules": {
+    "majority_gt": 0.6666667,
+    "bare_majority_gt": 0.5,
+    "decisive_families": ["Bovidae", "Cervidae", "Rhinocerotidae", "Equidae"],
+    "extant_code": "0",
+    "extinct_code": "1",
+    "unrecognized_limit": 0.05,
+    "confidence_supports": 0.7,
+    "confidence_refutes": 0.65,
+    "confidence_mixed": 0.55,
+    "confidence_inconclusive": 0.4,
+    "families": ["Bovidae", "Cervidae", "Antilocapridae", "Giraffidae", "Rhinocerotidae", "Equidae", "Tapiridae", "Camelidae"],
+    "hoof": {"mode": "exclusive", "labels": [
+      ["solid", ["single hoof", "one hoof", "solid hoof", "single toe", "one toe", "a single digit"]],
+      ["other", ["three toes", "three-toed", "four toes", "four-toed", "three digits", "four digits"]],
+      ["cloven", ["cloven", "two toes", "two-toed", "split hoof", "split hooves", "even-toed"]]
+    ]},
+    "horns": {"mode": "priority", "labels": [
+      ["absent", ["hornless", "unhorned", "no horns", "without horns", "lack horns", "lacks horns", "do not have horns", "does not have horns", "not horned", "lack antlers", "no antlers"]],
+      ["paired", ["pair of horns", "two horns", "have horns", "has horns", "horned", "antlers", "have antlers", "ossicones", "ossicone"]],
+      ["single", ["single horn", "one horn"]]
+    ]}
+  },
+  "test_contract": {
+    "expected_observation": "More than two thirds of extant species in horned families of the panel are in cloven-hoofed families, and the solid-hoofed family (Equidae) is not horned.",
+    "disconfirming_observation": "A panel family is both solid-hoofed and horned, or at most half of the horned extant species are cloven-hoofed.",
+    "admissible_datasets": "A species checklist of extant mammals with family names, plus a public family account that states hoof type and cranial appendages. Counts are of species, with the family trait applied to every extant species in that family. Extinct rows are excluded. Fossils outside the checklist are not in the test.",
+    "inference_method": "Code hoof and horns from family-account phrases, count extant MDD species per family, and compare the cloven proportion to 2/3 and the solid-hoofed families to the horn codes."
+  },
+  "interpretation": "The great majority is pre-registered as more than two thirds, not a bare majority. The stag's antlers count as horns, as in the claim's examples. Equidae is the solid-hoofed group named in the claim's scope. Rhinoceroses can be horned without being solid-hoofed; they count in the horned denominator and against the cloven numerator if their hooves are not coded cloven. Applying one family code to every species hides hornless individuals and species, which is stated as a limit of the count.",
+  "caveats": [
+    "Family-level wording is not a measurement of every species. A family described as horned contributes all of its extant species.",
+    "Recently extinct species are those the checklist marks extinct. Older fossils are absent.",
+    "Provider md5 and size for the checklist are from the Zenodo API."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}

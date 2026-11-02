@@ -1,0 +1,49 @@
+{
+  "claim_id": "aristotle-ha06-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If only fish eggs that have been sprinkled with milt produce young, a public egg-incubation table for an oviparous fish will show development or hatching in a milt-exposed group and none in a group that was not exposed to milt.",
+  "pass_criterion": "Pre-registered. The file supports the claim if it has a column or factor that separates eggs exposed to milt or sperm from eggs not exposed, the unexposed group's hatch or developed-embryo count is 0, the exposed group's hatch or developed-embryo count is at least 1, and the unexposed group has at least 20 eggs. Confidence 0.75.",
+  "fail_criterion": "Pre-registered. The claim is refuted if that same contrast exists and the unexposed group produces young at a rate at least half the exposed group's rate, with at least 20 eggs in each group. Confidence 0.75. A column named Unfertilized, or defined as eggs inside an inseminated lot that did not fertilize, is not an unexposed arm. If the file has no unexposed arm, the verdict is inconclusive with reason data-unavailable and confidence 0.70, and hatch counts are not summed. If the provider md5 does not match, the verdict is inconclusive with reason data-unavailable and confidence 0.40.",
+  "planned_datasets": [
+    "usgs-lake-trout-hatch-p9h094s2"
+  ],
+  "expected_files": [
+    {
+      "name": "LakeTroutEggHatchData.csv",
+      "download_url": "https://www.sciencebase.gov/catalog/file/get/61d5ac1dd34ed79293ffa314?f=__disk__c3%2Fdc%2F87%2Fc3dc87f97fb144987214e5a7cb48c089f70f1af5",
+      "landing_url": "https://www.sciencebase.gov/catalog/item/61d5ac1dd34ed79293ffa314",
+      "doi": "10.5066/P9H094S2",
+      "byte_size": 74238,
+      "md5": "192ab0d3c453a1d20ffc8af11b01193c",
+      "license": null
+    }
+  ],
+  "rules": {
+    "unexposed_column": "(?i)(no[_\\s-]?sperm|without[_\\s-]?milt|unexposed|no[_\\s-]?milt|sperm[_\\s-]?absent|without[_\\s-]?sperm)",
+    "not_an_unexposed_arm": ["Unfertilized_Removed", "Dead_or_unsuccesful_hatch", "Hatched", "Larval_Mortality"],
+    "min_eggs": 20,
+    "confidence_contrast": 0.75,
+    "confidence_no_contrast": 0.7,
+    "confidence_bad_file": 0.4
+  },
+  "test_contract": {
+    "expected_observation": "Eggs of an oviparous fish that were not exposed to milt do not hatch or develop, while eggs from the same design that were exposed do.",
+    "disconfirming_observation": "Eggs never exposed to milt hatch or develop at a rate comparable to exposed eggs.",
+    "admissible_datasets": "An openly downloadable incubation table for an oviparous fish with a milt-exposed arm and an arm that received no milt, and counts of eggs and of hatched or developed young. Counts of unfertilized eggs inside a lot that was inseminated are not that contrast.",
+    "inference_method": "Require a column whose name matches the unexposed pattern in rules. If it is absent, stop without summing hatch columns and record data-unavailable. If it is present, compare hatch or development counts to the thresholds in pass_criterion and fail_criterion."
+  },
+  "interpretation": "The sentence says the female lays eggs, the male sheds milt over them, and only the sprinkled eggs produce young. Fertilization mode (external versus internal) does not measure that contrast. The USGS lake-trout release is the public incubation file whose metadata lists an Unfertilized column; the preregistered rule is that this column is eggs removed from inseminated lots, not a no-milt control, unless a separate unexposed column is actually present.",
+  "caveats": [
+    "ScienceBase attribute definitions, read as the data dictionary and not as the counts, describe Unfertilized_Removed as eggs that were not fertilized and removed, Hatched as eggs that were fertilized and hatched, and the abstract says gametes were fertilized in the field. Those definitions are why an Unfertilized column was excluded in advance.",
+    "Dryad fertilization tables located while choosing a file (Chinook salmon cortisol, zebrafish paternal starvation, heatwave paternal effects) describe unfertilized counts inside inseminated clutches. They were not downloaded and are not a second test."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}

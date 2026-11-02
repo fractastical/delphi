@@ -1,0 +1,72 @@
+{
+  "claim_id": "aristotle-ha02-24",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-24",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If horned quadrupeds that lack upper front teeth have four stomach chambers and are exactly the animals that chew the cud, species accounts will show that combination and will not show a cud-chewer outside it or a member of it with another stomach.",
+  "pass_criterion": "Pre-registered. A species is in the antecedent when horns are paired, single, antlers or ossicones, and upper incisors are absent. It matches when it also has four chambers and chews the cud. Support requires at least three matching antecedent species, including one bovid and one cervid, at least one coded species that is not antecedent and does not chew the cud, and at least one camelid with all four traits coded, and no counterexample. Confidence 0.60.",
+  "fail_criterion": "Pre-registered. A conditional counterexample is a fully coded horned species without upper incisors whose chamber count is not 4 or that does not chew the cud. An identity counterexample is a fully coded cud-chewer that is not in that antecedent set or does not have four chambers. One counterexample refutes the claim (confidence 0.70). If there is no counterexample but the minimum set is incomplete, the verdict is inconclusive with reason underpowered, or data-unavailable if no account could be fetched (confidence 0.40).",
+  "planned_datasets": [
+    "animal-diversity-web-ungulate-accounts"
+  ],
+  "rules": {
+    "min_matches": 3,
+    "confidence_supports": 0.6,
+    "confidence_refutes": 0.7,
+    "confidence_inconclusive": 0.4,
+    "contrast_split": "(?i)\\b(?:unlike|whereas|compared with|compared to|in contrast to|rather than)\\b",
+    "traits": {
+      "horns": {"mode": "priority", "labels": [
+        ["absent", ["hornless", "unhorned", "no horns", "without horns", "lack horns", "lacks horns", "do not have horns", "does not have horns", "not horned"]],
+        ["paired", ["pair of horns", "two horns", "have horns", "has horns", "horned", "antlers", "have antlers", "has antlers", "ossicones", "ossicone"]],
+        ["single", ["single horn", "one horn"]]
+      ]},
+      "upper_incisors": {"mode": "priority", "labels": [
+        ["absent", ["no upper incisors", "without upper incisors", "lack upper incisors", "lacks upper incisors", "lacking upper incisors", "upper incisors are absent", "upper incisors absent", "do not have upper incisors", "does not have upper incisors", "no incisors in the upper", "dental pad"]],
+        ["present", ["upper incisors", "incisors in the upper", "upper front teeth"]]
+      ]},
+      "chambers": {"mode": "exclusive", "labels": [
+        ["4", ["four-chambered", "four chambered", "four chambers", "four compartments", "four-compartment", "4-chambered", "rumen, reticulum, omasum"]],
+        ["3", ["three-chambered", "three chambered", "three chambers", "three compartments", "three-compartment", "3-chambered"]],
+        ["1", ["simple stomach", "monogastric", "single-chambered stomach", "one-chambered stomach"]]
+      ]},
+      "ruminates": {"mode": "priority", "labels": [
+        ["no", ["do not ruminate", "does not ruminate", "do not chew the cud", "does not chew the cud", "non-ruminant", "not a ruminant", "not ruminants"]],
+        ["yes", ["chew the cud", "chews the cud", "chew their cud", "chewing the cud", "ruminate", "ruminates", "rumination", "ruminant"]]
+      ]}
+    },
+    "species": [
+      {"name": "Bos taurus", "family": "Bovidae"},
+      {"name": "Ovis aries", "family": "Bovidae"},
+      {"name": "Cervus elaphus", "family": "Cervidae"},
+      {"name": "Giraffa camelopardalis", "family": "Giraffidae"},
+      {"name": "Antilocapra americana", "family": "Antilocapridae"},
+      {"name": "Camelus dromedarius", "family": "Camelidae"},
+      {"name": "Lama glama", "family": "Camelidae"},
+      {"name": "Equus caballus", "family": "Equidae"},
+      {"name": "Diceros bicornis", "family": "Rhinocerotidae"},
+      {"name": "Ceratotherium simum", "family": "Rhinocerotidae"},
+      {"name": "Rhinoceros unicornis", "family": "Rhinocerotidae"},
+      {"name": "Tapirus terrestris", "family": "Tapiridae"}
+    ],
+    "families": ["Bovidae", "Cervidae", "Giraffidae", "Antilocapridae", "Camelidae", "Equidae", "Rhinocerotidae", "Tapiridae"]
+  },
+  "test_contract": {
+    "expected_observation": "Every coded horned species that lacks upper incisors has four stomach chambers and chews the cud, and every coded cud-chewer is one of those species.",
+    "disconfirming_observation": "A horned species without upper incisors has a stomach that is not four-chambered, or a species chews the cud without being in that set.",
+    "admissible_datasets": "Public species accounts that state horns or antlers, upper incisors, stomach chambers and cud-chewing for the pre-registered ungulates. A family account fills a trait only when the species account does not state it. Contrast clauses about other animals are not coded.",
+    "inference_method": "Match the preregistered phrases in the subject clause of each sentence, with priority or exclusive mode as set per trait. Apply the minimum set and the counterexample rule."
+  },
+  "interpretation": "The quote identifies the horned animals that are not equally toothed in both jaws with the four-chambered cud-chewers. Antlers and ossicones count as horns because the claim's own examples include the stag and the test's giraffe is scored by the account's wording. A family sentence is used only as a fallback. Camelids are in the panel because they are the living cud-chewers outside the horned, four-chambered set; if their accounts do not state the four traits, the identity is untested rather than assumed.",
+  "caveats": [
+    "Phrase coding of prose can miss a trait that the account states in other words. Unstated is not a biological zero.",
+    "The panel is twelve species, not every ungulate. One counterexample on the panel can refute a universal; agreement of the panel does not prove the universal beyond those accounts."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}

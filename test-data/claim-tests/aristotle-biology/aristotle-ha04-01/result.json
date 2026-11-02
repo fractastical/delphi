@@ -1,0 +1,55 @@
+{
+  "claim_id": "aristotle-ha04-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha04-01",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If every cephalopod in Aristotle's sense has eight feet, each with two rows of suckers, except one octopus, then octopus, cuttlefish and squid accounts state eight arms, two sucker rows, and exactly one octopus species with a different sucker-row count.",
+  "pass_criterion": "Pre-registered. Feet are arms; tentacles are not feet. Support requires Octopus vulgaris coded as 8 arms and 2 sucker rows, both Eledone cirrhosa and Eledone moschata coded for arms and sucker rows, at least one cuttlefish and one squid coded as 8 arms with a sucker-row count, every coded arm count equal to 8, and exactly one species with a sucker-row count other than 2, and that species an octopus (Octopus or Eledone). Confidence 0.55, because the panel is not every species in the scope.",
+  "fail_criterion": "Pre-registered. Refute if any coded species has an arm count other than 8 (confidence 0.75), or if two or more species have a sucker-row count other than 2 (confidence 0.60), or if a cuttlefish or squid has a sucker-row count other than 2 (confidence 0.70), or if both Eledone species are coded and every sucker-coded species has 2 rows (the stated exception is absent; confidence 0.55). Otherwise, including a missing Eledone code, the verdict is inconclusive with reason data-unavailable or underpowered (confidence 0.40).",
+  "planned_datasets": [
+    "fao-cephalopods-vol3-i3489e",
+    "fao-cephalopods-vol2-i1920e",
+    "animal-diversity-web",
+    "sealifebase-species-summaries"
+  ],
+  "rules": {
+    "one_row_phrases": ["one row of suckers", "a single row of suckers", "single row of suckers", "uniserial suckers", "suckers in one row", "suckers arranged in one row", "one series of suckers", "a single series of suckers", "1 row of suckers"],
+    "two_row_phrases": ["two rows of suckers", "2 rows of suckers", "double row of suckers", "double rows of suckers", "biserial suckers", "suckers in two rows", "suckers arranged in two rows", "two series of suckers"],
+    "sources": {
+      "fao3": {"url": "https://www.fao.org/4/i3489e/i3489e.pdf", "must_contain": ["cephalopod", "octop"]},
+      "fao2": {"url": "https://www.fao.org/4/i1920e/i1920e.pdf", "must_contain": ["cephalopod", "squid"]}
+    },
+    "species": [
+      {"name": "Octopus vulgaris", "group": "octopus", "aliases": ["Octopus vulgaris"], "adw": "https://animaldiversity.org/accounts/Octopus_vulgaris/", "slb": "https://www.sealifebase.se/summary/Octopus-vulgaris.html", "pdf": ["fao3"]},
+      {"name": "Eledone cirrhosa", "group": "octopus", "aliases": ["Eledone cirrhosa"], "adw": null, "slb": "https://www.sealifebase.se/summary/Eledone-cirrhosa.html", "pdf": ["fao3"]},
+      {"name": "Eledone moschata", "group": "octopus", "aliases": ["Eledone moschata"], "adw": null, "slb": "https://www.sealifebase.se/summary/Eledone-moschata.html", "pdf": ["fao3"]},
+      {"name": "Sepia officinalis", "group": "cuttlefish", "aliases": ["Sepia officinalis"], "adw": "https://animaldiversity.org/accounts/Sepia_officinalis/", "slb": "https://www.sealifebase.se/summary/Sepia-officinalis.html", "pdf": []},
+      {"name": "Loligo vulgaris", "group": "squid", "aliases": ["Loligo vulgaris"], "adw": null, "slb": "https://www.sealifebase.se/summary/Loligo-vulgaris.html", "pdf": ["fao2"]},
+      {"name": "Doryteuthis pealeii", "group": "squid", "aliases": ["Doryteuthis pealeii", "Loligo pealeii"], "adw": "https://animaldiversity.org/accounts/Doryteuthis_pealeii/", "slb": "https://www.sealifebase.se/summary/Doryteuthis-pealeii.html", "pdf": ["fao2"]}
+    ],
+    "confidence_bad_arms": 0.75,
+    "confidence_two_exceptions": 0.6,
+    "confidence_non_octopus_exception": 0.7,
+    "confidence_no_exception": 0.55,
+    "confidence_supports": 0.55,
+    "confidence_inconclusive": 0.4
+  },
+  "test_contract": {
+    "expected_observation": "In octopus, cuttlefish and squid accounts, every species has eight arms and two sucker rows except exactly one octopus.",
+    "disconfirming_observation": "Any of those species has an arm count other than eight, or more than one species lacks two sucker rows, or both candidate one-row octopuses are coded and none departs from two rows.",
+    "admissible_datasets": "Published morphological accounts of the named species: the FAO cephalopod catalogue volumes whose text identifies them as the cephalopod catalogue, Animal Diversity Web species accounts, and SeaLifeBase species summaries. Nautilus and cirrate octopods are outside the claim's stated scope and are not in the panel. A name in a table of contents does not count unless the surrounding text states arms or sucker rows.",
+    "inference_method": "Extract a text window around each binomial, code arm number and sucker-row phrases, ignore a phrase that sits in a contrast clause, and apply the pass and fail rules. Sources that disagree are a conflict and do not count as a code."
+  },
+  "interpretation": "Aristotle's molluscs here are octopus, cuttlefish and squid, and the heledone is Eledone. Feet are the eight arms; the two tentacles of squid and cuttlefish are recorded and are not counted as feet. Loligo pealeii is an allowed alias of Doryteuthis pealeii because that is the name used in older catalogues. Two modern Eledone species with one sucker row refute 'one single species' even if Aristotle's heledone was a single kind. That lumping is a caveat on confidence, not a reason to merge the two species after the fact.",
+  "caveats": [
+    "The panel is six species chosen before download, not a census of cephalopods.",
+    "General knowledge before download is that Eledone is the one-row octopus and that squid have eight arms plus two tentacles. The codes still have to be present in the fetched text."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "bc-37abdfd5-2c7d-45b6-8f26-227da55194a4",
+    "date": "2026-11-01"
+  }
+}
