@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha02-16",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-16",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Fishes lack a neck, lack limbs, lack testes whether internal or external, and lack mammary glands.",
   "pass_criterion": "Pre-registered. Four clauses are scored separately for fishes, meaning Actinopterygii, Chondrichthyes, and non-tetrapod Sarcopterygii. A clause is supported if an anatomy ontology restricts the structure to a non-fish clade (only_in_taxon or an equivalent never_in_taxon covering fishes) or, for a single-species fish anatomy ontology, the structure's label is absent. A clause is contradicted if any fish is asserted to possess the structure. Supports only if all four clauses are supported and none is contradicted. Fins, paired fins and fin rays are not limbs. A gonad labeled testis or testicle in a fish contradicts the testicle clause.",
   "fail_criterion": "Pre-registered. Refutes if the testicle clause is contradicted, because the claim says no fish has testicles within or without. Mixed if at least one clause is contradicted and at least one other clause is supported. Inconclusive, reason data-unavailable, if neither ontology can be retrieved. Inconclusive, reason not-operationalizable, if the files contain no taxon or presence assertion that can score at least one clause.",
@@ -17,11 +17,149 @@
     "inference_method": "analysis.py matches class labels neck, limb, forelimb, hindlimb, testis and mammary gland, reads taxon axioms, and resolves NCBI lineages for the cited taxa. Zebrafish Anatomy Ontology terms count as structures of Danio rerio. A universal absence is supported only by an exclusion that covers fishes, or by absence of the label from the fish-species ontology together with no contradictory presence axiom. A single presence axiom contradicts that clause. The conjunction refutes when the testicle clause is contradicted and no other clause is positively supported; it is mixed when support and contradiction both occur."
   },
   "interpretation": "Fish follows the modern scope of jawed fishes and excludes tetrapods. Aristotle's limb is an arm or leg, so pectoral and pelvic fins do not count; a digit-bearing limb or a class labeled limb, forelimb or hindlimb does. Testicles map to the testis, internal or external. Breasts map to the mammary gland. An ontology axiom is a curated anatomical assertion, not a new dissection, and the caveat must say so.",
-  "datasets": [],
+  "datasets": [
+    {
+      "id": "zfa-zebrafish-anatomy",
+      "name": "Zebrafish Anatomy Ontology",
+      "landing_url": "https://purl.obolibrary.org/obo/zfa.obo",
+      "doi": null,
+      "version": "releases/2026-07-16",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://purl.obolibrary.org/obo/zfa.obo",
+          "retrieved_at": "2026-11-02T01:01:06Z",
+          "byte_size": 1656680,
+          "sha256": "ee378cb00699a69d8b6fb7c608041ae11db97f0caab5570d63982a9a2d18ee25"
+        }
+      ],
+      "role": "anatomy of one fish species, Danio rerio"
+    },
+    {
+      "id": "uberon-2026-10-01",
+      "name": "Uberon multi-species anatomy ontology",
+      "landing_url": "https://github.com/obophenotype/uberon/releases/tag/v2026-10-01",
+      "doi": null,
+      "version": "v2026-10-01",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://github.com/obophenotype/uberon/releases/download/v2026-10-01/uberon.obo",
+          "retrieved_at": "2026-11-02T01:01:06Z",
+          "byte_size": 22529133,
+          "sha256": "d4751a15d7551a8414caee2628c62bf68301d567caf54ccfa3eef383ae7cbb61"
+        }
+      ],
+      "role": "taxon constraints on neck, limb, testis and mammary gland"
+    }
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-5da8",
     "date": "2026-11-01"
-  }
+  },
+  "method": "analysis.py downloaded the Zebrafish Anatomy Ontology and Uberon release v2026-10-01 and parsed OBO term blocks. A clause is contradicted when the zebrafish ontology has an exact label or synonym neck, limb, forelimb, hindlimb, testis, testicle, or mammary gland or breast. An Uberon in_taxon or only_in_taxon axiom whose taxon label is Mammalia, Tetrapoda or Amniota is read as a restriction to a non-fish clade. never_in_taxon on a fish clade would also support the clause. dubious_for_taxon is recorded and does not by itself support it. Fins are not scored as limbs. A zebrafish label that is simply absent supports that clause under the pre-registered single-species rule. The conjunction is mixed when at least one clause is contradicted and at least one other clause is supported.",
+  "measured": {
+    "value": 1,
+    "unit": "clauses contradicted, of neck, limb, testis and mammary gland",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "clauses": {
+        "neck": {
+          "state": "supported",
+          "zebrafish_terms": [],
+          "uberon_restriction_to_nonfish": false,
+          "uberon_dubious_for_a_fish_clade": true,
+          "uberon_taxon_axioms": [
+            {
+              "id": "UBERON:0000974",
+              "name": "neck",
+              "relation": "dubious_for_taxon",
+              "taxon": "NCBITaxon:32443",
+              "taxon_label": "Teleostei",
+              "raw": "dubious_for_taxon NCBITaxon:32443 {source=\"ISBN:9780674021839\"} ! Teleostei"
+            }
+          ]
+        },
+        "limb": {
+          "state": "supported",
+          "zebrafish_terms": [],
+          "uberon_restriction_to_nonfish": true,
+          "uberon_dubious_for_a_fish_clade": false,
+          "uberon_taxon_axioms": [
+            {
+              "id": "UBERON:0002101",
+              "name": "limb",
+              "relation": "in_taxon",
+              "taxon": "NCBITaxon:32523",
+              "taxon_label": "Tetrapoda",
+              "raw": "in_taxon NCBITaxon:32523 {note=\"extends to stem tetrapods such as Eusthenopteron\"} ! Tetrapoda"
+            }
+          ]
+        },
+        "testis": {
+          "state": "contradicted",
+          "zebrafish_terms": [
+            {
+              "id": "ZFA:0000598",
+              "name": "testis",
+              "synonyms": [
+                "testes"
+              ]
+            }
+          ],
+          "uberon_restriction_to_nonfish": false,
+          "uberon_dubious_for_a_fish_clade": false,
+          "uberon_taxon_axioms": [
+            {
+              "id": "UBERON:0000473",
+              "name": "testis",
+              "relation": "in_lateral_side_of",
+              "taxon": null,
+              "taxon_label": "multicellular organism",
+              "raw": "in_lateral_side_of UBERON:0000468 {gci_relation=\"part_of\", gci_filler=\"NCBITaxon:7742\", notes=\"vertebrates\"} ! multicellular organism"
+            }
+          ]
+        },
+        "mammary": {
+          "state": "supported",
+          "zebrafish_terms": [],
+          "uberon_restriction_to_nonfish": true,
+          "uberon_dubious_for_a_fish_clade": false,
+          "uberon_taxon_axioms": [
+            {
+              "id": "UBERON:0001911",
+              "name": "mammary gland",
+              "relation": "in_taxon",
+              "taxon": "NCBITaxon:40674",
+              "taxon_label": "Mammalia",
+              "raw": "in_taxon NCBITaxon:40674 ! Mammalia"
+            }
+          ]
+        }
+      },
+      "contradicted": [
+        "testis"
+      ],
+      "supported": [
+        "neck",
+        "limb",
+        "mammary"
+      ],
+      "verdict_from_criteria": "mixed",
+      "reason": null
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.76,
+  "data_kind": "biological",
+  "caveats": [
+    "These are curated ontology axioms, not new dissections.",
+    "Zebrafish Anatomy Ontology term ZFA:0000598 is named testis, with synonym testes, in Danio rerio. That contradicts the claim that no fish has testicles.",
+    "Neck, limb, forelimb, hindlimb, mammary gland and breast have no exact label in that fish ontology. Uberon restricts limb to Tetrapoda and mammary gland to Mammalia. Neck is only marked dubious for Teleostei, so its support is the missing zebrafish label.",
+    "The limb axiom notes that the class extends to stem tetrapods such as Eusthenopteron. That fossil was not scored as a living fish.",
+    "Paired fins are not counted as limbs."
+  ]
 }

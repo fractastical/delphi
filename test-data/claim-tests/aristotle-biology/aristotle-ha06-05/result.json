@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-05",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Across bird species, incubation period increases with adult body size, and the interval from copulation to laying does so as well when that interval is recorded.",
   "pass_criterion": "Pre-registered. Among species with class Aves and positive values for both adult body mass and incubation period, the Spearman rank correlation between log10(adult body mass) and incubation period must be positive with a two-sided p-value below 0.05 and n at least 50. If a separate column records days from copulation to laying for at least 30 bird species, that column must show the same positive significant Spearman correlation with log10(adult body mass). Supports when every tested association meets this threshold.",
   "fail_criterion": "Pre-registered. Refutes if the incubation correlation is zero or negative, or if its two-sided p-value is 0.05 or higher, provided n is at least 50. Mixed if incubation passes and a recorded egg-formation interval fails the same threshold. Inconclusive, reason data-unavailable, if the table cannot be retrieved or has no incubation column for birds. Inconclusive, reason underpowered, if fewer than 50 bird species have both mass and incubation.",
@@ -16,11 +16,54 @@
     "inference_method": "Spearman rho on log10(adult mass in grams) versus incubation in days, species as the unit, dropping non-positive values. The two-sided p-value is from the t approximation t = rho * sqrt((n-2)/(1-rho^2)) with n-2 degrees of freedom, or from an exact permutation test of the ranks if the t approximation is undefined. Passes if rho > 0, p < 0.05 and n >= 50. The egg-formation clause is scored only when its own column exists."
   },
   "interpretation": "The claim names two intervals: egg formation after copulation, and hatching of the chick. Adult body mass is the size of the parent. In a combined gestation-or-incubation column, values for class Aves are incubation, because birds do not gestate. The egg-formation interval is not that column and is scored only from a distinct field. Larger parents taking longer is the direction required by according to the size.",
-  "datasets": [],
+  "datasets": [
+    {
+      "id": "anage-build-dataset",
+      "name": "AnAge build 15, Animal Ageing and Longevity Database",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "Build 15 (03/07/2023), 4,671 entries",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:51:20Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "species-level adult body mass and incubation period for birds"
+    }
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-5da8",
     "date": "2026-11-01"
-  }
+  },
+  "method": "analysis.py downloaded the AnAge dataset zip and read anage_data.txt. Rows with Class Aves, a positive Adult weight (g), and a positive Gestation/Incubation (days) were kept. For birds that combined column is incubation. Spearman rho is the Pearson correlation of the average ranks of log10(adult weight) and incubation days, with ties averaged. The two-sided p-value uses t = rho * sqrt((n-2)/(1-rho^2)) and the regularized incomplete beta. No column records days from copulation to laying, so that clause is untested.",
+  "measured": {
+    "value": 0.7936828144180257,
+    "unit": "Spearman rho of log10(adult weight in grams) versus incubation days",
+    "n": 588,
+    "uncertainty": null,
+    "extra": {
+      "spearman_rho": 0.7936828144180257,
+      "t_statistic": 31.58313659907274,
+      "p_value_two_sided": 1.3306823477713215e-128,
+      "egg_formation_columns": [],
+      "egg_formation": "untested",
+      "verdict_from_criteria": "supports",
+      "reason": null
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.81,
+  "data_kind": "biological",
+  "caveats": [
+    "The incubation association is positive: Spearman rho 0.7936828144180257, two-sided p 1.3306823477713215e-128, n 588.",
+    "The interval from copulation to laying is not a column in AnAge, so that half of the sentence is untested. Its absence does not block support under the pre-registered rule.",
+    "Species are not phylogenetically independent. The correlation is the cross-species pattern the claim states, not a phylogenetically controlled effect.",
+    "AnAge is a compilation of published life-history values. HAGR asks users to cite de Magalhaes and others 2024, Nucleic Acids Research 52(D1):D900-D908."
+  ]
 }

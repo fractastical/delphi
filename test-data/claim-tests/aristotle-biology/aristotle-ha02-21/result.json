@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha02-21",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-21",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "A comparative anatomical compilation records no gall bladder in the deer, the roe, the horse, the mule, the ass and the seal, records no gall bladder in at least one kind of pig, and records a gall bladder in at least one other viviparous quadruped.",
   "pass_criterion": "Pre-registered. In Gorham and Ivy 1938, code each of deer, roe, horse, mule, ass and seal as absent, present or unrecorded from an explicit gall-bladder statement tied to that taxon. Supports requires at least 5 of these 6 coded absent, none of the 6 coded present, at least one pig, hog, swine, Sus or peccary coded absent, and at least one positive-control viviparous quadruped (ox, cattle, sheep, goat, dog, cat or human) coded present.",
   "fail_criterion": "Pre-registered. Refutes if 2 or more of deer, roe, horse, mule, ass and seal are explicitly coded present. Mixed if exactly one of those six is present, or if the absence list holds but no pig kind is coded absent, or if only 4 of the 6 are absent and none are present. Inconclusive, reason data-unavailable, if the text cannot be retrieved. Inconclusive, reason not-operationalizable, if fewer than 4 of the 6 taxa are mentioned or if no positive control is coded present.",
@@ -16,11 +16,70 @@
     "inference_method": "Code the six named absences, the existential pig clause, and one positive control by string match to pre-registered taxon words followed by manual-free rules in analysis.py. Supports only when at least 5/6 are absent, 0/6 are present, one pig kind is absent, and one control is present. Refutes when at least 2/6 are present. Otherwise mixed, or inconclusive when coverage or the download fails the thresholds above."
   },
   "interpretation": "Aristotle's viviparous quadrupeds are mapped to mammals. Deer is any deer other than the roe (Cervus, Cervidae, or the word deer) and roe is Capreolus or roe. Horse excludes seahorse. Ass includes donkey and Equus asinus. Seal is a pinniped, not the verb sealed. Mule is the word mule. Pig kinds are pig, hog, swine, Sus and peccary. 'Some kinds of pig' is read as an existential claim that at least one kind lacks the organ, not a claim that other pigs possess it. The gall bladder is the anatomical organ, not bile itself.",
-  "datasets": [],
+  "datasets": [
+    {
+      "id": "gorham-ivy-1938-gall-bladder",
+      "name": "Gorham and Ivy 1938, General function of the gall bladder from the evolutionary standpoint (Internet Archive OCR)",
+      "landing_url": "https://archive.org/details/generalfunctiono223gorh",
+      "doi": "10.5962/bhl.title.2727",
+      "version": "Field Museum Zoological Series volume 22, number 3, publication 417, 1938",
+      "license": "Public domain. Internet Archive metadata: Published 1923-1977 without copyright notice.",
+      "files": [
+        {
+          "download_url": "https://archive.org/download/generalfunctiono223gorh/generalfunctiono223gorh_djvu.txt",
+          "retrieved_at": "2026-11-02T00:59:55Z",
+          "byte_size": 145304,
+          "sha256": "e561e077292b2e2e9c2d09f652db252e05a13eda091fe774bb79eab84adaa8bb"
+        }
+      ],
+      "role": "comparative gall-bladder presence and absence for named mammals"
+    }
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-5da8",
     "date": "2026-11-01"
-  }
+  },
+  "method": "analysis.py downloaded the Internet Archive DjVu OCR and split it at the table legend 'presence of the gall bladder is indicated'. A table row is present when it begins with + and absent when it begins with a minus or dash; lines whose sign is an ambiguous '-\\\\' are skipped. A prose sentence is coded only when a presence or absence cue governs the words gall bladder, or when 'lost the organ' follows a sentence that names the gall bladder. Each of the six taxa, pigs, and the positive controls is then the set of those signs. The pre-registered thresholds are applied to those codes and the hit list is written to derived/evidence.json.",
+  "measured": {
+    "value": 2,
+    "unit": "named taxa coded absent out of deer, roe, horse, mule, ass and seal",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "codes": {
+        "deer": "conflict",
+        "roe": "unrecorded",
+        "horse": "absent",
+        "mule": "unrecorded",
+        "ass": "absent",
+        "seal": "present",
+        "pig": "conflict",
+        "control": "present"
+      },
+      "n_absent": 2,
+      "n_present": 1,
+      "n_conflict": 1,
+      "n_unrecorded": 2,
+      "pig_absence_recorded": true,
+      "positive_control_present": true,
+      "verdict_from_criteria": "mixed",
+      "reason": null
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.78,
+  "data_kind": "biological",
+  "caveats": [
+    "The source is a 1938 compilation of published dissections, read from OCR, not a new dissection of each species.",
+    "Deer is a conflict: the prose says true deer lost the organ, most Cervus rows are marked absent, and one row marks Cervus axis present (Crisp 1862) against another that marks it absent (Raven 1936).",
+    "Roe (Capreolus) and the mule are not named in the monograph, so two of the six absences are unrecorded.",
+    "The seal code rests on two table rows, +Phoca groenlandica and an OCR-garbled +Phoca row. Both signs are plus.",
+    "True pigs are stated to possess a gall bladder. The peccaries are stated to have lost the organ, which is the existential 'some kinds of pig' clause."
+  ],
+  "deviations": [
+    "The pre-registration did not say how to combine several records for one taxon. A taxon with both an unambiguous present record and an unambiguous absent record is coded conflict, which is neither coded absent nor coded present, so a conflict does not count toward the two-present refutation or the five-absent support rule.",
+    "After the text was retrieved, musk-deer, Moschus and the phrase traguline deer were excluded from the deer pattern. Aristotle's deer is not the musk-deer or a chevrotain. The deer code remains conflict without those phrases, because Cervus rows already disagree."
+  ]
 }
