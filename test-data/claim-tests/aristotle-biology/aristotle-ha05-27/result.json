@@ -2,10 +2,10 @@
   "claim_id": "aristotle-ha05-27",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-27",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:25:00Z",
   "hypothesis": "If the female elephant carries her young for two years and bears only one at a time, every living elephant species in the life-history tables has a gestation nearer to two years than to one or three years, and a species-typical litter size of one.",
-  "pass_criterion": "Pre-registered (claim supported). In both AnAge and PanTHERIA, wherever a value is present: gestation length for Elephas maximus and for Loxodonta africana falls in the open interval (547.875, 913.125) days, which is nearer to 730.5 days (2 × 365.25) than to 365.25 or to 1095.75 days; and litter size falls in [1.0, 1.05]. Any further species in genus Elephas or Loxodonta that has a value must meet the same two tests. Where both databases report the same species and quantity, they must agree on which side of the threshold the value falls. Both named species must have a gestation value and a litter-size value in at least one database.",
+  "pass_criterion": "Pre-registered (claim supported). In both AnAge and PanTHERIA, wherever a value is present: gestation length for Elephas maximus and for Loxodonta africana falls in the open interval (547.875, 913.125) days, which is nearer to 730.5 days (2 \u00d7 365.25) than to 365.25 or to 1095.75 days; and litter size falls in [1.0, 1.05]. Any further species in genus Elephas or Loxodonta that has a value must meet the same two tests. Where both databases report the same species and quantity, they must agree on which side of the threshold the value falls. Both named species must have a gestation value and a litter-size value in at least one database.",
   "fail_criterion": "Pre-registered (claim refuted). Gestation outside (547.875, 913.125) days for any Elephas or Loxodonta species, in every database that reports that species, refutes the two-year clause. Litter size >= 1.5 for any such species refutes the uniparous clause. Either failure refutes the claim. If the two databases disagree on whether a species' gestation is inside the window, or one species passes and another fails, the verdict is mixed. Litter size in (1.05, 1.5), with gestation inside the window and no litter >= 1.5, is mixed. If neither database has a gestation for any Elephas or Loxodonta species, the verdict is inconclusive with reason data-unavailable. If gestation is missing for the litter clause entirely while gestation itself passes, the verdict is inconclusive with reason data-unavailable. If only one of Elephas maximus and Loxodonta africana has data and that species passes both clauses, the verdict is inconclusive with reason underpowered.",
   "planned_datasets": [
     "anage-dataset-zip",
@@ -19,7 +19,10 @@
   },
   "interpretation": "The claim says 'two years' and 'only one young at a time' (uniparous). Two years is read at the resolution of a year: the reported length must be closer to two years than to one or three, using a 365.25-day year. Uniparous is read as a species-typical litter of one. A mean of at most 1.05 still counts as one, because a few twins do not make the typical birth a multiple. A mean of 1.5 or more means more than one is usual. The word 'never' is not in this sentence; a mean of 1 does not prove twins are impossible, and the test does not claim that it does. Scope is elephants, so both living species named Elephas maximus and Loxodonta africana have to be present for a support.",
   "caveats": [
-    "Column names were not inspected in the elephant rows before this file was committed. The script will select the gestation column and the litter-size column by header text. No gestation or litter value for an elephant has been read."
+    "Column names were not inspected in the elephant rows before this file was committed. The script selects the gestation column and the litter-size column by header text.",
+    "The two-year clause passes only under the pre-registered year-resolution window. The four gestation values are 634.49 to 670 days, about 1.74 to 1.83 years, which is nearer two years than one or three and is shorter than 24 months.",
+    "PanTHERIA litter sizes are 1.41 for Elephas maximus and 0.84 for Loxodonta africana. AnAge records 1 for both. This test does not re-derive those means from the papers PanTHERIA cites. The 0.84 value is below one offspring and still fails the pass interval [1.0, 1.05].",
+    "Loxodonta cyclotis is in PanTHERIA with both fields missing, so it casts no vote. Elephant shrews and the elephant fish are other genera and were excluded by the pre-registered genus filter."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -27,5 +30,121 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-ha-claim-tests-665a",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.74,
+  "datasets": [
+    {
+      "id": "anage-dataset-zip",
+      "name": "AnAge life-history table (build 15)",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gkx1042",
+      "version": "build 15",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "final_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:24:46Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "gestation length and litter size for Elephas and Loxodonta"
+    },
+    {
+      "id": "pantheria-1-0-wr05-aug2008",
+      "name": "PanTHERIA 1.0 WR05 August 2008",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "doi": "10.1890/08-1494.1",
+      "version": "1.0 (WR05, Aug 2008)",
+      "license": "Ecological Archives; copyright restrictions stated as none",
+      "files": [
+        {
+          "name": "PanTHERIA_1-0_WR05_Aug2008.txt",
+          "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "final_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "retrieved_at": "2026-11-02T00:24:46Z",
+          "byte_size": 2359096,
+          "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a"
+        }
+      ],
+      "role": "independent gestation length and litter size for the same elephants"
+    }
+  ],
+  "measured": {
+    "value": 1.41,
+    "unit": "maximum recorded litter size among elephant rows with a value",
+    "n": 4,
+    "uncertainty": "gestation clause supports; litter clause mixed; gestation days [644.0, 670.0, 634.49, 660.0]",
+    "extra": {
+      "gestation_clause": "supports",
+      "litter_clause": "mixed",
+      "window_days": [
+        547.875,
+        913.125
+      ],
+      "rows": [
+        {
+          "database": "anage",
+          "species": "Elephas maximus",
+          "gestation_days": 644.0,
+          "litter_size": 1.0,
+          "gestation_band": "inside",
+          "litter_band": "pass",
+          "gestation_years": 1.7632
+        },
+        {
+          "database": "anage",
+          "species": "Loxodonta africana",
+          "gestation_days": 670.0,
+          "litter_size": 1.0,
+          "gestation_band": "inside",
+          "litter_band": "pass",
+          "gestation_years": 1.8344
+        },
+        {
+          "database": "pantheria",
+          "species": "Elephas maximus",
+          "gestation_days": 634.49,
+          "litter_size": 1.41,
+          "gestation_band": "inside",
+          "litter_band": "intermediate",
+          "gestation_years": 1.7371
+        },
+        {
+          "database": "pantheria",
+          "species": "Loxodonta africana",
+          "gestation_days": 660.0,
+          "litter_size": 0.84,
+          "gestation_band": "inside",
+          "litter_band": "below",
+          "gestation_years": 1.807
+        },
+        {
+          "database": "pantheria",
+          "species": "Loxodonta cyclotis",
+          "gestation_days": null,
+          "litter_size": null,
+          "gestation_band": "missing",
+          "litter_band": "missing",
+          "gestation_years": null
+        }
+      ]
+    }
+  },
+  "deviations": [
+    {
+      "what": "A litter size below 1.0 had no named band in the pre-registration.",
+      "why": "The pass interval is [1.0, 1.05] and the refute threshold is >= 1.5. A value below 1 fails the pass interval and does not meet the refute threshold, so it is scored with the intermediate band as mixed. The thresholds themselves were not changed."
+    }
+  ],
+  "method": "Downloaded the AnAge build zip and the PanTHERIA WR05 table. Kept rows whose genus is Elephas or Loxodonta, read gestation in days and litter size, treated negative sentinels as missing, and applied the pre-registered day window and litter bands. Gestation clause: supports. Litter clause: mixed.",
+  "results_summary": [
+    "Scored rows: 4. Gestation days: [644.0, 670.0, 634.49, 660.0].",
+    "Litter sizes: [1.0, 1.0, 1.41, 0.84]. Maximum litter size 1.41.",
+    "Gestation clause supports; litter clause mixed; verdict mixed."
+  ]
 }
