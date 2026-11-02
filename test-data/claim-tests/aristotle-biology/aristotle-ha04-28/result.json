@@ -1,0 +1,112 @@
+{
+  "claim_id": "aristotle-ha04-28",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha04-28",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the eel is neither male nor female and produces no offspring, the FishBase reproduction record for the European eel Anguilla anguilla does not describe separate sexes, and neither that record nor OBIS life-stage counts record eggs or larvae.",
+  "pass_criterion": "Pre-registered (claim supported). The FishBase reproduction record for Anguilla anguilla was retrieved and its mode states that the sexes are not separate (wording such as no distinguishable sex, no gonads, or sexless), the reproduction text does not match egg, eggs, spawning, fecundity, leptocephalus, or larva/larvae, and the OBIS life-stage facet for Anguilla anguilla, if retrieved, has a zero count for every bucket whose label matches egg, larva, or leptocephalus.",
+  "fail_criterion": "Pre-registered (claim refuted). The claim is a universal negative, so one recorded counterexample refutes it. It is refuted if the reproduction mode matches dioecism, dioecious, gonochorism, gonochoristic, or separate sexes, or if the reproduction text matches egg, eggs, spawning, fecundity, leptocephalus, larva, or larvae, or if an OBIS life-stage bucket labelled egg, larva, or leptocephalus has a count of at least 1. If the summary page cannot be retrieved and OBIS returns no life-stage facet, the verdict is inconclusive with reason data-unavailable. If the page is retrieved but contains no reproduction mode and OBIS has no life-stage facet, the verdict is inconclusive with reason other.",
+  "planned_datasets": [
+    "fishbase-anguilla-anguilla",
+    "obis-anguilla-anguilla-lifestage"
+  ],
+  "test_contract": {
+    "expected_observation": "The European eel's public reproduction record does not assign it separate sexes and does not record eggs, spawning, or a larval stage, and OBIS has no egg or leptocephalus records.",
+    "disconfirming_observation": "The same record codes separate sexes, or it or OBIS records eggs, spawning, or larvae. Either one is enough, because the claim says the eel is neither sex and engenders nothing.",
+    "admissible_datasets": "A public species account of Anguilla anguilla, the European eel of the Mediterranean and eastern Atlantic, plus a public occurrence store that separates life stages. River-caught yellow eels without a life stage do not count as offspring.",
+    "inference_method": "The reproduction block linked from the FishBase species summary is matched with the pre-registered expressions. OBIS is queried for Anguilla anguilla with a life-stage facet and size 0 so that only counts are stored. Any positive egg, larva, or leptocephalus count, or a dioecious mode, refutes the claim."
+  },
+  "interpretation": "Aristotle's eel is the European eel, Anguilla anguilla. 'Neither male nor female' is separate sexes in the reproduction record. 'Engenders nothing' and 'no eel has ever been seen with an egg' are eggs, spawning, fecundity, or a leptocephalus larva. Other Anguilla species are out of scope for the verdict.",
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "fishbase-anguilla-anguilla",
+      "name": "FishBase species summary for Anguilla anguilla",
+      "landing_url": "https://www.fishbase.se/summary/Anguilla-anguilla.html",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "name": "Anguilla-anguilla.html",
+          "download_url": "https://www.fishbase.se/summary/Anguilla-anguilla.html",
+          "retrieved_at": "2026-11-02T00:38:31Z",
+          "byte_size": 71786,
+          "sha256": "7d738a828759cdcd9dddf537f60e39dd91c4c19d0f5601f63eb1611edb10f379",
+          "http_status": 200
+        },
+        {
+          "name": "FishReproSummary.html",
+          "download_url": "https://www.fishbase.se/Reproduction/FishReproSummary.php?ID=35&GenusName=Anguilla&SpeciesName=anguilla&fc=49&StockCode=45",
+          "retrieved_at": "2026-11-02T00:38:32Z",
+          "byte_size": 12783,
+          "sha256": "a21e700301cab21b84f134aa4cd767c504c21fb3dbc230266595597f463526fb",
+          "http_status": 200
+        }
+      ],
+      "role": "reproduction mode and life-cycle text of the European eel"
+    },
+    {
+      "id": "obis-anguilla-anguilla-lifestage",
+      "name": "OBIS occurrence life-stage facet for Anguilla anguilla",
+      "landing_url": "https://obis.org/",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "name": "obis-lifestage.json",
+          "download_url": "https://api.obis.org/v3/facet?scientificname=Anguilla%20anguilla&facets=lifeStage",
+          "retrieved_at": "2026-11-02T00:38:32Z",
+          "byte_size": 383,
+          "sha256": "ee7e3177676f8804a8d394cdf67fbf03ae75c46184499a40e303877973c9b07a",
+          "http_status": 200
+        }
+      ],
+      "role": "counts of egg and larval occurrence records, without downloading occurrences"
+    }
+  ],
+  "caveats": [
+    "A web-search snippet of a FishBase species page mentioned spawning and testicles of the European eel before this registration. The reproduction table itself was not downloaded, and the expressions above were fixed from the claim rather than from that snippet. The verdict is the scripted match on the retrieved page.",
+    "The FishBase summary URL for a different Lophius page returned HTTP 200 in this session. The Anguilla summary URL was not opened.",
+    "Silver eels mature at sea. A river account that omits eggs would not by itself support the claim once a larval record exists.",
+    "The retrieved account also says that actual spawning has never been observed. That sentence does not remove the mode or the egg-scatterer guild from the same record."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-df92",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.84,
+  "measured": {
+    "value": 1,
+    "unit": "1 if the reproduction mode matches separate sexes, else 0",
+    "n": 1,
+    "uncertainty": null,
+    "extra": {
+      "mode_match": "dioecism",
+      "sexless_match": false,
+      "egg_or_larva_terms": [
+        "egg",
+        "spawning"
+      ],
+      "reproduction_slice_chars": 908,
+      "obis_life_stage_retrieved": true,
+      "obis_error": null,
+      "obis_egg_larva_leptocephalus_buckets": [],
+      "obis_egg_larva_leptocephalus_records": 0,
+      "obis_life_stage_buckets": 10,
+      "phrase_actual_spawning_never_observed": true
+    }
+  },
+  "method": "Fetched the FishBase species summary, followed the FishReproSummary link, and searched only the slice from the Mode field through the life-cycle paragraph. Separate-sex wording and egg, spawning, fecundity, or larva wording were matched with the pre-registered expressions. OBIS was queried with facets=lifeStage and size implied by the facet endpoint; buckets whose labels match egg, larva, or leptocephalus were summed. The HTML navigation label 'Eggs' is outside that slice.",
+  "results_summary": [
+    "Reproduction mode match: dioecism.",
+    "Egg or larva terms in the reproduction slice: ['egg', 'spawning'].",
+    "OBIS egg/larva/leptocephalus records: 0 across 0 buckets (life-stage buckets returned: 10).",
+    "Verdict refutes."
+  ]
+}
