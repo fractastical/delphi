@@ -1,0 +1,30 @@
+{
+  "claim_id": "aristotle-ha06-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-14",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:25:35Z",
+  "hypothesis": "If the claim holds, elasmobranchs bear live young after internal eggs, actinopterygian fishes lay eggs, and Lophius is oviparous.",
+  "pass_criterion": "Pre-registered. Using the FishBase v26.06 snapshot tables species, families and reproduc: a reproduc row is internal live-bearing if casefolded RepGuild2 contains both 'internal' and 'bear', or contains 'vivip'. A row with a non-empty RepGuild1 or RepGuild2 that is not internal live-bearing is oviparous. RepGuild1 'bearers' with no internal/viviparous RepGuild2 is unknown, not viviparous, so mouth-brooders are not counted as live-bearing. A species is viviparous if it has an internal-live-bearing row and no oviparous row, oviparous if the reverse, and mixed if it has both. Mixed species count in the denominator and as neither mode. Supported only if at least 50 elasmobranch species and at least 500 actinopterygian species have a mode, the viviparous proportion among elasmobranchs is >= 0.90, the oviparous proportion among actinopterygians is >= 0.95, and every Lophius species with a mode is oviparous (at least one Lophius species must have a mode).",
+  "fail_criterion": "Pre-registered. Refuted if the elasmobranch viviparous proportion is < 0.70 with at least 30 species, or the actinopterygian oviparous proportion is < 0.80 with at least 200 species. If neither the pass nor the fail thresholds are met, the verdict is mixed. If fewer than 30 elasmobranchs have a mode, the verdict is inconclusive with reason underpowered. If RepGuild2 values are present for more than 100 rows but none contain 'bear', 'vivip' or 'ovipar', the coding is not the reproductive-guild vocabulary and the verdict is inconclusive with reason not-operationalizable. If the tables cannot be downloaded, inconclusive with reason data-unavailable. Holocephali are counted only as a descriptive side table and are not in the elasmobranch denominator.",
+  "planned_datasets": [
+    "fishbase-v26.06-species-families-reproduc"
+  ],
+  "test_contract": {
+    "expected_observation": "At least 90% of elasmobranch species with a coded mode are internal live-bearers, at least 95% of actinopterygians with a coded mode are egg-layers, and Lophius species with a mode are egg-layers.",
+    "disconfirming_observation": "Fewer than 70% of coded elasmobranchs are internal live-bearers, or fewer than 80% of coded actinopterygians are egg-layers.",
+    "admissible_datasets": "A public species-level reproductive-mode table joined to a class classification, covering sharks, rays and bony fishes, not derived from Aristotle. One pinned FishBase snapshot. Species are not weighted by abundance.",
+    "inference_method": "Species proportions. Internal live-bearing is the Balon internal-bearer guild or an explicit viviparous string. External bearers stay unknown. The fishing-frog exception is the genus Lophius and is required to be oviparous. Thresholds are absolute proportions, not a statistical test against a fitted model."
+  },
+  "interpretation": "Cartilaginous fishes in this sentence are elasmobranchs (sharks and rays), matching the scope. Chimaeras are cartilaginous but are not folded into that set. 'Viviparous after internal eggs' includes yolk-sac and placental live-bearing and excludes egg-laying. The fishing-frog is Lophius, and the claim's own wording treats it as the exception that does not rear embryos internally, so the pass rule requires Lophius to be oviparous.",
+  "caveats": [
+    "Column names of the v26.06 parquet files were read from the parquet schema before registration. No RepGuild value, class label or species row was read."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c447",
+    "date": "2026-11-01"
+  }
+}

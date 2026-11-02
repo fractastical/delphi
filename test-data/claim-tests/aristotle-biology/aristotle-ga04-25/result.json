@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-ga04-25",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-25",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:25:35Z",
+  "hypothesis": "If the claim holds, the maximum longevity recorded for Homo sapiens exceeds the maximum longevity of every other species that is not an elephant, among records AnAge marks as credible.",
+  "pass_criterion": "Pre-registered. Using AnAge build 15, keep rows with a numeric Maximum longevity (yrs) and Data quality in {acceptable, high} (case-insensitive). Elephants are Family Elephantidae. The claim is supported only if the Homo sapiens value is strictly greater than the longevity of every non-Elephantidae species in that credible set, and the credible set contains at least 100 non-human species. Equality with any non-elephant refutes the strict wording 'lives a longer time than'.",
+  "fail_criterion": "Pre-registered. The claim is refuted if at least one non-Elephantidae species in the credible set has Maximum longevity (yrs) greater than or equal to the Homo sapiens value. If the Homo sapiens row is missing, longevity is not numeric, fewer than 100 non-human credible species remain, the quality vocabulary contains neither 'acceptable' nor 'high', or the zip SHA-256 is not e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630, the verdict is inconclusive (reason data-unavailable, or underpowered when only the sample-size floor fails). Outcomes that meet neither pass nor fail are not expected; if the comparison cannot be evaluated, inconclusive with reason other.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "In the credible AnAge subset, Homo sapiens has a higher maximum longevity than every species outside Elephantidae.",
+    "disconfirming_observation": "At least one non-elephant species with acceptable or high data quality has a maximum longevity greater than or equal to the human record.",
+    "admissible_datasets": "A public, versioned compilation of maximum longevity with an explicit data-quality flag, assembled independently of Aristotle's text. Captive and wild records are both admissible for the primary comparison because the claim says 'credible experience', which AnAge encodes as data quality rather than as origin. Low and questionable rows are excluded from the verdict and reported only as a sensitivity.",
+    "inference_method": "Direct comparison of the recorded maximum longevity of Homo sapiens with the maximum among other credible species, split by Elephantidae versus not. No regression and no average across species. A mammal-only repeat and a wild-only count of exceedances are descriptive and do not change the verdict."
+  },
+  "secondary_analyses_descriptive": [
+    "The same comparison restricted to Class Mammalia.",
+    "How many credible non-elephant exceedances, if any, are Specimen origin wild versus captivity or unknown.",
+    "Whether any low or questionable row exceeds the human value."
+  ],
+  "interpretation": "The sentence is read as a ranking of maximum lifespan: humans outlive every animal except that elephants are set aside. It is not read as a claim about mean lifespan, about life expectancy at birth, or about a single named elephant. 'Credible experience' is mapped to AnAge data quality acceptable or high. The scope line 'especially mammals' is reported as a secondary cut and does not replace the stated 'any animal'.",
+  "caveats": [
+    "Before this registration the zip SHA-256 and byte size were checked against the copy already stored at test-data/organisms/darwin-origin/ch11-14/data/anage_build15_dataset.zip, and the header line of anage_data.txt was read. No longevity value, data-quality value, or taxon row was read."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c447",
+    "date": "2026-11-01"
+  }
+}

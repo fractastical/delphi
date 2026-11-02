@@ -1,0 +1,30 @@
+{
+  "claim_id": "aristotle-ha09-40",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-40",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:25:35Z",
+  "hypothesis": "If the claim holds, the European robin and the common redstart are one species that replaces itself seasonally, and the same is true of the blackcap and the garden warbler.",
+  "pass_criterion": "Pre-registered. Each pair is supported only if the GBIF backbone assigns both names the same accepted species key. The claim is supported only if both pairs are supported. Pairs: Erithacus rubecula with Phoenicurus phoenicurus, and Sylvia atricapilla with Sylvia borin.",
+  "fail_criterion": "Pre-registered. A pair is refuted if the two names resolve to different accepted GBIF species keys and, in the test region, at least one calendar month has at least max(5, 5% of that species' month-tagged occurrences) for each species. The test region is Greece (country GR). If either species has fewer than 30 occurrences in Greece, that pair is retested on continent EUROPE under the same rule. The claim is refuted if either pair is refuted. A pair with different species keys, at least 30 occurrences each, and no joint month is mixed for that pair (taxonomy separates them, but the months do not show them together). The claim is mixed if no pair is refuted and at least one pair is mixed or only one pair is supported. If neither pair can be resolved, or occurrence counts cannot be retrieved, the verdict is inconclusive with reason data-unavailable. A pair that remains under 30 occurrences in both regions is untestable and does not by itself refute.",
+  "planned_datasets": [
+    "gbif-backbone-and-occurrences"
+  ],
+  "test_contract": {
+    "expected_observation": "Each named pair collapses to a single accepted species in the GBIF backbone.",
+    "disconfirming_observation": "A pair is two accepted species that are both recorded in the same month in Greece, or in Europe if Greece is too sparse, at the pre-registered count floor.",
+    "admissible_datasets": "A public taxonomic backbone plus public occurrence records with a month and a country or continent. Fossil records are excluded by requesting only non-fossil basisOfRecord values. Records need not have coordinates when the country or continent filter is set. The names are those in the claim's scope.",
+    "inference_method": "Identity is the accepted species key from the GBIF species match. Co-occurrence is a month facet on the occurrence search with limit 0. A joint month requires both a minimum count of 5 and at least 5% of each species' month-tagged records, so a handful of misidentified rows in a large European file does not qualify. NCBI taxonomy IDs may be reported as a check and do not set the verdict."
+  },
+  "interpretation": "The claim asserts transformation, not merely that one species is common in winter and another in summer. Seasonal replacement without taxonomic identity cannot pass. 'Beccafigo' is read as the garden warbler, following the claim's scope line, and the blackcap as Sylvia atricapilla. Greece is the primary region because the work is Aristotle's; Europe is the pre-registered fallback when Greece has fewer than 30 records for a species.",
+  "caveats": [
+    "Occurrence counts were not queried before this registration. Only the species-match endpoint was checked for an HTTP 200 response."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c447",
+    "date": "2026-11-01"
+  }
+}
