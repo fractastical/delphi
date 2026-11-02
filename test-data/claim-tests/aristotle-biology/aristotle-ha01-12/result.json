@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha01-12",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-12",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Every animal with a coat of hair, counting spines and quills as hair, bears live young. In particular the living monotremes, if they have a coat, are viviparous.",
+  "pass_criterion": "Pre-registered, before any account or abstract was downloaded. The universal would be supported only by a dataset that codes both a coat (hair, fur, pelage, spines or quills) and reproductive mode for hair-coated animals across the living mammal orders, including Monotremata, and that codes zero of those animals as oviparous. This test's sample is the living monotremes only, so a support verdict is not available from it. Reaching the pass condition would require a later test with that broader coding; this run must not report supports.",
+  "fail_criterion": "Pre-registered. Refutes if at least one species in the frozen list is coded, on its Animal Diversity Web account, as both coated and oviparous, and Europe PMC returns at least one title or abstract for that same binomial that codes oviparity and at least one that codes a coat. The order account for Monotremata can supply the coat and oviparity coding for the clade, but the refutation still needs those two Europe PMC hits for at least one species on the list. Inconclusive, reason underpowered, if no account codes a coated oviparous animal: absence of a counterexample in this sample does not confirm the universal. Inconclusive, reason data-unavailable, if every Animal Diversity Web account fails to load. Inconclusive, reason other, if an account codes a counterexample but Europe PMC does not corroborate both traits for any such species.",
+  "planned_datasets": [
+    "animal-diversity-web-monotreme-accounts",
+    "europepmc-monotreme-abstracts"
+  ],
+  "test_contract": {
+    "expected_observation": "No hair-coated animal lays eggs. On the accounts examined here, that would mean no monotreme account describes both a coat and egg-laying.",
+    "disconfirming_observation": "At least one living monotreme is described as having a coat of hair, fur, spines or quills and as laying eggs, in its Animal Diversity Web account and in Europe PMC titles or abstracts.",
+    "admissible_datasets": "Public species accounts or abstracts that state integument and reproductive mode in their own words, independent of Aristotle, for the frozen taxa only: Ornithorhynchus anatinus, Tachyglossus aculeatus, Zaglossus bartoni, Zaglossus attenboroughi, Zaglossus bruijnii, and the order account Monotremata. Account URLs are https://animaldiversity.org/accounts/<Name>/ with spaces as underscores. Europe PMC queries are TITLE_ABS searches on https://www.ebi.ac.uk/europepmc/webservices/rest/search (format=json, resultType=lite, pageSize=25). Header checks on 2026-11-02 UTC, bodies not downloaded: Ornithorhynchus_anatinus, Tachyglossus_aculeatus, Zaglossus_bartoni, Zaglossus_attenboroughi and Monotremata returned HTTP 200; Zaglossus_bruijnii returned HTTP 405 to HEAD and is still in the list for a GET. No further taxa may be added after the text is read.",
+    "inference_method": "From each account, take the passage under the heading Physical Description and the passage under the heading Reproduction, each running until the next heading. A coat is coded if that physical-description passage matches fur, hair, hairs, pelage, spine, spines, quill or quills, and does not match hairless, no fur, no hair, without fur, without hair, lacks hair, lack hair, no spines, without spines or lacks spines. Oviparity is coded if the reproduction passage matches oviparous, egg-laying or egg laying, or contains egg or eggs within 80 characters of lay, lays, laid or laying, and does not match does not lay, do not lay or never lays. A Europe PMC hit counts only when the returned title or abstract itself matches the same pattern; a hit with an empty abstract and a non-matching title does not count. Refutes only when both the account coding and the two literature hits (oviparity and coat, same species, possibly different papers) are present. Otherwise inconclusive, with the reason in fail_criterion. Supports is not a reachable verdict of this sample."
+  },
+  "interpretation": "Hair-coated follows the claim, which counts hedgehog and porcupine spines as hair, so echidna spines and quills count as a coat. Viviparous means bearing live young, as opposed to laying an egg. The claim is a universal. The living monotremes are the sample because they are the mammals for which egg-laying is the trait that would make the universal false; finding one coated egg-layer refutes it, and failing to find one here does not show that every coated animal bears live young. The test does not reclassify whales or other sparsely haired mammals, and it does not treat 'mammal' as a synonym that already includes the conclusion.",
+  "caveats": [
+    "Account and abstract bodies were not downloaded before this file was committed. Only HTTP status codes from header requests were recorded.",
+    "A universal claim is not confirmed by a handful of species. The pass condition names the survey that would be required, and this run is not that survey.",
+    "Keyword coding can miss a paraphrase or trip on a negation the pattern does not list. Those misses make the test fail to refute; they are not treated as support."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-de78",
+    "date": "2026-11-01"
+  }
+}
