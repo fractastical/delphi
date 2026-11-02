@@ -1,0 +1,405 @@
+{
+  "claim_id": "aristotle-ga05-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga05-16",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "If white individuals occur in otherwise dark-coloured partridges, ravens, sparrows and bears, research-grade photographed observations filed as albino or leucistic will include at least one species in each of those four groups.",
+  "pass_criterion": "Pre-registered. Each of the four groups has at least one qualifying observation. A qualifying observation is research grade, has at least one photo, is not marked captive, and matches the group. It must also either belong to the iNaturalist project albino-leucistic-birds, or contain the word albino, albinism, albinistic, leucistic, leucism, leukistic or leukism in an observation-field value, a tag, or the description. An observation whose text matches melanism, melanistic or melanic and does not match one of those white-aberration words does not qualify. Groups: ravens are observations whose scientific name is Corvus corax or whose preferred common name contains the word Raven; sparrows are genus Passer (scientific name beginning with 'Passer '); partridges are genera Alectoris and Perdix; bears are family Ursidae excluding Ursus maritimus and excluding any taxon whose preferred common name is Polar Bear.",
+  "fail_criterion": "Pre-registered. This project sample cannot refute the claim: a zero count is not evidence that no white individual exists. The verdict is mixed if one, two or three groups have at least one qualifying observation and the others have zero. The verdict is inconclusive with reason data-unavailable if the iNaturalist API does not return observation pages. The verdict is inconclusive with reason underpowered if the API returns pages and every group has zero qualifying observations. There is no refutation branch.",
+  "planned_datasets": [
+    "inaturalist-project-albino-leucistic-birds",
+    "inaturalist-project-albino-leucistic-melanistic-animals"
+  ],
+  "test_contract": {
+    "expected_observation": "At least one research-grade photographed observation of a raven, a Passer sparrow, an Alectoris or Perdix partridge, and a non-polar bear, each tied to an albino or leucistic label as defined in the pass criterion.",
+    "disconfirming_observation": "Nothing in these two projects would show that white individuals do not occur. A complete census of each species with zero aberrant individuals would be required to refute the existential claim, and these projects are not that census.",
+    "admissible_datasets": "Public observation records with a species identification, a photograph, and an explicit albino or leucistic label, or membership in a project whose stated subject is albino and leucistic birds. Normally white species, captive animals, and melanistic-only records are excluded. The projects must be independent of Aristotle's text.",
+    "inference_method": "Page the iNaturalist observations API for each group inside each project. Count qualifying observations per group. Support requires a positive count in all four groups. A positive count in some but not all groups is mixed. Zeros across all groups, or an API failure, are inconclusive and are not a refutation."
+  },
+  "interpretation": "The claim is existential: white individuals have been observed among partridges, ravens, sparrows and bears, in kinds that are otherwise of one colour. 'Development is perverted' is Aristotle's cause and is not tested. Seasonal whitening and species that are normally white are excluded by the polar-bear rule and by requiring an albino or leucistic label rather than any pale pixel. Greek partridges are mapped to Alectoris and Perdix, sparrows to Passer, and ravens to birds named raven, including Corvus corax. House sparrows and their congeners are the sparrow group; New World sparrows are not.",
+  "caveats": [
+    "Observation records were not queried before this registration. Project pages were identified from their public titles. The iNaturalist API host returned HTTP 200 for a taxon-name request; the observation search itself is part of the analysis.",
+    "Project membership and free-text labels are observer-supplied. Research grade supports the species identification, not a veterinary diagnosis of albinism.",
+    "A single mis-tagged photograph can satisfy an existential count. The confidence rule is therefore capped: 0.70 only if every group has at least three qualifying observations, otherwise 0.55 if all four groups are positive, 0.45 if mixed, 0.30 if inconclusive."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-tests-f1f3",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.55,
+  "datasets": [
+    {
+      "id": "inaturalist-project-albino-leucistic-birds",
+      "name": "iNaturalist project Albino & Leucistic birds",
+      "landing_url": "https://www.inaturalist.org/projects/albino-leucistic-birds",
+      "doi": null,
+      "version": "API v1 observations, retrieved 2026-11-02T00:44:55Z",
+      "license": "Per-observation licences returned by the API; project membership is user-contributed",
+      "files": [
+        {
+          "name": "observations-0.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=7998&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 19419512,
+          "sha256": "9c92d3451364974b9a6d359b66917472852c6dbd348f938f02d8cd017eb6301b"
+        },
+        {
+          "name": "observations-1.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=7998&quality_grade=research&captive=false&per_page=200&page=2&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 2249436,
+          "sha256": "7519842f8b32fb92bf7b0f3836b0ab55e92985e11632c602276ccb5f03e1fdce"
+        },
+        {
+          "name": "observations-2.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=13847&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 14637961,
+          "sha256": "18ea75a7abd6fee3b03f0a20ac10405dde6be25de6e6ad1b85dd813555179732"
+        },
+        {
+          "name": "observations-3.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=13847&quality_grade=research&captive=false&per_page=200&page=2&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 406320,
+          "sha256": "9460b6d57af1a95b5f44fb2ff7126c458649657a931b9850af32ca5fc95c7627"
+        },
+        {
+          "name": "observations-4.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=845&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 82375,
+          "sha256": "57583b7d3c51444726eab85deca8641c9da20424ea87f3b2ef90f53f1432c8cf"
+        },
+        {
+          "name": "observations-5.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-birds&taxon_id=826&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 40204,
+          "sha256": "624536beae74425b2b272993b2e80b2758ba0615dee7a4db61a983dbf304fcf1"
+        }
+      ],
+      "role": "research-grade photographed observations in a project limited to albino and leucistic birds"
+    },
+    {
+      "id": "inaturalist-project-albino-leucistic-melanistic-animals",
+      "name": "iNaturalist project Albino, Leucistic & Melanistic Animals",
+      "landing_url": "https://www.inaturalist.org/projects/albino-leucistic-melanistic-animals",
+      "doi": null,
+      "version": "API v1 observations, retrieved 2026-11-02T00:44:55Z",
+      "license": "Per-observation licences returned by the API; project membership is user-contributed",
+      "files": [
+        {
+          "name": "observations-6.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-melanistic-animals&taxon_id=7998&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 13748682,
+          "sha256": "30fb0edc07d3b6ebce85f621218d5e5dd3bbaba1b6eaf206fbbc07e00ead5002"
+        },
+        {
+          "name": "observations-7.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-melanistic-animals&taxon_id=13847&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 9369039,
+          "sha256": "ab892b26890fbf038afd9fd0232466c07d4cb6a825d79682deb4fd40434f6804"
+        },
+        {
+          "name": "observations-8.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-melanistic-animals&taxon_id=845&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 56,
+          "sha256": "fd3f5273480beb5b21f0093988495568550347782a2ec8776cd9a3bafae0c489"
+        },
+        {
+          "name": "observations-9.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-melanistic-animals&taxon_id=826&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 56,
+          "sha256": "fd3f5273480beb5b21f0093988495568550347782a2ec8776cd9a3bafae0c489"
+        },
+        {
+          "name": "observations-10.json",
+          "download_url": "https://api.inaturalist.org/v1/observations?project_id=albino-leucistic-melanistic-animals&taxon_id=41636&quality_grade=research&captive=false&per_page=200&page=1&order_by=id&order=asc&has[]=photos",
+          "retrieved_at": "2026-11-02T00:44:55Z",
+          "byte_size": 797466,
+          "sha256": "1188468969dd98e04b1ba2dd13156d7eaf7a8f5f825f68429959909dfd23f2f6"
+        }
+      ],
+      "role": "research-grade photographed observations; melanistic-only text is excluded and a white-aberration word is required"
+    }
+  ],
+  "method": "Resolved Corvus, Passer, Alectoris, Perdix and Ursidae on the iNaturalist taxa API, then paged research-grade, non-captive observations with photos in the two projects. Ravens are species or subspecies whose name is Corvus corax or whose preferred common name contains the word Raven. Sparrows are species in genus Passer. Partridges are Alectoris and Perdix. Bears are Ursidae except Ursus maritimus. The birds project qualifies without a further keyword. The animals project qualifies only when the description, a tag or an observation field matches albino or leucistic wording, and melanistic-only text is dropped. Observation ids were deduplicated within each group. The pre-registered rule has no refutation from a zero count.",
+  "measured": {
+    "value": 4,
+    "unit": "groups with at least one qualifying observation (ravens, sparrows, partridges, bears)",
+    "n": 266,
+    "uncertainty": null,
+    "extra": {
+      "counts": {
+        "ravens": 47,
+        "sparrows": 214,
+        "partridges": 2,
+        "bears": 3
+      },
+      "samples": {
+        "ravens": [
+          {
+            "id": 149503870,
+            "uri": "https://www.inaturalist.org/observations/149503870",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 150584937,
+            "uri": "https://www.inaturalist.org/observations/150584937",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by"
+          },
+          {
+            "id": 170687103,
+            "uri": "https://www.inaturalist.org/observations/170687103",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 183564302,
+            "uri": "https://www.inaturalist.org/observations/183564302",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": null
+          },
+          {
+            "id": 188215732,
+            "uri": "https://www.inaturalist.org/observations/188215732",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 191984643,
+            "uri": "https://www.inaturalist.org/observations/191984643",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by"
+          },
+          {
+            "id": 192212907,
+            "uri": "https://www.inaturalist.org/observations/192212907",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 195905936,
+            "uri": "https://www.inaturalist.org/observations/195905936",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 197357182,
+            "uri": "https://www.inaturalist.org/observations/197357182",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 203767171,
+            "uri": "https://www.inaturalist.org/observations/203767171",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 226401865,
+            "uri": "https://www.inaturalist.org/observations/226401865",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": null
+          },
+          {
+            "id": 231861079,
+            "uri": "https://www.inaturalist.org/observations/231861079",
+            "taxon": "Corvus corax",
+            "common": "Common Raven",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          }
+        ],
+        "sparrows": [
+          {
+            "id": 362042,
+            "uri": "https://www.inaturalist.org/observations/362042",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 19334503,
+            "uri": "https://www.inaturalist.org/observations/19334503",
+            "taxon": "Passer domesticus domesticus",
+            "common": "European house sparrow",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 20297889,
+            "uri": "https://www.inaturalist.org/observations/20297889",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by"
+          },
+          {
+            "id": 22345244,
+            "uri": "https://www.inaturalist.org/observations/22345244",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by"
+          },
+          {
+            "id": 36656074,
+            "uri": "https://www.inaturalist.org/observations/36656074",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": null
+          },
+          {
+            "id": 36923680,
+            "uri": "https://www.inaturalist.org/observations/36923680",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by"
+          },
+          {
+            "id": 51461071,
+            "uri": "https://www.inaturalist.org/observations/51461071",
+            "taxon": "Passer montanus",
+            "common": "Eurasian Tree Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 54899206,
+            "uri": "https://www.inaturalist.org/observations/54899206",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 54975871,
+            "uri": "https://www.inaturalist.org/observations/54975871",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": null
+          },
+          {
+            "id": 55248678,
+            "uri": "https://www.inaturalist.org/observations/55248678",
+            "taxon": "Passer montanus",
+            "common": "Eurasian Tree Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          },
+          {
+            "id": 58010279,
+            "uri": "https://www.inaturalist.org/observations/58010279",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": null
+          },
+          {
+            "id": 59425583,
+            "uri": "https://www.inaturalist.org/observations/59425583",
+            "taxon": "Passer domesticus",
+            "common": "House Sparrow",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          }
+        ],
+        "partridges": [
+          {
+            "id": 345678204,
+            "uri": "https://www.inaturalist.org/observations/345678204",
+            "taxon": "Alectoris barbara",
+            "common": "Barbary Partridge",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by"
+          },
+          {
+            "id": 405478358,
+            "uri": "https://www.inaturalist.org/observations/405478358",
+            "taxon": "Perdix perdix",
+            "common": "Gray Partridge",
+            "project": "albino-leucistic-birds",
+            "license": "cc-by-nc"
+          }
+        ],
+        "bears": [
+          {
+            "id": 11452108,
+            "uri": "https://www.inaturalist.org/observations/11452108",
+            "taxon": "Ursus americanus",
+            "common": "American Black Bear",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": null
+          },
+          {
+            "id": 82107298,
+            "uri": "https://www.inaturalist.org/observations/82107298",
+            "taxon": "Ursus arctos horribilis",
+            "common": "Grizzly Bear",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": null
+          },
+          {
+            "id": 373693841,
+            "uri": "https://www.inaturalist.org/observations/373693841",
+            "taxon": "Ursus americanus",
+            "common": "American Black Bear",
+            "project": "albino-leucistic-melanistic-animals",
+            "license": "cc-by-nc"
+          }
+        ]
+      },
+      "taxon_ids": {
+        "ravens": 7998,
+        "sparrows": 13847,
+        "partridges_alectoris": 845,
+        "partridges_perdix": 826,
+        "bears": 41636
+      },
+      "api_failed": false
+    }
+  },
+  "results_summary": [
+    "Qualifying observations: ravens=47, sparrows=214, partridges=2, bears=3.",
+    "Groups positive: 4 of 4. Verdict supports."
+  ]
+}
