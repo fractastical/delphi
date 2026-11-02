@@ -1,0 +1,108 @@
+{
+  "claim_id": "aristotle-ga01-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-15",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, accounts of the octopus arm that enters the female's funnel describe it as an attachment organ only, with no role in passing sperm or spermatophores.",
+  "pass_criterion": "Pre-registered. Fetch the Animal Diversity Web account of Octopus vulgaris and the Wikipedia article Hectocotylus. On each stripped page, a generative hit is 'hectocotyl' within 200 characters of sperm, spermatophore, or fertil, or the phrase 'sperm groove' or 'transfers sperm' or 'transfer of spermatophores'. An attachment-only hit is 'attachment' or 'holding' or 'holdfast' within 120 characters of 'arm' or 'hectocotyl', together with a negation ('only', 'not an organ', 'no role', 'not used') in that same window, and the page has no generative hit. Supported only if at least one page is attachment-only and neither page has a generative hit.",
+  "fail_criterion": "Pre-registered. Refuted if either page has a generative hit. Mixed if one page is attachment-only and the other has a generative hit. Inconclusive with reason data-unavailable if both pages fail to load or if neither page contains 'hectocotyl' or 'spermatophore' or 'attachment'. The claim is about the arm's function, not about whether the arm is inserted.",
+  "planned_datasets": [
+    "adw-octopus-vulgaris",
+    "wikipedia-hectocotylus"
+  ],
+  "test_contract": {
+    "expected_observation": "The modified arm is described as serving attachment and as lying outside sperm transfer.",
+    "disconfirming_observation": "The same arm is described as the route by which spermatophores or sperm reach the female.",
+    "admissible_datasets": "Public prose accounts of Octopus vulgaris or of the hectocotylus generally, fetched without a login and independent of Aristotle. Image libraries are not scored. Wikipedia is a tertiary summary and cannot by itself raise confidence above the value set in the completed record; it is admitted because it is a stable, citable page with a revision history.",
+    "inference_method": "Each page is scored generative or attachment-only by the character windows in pass_criterion. One generative hit refutes the claim that the arm is not an organ of generation. Thresholds are not revised after the pages are read."
+  },
+  "interpretation": "Aristotle's 'arm inserted into the funnel' is the hectocotylus of modern anatomy, and his claim is that this arm is only for attachment and is not useful for generation because it lies outside the male's seminal passage. The test scores the functional claim. A statement that the arm transfers spermatophores refutes it, whether or not a groove is physically continuous with the internal vas deferens.",
+  "caveats": [
+    "This file was committed before either page was downloaded or read for this test.",
+    "SeaLifeBase species pages returned HTTP 403 to a scripted request and are not in the planned set.",
+    "A Wikipedia sentence is not a dissection. If only Wikipedia has a generative hit and the Animal Diversity Web account is silent, the verdict is still refuted under the rule above, and the completed record must say that the hit came from the tertiary page."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-4b39",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "adw-octopus-vulgaris",
+      "name": "Animal Diversity Web account of Octopus vulgaris",
+      "landing_url": "https://animaldiversity.org/accounts/Octopus_vulgaris/",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://animaldiversity.org/accounts/Octopus_vulgaris/",
+          "retrieved_at": "2026-11-02T00:29:59Z",
+          "byte_size": 47120,
+          "sha256": "f25f44dce912f4439e2b8a2fca3021497310bb18a5ccfc133018be884f911fe8"
+        }
+      ],
+      "role": "prose account of the arm used in octopus mating"
+    },
+    {
+      "id": "wikipedia-hectocotylus",
+      "name": "Wikipedia article Hectocotylus",
+      "landing_url": "https://en.wikipedia.org/wiki/Hectocotylus",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://en.wikipedia.org/wiki/Hectocotylus",
+          "retrieved_at": "2026-11-02T00:29:59Z",
+          "byte_size": 134678,
+          "sha256": "8061bd2cd7d07b6f716c41081d2a8b4a97c984270c39e00ed555121b2cd0a266"
+        }
+      ],
+      "role": "prose account of the arm used in octopus mating"
+    }
+  ],
+  "measured": {
+    "value": 7,
+    "unit": "character windows linking the hectocotylus to sperm or spermatophores",
+    "n": 2,
+    "uncertainty": null,
+    "extra": {
+      "pages": [
+        {
+          "id": "adw-octopus-vulgaris",
+          "http_status": 200,
+          "chars": 13866,
+          "label": "generative",
+          "mentioned": true,
+          "n_generative_windows": 1,
+          "n_attachment_windows": 0,
+          "generative_snippet": "on Octopus vulgaris has individuals of both sexes. During mating, the male approaches the female, who fends him off for a while, but then accepts him. He sits next to her or mounts her, inserting the hectocotylus in her mantle cavity to pass the spermatophores. They may copulate for several hours. The same pair often repeat mating over a period of a week or so, but a male copulates with other fema",
+          "attachment_snippet": ""
+        },
+        {
+          "id": "wikipedia-hectocotylus",
+          "http_status": 200,
+          "chars": 7229,
+          "label": "generative",
+          "mentioned": true,
+          "n_generative_windows": 6,
+          "n_attachment_windows": 0,
+          "generative_snippet": "arate organism, he named it Hectocotyle octopodis . A hectocotylus ( plural</span>\"}]],\"parts\":[{\"template\":{\"target\":{\"wt\":\"plural form\",\"href\":\"./Template:Plural_form\"},\"params\":{},\"i\":0}}]}'>pl. : hectocotyli ) is one of the arms of male cephalopods that is specialized to store and transfer spermatophores to the female. [ 1 ] Structurally, hectocotyli are muscular hydrostats . Depending on the ",
+          "attachment_snippet": ""
+        }
+      ]
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.84,
+  "method": "Fetched the two pre-registered pages, stripped HTML, and applied the generative and attachment-only windows from pass_criterion. adw-octopus-vulgaris=generative, wikipedia-hectocotylus=generative.",
+  "results_summary": [
+    "adw-octopus-vulgaris: generative (1 generative windows).",
+    "wikipedia-hectocotylus: generative (6 generative windows)."
+  ]
+}
