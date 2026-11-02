@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha08-38",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-38",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, a public wolf-dog genotype panel contains at least one wolf-dog hybrid or wolf-dog breed individual alongside wolves and dogs, and the dog and red-fox chromosome counts are close enough that a fox-dog cross could found a dog breed.",
+  "pass_criterion": "Pre-registered (claim supported). Both components are supported. Wolf-dog component: in the PLINK ped file of Dryad 10.5061/dryad.76hdr7stk, at least one row is classed hybrid and at least one row is classed wolf and at least one row is classed dog. Fox-dog component: the Ensembl diploid counts of Canis lupus familiaris and Vulpes vulpes differ by at most 2, and the ped file also contains a row classed fox-dog. Classing uses the FID and IID strings, casefolded, in this order: fox-dog if the string contains fox and also dog, hybrid or hyb; hybrid if it contains hybrid, hyb, suspected, wolfdog, wolf-dog, wolf_dog, saarloos or czechoslovak; fox if it contains fox; jackal if it contains jackal; wolf if it contains wolf and not dog; dog if it contains dog. A row is a class if either FID or IID matches that class.",
+  "fail_criterion": "Pre-registered. The wolf-dog component is refuted only if at least 100 rows class as wolf or dog and zero rows class as hybrid. Otherwise, if the hybrid class is missing or fewer than 100 rows class as wolf or dog, the wolf-dog component is inconclusive (underpowered), not refuted. The fox-dog component is refuted if the absolute difference of the two diploid counts is 8 or greater. Diploid count from the Ensembl karyotype list: drop blank names; if X is present and Y is absent, diploid = 2 times the number of names; if both X and Y are present, diploid = 2 times the number of non-sex names plus 2; if neither sex chromosome is listed, that species is not scored. The fox-dog component is supported only when the difference is at most 2 and a ped row classes as fox-dog. A difference from 3 to 7, or a missing assembly, makes the fox-dog component inconclusive. Overall: both supported → supports; both refuted → refutes; one supported and one refuted → mixed; any inconclusive component → inconclusive. If the ped or an assembly cannot be downloaded, or a re-download does not match the first SHA-256, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "dryad-10.5061-dryad.76hdr7stk-wolf-dog-snp-ped",
+    "ensembl-assembly-karyotype-dog-and-red-fox"
+  ],
+  "test_contract": {
+    "expected_observation": "The genotype panel includes wolves, dogs and at least one wolf-dog hybrid or wolf-dog breed, and the dog and red fox diploid counts differ by at most 2 with a labeled fox-dog individual.",
+    "disconfirming_observation": "Either no labeled wolf-dog hybrid exists in a panel that clearly labels wolves and dogs, or the dog and red fox differ by 8 or more chromosomes, which is past the pre-registered bar for a cross that founds a breed.",
+    "admissible_datasets": "A public genotype file whose rows are individual canids and whose identifiers distinguish wolves, dogs and hybrids, plus the Ensembl assembly karyotypes for the domestic dog and the red fox. The Cyrene locality and the name Laconian hound are not required fields. A zero count of fox-dog labels is not, by itself, a refutation.",
+    "inference_method": "Count ped rows by the pre-registered substring classes. Compute diploid counts from the Ensembl karyotype lists with the sex-chromosome rule above. Wolf-dog is an existence test (at least one hybrid row). Fox-dog is a karyotype-difference test with the thresholds 2 and 8. Combine the two components as support, refutation, mixed or inconclusive."
+  },
+  "interpretation": "The sentence asserts two crosses: the wolf and the dog couple and breed, and the Laconian hound is a fox-dog cross. The dataset does not sample Cyrene and does not name the Laconian hound, so the test is of the two biological crosses named in the scope (wolf × dog; fox × dog), not of that city or that ancient breed's skeleton. 'Breed' is read as production of offspring, scored by labeled hybrids and wolf-dog breeds in the panel. The fox clause is read as a real cross that could found a dog breed, scored by the diploid counts: a gap of 8 or more chromosomes is treated as incompatible with that cross. Reference foxes in the panel are an outgroup, not fox-dog offspring.",
+  "confidence_rule_preregistered": "Mixed or two-sided verdict with at least one hybrid row and a diploid gap of 8 or more: 0.7. The same but the only hybrid rows are breed-name matches (saarloos or czechoslovak) with no hybrid/hyb/suspected match: 0.55. Inconclusive: 0.4. Data-unavailable: 0.35.",
+  "caveats": [
+    "Criteria were fixed before the ped file was downloaded and before the Ensembl karyotype arrays were parsed. The assembly URLs were requested once while checking that they answered; the bodies were not read and were not kept.",
+    "The Dryad usage note, which states how many wolves, dogs, hybrids, jackals and foxes are in the file, was read as the codebook. Those prose counts are not the measurement. The script counts rows.",
+    "A chromosome-count gap refutes a fox-dog breed. It does not by itself identify what the historical Laconian hound was."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  }
+}
