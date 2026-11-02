@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga02-16",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-16",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If some cartilaginous fishes finish development while attached to the mother, so that the egg is not released, a species-level table of shark and ray reproductive modes will code more than a handful of species as placental viviparity.",
   "pass_criterion": "Pre-registered. In shark_modepruned_E.csv (the corrected five-mode coding), the number of unique non-empty species whose mode normalizes to placental_viviparity is at least 5, and the same count in shark_modepruned_D.csv is also at least 5. Mode strings are compared after lowercasing and replacing spaces and hyphens with underscores.",
@@ -26,5 +26,98 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-tests-f1f3",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.8,
+  "datasets": [
+    {
+      "id": "hughes-blackburn-2025-dryad-10.5061/dryad.80gb5mm12",
+      "name": "Data and R Script from: The ancestor of sharks and rays laid eggs, but ancestral state reconstructions need empirically supported traits and transparent reporting",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.80gb5mm12",
+      "doi": "10.5061/dryad.80gb5mm12",
+      "version": "7",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "shark_modepruned_E.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3901773",
+          "retrieved_at": "2026-11-02T00:53:01Z",
+          "byte_size": 38424,
+          "sha256": "ea9d1b989bee8941eb0e9f89cb6457f22bd5e13b3d5b5777066a18eee709923d",
+          "publisher_sha256": "ea9d1b989bee8941eb0e9f89cb6457f22bd5e13b3d5b5777066a18eee709923d",
+          "publisher_digest_matches": true
+        },
+        {
+          "name": "shark_modepruned_D.csv",
+          "download_url": "https://datadryad.org/downloads/file_stream/3901770",
+          "retrieved_at": "2026-11-02T00:53:01Z",
+          "byte_size": 38539,
+          "sha256": "bb32d5be6070379d3e44db08d58eb1d6f30a64a4ed7a7b89c4afe26b65d8a872",
+          "publisher_sha256": "bb32d5be6070379d3e44db08d58eb1d6f30a64a4ed7a7b89c4afe26b65d8a872",
+          "publisher_digest_matches": true
+        }
+      ],
+      "role": "species-level reproductive mode of sharks and rays, corrected (E) and original (D) codings"
+    }
+  ],
+  "method": "Downloaded shark_modepruned_E.csv and shark_modepruned_D.csv from the public Dryad file_stream URLs for the file ids in the version file list (the API download route requires a bearer token), checked each SHA-256 against the publisher digest, and counted unique species whose mode normalizes to placental_viviparity. The five-mode vocabulary is the one named on the Dryad file description. The verdict uses the pre-registered thresholds: at least 5 in both files supports; zero in E inside that vocabulary refutes; 1 to 4, or E passing while D is zero, is mixed.",
+  "measured": {
+    "value": 79,
+    "unit": "species coded placental_viviparity in shark_modepruned_E.csv",
+    "n": 957,
+    "uncertainty": null,
+    "extra": {
+      "E": {
+        "n_coded_species": 957,
+        "n_placental": 79,
+        "mode_counts": {
+          "egg_laying": 436,
+          "live_bearing_with_oophagy": 18,
+          "live_bearing_with_uterine_milk": 224,
+          "placental_viviparity": 79,
+          "yolk_only_viviparity": 200
+        },
+        "vocabulary_is_five_mode": true,
+        "contains_five_mode_labels": true,
+        "observed_modes": [
+          "egg_laying",
+          "live_bearing_with_oophagy",
+          "live_bearing_with_uterine_milk",
+          "placental_viviparity",
+          "yolk_only_viviparity"
+        ],
+        "species_column": "species",
+        "mode_column": "mode"
+      },
+      "D": {
+        "n_coded_species": 959,
+        "n_placental": 79,
+        "mode_counts": {
+          "egg_laying": 427,
+          "live_bearing_with_oophagy": 16,
+          "live_bearing_with_uterine_milk": 219,
+          "placental_viviparity": 79,
+          "yolk_only_viviparity": 218
+        },
+        "vocabulary_is_five_mode": true,
+        "contains_five_mode_labels": true,
+        "observed_modes": [
+          "egg_laying",
+          "live_bearing_with_oophagy",
+          "live_bearing_with_uterine_milk",
+          "placental_viviparity",
+          "yolk_only_viviparity"
+        ],
+        "species_column": "species",
+        "mode_column": "mode"
+      },
+      "checksums_match_publisher": true
+    }
+  },
+  "results_summary": [
+    "Corrected table E: 79 species coded placental_viviparity out of 957 coded species.",
+    "Original table D: 79 species coded placental_viviparity.",
+    "Verdict supports at confidence 0.8."
+  ]
 }
