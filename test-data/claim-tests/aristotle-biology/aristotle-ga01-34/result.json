@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ga01-34",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-34",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, eggs of an oviparous externally fertilizing fish that milt does not reach remain unfertilized, while eggs from the same experiment that milt does reach are fertilized.",
+  "pass_criterion": "Pre-registered support rule. Only an oviparous fish with external fertilization counts. The planned files are the zebrafish fertilization table (Dryad 10.5061/dryad.crjdfn38v), the round-goby egg and sperm tables (Dryad 10.5061/dryad.6djh9w10z), and the salmon and trout fertilization workbooks (Dryad 10.5061/dryad.v933m). A no-milt arm is a set of rows whose numeric sperm, milt, or sperm-concentration value is 0, or whose treatment label matches, case-insensitively, one of: no sperm, no milt, without sperm, without milt, unexposed, sperm-free, sperm free, zero sperm, 0 sperm, seawater only, water only, unfertilized control, no male, males absent, milt absent. A milt arm is the other rows of that same table in which sperm or milt was added: a positive amount, or a label that is not the no-milt arm. Fertilization proportion is fertilized eggs divided by eggs scored, a percent column divided by 100, or a proportion already on 0 to 1. A species passes if the no-milt arm mean is at most 0.05, the milt arm mean is at least 0.50, and each arm has at least 20 eggs or at least 3 replicate rows. The claim is supported only when at least one species passes and no species with both arms fails. Two treatments that both add sperm, including selected versus non-selected sperm, are not a no-milt arm. FishBase fertilization-mode codes are not a test of this claim.",
+  "fail_criterion": "Pre-registered refutation rule. A species fails if its no-milt arm mean fertilization proportion is at least 0.20 and that arm has at least 20 eggs or at least 3 replicate rows. Any such species refutes the claim. If one species passes and another fails, the verdict is mixed. If every planned file downloads and none contains a no-milt arm for an oviparous externally fertilizing fish, the verdict is inconclusive with reason data-unavailable. Rows from anemones, urchins, mussels, frogs, or any animal that is not a fish are ignored. If a planned file cannot be downloaded and no downloaded file contains a no-milt arm, the verdict is inconclusive with reason data-unavailable. A mean strictly between 0.05 and 0.20 on a no-milt arm, with the sample-size minimum met and the milt arm at least 0.50, is neither a pass nor a fail: that species is intermediate, and the verdict is mixed if no species fails. If a no-milt arm exists but fewer than 20 eggs and fewer than 3 rows were scored, and no species fails, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "dryad-crjdfn38v-zebrafish-fertilization",
+    "dryad-6djh9w10z-round-goby",
+    "dryad-v933m-salmon-trout-fertilization"
+  ],
+  "test_contract": {
+    "expected_observation": "In an oviparous externally fertilizing fish, eggs recorded as not reached by milt are unfertilized, and eggs from the same experiment that were reached by milt are fertilized.",
+    "disconfirming_observation": "Eggs recorded as not reached by milt are fertilized at a rate of 20 percent or more.",
+    "admissible_datasets": "A public table that scores fertilization of fish eggs in a no-milt arm and in a milt arm from the same experiment. A table in which every egg was mixed with sperm, a fertilization-mode code, and a login wall do not count. Animals other than oviparous externally fertilizing fishes do not count.",
+    "inference_method": "Search the three planned files for a no-milt arm as defined in pass_criterion. If none exists, the verdict is inconclusive with reason data-unavailable, and fertilization rates from sperm-exposed rows are not scored. If an arm exists, compare its mean fertilization proportion with 0.05 and 0.20, and the milt arm with 0.50, at the pre-registered sample sizes."
+  },
+  "interpretation": "The sentence has two parts: the male sprinkles milt over eggs after they are laid, and only the eggs the milt reaches are fertilized. This test is the second part. External fertilization after laying is the scope, so salmon, trout, zebrafish and the round goby are inside it, and internally fertilizing fishes are outside it. Egg activation without cleavage is not scored as fertilization. The test does not ask how many sperm are required once milt has reached the egg.",
+  "caveats": [
+    "Before this registration the Dryad landing records, file names, byte sizes and the zebrafish README were read. The zebrafish README describes in-vitro fertilization of FRF-selected and non-selected sperm, which is not a no-milt arm. The numeric tables and workbooks were not opened. No fertilization proportion was computed.",
+    "FishBase was named by the assessors and was not used. A fertilization-mode field does not say whether an egg the milt missed stays unfertilized.",
+    "The three packages are the public fish tables checked. A no-milt table outside them would be a different test."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-claim-tests-957f",
+    "date": "2026-11-01"
+  }
+}
