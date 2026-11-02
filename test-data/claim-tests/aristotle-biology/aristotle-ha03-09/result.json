@@ -1,0 +1,46 @@
+{
+  "claim_id": "aristotle-ha03-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha03-09",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, brain tissue itself contains no blood vessels: endothelial-cell rows in parenchymal brain tissues of the Human Protein Atlas immunohistochemistry table are Not detected for the vessel-wall markers PECAM1, VWF and CD34.",
+  "pass_criterion": "Pre-registered. This dataset cannot support the claim. The claim is a universal negative (in all animals the brain is bloodless and no vein runs within it). A Not detected result in human tissue does not establish that universal, so Not detected is not a pass. There is no pass_criterion that returns supports.",
+  "fail_criterion": "Pre-registered (claim refuted). Among rows in normal_ihc_data.tsv whose Gene is ENSG00000261371 (PECAM1), ENSG00000110799 (VWF) or ENSG00000174059 (CD34), whose Tissue is a brain tissue in the Atlas cell-type codebook other than pituitary, choroid plexus, meninges, pia, dura, arachnoid or spinal cord, whose Cell type contains the substring endothelial (case-insensitive), and whose Reliability is Enhanced, Supported or Approved: the claim is refuted if at least one such row has Level Low, Medium or High. Not detected does not refute. Reliability Uncertain does not count. If the zip cannot be downloaded, the verdict is inconclusive with reason data-unavailable. If the file downloads but no endothelial row in an included brain tissue exists for any of the three genes, the verdict is inconclusive with reason underpowered. If every counted row is Not detected, the verdict is inconclusive with reason underpowered, not supports.",
+  "planned_datasets": [
+    "human-protein-atlas-v25.1-normal-ihc"
+  ],
+  "test_contract": {
+    "expected_observation": "No reliable immunohistochemistry row for PECAM1, VWF or CD34 reports detectable staining in endothelial cells of a parenchymal human brain tissue.",
+    "disconfirming_observation": "At least one reliable row reports Low, Medium or High staining of one of those three vessel-wall proteins in endothelial cells inside a brain tissue that is not pituitary, choroid plexus, meninges or spinal cord. One such row is a vessel inside the brain and refutes the universal.",
+    "admissible_datasets": "A public, versioned table of protein staining in normal human tissues that names the tissue, the cell type and an expression level, with a licence that allows reuse. The cell type must be endothelial cells so the stain is of the vessel wall rather than of neurons. Meninges, choroid plexus, pituitary and spinal cord are out of scope because the claim allows vessels in the membrane around the brain and is about the brain itself. The table must not be Aristotle's text.",
+    "inference_method": "A universal negative is refuted by one in-scope counterexample and is not confirmed by a negative stain in a single species. Counted rows are the three pre-registered Ensembl genes, endothelial cell types, included brain tissues, and reliability Enhanced, Supported or Approved. Any counted Level in {Low, Medium, High} yields refutes. Otherwise the verdict is inconclusive with reason underpowered, or data-unavailable if the file cannot be fetched."
+  },
+  "interpretation": "The sentence says two things: the brain itself has no blood, and no vein, large or small, runs inside it; veins stop in the membrane around the brain. The test uses the second clause. Endothelial proteins (PECAM1/CD31, von Willebrand factor, CD34) mark the vessel wall. Staining of endothelial cells in the cerebral cortex, cerebellum, hippocampus or another parenchymal brain tissue is a vein or capillary inside the brain, which the sentence denies. Staining limited to meninges or choroid plexus would not count. The dataset is human immunohistochemistry, so a positive result refutes 'in all animals' by a human counterexample, and a negative result does not show that every animal brain lacks vessels. Blood volume and flowing blood are not in the table; the measurement is the vessel wall.",
+  "markers_preregistered": [
+    {"symbol": "PECAM1", "ensembl": "ENSG00000261371"},
+    {"symbol": "VWF", "ensembl": "ENSG00000110799"},
+    {"symbol": "CD34", "ensembl": "ENSG00000174059"}
+  ],
+  "excluded_tissues_preregistered": [
+    "pituitary",
+    "choroid",
+    "meninges",
+    "pia",
+    "dura",
+    "arachnoid",
+    "spinal cord"
+  ],
+  "confidence_rule_preregistered": "If refuted by Medium or High staining of two or three markers: 0.8. If refuted by Medium or High staining of exactly one marker: 0.7. If refuted only by Low staining: 0.55. If inconclusive underpowered: 0.4. If data-unavailable: 0.35. These values are confidence in the verdict about the universal vessel clause, given that the observations are human tissue-microarray stains of three proteins.",
+  "caveats": [
+    "Criteria were written before normal_ihc_data.tsv.zip was downloaded and before any Level for these genes was read. Ensembl ids were checked with the lookup service only (symbol, id, biotype, description).",
+    "The Atlas codebook lists endothelial cells as an annotated cell type in cerebral cortex. That listing is the sampling frame, not the staining result, and it is not used as a measurement.",
+    "A human counterexample can refute a claim about all animals. It cannot, by itself, prove the same anatomy in every other animal."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-2a8b",
+    "date": "2026-11-01"
+  }
+}
