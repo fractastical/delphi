@@ -1,0 +1,899 @@
+{
+  "claim_id": "darwin1859-intro-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-intro-04",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "For the animal genera named in the vendored Darwin inventory, species placed in the same genus are a single clade on an independent phylogeny, and the fossil record of the genus shows an extinct species at least as old as every living species in it: congeners descend from one source, and that source is not a species still living.",
+  "pass_criterion": "Pre-registered. Two fractions are computed on the frozen genus list in preregistration.genera. M is the fraction of monophyly-testable genera that are monophyletic on the Open Tree induced subtree (at least 3 extant ingroup tips and at least 1 outgroup tip; the genus is a clade when every tip under the most recent common ancestor of the ingroup tips is an ingroup tip). E is the fraction of fossil-testable genera in which the maximum firstapp_max_ma among extinct accepted species is greater than or equal to the maximum firstapp_max_ma among extant accepted species. A genus is monophyly-testable only under the sampling rules in test_contract. A genus is fossil-testable only when Paleobiology Database returns at least one extant and one extinct accepted species of that genus, each with a numeric firstapp_max_ma, after the family filter. SUPPORTS if M >= 0.80 with at least 20 monophyly-testable genera AND E >= 0.80 with at least 12 fossil-testable genera.",
+  "fail_criterion": "Pre-registered. REFUTES if M <= 0.50 with at least 20 monophyly-testable genera, or E <= 0.50 with at least 12 fossil-testable genera. The claim is a conjunction, so either half failing refutes it. MIXED if both halves are measured (at least 20 and at least 12) and neither the support rule nor the refute rule holds. INCONCLUSIVE with reason underpowered if queries succeed but a half is below its minimum n and neither half has met its refute rule. INCONCLUSIVE with reason data-unavailable if ITIS, Open Tree or the Paleobiology Database cannot be queried, or if HTTP or parse errors hit more genera than the number that receive a definitive monophyly or fossil answer and the corresponding minimum n is not met. A genus that is queried and has too few extant species, no outgroup, or no fossil species of both kinds is not testable; it is not an error and not a failure.",
+  "planned_datasets": [
+    "itis-web-service",
+    "opentree-synthetic-tree-api",
+    "pbdb-taxa-list",
+    "darwin-origin-vendored-genus-inventory"
+  ],
+  "interpretation": "The sentence tested is Darwin's: species of the same genus are lineal descendants of some other and generally extinct species, in the same way that varieties descend from their species. 'Same genus' is frozen as the 82 genus names in the vendored darwin-origin organism files (rank genus), not a list chosen for having trees or fossils. Membership of species in a genus is taken from ITIS, a classification, and the tree is the Open Tree synthetic tree. That avoids scoring Open Tree's own taxonomy against Open Tree's tree. It does not avoid a real circularity: many modern genera were revised to be monophyletic using molecular trees, so M is biased toward support. The 1859 contents of these genera are not reconstructed; Felis in ITIS is not the Felis of 1859. 'Generally extinct' is read as a fossil pattern, not as an identified ancestor: among genera that have both living and extinct accepted species with ages, the oldest first appearance belongs to an extinct species (or is tied). Genera with no fossil species, and wholly extinct genera that do not yield 3 living species, are untested on the half they cannot speak to, not counted as refutations. No plant genus is in the vendored genus list, so plants, which the claim's scope includes, are not in this test. Assessors named GenBank, the Paleobiology Database and Open Tree. GenBank loci are not reanalysed one gene at a time; the synthetic tree is the molecular summary. The Paleobiology Database is queried live because occurrence counts and ages change.",
+  "test_contract": {
+    "expected_observation": "On the frozen animal genera, at least 80 percent of those with 3 or more living species placed on the tree form a clade relative to other genera of the same family, and at least 80 percent of those with both living and extinct fossil species have an extinct species whose first appearance is at least as old as that of every living species in the genus.",
+    "disconfirming_observation": "Either half at or below 50 percent: congeners are commonly not a clade (they do not descend from one source), or, among genera with a two-sided fossil record, a living species is older than every extinct congener (the pattern expected if living species, not extinct ones, were the sources of their congeners). A genus with no fossil record does not disconfirm the extinct-ancestor half.",
+    "admissible_datasets": "Genus names must be the vendored darwin-origin genus inventory, frozen in this file before any phylogeny or fossil query for the test. Species membership must come from ITIS, not from Open Tree's taxonomy. The tree must be the Open Tree synthetic tree with exact name matches only. Fossil ages must be Paleobiology Database accepted species of that genus (vocab=pbdb), with is_extant and firstapp_max_ma, and the family must match the vendored family when both are present so that a homonym (Pieris the butterfly versus Pieris the plant) is not scored as the Darwin genus. No login-gated database.",
+    "inference_method": "ITIS: use the vendored itis_tsn when present; otherwise searchByScientificName, keep Animalia genus-rank hits via getTaxonomicRankNameFromTSN, and treat 0 or more than 1 hit as not monophyly-testable. Species are rank Species children of the genus, recursing through subgenera at most two levels, whose name is a binomial (genus, then an epithet of lowercase letters and hyphens). If more than 12, sort by epithet and take 12 evenly spaced indices. Drop a species if its Open Tree match flags include extinct. Outgroups: walk getHierarchyUpFromTSN at most 8 steps to a rank Family node; from that family's descendant genera (recurse through subfamily and tribe at most two levels) take up to 4 other genera in alphabetical order and up to 2 species each (first and last epithet if more than 2). A name is placed only when its ott id is a tip in the induced Newick (label_format name_and_id, context All life, approximate matching off). Two names collapsing to one ott id with opposite ingroup/outgroup roles make the genus not testable. Monophyly is the clade test above, after unary nodes are collapsed. PBDB: taxa/list.json with base_name, rank=species, taxon_status=valid, show=attr,app,class, vocab=pbdb. Keep accepted_rank species whose accepted_name starts with the genus token. If a family value is present and is not blank or NO_*, it must equal the vendored family, case-insensitively; if that filter removes every row, the genus is not fossil-testable. Extant values of is_extant are extant, 1, true, True, yes. Extinct values are extinct, 0, false, False, no. Other values count as neither. Compare maximum firstapp_max_ma. Fractions, minima 20 and 12, and cutoffs 0.80 and 0.50 are exactly the pass_criterion and fail_criterion. The verdict table is: refute if either half refutes; support if both support; mixed if both halves are measured and at least one is between the cutoffs; otherwise inconclusive."
+  },
+  "preregistration": {
+    "genera": [
+      {
+        "name": "Alligator",
+        "itis_tsn": "174366",
+        "family": "Alligatoridae",
+        "class": "Crocodylia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/alligator.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/alligator.json"
+        ]
+      },
+      {
+        "name": "Amblyopsis",
+        "itis_tsn": null,
+        "family": "Amblyopsidae",
+        "class": "Actinopterygii",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/amblyopsis.json"
+        ]
+      },
+      {
+        "name": "Ancylus",
+        "itis_tsn": "76580",
+        "family": "Planorbidae",
+        "class": "Gastropoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/ancylus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/ancylus.json"
+        ]
+      },
+      {
+        "name": "Anser",
+        "itis_tsn": "175019",
+        "family": "Anatidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/anser.json"
+        ]
+      },
+      {
+        "name": "Aphis",
+        "itis_tsn": "200573",
+        "family": "Aphididae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/aphis.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/aphis.json"
+        ]
+      },
+      {
+        "name": "Apodemus",
+        "itis_tsn": "584983",
+        "family": "Muridae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/apodemus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/apodemus.json"
+        ]
+      },
+      {
+        "name": "Apteryx",
+        "itis_tsn": "174393",
+        "family": "Apterygidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/apteryx.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/apteryx.json"
+        ]
+      },
+      {
+        "name": "Aquila",
+        "itis_tsn": null,
+        "family": "Accipitridae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/aquila.json"
+        ]
+      },
+      {
+        "name": "Balanus",
+        "itis_tsn": "89600",
+        "family": "Balanidae",
+        "class": "Maxillopoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/balanus.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/balanus.json"
+        ]
+      },
+      {
+        "name": "Bombus",
+        "itis_tsn": "154397",
+        "family": "Apidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/bombus.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/bombus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/bombus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/bombus.json"
+        ]
+      },
+      {
+        "name": "Bos",
+        "itis_tsn": "183837",
+        "family": "Bovidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/bos.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/bos.json"
+        ]
+      },
+      {
+        "name": "Camelus",
+        "itis_tsn": "624942",
+        "family": "Camelidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/camelus.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/camelus.json",
+          "test-data/organisms/darwin-origin/intro-ch02/taxa/camelus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/camelus.json"
+        ]
+      },
+      {
+        "name": "Canis",
+        "itis_tsn": "180595",
+        "family": "Canidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/canis.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/canis.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/canis.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/canis.json"
+        ]
+      },
+      {
+        "name": "Castor",
+        "itis_tsn": "180211",
+        "family": "Castoridae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/castor.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/castor.json"
+        ]
+      },
+      {
+        "name": "Cephalotes",
+        "itis_tsn": "574047",
+        "family": "Formicidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/cephalotes.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/cephalotes.json"
+        ]
+      },
+      {
+        "name": "Certhia",
+        "itis_tsn": null,
+        "family": "Certhiidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/certhia.json"
+        ]
+      },
+      {
+        "name": "Cervus",
+        "itis_tsn": null,
+        "family": "Cervidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/cervus.json"
+        ]
+      },
+      {
+        "name": "Chiton",
+        "itis_tsn": "79012",
+        "family": "Chitonidae",
+        "class": "Polyplacophora",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/chiton.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/chiton.json"
+        ]
+      },
+      {
+        "name": "Chloephaga",
+        "itis_tsn": "175203",
+        "family": "Anatidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/chloephaga.json"
+        ]
+      },
+      {
+        "name": "Chthamalus",
+        "itis_tsn": "89591",
+        "family": "Chthamalidae",
+        "class": "Maxillopoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/chthamalus.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/chthamalus.json"
+        ]
+      },
+      {
+        "name": "Cinclus",
+        "itis_tsn": "178535",
+        "family": "Cinclidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/cinclus.json"
+        ]
+      },
+      {
+        "name": "Cobitis",
+        "itis_tsn": "163980",
+        "family": "Cobitidae",
+        "class": null,
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/cobitis.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/cobitis.json"
+        ]
+      },
+      {
+        "name": "Coccus",
+        "itis_tsn": "200853",
+        "family": "Coccidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/intro-ch02/taxa/coccus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/coccus.json"
+        ]
+      },
+      {
+        "name": "Coccyzus",
+        "itis_tsn": "177827",
+        "family": "Cuculidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/coccyzus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/coccyzus.json"
+        ]
+      },
+      {
+        "name": "Columba",
+        "itis_tsn": "177062",
+        "family": "Columbidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/columba.json"
+        ]
+      },
+      {
+        "name": "Colymbetes",
+        "itis_tsn": "112379",
+        "family": "Dytiscidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/colymbetes.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/colymbetes.json"
+        ]
+      },
+      {
+        "name": "Crotalus",
+        "itis_tsn": "174305",
+        "family": "Viperidae",
+        "class": "Squamata",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/crotalus.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/crotalus.json"
+        ]
+      },
+      {
+        "name": "Ctenomys",
+        "itis_tsn": "584626",
+        "family": "Ctenomyidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/ctenomys.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/ctenomys.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/ctenomys.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/ctenomys.json"
+        ]
+      },
+      {
+        "name": "Dasyprocta",
+        "itis_tsn": "584623",
+        "family": "Dasyproctidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/dasyprocta.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/dasyprocta.json"
+        ]
+      },
+      {
+        "name": "Dorylus",
+        "itis_tsn": "573941",
+        "family": "Formicidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/dorylus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/dorylus.json"
+        ]
+      },
+      {
+        "name": "Dytiscus",
+        "itis_tsn": "112118",
+        "family": "Dytiscidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/dytiscus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/dytiscus.json"
+        ]
+      },
+      {
+        "name": "Eciton",
+        "itis_tsn": "573943",
+        "family": "Formicidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/eciton.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/eciton.json"
+        ]
+      },
+      {
+        "name": "Equus",
+        "itis_tsn": "180689",
+        "family": "Equidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/equus.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/equus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/equus.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/equus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/equus.json"
+        ]
+      },
+      {
+        "name": "Falco",
+        "itis_tsn": "175598",
+        "family": "Falconidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/falco.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/falco.json"
+        ]
+      },
+      {
+        "name": "Felis",
+        "itis_tsn": "180586",
+        "family": "Felidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/felis.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/felis.json"
+        ]
+      },
+      {
+        "name": "Fregata",
+        "itis_tsn": "174762",
+        "family": "Fregatidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/fregata.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/fregata.json"
+        ]
+      },
+      {
+        "name": "Fulica",
+        "itis_tsn": null,
+        "family": "Rallidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/fulica.json"
+        ]
+      },
+      {
+        "name": "Giraffa",
+        "itis_tsn": "624948",
+        "family": "Giraffidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/giraffa.json"
+        ]
+      },
+      {
+        "name": "Hippobosca",
+        "itis_tsn": "152647",
+        "family": "Hippoboscidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/hippobosca.json"
+        ]
+      },
+      {
+        "name": "Hydra",
+        "itis_tsn": "50845",
+        "family": "Hydridae",
+        "class": "Hydrozoa",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/hydra.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/hydra.json"
+        ]
+      },
+      {
+        "name": "Ibla",
+        "itis_tsn": null,
+        "family": "Iblidae",
+        "class": "Maxillopoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/ibla.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/ibla.json"
+        ]
+      },
+      {
+        "name": "Lagidium",
+        "itis_tsn": "584614",
+        "family": "Chinchillidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/lagidium.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/lagidium.json"
+        ]
+      },
+      {
+        "name": "Leiopelma",
+        "itis_tsn": "202079",
+        "family": "Leiopelmatidae",
+        "class": "Amphibia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/leiopelma.json"
+        ]
+      },
+      {
+        "name": "Lepidosiren",
+        "itis_tsn": "161041",
+        "family": "Lepidosirenidae",
+        "class": "Dipneusti",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch09-10/taxa/lepidosiren.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/lepidosiren.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/lepidosiren.json"
+        ]
+      },
+      {
+        "name": "Lepus",
+        "itis_tsn": "180111",
+        "family": "Leporidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/ch05-06/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/ch11-12/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/lepus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/lepus.json"
+        ]
+      },
+      {
+        "name": "Lingula",
+        "itis_tsn": "156762",
+        "family": "Lingulidae",
+        "class": "Lingulata",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/lingula.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/lingula.json"
+        ]
+      },
+      {
+        "name": "Lutra",
+        "itis_tsn": "180571",
+        "family": "Mustelidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/lutra.json"
+        ]
+      },
+      {
+        "name": "Macrauchenia",
+        "itis_tsn": null,
+        "family": "Macraucheniidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/macrauchenia.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/macrauchenia.json"
+        ]
+      },
+      {
+        "name": "Mammut",
+        "itis_tsn": null,
+        "family": "Mammutidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/mammut.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/mammut.json"
+        ]
+      },
+      {
+        "name": "Megatherium",
+        "itis_tsn": null,
+        "family": "Megatheriidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/megatherium.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/megatherium.json"
+        ]
+      },
+      {
+        "name": "Melipona",
+        "itis_tsn": "634192",
+        "family": "Apidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/melipona.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/melipona.json"
+        ]
+      },
+      {
+        "name": "Mimus",
+        "itis_tsn": "178619",
+        "family": "Mimidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/mimus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/mimus.json"
+        ]
+      },
+      {
+        "name": "Mus",
+        "itis_tsn": "180365",
+        "family": "Muridae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/mus.json",
+          "test-data/organisms/darwin-origin/ch05-06/taxa/mus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/mus.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/mus.json"
+        ]
+      },
+      {
+        "name": "Mustela",
+        "itis_tsn": "180552",
+        "family": "Mustelidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/mustela.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/mustela.json"
+        ]
+      },
+      {
+        "name": "Mylodon",
+        "itis_tsn": null,
+        "family": "Mylodontidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/mylodon.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/mylodon.json"
+        ]
+      },
+      {
+        "name": "Myrmecocystus",
+        "itis_tsn": "573974",
+        "family": "Formicidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/myrmecocystus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/myrmecocystus.json"
+        ]
+      },
+      {
+        "name": "Myrmica",
+        "itis_tsn": "574107",
+        "family": "Formicidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/myrmica.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/myrmica.json"
+        ]
+      },
+      {
+        "name": "Nautilus",
+        "itis_tsn": "555825",
+        "family": "Nautilidae",
+        "class": "Cephalopoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/nautilus.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/nautilus.json"
+        ]
+      },
+      {
+        "name": "Neotoma",
+        "itis_tsn": "180369",
+        "family": "Cricetidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/neotoma.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/neotoma.json"
+        ]
+      },
+      {
+        "name": "Onitis",
+        "itis_tsn": "187514",
+        "family": "Scarabaeidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/onitis.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/onitis.json"
+        ]
+      },
+      {
+        "name": "Pelecanoides",
+        "itis_tsn": "174665",
+        "family": "Pelecanoididae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/pelecanoides.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/pelecanoides.json"
+        ]
+      },
+      {
+        "name": "Pelecanus",
+        "itis_tsn": "174683",
+        "family": "Pelecanidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/pelecanus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/pelecanus.json"
+        ]
+      },
+      {
+        "name": "Pieris",
+        "itis_tsn": "188536",
+        "family": "Pieridae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/pieris.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/pieris.json"
+        ]
+      },
+      {
+        "name": "Pongo",
+        "itis_tsn": null,
+        "family": "Hominidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/pongo.json"
+        ]
+      },
+      {
+        "name": "Proteolepas",
+        "itis_tsn": null,
+        "family": "Crinoniscidae",
+        "class": "Malacostraca",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/proteolepas.json"
+        ]
+      },
+      {
+        "name": "Pyrgoma",
+        "itis_tsn": null,
+        "family": "Pyrgomatidae",
+        "class": "Maxillopoda",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/pyrgoma.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/pyrgoma.json"
+        ]
+      },
+      {
+        "name": "Rangia",
+        "itis_tsn": "80961",
+        "family": "Mactridae",
+        "class": "Bivalvia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/rangia.json"
+        ]
+      },
+      {
+        "name": "Rattus",
+        "itis_tsn": "180361",
+        "family": "Muridae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch03-04/taxa/rattus.json",
+          "test-data/organisms/darwin-origin/ch05-06/taxa/rattus.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/rattus.json"
+        ]
+      },
+      {
+        "name": "Rhea",
+        "itis_tsn": "174378",
+        "family": "Rheidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-12/taxa/rhea.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/rhea.json"
+        ]
+      },
+      {
+        "name": "Sitta",
+        "itis_tsn": "178774",
+        "family": "Sittidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/sitta.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/sitta.json"
+        ]
+      },
+      {
+        "name": "Sus",
+        "itis_tsn": "180721",
+        "family": "Suidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch09-10/taxa/sus.json"
+        ]
+      },
+      {
+        "name": "Tachyeres",
+        "itis_tsn": "175217",
+        "family": "Anatidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch05-06/taxa/tachyeres.json",
+          "test-data/organisms/darwin-origin/ch06-10/taxa/tachyeres.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/tachyeres.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/tachyeres.json"
+        ]
+      },
+      {
+        "name": "Tachytes",
+        "itis_tsn": "768509",
+        "family": "Crabronidae",
+        "class": "Insecta",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch07-08/taxa/tachytes.json"
+        ]
+      },
+      {
+        "name": "Talpa",
+        "itis_tsn": "633478",
+        "family": "Talpidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/talpa.json"
+        ]
+      },
+      {
+        "name": "Tapirus",
+        "itis_tsn": "624930",
+        "family": "Tapiridae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/tapirus.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/tapirus.json"
+        ]
+      },
+      {
+        "name": "Toxodon",
+        "itis_tsn": null,
+        "family": "Toxodontidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/toxodon.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/toxodon.json"
+        ]
+      },
+      {
+        "name": "Trichechus",
+        "itis_tsn": "180683",
+        "family": "Trichechidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/trichechus.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/trichechus.json"
+        ]
+      },
+      {
+        "name": "Trigonia",
+        "itis_tsn": null,
+        "family": "Trigoniidae",
+        "class": "Bivalvia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/trigonia.json",
+          "test-data/organisms/darwin-origin/ch09-10/taxa/trigonia.json"
+        ]
+      },
+      {
+        "name": "Troglodytes",
+        "itis_tsn": "178540",
+        "family": "Troglodytidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/troglodytes.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/troglodytes.json"
+        ]
+      },
+      {
+        "name": "Turdus",
+        "itis_tsn": "179752",
+        "family": "Turdidae",
+        "class": "Aves",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/turdus.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/turdus.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/turdus.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/turdus.json"
+        ]
+      },
+      {
+        "name": "Vombatus",
+        "itis_tsn": "552430",
+        "family": "Vombatidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch11-14/taxa/vombatus.json",
+          "test-data/organisms/darwin-origin/ch13-14/taxa/vombatus.json"
+        ]
+      },
+      {
+        "name": "Vulpes",
+        "itis_tsn": "180603",
+        "family": "Canidae",
+        "class": "Mammalia",
+        "source_paths": [
+          "test-data/organisms/darwin-origin/ch06-10/taxa/vulpes.json",
+          "test-data/organisms/darwin-origin/ch07-08/taxa/vulpes.json",
+          "test-data/organisms/darwin-origin/ch11-14/taxa/vulpes.json",
+          "test-data/organisms/darwin-origin/intro-ch02/taxa/vulpes.json",
+          "test-data/organisms/darwin-origin/intro-ch05/taxa/vulpes.json"
+        ]
+      }
+    ],
+    "min_ingroup_tips": 3,
+    "max_ingroup_sample": 12,
+    "max_outgroup_genera": 4,
+    "outgroup_species_per_genus": 2,
+    "min_monophyly_n": 20,
+    "min_fossil_n": 12,
+    "support_fraction": 0.8,
+    "refute_fraction": 0.5,
+    "extant_values": [
+      "extant",
+      "1",
+      "true",
+      "True",
+      "yes"
+    ],
+    "extinct_values": [
+      "extinct",
+      "0",
+      "false",
+      "False",
+      "no"
+    ],
+    "tnrs_context": "All life",
+    "tnrs_endpoint": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+    "induced_subtree_endpoint": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+    "about_endpoint": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+    "itis_search": "https://www.itis.gov/ITISWebService/jsonservice/searchByScientificName",
+    "itis_down": "https://www.itis.gov/ITISWebService/jsonservice/getHierarchyDownFromTSN",
+    "itis_up": "https://www.itis.gov/ITISWebService/jsonservice/getHierarchyUpFromTSN",
+    "itis_rank": "https://www.itis.gov/ITISWebService/jsonservice/getTaxonomicRankNameFromTSN",
+    "pbdb_taxa_list": "https://paleobiodb.org/data1.2/taxa/list.json",
+    "do_approximate_matching": false
+  },
+  "caveats": [
+    "What was inspected before registration: the vendored taxon JSON files (rank and identifiers only); the Paleobiology Database taxa/list documentation page (field names is_extant, firstapp_max_ma, taxon_name, family); ITIS getDescription; and, for schema only, ITIS searchByScientificName, getHierarchyDownFromTSN, getHierarchyUpFromTSN and getTaxonomicRankNameFromTSN on Equus (TSN 180689, already in the vendored Equus file). Species lists from that Equus call were not recorded and were not used to set the sample size or the thresholds. No Open Tree subtree and no Paleobiology Database genus query was run. Landing pages for GenBank, the Paleobiology Database and Open Tree returned HTTP 200.",
+    "Modern genus limits are partly defined to be monophyletic. A high M would repeat that taxonomic practice and would be weaker evidence than the fossil half. The interpretation says this so that a pass is not read as an independent rediscovery of the tree.",
+    "First appearances of living species are truncated by preservation. An extinct congener will often look older even when a living species is the true sister of the rest. That bias pushes E upward. It is accepted in the criterion rather than corrected after the fact, and it lowers how much a pass can mean.",
+    "The frozen list is every genus the darwin-origin inventory already resolved, including genera Darwin used for a single extinct animal. Those drop out of a half when they lack living species or lack fossils. They were not removed by hand."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/darwin-ch06-17-intro-04-8624",
+    "date": "2026-11-01"
+  }
+}
