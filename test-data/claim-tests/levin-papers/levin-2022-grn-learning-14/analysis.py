@@ -457,6 +457,11 @@ def decide(models: list[dict]) -> dict:
 def measured_block(models: list[dict], decision: dict) -> dict:
     testable = [m for m in models if m.get("testable")]
     fractions = [m["fraction"] for m in testable if m["fraction"] is not None]
+    n_scored_pairs = sum(m["n_pairs"] for m in testable)
+    n_habituating_pairs = sum(m["n_habituating"] for m in testable)
+    n_flip_pairs = sum(m["n_flip"] for m in testable)
+    n_with_zero = sum(1 for m in testable if m["n_habituating"] == 0)
+    n_flip_models = sum(1 for m in testable if m["n_flip"] >= 1)
     per_model = []
     for m in models:
         per_model.append(
@@ -470,7 +475,6 @@ def measured_block(models: list[dict], decision: dict) -> dict:
                 "n_habituating": m["n_habituating"],
                 "fraction": m["fraction"],
                 "n_flip": m["n_flip"],
-                "seconds": m["seconds"],
                 "tolerances": m["tolerances"],
             }
         )
@@ -489,6 +493,11 @@ def measured_block(models: list[dict], decision: dict) -> dict:
             "clause_every_fraction_in_band": decision.get("clause_every_fraction_in_band"),
             "min_fraction": min(fractions) if fractions else None,
             "max_fraction": max(fractions) if fractions else None,
+            "n_scored_pairs": n_scored_pairs,
+            "n_habituating_pairs": n_habituating_pairs,
+            "n_flip_pairs": n_flip_pairs,
+            "n_testable_with_zero": n_with_zero,
+            "n_testable_with_flip": n_flip_models,
             "verdict": decision["verdict"],
             "reason": decision["reason"],
             "confidence": decision["confidence"],
