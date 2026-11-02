@@ -1,0 +1,126 @@
+{
+  "claim_id": "aristotle-ha06-40",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-40",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "Striped hyenas (Hyaena hyaena) are not simultaneous hermaphrodites: recorded individuals are male or female, and an anatomical account denies that every hyena bears functional organs of both sexes.",
+  "pass_criterion": "Pre-registered. SUPPORTS if both of the following hold. (1) GBIF occurrences of the species Hyaena hyaena (accepted species match, not Crocuta) include at least 20 records with sex male and at least 20 with sex female, and zero records whose sex value is hermaphrodite, intersex, or both. (2) At least one fetched anatomical text matches an anatomical-support pattern: it denies hermaphroditism for hyenas or for the striped hyena; or it states that a penis-like clitoris or masculinized female external genitalia is unique to the spotted hyena among hyaenids, or absent in other hyaenid species; or it describes separate male and female reproductive organs for Hyaena hyaena.",
+  "fail_criterion": "Pre-registered. REFUTES if an anatomical text states that Hyaena hyaena or striped hyenas are functional hermaphrodites, or that every individual bears functional organs of both sexes, or if GBIF sex counts of hermaphrodite/intersex/both exceed the combined male and female counts. MIXED if exactly one of the two support lines holds (sex counts pass but no anatomical-support pattern, or an anatomical-support pattern is present but a sex class has fewer than 20 records) and no refute pattern is present. INCONCLUSIVE with reason data-unavailable if the GBIF species match or occurrence facet cannot be retrieved, and no anatomical text can be fetched; reason underpowered if sexed GBIF records total fewer than 20 and no anatomical-support or refute pattern is present.",
+  "planned_datasets": [
+    "gbif-occurrence-sex-hyaena-hyaena",
+    "pmc-pmc9248831-sex-differences-spotted-hyenas",
+    "adw-hyaena-hyaena"
+  ],
+  "test_contract": {
+    "expected_observation": "Sexed striped-hyena occurrence records are male or female, none are coded hermaphrodite, and an anatomical text denies functional hermaphroditism for this species or restricts masculinized female genitalia to the spotted hyena.",
+    "disconfirming_observation": "An anatomical text states that striped hyenas are functional hermaphrodites, or occurrence records are coded hermaphrodite more often than as a single sex.",
+    "admissible_datasets": "Public occurrence records with a sex field for the species Hyaena hyaena, and open anatomical prose that names hyena genitalia. Crocuta records do not substitute for Hyaena hyaena in the sex counts. Sources must be fetched by the analysis script; counts and sentence matches are computed there.",
+    "inference_method": "GBIF species/match then occurrence facet=sex with limit=0. Anatomical support and refute are phrase patterns listed in the pass and fail criteria, applied to stripped text of the fetched pages. Both lines are required to support; one line is mixed; an explicit hermaphrodite statement refutes."
+  },
+  "interpretation": "The claim denies the report that every hyena has the organs of both sexes, and describes a blind female-like part in the male and a blind male-like part in the female of the striped hyena. 'Organs of both sexes' is read as functional hermaphroditism (each individual has a working male and a working female tract), not as the mere presence of a scent pouch. The blind-pouch detail is recorded if a source mentions a subcaudal gland, and is not required for the verdict. The scope is Hyaena hyaena; spotted-hyena anatomy is used only when a source contrasts it with other hyaenids.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-954e",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "gbif-occurrence-sex-hyaena-hyaena",
+      "name": "GBIF occurrence sex facet for Hyaena hyaena",
+      "landing_url": "https://www.gbif.org/",
+      "doi": null,
+      "version": "species usageKey 5218777",
+      "license": "GBIF occurrence records, mixed licenses, attribution required",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Hyaena%20hyaena",
+          "retrieved_at": "2026-11-02T00:51:49Z",
+          "byte_size": 436,
+          "sha256": "30c622622cac4046f5a976896a67f99d23c9b87752a796ce16f85da28b8d867b",
+          "label": "GBIF species match Hyaena hyaena"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=5218777&facet=sex&limit=0",
+          "retrieved_at": "2026-11-02T00:51:50Z",
+          "byte_size": 200,
+          "sha256": "3a840aab876f24383061604c3c1394b6b7676582221e41543229021f0d74f599",
+          "label": "GBIF occurrence sex facet"
+        }
+      ],
+      "role": "counts of sexed striped-hyena occurrences"
+    },
+    {
+      "id": "adw-hyaena-hyaena",
+      "name": "Animal Diversity Web account of Hyaena hyaena",
+      "landing_url": "https://animaldiversity.org/accounts/Hyaena_hyaena/",
+      "doi": null,
+      "version": null,
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://animaldiversity.org/accounts/Hyaena_hyaena/",
+          "retrieved_at": "2026-11-02T00:51:50Z",
+          "byte_size": 43214,
+          "sha256": "9fa740c083a6b5ec517f049846e81ecf98afb07c6e1998438fd13be11b9dab05",
+          "label": "ADW Hyaena hyaena"
+        }
+      ],
+      "role": "structured reproductive-mode statement"
+    },
+    {
+      "id": "pmc-pmc9248831-sex-differences-spotted-hyenas",
+      "name": "PMC9248831 Sex Differences in Spotted Hyenas (HTML)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9248831/",
+      "doi": "10.1101/cshperspect.a039180",
+      "version": "PMC9248831",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9248831/",
+          "retrieved_at": "2026-11-02T00:51:51Z",
+          "byte_size": 214234,
+          "sha256": "c6ebf1fface2023f2044c2fc91b5d84a06b19f4df40d09c9b9fa081f823ebd22",
+          "label": "PMC9248831 Sex Differences in Spotted Hyenas"
+        }
+      ],
+      "role": "anatomical contrast between spotted hyenas and other hyaenids"
+    }
+  ],
+  "method": "The script resolved Hyaena hyaena on GBIF and read the occurrence sex facet. It took the 500 characters after 'Key Reproductive Features' on the Animal Diversity Web account and matched the pre-registered support and refute phrases. The PMC HTML of the spotted-hyena sex-difference article was fetched the same way and kept only when a matching sentence also names a hyena.",
+  "measured": {
+    "value": 135,
+    "unit": "GBIF occurrences of Hyaena hyaena sexed male or female",
+    "n": 8840,
+    "uncertainty": null,
+    "extra": {
+      "gbif_usage_key": 5218777,
+      "gbif_total_occurrences": 8840,
+      "sex_counts": {
+        "Indeterminate": 100,
+        "Female": 80,
+        "Male": 55
+      },
+      "male": 55,
+      "female": 80,
+      "hermaphrodite_intersex_or_both": 0,
+      "sex_count_pass": true,
+      "adw_reproductive_window": "Key Reproductive Features gonochoric/gonochoristic/dioecious (sexes separate) sexual sexual Average number of offspring 2.5 AnAge Average gestation period 90 days AnAge Average age at sexual or reproductive maturity (female) Sex: female 800 days AnAge Average age at sexual or reproductive maturity (male) Sex: male 800 days AnAge Lifespan/Longevity Average lifespan Status: captivity 24.0 years Max Planck Institute for Demographic Research Average lifespan Status: captivity 24.0 years Max Planck I",
+      "adw_support": true,
+      "pmc_support_sentences": [
+        "No adult females in other members of the hyena family have unusual genitalia, so the enlargement of the clitoris is unique to spotted hyenas."
+      ],
+      "pmc_refute_sentences": [],
+      "pmc_error": null
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.72,
+  "data_kind": "biological",
+  "headline": "Striped-hyena records list 80 females and 55 males and none as hermaphrodites, and the species account codes the sexes as separate.",
+  "caveats": [
+    "GBIF sex is the sex assigned by the record publisher, not a dissection of the reproductive tract.",
+    "The Animal Diversity Web line codes separate sexes. It does not measure the blind subcaudal pouch Aristotle described.",
+    "Indeterminate GBIF records are neither male, female, nor hermaphrodite and are not counted in the threshold."
+  ]
+}
