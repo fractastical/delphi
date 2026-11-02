@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-29",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-29",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If European eels arise from worms that grow of themselves in mud, then Anguilla anguilla will not be recorded as a sexual spawner with eggs or a marine larval life, and it will not be recorded in the Sargasso Sea.",
   "pass_criterion": "Pre-registered. Support only if the FishBase reproduction record for Anguilla anguilla states origin from worms, mud or spontaneous generation, and its mode is not dioecism or any other sexual mode, and the OBIS occurrence count inside the pre-registered Sargasso box is zero, and OBIS reports no larval or leptocephalus life stage.",
   "fail_criterion": "Pre-registered. Refute if any one of these holds: the FishBase mode is dioecism or dioecious, or fertilization is external or internal, and the same record mentions eggs, a larva, leptocephalus or spawning in the sea; or the OBIS count of Anguilla anguilla inside latitude 20 to 35 degrees north and longitude 80 to 40 degrees west is at least 1; or an OBIS life-stage facet lists larva or leptocephalus with count at least 1. Freshwater occurrences outside that box, with no life stage, do not refute and do not support. If the FishBase reproduction record cannot be retrieved and OBIS returns neither a Sargasso count nor a life-stage facet, the verdict is inconclusive with reason data-unavailable. If the record is retrieved but states neither a sexual mode nor spontaneous generation, and the Sargasso count is zero and no larval facet is present, the verdict is inconclusive with reason other.",
@@ -13,7 +13,7 @@
   "test_contract": {
     "expected_observation": "The species account derives eels from mud worms or spontaneous generation and does not describe sexual fertilization, eggs, a marine larva or Sargasso occurrences.",
     "disconfirming_observation": "A sexual reproductive mode together with eggs, a larva or sea spawning, or at least one occurrence inside the Sargasso box, or a larval life-stage count.",
-    "admissible_datasets": "The FishBase reproduction summary linked from the Anguilla anguilla species page, and OBIS occurrence counts for that scientific name. The Sargasso box is fixed at 20–35 N and 80–40 W before any coordinates are read. Identity is the scientific name on the page or in the API, not a stock code assumed in advance.",
+    "admissible_datasets": "The FishBase reproduction summary linked from the Anguilla anguilla species page, and OBIS occurrence counts for that scientific name. The Sargasso box is fixed at 20\u201335 N and 80\u201340 W before any coordinates are read. Identity is the scientific name on the page or in the API, not a stock code assumed in advance.",
     "inference_method": "Parse the reproduction fields and life-cycle text, and read the OBIS total for the polygon query with size 0. Any one disconfirming observation refutes. All confirming observations together support. Otherwise inconclusive."
   },
   "interpretation": "The scope is the European eel, Anguilla anguilla. Earth's guts are read as worms arising in mud, the mechanism the claim names. A sexual marine life cycle, or larvae, or occurrences in the Sargasso box, contradicts origin by transformation of those worms. The test does not identify which modern worm, if any, was meant by the phrase.",
@@ -22,5 +22,96 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-claim-tests-7efa",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "measured": {
+    "value": 2,
+    "unit": "independent disconfirming observations among the three pre-registered checks",
+    "n": 3,
+    "uncertainty": null,
+    "extra": {
+      "mode": "dioecism",
+      "fertilization": "external",
+      "reproductive_guild": "nonguarders",
+      "life_cycle_quote": "Semelparous. Catadromous species. When sexual maturity is reached they leave the river. Spawning migrations occur mainly during the second half of the year but have been observed year-round, usually commencing during dark nights (Ref. 172). Maturity is obtained during the spawning migration (Ref. 88171). Actual spawning has never been observed but is believed to occur solely in the Sargasso Sea between March and June (Ref. 89144). After spawning (at 600 m depth) adults die. Sigmund Freud describ",
+      "sexual_mode": true,
+      "mentions_egg_larva_or_sea": true,
+      "spontaneous_language": false,
+      "sargasso_occurrences": 59,
+      "global_occurrences": 373759,
+      "larval_facet_count": null,
+      "facet_status": 200,
+      "obis_error": null,
+      "reproduction_url": "https://www.fishbase.se/Reproduction/FishReproSummary.php?ID=35&GenusName=Anguilla&SpeciesName=anguilla&fc=49&StockCode=45",
+      "rule_based_verdict": "refutes"
+    }
+  },
+  "datasets": [
+    {
+      "id": "fishbase-anguilla-anguilla-reproduction",
+      "name": "FishBase reproduction summary for Anguilla anguilla",
+      "landing_url": "https://www.fishbase.se/summary/Anguilla-anguilla.html",
+      "doi": null,
+      "version": null,
+      "license": "FishBase terms of use",
+      "files": [
+        {
+          "download_url": "https://www.fishbase.se/summary/Anguilla-anguilla.html",
+          "retrieved_at": "2026-11-02T01:02:00Z",
+          "byte_size": 71786,
+          "sha256": "7b3ce2dcfdb7387d0b9a0d8975b2c2c8d9a17b0500f52c25ec39fa7e4706a725",
+          "note": "species summary page"
+        },
+        {
+          "download_url": "https://www.fishbase.se/Reproduction/35",
+          "retrieved_at": "2026-11-02T01:02:01Z",
+          "byte_size": 12783,
+          "sha256": "a21e700301cab21b84f134aa4cd767c504c21fb3dbc230266595597f463526fb",
+          "note": "reproduction summary"
+        }
+      ],
+      "role": "reproductive mode and life-cycle description"
+    },
+    {
+      "id": "obis-anguilla-anguilla",
+      "name": "OBIS occurrences of Anguilla anguilla",
+      "landing_url": "https://obis.org/",
+      "doi": null,
+      "version": "api v3",
+      "license": "mixed; occurrence records keep the license of each contributing dataset",
+      "files": [
+        {
+          "download_url": "https://api.obis.org/v3/occurrence?scientificname=Anguilla+anguilla&geometry=POLYGON%28%28-80+20%2C-40+20%2C-40+35%2C-80+35%2C-80+20%29%29&size=0",
+          "retrieved_at": "2026-11-02T01:02:02Z",
+          "byte_size": 25,
+          "sha256": "45d24c94603ea65af7eed3ff1028681c5f61e8dba21c7e92267858922515447a",
+          "note": "Sargasso box occurrence count"
+        },
+        {
+          "download_url": "https://api.obis.org/v3/occurrence?scientificname=Anguilla+anguilla&size=0",
+          "retrieved_at": "2026-11-02T01:02:02Z",
+          "byte_size": 29,
+          "sha256": "838ecfc15b44c13843b3eb04769c7d2436e66be90e0f45bb768a5fa9e3fd6437",
+          "note": "global occurrence count"
+        },
+        {
+          "download_url": "https://api.obis.org/v3/occurrence/facet?scientificname=Anguilla+anguilla&facets=lifestage",
+          "retrieved_at": "2026-11-02T01:02:02Z",
+          "byte_size": 24,
+          "sha256": "583475f72c772029dd4c54f41e19f42507eeed27df40ebf7b3e88d72e7c582d6",
+          "note": "life-stage facet HTTP 200"
+        }
+      ],
+      "role": "count of occurrences inside the pre-registered Sargasso box and life-stage facet"
+    }
+  ],
+  "method": "Opened the FishBase species page for Anguilla anguilla, followed the reproduction link on that page, and read mode, fertilization, guild and the life-cycle description. Counted OBIS occurrences of the same scientific name inside latitude 20\u201335 N and longitude 80\u201340 W, and requested a life-stage facet.",
+  "caveats": [
+    "FishBase is a compiled species account, not a new observation of spawning.",
+    "An OBIS point inside the Sargasso box is a recorded occurrence of the species, not by itself a witnessed spawning event.",
+    "The life-stage facet is used only when the API returns structured stage counts. A missing facet is not a count of zero unless the response lists stages and none is larval.",
+    "The test does not identify the animal Aristotle called the earth's guts."
+  ]
 }
