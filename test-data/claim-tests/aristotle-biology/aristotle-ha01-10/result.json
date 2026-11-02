@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-ha01-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha01-10",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, some sharks retain yolked eggs that develop inside the mother and are born live, while the human and the horse carry a foetus rather than laying an egg.",
+  "pass_criterion": "Pre-registered (supports). Primary shark table: Hughes and Blackburn's Dryad file shark_modepruned_D.csv (doi:10.5061/dryad.80gb5mm12), column mode, categories as named in that deposit's file description. A species counts as hatching eggs internally only when mode is exactly Yolk-only_viviparity. Sharks are binomials that match a FishBase v25.04 species in class Elasmobranchii whose order is not batoid, using the same batoid order rule as aristotle-ha05-03. Supports only if at least 10 matched shark species are Yolk-only_viviparity, and AnAge (genomics.senescence.info species dataset.zip) has a non-null Gestation/Incubation value for Homo sapiens and for Equus caballus, both in class Mammalia and neither in order Monotremata.",
+  "fail_criterion": "Pre-registered. Refutes if no matched shark species is Yolk-only_viviparity, or if Homo sapiens or Equus caballus is present as a monotreme or has no gestation value while an incubation-only coding is present. Mixed if the count of yolk-only sharks is from 1 to 9 and both mammals meet the gestation rule. Inconclusive with reason data-unavailable if the Dryad mode file or the AnAge file cannot be retrieved, or if the mode column does not contain the named category labels. Unmatched binomials are excluded from the shark count, not treated as non-sharks that fail the claim.",
+  "planned_datasets": [
+    "dryad-10.5061-dryad.80gb5mm12-shark-modepruned-D",
+    "anage-dataset-zip",
+    "fishbase-v25.04-species-families-orders"
+  ],
+  "test_contract": {
+    "expected_observation": "At least ten non-batoid sharks are coded yolk-only viviparity, and the human and the horse each have a recorded gestation and are therian mammals.",
+    "disconfirming_observation": "No shark in the table is coded as retaining a yolk-only egg through a live birth, or the human or the horse is coded as an egg-laying mammal.",
+    "admissible_datasets": "A public species-level reproductive-mode table for chondrichthyans that separates yolk-only live-bearing from egg-laying and from placental live-bearing, plus a public life-history table that records gestation for Homo sapiens and Equus caballus. FishBase is used only to tell sharks from rays.",
+    "inference_method": "Count of matched shark species with mode Yolk-only_viviparity, threshold 10, conjoined with presence of a gestation value for the two named therian mammals. Egg-laying, oophagy, uterine-milk, and placental modes are not counted as internal egg-hatching. They are reported and do not by themselves refute the claim, because the claim says some sharks, not all."
+  },
+  "interpretation": "The quote contrasts animals that hatch eggs in their own interior, 'as creatures of the shark kind', with animals that engender a live foetus, 'as man and the horse'. Yolk-only viviparity is the mode in which a yolked egg is retained and the young is born live. Placental viviparity, oophagy, and uterine milk are live birth with extra maternal feeding, so they are not counted as the egg-hatching side. Egg-laying is birth of an egg, not internal hatching. The mammal side is a recorded gestation in a therian, which is the table's distinction from an incubated egg. The test does not measure a placenta histologically.",
+  "caveats": [
+    "The Dryad file description, not the data file, was read before registration. It names the mode labels Egg-laying, Live-bearing_with_oophagy, Live-bearing_with_uterine_milk, Placental_viviparity, and Yolk-only_viviparity. No species row and no count of modes was read.",
+    "A web-search snippet of a Sharkipedia reproductive-mode page showed both oviparous and viviparous labels for individual elasmobranchs. That snippet is not the dataset and was not counted.",
+    "AnAge's column is labelled gestation/incubation in one field. Order Monotremata is the pre-registered egg-laying mammal exclusion. A gestation number is not a measurement of foetal membranes."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  }
+}

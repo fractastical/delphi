@@ -1,0 +1,34 @@
+{
+  "claim_id": "aristotle-pa04-31",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-31",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, fishes that are not broad and flat have one pair of pectoral fins and one pair of pelvic fins, and no fish has an extra pair beyond those four fins.",
+  "pass_criterion": "Pre-registered (supports). From FishBase v25.04 morphdat joined to species, families, and orders. Include classes Actinopterygii, Actinopteri, Teleostei, Chondrostei, Holostei, Cladistii, Elasmobranchii, Holocephali, Sarcopterygii, Coelacanthi, and Dipneusti. Exclude jawless classes Agnatha, Myxini, Petromyzonti, and Cephalaspidomorphi. A species is broad-and-flat if BodyShapeI or BodyShapeII contains 'flat', or if its order matches the batoid rule used for aristotle-ha05-03 (order name matching rajiformes, myliobatiformes, torpediniformes, rhinopristiformes, rhinobatiformes, pristiformes, or platyrhiniformes, or order common name matching rays, skates, guitarfish, sawfish, or torpedo). Absence codes are the words absent, suppressed, or none. A species is scored when at least one row has a non-empty PectoralAttributes and at least one row has a non-empty PelvicsAttributes or VPosition. It has four paired fins only if some row records a non-absent pectoral and no row records an absent pectoral, and some row records a non-absent pelvic attribute with a non-absent VPosition and no row records an absent pelvic attribute or an absent VPosition. Supports only if at least 200 non-flat species are scored, the proportion with four paired fins is at least 0.95, and a search of AddChars finds no species described with an extra paired fin (patterns: three pairs, third pair, two pairs of pectoral, additional pair of pectoral, extra pectoral fin, three pectoral).",
+  "fail_criterion": "Pre-registered. Refutes if the proportion of scored non-flat species with four paired fins is below 0.50, or if at least five species in the included classes have an AddChars match for an extra paired fin. Mixed if the proportion is at least 0.50 and below 0.95 while fewer than five species have an extra pair, or if the proportion is at least 0.95 but at least one and fewer than five species have an extra pair. Inconclusive with reason underpowered if fewer than 200 non-flat species are scored for both paired fins. Inconclusive with reason data-unavailable if the paired-fin columns are missing or entirely blank.",
+  "planned_datasets": [
+    "fishbase-v25.04-morphdat",
+    "fishbase-v25.04-species",
+    "fishbase-v25.04-families",
+    "fishbase-v25.04-orders"
+  ],
+  "test_contract": {
+    "expected_observation": "Among scored fishes that are not broad and flat, at least 95 percent have both a pectoral pair and a pelvic pair, and no included species is described as having a further pair.",
+    "disconfirming_observation": "Half or more of scored non-flat fishes lack a pectoral or a pelvic pair, or at least five species are described with an extra paired fin.",
+    "admissible_datasets": "A public species-level fin-attribute table compiled independently of Aristotle, with pectoral and pelvic fields that can record absence, plus a body-shape or order field that marks broad flat fishes. Median-fin counts may be reported and do not decide the verdict.",
+    "inference_method": "Species-level proportion with both pairs present and no conflicting absence row, denominator the scored non-flat species in the classes named above, thresholds 0.95 and 0.50, plus a literal search of AddChars for an extra pair. Dorsal, anal, and caudal fin counts are descriptive only, because the claim's scope maps the four fins to the paired pectoral and pelvic fins."
+  },
+  "interpretation": "The quote's 'two on the upper and two on the under side' and the claim's scope both map the four fins to the pectoral and pelvic pairs, not to dorsal, anal, and caudal fins. Broad and flat follows the named exception of rays and skates, plus any species whose body-shape text says flat. Jawless fishes are excluded because this section of the claim is about finned fishes, not hagfish or lampreys. A fish with both pairs is counted as four fins because each field records one pair; the table has no column for a second pectoral pair, so 'more than four' is tested in the free-text AddChars field rather than by a count the schema cannot store.",
+  "caveats": [
+    "Parquet column names for FishBase v25.04 were read earlier for aristotle-ha05-03. PectoralAttributes, PelvicsAttributes, VPosition, BodyShapeI, BodyShapeII, and AddChars values have not been tabulated for this claim.",
+    "A web-search snippet of the FishBase morphology page for Mola mola showed pelvic attributes 'suppressed/absent' and position 'absent'. That page supplied the absence wording. It was not counted, and no fin-attribute distribution was computed before this registration.",
+    "The paired-fin schema records one pair of each. A negative text search can show that no species was described with an extra pair. It cannot show a fin the compilers had no place to put."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  }
+}

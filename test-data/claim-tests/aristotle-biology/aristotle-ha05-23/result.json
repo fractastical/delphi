@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha05-23",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-23",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, domestic-dog gestation lasts 60 to 63 days, and a pregnancy shorter than 60 days does not produce a surviving litter.",
+  "pass_criterion": "Pre-registered (supports). Two sources. (1) AnAge dataset.zip: the Gestation/Incubation value T, in days, for Canis familiaris or, if that binomial is absent, Canis lupus familiaris. (2) The PubMed abstract of Okkens et al. 2001, PMID 11787149, fetched as text from NCBI E-utilities, which states gestation from mating to parturition. Parse the first range of the form 'between A and B days' as the sample minimum and maximum, and parse the sample size if it is given as a count of bitches. Supports only if T is between 60 and 63 inclusive, the parsed sample minimum is at least 60, the parsed sample maximum is at most 63, and the abstract does not report a pregnancy shorter than 60 days.",
+  "fail_criterion": "Pre-registered. Refutes if the parsed mating-dated sample has n at least 20 and either the maximum is greater than 63, or the minimum is less than 60 and the abstract does not state that litters born before 60 days failed to survive. Mixed only when that refutes condition is not met and T is between 60 and 63 inclusive while a parsed sample range still extends below 60 or above 63 (for example because n is below 20). If both conditions match, the verdict is refutes. Inconclusive with reason underpowered if AnAge supplies only a single typical value and no sample range can be parsed, because one number cannot test 'never' or 'at the utmost'. Inconclusive with reason data-unavailable if the dog row is absent from AnAge and the abstract cannot be fetched. The survival clause is recorded as untested when the abstract does not mention survival or neonatal death.",
+  "planned_datasets": [
+    "anage-dataset-zip",
+    "pubmed-11787149-okkens-2001-abstract"
+  ],
+  "test_contract": {
+    "expected_observation": "The compiled gestation for the domestic dog falls on 60, 61, 62, or 63 days, and a mating-dated series of pregnancies falls inside that same closed interval.",
+    "disconfirming_observation": "A mating-dated series of at least 20 pregnancies includes births after 63 days, or births before 60 days that are not reported as non-surviving litters.",
+    "admissible_datasets": "A public species-level life-history compilation for Canis familiaris, and a published series of dog pregnancies that states how the clock was started. Veterinary records behind a login are not admissible. The survival clause requires the series to say whether short pregnancies produced living litters.",
+    "inference_method": "Compare the AnAge point value and the first parsed abstract range with the closed interval [60, 63]. A mating-dated range outside that interval with n at least 20 refutes when a short pregnancy is not stated to have failed. Mixed is reserved for an outside range that does not meet that sample-size condition while the AnAge point lies inside the interval. One point alone is underpowered."
+  },
+  "interpretation": "The quote says the bitch's gestation is sixty, sixty-one, sixty-two, or sixty-three days at the utmost. The claim adds that it is never less than sixty unless the litter does not survive. Aristotle does not say whether the count starts at mating or at ovulation. The Okkens series is used only as a mating-to-birth clock, and AnAge is used as a species-typical value whose clock is whatever the database records. The two are not averaged. A value above 63 is not rescued by the survival clause, which speaks only to pregnancies that are too short.",
+  "caveats": [
+    "A web-search snippet of the Okkens 2001 PubMed abstract was seen before this registration and included a range and a mean. The thresholds are the claim's own 60 and 63 days. They were not adjusted to that snippet. The analysis re-parses the abstract and does not copy the snippet.",
+    "AnAge's dog gestation value was not read before registration. The search listing showed the binomial and a longevity figure only.",
+    "An abstract is a published summary, not the litter table. If the full paper is not open, the test cannot recover pup survival, and the result will say so."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  }
+}

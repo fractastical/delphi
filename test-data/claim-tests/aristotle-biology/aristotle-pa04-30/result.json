@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-pa04-30",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-30",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, Jynx torquilla is the only bird with two toes forward and two back, and every other bird has three toes forward and one back.",
+  "pass_criterion": "Pre-registered (supports). Source of the foot coding: the open text of Botelho et al. 2014, Proceedings of the Royal Society B, doi:10.1098/rspb.2014.0765. A named taxon is coded two-forward-two-back if the text applies zygodactyl, semi-zygodactyl, facultative zygodactyl, or heterodactyl to it, or says two toes point forward and two backward. The wryneck has the arrangement if the text names Jynx or wryneck, or if GBIF places Jynx torquilla in a family or order the text codes that way. Supports only if every taxon the text codes two-forward-two-back is the genus Jynx or the species Jynx torquilla, and the text describes other birds as three forward and one back.",
+  "fail_criterion": "Pre-registered. Refutes if the text codes any taxon other than the genus Jynx as two-forward-two-back, and the GBIF backbone count of accepted species in that taxon, minus Jynx torquilla if it falls inside the taxon, is at least 1. Inconclusive with reason data-unavailable if the article text cannot be fetched. Inconclusive with reason not-operationalizable if the fetched text names no taxon for a toe arrangement. Species counts come from GBIF species search on the matched taxon key, rank SPECIES, status ACCEPTED, limit 0, using the count field.",
+  "planned_datasets": [
+    "botelho-2014-rspb-20140765-text",
+    "gbif-backbone-species-counts"
+  ],
+  "test_contract": {
+    "expected_observation": "The comparative statement in the paper assigns two toes forward and two back only to the wryneck, and three forward and one back to other birds.",
+    "disconfirming_observation": "The same statement assigns that toe arrangement, including a facultative one, to a named bird group that contains at least one accepted species other than Jynx torquilla.",
+    "admissible_datasets": "An open peer-reviewed anatomical text that names bird taxa together with toe arrangements, plus a public taxonomic backbone that can count accepted species in a named family or order. A checklist with no toe field is not enough on its own.",
+    "inference_method": "Extract taxon-to-arrangement assignments from the article text by the patterns in the pass criterion, resolve Jynx torquilla and each other taxon on GBIF, and refute uniqueness when any other assignment covers at least one accepted species besides the wryneck. The test does not re-score museum skins."
+  },
+  "interpretation": "The quote says that in the wryneck alone two toes are in front and two behind, and that every other bird has the arrangement described for birds generally, which the claim states as three in front and one behind. Facultative and semi-zygodactyl feet put two toes back some of the time, so they are inside the claim's 'arranged two in front and two behind' and outside 'three in front and one behind'. Heterodactyl feet also have two forward and two back, with a different toe reversed, and count against uniqueness. The test uses one paper's explicit assignments plus a species count. It is not a specimen-by-specimen survey.",
+  "caveats": [
+    "A web-search snippet of Botelho et al. 2014 named more than one bird group in connection with zygodactyl feet before this registration. The rule is the claim's own uniqueness test. It was not written to fit a count, and the analysis has to extract the assignments from the fetched text rather than from the snippet.",
+    "GBIF counts change. The retrieval time will be recorded. The count is a taxonomic total, not a count of feet that were examined.",
+    "If the publisher returns a paywall or a block, the verdict is data-unavailable. No arrangement will be filled in from memory."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  }
+}
