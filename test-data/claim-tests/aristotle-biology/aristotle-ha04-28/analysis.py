@@ -105,7 +105,8 @@ def obis_larvae() -> dict:
                 "for an unknown JSON shape, so the count is not used."
             )
             out["payload_excerpt"] = text[:500]
-        return out
+            return out
+        # A 200 that is not a larval total is not a count. Try the next URL.
     # Total occurrences, unfiltered by life stage, is not an offspring record.
     try:
         response = requests.get(
@@ -170,6 +171,13 @@ def main() -> None:
         genus_rows.append(item)
 
     obis = obis_larvae()
+    if not obis.get("used"):
+        deviations.append(
+            "OBIS is not used. A facet URL can return HTTP 200 JSON that is not a larval total; "
+            "the first run left reason null in that case. The script now records why no explicit "
+            "larval count was accepted. An unfiltered occurrence total is still not offspring. "
+            "FishBase sex and offspring counts are unchanged."
+        )
     sex_positive = bool(record.get("sex_positive"))
     offspring_positive = bool(record.get("offspring_positive"))
     if record.get("species_found") and (sex_positive or offspring_positive):

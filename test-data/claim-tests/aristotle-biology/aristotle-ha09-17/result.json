@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-17",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-17",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:40:23Z",
   "hypothesis": "If the claim holds, FishBase species accounts for the genus Lophius describe a head filament (illicium or esca) that is used to lure prey, and they describe the fish as hidden in sand or mud while it does so.",
   "pass_criterion": "Pre-registered. Species are the valid Lophius binomials in FishBase v25.04 species.parquet (Genus Lophius, a non-empty species epithet, epithet not sp or spp). For each, fetch https://www.fishbase.se/summary/{Genus}-{Species}.html and score the biology slice: text from the first 'Biology' heading until Life cycle, Diet, Main reference, or 4000 characters, whichever comes first. If there is no Biology heading, the species is unscored. Anatomy matches if the slice contains illicium, esca, filament or 'first dorsal spine'. Use matches if the slice contains illicium or esca, or 'as a lure' or 'to lure', or filament/illicium/esca in the same sentence as attract, prey or lure. The fisheries phrase 'used as bait' does not count as use unless illicium, esca or lure is in that same sentence. Burial matches sand, mud, bury, buried or conceal, and does not match on the word bottom alone. A species is full support only if anatomy, use and burial all match. The claim passes if at least 3 species are scored and the full-support fraction is at least 2/3.",
@@ -18,7 +18,7 @@
   },
   "interpretation": "The fishing-frog is the angler of the genus Lophius, the shallow-water genus Aristotle could have seen, not the deep-sea ceratioid anglers. 'Filaments ... in front of its eyes ... round at the tips ... used as baits' while the fish is hidden in sand and mud is scored as three pieces: the illicium or esca is present, it is described as a lure, and the account mentions burial in sand or mud. The test uses what the compiled accounts say. It does not measure a video of a strike.",
   "caveats": [
-    "The summary URL for Lophius-piscatorius returned HTTP 200 on HEAD. The body was not read. species.parquet was not opened.",
+    "Before registration, the Lophius-piscatorius summary URL returned HTTP 200 on HEAD, the body was not read, and species.parquet was not opened.",
     "Keyword counts on a compiled account are a coarser measurement than a filmed feeding sequence. A pass means the accounts state the three pieces, not that this session timed a predation event. Confidence on a pass is capped at 0.6.",
     "A refutation by absence of the words would be weak, so absence refutes only when several scored pages exist and none of them has the anatomical terms, and confidence on that refutation is capped at 0.45."
   ],
@@ -28,5 +28,168 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claim-tests-cf1c",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.5,
+  "method": "Listed valid Lophius binomials from FishBase v25.04, fetched each species-summary page, cut the Biology slice, and applied the registered anatomy, lure-use and burial substrings. The fisheries sense of 'used as bait' was not counted as the fish using a lure.",
+  "measured": {
+    "value": 0.1429,
+    "unit": "fraction of scored Lophius accounts with anatomy, lure use and burial",
+    "n": 7,
+    "uncertainty": null,
+    "extra": {
+      "n_anatomy": 1,
+      "n_full": 1,
+      "species": [
+        {
+          "binomial": "Lophius americanus",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 225,
+          "anatomy": false,
+          "use": false,
+          "burial": false,
+          "full": false
+        },
+        {
+          "binomial": "Lophius budegassa",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 240,
+          "anatomy": false,
+          "use": false,
+          "burial": false,
+          "full": false
+        },
+        {
+          "binomial": "Lophius gastrophysus",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 218,
+          "anatomy": false,
+          "use": false,
+          "burial": false,
+          "full": false
+        },
+        {
+          "binomial": "Lophius litulon",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 325,
+          "anatomy": false,
+          "use": false,
+          "burial": true,
+          "full": false
+        },
+        {
+          "binomial": "Lophius piscatorius",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 708,
+          "anatomy": true,
+          "use": true,
+          "burial": true,
+          "full": true
+        },
+        {
+          "binomial": "Lophius vaillanti",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 145,
+          "anatomy": false,
+          "use": false,
+          "burial": false,
+          "full": false
+        },
+        {
+          "binomial": "Lophius vomerinus",
+          "fetched": true,
+          "scored": true,
+          "slice_chars": 310,
+          "anatomy": false,
+          "use": false,
+          "burial": false,
+          "full": false
+        }
+      ]
+    }
+  },
+  "results_summary": [
+    "Lophius binomials in the species table: 7.",
+    "Scored accounts: 7. Anatomy matches: 1. Full support (anatomy, use, burial): 1.",
+    "Verdict mixed."
+  ],
+  "datasets": [
+    {
+      "id": "fishbase-v25.04-species-and-lophius-summaries",
+      "name": "FishBase v25.04 species table and Lophius species-summary pages",
+      "landing_url": "https://www.fishbase.se/",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 4.0",
+      "files": [
+        {
+          "name": "species.parquet",
+          "download_url": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T00:45:04Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        },
+        {
+          "name": "Lophius-americanus.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-americanus.html",
+          "retrieved_at": "2026-11-02T00:45:05Z",
+          "byte_size": 59772,
+          "sha256": "e338d4e63d48c978d121a2dcc410894469f412fa966c7891e17159e587e66833"
+        },
+        {
+          "name": "Lophius-budegassa.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-budegassa.html",
+          "retrieved_at": "2026-11-02T00:45:06Z",
+          "byte_size": 58619,
+          "sha256": "d6c64c65ce8deae639803f44ba49a607dd891e3d71878bc46a8de3c59690b323"
+        },
+        {
+          "name": "Lophius-gastrophysus.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-gastrophysus.html",
+          "retrieved_at": "2026-11-02T00:45:07Z",
+          "byte_size": 54666,
+          "sha256": "16feefb1955a16f3149a8ae6e418a8a43b845601b78e29507c8a1fcd3d2e8b98"
+        },
+        {
+          "name": "Lophius-litulon.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-litulon.html",
+          "retrieved_at": "2026-11-02T00:45:08Z",
+          "byte_size": 53872,
+          "sha256": "0696236f58f23dfb6ff2c444e065bf1a0111096cb654f71d59bc10fb2f0e8c3b"
+        },
+        {
+          "name": "Lophius-piscatorius.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-piscatorius.html",
+          "retrieved_at": "2026-11-02T00:45:09Z",
+          "byte_size": 64483,
+          "sha256": "b6bd8ca3c1e8cf003a9308f6db033c2f2d92758a5e4ab1ba4dc3d2ceabdf4f44"
+        },
+        {
+          "name": "Lophius-vaillanti.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-vaillanti.html",
+          "retrieved_at": "2026-11-02T00:45:09Z",
+          "byte_size": 54615,
+          "sha256": "cc7718caae2ddaca08f6629df68b1e0ac24fd04c5a9b7fb81699ccfdb6718359"
+        },
+        {
+          "name": "Lophius-vomerinus.html",
+          "download_url": "https://www.fishbase.se/summary/Lophius-vomerinus.html",
+          "retrieved_at": "2026-11-02T00:45:10Z",
+          "byte_size": 55724,
+          "sha256": "2f8969aa240176085d4be0045499b588363288bcc3fa7eb535b9ed8cb77ab99e"
+        }
+      ],
+      "role": "which Lophius species exist, and the compiled biology text for each"
+    }
+  ],
+  "deviations": [
+    "The registered pass needs a full-support fraction of at least 2/3, and the registered refutation needs an anatomy count of 0. This run sits in the residual the script already coded as mixed (anatomy 1/7, full support 1/7). Thresholds were not changed after the pages were read."
+  ]
 }

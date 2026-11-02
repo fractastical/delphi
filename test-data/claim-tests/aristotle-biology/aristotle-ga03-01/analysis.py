@@ -171,8 +171,11 @@ def chondrichthyan_mask(frame: pd.DataFrame) -> pd.Series:
         series = frame[name]
         if series.dtype != object and not pd.api.types.is_string_dtype(series):
             continue
-        low = series.astype(str).str.lower()
-        mask = mask | low.apply(lambda text: any(token in text for token in CHOND))
+        low = series.astype(str).str.lower().fillna("")
+        hit = pd.Series(False, index=frame.index)
+        for token in CHOND:
+            hit = hit | low.str.contains(token, na=False, regex=False)
+        mask = mask | hit
     return mask
 
 

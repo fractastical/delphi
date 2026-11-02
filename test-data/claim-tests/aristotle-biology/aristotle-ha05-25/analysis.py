@@ -16,9 +16,10 @@ import json
 import re
 from pathlib import Path
 
+import xml.etree.ElementTree as ET
+
 import pandas as pd
 import requests
-import xlrd
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -316,87 +317,82 @@ def age_kind(text: str):
     return None
 
 
-def italic_rows(book, sheet) -> set:
-    italics = set()
-    try:
-        for row_index in range(sheet.nrows):
-            cell = sheet.cell(row_index, 0)
-            font = book.font_list[book.xf_list[cell.xf_index].font_index]
-            if font.italic:
-                italics.add(row_index)
-    except Exception:
-        return set()
-    return italics
+SS = "{urn:schemas-microsoft-com:office:spreadsheet}"
+FATHER_BINS = ("50-54", "55-59", "60-64", "65+")
 
 
 def parse_fathers(path: Path, deviations: list) -> dict:
-    book = xlrd.open_workbook(str(path), formatting_info=True)
-    sheet = book.sheet_by_index(0)
-    italics = italic_rows(book, sheet)
-    if not italics:
-        deviations.append(
-            "Table 11 italics (the Yearbook's mark for incomplete registration) could not be read, "
-            "so the completeness filter was not applied."
-        )
-    header_row = None
-    header_map = {}
-    for row_index in range(min(sheet.nrows, 40)):
-        kinds = {}
-        for col in range(sheet.ncols):
-            kind = age_kind(cell_text(sheet.cell_value(row_index, col)))
-            if kind and kind not in kinds:
-                kinds[kind] = col
-        if "65+" in kinds and "60-64" in kinds:
-            header_row = row_index
-            header_map = kinds
-            break
-    if header_row is None:
-        preview = []
-        for row_index in range(min(12, sheet.nrows)):
-            preview.append([cell_text(sheet.cell_value(row_index, col)) for col in range(min(sheet.ncols, 16))])
-        (DERIVED / "table11-header-preview.json").write_text(json.dumps(preview, indent=2) + "\n")
-        deviations.append("Table 11 header with 60-64 and 65+ was not found. See derived/table11-header-preview.json.")
-        return {"call": "data-unavailable", "countries": []}
+    """Table 11 is SpreadsheetML with a UTF-8 BOM, one age group per row.
 
-    # If a second identical age block exists it is the rate block; keep the first (counts).
-    wanted = ["total", "50-54", "55-59", "60-64", "65+", "unknown", "45-49", "40-44"]
-    columns = {key: header_map[key] for key in wanted if key in header_map}
+    The count is the first integer cell. sDataIntegerItalic is the Yearbook's
+    italics mark for incomplete registration, so those country-years are dropped.
+    """
+    deviations.append(
+        "Table 11 is Office SpreadsheetML (it begins with an XML declaration, not a BIFF workbook). "
+        "Counts were read from that XML. Incomplete registration is the italic integer style "
+        "sDataIntegerItalic on the Total row, and those country-years were dropped."
+    )
+    raw = path.read_bytes()
+    if raw.startswith(b"\xef\xbb\xbf"):
+        raw = raw[3:]
+    root = ET.fromstring(raw)
     countries = []
-    current = None
-    for row_index in range(header_row + 1, sheet.nrows):
-        if row_index in italics:
-            current = None
-            continue
-        name = cell_text(sheet.cell_value(row_index, 0))
-        year_cell = cell_text(sheet.cell_value(row_index, 1)) if sheet.ncols > 1 else ""
-        year = as_year(year_cell)
-        if name and not year:
-            current = name
-            continue
-        if year is None:
-            continue
-        if not name:
-            name = current
-        if not name or NAME_DROP.search(name):
-            continue
+    country = None
+    year = None
+    counts = {}
+    italic_total = False
+
+    def flush():
+        nonlocal counts, italic_total
+        if country and year and "total" in counts and not italic_total:
+            if NAME_DROP.search(country):
+                counts = {}
+                italic_total = False
+                return
+            total = counts["total"]
+            if all(key in counts for key in FATHER_BINS) and total >= 10000:
+                countries.append({"country": country, "year": year, "counts": dict(counts), "total": total})
         counts = {}
-        ok = True
-        for key, col in columns.items():
-            raw = sheet.cell_value(row_index, col)
-            if raw == "" or raw is None:
-                counts[key] = None
+        italic_total = False
+
+    for row in root.iter(f"{SS}Row"):
+        cells = []
+        for cell in list(row):
+            if not cell.tag.endswith("Cell"):
                 continue
-            try:
-                counts[key] = float(raw)
-            except (TypeError, ValueError):
-                ok = False
-        if not ok:
+            style = cell.attrib.get(f"{SS}StyleID", "")
+            data = None
+            for child in cell:
+                if child.tag.endswith("Data"):
+                    data = "".join(child.itertext()).strip()
+            cells.append((style, data))
+        if not cells or cells[0][1] is None:
             continue
-        total = counts.get("total")
-        parts = [counts.get(key) for key in ("50-54", "55-59", "60-64", "65+") if counts.get(key) is not None]
-        if total is None or total < 10000:
-            continue
-        countries.append({"country": name, "year": year, "counts": counts, "total": total})
+        style, text = cells[0]
+        if style == "sCountryName":
+            flush()
+            country = text.split(" - ")[0].strip()
+            year = None
+        elif style == "sRefDate":
+            flush()
+            year = as_year(text)
+        elif style == "sAgeGroup":
+            kind = age_kind(text)
+            number = None
+            number_style = ""
+            for cell_style, cell_text_value in cells[1:]:
+                if "Integer" in cell_style and cell_text_value not in {None, "", ".."}:
+                    try:
+                        number = float(cell_text_value)
+                        number_style = cell_style
+                    except ValueError:
+                        number = None
+                    break
+            if kind and number is not None:
+                counts[kind] = number
+                if kind == "total" and "Italic" in number_style:
+                    italic_total = True
+    flush()
     # latest year per country
     latest = {}
     for row in countries:
@@ -404,19 +400,23 @@ def parse_fathers(path: Path, deviations: list) -> dict:
         if previous is None or row["year"] > previous["year"]:
             latest[row["country"]] = row
     kept = []
+    dropped_unbalanced = 0
     for row in latest.values():
         counts = row["counts"]
-        bins = {key: counts.get(key) or 0 for key in ("50-54", "55-59", "60-64", "65+")}
-        # denominator: total minus unknown when both exist
+        bins = {key: counts.get(key) or 0 for key in FATHER_BINS}
+        accounted = sum(value for key, value in counts.items() if key != "total")
+        if row["total"] <= 0 or abs(accounted - row["total"]) / row["total"] > 0.02:
+            dropped_unbalanced += 1
+            continue
         unknown = counts.get("unknown") or 0
         known = row["total"] - unknown
         if known <= 0:
             continue
         kept.append({**row, "known": known, "bins": bins})
     pool_known = sum(row["known"] for row in kept)
-    pool_bins = {key: sum(row["bins"][key] for row in kept) for key in ("50-54", "55-59", "60-64", "65+")}
+    pool_bins = {key: sum(row["bins"][key] for row in kept) for key in FATHER_BINS}
     if pool_known == 0:
-        return {"call": "data-unavailable", "n_countries": 0, "header_row": header_row, "columns": columns}
+        return {"call": "data-unavailable", "n_countries": 0, "dropped_unbalanced": dropped_unbalanced}
     share_65 = pool_bins["65+"] / pool_known
     share_5064 = (pool_bins["50-54"] + pool_bins["55-59"] + pool_bins["60-64"]) / pool_known
     if share_65 >= 0.02 or (pool_known >= 500_000 and share_5064 == 0 and pool_bins["65+"] == 0):
@@ -430,9 +430,10 @@ def parse_fathers(path: Path, deviations: list) -> dict:
         "n_countries": len(kept),
         "pooled_births_known_age": pool_known,
         "pooled_bins": pool_bins,
-        "share_65_plus": share_65,
-        "share_50_64": share_5064,
-        "header_row": header_row,
+        "share_65_plus": round(share_65, 6),
+        "share_50_64": round(share_5064, 6),
+        "dropped_unbalanced": dropped_unbalanced,
+        "n_country_years_read": len(countries),
     }
 
 

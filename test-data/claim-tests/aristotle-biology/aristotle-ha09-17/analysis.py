@@ -168,8 +168,17 @@ def main() -> None:
         verdict, reason = "mixed", None
         confidence = 0.5
     else:
+        # Residual, already in the script committed before download: anatomy is
+        # present on some scored accounts but on fewer than 2/3, and full support
+        # is also below 2/3. That is neither the pass nor the absence refutation.
         verdict, reason = "mixed", None
         confidence = 0.5
+        deviations.append(
+            "The registered pass needs a full-support fraction of at least 2/3, and the "
+            "registered refutation needs an anatomy count of 0. This run sits in the residual "
+            f"the script already coded as mixed (anatomy {n_anatomy}/{n}, full support {n_full}/{n}). "
+            "Thresholds were not changed after the pages were read."
+        )
     measured = {
         "value": None if n == 0 else round(n_full / n, 4),
         "unit": "fraction of scored Lophius accounts with anatomy, lure use and burial",
