@@ -1,0 +1,423 @@
+{
+  "claim_id": "aristotle-ha07-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-22",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:25:00Z",
+  "hypothesis": "Among women who are still breastfeeding their last child, not currently pregnant, and not using the pill or an injectable contraceptive, most are still amenorrheic, while a visible minority have already resumed menstruation.",
+  "pass_criterion": "Pre-registered (supports). In the pooled eligible sample defined below, the weighted proportion still amenorrheic is at least 0.60, the weighted proportion whose amenorrhea has ended is at least 0.05, and the eligible sample has at least 200 women. Survey weights are used as specified in inference_method.",
+  "fail_criterion": "Pre-registered (refutes). The same weighted proportion still amenorrheic is at most 0.50. If that proportion is greater than 0.50 and less than 0.60, or is at least 0.60 but the proportion whose amenorrhea has ended is under 0.05, or at least three surveys each with 100 or more eligible women disagree (at least one survey at or above 0.60 and at least one at or below 0.50), the verdict is mixed. If no survey can be read, the verdict is inconclusive with reason data-unavailable. If surveys can be read but fewer than 200 women are eligible, or a coding check below fails for every survey, the verdict is inconclusive with reason underpowered or other as specified.",
+  "planned_datasets": [
+    "wfs-standard-recode-public-use"
+  ],
+  "interpretation": "Aristotle's general rule is read as a statement about women who are producing milk, not about all postpartum women and not about the contraceptive failure rate. 'A flow of milk' is self-reported current breastfeeding of the last child. 'Menstrual purgations do not take place' is an open amenorrhea interval. The quoted exception, that discharge has been known to occur during suckling, is a requirement that resumed menstruation be observed, not a nuisance. The clause that moisture is not directed in several directions at once is a proposed mechanism and is not measured. Pregnancy and hormonal contraceptives also stop menstruation, so those women are removed rather than counted as support for the lactation rule. Months are the survey's own month codes.",
+  "test_contract": {
+    "expected_observation": "In public fertility-survey microdata, the weighted share of currently breastfeeding, non-pregnant, non-hormonally-contracepting women who are still amenorrheic is at least 0.60, and at least 0.05 have a closed amenorrhea interval.",
+    "disconfirming_observation": "That same weighted share still amenorrheic is 0.50 or lower, so menstruation during ongoing breastfeeding is at least as common as amenorrhea.",
+    "admissible_datasets": "Public-use individual microdata, not a registration wall, in which the same woman has a current-breastfeeding indicator and an amenorrhea measure that separates 'still amenorrheic' from a completed duration and from not-stated. The World Fertility Survey standard recode files distributed for public use at wfs.dhsprogram.com meet this. Aggregates that do not identify breastfeeding and menstrual status on the same woman do not. The codebook may be read before the data file; the data file may not.",
+    "inference_method": "Eligible woman: still breastfeeding the last child (F117 = 1), not currently pregnant (V206 = 0), current method not pill or injection (V635 not in {1, 11}), and amenorrhea in the open pregnancy interval (F122) equal to 96 (still amenorrheic) or to an integer from 0 through 41 inclusive (completed months; the interval has closed). Codes 87, 88 and 99 on F122, and any other value, are not eligible. Within each survey, the proportion still amenorrheic uses the sample weight V006/1000, dropping non-positive weights. Each survey's weights are then rescaled to sum to its number of eligible women, and the surveys are pooled, so each eligible woman counts once after her own survey's design weight. Thresholds are those in pass_criterion and fail_criterion. A survey is used only if its original WFS dictionary (.dct, not the ISSA .dic) defines these variables with the Kenya SR02 labels: F117 value 1 = Yes and 0 = No, na, ns; F122 value 96 = Still amenorrheic, with minimum 0, maximum 41, and 87/88/99 as no data, not applicable and not stated; V206 value 0 = not pregnant and 1 = yes; V635 value 1 = pill and 11 = injection; V006 = sample weight per 1000. F121 is the back-reference of F117 (1 = yes, still amenorrheic). A survey is dropped if its logical record length does not divide the file, the parsed record count differs from the dictionary %FILE count, more than 1 percent of non-missing ages (V010) fall outside 15\u201350, more than 5 percent of rows that pass the F117/V206/V635 filters have an F122 value outside {0..41, 96, 87, 88, 99}, or concordance of F122 with F121 on eligible rows is under 95 percent (F122 = 96 must have F121 = 1, and F122 in 0..41 must have F121 = 0). Positions and labels are taken from each dictionary at run time. Full breastfeeding, where a dictionary defines it, is reported and does not enter the verdict."
+  },
+  "caveats": [
+    "Only the Kenya 1977\u201378 dictionary was opened before this registration. No standard-recode data file, marginals file, or amenorrhea frequency was read. Other surveys are included only if their dictionaries match the labels above.",
+    "Current breastfeeding includes partial breastfeeding. The survey does not measure milk volume.",
+    "The World Fertility Survey samples are national samples from the late 1970s and early 1980s, not a draw from all lactating women.",
+    "Partial breastfeeding is coded as still breastfeeding. Women on the pill or an injection were removed; other contraceptives were kept.",
+    "F122 values 0 through 41 are read as a closed amenorrhea interval because 96 is the dictionary's code for still amenorrheic. A closed interval means menstruation resumed during the open pregnancy interval, and the woman was still breastfeeding at interview.",
+    "42 linked surveys were not in the pool. Reasons are in derived/measured.json.",
+    "Partial breastfeeding is coded as still breastfeeding. Women on the pill or an injection were removed; other contraceptives were kept.",
+    "F122 values 0 through 41 are read as a closed amenorrhea interval because 96 is the dictionary's code for still amenorrheic. A closed interval means menstruation resumed during the open pregnancy interval, and the woman was still breastfeeding at interview.",
+    "34 linked surveys were not in the pool. Reasons are in derived/measured.json.",
+    "Partial breastfeeding is coded as still breastfeeding. Women on the pill or an injection were removed; other contraceptives were kept.",
+    "F122 values 0 through 41 are read as a closed amenorrhea interval because 96 is the dictionary's code for still amenorrheic. A closed interval means menstruation resumed during the open pregnancy interval, and the woman was still breastfeeding at interview.",
+    "34 linked surveys were not in the pool. Reasons are in derived/measured.json."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-3f12",
+    "date": "2026-11-01"
+  },
+  "verdict": "supports",
+  "data_kind": "biological",
+  "confidence": 0.9,
+  "measured": {
+    "value": 0.616459662994051,
+    "unit": "weighted proportion still amenorrheic (F122=96) among eligible currently breastfeeding women",
+    "n": 15016,
+    "uncertainty": "survey proportions 0.5009 to 0.7038 across 9 surveys",
+    "extra": {
+      "proportion_amenorrhea_ended": 0.38354033700594903,
+      "n_surveys": 9,
+      "surveys": [
+        {
+          "ccode": "bj",
+          "name": "B\u00e9nin, 1981-82",
+          "n": 1542,
+          "n_weighted": 1542,
+          "proportion_still_amenorrheic": 0.6186770428015564,
+          "proportion_amenorrhea_ended": 0.38132295719844356,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 238,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.8865546218487395,
+          "data_sha256": "7e2928cbdbf17937ec3c15466fcf524e7a5e1d588cf2dceda97fe971ebc8dda0",
+          "data_byte_size": 4524268
+        },
+        {
+          "ccode": "ci",
+          "name": "Cote d'Ivoire, 1980-81",
+          "n": 1915,
+          "n_weighted": 1915,
+          "proportion_still_amenorrheic": 0.6078328981723238,
+          "proportion_amenorrhea_ended": 0.3921671018276762,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 630,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.8412698412698413,
+          "data_sha256": "b8a5894691676ec800baac626597b0253b15e2e882c4069f9f218e2d52f15fed",
+          "data_byte_size": 6444152
+        },
+        {
+          "ccode": "gh",
+          "name": "Ghana, 1979-80",
+          "n": 1688,
+          "n_weighted": 1688,
+          "proportion_still_amenorrheic": 0.7037914691943128,
+          "proportion_amenorrhea_ended": 0.2962085308056872,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 513,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.9376218323586745,
+          "data_sha256": "fc12562184b5217cd6c2a081acaad100e744c62cc588cfdd5062d35e3b660c79",
+          "data_byte_size": 8293250
+        },
+        {
+          "ccode": "ke",
+          "name": "Kenya, 1977-78",
+          "n": 2397,
+          "n_weighted": 2397,
+          "proportion_still_amenorrheic": 0.6433989619206489,
+          "proportion_amenorrhea_ended": 0.35660103807935106,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 332,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.9341943657196897,
+          "data_sha256": "7aecf80855cdae02a73aa833f9228f676b5a7558189329d4c002b63d535e9ece",
+          "data_byte_size": 8618400
+        },
+        {
+          "ccode": "ls",
+          "name": "Lesotho, 1977",
+          "n": 1277,
+          "n_weighted": 1277,
+          "proportion_still_amenorrheic": 0.518495700791406,
+          "proportion_amenorrhea_ended": 0.48150429920859406,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 199,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.8788583125775192,
+          "data_sha256": "9b1f5f6df7c84ab7e75eb2b02f96315fca8bcec77b09378e3afa5607744ed72e",
+          "data_byte_size": 3610206
+        },
+        {
+          "ccode": "ng",
+          "name": "Nigeria, 1981-82",
+          "n": 2810,
+          "n_weighted": 2810,
+          "proportion_still_amenorrheic": 0.6090874476456403,
+          "proportion_amenorrhea_ended": 0.39091255235435973,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 648,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.7630983489292127,
+          "data_sha256": "2a7dc09abd1100ccd76e0340e55c10fec626b00bad6fed4605b3e67e5f3eed0a",
+          "data_byte_size": 15115758
+        },
+        {
+          "ccode": "sd",
+          "name": "Sudan (North), 1978-79",
+          "n": 978,
+          "n_weighted": 978,
+          "proportion_still_amenorrheic": 0.693125,
+          "proportion_amenorrhea_ended": 0.306875,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 376,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.8719611021069692,
+          "data_sha256": "27e87cd9e9cb82c409ea000544e20bd49707beb17b37fe0f75187cafdf8e0790",
+          "data_byte_size": 2959250
+        },
+        {
+          "ccode": "tn",
+          "name": "Tunisia, 1978",
+          "n": 1128,
+          "n_weighted": 1128,
+          "proportion_still_amenorrheic": 0.500886524822695,
+          "proportion_amenorrhea_ended": 0.499113475177305,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 535,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.6411214953271028,
+          "data_sha256": "378b89d4a3b0e888016e575c8b3ea3dbb4ed8bc6f292b3990ffa2abed4d04942",
+          "data_byte_size": 5788692
+        },
+        {
+          "ccode": "sy",
+          "name": "Syria, 1978",
+          "n": 1281,
+          "n_weighted": 1281,
+          "proportion_still_amenorrheic": 0.6182669789227166,
+          "proportion_amenorrhea_ended": 0.38173302107728335,
+          "concordance_f121_f122": 1.0,
+          "n_full_breastfeeding": 722,
+          "proportion_still_amenorrheic_if_full_breastfeeding": 0.7382271468144044,
+          "data_sha256": "e6e23bda933dde738eae125eca2ec576db000460366f8a551ac74c56907bb0c6",
+          "data_byte_size": 4603662
+        }
+      ],
+      "full_breastfeeding_pooled_n": 4193,
+      "full_breastfeeding_pooled_proportion_still_amenorrheic": 0.8121608485857891,
+      "n_surveys_excluded": 34
+    }
+  },
+  "datasets": [
+    {
+      "id": "wfs-sr-bj",
+      "name": "World Fertility Survey standard recode, B\u00e9nin, 1981-82",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=bj",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/bj/bjsr01.dct",
+          "retrieved_at": "2026-11-02T00:28:38Z",
+          "byte_size": 167746,
+          "sha256": "ac8446d59a788de67701a7931942822296e6ea4cf5c5a7390a85c70bebe20524"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/bj/bjsr01.dat",
+          "retrieved_at": "2026-11-02T00:33:35Z",
+          "byte_size": 4524268,
+          "sha256": "7e2928cbdbf17937ec3c15466fcf524e7a5e1d588cf2dceda97fe971ebc8dda0"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-ci",
+      "name": "World Fertility Survey standard recode, Cote d'Ivoire, 1980-81",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=ci",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/ci/cisr02.dct",
+          "retrieved_at": "2026-11-02T00:28:38Z",
+          "byte_size": 168510,
+          "sha256": "89b15f2f58e839e3c552569ab8a831f7822847902907b59cb8777f04f4c14341"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/ci/cisr02.dat",
+          "retrieved_at": "2026-11-02T00:33:35Z",
+          "byte_size": 6444152,
+          "sha256": "b8a5894691676ec800baac626597b0253b15e2e882c4069f9f218e2d52f15fed"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-gh",
+      "name": "World Fertility Survey standard recode, Ghana, 1979-80",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=gh",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/gh/ghsr04.dct",
+          "retrieved_at": "2026-11-02T00:28:38Z",
+          "byte_size": 133933,
+          "sha256": "b2c023d3282b87c19f6c6f12a2d3941d447934f7397945ee9b9e545997749ae6"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/gh/ghsr04.dat",
+          "retrieved_at": "2026-11-02T00:33:35Z",
+          "byte_size": 8293250,
+          "sha256": "fc12562184b5217cd6c2a081acaad100e744c62cc588cfdd5062d35e3b660c79"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-ke",
+      "name": "World Fertility Survey standard recode, Kenya, 1977-78",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=ke",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/ke/kesr02.dct",
+          "retrieved_at": "2026-11-02T00:28:38Z",
+          "byte_size": 176028,
+          "sha256": "aaa00d047b25fc74d9106bdfa852dc37d51f4be4926048930984f7dbc2f85c0e"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/ke/kesr02.dat",
+          "retrieved_at": "2026-11-02T00:28:38Z",
+          "byte_size": 8618400,
+          "sha256": "7aecf80855cdae02a73aa833f9228f676b5a7558189329d4c002b63d535e9ece"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-ls",
+      "name": "World Fertility Survey standard recode, Lesotho, 1977",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=ls",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/ls/lssr03.dct",
+          "retrieved_at": "2026-11-02T00:28:39Z",
+          "byte_size": 136776,
+          "sha256": "e76d04b2ff54829be21da66fc5d936d69734f14d58f2789a1f7cedcc1b982202"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/ls/lssr03.dat",
+          "retrieved_at": "2026-11-02T00:33:35Z",
+          "byte_size": 3610206,
+          "sha256": "9b1f5f6df7c84ab7e75eb2b02f96315fca8bcec77b09378e3afa5607744ed72e"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-ng",
+      "name": "World Fertility Survey standard recode, Nigeria, 1981-82",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=ng",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/ng/ngsr02.dct",
+          "retrieved_at": "2026-11-02T00:28:39Z",
+          "byte_size": 197702,
+          "sha256": "6dd50459e06f071e8e7509f97aeb09894763912f836c72eb38e2c3d76640e469"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/ng/ngsr02.dat",
+          "retrieved_at": "2026-11-02T00:33:36Z",
+          "byte_size": 15115758,
+          "sha256": "2a7dc09abd1100ccd76e0340e55c10fec626b00bad6fed4605b3e67e5f3eed0a"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-sd",
+      "name": "World Fertility Survey standard recode, Sudan (North), 1978-79",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=sd",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/sd/sdsr05.dct",
+          "retrieved_at": "2026-11-02T00:28:39Z",
+          "byte_size": 123656,
+          "sha256": "61307b693a46ff212ab28788cac784b0c1b025d3b8fedd64e9e794f2688ff49c"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/sd/sdsr05.dat",
+          "retrieved_at": "2026-11-02T00:33:36Z",
+          "byte_size": 2959250,
+          "sha256": "27e87cd9e9cb82c409ea000544e20bd49707beb17b37fe0f75187cafdf8e0790"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-tn",
+      "name": "World Fertility Survey standard recode, Tunisia, 1978",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=tn",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/tn/tnsr03.dct",
+          "retrieved_at": "2026-11-02T00:28:39Z",
+          "byte_size": 192782,
+          "sha256": "31e70fbd0747cc030c4a6534485887caeb92f0539c8aeb1773628e9d90881f26"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/tn/tnsr03.dat",
+          "retrieved_at": "2026-11-02T00:33:36Z",
+          "byte_size": 5788692,
+          "sha256": "378b89d4a3b0e888016e575c8b3ea3dbb4ed8bc6f292b3990ffa2abed4d04942"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    },
+    {
+      "id": "wfs-sr-sy",
+      "name": "World Fertility Survey standard recode, Syria, 1978",
+      "landing_url": "https://wfs.dhsprogram.com/index.cfm?ccode=sy",
+      "doi": null,
+      "version": "WFS SR02 public-use",
+      "license": "Public-use file. The Kenya release note, which the registration treated as the archive's stated condition, allows academic research with credit to the agency that conducted the survey.",
+      "files": [
+        {
+          "name": "dictionary",
+          "download_url": "https://wfs.dhsprogram.com/sy/sysr02.dct",
+          "retrieved_at": "2026-11-02T00:28:42Z",
+          "byte_size": 120622,
+          "sha256": "4625eae4cf32682dedacfb0bf5e5b12a889b182f548f8b308a9cd20644200104"
+        },
+        {
+          "name": "standard-recode",
+          "download_url": "https://wfs.dhsprogram.com/sy/sysr02.dat",
+          "retrieved_at": "2026-11-02T00:33:36Z",
+          "byte_size": 4603662,
+          "sha256": "e6e23bda933dde738eae125eca2ec576db000460366f8a551ac74c56907bb0c6"
+        }
+      ],
+      "role": "individual records of current breastfeeding and amenorrhea in the open interval"
+    }
+  ],
+  "method": "Every country linked from the World Fertility Survey public index was opened. A survey entered the pool only when its original .dct used the same codes as Kenya: current breastfeeding (F117=1), not currently pregnant (V206=0), pill or injection excluded by value label, and amenorrhea in the open interval (F122=96 still amenorrheic; a closed duration is an integer from that dictionary's own minimum through its maximum). Design weights V006/1000 were applied inside each survey, rescaled to sum to that survey's eligible count, and pooled. The pre-registered thresholds were then applied. Full breastfeeding (F119=1) is reported and does not set the verdict. Excluded surveys: 34.",
+  "deviations": [
+    {
+      "what": "A fixed-width file is accepted when its byte size equals the dictionary record count times the logical record length plus 0, 1 or 2 separator bytes.",
+      "why": "The Kenya content-length, read from the HTTP header before any field value, is 8618400 = 8100 * (1062 + 2). The logical record length does not divide the on-disk file because each record is followed by CR LF. Eligibility and the 0.60 / 0.50 thresholds are unchanged."
+    },
+    {
+      "what": "V206 = 0 is accepted when the variable label contains 'pregnant' or 'enceinte' and value 0 starts with No or Non and value 1 is Yes or Oui, rather than requiring the value label 'not pregnant'.",
+      "why": "Re-reading the same Kenya dictionary showed that the words 'Not pregnant' are the value label of V205 (duration of the current pregnancy). V206 is labeled 'Currently pregnant', with 0 = No and 1 = Yes. The eligibility rule is the one named in the hypothesis: drop women who are currently pregnant. No microdata value had been read when this was noticed."
+    },
+    {
+      "what": "The closed amenorrhea codes are the integers from that survey's own F122 minimum through its maximum, not Kenya's maximum of 41. F117 may be labeled Yes or Oui. Code 96 must be labeled as still amenorrheic. Codes 88 and 99 must be the not-applicable and not-stated labels. Code 87, when present, is a missing-data label and is excluded. Pill and injection are recognized from the value label (Pill/Pilule, Injection) rather than only the English words; a code labeled 'not used' is not treated as an injection.",
+      "why": "The figure 41 in the Kenya dictionary is the highest closed duration coded in Kenya, not a different meaning of the variable. Other standard-recode dictionaries use the same 96 = still amenorrheic code with a different ordinary maximum, and the French files label the sampling weight 'ponderation' rather than 'weight'. Requiring the maximum to equal 41 and the English word 'weight' kept only Kenya. The other dictionaries were compared before their microdata were read. The 0.60 and 0.50 thresholds are unchanged."
+    }
+  ],
+  "results_summary": [
+    "Pooled weighted proportion still amenorrheic: 0.6165 on 15016 eligible women in 9 surveys; proportion whose amenorrhea had ended: 0.3835.",
+    "Lowest surveys: Tunisia, 1978 0.501 (n=1128); Lesotho, 1977 0.518 (n=1277); Cote d'Ivoire, 1980-81 0.608 (n=1915).",
+    "Highest surveys: Ghana, 1979-80 0.704 (n=1688); Sudan (North), 1978-79 0.693 (n=978); Kenya, 1977-78 0.643 (n=2397).",
+    "Among women coded as fully breastfeeding, the pooled proportion still amenorrheic is 0.8122 (n=4193). This split was pre-registered as descriptive."
+  ]
+}
