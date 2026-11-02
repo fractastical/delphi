@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ga03-26",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga03-26",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:45:00Z",
   "hypothesis": "If eels arise without parents from earth entrails, then Anguilla anguilla will lack a sexual reproductive record and will have no occurrence cluster in the Sargasso Sea.",
   "pass_criterion": "The FishBase reproduction row for Anguilla anguilla matches a spontaneous or parentless pattern and does not match a parental pattern, and the GBIF occurrence count inside the Sargasso box (latitude 20 to 35, longitude -80 to -40) is 0.",
@@ -23,5 +23,86 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-tests-4186",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "datasets": [
+    {
+      "id": "fishbase-v24.07-anguilla-reproduc",
+      "name": "FishBase v24.07 species and reproduc tables",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v24.07",
+      "license": "cc-by-nc-4.0",
+      "files": [
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/species.parquet",
+          "retrieved_at": "2026-11-02T01:20:50Z",
+          "byte_size": 5469594,
+          "sha256": "571c60b0b47cf50ca28d49b01b6abc17ab0506d8233e7d703b2c87e3ff41fb3c",
+          "content_type": "application/octet-stream"
+        },
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/reproduc.parquet",
+          "retrieved_at": "2026-11-02T01:20:51Z",
+          "byte_size": 555433,
+          "sha256": "24c208a224357c36f3e4a5b6e34357837671f0c5a0b3954c2fe698d26909155b",
+          "content_type": "application/octet-stream"
+        }
+      ],
+      "role": "binomial Anguilla anguilla and its reproduction fields"
+    },
+    {
+      "id": "gbif-anguilla-anguilla-sargasso",
+      "name": "GBIF occurrence search for Anguilla anguilla in the pre-registered Sargasso box",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "version": "GBIF occurrence API",
+      "license": "not included in the occurrence search response",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=5212973&geometry=POLYGON%28%28-80+20%2C-40+20%2C-40+35%2C-80+35%2C-80+20%29%29&hasCoordinate=true&limit=20",
+          "retrieved_at": "2026-11-02T01:20:52Z",
+          "byte_size": 121705,
+          "sha256": "afd88208a723915ad4bda8f57d353dcdf57f94290722cb0862a2df5be282eed8"
+        }
+      ],
+      "role": "georeferenced occurrences inside the box"
+    }
+  ],
+  "method": "Anguilla anguilla was joined from the species table to reproduc on SpecCode. The concatenated row was tested for the parental pattern (egg, spawn, fertiliz, ovipar, dioec, leptocephal, larva, Sargasso) and the spontaneous pattern (spontaneous, without parent, asexual, parthenogen). GBIF species/match supplied the usage key. The occurrence count is the API count when the first 20 records all fall inside the box; otherwise the script pages and counts.",
+  "measured": {
+    "value": 98,
+    "unit": "GBIF occurrences of Anguilla anguilla inside latitude 20-35 and longitude -80 to -40",
+    "n": 1,
+    "uncertainty": "FishBase text match is a pattern on the concatenated reproduction row; the box is the pre-registered rectangle",
+    "extra": {
+      "spec_code": 35,
+      "n_reproduction_rows": 1,
+      "parental_pattern": true,
+      "spontaneous_pattern": false,
+      "reproduction_text": "26 45 35 172.0 dioecism external     0  once in a lifetime 0 88808.0 nonguarders open water/substratum egg scatterers none 1 88808.0   3 1990-10-19 2.0 2016-06-03 2.0 2008-08-11 Catadromous species. When sexual maturity is reached they leave the river. Spawning migrations occur mainly during the second half of the year but have been observed year-round, usually commencing during dark nights (Ref. 172). Maturity is obtained during the spawning migration (Ref. 88171). Actual spawning has never been observed but is believed to occur solely in the Sargasso Sea between March and June (Ref. 89144). After spawning (at 600 m depth) adults die. Sigmund Freud described the testicles of eel (Ref. 72449). ",
+      "gbif": {
+        "count": 98,
+        "method": "api_count",
+        "first_page_inside_box": true,
+        "n_first_page": 20,
+        "response_sha256": "afd88208a723915ad4bda8f57d353dcdf57f94290722cb0862a2df5be282eed8",
+        "response_bytes": 121705,
+        "retrieved_at": "2026-11-02T01:20:52Z",
+        "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=5212973&geometry=POLYGON%28%28-80+20%2C-40+20%2C-40+35%2C-80+35%2C-80+20%29%29&hasCoordinate=true&limit=20",
+        "usageKey": 5212973,
+        "match_scientificName": "Anguilla anguilla (Linnaeus, 1758)",
+        "match_status": "EXACT"
+      },
+      "gbif_error": null,
+      "verdict_by_rule": "refutes"
+    }
+  },
+  "caveats": [
+    "The unnamed mullet and the other river fishes in the claim are not in the verdict.",
+    "The Sargasso box is the pre-registered rectangle, latitude 20 to 35 and longitude -80 to -40, not the whole ocean.",
+    "A parental pattern on a FishBase text field is a description of reproduction, not a count of eels watched spawning."
+  ]
 }

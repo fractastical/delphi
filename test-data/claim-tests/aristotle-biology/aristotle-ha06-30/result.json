@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-30",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-30",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:45:00Z",
   "hypothesis": "If fish gestation always lasts thirty days or less and always a number of days divisible by seven, then every FishBase egg-development duration is at most 30 days and within 0.05 day of a multiple of 7.",
   "pass_criterion": "At least 20 species have a positive egg-development time, and every positive time is <= 30 days and within 0.05 day of a multiple of 7.",
@@ -22,5 +22,125 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-tests-4186",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.94,
+  "datasets": [
+    {
+      "id": "fishbase-v24.07-eggdev",
+      "name": "FishBase v24.07 eggdev table",
+      "landing_url": "https://source.coop/cboettig/fishbase",
+      "doi": null,
+      "version": "fb/v24.07",
+      "license": "cc-by-nc-4.0",
+      "files": [
+        {
+          "download_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/eggdev.parquet",
+          "retrieved_at": "2026-11-02T01:17:22Z",
+          "byte_size": 21310,
+          "sha256": "e97c31854d3c3d5fe4d738ab44f0d109cc7a3516676aa2dce672ce923ef5efac",
+          "content_type": "application/octet-stream",
+          "final_url": "https://data.source.coop/cboettig/fishbase/fb/v24.07/parquet/eggdev.parquet"
+        }
+      ],
+      "role": "egg development time in days and species identifier"
+    }
+  ],
+  "method": "The FishBase v24.07 eggdev parquet was read. The duration column selected by the name rule is EggDevTime. A positive value v refutes when v > 30 or the absolute distance from v to the nearest multiple of 7 exceeds 0.05. Species are distinct SpecCode values among positive rows. Zero, negative and missing values are dropped.",
+  "measured": {
+    "value": 335,
+    "unit": "positive egg-development rows that exceed 30 days or miss a multiple of 7 by more than 0.05 day",
+    "n": 371,
+    "uncertainty": "each row is one printed duration; temperature is not adjusted",
+    "extra": {
+      "duration_column": "EggDevTime",
+      "n_positive_rows": 371,
+      "n_species": 231,
+      "n_over_30_days": 36,
+      "n_farther_than_0.05_from_multiple_of_7": 328,
+      "n_refuting_rows": 335,
+      "example_refuting_rows": [
+        {
+          "SpecCode": 2,
+          "days": 5.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 15,
+          "days": 1.12,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 26,
+          "days": 8.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 30,
+          "days": 10.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 30,
+          "days": 4.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 30,
+          "days": 4.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 30,
+          "days": 4.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 30,
+          "days": 4.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 31,
+          "days": 4.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 31,
+          "days": 11.5,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 41,
+          "days": 6.0,
+          "over_30": false,
+          "far_from_multiple_of_7": true
+        },
+        {
+          "SpecCode": 47,
+          "days": 35.0,
+          "over_30": true,
+          "far_from_multiple_of_7": false
+        }
+      ],
+      "min_positive_days": 0.17,
+      "max_positive_days": 220.0,
+      "verdict_by_rule": "refutes"
+    }
+  },
+  "caveats": [
+    "Egg-development time is the pre-registered reading of Aristotle's gestation. It is not a degree-day total.",
+    "Rows are observations. A species can contribute more than one duration, and one non-compliant row refutes the universal."
+  ]
 }
