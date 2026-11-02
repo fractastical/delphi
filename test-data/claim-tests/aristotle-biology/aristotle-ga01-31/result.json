@@ -1,0 +1,26 @@
+{
+  "claim_id": "aristotle-ga01-31",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-31",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:39:45Z",
+  "hypothesis": "If nothing material from the male becomes part of the embryo, and what comes from him only imparts motion and form, then a child's genome contains no alleles that are present in the father and absent from the mother.",
+  "pass_criterion": "Pre-registered. On chromosome 22 (contig name 22 or chr22) of the 1000 Genomes pilot CEU trio, keep biallelic or multi-allelic SNPs whose alleles are single A/C/G/T bases, FILTER is PASS or '.', and the child (NA12878), father (NA12891), and mother (NA12892) are all called. An informative site has the mother homozygous and the father carrying at least one allele the mother lacks. p is the fraction of informative sites at which the child carries an allele that is absent from the mother and present in the father. Maternal concordance is the fraction of sites where the mother is homozygous and the child is called at which the child carries the mother's allele. SUPPORTS if p <= 0.01, n_informative >= 100, and maternal concordance >= 0.95.",
+  "fail_criterion": "Pre-registered. REFUTES if p >= 0.40, n_informative >= 100, and maternal concordance >= 0.95. MIXED if 0.01 < p < 0.40, n_informative >= 100, and maternal concordance >= 0.95. INCONCLUSIVE, reason underpowered, if the file is retrieved but n_informative < 100. INCONCLUSIVE, reason other, if n_informative >= 100 but maternal concordance < 0.95 (the calls do not show that this child inherited the mother's genome, so paternal counts are not interpretable). INCONCLUSIVE, reason data-unavailable, if the trio VCF cannot be retrieved or does not contain these three sample IDs.",
+  "planned_datasets": [
+    "1000genomes-pilot-ceu-trio-snps-2010-09"
+  ],
+  "interpretation": "The clause tested is the one the quote states: even if something comes away from the male, it does not give rise to the embryo by being in the embryo, but only by imparting motion and form. 'Material in the embryo' is mapped to DNA sequence in the offspring genome, which is a chemical constituent of the offspring's cells. Humans are inside the claim's scope, all animals with two sexes, and are the species Aristotle discusses through this part of Generation of Animals. The modal wording 'it is not necessary' (nothing need come from the male) is a second reading, about whether male-less generation can occur; this test does not measure parthenogenesis. One autosome of one trio is enough to refute a universal denial of male material if paternal alleles are present, and is not a survey of all animals.",
+  "test_contract": {
+    "expected_observation": "At informative chromosome-22 sites, the child almost never carries an allele that the father has and the mother lacks (p <= 0.01), so no paternal sequence is in the offspring.",
+    "disconfirming_observation": "The child carries a father-only allele at 40% or more of informative sites, which is paternal DNA in the offspring and cannot be genotyping noise.",
+    "admissible_datasets": "A public genotype file for a human mother-father-child trio in which all three are called at the same sites, from a project that is not a commentary on Aristotle. Chromosome 22 only. Samples must be the CEU trio NA12878 (child), NA12891 (father), NA12892 (mother), or the file is data-unavailable.",
+    "inference_method": "Among SNPs where the mother is homozygous and the father carries another allele, compute the fraction p of sites where the child carries that paternal allele. Require maternal concordance >= 0.95 as a check that the child really is this mother's offspring. Support at p <= 0.01, refute at p >= 0.40, mixed between, with at least 100 informative sites."
+  },
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/test-aristotle-ga03-27-ga01-31-f35a",
+    "date": "2026-11-01"
+  }
+}
