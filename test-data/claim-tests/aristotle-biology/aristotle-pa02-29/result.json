@@ -1,0 +1,33 @@
+{
+  "claim_id": "aristotle-pa02-29",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-29",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "English anatomical descriptions of birds, lizards, crocodiles, and turtles record an auditory opening and no external pinna, while the mammal article, used only as a parser control, records an external pinna.",
+  "pass_criterion": "Pre-registered. Target groups are the English Wikipedia articles Bird, Lizard, Crocodile, and Turtle. The Mammal article is a parser control and is not a target. Text is the lead plus sections whose headings concern anatomy, morphology, senses, the head, the ear, skin, feathers, scales, description, or external appearance, skipping taxonomy, evolution, culture, fossils, and references. A sentence counts as pinna-present only if it contains pinna, pinnae, auricle, auricles, external ear, external ears, projecting ears, or ears that stand out, the hit is not preceded within six words by no, not, without, lack, or never, and the sentence is not about ear tufts. On a non-mammal page, a presence sentence that names mammal, mammals, mammalian, dog, cat, human, or horse is ignored. A sentence counts as pinna-absent if it says there is no external ear, no pinna, or that ears are lacking or absent, with the same hedge rule as a failure only when the sentence is limited to few, some, an exception, rarely, or one species. A sentence counts as an auditory passage if it contains ear opening, auditory canal, auditory meatus, auditory passage, external acoustic meatus, tympanum, tympanic membrane, ear canal, ear flap, or earlid. Ear flaps and ear tufts are passages or feathers, not pinnae. A target is pinna-absent when it has an absence hit and no presence hit, or when it has a passage hit and no presence hit (passage_only). It is pinna-present when it has a presence hit and no absence hit. Both hits make it mixed. The claim is supported when the mammal control is pinna-present, Bird is pinna-absent or passage_only and has a passage hit, at least two of Lizard, Crocodile, and Turtle are pinna-absent or passage_only, none of the four targets is pinna-present, and at least one of those reptile groups has a passage hit. Uberon, queried through the OLS 4 API for the labels pinna, external acoustic meatus, external ear, feather, hair, and scale, may supply the passage hit for a group when Wikipedia has none and the meatus term is not never_in_taxon for that group's taxon (Aves, Squamata, Crocodilia, Testudines). Uberon does not override an explicit Wikipedia presence or absence hit.",
+  "fail_criterion": "Pre-registered. The claim is refuted when the mammal control is pinna-present and either Bird is pinna-present or at least two of Lizard, Crocodile, and Turtle are pinna-present. If the control is present and the outcome is neither support nor refutation, and at least three targets are scored, the verdict is mixed. If Wikipedia pages fail to download, the verdict is inconclusive with reason data-unavailable. If the mammal control is not an explicit pinna-present, the verdict is inconclusive with reason other, because the parser was not shown to detect a pinna. The 'because' clause (hard skin, feathers, or scales as the material of the ear) is reported from Uberon taxon restrictions when those axioms are present and is not part of support or refutation.",
+  "planned_datasets": [
+    "wikipedia-en-anatomy-bird-lizard-crocodile-turtle-mammal",
+    "uberon-via-ols4"
+  ],
+  "test_contract": {
+    "expected_observation": "Birds and at least two of lizards, crocodiles, and turtles are described as having an ear opening or meatus and no external pinna or auricle.",
+    "disconfirming_observation": "Birds, or at least two of the three scaly quadruped groups, are described as having a pinna, auricle, or external ear of the projecting kind. An ear flap, a tympanum, or a feather tuft is not that structure.",
+    "admissible_datasets": "The named English Wikipedia articles at the retrieved revision, and the Uberon class records returned by the public OLS 4 API for the labels listed in pass_criterion. A morphometric table that simply lacks an ear column is not evidence of absence. Assessor scores are not data.",
+    "inference_method": "Sentence patterns in the filtered article text, with the mammal article as a positive control that must detect a pinna. Support and refutation follow pass_criterion and fail_criterion. Uberon taxon axioms can fill a missing passage record and are recorded when they bear on the untested material explanation; they do not outvote an explicit Wikipedia hit."
+  },
+  "interpretation": "On the Parts of Animals II.12 says birds have no ears, only the auditory passages, and that the same is true of oviparous quadrupeds clad in scaly plates. 'Ears' is read as the projecting external ear (pinna or auricle) that the previous sentence attributes to quadrupeds, not as the organ of hearing and not as a crocodile ear flap or an owl's feather tuft. Scaly oviparous quadrupeds are scored as lizards, crocodiles, and turtles. Snakes are not quadrupeds and are not fetched. The material explanation, that feathers or scales are the wrong material for an ear, is not treated as shown by the absence of a pinna.",
+  "caveats": [
+    "Criteria were fixed before the Wikipedia article bodies and the Uberon term records were downloaded. Page existence was checked with the Wikipedia info API only.",
+    "Assessor resolvability scores are not used as evidence and do not enter the verdict.",
+    "This is a coding of published anatomical prose and ontology axioms, not a specimen-by-specimen character matrix.",
+    "The material explanation in the quote is outside the decision rule even when Uberon taxon restrictions are consistent with it."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-ha08-04-pa02-29-1386",
+    "date": "2026-11-01"
+  }
+}
