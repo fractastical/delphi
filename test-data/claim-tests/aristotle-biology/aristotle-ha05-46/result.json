@@ -1,0 +1,92 @@
+{
+  "claim_id": "aristotle-ha05-46",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-46",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If the fig-wasp that develops in the wild fig enters the cultivated fig and keeps the fruit on the tree, then edible figs pollinated by Blastophaga psenes set or retain more fruit than the same figs from which the wasp is excluded.",
+  "pass_criterion": "Pre-registered. Using a retrieved full text of the Horticulturae article doi:10.3390/horticulturae9010078, read fruit-set or fruit-retention percentages. The claim is supported if a caprification treatment that uses Blastophaga and a zero-caprification or wasp-excluded treatment are both reported and the wasp treatment's fruit set is at least 10 percentage points higher.",
+  "fail_criterion": "Pre-registered. The claim is refuted if both treatments are reported and the wasp treatment's fruit set is less than or equal to the zero-wasp treatment. If the difference is greater than 0 and less than 10 percentage points, the verdict is mixed. If fruit set is reported but there is no zero-wasp or zero-caprification control, the verdict is inconclusive with reason not-operationalizable. If every planned URL fails (HTTP status other than 200, or a body that is not the article), the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "mdpi-horticulturae-2023-caprifig-storage-10.3390-horticulturae9010078"
+  ],
+  "interpretation": "Aristotle's three clauses are that the wasp develops in the wild fig, enters the cultivated fig through the ostiole, and thereby stops the fruit dropping, which is why growers hang wild figs in the trees. This paper studies caprification of the edible cultivar Bursa Siyahi with Blastophaga psenes carried in stored caprifigs, and it reports fruit set. Fruit set is the modern measurement of fruit that stay to harvest. Storage temperature is not part of the claim; if several wasp treatments exist, the verdict uses the wasp treatment with the highest fruit set against the zero-wasp control, so storage is not allowed to create a false failure. Cultivar identity is Ficus carica, the cultivated fig, and the caprifig is the wild-type polliniser fig.",
+  "test_contract": {
+    "expected_observation": "Fruit set under caprification with Blastophaga is at least 10 percentage points above fruit set when wasps are not introduced.",
+    "disconfirming_observation": "Fruit set without wasps is as high as or higher than fruit set with wasps, in the same experiment.",
+    "admissible_datasets": "A public experiment on Ficus carica that reports fruit set or retention for a wasp treatment and for a treatment with wasps excluded. An interaction record that names the wasp and the fig without a retention number does not count.",
+    "inference_method": "Take the highest wasp-treatment fruit-set percentage and subtract the zero-wasp percentage. Thresholds are 0 and 10 percentage points, fixed above. If the article cannot be downloaded, do not substitute a number from memory."
+  },
+  "caveats": [
+    "Before registration the OpenAlex record was read (gold OA, PDF URL on mdpi.com). A HEAD request to that PDF URL from this environment returned HTTP 403. The CSV was not available because the article is a PDF, and the PDF was not downloaded. A search snippet quoted fruit-set percentages; those numbers are not used.",
+    "Parthenocarpic cultivars set fruit without wasps. A result on one cultivar does not cover every cultivated fig. The pass and fail rules apply only if a zero-wasp control is in the article."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "mdpi-horticulturae-2023-caprifig-storage-10.3390-horticulturae9010078",
+      "name": "Effects of caprifig storage on fruit productivity of Bursa Siyahi figs",
+      "landing_url": "https://doi.org/10.3390/horticulturae9010078",
+      "doi": "10.3390/horticulturae9010078",
+      "version": null,
+      "license": "open access; the file was not retrieved, so the licence text was not read from the PDF",
+      "files": [],
+      "role": "fruit set under caprification; not obtained"
+    }
+  ],
+  "method": "Requested the MDPI PDF, the MDPI HTML and the DOI landing page. Each response status and content type was recorded. No article body was parsed, and no fruit-set percentage was supplied from any other source.",
+  "measured": {
+    "value": null,
+    "unit": "percentage-point difference in fruit set, wasp treatment minus zero-wasp treatment",
+    "n": 0,
+    "uncertainty": null,
+    "extra": {
+      "attempts": [
+        {
+          "url": "https://www.mdpi.com/2311-7524/9/1/78/pdf?version=1674006898",
+          "status": 403,
+          "content_type": "text/html",
+          "final_url": "https://www.mdpi.com/2311-7524/9/1/78/pdf?version=1674006898",
+          "bytes_read": 409,
+          "sha256_prefix": "67c32cabbead311da9303b27a39bd37d318e6472d8aa55f13724a1364769690c",
+          "looks_like_pdf": false,
+          "error": "HTTPError"
+        },
+        {
+          "url": "https://www.mdpi.com/2311-7524/9/1/78/htm",
+          "status": 403,
+          "content_type": "text/html",
+          "final_url": "https://www.mdpi.com/2311-7524/9/1/78/htm",
+          "bytes_read": 404,
+          "sha256_prefix": "368851c373b07330453b0ef003551daa9bf6f9228793bf9b5d11b66395e1b502",
+          "looks_like_pdf": false,
+          "error": "HTTPError"
+        },
+        {
+          "url": "https://doi.org/10.3390/horticulturae9010078",
+          "status": 403,
+          "content_type": "text/html",
+          "final_url": "https://doi.org/10.3390/horticulturae9010078",
+          "bytes_read": 396,
+          "sha256_prefix": "ac304599c5be44769c852aa40feed3fb91ca4e2fcb3dd405e8379deb9b0f0fed",
+          "looks_like_pdf": false,
+          "error": "HTTPError"
+        }
+      ],
+      "retrieved_at": "2026-11-02T00:38:34Z"
+    }
+  },
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.8,
+  "data_kind": "none",
+  "results_summary": [
+    "None of the planned URLs returned the article. Fruit set was not read from anywhere else.",
+    "HTTP statuses: 403 https://www.mdpi.com/2311-7524/9/1/78/pdf?version=1674006898, 403 https://www.mdpi.com/2311-7524/9/1/78/htm, 403 https://doi.org/10.3390/horticulturae9010078"
+  ]
+}

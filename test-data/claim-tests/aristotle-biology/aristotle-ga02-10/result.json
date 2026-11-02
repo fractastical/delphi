@@ -1,0 +1,356 @@
+{
+  "claim_id": "aristotle-ga02-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-10",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If the parts of an embryo come into being in succession, the named organs of the zebrafish do not share a single start stage in the ZFIN anatomy table: some are recorded as present from an earlier stage than others.",
+  "pass_criterion": "Pre-registered. Match anatomy-item names, case-insensitive and exact, to this list: heart, liver, eye, intestine, pectoral fin, kidney, pancreas, swim bladder, brain, notochord. Drop a match whose start stage has the name Unknown or whose stage spans more than 1000 hours. Let n be the number of remaining matches and s the number of distinct start-stage identifiers. The claim is supported if n >= 5 and s >= 2.",
+  "fail_criterion": "Pre-registered. The claim is refuted if n >= 5 and s = 1: every named organ that can be scored is already present from the same stage. If 1 <= n < 5 the verdict is inconclusive with reason underpowered. If either file cannot be fetched, or fewer than half of the matched organs join to the stage table, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "zfin-anatomy-item-and-stage-series"
+  ],
+  "interpretation": "Aristotle is denying that every part is present from the beginning of development: some parts are visible in the embryo while others are not yet formed. The zebrafish staging table is a modern embryo series, not his chick. Exact names are required so that 'heart' does not silently match 'heart tube' or 'heart primordium'. Organs that first appear after hatching still count as parts that were not present when earlier organs appeared. The test is about one species. It does not show that every animal embryo is built this way, and it does not order the organs into Aristotle's own sequence.",
+  "test_contract": {
+    "expected_observation": "At least five of the ten named organs have a specific start stage, and those start stages are not all the same.",
+    "disconfirming_observation": "At least five named organs, all first recorded at one and the same stage, which is what simultaneous formation would look like in this table.",
+    "admissible_datasets": "A public, species-specific anatomical ontology or staging atlas that gives a start stage for organs, curated from embryos of that species, not a model invented for this test.",
+    "inference_method": "Exact name match, drop placeholder stages, count distinct start stages. Support on two or more stages among at least five organs; refute on a single shared stage. No statistical test."
+  },
+  "caveats": [
+    "The ZFIN downloads page was read before registration (column order and file sizes). The first line of each file was counted for fields and bytes only; the line text was not stored. A web-search tool had already returned the full stage-series file, so the stage names and hour bounds were known before registration. They are a lookup table. The anatomy-item file, which pairs organs with start stages, was not read, and the organ list was fixed without it.",
+    "Start stage in ZFIN is the earliest stage at which the structure is recorded, which can be a precursor. Two organs can differ by a precursor annotation rather than by the appearance of the finished organ.",
+    "The author knows the standard embryological fact that these organs do not appear in the same hour. A pass is the expected outcome."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "zfin-anatomy-item-and-stage-series",
+      "name": "ZFIN zebrafish anatomy terms and stage series",
+      "landing_url": "https://zfin.org/downloads",
+      "doi": null,
+      "version": "downloaded at analysis time; ZFIN rebuilds these files daily",
+      "license": "ZFIN public download; the downloads page asks for attribution and does not name an SPDX licence",
+      "files": [
+        {
+          "name": "anatomy_item.txt",
+          "download_url": "https://zfin.org/downloads/anatomy_item.txt",
+          "retrieved_at": "2026-11-02T00:35:29Z",
+          "byte_size": 226263,
+          "sha256": "b5d296611d1b28992f6ff7a576da45c598611de98d308bd8cbddb5ccd49de7f1"
+        },
+        {
+          "name": "stage_ontology.txt",
+          "download_url": "https://zfin.org/downloads/stage_ontology.txt",
+          "retrieved_at": "2026-11-02T00:35:29Z",
+          "byte_size": 2766,
+          "sha256": "5be4ad7a51ee159098497a22c17819d04a19025c22078f0161f87c9aa557299c"
+        }
+      ],
+      "role": "start stage of named zebrafish anatomical structures, with hour bounds of each stage"
+    }
+  ],
+  "method": "Downloaded the ZFIN anatomy-item and stage-series files and hashed them. Ten organ names were matched exactly, placeholders named Unknown or spanning more than 1000 hours were dropped, and the number of distinct start stages among the remaining organs was compared with the pre-registered thresholds. Where one name had several rows, the earliest specific start stage was kept.",
+  "measured": {
+    "value": 8,
+    "unit": "distinct ZFIN start stages among scored named organs",
+    "n": 10,
+    "uncertainty": "exact count of stage identifiers",
+    "extra": {
+      "organs_requested": [
+        "heart",
+        "liver",
+        "eye",
+        "intestine",
+        "pectoral fin",
+        "kidney",
+        "pancreas",
+        "swim bladder",
+        "brain",
+        "notochord"
+      ],
+      "organs_found": 10,
+      "organs_scored": 10,
+      "join_failures": 0,
+      "begin_hours_min": 10.0,
+      "begin_hours_max": 120.0,
+      "span_hours": 110.0,
+      "scored": [
+        {
+          "organ": "heart",
+          "anatomy_id": "ZFA:0000114",
+          "start_stage_id": "ZDB-STAGE-010723-31",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Pharyngula:High-pec",
+          "begin_hours": 42.0,
+          "end_hours": 48.0
+        },
+        {
+          "organ": "liver",
+          "anatomy_id": "ZFA:0000123",
+          "start_stage_id": "ZDB-STAGE-010723-32",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Pharyngula:Prim-15",
+          "begin_hours": 30.0,
+          "end_hours": 36.0
+        },
+        {
+          "organ": "eye",
+          "anatomy_id": "ZFA:0000107",
+          "start_stage_id": "ZDB-STAGE-010723-10",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Pharyngula:Prim-5",
+          "begin_hours": 24.0,
+          "end_hours": 30.0
+        },
+        {
+          "organ": "intestine",
+          "anatomy_id": "ZFA:0001338",
+          "start_stage_id": "ZDB-STAGE-010723-32",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Pharyngula:Prim-15",
+          "begin_hours": 30.0,
+          "end_hours": 36.0
+        },
+        {
+          "organ": "pectoral fin",
+          "anatomy_id": "ZFA:0001161",
+          "start_stage_id": "ZDB-STAGE-010723-32",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Pharyngula:Prim-15",
+          "begin_hours": 30.0,
+          "end_hours": 36.0
+        },
+        {
+          "organ": "kidney",
+          "anatomy_id": "ZFA:0000529",
+          "start_stage_id": "ZDB-STAGE-010723-36",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Larval:Day 5",
+          "begin_hours": 120.0,
+          "end_hours": 144.0
+        },
+        {
+          "organ": "pancreas",
+          "anatomy_id": "ZFA:0000140",
+          "start_stage_id": "ZDB-STAGE-010723-9",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Hatching:Long-pec",
+          "begin_hours": 48.0,
+          "end_hours": 60.0
+        },
+        {
+          "organ": "swim bladder",
+          "anatomy_id": "ZFA:0000076",
+          "start_stage_id": "ZDB-STAGE-010723-26",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Hatching:Pec-fin",
+          "begin_hours": 60.0,
+          "end_hours": 72.0
+        },
+        {
+          "organ": "brain",
+          "anatomy_id": "ZFA:0000008",
+          "start_stage_id": "ZDB-STAGE-020626-1",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Segmentation:10-13 somites",
+          "begin_hours": 14.0,
+          "end_hours": 16.0
+        },
+        {
+          "organ": "notochord",
+          "anatomy_id": "ZFA:0000135",
+          "start_stage_id": "ZDB-STAGE-010723-12",
+          "joined": true,
+          "placeholder": false,
+          "stage_name": "Gastrula:Bud",
+          "begin_hours": 10.0,
+          "end_hours": 10.33
+        }
+      ],
+      "lookup": [
+        {
+          "organ": "heart",
+          "found": true,
+          "rows": [
+            {
+              "organ": "heart",
+              "anatomy_id": "ZFA:0000114",
+              "start_stage_id": "ZDB-STAGE-010723-31",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Pharyngula:High-pec",
+              "begin_hours": 42.0,
+              "end_hours": 48.0
+            }
+          ]
+        },
+        {
+          "organ": "liver",
+          "found": true,
+          "rows": [
+            {
+              "organ": "liver",
+              "anatomy_id": "ZFA:0000123",
+              "start_stage_id": "ZDB-STAGE-010723-32",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Pharyngula:Prim-15",
+              "begin_hours": 30.0,
+              "end_hours": 36.0
+            }
+          ]
+        },
+        {
+          "organ": "eye",
+          "found": true,
+          "rows": [
+            {
+              "organ": "eye",
+              "anatomy_id": "ZFA:0000107",
+              "start_stage_id": "ZDB-STAGE-010723-10",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Pharyngula:Prim-5",
+              "begin_hours": 24.0,
+              "end_hours": 30.0
+            }
+          ]
+        },
+        {
+          "organ": "intestine",
+          "found": true,
+          "rows": [
+            {
+              "organ": "intestine",
+              "anatomy_id": "ZFA:0001338",
+              "start_stage_id": "ZDB-STAGE-010723-32",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Pharyngula:Prim-15",
+              "begin_hours": 30.0,
+              "end_hours": 36.0
+            }
+          ]
+        },
+        {
+          "organ": "pectoral fin",
+          "found": true,
+          "rows": [
+            {
+              "organ": "pectoral fin",
+              "anatomy_id": "ZFA:0001161",
+              "start_stage_id": "ZDB-STAGE-010723-32",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Pharyngula:Prim-15",
+              "begin_hours": 30.0,
+              "end_hours": 36.0
+            }
+          ]
+        },
+        {
+          "organ": "kidney",
+          "found": true,
+          "rows": [
+            {
+              "organ": "kidney",
+              "anatomy_id": "ZFA:0000529",
+              "start_stage_id": "ZDB-STAGE-010723-36",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Larval:Day 5",
+              "begin_hours": 120.0,
+              "end_hours": 144.0
+            }
+          ]
+        },
+        {
+          "organ": "pancreas",
+          "found": true,
+          "rows": [
+            {
+              "organ": "pancreas",
+              "anatomy_id": "ZFA:0000140",
+              "start_stage_id": "ZDB-STAGE-010723-9",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Hatching:Long-pec",
+              "begin_hours": 48.0,
+              "end_hours": 60.0
+            }
+          ]
+        },
+        {
+          "organ": "swim bladder",
+          "found": true,
+          "rows": [
+            {
+              "organ": "swim bladder",
+              "anatomy_id": "ZFA:0000076",
+              "start_stage_id": "ZDB-STAGE-010723-26",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Hatching:Pec-fin",
+              "begin_hours": 60.0,
+              "end_hours": 72.0
+            }
+          ]
+        },
+        {
+          "organ": "brain",
+          "found": true,
+          "rows": [
+            {
+              "organ": "brain",
+              "anatomy_id": "ZFA:0000008",
+              "start_stage_id": "ZDB-STAGE-020626-1",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Segmentation:10-13 somites",
+              "begin_hours": 14.0,
+              "end_hours": 16.0
+            }
+          ]
+        },
+        {
+          "organ": "notochord",
+          "found": true,
+          "rows": [
+            {
+              "organ": "notochord",
+              "anatomy_id": "ZFA:0000135",
+              "start_stage_id": "ZDB-STAGE-010723-12",
+              "joined": true,
+              "placeholder": false,
+              "stage_name": "Gastrula:Bud",
+              "begin_hours": 10.0,
+              "end_hours": 10.33
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.7,
+  "data_kind": "biological",
+  "results_summary": [
+    "Named organs found: 10 of 10. Scored after dropping placeholders: 10. Distinct start stages: 8.",
+    "Span of start times, in hours from fertilization, is in measured.extra. The verdict uses the count of stages, not the span."
+  ]
+}

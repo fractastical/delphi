@@ -1,0 +1,92 @@
+{
+  "claim_id": "aristotle-pa04-34",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-34",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:26:24Z",
+  "hypothesis": "If no fish has testicles, either external or internal, the zebrafish anatomical table will not contain a testis.",
+  "pass_criterion": "Pre-registered. This dataset cannot support the claim. A missing row is not a record that the organ was looked for and found absent. There is no pass outcome. Snakes and other footless animals are not in this table and are not scored.",
+  "fail_criterion": "Pre-registered. The claim is refuted if anatomy_item.txt contains a row whose anatomy name is exactly 'testis', case-insensitive. The same verdict follows if that exact name is absent and anatomy_synonyms.txt contains the synonym 'testis' (case-insensitive) attached to an anatomy name. If the anatomy file cannot be fetched, the verdict is inconclusive with reason data-unavailable. If the term is absent, the verdict is inconclusive with reason other: absence of a curated term is not absence of the organ.",
+  "planned_datasets": [
+    "zfin-anatomy-item-testis"
+  ],
+  "interpretation": "Aristotle says no fish has testicles externally or internally, and neither does any footless animal, including serpents. 'Internally' closes the reading on which he only meant a scrotum. A testis is the sperm-producing organ, internal in a fish. Danio rerio is a fish. One fish with a testis refutes the universal. The serpents clause is not tested here. The ZFIN term is a curated structure of the zebrafish, with a stage range, not a dictionary definition invented apart from the animal.",
+  "test_contract": {
+    "expected_observation": "No anatomy term or synonym 'testis' for the zebrafish. That observation is not available from a missing row, so the dataset cannot confirm the claim.",
+    "disconfirming_observation": "A zebrafish anatomy term named testis, or a synonym testis on a zebrafish anatomy term.",
+    "admissible_datasets": "A public anatomical record of a named fish species in which organs are terms curated for that species. A logical definition that says 'a testis is a gonad' without a species record does not count.",
+    "inference_method": "Exact string match on the anatomy name, then on the synonym column. Presence refutes. Absence is inconclusive, reason other. No count of males and no histological measurement is required beyond the curated term."
+  },
+  "caveats": [
+    "The downloads page and the field counts of the first lines of anatomy_item.txt and anatomy_synonyms.txt were inspected before registration. The line text was not stored, and the file was not searched for 'testis'.",
+    "A curated term can outlive a mistake. The verdict is only as strong as ZFIN's curation of this one structure. It does not describe testes in every fish lineage, and it says nothing about snakes."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-1551",
+    "date": "2026-11-01"
+  },
+  "datasets": [
+    {
+      "id": "zfin-anatomy-item-testis",
+      "name": "ZFIN zebrafish anatomy terms and synonyms",
+      "landing_url": "https://zfin.org/downloads",
+      "doi": null,
+      "version": "downloaded at analysis time; ZFIN rebuilds these files daily",
+      "license": "ZFIN public download; the downloads page asks for attribution and does not name an SPDX licence",
+      "files": [
+        {
+          "name": "anatomy_item.txt",
+          "download_url": "https://zfin.org/downloads/anatomy_item.txt",
+          "retrieved_at": "2026-11-02T00:35:29Z",
+          "byte_size": 226263,
+          "sha256": "b5d296611d1b28992f6ff7a576da45c598611de98d308bd8cbddb5ccd49de7f1"
+        },
+        {
+          "name": "anatomy_synonyms.txt",
+          "download_url": "https://zfin.org/downloads/anatomy_synonyms.txt",
+          "retrieved_at": "2026-11-02T00:35:30Z",
+          "byte_size": 160562,
+          "sha256": "bde4adf702730ab7c928a539d558d69949805bc2024a5e7de23d090fb886a75d"
+        }
+      ],
+      "role": "whether the zebrafish anatomical record contains a testis"
+    }
+  ],
+  "method": "Downloaded the ZFIN anatomy-item file and the synonym file, hashed them, and searched for the exact string testis. An exact anatomy name refutes the claim that no fish has testicles internally. A missing term would be inconclusive, because the file does not record absences. Snakes were not in the file and were not scored.",
+  "measured": {
+    "value": 2,
+    "unit": "ZFIN anatomy rows whose name or synonym is exactly testis",
+    "n": 1,
+    "uncertainty": "exact string match; one species, Danio rerio",
+    "extra": {
+      "exact_name_rows": [
+        {
+          "anatomy_id": "ZFA:0000598",
+          "anatomy_name": "testis",
+          "start_stage_id": "ZDB-STAGE-010723-49",
+          "end_stage_id": "ZDB-STAGE-010723-39"
+        }
+      ],
+      "synonym_rows": [
+        {
+          "columns": [
+            "ZFA:0000598",
+            "testis",
+            "testes"
+          ]
+        }
+      ],
+      "n_synonym_rows": 1,
+      "synonym_file_error": null
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "results_summary": [
+    "Exact anatomy-name rows equal to testis: 1. Synonym rows containing that exact string: 1.",
+    "One fish with a testis refutes 'no fish has testicles, either externally or internally'. The serpents clause was not tested."
+  ]
+}
