@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch14-02",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-02",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:44Z",
   "hypothesis": "On real Helianthus annuus seedheads, the opposed (clockwise and anticlockwise) parastichies cross at one roughly constant angle across the disc, and that angle is orthogonal (near 90 degrees) only rarely.",
   "pass_criterion": "Pre-registered (supports). Using reviewer-drawn parastichy strokes extracted from the annotated PowerPoint files, and only heads that yield at least 6 opposed-family crossings: (1) at least 40 such heads; (2) the median across heads of the within-head interquartile range of the acute intersection angle is at most 20 degrees; (3) the median across heads of the within-head median angle is at most 75 degrees; (4) the fraction of heads whose within-head median angle is at least 80 degrees is below 0.25. The acute intersection angle is the smaller angle between the two tangents, in (0, 90] degrees, so 90 degrees is orthogonal.",
@@ -29,5 +29,62 @@
     "model": "Grok 4.7",
     "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.55,
+  "measured": {
+    "value": 13.513,
+    "unit": "degrees, median across heads of the within-head IQR of the acute crossing angle",
+    "n": 273,
+    "uncertainty": "cross-head spread of the within-head IQRs; not a standard error",
+    "extra": {
+      "median_within_head_iqr_deg": 13.513,
+      "median_of_head_median_angle_deg": 73.466,
+      "fraction_heads_median_at_least_80": 0.1941,
+      "n_heads_with_at_least_6_crossings": 273,
+      "n_heads_after_dedupe": 427,
+      "n_slides_with_strokes": 428
+    }
+  },
+  "datasets": [
+    {
+      "id": "swinton-ochu-2016-turings-sunflowers-dryad-f9k77",
+      "name": "Turing's Sunflowers: annotated seedhead images (Swinton and Ochu)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "doi": "10.5061/dryad.f9k77",
+      "version": "Dryad version id 818, file 4661, API md5 987a93b54a9e0c4703f177dff4865b65",
+      "license": "CC0-1.0",
+      "files": [
+        {
+          "name": "Annotated seedhead images 20160205.zip",
+          "download_url": "https://datadryad.org/downloads/file_stream/4661",
+          "retrieved_at": "2026-11-02T00:35:48Z",
+          "byte_size": 314590945,
+          "sha256": "71537e93a9bdbf434b17b19e362c8ea8f9dbbba90e7ff80bbb1919022de0af11",
+          "md5": "987a93b54a9e0c4703f177dff4865b65"
+        }
+      ],
+      "role": "reviewer freehand parastichy strokes on Helianthus annuus photographs"
+    }
+  ],
+  "method": "Opened each PowerPoint slide inside Dryad file 4661 and read freeform custGeom paths (line segments and sampled cubic beziers), mapped through shape and group transforms. The disc centre is the geometric median of the stroke vertices and the disc radius is the 90th percentile of vertex distances from that centre. Strokes shorter than 15 percent of that radius are dropped. Each remaining stroke is smoothed with a 5-vertex moving average, oriented from the inner end to the outer end, and classed clockwise or anticlockwise by the sign of r cross dr. A stroke whose mean |sin| against the radius is below 0.15 is dropped. A crossing is the closest approach of one clockwise and one anticlockwise stroke when that distance is below 3 percent of the radius. The tangent is the chord spanning 5 percent of the smoothed stroke about that point. The acute angle is arccos of the absolute cosine, in (0, 90] degrees. Heads need at least 6 crossings. Slides that share a leading integer in the title are one head; the drawing with more crossings is kept.",
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Disc radius is the 90th percentile of vertex distances from the geometric median. Strokes shorter than 0.15 radii, and strokes whose tangent stays within about 9 degrees of the radius (|mean sin| < 0.15), are not treated as parastichies. Slides whose title starts with the same integer are one head.",
+      "why": "The pre-registration named the centre, the 3 percent approach, the 5-vertex smooth and the 5 percent chord, and it named heads rather than slides. It did not define the radius, a minimum stroke length, or how a repeated head number is counted. These choices do not change the 20 degree, 35 degree, 75 degree, 80 degree or 0.25 thresholds. Colours are not used: a methods slide in the same decks says colours are not significant, and the pre-registration splits families by winding."
+    }
+  ],
+  "caveats": [
+    "The strokes are a reviewer's freehand lines on photographs. A smoothed line can look steadier than the seeds, which biases this test toward the claim.",
+    "Clockwise is the deck's own definition: the curve goes clockwise as it radiates outward, evaluated in slide coordinates.",
+    "One closest approach is kept per pair of strokes. Broken pieces of one spiral can contribute more than one approach.",
+    "Parastichy counts are not turned into angles. The count workbooks in this Dryad deposit are not used.",
+    "The zip md5 matches the Dryad file record 987a93b54a9e0c4703f177dff4865b65."
+  ],
+  "results_summary": [
+    "Qualified heads 273 of 427 after collapsing 1 repeat slides. Median within-head IQR 13.51 degrees. Median of head-median angles 73.47 degrees. Fraction of heads with median angle at least 80 degrees: 0.194.",
+    "Verdict supports."
+  ]
 }

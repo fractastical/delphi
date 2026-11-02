@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch07-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-05",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:44Z",
   "hypothesis": "At the four-cell stage, embryos whose blastomeres are in full contact at the pole show a polar furrow (a short contact between one pair of opposite cells) and do not meet four-at-a-point in a stable cross.",
   "pass_criterion": "Pre-registered (supports). From embryo counts scored by the source as polar furrow or as a four-way junction (X-furrow / simple cross), with a central opening or gap treated as not in full contact and excluded from the denominator: n_in_scope >= 20, the polar-furrow fraction >= 0.90, and the X-furrow fraction <= 0.10. If two or more species each have n >= 10 and at least one of those species meets the refute thresholds below while another meets these support thresholds, the verdict is mixed even if the pooled counts support.",
@@ -19,7 +19,7 @@
   "interpretation": "Thompson's claim is about the four-celled stage of a segmenting egg whose cells are in full fluid contact: the four cells cannot meet in one point, a short intermediate partition (the polar furrow) must be present, and drawings of a simple cross are error or imperfect observation. He allows the furrow to be very short. A central hole, where the four cells do not touch, is not full contact and is not counted as a counterexample. The claim is universal across such eggs; one phoronid study can refute it if four-way junctions are common, and can support it only for the animals actually scored. Tetrahedral four-cell packings that are not a planar junction at the pole are outside the planar cross he discusses and are not recoded.",
   "planned_method": "Download the PDF of Pennerstorfer 2015 (DOI 10.18452/17282, bitstream https://edoc.hu-berlin.de/server/api/core/bitstreams/1911bb6c-b4d1-4b9b-89ec-2be03e16abfc/content, 57993948 bytes, md5 2c50a890f0cfcf61bd2fc134138ef8c7 from the repository API). Do not commit the PDF. Extract text and parse counts the source already tabulated for the four-cell stage under the labels polar furrow, X-furrow or cross, and opening or gap. The script writes the parsed rows and the fractions. No count is typed in by hand. Thresholds above are not revised after the table is read.",
   "caveats_before_data": [
-    "Before this file was committed, the edoc item metadata was read (author Markus Pennerstorfer, doctoral thesis, Humboldt-Universität zu Berlin, issued 2015-07-28, license CC BY-NC-ND 3.0 DE, DOI 10.18452/17282) and the bitstream size and md5 were read. The PDF bytes were not downloaded.",
+    "Before this file was committed, the edoc item metadata was read (author Markus Pennerstorfer, doctoral thesis, Humboldt-Universit\u00e4t zu Berlin, issued 2015-07-28, license CC BY-NC-ND 3.0 DE, DOI 10.18452/17282) and the bitstream size and md5 were read. The PDF bytes were not downloaded.",
     "The abstract states that cleavage was followed in Phoronis pallida, Phoronis muelleri and Phoronis vancouverensis. A search snippet showed that the thesis defines a polar furrow and an X-furrow; the counts themselves were not opened.",
     "CC BY-NC-ND forbids redistributing a modified copy of the thesis. Only counts computed by the script are written under derived/."
   ],
@@ -29,5 +29,67 @@
     "model": "Grok 4.7",
     "run": "cursor/thompson-ch14-to-ch11-tests-48d7",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.45,
+  "measured": {
+    "value": 0.25,
+    "unit": "fraction of full-contact 4-cell embryos with an X-furrow",
+    "n": 20,
+    "uncertainty": "counts are nearest integers of the table percentages times n; see extra.unrounded",
+    "extra": {
+      "n_polar_only": 15,
+      "n_x": 5,
+      "n_opening_excluded": 36,
+      "polar_fraction": 0.75,
+      "species_calls": {
+        "P. pallida": "underpowered",
+        "P. muelleri": "underpowered",
+        "P. vancouverensis": "refutes"
+      },
+      "unrounded_n_x": 4.71
+    }
+  },
+  "datasets": [
+    {
+      "id": "pennerstorfer-2015-phoronida-cleavage-edoc-17282",
+      "name": "Cleavage and cell fates in Phoronida (Pennerstorfer 2015), doctoral thesis",
+      "landing_url": "https://doi.org/10.18452/17282",
+      "doi": "10.18452/17282",
+      "version": "PDF issued 2015-07-28, bitstream md5 2c50a890f0cfcf61bd2fc134138ef8c7",
+      "license": "CC BY-NC-ND 3.0 DE",
+      "files": [
+        {
+          "name": "pennerstorfer.pdf",
+          "download_url": "https://edoc.hu-berlin.de/server/api/core/bitstreams/1911bb6c-b4d1-4b9b-89ec-2be03e16abfc/content",
+          "retrieved_at": "2026-11-02T00:31:09Z",
+          "byte_size": 57993948,
+          "sha256": "72987207736c7e5ca6855bedccc635c2cc9c1dbcb7cf80b27eec57705cf051ac",
+          "md5": "2c50a890f0cfcf61bd2fc134138ef8c7"
+        }
+      ],
+      "role": "scored 4-cell polar furrows and X-furrows in three Phoronis species"
+    }
+  ],
+  "method": "Downloaded the thesis PDF, checked its size and md5 against the repository record, and read Tables 1, 5 and 8 (pole blastomere contacts) by word coordinates. For each 4-cell row, a percentage is the value in that column and a blank is zero. Nearest-integer counts are percent times n. Where the polar-furrow columns sum to about 100 percent, every embryo is in full contact and an X-furrow column counts an embryo that also meets at a point at the other pole. Where only one contact type is filled, the rest of the row are openings and are excluded. The pre-registered fractions are applied to the pooled full-contact embryos.",
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "How a percentage table becomes a count.",
+      "why": "The pre-registration asked for counts. The tables print percentages of n, rounded by the author, and an embryo can carry a polar furrow at one pole and an X-furrow at the other. Counts are the nearest integer of percent times n. That rule is not a change of the 0.90 or 0.25 thresholds."
+    }
+  ],
+  "caveats": [
+    "Openings, where the four cells do not touch, are outside the claim's full-contact scope and are not counted as crosses.",
+    "X-furrows in these tables come from fixed embryos. The 4D-recorded rows of P. pallida and P. muelleri show polar furrows or openings and no X-furrow.",
+    "The author notes that a very small opening is difficult to tell from an X-furrow, so some X calls may be openings.",
+    "Percentages were already rounded in the thesis, so a count can be off by about one embryo. The unrounded X total is stored beside the rounded one.",
+    "One phoronid genus is not every animal egg the claim names.",
+    "The PDF md5 matches the repository record."
+  ],
+  "results_summary": [
+    "Full-contact 4-cell embryos n=20: polar furrow only 15, X-furrow 5, X fraction 0.250. Openings excluded: 36.",
+    "Pooled verdict refutes. Species calls: {'P. pallida': 'underpowered', 'P. muelleri': 'underpowered', 'P. vancouverensis': 'refutes'}."
+  ]
 }
