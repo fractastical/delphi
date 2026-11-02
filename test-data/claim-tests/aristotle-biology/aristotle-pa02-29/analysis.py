@@ -14,6 +14,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sys
 import time
 from datetime import datetime, timezone
 from html.parser import HTMLParser
@@ -90,15 +91,15 @@ PRESENCE_RE = re.compile(
 )
 ABSENCE_RE = re.compile(
     r"\b(?:no|without|lack(?:s|ing)?|do not have|don't have)\s+"
-    r"(?:an?\s+|any\s+)?(?:external\s+ears?|pinnae?|auricles?)\b"
+    r"(?:an?\s+|any\s+)?"
+    r"(?:external\s+(?:ears?|pinnae?|auricles?)|pinnae?|auricles?)\b"
     r"|"
     r"\bears?\s+(?:are|is)\s+(?:absent|lacking)\b"
     r"|"
-    r"\bno ears?,\s+only\b"
-    r"|"
-    r"\black(?:s|ing)?\s+(?:external\s+)?ears?\b",
+    r"\bno ears?,\s+only\b",
     re.I,
 )
+NOT_EAR_RE = re.compile(r"\b(syrinx|trachea|vocali[sz])\b", re.I)
 PASSAGE_RE = re.compile(
     r"\b(ear openings?|auditory canals?|auditory meatus|auditory passages?|"
     r"external acoustic meatus|tympanum|tympanic membranes?|ear canals?|"
@@ -215,9 +216,15 @@ def score_page(sentences: list[str], control: bool) -> dict:
         ):
             if control or not OTHER_TAXA_RE.search(sentence):
                 presence.append(sentence)
-        if ABSENCE_RE.search(sentence) and not HEDGE_RE.search(sentence):
+        absence_match = ABSENCE_RE.search(sentence)
+        if absence_match and not HEDGE_RE.search(sentence[: absence_match.start()]):
             absence.append(sentence)
-        if PASSAGE_RE.search(sentence):
+        passage_match = PASSAGE_RE.search(sentence)
+        if (
+            passage_match
+            and not negated(sentence, passage_match)
+            and not NOT_EAR_RE.search(sentence)
+        ):
             passage.append(sentence)
     if presence and not absence:
         state = "present"
@@ -419,9 +426,16 @@ def main() -> None:
             return False
         return any(item["relation"] == relation and item["taxon_id"] == taxon_id for item in axioms.get(label, []))
 
-    meatus_never = {key: mentions("external acoustic meatus", "never_in_taxon", taxa) for key, taxa in TAXA.items()}
-    meatus_known = found_labels.get("external acoustic meatus", False)
-    uberon_passage = {key: meatus_known and not meatus_never.get(key, False) for key in TARGETS}
+    # A bare OLS label with no taxon axiom does not show that the group has a meatus.
+    # See deviations in result.json.
+    uberon_passage = {
+        key: (
+            mentions("external acoustic meatus", "present_in_taxon", taxa)
+            or mentions("external acoustic meatus", "only_in_taxon", taxa)
+        )
+        for key, taxa in TAXA.items()
+        if key in TARGETS
+    }
     for key in TARGETS:
         if pages[key]["state"] in {"absent", "passage_only", "unscored"} and not pages[key]["passage"]:
             if uberon_passage.get(key):
@@ -539,7 +553,8 @@ def main() -> None:
             "kept the lead and anatomy-related sections, and coded pinna presence, pinna absence, "
             "and auditory openings with the pre-registered sentence patterns. Mammal is only a check "
             "that the same patterns detect a pinna. Queried Uberon class records by label through the "
-            "OLS 4 API and used a meatus term not marked never_in_taxon to fill a missing passage hit. "
+            "OLS 4 API. A tympanic membrane in a sentence about the syrinx, trachea, or vocalization is not an ear passage. "
+            "A missing Wikipedia passage is filled only by a present_in_taxon or only_in_taxon axiom for that group. "
             "The material explanation is stored from taxon axioms and is not part of the decision."
         ),
         "provenance_wiki": wiki_files,

@@ -57,7 +57,8 @@ WATER_HABITAT_RE = re.compile(
     r"aquatic|marsh|stream|estuar|pond|bog|riparian|coast",
     re.I,
 )
-SEMI_RE = re.compile(r"semi-?\s*aquatic", re.I)
+# Aquatic and marine were added after the first run. See deviations in result.json.
+MICRO_WATER_RE = re.compile(r"\b(?:semi-?\s*aquatic|aquatic|marine)\b", re.I)
 
 HEDGE_RE = re.compile(
     r"\b(few|some|exception|exceptions|rarely|occasionally|a handful|"
@@ -72,7 +73,7 @@ PASS_A = [
         r"\blungs?\b",
         r"\bbreathe[sd]?\s+air\b",
         r"\bbreathing\s+air\b",
-        r"\bsurfaces?\s+to\s+breathe\b",
+        r"\bsurfac(?:e|es|ing)\s+to\s+breathe\b",
         r"\bmust\s+surface\b",
         r"\bcome[s]?\s+to\s+the\s+surface\s+to\s+breathe\b",
     )
@@ -348,7 +349,7 @@ def load_repttraits(path: Path) -> pd.DataFrame:
 def reptile_water(row, micro_col, habitat_col) -> str:
     micro = row[micro_col] if micro_col is not None else None
     if not (micro is None or (isinstance(micro, float) and pd.isna(micro)) or str(micro).strip().lower() in {"", "na", "nan"}):
-        return "present" if SEMI_RE.search(str(micro)) else "absent"
+        return "present" if MICRO_WATER_RE.search(str(micro)) else "absent"
     if habitat_col is None:
         return "missing"
     habitat = row[habitat_col]
@@ -451,7 +452,8 @@ def clause_from_sentences(sentences: list[str], frog: bool) -> dict:
                 pass_a.append(sentence)
                 break
         for pattern in FAIL_A:
-            if pattern.search(sentence) and not hedged:
+            match = pattern.search(sentence)
+            if match and not hedged and not negated(sentence, match):
                 fail_a.append(sentence)
                 break
         for pattern in PASS_B:
@@ -461,7 +463,8 @@ def clause_from_sentences(sentences: list[str], frog: bool) -> dict:
                 break
         fail_patterns = FAIL_B + (FAIL_B_FROG_ONLY if frog else [])
         for pattern in fail_patterns:
-            if pattern.search(sentence) and not hedged:
+            match = pattern.search(sentence)
+            if match and not hedged and not negated(sentence, match):
                 fail_b.append(sentence)
                 break
 
@@ -961,7 +964,9 @@ def main() -> None:
             "checked the MD5 or git blob pin, and scored water-living from AmphiBIO Aqu, ReptTraits microhabitat, "
             "and PHYLACINE Marine/Freshwater using the pre-registered group definitions and cuts. "
             "Fetched the named English Wikipedia articles, kept the lead and natural-history sections, and applied "
-            "the pre-registered sentence patterns for lungs or surfacing and for where eggs or young are placed. "
+            "the pre-registered sentence patterns for lungs or surfacing, including the gerund surfacing to breathe, "
+            "and for where eggs or young are placed. A negation in the six words before a fail pattern cancels it. "
+            "Microhabitat tokens aquatic and marine count as water-living together with semi-aquatic. "
             "Ranid breeding mode came from AmphiBIO Dir and Lar when that table met its sample floor. "
             "A group passes only if water-living, air-breathing, and breeding site all pass."
         ),

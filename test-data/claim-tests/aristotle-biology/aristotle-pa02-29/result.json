@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa02-29",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-29",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "English anatomical descriptions of birds, lizards, crocodiles, and turtles record an auditory opening and no external pinna, while the mammal article, used only as a parser control, records an external pinna.",
   "pass_criterion": "Pre-registered. Target groups are the English Wikipedia articles Bird, Lizard, Crocodile, and Turtle. The Mammal article is a parser control and is not a target. Text is the lead plus sections whose headings concern anatomy, morphology, senses, the head, the ear, skin, feathers, scales, description, or external appearance, skipping taxonomy, evolution, culture, fossils, and references. A sentence counts as pinna-present only if it contains pinna, pinnae, auricle, auricles, external ear, external ears, projecting ears, or ears that stand out, the hit is not preceded within six words by no, not, without, lack, or never, and the sentence is not about ear tufts. On a non-mammal page, a presence sentence that names mammal, mammals, mammalian, dog, cat, human, or horse is ignored. A sentence counts as pinna-absent if it says there is no external ear, no pinna, or that ears are lacking or absent, with the same hedge rule as a failure only when the sentence is limited to few, some, an exception, rarely, or one species. A sentence counts as an auditory passage if it contains ear opening, auditory canal, auditory meatus, auditory passage, external acoustic meatus, tympanum, tympanic membrane, ear canal, ear flap, or earlid. Ear flaps and ear tufts are passages or feathers, not pinnae. A target is pinna-absent when it has an absence hit and no presence hit, or when it has a passage hit and no presence hit (passage_only). It is pinna-present when it has a presence hit and no absence hit. Both hits make it mixed. The claim is supported when the mammal control is pinna-present, Bird is pinna-absent or passage_only and has a passage hit, at least two of Lizard, Crocodile, and Turtle are pinna-absent or passage_only, none of the four targets is pinna-present, and at least one of those reptile groups has a passage hit. Uberon, queried through the OLS 4 API for the labels pinna, external acoustic meatus, external ear, feather, hair, and scale, may supply the passage hit for a group when Wikipedia has none and the meatus term is not never_in_taxon for that group's taxon (Aves, Squamata, Crocodilia, Testudines). Uberon does not override an explicit Wikipedia presence or absence hit.",
   "fail_criterion": "Pre-registered. The claim is refuted when the mammal control is pinna-present and either Bird is pinna-present or at least two of Lizard, Crocodile, and Turtle are pinna-present. If the control is present and the outcome is neither support nor refutation, and at least three targets are scored, the verdict is mixed. If Wikipedia pages fail to download, the verdict is inconclusive with reason data-unavailable. If the mammal control is not an explicit pinna-present, the verdict is inconclusive with reason other, because the parser was not shown to detect a pinna. The 'because' clause (hard skin, feathers, or scales as the material of the ear) is reported from Uberon taxon restrictions when those axioms are present and is not part of support or refutation.",
@@ -21,7 +21,13 @@
     "Criteria were fixed before the Wikipedia article bodies and the Uberon term records were downloaded. Page existence was checked with the Wikipedia info API only.",
     "Assessor resolvability scores are not used as evidence and do not enter the verdict.",
     "This is a coding of published anatomical prose and ontology axioms, not a specimen-by-specimen character matrix.",
-    "The material explanation in the quote is outside the decision rule even when Uberon taxon restrictions are consistent with it."
+    "The material explanation in the quote is outside the decision rule even when Uberon taxon restrictions are consistent with it.",
+    "The bird sentence kept by the scorer is: the avian ear lacks external pinnae and is covered by feathers, and some owls have feather tufts that resemble ears. No coded sentence gives birds an auditory opening, so the passage half of the claim is not shown for birds and the group does not pass.",
+    "Lizards are coded from one sentence: they lack external ears and have a circular opening in which the tympanic membrane can be seen. Crocodiles are coded from flat flaps over the tympanic membrane, which the pre-registration counts as a passage and not a pinna.",
+    "The Turtle article says turtles have no ear openings and a scale-covered eardrum. The negated opening was not counted as a passage, so turtles are unscored.",
+    "The mammal control sentence is about fossorial mammals: external ear flaps are very small or absent. The pattern counts it as pinna-present because the words 'external ears' are not preceded by a negation. It is a weak control, and the Mammal article does not use the word pinna.",
+    "Uberon axiom counts were 0 for every label queried. The feather, hair, and scale association was not tested, and it is not part of the verdict.",
+    "Confidence 0.65 is the pre-registered formula. It is not a specimen count."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -29,5 +35,205 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-ha08-04-pa02-29-1386",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "mixed",
+  "confidence": 0.65,
+  "data_kind": "biological",
+  "measured": {
+    "value": 3,
+    "unit": "target groups coded without an external pinna",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "mammal_control": "present",
+      "reptile_groups_without_pinna": [
+        "lizard",
+        "crocodile"
+      ],
+      "reptile_groups_with_pinna": [],
+      "confidence_formula": 0.65,
+      "groups": {
+        "bird": {
+          "state": "absent",
+          "passage": false,
+          "passage_source": null,
+          "title": "Bird",
+          "revid": 1382763839
+        },
+        "lizard": {
+          "state": "absent",
+          "passage": true,
+          "passage_source": "wikipedia",
+          "title": "Lizard",
+          "revid": 1379868687
+        },
+        "crocodile": {
+          "state": "passage_only",
+          "passage": true,
+          "passage_source": "wikipedia",
+          "title": "Crocodile",
+          "revid": 1372417258
+        },
+        "turtle": {
+          "state": "unscored",
+          "passage": false,
+          "passage_source": null,
+          "title": "Turtle",
+          "revid": 1375970473
+        },
+        "mammal": {
+          "state": "present",
+          "passage": false,
+          "passage_source": null,
+          "title": "Mammal",
+          "revid": 1382842182
+        }
+      },
+      "uberon_taxon_ids": {
+        "Aves": "8782",
+        "Crocodilia": "1067855",
+        "Mammalia": "40674",
+        "Squamata": "8509",
+        "Testudines": "8459"
+      },
+      "uberon_axiom_counts": {
+        "pinna": 0,
+        "external acoustic meatus": 0,
+        "external ear": 0,
+        "feather": 0,
+        "hair": 0,
+        "scale": 0
+      },
+      "uberon_material_association": {
+        "pinna_restricted_toward_mammalia": false,
+        "pinna_never_in_aves": false,
+        "feather_toward_aves": false,
+        "hair_toward_mammalia": false,
+        "used_in_verdict": false
+      },
+      "problems": []
+    }
+  },
+  "results_summary": [
+    "mammal: present; passage=False",
+    "bird: absent; passage=False",
+    "lizard: absent; passage=True",
+    "crocodile: passage_only; passage=True",
+    "turtle: unscored; passage=False",
+    "target groups without a pinna code: 3; mammal control: present"
+  ],
+  "method": "Fetched the English Wikipedia articles Bird, Lizard, Crocodile, Turtle, and Mammal, kept the lead and anatomy-related sections, and coded pinna presence, pinna absence, and auditory openings with the pre-registered sentence patterns. Mammal is only a check that the same patterns detect a pinna. Queried Uberon class records by label through the OLS 4 API. A tympanic membrane in a sentence about the syrinx, trachea, or vocalization is not an ear passage. A missing Wikipedia passage is filled only by a present_in_taxon or only_in_taxon axiom for that group. The material explanation is stored from taxon axioms and is not part of the decision.",
+  "datasets": [
+    {
+      "id": "wikipedia-en-anatomy-bird-lizard-crocodile-turtle-mammal",
+      "name": "English Wikipedia anatomy text for Bird, Lizard, Crocodile, Turtle, and Mammal",
+      "landing_url": "https://en.wikipedia.org/wiki/Bird",
+      "doi": null,
+      "version": "revision ids on each file",
+      "license": "CC BY-SA 4.0",
+      "files": [
+        {
+          "name": "Bird",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Bird&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:31Z",
+          "byte_size": 1125022,
+          "sha256": "cf57b3f582ef216e1b68e86588a9d008bfc2a9c3529b4651da15d37fe11f0bd8",
+          "revid": 1382763839
+        },
+        {
+          "name": "Lizard",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Lizard&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:32Z",
+          "byte_size": 319159,
+          "sha256": "eab5402f4aa1ffbc8e7c284e33ccaa3b06623edaa4e9e601a9a1683efec52be6",
+          "revid": 1379868687
+        },
+        {
+          "name": "Crocodile",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Crocodile&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:33Z",
+          "byte_size": 566631,
+          "sha256": "3c662dcbe50a1fb456339f81c5e3e5631f135acff15cd6cdd926e90dde17877c",
+          "revid": 1372417258
+        },
+        {
+          "name": "Turtle",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Turtle&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:34Z",
+          "byte_size": 598533,
+          "sha256": "564f1d1a706a9d7335e3bc1f93755171dd4b76b3024d403cc4090c937998838f",
+          "revid": 1375970473
+        },
+        {
+          "name": "Mammal",
+          "download_url": "https://en.wikipedia.org/w/api.php?action=parse&page=Mammal&prop=text%7Crevid&format=json&formatversion=2&redirects=1&disableeditsection=1",
+          "retrieved_at": "2026-11-02T00:37:34Z",
+          "byte_size": 1122801,
+          "sha256": "ca7585be797a1432e2e12fd3a340d11060385521e9e23a3f00b0a4885f666145",
+          "revid": 1382842182
+        }
+      ],
+      "role": "sentence coding of external pinna versus auditory opening; Mammal is the parser control"
+    },
+    {
+      "id": "uberon-via-ols4",
+      "name": "Uberon class records via the EMBL-EBI OLS 4 API",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/uberon",
+      "doi": null,
+      "version": "OLS 4 response at retrieval",
+      "license": null,
+      "files": [
+        {
+          "name": "pinna",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=pinna&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:35Z",
+          "byte_size": 3340,
+          "sha256": "d33f3999c152c803d64bbaa2c547d290a694ace9733eb800a5845d7a1d5d9c52"
+        },
+        {
+          "name": "external acoustic meatus",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=external+acoustic+meatus&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:36Z",
+          "byte_size": 3144,
+          "sha256": "7ec4261824dcd9f0c9095a8db6d58cd369e0f628e33a624b67882b93ba8a93cd"
+        },
+        {
+          "name": "external ear",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=external+ear&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:37Z",
+          "byte_size": 3111,
+          "sha256": "6b5e7bc67c5fe682162bbd294adefeb3dbd0789875fbab63d802821b453715e0"
+        },
+        {
+          "name": "feather",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=feather&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:38Z",
+          "byte_size": 4189,
+          "sha256": "18f21435fbe20ecbe02bd7deb5d5d6daa05c6f5a119ac68e6a36c7c28316d852"
+        },
+        {
+          "name": "hair",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=hair&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:39Z",
+          "byte_size": 4875,
+          "sha256": "4c34ce7b2d78391d78a4b97475edb3b5dad6d74b2be00c38cf00721212e6f0b2"
+        },
+        {
+          "name": "scale",
+          "download_url": "https://www.ebi.ac.uk/ols4/api/search?q=scale&ontology=uberon&type=class&exact=true&rows=5",
+          "retrieved_at": "2026-11-02T00:37:39Z",
+          "byte_size": 4851,
+          "sha256": "084245735afd6f5e668924792eeadb710036fe0e2c7428171272f2454d749f4a"
+        }
+      ],
+      "role": "optional passage axiom and the untested feather, hair, and pinna taxon association"
+    }
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Absence matches 'lacks external pinnae'. A hedge word counts only when it occurs before the match. A tympanic membrane in a sentence that also names the syrinx, trachea, or vocalization is not an auditory passage. Uberon fills a missing passage only from a present_in_taxon or only_in_taxon axiom.",
+      "why": "The first absence pattern missed 'external pinnae', and the word 'some' later in the bird sentence, about feather tufts, cancelled an unhedged lack of pinnae. The syrinx uses tympanic membranes that are not ears. The OLS search returned class labels and zero taxon axioms, so treating 'not never_in' as true would have assigned a meatus to every group Wikipedia left blank. The support and refutation cuts were not changed."
+    }
+  ]
 }
