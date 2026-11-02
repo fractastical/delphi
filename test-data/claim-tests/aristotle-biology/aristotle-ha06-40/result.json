@@ -1,0 +1,27 @@
+{
+  "claim_id": "aristotle-ha06-40",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-40",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "Striped hyenas (Hyaena hyaena) are not simultaneous hermaphrodites: recorded individuals are male or female, and an anatomical account denies that every hyena bears functional organs of both sexes.",
+  "pass_criterion": "Pre-registered. SUPPORTS if both of the following hold. (1) GBIF occurrences of the species Hyaena hyaena (accepted species match, not Crocuta) include at least 20 records with sex male and at least 20 with sex female, and zero records whose sex value is hermaphrodite, intersex, or both. (2) At least one fetched anatomical text matches an anatomical-support pattern: it denies hermaphroditism for hyenas or for the striped hyena; or it states that a penis-like clitoris or masculinized female external genitalia is unique to the spotted hyena among hyaenids, or absent in other hyaenid species; or it describes separate male and female reproductive organs for Hyaena hyaena.",
+  "fail_criterion": "Pre-registered. REFUTES if an anatomical text states that Hyaena hyaena or striped hyenas are functional hermaphrodites, or that every individual bears functional organs of both sexes, or if GBIF sex counts of hermaphrodite/intersex/both exceed the combined male and female counts. MIXED if exactly one of the two support lines holds (sex counts pass but no anatomical-support pattern, or an anatomical-support pattern is present but a sex class has fewer than 20 records) and no refute pattern is present. INCONCLUSIVE with reason data-unavailable if the GBIF species match or occurrence facet cannot be retrieved, and no anatomical text can be fetched; reason underpowered if sexed GBIF records total fewer than 20 and no anatomical-support or refute pattern is present.",
+  "planned_datasets": [
+    "gbif-occurrence-sex-hyaena-hyaena",
+    "pmc-pmc9248831-sex-differences-spotted-hyenas",
+    "adw-hyaena-hyaena"
+  ],
+  "test_contract": {
+    "expected_observation": "Sexed striped-hyena occurrence records are male or female, none are coded hermaphrodite, and an anatomical text denies functional hermaphroditism for this species or restricts masculinized female genitalia to the spotted hyena.",
+    "disconfirming_observation": "An anatomical text states that striped hyenas are functional hermaphrodites, or occurrence records are coded hermaphrodite more often than as a single sex.",
+    "admissible_datasets": "Public occurrence records with a sex field for the species Hyaena hyaena, and open anatomical prose that names hyena genitalia. Crocuta records do not substitute for Hyaena hyaena in the sex counts. Sources must be fetched by the analysis script; counts and sentence matches are computed there.",
+    "inference_method": "GBIF species/match then occurrence facet=sex with limit=0. Anatomical support and refute are phrase patterns listed in the pass and fail criteria, applied to stripped text of the fetched pages. Both lines are required to support; one line is mixed; an explicit hermaphrodite statement refutes."
+  },
+  "interpretation": "The claim denies the report that every hyena has the organs of both sexes, and describes a blind female-like part in the male and a blind male-like part in the female of the striped hyena. 'Organs of both sexes' is read as functional hermaphroditism (each individual has a working male and a working female tract), not as the mere presence of a scent pouch. The blind-pouch detail is recorded if a source mentions a subcaudal gland, and is not required for the verdict. The scope is Hyaena hyaena; spotted-hyena anatomy is used only when a source contrasts it with other hyaenids.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-954e",
+    "date": "2026-11-01"
+  }
+}

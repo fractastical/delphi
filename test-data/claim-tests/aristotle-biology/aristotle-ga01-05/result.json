@@ -1,0 +1,25 @@
+{
+  "claim_id": "aristotle-ga01-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-05",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the classes of fishes and of serpents have no testes, a public sample registry that records mammalian testis samples will contain no testis-tissue samples from ray-finned fishes, cartilaginous fishes, or snakes.",
+  "pass_criterion": "Pre-registered. SUPPORTS only if the mammal positive control returns at least 20 testis BioSamples, both the fish group and Serpentes return zero parsed testis BioSamples, and a second source explicitly codes the testis as absent in those classes. Absence of BioSamples alone does not support the claim.",
+  "fail_criterion": "Pre-registered. REFUTES if at least one species of fish (Actinopterygii or Chondrichthyes) and at least one species of Serpentes each have at least one NCBI BioSample whose parsed tissue, sample-type, or body-site attribute is testis or testes and whose organism is in that group. The claim is the conjunction 'no testes, only two spermatic ducts'; a testis in each class refutes the conjunction. The duct count is not measured by tissue labels and is reported as untested. MIXED if parsed testis samples occur in exactly one of the two groups. INCONCLUSIVE with reason data-unavailable if the BioSample service cannot be queried; reason underpowered if the mammal control returns fewer than 20 samples under every pre-registered query syntax (the query is then not usable) or if neither group has a parsed testis sample and no explicit absence code exists.",
+  "planned_datasets": [
+    "ncbi-biosample-testis-attribute"
+  ],
+  "test_contract": {
+    "expected_observation": "No BioSample from a fish or a snake has tissue testis, while mammals do, and an anatomy source codes the testis absent in fishes and snakes.",
+    "disconfirming_observation": "At least one fish species and one snake species have a BioSample whose tissue attribute is testis.",
+    "admissible_datasets": "NCBI BioSample records with a tissue or sample-type attribute and an organism name. The mammal query is only a positive control that the same filter retrieves testis samples. Query syntaxes, tried in order and locked before any clade count is interpreted: (1) testis[attr] AND \"CLADE\"[Organism]; (2) testes[attr] AND \"CLADE\"[Organism]; (3) \"tissue\"[Attribute Name] AND testis[All Fields] AND \"CLADE\"[Organism]. The first syntax for which Mammalia has an esearch count of at least 20 is applied unchanged to Actinopterygii, Chondrichthyes, and Serpentes. No email address is sent to NCBI.",
+    "inference_method": "Esearch count for the control, then esearch plus efetch of up to 80 BioSample XML records per non-mammal clade. A record counts only if an Attribute name matches tissue, sample type, body site, or tissue type and the value matches testis or testes (whole word), and the organism string is retained. Distinct species names are the measured sample size. One confirmed species in each of fishes and snakes refutes the universal."
+  },
+  "interpretation": "Aristotle's 'classes of fish and of serpents' are read as fishes (Actinopterygii and Chondrichthyes) and snakes (Serpentes). 'Have no testes at all, but only two spermatic ducts' is a conjunction. Internal or elongate testes still count as testes. The duct clause is a separate anatomical count and is not decided by tissue labels.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-claim-tests-954e",
+    "date": "2026-11-01"
+  }
+}
