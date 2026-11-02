@@ -1,0 +1,132 @@
+{
+  "claim_id": "aristotle-pa02-21",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-21",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, cuttlefishes (Sepiidae) are described as having an internal cuttlebone (os sepiae), squids (calamaries) as having a gladius (pen), and octopuses (poulps) as having no such internal shell.",
+  "pass_criterion": "Supports if all three group clauses match. Sepiidae matches if the FAO catalogue text places a cuttlebone or sepion in Sepiidae and does not say that Sepiidae lack one. Squids match if the FAO squid catalogue places a gladius or pen in squids (Loliginidae, Myopsida, or Oegopsida) as a possessed structure. Octopuses match only if the FAO octopod catalogue says the internal shell, gladius, cuttlebone, and shell vestige or stylet are absent in Octopoda or Incirrata as a group. A vestige counts as an internal hard part: stylets, a vestigial gladius, or a shell vestige stated as present means the octopus clause does not match.",
+  "fail_criterion": "A clause fails if the catalogue states the opposite: Sepiidae without a cuttlebone, squids without a gladius, or octopuses with a cuttlebone, gladius, or shell vestige or stylet. Refutes if two or three clauses fail. Mixed if exactly one clause fails, or if a group is described as variable (present in some, absent in others), which fails a universal wording for that group. Inconclusive, reason data-unavailable, if a PDF cannot be downloaded or if two or more groups have no explicit shell sentence (no co-occurrence, inside one paragraph or an 800-character window, of the group name and a shell term). The short body-sac explanation is not tested.",
+  "planned_datasets": [
+    "fao-cephalopods-of-the-world-vol1-sepioids",
+    "fao-cephalopods-of-the-world-vol2-squids",
+    "fao-cephalopods-of-the-world-vol3-octopods"
+  ],
+  "test_contract": {
+    "expected_observation": "FAO diagnoses or keys state a cuttlebone in Sepiidae, a gladius in squids, and no internal shell or shell vestige in octopuses.",
+    "disconfirming_observation": "The same catalogues deny a cuttlebone in Sepiidae, deny a gladius in squids, or attribute an internal shell, gladius, or stylet or shell vestige to octopuses.",
+    "admissible_datasets": "The three open FAO species-catalogue PDFs named in planned_datasets, text-extracted by the script. Family and order names must occur in the same paragraph or within 800 characters of the shell term. A figure caption that only labels a drawing is not used unless it states presence or absence. Nautiluses and sepiolids are outside the three clauses: Sepiidae is the cuttlefish clause, not every sepioid.",
+    "inference_method": "Extract text, find windows that join each group name to cuttlebone, sepion, gladius, pen, stylet, or shell vestige, and code presence or absence from the negation in that window ('absent', 'without', 'lacking', 'no '). Then apply the three-clause rule. Confidence is 0.70 if supports, 0.65 if refutes, 0.50 if mixed, and 0.55 if inconclusive."
+  },
+  "dataset_urls": {
+    "fao-cephalopods-of-the-world-vol1-sepioids": "https://www.fao.org/3/a0150e/a0150e.pdf",
+    "fao-cephalopods-of-the-world-vol2-squids": "https://www.fao.org/3/i1920e/i1920e.pdf",
+    "fao-cephalopods-of-the-world-vol3-octopods": "https://www.fao.org/3/i3489e/i3489e.pdf"
+  },
+  "interpretation": "Cuttle-fishes are Sepiidae, calamaries are the squids covered by the FAO squid volume (myopsid and oegopsid squids, including Loliginidae), and poulps are octopods. The claim says octopuses have no internal part of the sort just named (os sepiae, gladius). A stylet or shell vestige is that sort of part, reduced. The claim's reason, a short body-sac, is not measured.",
+  "caveats": [
+    "A web search displayed a short FAO key excerpt on sepioid shells before this file was committed. The pass and fail rules were written from the claim, not edited to fit that excerpt. The three catalogue PDFs were not downloaded before this commit.",
+    "Group-level sentences in a catalogue are not a species-by-species census. A match shows what the catalogue asserts about the group."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  },
+  "verdict": "mixed",
+  "confidence": 0.5,
+  "data_kind": "biological",
+  "deviations": [
+    "The pre-registered Volume 1 URL is a 14-page front-matter file and states no shell diagnosis. Volume 2 (649 pages, squids) and Volume 3 (398 pages, octopods) are the full catalogues and were coded. Any clause those volumes leave unscored is filled from the key chapter of the same catalogue, https://www.fao.org/4/a0150e/a0150e03.pdf. Thresholds were not changed.",
+    "Sepiidae couplet does not use the words cuttlebone or sepion. The calcified, laminate, chalky internal shell in that couplet is coded as the os sepiae. Threshold unchanged."
+  ],
+  "datasets": [
+    {
+      "id": "fao-cephalopods-catalogue-key",
+      "name": "FAO Species Catalogue for Fishery Purposes No. 4, Cephalopods of the world, Jereb and Roper (eds.)",
+      "landing_url": "https://www.fao.org/3/a0150e/a0150e.pdf",
+      "doi": null,
+      "version": "Vol. 1 key chapter a0150e03 plus the three volume URLs as retrieved",
+      "license": "FAO, reproduction for educational non-commercial use as stated in the catalogue",
+      "files": [
+        {
+          "download_url": "https://openknowledge.fao.org/server/api/core/bitstreams/f00efa27-cde2-43bc-be41-d9b118ddf378/content",
+          "retrieved_at": "2026-11-02T00:31:06Z",
+          "byte_size": 519215,
+          "sha256": "c3f9c071f546dcd18db03648b4719030361da19de86cfa71795a02f8a0a3f68b",
+          "part": "vol1",
+          "requested_url": "https://www.fao.org/3/a0150e/a0150e.pdf"
+        },
+        {
+          "download_url": "https://openknowledge.fao.org/server/api/core/bitstreams/cf869f5f-a66b-443e-8de3-48d76be47d85/content",
+          "retrieved_at": "2026-11-02T00:31:06Z",
+          "byte_size": 17405538,
+          "sha256": "61e53e77a30755c80b1d4354b5ebd8d72dd0af24af9f1ba87656b1eaed0d8444",
+          "part": "vol2",
+          "requested_url": "https://www.fao.org/3/i1920e/i1920e.pdf"
+        },
+        {
+          "download_url": "https://openknowledge.fao.org/server/api/core/bitstreams/57241695-4904-470b-b9e2-ee36fbe1a947/content",
+          "retrieved_at": "2026-11-02T00:31:18Z",
+          "byte_size": 14824647,
+          "sha256": "24c31a489d4cd2a57c4ec2067ab43fd9ba18c6bc03b41a904676d40cd0105eb4",
+          "part": "vol3",
+          "requested_url": "https://www.fao.org/3/i3489e/i3489e.pdf"
+        },
+        {
+          "download_url": "https://www.fao.org/4/a0150e/a0150e03.pdf",
+          "retrieved_at": "2026-11-02T00:31:24Z",
+          "byte_size": 952929,
+          "sha256": "5458d34fe78be3c53aef0cd1b766bfba32e38af201ff4302fc0d236ada930e56",
+          "part": "vol1-key",
+          "requested_url": "https://www.fao.org/4/a0150e/a0150e03.pdf"
+        }
+      ],
+      "role": "internal shell, cuttlebone or gladius, and shell vestige by cephalopod group"
+    }
+  ],
+  "method": "Downloaded the three pre-registered FAO PDFs. Volume 1 at that URL is front matter, so Sepiidae is read from the Volume 1 key chapter of the same catalogue. Volumes 2 and 3 are the full squid and octopod books and were coded. Key couplets that state an internal shell were attributed to the family or group named in that couplet. Sepiidae matches if it is given a calcified laminate shell (the cuttlebone). Squids match if myopsids and oegopsids are given a feather- or rod-shaped chitinous internal shell (the gladius). Octopuses match only if the group is said to lack a shell and any vestige. A couplet that allows either a vestige or absence fails that universal clause.",
+  "measured": {
+    "value": 2,
+    "unit": "group clauses matching the claim (Sepiidae cuttlebone, squid gladius, octopus without an internal shell or vestige)",
+    "n": 3,
+    "uncertainty": "group-level key couplets, not a species count",
+    "extra": {
+      "source_used": "planned-plus-key",
+      "clauses": {
+        "sepiidae": "match",
+        "squid": "match",
+        "octopus": "fail"
+      },
+      "planned_clauses": {
+        "sepiidae": "unscored",
+        "squid": "match",
+        "octopus": "fail"
+      },
+      "key_clauses": {
+        "sepiidae": "match",
+        "squid": "match",
+        "octopus": "fail"
+      },
+      "evidence": {
+        "sepiidae": "key couplet: internal shell calcified, straight, laminate, chalky \u2014 Family Sepiidae",
+        "squid": "gladius or pen named with squids",
+        "octopus": "octopod diagnosis: internal shell reduced to rod-like stylets or absent"
+      },
+      "planned_pages": {
+        "vol1": 14,
+        "vol2": 649,
+        "vol3": 398
+      },
+      "planned_chars": {
+        "vol1": 33171,
+        "vol2": 2324107,
+        "vol3": 1184547
+      }
+    }
+  },
+  "results_summary": [
+    "Cuttlefishes and squids have the internal shells the claim names, and octopuses are described with a shell vestige or none, not with none in every case."
+  ]
+}

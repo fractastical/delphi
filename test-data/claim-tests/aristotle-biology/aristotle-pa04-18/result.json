@@ -1,0 +1,145 @@
+{
+  "claim_id": "aristotle-pa04-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-18",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, wolves, lions, dogs and leopards each have five digits on the forefoot and four digits on the hind foot.",
+  "pass_criterion": "Supports if at least three of the four named species have an explicit forefoot digit count of 5 and an explicit hind-foot digit count of 4 in the Animal Diversity Web account, and no scored species has any other pair of counts. A dewclaw is a digit: if the account says four toes on a foot and also says that foot has a dewclaw, the count for that foot is 5. If it says the dewclaw is absent, it is not added.",
+  "fail_criterion": "Refutes if two or more scored species have an explicit count other than five on the forefoot or other than four on the hind foot. Mixed if exactly one scored species fails and at least one other species passes. Inconclusive, reason data-unavailable, if fewer than three species have both a fore count and a hind count explicitly stated. A species is unscored if the account does not state both counts, if two sentences give conflicting counts, or if the domestic-dog account is only a redirect to the wolf account and no sentence distinguishes the dog's digits from the wolf's. Unscored species are not failures.",
+  "planned_datasets": [
+    "adw-carnivore-digit-accounts"
+  ],
+  "test_contract": {
+    "expected_observation": "For Canis lupus, Panthera leo, Canis lupus familiaris and Panthera pardus, the account states five fore digits and four hind digits, counting a dewclaw when the account includes it.",
+    "disconfirming_observation": "An explicit digit count, dewclaw rule applied, of something other than 5 in front or other than 4 behind, for two or more of those species.",
+    "admissible_datasets": "The Animal Diversity Web species accounts for those four names, fetched live. Counts must be integers or number-words in the account text tied to a fore foot and a hind foot. A general remark that carnivores have claws, with no number, is not a count. No other website is consulted for the verdict.",
+    "inference_method": "Strip HTML. Prefer the Physical Description section when that heading exists; otherwise use the whole account. Apply the dewclaw rule, then the thresholds in pass_criterion and fail_criterion. Domestic dog and wolf are separate species only when their digit sentences are not the same undifferentiated account. Confidence is 0.75 if all four species are scored and agree, 0.60 if the verdict rests on exactly three scored species, 0.70 if refutes, 0.50 if mixed, and 0.60 if inconclusive."
+  },
+  "species": [
+    {
+      "name": "Canis lupus",
+      "role": "wolf",
+      "url": "https://animaldiversity.org/accounts/Canis_lupus/"
+    },
+    {
+      "name": "Panthera leo",
+      "role": "lion",
+      "url": "https://animaldiversity.org/accounts/Panthera_leo/"
+    },
+    {
+      "name": "Canis lupus familiaris",
+      "role": "dog",
+      "url": "https://animaldiversity.org/accounts/Canis_lupus_familiaris/"
+    },
+    {
+      "name": "Panthera pardus",
+      "role": "leopard",
+      "url": "https://animaldiversity.org/accounts/Panthera_pardus/"
+    }
+  ],
+  "interpretation": "The claim names wolves, lions, dogs and leopards and gives one formula for all of them: five digits on each forefoot and four on each hind foot. The dewclaw is included because the claim's 'five' on the forefoot is the count that includes it; dropping it would test a different sentence. The test does not ask whether other polydactylous quadrupeds share the formula.",
+  "caveats": [
+    "No Animal Diversity Web account was read before this commit. A wolf page had been downloaded to a temporary file during a URL check; its text was not used to write these criteria.",
+    "Accounts are secondary natural-history statements, not a specimen-by-specimen count. One account per species is one published description, not a sample size of individuals."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.6,
+  "data_kind": "biological",
+  "reason": "data-unavailable",
+  "datasets": [
+    {
+      "id": "adw-carnivore-digit-accounts",
+      "name": "Animal Diversity Web accounts for wolf, lion, domestic dog, and leopard",
+      "landing_url": "https://animaldiversity.org/",
+      "doi": null,
+      "version": "pages retrieved 2026-11-02",
+      "license": "Animal Diversity Web, University of Michigan Museum of Zoology",
+      "files": [
+        {
+          "download_url": "https://animaldiversity.org/accounts/Canis_lupus/",
+          "retrieved_at": "2026-11-02T00:42:16Z",
+          "byte_size": 85085,
+          "sha256": "3c789547f6e7a6289f5e16e774bd899908a3cdd0867a41cb6effa5978aa0dbcd",
+          "requested_url": "https://animaldiversity.org/accounts/Canis_lupus/"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Panthera_leo/",
+          "retrieved_at": "2026-11-02T00:42:16Z",
+          "byte_size": 114273,
+          "sha256": "301db81c3222a00e934eaa640df881943ec73051bc1e3b416b0d247fde445227",
+          "requested_url": "https://animaldiversity.org/accounts/Panthera_leo/"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Canis_lupus_familiaris/",
+          "retrieved_at": "2026-11-02T00:42:16Z",
+          "byte_size": 101006,
+          "sha256": "0414c3414de6e2fd0c368c689acf05dfd7ae718ae77a5ad122e469dcc9e84f33",
+          "requested_url": "https://animaldiversity.org/accounts/Canis_lupus_familiaris/"
+        },
+        {
+          "download_url": "https://animaldiversity.org/accounts/Panthera_pardus/",
+          "retrieved_at": "2026-11-02T00:42:16Z",
+          "byte_size": 98324,
+          "sha256": "d95cbdc11d012b3164fc353d5f85cb5e00375c6531305725f9d929ddded9f47d",
+          "requested_url": "https://animaldiversity.org/accounts/Panthera_pardus/"
+        }
+      ],
+      "role": "explicit forefoot and hind-foot digit counts"
+    }
+  ],
+  "method": "Fetched the four Animal Diversity Web accounts and searched the text for a number of digits or toes tied to a fore foot and a hind foot. A dewclaw stated for a foot whose count is four is added, so the count includes it. Conflicting numbers leave the species unscored. The domestic dog is scored only from sentences that survive a redirect onto the wolf account. The verdict uses the pre-registered thresholds and no other website.",
+  "measured": {
+    "value": 0,
+    "unit": "named species whose account states 5 fore digits and 4 hind digits",
+    "n": 4,
+    "uncertainty": "one published account per species; unscored accounts state no digit formula",
+    "extra": {
+      "scored": 0,
+      "fail": 0,
+      "species": [
+        {
+          "species": "Canis lupus",
+          "role": "wolf",
+          "code": "unscored",
+          "fore": null,
+          "hind": null,
+          "reason": "no explicit fore and hind digit counts"
+        },
+        {
+          "species": "Panthera leo",
+          "role": "lion",
+          "code": "unscored",
+          "fore": null,
+          "hind": null,
+          "reason": "no explicit fore and hind digit counts"
+        },
+        {
+          "species": "Canis lupus familiaris",
+          "role": "dog",
+          "code": "unscored",
+          "fore": null,
+          "hind": null,
+          "reason": "no explicit fore and hind digit counts"
+        },
+        {
+          "species": "Panthera pardus",
+          "role": "leopard",
+          "code": "unscored",
+          "fore": null,
+          "hind": null,
+          "reason": "no explicit fore and hind digit counts"
+        }
+      ]
+    }
+  },
+  "results_summary": [
+    "Animal Diversity Web states both a forefoot count and a hind-foot count for 0 of the four species, which is below the three required to score the claim."
+  ]
+}

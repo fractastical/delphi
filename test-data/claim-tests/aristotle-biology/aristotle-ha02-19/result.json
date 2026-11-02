@@ -1,0 +1,206 @@
+{
+  "claim_id": "aristotle-ha02-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-19",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If the claim holds, every scaly bony fish with a coded reproductive guild in FishBase is an egg-layer, every cartilaginous fish with a coded guild gives birth to live young, and the fishing-frog (Lophius) is an egg-layer rather than a live-bearer.",
+  "pass_criterion": "Supports only if all three hold: (1) among Actinopterygii with a coded guild, the number of internal-live-bearer species is 0 and at least 100 species are coded; (2) among Elasmobranchii and Holocephali (or a class string containing chondrichthyes) with a coded guild, the number of egg-laying species is 0 and at least 30 species are coded; (3) at least one Lophius species is coded and none of them is an internal live bearer. Egg-laying guilds are RepGuild2 values containing 'egg scatter', 'brood hider', 'clutch tender', 'nester', or 'external brood'. Live-bearing is RepGuild2 containing 'internal live bear', 'internal bearer', or 'live bearer'. RepGuild1 alone does not code either mode, because both external brooders and live-bearers can be 'bearers'.",
+  "fail_criterion": "A bony counterexample is an actinopterygian species coded as an internal live bearer. A cartilaginous counterexample is an elasmobranch or holocephalan species coded as an egg-layer. Lophius is not removed from the bony tally if FishBase places it in Actinopterygii; it is the named exception only inside the cartilaginous tally, and only if FishBase itself places that species in a cartilaginous class. A clause fails if it has at least 5 counterexample species. Refutes if both the bony clause and the cartilaginous clause fail. Mixed if one of those two clauses fails and the other passes, or if either clause has 1 to 4 counterexample species, or if both clauses pass but a scored Lophius species is an internal live bearer. Inconclusive, reason underpowered, if a clause has fewer scored species than its minimum and the other clause does not fail. Inconclusive, reason data-unavailable, if the reproduc table has no RepGuild2 column or the class crosswalk cannot be joined.",
+  "planned_datasets": [
+    "fishbase-v25.04-species",
+    "fishbase-v25.04-families",
+    "fishbase-v25.04-reproduc"
+  ],
+  "test_contract": {
+    "expected_observation": "No coded ray-finned fish is an internal live bearer, no coded shark, ray, or chimaera is an egg-layer, and every coded Lophius species is an egg-layer.",
+    "disconfirming_observation": "Five or more ray-finned species coded as internal live bearers, or five or more sharks, rays, or chimaeras coded as egg-layers.",
+    "admissible_datasets": "FishBase snapshot v25.04 distributed as parquet by the rfishbase Hugging Face dataset: species, families (for class via FamCode), and reproduc. One species is one species, even if reproduc has several rows: any internal-live-bearer row makes the species viviparous; otherwise an egg-laying row makes it oviparous. Species with no matching guild phrase are unscored and are not counterexamples. The fishing-frog is the genus Lophius.",
+    "inference_method": "Join species to families on FamCode, aggregate reproduc by SpecCode, and apply the thresholds in pass_criterion and fail_criterion. The 1-to-4 band is a pre-registered allowance for single-row coding errors, not a softening of 'all' into 'most': zero is the only pass. Confidence is 0.80 if refutes with both minima met, 0.75 if supports, 0.55 if mixed, and 0.60 if inconclusive."
+  },
+  "dataset_urls": {
+    "fishbase-v25.04-species": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/species.parquet",
+    "fishbase-v25.04-families": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/families.parquet",
+    "fishbase-v25.04-reproduc": "https://huggingface.co/datasets/cboettig/fishbase/resolve/main/data/fb/v25.04/parquet/reproduc.parquet"
+  },
+  "interpretation": "Scaly fishes are mapped to FishBase class Actinopterygii, and cartilaginous fishes to Elasmobranchii plus Holocephali. That is the modern bony-versus-cartilaginous split the scope line names. It is wider than 'fishes that bear scales': scaleless ray-finned fishes stay in the bony clause. Aristotle's fishing-frog is Lophius. Mouth-brooders and other external brooders are egg-layers for this claim, because the eggs leave the ovary before the young are born; only internal live bearers count as his viviparous fishes. Lampreys, hagfish, and lobe-finned fishes are in neither clause.",
+  "caveats": [
+    "Column names below are the FishBase names documented for these tables (SpecCode, Genus, Species, FamCode, Class, RepGuild1, RepGuild2). No row of v25.04 was opened before this commit. If a snapshot uses a different column name for the same Balon guild field, the script may use that column and must record the rename as a deviation. The thresholds do not change.",
+    "FishBase guilds are compiled literature codes, not a new examination of each species. A refutation is a refutation of the universal claim against those codes.",
+    "'Invariably' and 'all' are treated as universals with a five-species floor before a clause is called failed, so that one miscoded row cannot by itself refute the claim. One to four counterexamples are mixed, not a pass."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claim-tests-c47a",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "fishbase-v25.04-species",
+      "name": "FishBase species table, rfishbase snapshot v25.04",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 3.0 (FishBase)",
+      "files": [
+        {
+          "download_url": "https://us.aws.cdn.hf.co/xet-bridge-us/66abfff505dac77e2fd6b206/b942233dc0d954a476a69cfe779051d71bbc66e695d57058e92bc72cdad58531?X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27species.parquet%3B+filename%3D%22species.parquet%22%3B&xip=rhR2LN4G4js&user_id=public&Expires=1793583065&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjZhYmZmZjUwNWRhYzc3ZTJmZDZiMjA2L2I5NDIyMzNkYzBkOTU0YTQ3NmE2OWNmZTc3OTA1MWQ3MWJiYzY2ZTY5NWQ1NzA1OGU5MmJjNzJjZGFkNTg1MzFcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZyZXNwb25zZS1jb250ZW50LWRpc3Bvc2l0aW9uPWlubGluZSUzQitmaWxlbmFtZSUyQSUzRFVURi04JTI3JTI3c3BlY2llcy5wYXJxdWV0JTNCK2ZpbGVuYW1lJTNEJTIyc3BlY2llcy5wYXJxdWV0JTIyJTNCJnhpcD1yaFIyTE40RzRqcyZ1c2VyX2lkPXB1YmxpYyIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiRXBvY2hUaW1lIjoxNzkzNTgzMDY1fX19XX0_&Signature=MEUCIQC1Ocf1VwiIkrbQZ79S7mPTtPuZ8R0UvChnadJtO3l7dAIgFwNZOG9-mDiTw3WnK5wECpbJT0HFDDxwfcGZOLmQgnI_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
+          "retrieved_at": "2026-11-02T00:31:06Z",
+          "byte_size": 5272364,
+          "sha256": "02bfae694deed266250e58ecebf4b10af595178944c431612e865cb37dc563e4"
+        }
+      ],
+      "role": "scientific name and family code"
+    },
+    {
+      "id": "fishbase-v25.04-families",
+      "name": "FishBase families table, rfishbase snapshot v25.04",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 3.0 (FishBase)",
+      "files": [
+        {
+          "download_url": "https://us.aws.cdn.hf.co/xet-bridge-us/66abfff505dac77e2fd6b206/8bf77512ed6fa020decd6cb93105e45fd66480338e76aca18971bc54b99f577a?xip=fGQ1-fAVvPo&user_id=public&X-Xet-Cas-Uid=public&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27families.parquet%3B+filename%3D%22families.parquet%22%3B&Expires=1793583066&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjZhYmZmZjUwNWRhYzc3ZTJmZDZiMjA2LzhiZjc3NTEyZWQ2ZmEwMjBkZWNkNmNiOTMxMDVlNDVmZDY2NDgwMzM4ZTc2YWNhMTg5NzFiYzU0Yjk5ZjU3N2FcXD94aXA9ZkdRMS1mQVZ2UG8mdXNlcl9pZD1wdWJsaWMmWC1YZXQtQ2FzLVVpZD1wdWJsaWMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN2ZhbWlsaWVzLnBhcnF1ZXQlM0IrZmlsZW5hbWUlM0QlMjJmYW1pbGllcy5wYXJxdWV0JTIyJTNCIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3OTM1ODMwNjZ9fX1dfQ__&Signature=MEUCIQDSTmLmZhy2DyaqwBkESGvoNMacCvWN343fEcKp1WO8sQIgYrXc-KbiSw3i1s5bo1Se6kfNgYJ0e75Fxb9WxKQS0MQ_&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
+          "retrieved_at": "2026-11-02T00:31:06Z",
+          "byte_size": 427298,
+          "sha256": "3f09bbb09c1c10219277f35b4f8c42aebedd5f1b8e00ebdfdeb0e16574b0e090"
+        }
+      ],
+      "role": "class of each family"
+    },
+    {
+      "id": "fishbase-v25.04-reproduc",
+      "name": "FishBase reproduc table, rfishbase snapshot v25.04",
+      "landing_url": "https://huggingface.co/datasets/cboettig/fishbase",
+      "doi": null,
+      "version": "v25.04",
+      "license": "CC BY-NC 3.0 (FishBase)",
+      "files": [
+        {
+          "download_url": "https://us.aws.cdn.hf.co/xet-bridge-us/66abfff505dac77e2fd6b206/74734eb5e912bd5392088ac2d24e132d002f2f9f19a261b79f6df63797898f4d?X-Xet-Cas-Uid=public&user_id=public&xip=rhR2LN4G4js&response-content-disposition=inline%3B+filename*%3DUTF-8%27%27reproduc.parquet%3B+filename%3D%22reproduc.parquet%22%3B&Expires=1793583066&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly91cy5hd3MuY2RuLmhmLmNvL3hldC1icmlkZ2UtdXMvNjZhYmZmZjUwNWRhYzc3ZTJmZDZiMjA2Lzc0NzM0ZWI1ZTkxMmJkNTM5MjA4OGFjMmQyNGUxMzJkMDAyZjJmOWYxOWEyNjFiNzlmNmRmNjM3OTc4OThmNGRcXD9YLVhldC1DYXMtVWlkPXB1YmxpYyZ1c2VyX2lkPXB1YmxpYyZ4aXA9cmhSMkxONEc0anMmcmVzcG9uc2UtY29udGVudC1kaXNwb3NpdGlvbj1pbmxpbmUlM0IrZmlsZW5hbWUlMkElM0RVVEYtOCUyNyUyN3JlcHJvZHVjLnBhcnF1ZXQlM0IrZmlsZW5hbWUlM0QlMjJyZXByb2R1Yy5wYXJxdWV0JTIyJTNCIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJFcG9jaFRpbWUiOjE3OTM1ODMwNjZ9fX1dfQ__&Signature=MEYCIQC6jsjltS7wOgDjNsRLVY1xourZoAz2SA8RW5nADVtjAgIhAL8FdzrgoMYv6jVt61nds-e4Gv~hzA4Nw0s5HONhP571&Key-Pair-Id=01KXEF4KZ1B6FV465MAWR4M21F&Hash-Algorithm=SHA256",
+          "retrieved_at": "2026-11-02T00:31:06Z",
+          "byte_size": 566805,
+          "sha256": "43e1f115ebbd2bf72fb754c402c1f8ad172ea340cee3cddd581d932b2667987e"
+        }
+      ],
+      "role": "Balon reproductive guild"
+    }
+  ],
+  "method": "Downloaded FishBase v25.04 species, families, and reproduc. Joined class through FamCode. Coded RepGuild2 as internal live bearer or as an egg-laying guild (egg scatterers, brood hiders, clutch tenders, nesters, external brooders). RepGuild1 alone was not used. A species with any live-bearer row is viviparous. Ray-finned fishes are Actinopterygii when that class string is present, and otherwise the FishBase labels Teleostei, Chondrostei, Holostei, and Cladistii. Elasmobranchii plus Holocephali are the cartilaginous clause. Lophius is the fishing-frog. Thresholds are those in the pre-registration.",
+  "measured": {
+    "value": 455,
+    "unit": "Actinopterygii species coded as internal live bearers",
+    "n": 9977,
+    "uncertainty": "FishBase RepGuild2 codes; a species with any internal-live-bearer row is viviparous",
+    "extra": {
+      "bony_scored": 9977,
+      "bony_viviparous": 455,
+      "bony_clause": "fail",
+      "cartilaginous_scored": 867,
+      "cartilaginous_egglaying": 372,
+      "cartilaginous_clause": "fail",
+      "lophius_scored": 3,
+      "lophius_viviparous": 0,
+      "lophius_exception": "pass",
+      "lophius_species": [
+        "Lophius americanus",
+        "Lophius litulon",
+        "Lophius piscatorius"
+      ],
+      "bony_viviparous_examples": [
+        "Acarobythites larsonae",
+        "Ageneiosus magoi",
+        "Alfaro cultratus",
+        "Alfaro huberi",
+        "Alionematichthys minyomma",
+        "Alionematichthys riukiuensis",
+        "Allodontichthys polylepis",
+        "Allodontichthys zonistius",
+        "Allotoca catarinae",
+        "Allotoca diazi",
+        "Allotoca maculata",
+        "Allotoca meeki",
+        "Allotoca regalis",
+        "Ameca splendens",
+        "Amphistichus argenteus",
+        "Amphistichus koelzi",
+        "Amphistichus rhodoterus",
+        "Anableps anableps",
+        "Anableps dowii",
+        "Anableps microlepis",
+        "Aphyonus gelatinosus",
+        "Ataeniobius toweri",
+        "Beaglichthys macrophthalmus",
+        "Bellottia apoda",
+        "Bellottia armiger",
+        "Belonesox belizanus",
+        "Bidenichthys beeblebroxi",
+        "Bidenichthys capensis",
+        "Bidenichthys consobrinus",
+        "Bidenichthys paxtoni"
+      ],
+      "cartilaginous_egglaying_examples": [
+        "Amblyraja doellojuradoi",
+        "Amblyraja frerichsi",
+        "Amblyraja georgiana",
+        "Amblyraja hyperborea",
+        "Amblyraja jenseni",
+        "Amblyraja radiata",
+        "Amblyraja reversa",
+        "Amblyraja taaf",
+        "Apristurus albisoma",
+        "Apristurus aphyodes",
+        "Apristurus brunneus",
+        "Apristurus canutus",
+        "Apristurus exsanguis",
+        "Apristurus fedorovi",
+        "Apristurus gibbosus",
+        "Apristurus herklotsi",
+        "Apristurus indicus",
+        "Apristurus internatus",
+        "Apristurus investigatoris",
+        "Apristurus japonicus",
+        "Apristurus kampae",
+        "Apristurus laurussonii",
+        "Apristurus longicephalus",
+        "Apristurus macrorhynchus",
+        "Apristurus macrostomus",
+        "Apristurus manis",
+        "Apristurus microps",
+        "Apristurus micropterygeus",
+        "Apristurus nasutus",
+        "Apristurus parvipinnis"
+      ],
+      "guild_column": "RepGuild2",
+      "class_column": "Class",
+      "class_counts_species": {
+        "Teleostei": 34583,
+        "Elasmobranchii": 1286,
+        "Myxini": 91,
+        "Holocephali": 58,
+        "Petromyzonti": 50,
+        "Chondrostei": 29,
+        "Cladistii": 14,
+        "Holostei": 9,
+        "Dipneusti": 6,
+        "Class": 2,
+        "nan": 2,
+        "Coelacanthi": 2
+      },
+      "lophius_classes": [
+        "Teleostei"
+      ]
+    }
+  },
+  "results_summary": [
+    "FishBase codes 455 live-bearing ray-finned species of 9977 scored, and 372 egg-laying cartilaginous species of 867 scored, so neither universal holds."
+  ],
+  "deviations": [
+    "FishBase v25.04 Class has no value containing Actinopterygii. The ray-finned labels Teleostei, Chondrostei, Holostei, and Cladistii were used as that pre-registered clause. Elasmobranchii and Holocephali remain the cartilaginous clause. A pass still requires zero counterexamples, a clause still fails at five or more, and the minima stay 100 and 30."
+  ]
+}
