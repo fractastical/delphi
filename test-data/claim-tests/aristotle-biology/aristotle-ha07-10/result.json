@@ -1,0 +1,31 @@
+{
+  "claim_id": "aristotle-ha07-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha07-10",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:31:09Z",
+  "hypothesis": "If the claim holds, no child born before seven months of pregnancy survives, and children born at seven months are the earliest who do.",
+  "pass_criterion": "Pre-registered (claim supported). In the ONS workbook cimdeathcohort2024.xlsx for England and Wales in 2024, every gestational-age bin whose upper bound is strictly below 28 completed weeks has zero survivors, those bins together contain at least 100 live births, and, if a bin covering 28 to 31 completed weeks is present, that bin has at least one survivor. A survivor is a live birth minus a death, using infant deaths under one year when that count is in the same table, and otherwise deaths under 28 days. Confidence if this pass is met: 0.55, because one country and one year is not every circumstance.",
+  "fail_criterion": "Pre-registered. The claim is refuted if any gestational-age bin whose upper bound is strictly below 28 completed weeks has at least one survivor, with the live-birth count of that bin reported. One survivor is enough, because the quote says children born before seven months can under no circumstances survive. Confidence 0.9 if the survivors in those bins sum to at least 10 and the live births in those bins sum to at least 100; confidence 0.75 if there is at least one survivor but one of those floors is missed. Bins that cross or start at 28 weeks, and bins labeled only as preterm or under 32 or under 37 weeks, are not used. If the admissible bins have at least 100 live births and zero survivors but the 28-to-31-week bin is absent, the never-survive clause passes and the earliest-viable clause is untested: verdict inconclusive with reason other (confidence 0.6). If every admissible bin has zero survivors but the live births in them sum to fewer than 100, verdict inconclusive with reason underpowered (confidence 0.5). If the workbook cannot be retrieved, or it has no live-birth count paired with a death count for any bin lying entirely below 28 weeks, verdict inconclusive with reason data-unavailable (confidence 0.8). The phrase 'most of them are weakly' is not scored. It does not block a refutation.",
+  "planned_datasets": [
+    "ons-england-wales-child-infant-mortality-2024-cimdeathcohort"
+  ],
+  "test_contract": {
+    "expected_observation": "Among live births in England and Wales in 2024, no infant born at a gestational age below 28 completed weeks is still alive at the longest death horizon the table reports, and survival is present in the next lunar month of gestation when that bin is shown.",
+    "disconfirming_observation": "At least one live-born infant in a gestational-age bin lying entirely below 28 completed weeks is not counted as dead at that horizon.",
+    "admissible_datasets": "A public vital-statistics table of live births and infant or neonatal deaths by gestational age, for a stated population and year, in which at least one age bin lies entirely below 28 completed weeks. Stillbirths are not survivors and are not the denominator. A login-walled registry extract is not admissible.",
+    "inference_method": "Map seven lunar months to 28 weeks of 7 days, because ten such months are 280 days. Subtract deaths from live births inside each bin below that bound. One or more survivors refutes the universal. Zero survivors across at least 100 live births, with a survivor in the 28-to-31-week bin when that bin exists, supports it. No assessor score is used."
+  },
+  "interpretation": "The quote says children born before seven months cannot survive, and that seven-month children are the earliest who can, most of them weakly. The claim says the same. 'Before seven months' is read as a gestational age below seven lunar months. A lunar month is 28 days, so seven months are 196 days, which is 28 completed weeks. A bin is inside that range only when its upper bound is below 28 completed weeks: under 24 weeks qualifies, 22 to 27 weeks qualifies, under 32 weeks does not. The seven-month bin used for the earliest-viable clause is 28 to 31 completed weeks. 'Survive' is being alive at one year if the table counts infant deaths, and alive at 28 days if it counts only neonatal deaths. Stillbirths are excluded. 'Weakly' has no column in a mortality table and is left unscored. The test uses births in England and Wales in 2024, which is modern care, not Aristotle's Greece. The universal says 'under no circumstances', so a survivor now refutes it. A year with no survivors would not show that no other circumstance allows survival.",
+  "caveats": [
+    "The ONS dataset page and the 2024 bulletin were read to find the workbook. The bulletin states a neonatal mortality rate for births before 24 weeks. That sentence was seen before this registration. The workbook was not downloaded. The decision rule is the universal test above and was not adjusted to that rate.",
+    "Gestational age on a birth registration is the completed weeks recorded on the certificate, not a measurement made for this test.",
+    "Deaths under 28 days and deaths under one year are both shorter than a whole life. An infant alive at the table's horizon has survived the period the table covers. The table cannot show that the same infant later died."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-a564",
+    "date": "2026-11-01"
+  }
+}
