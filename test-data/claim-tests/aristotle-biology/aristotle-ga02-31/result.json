@@ -1,0 +1,400 @@
+{
+  "claim_id": "aristotle-ga02-31",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-31",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "Humans are normally born without erupted teeth, and horses, cattle, sheep, goats, pigs, dogs and cats are born with at least one erupted tooth.",
+  "pass_criterion": "Supports only if the human normal earliest primary-tooth eruption is at least 4 months after birth, and every panel species (horse, cow, sheep, goat, pig, dog, cat) is born with teeth. A panel species is born with teeth if at least one deciduous tooth is stated as erupting before birth or the eruption range starts at birth (lower bound 0 days, including '0 wk' and 'at birth'). A species is born without teeth if every deciduous tooth's earliest eruption is strictly after birth.",
+  "fail_criterion": "Refutes if humans are normally born with teeth and at least two panel species are born without teeth. Mixed if humans are normally born without teeth and at least one panel species is born without teeth, or if humans are normally born with teeth and every panel species is born with teeth. Inconclusive, reason data-unavailable, if the human source is missing or fewer than four panel species can be parsed. Rare natal teeth described as exceptions do not count as the normal human state. Sheep and goat share a table column unless a footnote splits them.",
+  "planned_datasets": [
+    "merck-eruption-of-the-teeth",
+    "ncbi-bookshelf-primary-dentition"
+  ],
+  "test_contract": {
+    "expected_observation": "The normal human primary dentition erupts months after birth, and each of horse, cow, sheep, goat, pig, dog and cat has a deciduous tooth already erupted at birth.",
+    "disconfirming_observation": "A panel species has no deciduous tooth until after birth, or humans normally have erupted teeth at birth.",
+    "admissible_datasets": "A public veterinary eruption table giving deciduous eruption ages for the panel, and a public human primary-dentition account stating the normal age of the first erupted tooth. 'Contrary to nature' natal teeth are exceptions, not the normal human state.",
+    "inference_method": "Parse eruption ages. Lower bound 0 or 'before birth' means born with that tooth. Any species whose earliest deciduous tooth is after day 0 is born without teeth. Human clause holds if the normal first eruption is at least 4 months. Supports only if the human clause holds and no panel species is born without teeth. Mixed if exactly one of those two sides fails. Refutes if both sides fail."
+  },
+  "interpretation": "Aristotle contrasts other animals, born with teeth or their analogue, with man, normally born without them, allowing cases 'contrary to nature'. The panel is the domestic mammals in a standard eruption table, which is a modern sample of 'other animals', not every toothed species. 'Born in possession' means erupted at birth, not a tooth germ still inside the jaw. Sheep and goats are the claim's neighbouring livestock and are included because the table pairs them.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7800",
+    "date": "2026-11-01"
+  },
+  "preregistered": true,
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.8,
+  "deviations": [
+    {
+      "field": "datasets",
+      "change": "Human eruption age was read from OpenStax Anatomy and Physiology 2e section 23.3 instead of the NCBI Bookshelf page.",
+      "why": "https://www.ncbi.nlm.nih.gov/books/NBK573074/ returned a browser-check page, not the chapter. Pass and fail thresholds were not changed."
+    }
+  ],
+  "method": "Deciduous eruption ages were parsed from the Merck Veterinary Manual table. A species is born with teeth if any deciduous tooth is 'before birth' or the stated range starts at day 0; it is born without teeth if every deciduous tooth starts later. Sheep and goats share one column. The human age is the OpenStax statement that deciduous teeth begin to appear at about 6 months, which meets the pre-registered threshold of 4 months for being born without teeth. The claim supports only if humans are born without teeth and every panel species is born with them; one panel species born without teeth makes the result mixed when the human clause holds.",
+  "measured": {
+    "value": 2,
+    "unit": "panel species born without erupted teeth",
+    "n": 7,
+    "uncertainty": null,
+    "extra": {
+      "human_first_eruption_months": 6,
+      "human_normally_born_without": true,
+      "born_without": [
+        "Dog",
+        "Cat"
+      ],
+      "born_with": [
+        "Horse",
+        "Cow",
+        "Sheep",
+        "Goat",
+        "Pig"
+      ],
+      "by_species": {
+        "Horse": {
+          "born_with": true,
+          "born_without": false,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "0–1 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "4–6 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "6–9 mo",
+              "lower_bound_days": 182.62125
+            },
+            {
+              "tooth": "Dc",
+              "cell": "Does not erupt",
+              "lower_bound_days": null
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "0–2 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "0–2 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "0–2 wk",
+              "lower_bound_days": 0.0
+            }
+          ]
+        },
+        "Cow": {
+          "born_with": true,
+          "born_without": false,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "Before birth",
+              "lower_bound_days": -1.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "Before birth",
+              "lower_bound_days": -1.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "0–1 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "0–2 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "0–3 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "0–3 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "0–3 wk",
+              "lower_bound_days": 0.0
+            }
+          ]
+        },
+        "Sheep": {
+          "born_with": true,
+          "born_without": false,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "0–1 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "1–2 wk",
+              "lower_bound_days": 7.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "2–3 wk",
+              "lower_bound_days": 14.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            }
+          ]
+        },
+        "Goat": {
+          "born_with": true,
+          "born_without": false,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "0–1 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "1–2 wk",
+              "lower_bound_days": 7.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "2–3 wk",
+              "lower_bound_days": 14.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "0–4 wk",
+              "lower_bound_days": 0.0
+            }
+          ]
+        },
+        "Pig": {
+          "born_with": true,
+          "born_without": false,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "2–3 mo",
+              "lower_bound_days": 60.87375
+            },
+            {
+              "tooth": "Di3",
+              "cell": "Before birth",
+              "lower_bound_days": -1.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "Before birth",
+              "lower_bound_days": -1.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "4–6 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "1½ mo",
+              "lower_bound_days": 45.6553125
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "1–5 wk",
+              "lower_bound_days": 7.0
+            }
+          ]
+        },
+        "Dog": {
+          "born_with": false,
+          "born_without": true,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "4–5 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "4–5 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "4–6 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "4–6 wk",
+              "lower_bound_days": 28.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "4–6 wk",
+              "lower_bound_days": 28.0
+            }
+          ]
+        },
+        "Cat": {
+          "born_with": false,
+          "born_without": true,
+          "teeth": [
+            {
+              "tooth": "Di1",
+              "cell": "2–3 wk",
+              "lower_bound_days": 14.0
+            },
+            {
+              "tooth": "Di2",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Di3",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dc",
+              "cell": "3–4 wk",
+              "lower_bound_days": 21.0
+            },
+            {
+              "tooth": "Dp2",
+              "cell": "5–6 wk (upper only)",
+              "lower_bound_days": 35.0
+            },
+            {
+              "tooth": "Dp3",
+              "cell": "5–6 wk",
+              "lower_bound_days": 35.0
+            },
+            {
+              "tooth": "Dp4",
+              "cell": "5–6 wk",
+              "lower_bound_days": 35.0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "caveats": [
+    "The panel is the domestic mammals in one eruption table, not every toothed animal.",
+    "A range written '0–1 wk' has lower bound 0 and counts as including birth, as pre-registered.",
+    "Rare human natal teeth are not the normal age stated by the source.",
+    "NCBI Bookshelf did not return chapter text to this client."
+  ],
+  "datasets": [
+    {
+      "id": "merck-eruption-of-the-teeth",
+      "name": "Merck Veterinary Manual, eruption of the teeth",
+      "landing_url": "https://www.merckvetmanual.com/digestive-system/dental-development-and-anatomy/estimation-of-age-by-examination-of-the-teeth-in-animals",
+      "doi": null,
+      "version": "page retrieved with this run",
+      "license": "publicly readable; Merck Veterinary Manual terms",
+      "files": [
+        {
+          "download_url": "https://www.merckvetmanual.com/digestive-system/dental-development-and-anatomy/estimation-of-age-by-examination-of-the-teeth-in-animals",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 480573,
+          "sha256": "5d2c5bf4d999894372ba22c6595c5950d1f1c7cb3eaeb079cbbc5fe7e804f1bb",
+          "role": "eruption table"
+        }
+      ],
+      "role": "deciduous eruption ages for the panel"
+    },
+    {
+      "id": "ncbi-bookshelf-primary-dentition",
+      "name": "NCBI Bookshelf primary dentition page (blocked) and OpenStax section 23.3",
+      "landing_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+      "doi": null,
+      "version": "2e",
+      "license": "OpenStax CC BY 4.0; NCBI page was a browser check",
+      "files": [
+        {
+          "download_url": "https://www.ncbi.nlm.nih.gov/books/NBK573074/",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 21391,
+          "sha256": "baa9778b9b40c4c3bb3da1195bba3647a670db4efd414a6a7420d85c424fea90",
+          "role": "planned human primary-dentition page"
+        },
+        {
+          "download_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 379223,
+          "sha256": "b5913834c91deb654184243d6b2a067acec8d48550d1d345e919e7ec785533a0",
+          "role": "human primary dentition, used because NCBI Bookshelf blocked this client"
+        }
+      ],
+      "role": "normal age of the first human deciduous tooth"
+    }
+  ],
+  "headline": "Humans normally erupt the first tooth at about 6 months, and dogs and cats are born without erupted teeth."
+}

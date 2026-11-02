@@ -1,0 +1,142 @@
+{
+  "claim_id": "aristotle-ha06-41",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-41",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "The European hare Lepus europaeus breeds in every season, superfoetates during pregnancy, and bears young every month.",
+  "pass_criterion": "Supports only if all three clauses pass. Every month passes if litters per year is at least 10 or the inter-litter interval is at most 35 days. All seasons passes if at least one source states year-round breeding, all seasons, or all twelve months, and no source states a breeding season of nine months or fewer. Superfoetation passes if a source explicitly affirms superfoetation or superconception in Lepus europaeus.",
+  "fail_criterion": "A clause fails as follows: every month fails if litters per year is present and below 8; all seasons fails if a source states a breeding season of nine months or fewer and no source affirms year-round breeding; superfoetation fails if a source explicitly denies it. Conflicting season statements, or silence, leave that clause unresolved. Supports if all three pass. Refutes if every resolved clause fails and at least two clauses are resolved. Mixed if at least one clause passes and at least one fails. Inconclusive, reason data-unavailable or other, if fewer than two clauses are resolved as pass or fail.",
+  "planned_datasets": [
+    "anage-build-15",
+    "iucn-gisd-lepus-europaeus",
+    "adw-lepus-europaeus"
+  ],
+  "test_contract": {
+    "expected_observation": "Lepus europaeus has about twelve litters a year or an interbirth interval of at most 35 days, is described as breeding in all seasons, and is described as superfoetating.",
+    "disconfirming_observation": "Litters per year are below 8, or breeding is confined to nine months or fewer, or superfoetation is denied.",
+    "admissible_datasets": "AnAge life-history fields for litters per year, gestation and inter-litter interval, plus public species accounts that state breeding season and superfoetation. Scope is the brown hare Lepus europaeus, not every hare.",
+    "inference_method": "Read litters per year and inter-litter interval from AnAge. Read season and superfoetation as explicit affirmations or denials in the species accounts, not as inferences from gestation length. A conjunction of three clauses supports only if all pass; one pass and one fail is mixed; all resolved clauses failing is refutes."
+  },
+  "interpretation": "The claim bundles three reproductive assertions about hares. The scope field names the brown hare, Lepus europaeus. 'Bear young every month' is a rate of at least ten litters a year, not a single monthly anecdote. 'At all seasons' means the breeding season is not confined to nine months or fewer. Superfoetation means conceiving during an ongoing pregnancy, and it is scored only from an explicit statement. Conceiving again after birth while suckling is a separate phrase in the claim record and is not given its own clause.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7800",
+    "date": "2026-11-01"
+  },
+  "preregistered": true,
+  "data_kind": "biological",
+  "verdict": "inconclusive",
+  "confidence": 0.72,
+  "reason": "other",
+  "deviations": [],
+  "method": "Litters per year and the inter-litter interval were read from the vendored AnAge build 15 row for Lepus europaeus. Every month fails when litters per year are present and below 8. GISD and Animal Diversity Web were searched for an explicit year-round statement and for a between-month breeding span of nine months or fewer. A year-round statement in one source and a short span in the other leaves the season clause unresolved. Superfoetation passes only if one of those accounts names it. Fewer than two resolved clauses is inconclusive.",
+  "measured": {
+    "value": 3.8,
+    "unit": "litters per year",
+    "n": 1,
+    "uncertainty": null,
+    "extra": {
+      "gestation_days": "42",
+      "interlitter_interval": null,
+      "clauses": {
+        "every_month": "fail",
+        "all_seasons": "unresolved",
+        "superfoetation": "unresolved"
+      },
+      "season_spans": {
+        "gisd": [],
+        "adw": [
+          {
+            "phrase": "between midwinter (January/February) and midsummer",
+            "start_month": 1,
+            "end_month": 7,
+            "inclusive_months": 7
+          },
+          {
+            "phrase": "between midwinter (January/February) and midsummer",
+            "start_month": 1,
+            "end_month": 7,
+            "inclusive_months": 7
+          }
+        ]
+      },
+      "season_affirm": {
+        "gisd": true,
+        "adw": true
+      },
+      "superfoetation_mentioned": {
+        "gisd": false,
+        "adw": false
+      },
+      "anage_path": "test-data/organisms/darwin-origin/ch11-14/data/anage_build15_dataset.zip",
+      "anage_zip_bytes": 169150,
+      "anage_zip_sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+    }
+  },
+  "caveats": [
+    "AnAge's litters-per-year figure is a literature average, not a count of births made for this test.",
+    "GISD says reproduction occurs year round, while Animal Diversity Web limits the breeding season to midwinter through midsummer. The pre-registered rule treats that conflict as unresolved rather than as a vote.",
+    "Neither account uses the word superfoetation or superconception, so that clause is unresolved rather than denied.",
+    "The scope is Lepus europaeus, the brown hare named in the claim record."
+  ],
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gks1155",
+      "doi_note": "The vendored release notes cite PMID 23193293. NCBI esummary for that PMID returns this DOI.",
+      "version": "build 15",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T01:12:45Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+          "role": "AnAge build 15 zip already in test-data/organisms",
+          "path": "test-data/organisms/darwin-origin/ch11-14/data/anage_build15_dataset.zip"
+        }
+      ],
+      "role": "litters per year, gestation and inter-litter interval for Lepus europaeus"
+    },
+    {
+      "id": "iucn-gisd-lepus-europaeus",
+      "name": "IUCN Global Invasive Species Database, Lepus europaeus",
+      "landing_url": "https://www.iucngisd.org/gisd/species.php?sc=1643",
+      "doi": null,
+      "version": "page retrieved with this run",
+      "license": "publicly readable GISD species profile",
+      "files": [
+        {
+          "download_url": "https://www.iucngisd.org/gisd/species.php?sc=1643",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 53098,
+          "sha256": "59f494e8393b7fa816865ac4a64618e946a47a9f932707d69d5716d5e00f5b2b",
+          "role": "IUCN GISD Lepus europaeus"
+        }
+      ],
+      "role": "breeding-season wording"
+    },
+    {
+      "id": "adw-lepus-europaeus",
+      "name": "Animal Diversity Web, Lepus europaeus",
+      "landing_url": "https://animaldiversity.org/accounts/Lepus_europaeus/",
+      "doi": null,
+      "version": "page retrieved with this run",
+      "license": "publicly readable; University of Michigan Museum of Zoology",
+      "files": [
+        {
+          "download_url": "https://animaldiversity.org/accounts/Lepus_europaeus/",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 77179,
+          "sha256": "ee27fd011f53ca5b4a0ac815c5edeae1f23b810827bfdf979ac6e5bc72e30eca",
+          "role": "Animal Diversity Web Lepus europaeus"
+        }
+      ],
+      "role": "breeding-season wording and any superfoetation statement"
+    }
+  ],
+  "headline": "AnAge records 3.8 litters per year for the European hare, so bearing young every month fails, but the season accounts conflict and superfoetation is not stated, so the pre-registered rule stays inconclusive."
+}

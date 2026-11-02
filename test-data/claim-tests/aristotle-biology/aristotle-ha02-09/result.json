@@ -1,0 +1,211 @@
+{
+  "claim_id": "aristotle-ha02-09",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-09",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "In humans, sheep, goats and pigs, the typical adult male permanent tooth count exceeds the typical adult female permanent tooth count.",
+  "pass_criterion": "Supports only if all four kinds pass. A kind passes when its male typical permanent tooth count exceeds its female count by at least 1 tooth. Livestock counts come from the permanent dental formula (both sides). A formula given once for a species, with no statement that males of that species have more teeth, is a difference of 0 and that kind fails. A sex difference counts only when the same source states it for that species. Humans pass only if the anatomical formula gives males at least one more tooth than females AND, in NHANES adults aged 20–39, the male mean number of permanent teeth present exceeds the female mean by at least 1.0. If the formula source and NHANES disagree, the kind fails.",
+  "fail_criterion": "Refutes if at least one of the four kinds has male minus female less than or equal to 0. Inconclusive, reason data-unavailable or other, if no kind fails and at least one kind cannot be measured. Mixed is not used: the claim asserts the pattern for all four kinds, so one measured counterexample refutes it.",
+  "planned_datasets": [
+    "msd-merck-dental-formulas",
+    "openstax-anatomy-permanent-dentition",
+    "nhanes-2017-2018-ohxden-demo"
+  ],
+  "test_contract": {
+    "expected_observation": "For each of Homo sapiens, Ovis aries, Capra hircus and Sus scrofa, the typical adult male permanent tooth count is at least one tooth higher than the female count.",
+    "disconfirming_observation": "For any one of those four kinds, the typical counts are equal or the female count is higher.",
+    "admissible_datasets": "A public veterinary or anatomical dental-formula table that states permanent tooth positions, and a public human dental examination with sex and per-tooth presence. The formula source must be one that records a sex-limited tooth when the editors believe one exists. Feral or pathological tooth loss is not the livestock estimand. NHANES ages are restricted to 20–39 so that unerupted primary teeth and late-life extraction are reduced; remaining-tooth means still do not override an equal anatomical formula.",
+    "inference_method": "Sum the permanent formula for both sides of the mouth. Difference = male count minus female count, or 0 when a single species formula is given. NHANES: mean count of teeth coded as permanent and present, males minus females, ages 20–39. A kind passes only if its difference is at least 1. The claim supports only if every kind passes; otherwise, if any kind fails, the verdict is refutes."
+  },
+  "interpretation": "Aristotle's 'more teeth' is read as the typical adult permanent complement, not a difference in tooth size and not teeth lost to decay. Sheep, goats and swine are Ovis aries, Capra hircus and Sus scrofa. Man is Homo sapiens. A species-level dental formula is the count for both sexes unless the source splits them. The horse is not one of the four kinds; if the same table notes a sex difference for the horse, that shows the table records sex-limited teeth, and it is reported as a methods check, not as a tested kind.",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-7800",
+    "date": "2026-11-01"
+  },
+  "preregistered": true,
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.84,
+  "method": "Permanent dental formulas were read from the MSD Veterinary Manual table. Formula images were fetched and the printed total was taken with Tesseract; sheep and goats share one row with cattle. The human count is the permanent-tooth total stated in OpenStax Anatomy and Physiology 2e, section 23.3. NHANES 2017–2018 oral exams (OHXDEN_J) joined to demographics give the mean number of teeth coded permanent-and-present at ages 20–39, by sex. A kind passes only if males exceed females by at least one tooth on the formula, and, for humans, also on that mean.",
+  "measured": {
+    "value": 0,
+    "unit": "kinds in which males have at least one more permanent tooth",
+    "n": 4,
+    "uncertainty": null,
+    "extra": {
+      "kinds": {
+        "sheep": {
+          "formula_total": 32,
+          "formula_diff": 0,
+          "source": "shared cow/sheep/goat permanent formula",
+          "passes": false
+        },
+        "goat": {
+          "formula_total": 32,
+          "formula_diff": 0,
+          "source": "shared cow/sheep/goat permanent formula",
+          "passes": false
+        },
+        "pig": {
+          "formula_total": 44,
+          "formula_diff": 0,
+          "source": "pig permanent formula",
+          "passes": false
+        },
+        "human": {
+          "formula_total": 32,
+          "formula_diff": 0,
+          "nhanes_male_mean": 28.3035,
+          "nhanes_female_mean": 27.6503,
+          "nhanes_diff": 0.6532,
+          "nhanes_n_male": 715,
+          "nhanes_n_female": 815,
+          "passes": false
+        }
+      },
+      "formula_rows": {
+        "Horse": {
+          "permanent_total": null,
+          "ocr": null
+        },
+        "Cow c Sheep Goat": {
+          "permanent_total": 32,
+          "ocr": "O00 ps3) __\n2(1¢C7P2M=) = 32"
+        },
+        "Pig": {
+          "permanent_total": 44,
+          "ocr": "2(1C+P2M=) = 44"
+        },
+        "Dog": {
+          "permanent_total": 42,
+          "ocr": "2(1C+P2M 2) = 42"
+        },
+        "Cat": {
+          "permanent_total": 30,
+          "ocr": "2(1C+P5$M-) = 30"
+        }
+      },
+      "sex_footnotes": [
+        "a Canine teeth usually appear only in male horses; the canine teeth are usually regressed or absent in mares."
+      ],
+      "nhanes_permanent_code": 2,
+      "nhanes_age_years": "20-39",
+      "openstax_permanent_sentence": " months of age. Between approximately age 6 and 12, these teeth are replaced by 32 permanent teeth . Moving from the center of the mouth toward the side, these are as follows ( F"
+    }
+  },
+  "caveats": [
+    "Livestock counts are species-typical formulas, not measurements of sex-labelled skulls.",
+    "The same table's footnote records canine teeth as usual in male horses and reduced or absent in mares, so a sex difference had a place to be written for sheep, goats and pigs and was not.",
+    "NHANES counts teeth still present in the mouth. Extractions and unerupted third molars move that mean off the anatomical formula, which is why an equal formula fails the kind even if the means differ by a fraction of a tooth.",
+    "OpenStax states one adult human total and does not split it by sex."
+  ],
+  "deviations": [],
+  "datasets": [
+    {
+      "id": "msd-merck-dental-formulas",
+      "name": "MSD Veterinary Manual dental formulas of various animal species",
+      "landing_url": "https://www.msdvetmanual.com/multimedia/table/dental-formulas-of-various-animal-species",
+      "doi": null,
+      "version": "page retrieved with this run",
+      "license": "publicly readable; MSD Veterinary Manual terms",
+      "files": [
+        {
+          "download_url": "https://www.msdvetmanual.com/multimedia/table/dental-formulas-of-various-animal-species",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 212673,
+          "sha256": "21e90ca389faf060d859859743ddc2faf363cdaabd9a13b1133a5d1dfd3642cf",
+          "role": "dental formula table"
+        },
+        {
+          "download_url": "https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/veterinary/images/d/i/g/digzz04.gif?thn=0&sc_lang=en&mw=640",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 16807,
+          "sha256": "d5f8c7959a4c2a0d92b79129e86397b1b4e4500a1f90a43cec1f7d034ee057de",
+          "role": "permanent formula image for Cow c Sheep Goat"
+        },
+        {
+          "download_url": "https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/veterinary/images/d/i/g/digzz06.gif?thn=0&sc_lang=en&mw=640",
+          "retrieved_at": "2026-11-02T01:02:47Z",
+          "byte_size": 15735,
+          "sha256": "1a769a72acdd073f8a288acf5215ba9c4aa73997abc8aa47b366ace589239c82",
+          "role": "permanent formula image for Pig"
+        },
+        {
+          "download_url": "https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/veterinary/images/d/i/g/digzz08.gif?thn=0&sc_lang=en&mw=640",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 16038,
+          "sha256": "0851a25489a2ec94841c5d4dd23950665a1fb4d2cb36de92b372ca2218b80d1d",
+          "role": "permanent formula image for Dog"
+        },
+        {
+          "download_url": "https://edge.sitecorecloud.io/mmanual-ssq1ci05/media/veterinary/images/d/i/g/digzz10.gif?thn=0&sc_lang=en&mw=640",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 15449,
+          "sha256": "d281ee19034b783fba02761a470798b9f6046ee2a5612240f3545576b9de433b",
+          "role": "permanent formula image for Cat"
+        }
+      ],
+      "role": "permanent tooth totals for sheep, goat and pig, and whether a sex difference is stated"
+    },
+    {
+      "id": "openstax-anatomy-permanent-dentition",
+      "name": "OpenStax Anatomy and Physiology 2e, section 23.3",
+      "landing_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+      "doi": null,
+      "version": "2e",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://openstax.org/books/anatomy-and-physiology-2e/pages/23-3-the-mouth-pharynx-and-esophagus",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 379223,
+          "sha256": "b5913834c91deb654184243d6b2a067acec8d48550d1d345e919e7ec785533a0",
+          "role": "human dental formula"
+        }
+      ],
+      "role": "human permanent tooth count"
+    },
+    {
+      "id": "nhanes-2017-2018-ohxden-demo",
+      "name": "NHANES 2017-2018 oral health dentition and demographics",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "2017-2018",
+      "license": "public domain (US government work)",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/OHXDEN_J.htm",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 864518,
+          "sha256": "7330dcb64e29d8479b8b4eff2827e59734517f9e6b6221c77c121aa1e2e1d38a",
+          "role": "NHANES tooth-count codebook"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.htm",
+          "retrieved_at": "2026-11-02T01:02:48Z",
+          "byte_size": 167262,
+          "sha256": "07f8f1e7f884fab180ccf53c705652de9d663833fdad85b0d759919c8464cde0",
+          "role": "NHANES demographics codebook"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/OHXDEN_J.xpt",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 9361040,
+          "sha256": "91767a08eba61c5e7cde9cce3a1a5db43e2792dba1067ec1f8bf7af7032ec212",
+          "role": "NHANES 2017-2018 dentition"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-11-02T01:02:49Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec",
+          "role": "NHANES 2017-2018 demographics"
+        }
+      ],
+      "role": "mean permanent teeth present by sex at ages 20-39"
+    }
+  ],
+  "headline": "Males do not have more teeth than females: sheep and goats share a 32-tooth formula, pigs have 44, humans have 32, and at ages 20–39 the NHANES male mean exceeds the female mean by 0.6532 teeth, short of one tooth."
+}
