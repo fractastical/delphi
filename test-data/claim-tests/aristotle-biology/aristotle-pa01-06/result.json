@@ -1,0 +1,29 @@
+{
+  "claim_id": "aristotle-pa01-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa01-06",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If ants as a group both fly and do not fly, a public specimen corpus will contain winged ants and wingless ants, not only one of those forms.",
+  "pass_criterion": "Pre-registered. Supports if AntWeb specimen records in Formicidae include at least 50 flying specimens in at least 2 genera and at least 50 non-flying specimens in at least 2 genera. A specimen is flying only when its life-stage text contains alate (and not dealate), winged, or macropterous. A specimen is non-flying when its caste is worker, or its life-stage text contains wingless, apterous, ergatoid, or dealate. A queen or a male with no wing word is neither class: ergatoid queens and wingless males exist, so caste alone does not show that they fly.",
+  "fail_criterion": "Pre-registered. Refutes if one of the two classes has zero specimens and the other has at least 50, in a response that reports a total or that exhausts the matching records. Mixed if both classes are present but one is below 50 or is confined to a single genus. Inconclusive with reason underpowered if both classes are below 50. Inconclusive with reason data-unavailable if the specimen service cannot be retrieved or returns no caste and no life-stage field. Confidence is 0.8 when the pass rule is met or when one class is absent against at least 50 of the other, and 0.5 when the verdict is mixed or underpowered.",
+  "planned_datasets": [
+    "antweb-specimens-v3"
+  ],
+  "test_contract": {
+    "expected_observation": "The ant specimen record contains both winged individuals (alates or otherwise marked winged) and wingless individuals (workers, or specimens marked wingless, apterous, ergatoid, or dealate).",
+    "disconfirming_observation": "Every scored ant specimen falls in only one of those two classes, with at least 50 specimens in the class that is present.",
+    "admissible_datasets": "A public entomological specimen database that records caste or a life-stage statement for ants (Formicidae), independently of Aristotle's text. Occurrence points without a caste or wing statement do not count.",
+    "inference_method": "Class each specimen by the pre-registered text and caste rules. Compare the two class sizes with the thresholds of 50 specimens and 2 genera. The specimen total is the service's reported total when it provides one; genera are counted on up to 200 records of each class."
+  },
+  "interpretation": "Aristotle's point is that the group Ants falls under both Flying and Walking, because some ants fly and others do not. The test asks whether both forms occur among ants. It does not ask whether flight is a species-level character, and it does not treat every queen as flying.",
+  "caveats": [
+    "No AntWeb specimen response had been read when this file was committed. Worker is counted as non-flying because that is the wingless caste in the coding the pass criterion names; a worker record that also says alate would be classified by the flying rule first and would not be counted as non-flying."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-906a",
+    "date": "2026-11-01"
+  }
+}
