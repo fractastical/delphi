@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ga02-21",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga02-21",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If eels are neither male nor female, FishBase reproduction records for genus Anguilla will not describe separate sexes.",
+  "pass_criterion": "Pre-registered. Join FishBase v24.07 reproduc.csv to species.csv on SpecCode. Keep genus Anguilla, case-insensitive, rows whose ReproMode is non-blank. A species supports the claim only if every non-blank mode is in the supporting set: neither, none, no sex, undifferentiated, asexual, sexless. The claim is supported only if every Anguilla species with a non-blank mode is supporting, and at least one such species exists.",
+  "fail_criterion": "Pre-registered. Modes that refute 'neither male nor female': dioecism, dioecious, gonochorism, gonochoristic, protogyny, protandry, protogynous, protandrous, hermaphrodite, hermaphroditism, sequential hermaphrodite, simultaneous hermaphrodite, parthenogenesis, and any other mode containing 'dioec' or 'gonochor' or 'hermaphrod' or 'protogyn' or 'protandr' or 'parthenogen'. A species is refuting if any of its non-blank modes is refuting. The claim is refuted if every classified Anguilla species is refuting. If some species support and some refute, the verdict is mixed. Blank modes do not count. The stagnant-water mullet is not identified to a species in the claim and is not scored. If no Anguilla row has a non-blank ReproMode, or the files cannot be downloaded, the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "fishbase-v24.07-reproduc",
+    "fishbase-v24.07-species"
+  ],
+  "interpretation": "Aristotle's eel is the fish now placed in Anguilla; Anguilla anguilla is the European species he could have seen, and the whole genus is scored because the claim says eels. 'Neither male nor female' is refuted by dioecism and also by hermaphroditism, sequential sex change and parthenogenesis, because each of those is a sexual system with a sex, not the absence of sexes. The mullet of stagnant waters is left unscored rather than assigned a modern species after the fact.",
+  "test_contract": {
+    "expected_observation": "Every Anguilla species with a FishBase reproduction mode is coded as having no sex.",
+    "disconfirming_observation": "Anguilla species are coded as dioecious or as any other system in the refuting set.",
+    "admissible_datasets": "A public, versioned FishBase export with a reproduction-mode field and a species table that can be joined on the species code. The HTML species summary is not the dataset.",
+    "inference_method": "Species-level classification from non-blank ReproMode values using the fixed supporting and refuting sets. Genus verdict is unanimous support, unanimous refutation, or mixed. One blank table is data-unavailable."
+  },
+  "caveats": [
+    "The FishBase HTML reproduction summary for Anguilla anguilla was visible while confirming that a reproduction table exists. It is not used. Only reproduc.csv joined to species.csv is used. Headers of both files were read before registration; data rows were not.",
+    "FishBase modes are literature compilations, not a gonad survey run for this test."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "claim_id": "aristotle-ha06-39",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-39",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the bear cub is the smallest newborn relative to its mother among animals, then among mammals with both a neonate mass and an adult mass the brown bear Ursus arctos has a strictly smaller neonate/adult mass ratio than every other species, and that cub's mass lies between the adult mass of the house mouse and the adult mass of the least weasel.",
+  "pass_criterion": "Pre-registered. Primary dataset PanTHERIA WR05 (columns 5-1 adult body mass and 5-3 neonate body mass; missing code -999; EXT columns ignored). Keep species with both masses > 0 and neonate mass < adult mass. Pass only if Ursus arctos is present and its ratio is strictly smaller than every other species in that set. The absolute-size bracket also has to hold on the same file: Ursus arctos neonate mass > adult mass of Mus musculus and < adult mass of Mustela nivalis (if Mustela nivalis has no adult mass, Mustela erminea). Born-blind proxy, scored only if 2-1 AgeatEyeOpening_d is present for Ursus arctos: a value > 0 counts as eyes opening after birth. AnAge (birth weight and adult weight, Class Mammalia, same positivity filter) is a replication: if it also contains Ursus arctos and at least 30 qualifying species, it must agree that Ursus arctos is strictly smallest. Hair and unformed organs are not in either table and are not scored.",
+  "fail_criterion": "Pre-registered. The superlative is refuted if any other species in the PanTHERIA qualifying set has a strictly smaller ratio than Ursus arctos. A tie with any other species is not a pass (mixed: not uniquely smallest). If the superlative passes but the mouse/weasel bracket fails, the verdict is mixed. If the superlative passes and AgeatEyeOpening_d is 0, the verdict is mixed. If PanTHERIA and a qualifying AnAge replication disagree on whether any other species is smaller, the verdict is mixed. If Ursus arctos lacks either mass, or fewer than 30 PanTHERIA species qualify, the verdict is inconclusive with reason data-unavailable or underpowered. The placental-only ranking (dropping orders Didelphimorphia, Paucituberculata, Microbiotheria, Notoryctemorphia, Dasyuromorphia, Peramelemorphia, Diprotodontia, Monotremata, Marsupialia) is reported and does not change the verdict.",
+  "planned_datasets": [
+    "pantheria-wr05-2008",
+    "anage-hagr"
+  ],
+  "interpretation": "The claim's 'she-bear' is Ursus arctos, the bear of Aristotle's Mediterranean scope, and the claim record's scope is brown bear versus mammals generally, so every qualifying mammal counts, including marsupials and other bears. 'Smallest in proportion to the mother' is neonate mass divided by adult body mass. Adult mass is not sex-specific in these tables and is used as the maternal-mass proxy for every species alike. 'Larger than a mouse but smaller than a weasel' compares the cub's mass with adult Mus musculus and adult Mustela nivalis. 'Blind' is read only as eyes still shut at birth (age at eye opening > 0). Hairlessness and unformed organs are not in the tables.",
+  "test_contract": {
+    "expected_observation": "Ursus arctos has the unique minimum neonate/adult mass ratio among mammals with both masses, and its neonate mass sits between the adult masses of Mus musculus and Mustela nivalis.",
+    "disconfirming_observation": "Any other mammal species with both masses has a strictly smaller neonate/adult ratio, or the cub's mass falls outside the mouse-to-weasel interval.",
+    "admissible_datasets": "Published species-level mammal life-history tables with neonate mass and adult mass, measured independently of Aristotle, openly downloadable, missing values explicitly coded. Extinct-only estimate columns are not used. Non-mammals are outside the tables and are not imputed.",
+    "inference_method": "Ratio = neonate mass / adult mass on the filtered species set. The superlative passes only if the Ursus arctos ratio is strictly less than every other species. AnAge must agree when it has the bear and at least 30 species. Ties, bracket failure, eye-opening of 0, and replication disagreement are mixed. A pre-registered placental subset is descriptive only."
+  },
+  "caveats": [
+    "Before this registration, the PanTHERIA metadata (column names and the missing code -999) and the AnAge column list and licence page were read. No species-level mass was read. A column-sum printed in the PanTHERIA metadata for the WR93 file was not used.",
+    "Marsupials are in the primary set on purpose. Excluding them after seeing the ranking is not allowed.",
+    "Adult body mass is not female mass, so the ratio is not literally cub/mother.",
+    "Hair and anatomical incompleteness are untested."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  }
+}

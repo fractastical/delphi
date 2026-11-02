@@ -1,0 +1,34 @@
+{
+  "claim_id": "aristotle-ga04-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If women develop more slowly before birth and then reach puberty and old age sooner than men, girls are smaller at birth than boys, female maturity is earlier than male maturity, and female life expectancy is shorter than male life expectancy in most countries.",
+  "pass_criterion": "Pre-registered. All three scored clauses must support. (P) Size at birth: in the WHO weight-for-age z-score tables, birth to 13 weeks, the female median at week 0 is strictly less than the male median at week 0. This is size attained by birth, not gestational duration; duration is not scored. (U) Puberty: in AnAge, Homo sapiens female maturity in days is strictly less than male maturity in days. (O) Old age, read as the life course ending sooner: in the World Bank life expectancy at birth for a pre-set year, female expectancy is strictly less than male expectancy in at least 90 percent of countries that have both values. The year is the first of 2022, 2021, 2020, 2019 with at least 100 such countries. Aggregates with an empty ISO3 code are dropped. Prime of life is not scored.",
+  "fail_criterion": "Pre-registered. The claim is refuted only if every scored clause refutes: female birth median >= male; female maturity > male maturity; and female life expectancy exceeds male life expectancy in at least 90 percent of countries. If some scored clauses support and some refute, the verdict is mixed. If fewer than two clauses can be measured, the verdict is inconclusive with reason data-unavailable. A tie on maturity, or a life-expectancy share between 10 and 90 percent in either direction, makes that clause mixed and the whole verdict mixed unless another clause is unmeasured and only one remains.",
+  "planned_datasets": [
+    "who-wfa-0-13-weeks",
+    "anage-hagr",
+    "worldbank-life-expectancy-sex"
+  ],
+  "interpretation": "The claim is about humans. 'Develops more slowly in the womb' is scored only as size at the same postnatal age zero in a growth standard, which is a size proxy, not time in the womb. 'Puberty' is the AnAge female and male maturity ages for Homo sapiens. 'Old age' is scored as which sex dies sooner, using period life expectancy at birth. A reading on which old age means menopause rather than death is not tested, because no menopause table is in the plan. 'Prime of life' has no pre-registered marker and is not tested.",
+  "test_contract": {
+    "expected_observation": "Girls' median birth weight is below boys', women reach the maturity age in AnAge sooner than men, and women have shorter life expectancy than men in at least 90 percent of countries.",
+    "disconfirming_observation": "Girls are not smaller at birth, women mature later, or women live longer in at least 90 percent of countries. Disagreement among these three is a mixed claim, not a pass.",
+    "admissible_datasets": "Public human demographic or growth-standard tables with sex separated, downloadable without an account, independent of Aristotle. Life expectancy must be at birth and by sex. Countries, not regional aggregates, are the units for the old-age clause.",
+    "inference_method": "Three pre-registered comparisons. Birth: female median < male median at week 0. Maturity: female days < male days for the single Homo sapiens row. Old age: share of countries with female expectancy < male expectancy, threshold 0.90, year chosen by the fixed fallback list. The conjunction passes only if all three support and fails only if all three refute."
+  },
+  "caveats": [
+    "A WHO boys chart snippet showed a week-0 median of 3.3464 kg while the file URL was being checked. The girls table was not opened. Both medians used in the verdict are read by the script from the xlsx files.",
+    "Life expectancy is not the age at which senescence begins. The menopause reading is untested.",
+    "AnAge maturity is one curated point for the species, not a cohort this test sampled."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  }
+}

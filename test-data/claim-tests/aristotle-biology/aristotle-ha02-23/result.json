@@ -1,0 +1,32 @@
+{
+  "claim_id": "aristotle-ha02-23",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-23",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If no fish and no bird has kidneys or a urinary bladder, then a fish anatomy ontology that records adult structures will not contain a kidney or a urinary bladder, and a vertebrate renal ontology will not assert either organ in birds.",
+  "pass_criterion": "Pre-registered. A pass requires positive evidence of absence, not a missing string: the zebrafish anatomy file has no adult term whose name or synonym is exactly 'kidney' or exactly 'urinary bladder', AND the Uberon renal subset asserts absence (never_in_taxon, or an equivalent negative taxon axiom) of both kidney and urinary bladder for Aves. Swim bladder and gas bladder are not urinary bladders and never count.",
+  "fail_criterion": "Pre-registered. The universal is refuted if the zebrafish adult anatomy contains an exact term 'kidney' or 'urinary bladder', or if the Uberon renal subset positively asserts a kidney or a urinary bladder in Aves or Gallus. A missing term is not evidence of absence: if neither file positively shows an organ and neither positively asserts absence, the verdict is inconclusive with reason not-operationalizable. If the zebrafish file cannot be downloaded, the verdict is inconclusive with reason data-unavailable. Quadruped oviparous animals are outside the claim and are not scored.",
+  "planned_datasets": [
+    "zfin-zebrafish-anatomy",
+    "uberon-renal-minimal"
+  ],
+  "interpretation": "The claim is the anatomical universal in the claim record: fishes and birds lack kidneys and lack a urinary bladder. 'Is known to have' is read as a claim about the animals, not as a claim about what Aristotle's contemporaries had heard. One adult fish with a kidney is enough to refute that universal. The zebrafish anatomy ontology is a curated inventory of one fish, Danio rerio. Birds are scored only from taxon axioms in the Uberon renal subset, not from the mere existence of a general kidney class.",
+  "test_contract": {
+    "expected_observation": "No adult zebrafish anatomy term is exactly kidney or urinary bladder, and the renal ontology asserts that birds lack both.",
+    "disconfirming_observation": "An adult zebrafish term named kidney or urinary bladder, or a positive axiom that a bird has either organ.",
+    "admissible_datasets": "Public anatomical ontologies whose terms are structures of fishes or that carry taxon axioms for birds, licensed for reuse, independent of Aristotle's text. Swim-bladder terms are inadmissible as bladders. A term's absence is inadmissible as proof the organ is absent.",
+    "inference_method": "Exact name or synonym match, restricted to structures whose end stage is the adult stage (the stage named Adult, or else the stage with the greatest end hour). Any single positive presence refutes the universal. Positive taxon absence of both organs, with no positive presence, would support it. Otherwise the test cannot decide."
+  },
+  "caveats": [
+    "While checking URLs, the ZFIN page for the term kidney was visible, and a review abstract mentioning avian kidneys was returned by search. Neither is the dataset. The verdict uses the downloaded files only.",
+    "A single model species can refute a universal and cannot confirm one."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  }
+}
