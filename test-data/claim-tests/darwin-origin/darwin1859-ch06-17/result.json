@@ -2,7 +2,7 @@
   "claim_id": "darwin1859-ch06-17",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch06-17",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Within Mammalia, the fundamental structural agreement scored in a phenomic character matrix tracks an independently estimated genealogy more closely than it tracks habits of life: morphological distance among extant species correlates more strongly with phylogenetic distance than with ecological distance.",
   "pass_criterion": "Pre-registered. Using every extant species that is (i) a taxon in MorphoBank project 773 matrix X1766, (ii) placed as a tip on the Open Tree of Life synthetic tree, and (iii) matched to one EltonTraits 1.0 mammal row, compute pairwise morphological Hamming distance, phylogenetic distance, and ecological distance as specified in test_contract. Let r_p be the Spearman correlation of morphological distance with phylogenetic distance and r_e the Spearman correlation of morphological distance with ecological distance, both on the same complete-case pairs, and let delta = r_p - r_e. SUPPORTS if at least 20 taxa and at least 50 pairs enter the correlations, r_p >= 0.30, delta >= 0.15, and a one-sided permutation test of delta (4999 permutations, seed 20261101; p = (1 + number of permutations with delta >= observed delta) / 5000) gives p < 0.05.",
   "fail_criterion": "Pre-registered. REFUTES if at least 20 taxa and at least 50 pairs enter, r_e >= 0.30, (r_e - r_p) >= 0.15, and the same permutation test applied to (r_e - r_p) gives p < 0.05. MIXED if at least 20 taxa and at least 50 pairs enter and neither the support rule nor the refute rule holds. INCONCLUSIVE with reason data-unavailable if the MorphoBank NEXUS file, the EltonTraits file, or the Open Tree induced subtree cannot be obtained or parsed. INCONCLUSIVE with reason underpowered if those files are obtained but fewer than 20 taxa or fewer than 50 complete-case pairs remain.",
@@ -59,10 +59,12 @@
     "do_approximate_matching": false
   },
   "caveats": [
+    "Measured on 42 taxa and 861 pairs: r_phylogeny = 0.36054563207192003, r_ecology = 0.29250674969041357, delta = 0.06803888238150646, permutation p(delta) = 0.2326.",
     "What was inspected before registration, and nothing else: the MorphoBank public project JSON for project 773 (description states 4,541 phenomic characters; publish_cc0 is 0; article DOI 10.1126/science.1229237; project DOI 10.7934/P773); a ranged read of the NEXUS download that showed the file starts with #NEXUS, reports NTAX=86, and lists the first six TAXLABELS; and bytes 0-1200 of MamFuncDat.txt (Content-Range reports the file is 579107 bytes; the header names the ten Diet-* columns, ForStrat-Value, three Activity-* columns and BodyMass-Value, and six data rows were in that byte range). No character-by-taxon matrix was parsed, no distance was computed, and no correlation was calculated. The 0.30 and 0.15 thresholds were chosen as a moderate correlation and a clear gap, not from those rows.",
     "The phenomic matrix was assembled to study mammal phylogeny, so it is enriched for characters that vary among mammals in a hierarchical way. A correlation with an independent molecular tree is still the non-circular comparison the assessors asked for, but it is an easier test than a matrix assembled without phylogeny in view. The inclusion of adaptive characters works in the other direction.",
     "EltonTraits was not named by the assessors. It is used because the claim's contrast is with habits of life and the assessors named no habits table. Diet, foraging stratum and activity time are the habits columns in the file that was header-checked.",
-    "One class is not every class. Mammals that lack an EltonTraits row or an Open Tree tip are absent. The synthetic tree has no branch support, so the permutation tests sampling of labels, not uncertainty of the tree."
+    "One class is not every class. Mammals that lack an EltonTraits row or an Open Tree tip are absent. The synthetic tree has no branch support, so the permutation tests sampling of labels, not uncertainty of the tree.",
+    "Open Tree exact matches flagged extinct were dropped before the tree was built: Homo sapiens. A later non-extinct match for the same binomial was not substituted."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -70,5 +72,115 @@
     "model": "Grok 4.7",
     "run": "cursor/darwin-ch06-17-intro-04-8624",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.61,
+  "method": "The MorphoBank P773 matrix X1766 NEXUS (4541 characters, 86 taxa) and the EltonTraits mammal table were downloaded. Extant species were the matrix binomials that match an EltonTraits row, have an exact Open Tree name match not flagged extinct, and sit on the induced synthetic subtree (42 taxa, 861 complete-case pairs). Morphological distance is the Hamming fraction on characters scored in both taxa (at least 100 characters). Phylogenetic distance is the number of edges after unary nodes are collapsed. Ecological distance is Euclidean distance on diet proportions, a one-hot of ForStrat-Value, and the three activity columns. Spearman correlations and a 4999-permutation test of their difference follow the pre-registered thresholds.",
+  "measured": {
+    "value": 0.06803888238150646,
+    "unit": "Spearman r(morphology, phylogeny) minus Spearman r(morphology, ecology)",
+    "n": 42,
+    "uncertainty": "one-sided permutation p for delta = 0.2326",
+    "extra": {
+      "r_morph_phylogeny": 0.36054563207192003,
+      "r_morph_ecology": 0.29250674969041357,
+      "delta": 0.06803888238150646,
+      "p_delta_phylogeny_greater": 0.2326,
+      "p_ecology_gap": 0.7676,
+      "n_pairs": 861,
+      "n_matrix_taxa": 86,
+      "nchar": 4541,
+      "n_binomial_matched_to_elton": 44,
+      "n_opentree_not_extinct": 43,
+      "n_on_induced_tree": 42,
+      "extinct_flag_dropped": [
+        "Homo sapiens"
+      ],
+      "phylogenetic_distance": "edge_count",
+      "forstrat_codes": [
+        "A",
+        "Ar",
+        "G",
+        "M",
+        "S"
+      ],
+      "partial_spearman_morph_phylo_given_eco": 0.3543010060407719,
+      "partial_spearman_morph_eco_given_phylo": 0.28437346223136245,
+      "partials_not_used_for_verdict": true,
+      "synth_id": "opentree16.1",
+      "taxonomy_version": "3.7draft3",
+      "n_permutations": 4999,
+      "n_permutations_finite": 4999,
+      "seed": 20261101
+    }
+  },
+  "datasets": [
+    {
+      "id": "morphobank-p773-x1766",
+      "name": "MorphoBank project 773 matrix X1766, O'Leary et al. 2013 phenomic matrix of placental mammals",
+      "landing_url": "https://morphobank.org/index.php/Projects/ProjectOverview/project_id/773",
+      "doi": "10.1126/science.1229237",
+      "version": "matrix 1766, NEXUS generated on retrieval",
+      "license": "not CC0 (project record publish_cc0 = 0); public NEXUS download of the published project",
+      "files": [
+        {
+          "download_url": "https://www.morphobank.org/services/public/projects/773/matrices/1766/download?format=nexus&notes=0",
+          "retrieved_at": "2026-11-02T00:53:54Z",
+          "byte_size": 10385072,
+          "sha256": "4bc47e57b273f93a6695ec17b043fd8ee7a8cba523795af4e5436186787eadce"
+        }
+      ],
+      "role": "discrete phenomic characters used as the structural distances"
+    },
+    {
+      "id": "eltontraits-1-0-mammals",
+      "name": "EltonTraits 1.0 mammal foraging attributes (MamFuncDat.txt), Wilman et al. 2014",
+      "landing_url": "https://esapubs.org/archive/ecol/E095/178/default.php",
+      "doi": "10.1890/13-1917.1",
+      "version": "MamFuncDat.txt, Ecological Archives E095-178, last-modified 2014-06-17",
+      "license": "CC BY 4.0 (Figshare collection 10.6084/m9.figshare.c.3306933; file retrieved from the Ecological Archives copy)",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E095/178/MamFuncDat.txt",
+          "retrieved_at": "2026-11-02T00:53:55Z",
+          "byte_size": 579107,
+          "sha256": "51acbe6215b3c1f742463ff3fb37ef607150c052e0f7a9dc0d97fcaca61d3f76"
+        }
+      ],
+      "role": "diet, foraging stratum and activity time, the habits-of-life distance"
+    },
+    {
+      "id": "opentree-synthetic-tree-api",
+      "name": "Open Tree of Life synthetic tree via the v3 API (tnrs/match_names, tree_of_life/induced_subtree, tree_of_life/about)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "doi": null,
+      "version": "opentree16.1 / 3.7draft3",
+      "license": "CC0 for Open Tree synthesis products, as stated by the project; the licence deed was not re-fetched in this run",
+      "files": [
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+          "retrieved_at": "2026-11-02T00:56:05Z",
+          "byte_size": 611,
+          "sha256": "aa8103ee4fe56d946d224583eeccbcc1294fdb6bafbfb2f6ba2c44897c5b317c",
+          "request_body": "{}"
+        },
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+          "retrieved_at": "2026-11-02T00:56:05Z",
+          "byte_size": 41602,
+          "sha256": "5cf28e05905934b2241cffb806657d05e1dfec8fb3fe1c411ad26ae2a6551d8a",
+          "request_body": "{\"context_name\": \"Mammals\", \"do_approximate_matching\": false, \"names\": [\"Amblysomus hottentotus\", \"Bos taurus\", \"Canis lupus\", \"Caperea marginata\", \"Castor canadensis\", \"Cavia porcellus\", \"Cynocephalus volans\", \"Dasypus novemcinctus\", \"Didelphis virginiana\", \"Dromiciops gliroides\", \"Echinops telfairi\", \"Equus caballus\", \"Erinaceus europaeus\", \"Felis silvestris\", \"Hippopotamus amphibius\", \"Homo sapiens\", \"Lama glama\", \"Lemur catta\", \"Loxodonta africana\", \"Manis pentadactyla\", \"Myotis lucifugus\", \"Nycteris thebaica\", \"Ornithorhynchus anatinus\", \"Orycteropus afer\", \"Oryctolagus cuniculus\", \"Procavia capensis\", \"Pteronotus parnellii\", \"Pteropus giganteus\", \"Ptilocercus lowii\", \"Rattus norvegicus\", \"Rhinopoma hardwickii\", \"Rhynchocyon cirnei\", \"Saccopteryx bilineata\", \"Saimiri sciureus\", \"Solenodon paradoxus\", \"Sorex araneus\", \"Sus scrofa\", \"Tachyglossus aculeatus\", \"Talpa europaea\", \"Tamandua tetradactyla\", \"Tarsius syrichta\", \"Trichechus manatus\", \"Tupaia glis\", \"Tursiops truncatus\"]}"
+        },
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+          "retrieved_at": "2026-11-02T00:56:05Z",
+          "byte_size": 9843,
+          "sha256": "e3a26ecd3a0b41bc409abdbd9239e5672d89934cd4a0d115d6dc816f882d33b7",
+          "request_body": "{\"label_format\": \"name_and_id\", \"ott_ids\": [16038, 81758, 124230, 190912, 222351, 222362, 226178, 247341, 267981, 271555, 339031, 342715, 342726, 397243, 469465, 490099, 510762, 541936, 561087, 561114, 563163, 574727, 574736, 588290, 588292, 627114, 633213, 730013, 744000, 781510, 796660, 796672, 842875, 864596, 867405, 886085, 905267, 913930, 919171, 962377, 986973, 1014324, 1068218]}"
+        }
+      ],
+      "role": "independently estimated genealogy of the matched extant mammals"
+    }
+  ]
 }
