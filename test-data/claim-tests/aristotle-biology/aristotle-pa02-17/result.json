@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa02-17",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-17",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:25Z",
   "hypothesis": "If man has the largest brain in proportion to his size, the species-median brain-mass/body-mass ratio of Homo sapiens is strictly greater than that of every other vertebrate species in the compilation; and if the brain is larger in men than in women, mean adult male human brain mass exceeds mean adult female human brain mass.",
   "pass_criterion": "Pre-registered. Clause A (proportion to size), primary dataset the six Tsuboi et al. class workbooks pooled: for each species, the median of row-wise brain-mass/body-mass ratios among rows with brain mass > 0, body mass in (0.05 g, 2e8 g), and ratio < 0.5. Homo sapiens is identified by genus Homo and species sapiens (or a binomial equal to Homo sapiens), case-insensitive. When an age-class column exists and at least one row for that species is adult (the age text contains adult or mature, and does not contain juvenile, fetus, foetus, embryo, neonat, subadult, or young), only those adult rows enter that species' median; otherwise all valid rows do. Clause A passes only if at least 100 non-human species have a median and the human median is strictly greater than every one of them. Clause B (men larger than women): among adult Homo sapiens rows in the same workbooks with sex male versus female (a value containing female is female; a value containing male and not female is male; mixed, both, unknown, and blank are dropped), n >= 10 for each sex, male mean brain mass > female mean brain mass, (male mean - female mean) / female mean >= 0.05, and a two-sided Welch t-test p < 0.05. If Tsuboi does not supply 10 adults of each sex, the same numerical rule is applied to Burger et al. rows for Homo sapiens when that file has sex-specific human rows. The claim is supported only if both clauses pass.",
@@ -23,21 +23,59 @@
   ],
   "interpretation": "In proportion to his size is read as the arithmetic ratio of brain mass to body mass, not as an encephalization residual and not as absolute brain mass. The sex clause is read as absolute brain mass, because the quote says the brain is larger in men than in women and does not repeat in proportion for that contrast. Scope is vertebrates: in the same chapter Aristotle says bloodless animals have no brain except by analogy, so invertebrates are outside the comparison he is making. Rows are specimen or study observations as published; the species summary is a median so one study does not dominate.",
   "caveats": [
-    "File names, byte sizes, and MD5 checksums below were taken from the figshare and Dryad APIs before any workbook or CSV was downloaded. No brain or body mass value has been read.",
     "The Burger abstract states a mammal brain-body slope. That slope is not a measurement in this test and is not used.",
-    "The ecological-archives amniote life-history file was not part of this test. A HEAD request to https://esapubs.org/archive/ecol/E096/269/Amniote_Database_Aug_2015.csv on 2026-11-02T00:21:31Z returned HTTP 404."
+    "The ecological-archives amniote life-history file was not part of this test. A HEAD request to https://esapubs.org/archive/ecol/E096/269/Amniote_Database_Aug_2015.csv on 2026-11-02T00:21:31Z returned HTTP 404.",
+    "Species medians give equal weight to a species with one row and a species with many rows.",
+    "The ratio cut at 0.5 drops rows in which the recorded brain mass is at least half the body mass; those rows are treated as unit or entry errors.",
+    "Age class 'Young adult' contains the word young and is excluded from the adult pool by the pre-registered rule. 'Sub-adult' is treated as subadult.",
+    "Clause A uses the raw brain/body ratio. The allometric residual, which can rank Homo sapiens first, is stored and does not enter the verdict."
   ],
   "registered_files": {
     "tsuboi-2018-figshare-6803276": [
-      {"name": "Tsuboi_etal_NEE_amphibian.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384062", "byte_size": 89709, "md5": "542544a1b13e50d197b7a7fbc609ab06"},
-      {"name": "Tsuboi_etal_NEE_bird.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384068", "byte_size": 1126942, "md5": "b3d6fd8e0f4395b11b691e99e7e14628"},
-      {"name": "Tsuboi_etal_NEE_mammal.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384065", "byte_size": 373510, "md5": "ad4c91be6e79e8d1c3ff03f5ab946ae6"},
-      {"name": "Tsuboi_etal_NEE_reptile.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384071", "byte_size": 56289, "md5": "cbc361b0a39de5af885544e9921d96fb"},
-      {"name": "Tsuboi_etal_NEE_shark_ray.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384074", "byte_size": 86236, "md5": "fa1aabc4e3f72383fdfa17a950b82aa4"},
-      {"name": "Tsuboi_etal_NEE_teleost.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384077", "byte_size": 310372, "md5": "b45ba45ea145674c65e7cc67d308e457"}
+      {
+        "name": "Tsuboi_etal_NEE_amphibian.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384062",
+        "byte_size": 89709,
+        "md5": "542544a1b13e50d197b7a7fbc609ab06"
+      },
+      {
+        "name": "Tsuboi_etal_NEE_bird.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384068",
+        "byte_size": 1126942,
+        "md5": "b3d6fd8e0f4395b11b691e99e7e14628"
+      },
+      {
+        "name": "Tsuboi_etal_NEE_mammal.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384065",
+        "byte_size": 373510,
+        "md5": "ad4c91be6e79e8d1c3ff03f5ab946ae6"
+      },
+      {
+        "name": "Tsuboi_etal_NEE_reptile.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384071",
+        "byte_size": 56289,
+        "md5": "cbc361b0a39de5af885544e9921d96fb"
+      },
+      {
+        "name": "Tsuboi_etal_NEE_shark_ray.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384074",
+        "byte_size": 86236,
+        "md5": "fa1aabc4e3f72383fdfa17a950b82aa4"
+      },
+      {
+        "name": "Tsuboi_etal_NEE_teleost.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/12384077",
+        "byte_size": 310372,
+        "md5": "b45ba45ea145674c65e7cc67d308e457"
+      }
     ],
     "burger-2019-dryad-2r62k7s": [
-      {"name": "BrainAllometry_Supplement_Data.csv", "download_url": "https://datadryad.org/api/v2/files/94072/download", "byte_size": 203795, "md5": "3a68156bcdbc6531895c51fdaf2fb111"}
+      {
+        "name": "BrainAllometry_Supplement_Data.csv",
+        "download_url": "https://datadryad.org/api/v2/files/94072/download",
+        "byte_size": 203795,
+        "md5": "3a68156bcdbc6531895c51fdaf2fb111"
+      }
     ]
   },
   "created": "2026-11-01",
@@ -46,5 +84,176 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-e1fe",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "tsuboi-2018-figshare-6803276",
+      "name": "Brain mass and body mass datasets for amphibians, birds, mammals, reptiles, sharks and rays, and teleosts (Tsuboi et al.)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.6803276.v1",
+      "doi": "10.6084/m9.figshare.6803276.v1",
+      "version": "v1",
+      "license": "CC0",
+      "files": [
+        {
+          "name": "Tsuboi_etal_NEE_amphibian.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384062",
+          "retrieved_at": "2026-11-02T00:32:57Z",
+          "byte_size": 89709,
+          "md5": "542544a1b13e50d197b7a7fbc609ab06",
+          "sha256": "79a5540dad712fbbf9399a973a8cfb175967b081a40d8c52f45baffb566fe1ce"
+        },
+        {
+          "name": "Tsuboi_etal_NEE_bird.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384068",
+          "retrieved_at": "2026-11-02T00:32:58Z",
+          "byte_size": 1126942,
+          "md5": "b3d6fd8e0f4395b11b691e99e7e14628",
+          "sha256": "fa996676035be9f042699aafca23b06869d82ffb41e72d31341a2626320fbb21"
+        },
+        {
+          "name": "Tsuboi_etal_NEE_mammal.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384065",
+          "retrieved_at": "2026-11-02T00:32:59Z",
+          "byte_size": 373510,
+          "md5": "ad4c91be6e79e8d1c3ff03f5ab946ae6",
+          "sha256": "fda61dbdff684abd678713bcbaf0cfcdd9e26d99522ddacf55584fe36b90964c"
+        },
+        {
+          "name": "Tsuboi_etal_NEE_reptile.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384071",
+          "retrieved_at": "2026-11-02T00:32:59Z",
+          "byte_size": 56289,
+          "md5": "cbc361b0a39de5af885544e9921d96fb",
+          "sha256": "1f5e85648f916617461e019ea3b78c5e40d449ea4fe87d6e78a8d8d6a91e6f43"
+        },
+        {
+          "name": "Tsuboi_etal_NEE_shark_ray.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384074",
+          "retrieved_at": "2026-11-02T00:33:00Z",
+          "byte_size": 86236,
+          "md5": "fa1aabc4e3f72383fdfa17a950b82aa4",
+          "sha256": "587b834fe66d507bfca831ed83c9bb6381cb0922a595943ea31cc2d3a4e03d83"
+        },
+        {
+          "name": "Tsuboi_etal_NEE_teleost.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/12384077",
+          "retrieved_at": "2026-11-02T00:33:01Z",
+          "byte_size": 310372,
+          "md5": "b45ba45ea145674c65e7cc67d308e457",
+          "sha256": "53376eb85a61001fc4a95e49f4863353b866f6a785b7ef1e8f827b012eee8db4"
+        }
+      ],
+      "role": "brain mass, body mass, sex, and age class for vertebrate species"
+    }
+  ],
+  "method": "Downloaded the six Tsuboi class workbooks and checked each MD5 and byte size against the registration. For each species the median brain-mass/body-mass ratio was taken on adult rows when any adult row existed, otherwise on all rows with brain mass > 0, body mass between 0.05 g and 2e8 g, and ratio < 0.5. Homo sapiens was compared with every other species. Adult male and female human brain masses were compared with a Welch t-test. An allometric residual was computed and stored and was not used for the verdict. The Burger CSV was not retrieved.",
+  "measured": {
+    "value": 0.02075,
+    "unit": "species-median brain mass / body mass, Homo sapiens",
+    "n": 3079,
+    "uncertainty": "909 non-human species have a median ratio greater than or equal to the human median",
+    "extra": {
+      "clause_a_human_strictly_largest": false,
+      "clause_b_men_larger": true,
+      "n_nonhuman_species": 3078,
+      "n_at_or_above_human": 909,
+      "human": {
+        "median_ratio": 0.02075,
+        "n_rows": 43,
+        "adult_only": true,
+        "clade": "mammal"
+      },
+      "highest_nonhuman": [
+        {
+          "species": "euplectes macroura",
+          "median_ratio": 0.10588235294117647,
+          "n_rows": 1,
+          "adult_only": true,
+          "clade": "bird"
+        },
+        {
+          "species": "forpus cyanopygius",
+          "median_ratio": 0.09999999999999999,
+          "n_rows": 1,
+          "adult_only": true,
+          "clade": "bird"
+        },
+        {
+          "species": "neurotrichus gibbsii",
+          "median_ratio": 0.091,
+          "n_rows": 1,
+          "adult_only": true,
+          "clade": "mammal"
+        },
+        {
+          "species": "carassius carassius",
+          "median_ratio": 0.09003831417624521,
+          "n_rows": 1,
+          "adult_only": false,
+          "clade": "teleost"
+        },
+        {
+          "species": "sporophila minuta",
+          "median_ratio": 0.08090614886731393,
+          "n_rows": 1,
+          "adult_only": true,
+          "clade": "bird"
+        },
+        {
+          "species": "amandava amandava",
+          "median_ratio": 0.07761194029850746,
+          "n_rows": 3,
+          "adult_only": true,
+          "clade": "bird"
+        },
+        {
+          "species": "lonchura tristissima",
+          "median_ratio": 0.07761194029850746,
+          "n_rows": 3,
+          "adult_only": true,
+          "clade": "bird"
+        },
+        {
+          "species": "lonchura nana",
+          "median_ratio": 0.07758620689655173,
+          "n_rows": 1,
+          "adult_only": true,
+          "clade": "bird"
+        }
+      ],
+      "sex": {
+        "n_male": 30,
+        "n_female": 12,
+        "adult_pool": true,
+        "mean_male_g": 1351.1333333333334,
+        "mean_female_g": 1209.4166666666667,
+        "relative_excess": 0.1171777027492593,
+        "welch_p": 0.0002542865757396634
+      },
+      "encephalization_residual_not_used_for_verdict": {
+        "ols_slope": 0.7521253773658394,
+        "ols_intercept": -1.6015774378072956,
+        "human_residual": 1.1163527821366492,
+        "human_residual_rank": 1,
+        "n_species": 3079,
+        "used_for_verdict": false
+      }
+    }
+  },
+  "verdict": "mixed",
+  "data_kind": "biological",
+  "confidence": 0.6,
+  "results_summary": [
+    "Homo sapiens median brain/body ratio is 0.02075 across 43 rows (adult-only=True), compared with 3078 other vertebrate species.",
+    "909 non-human species have a median ratio at least as high as the human median. Clause A (largest in proportion to size) fails.",
+    "Adult human brain mass mean 1351 g (male, n=30) versus 1209 g (female, n=12), relative excess 0.1172, Welch p=0.0002543. Clause B passes.",
+    "Secondary, not used for the verdict: log-log OLS slope of brain on body is 0.7521; the human residual ranks 1 of 3079."
+  ],
+  "deviations": [
+    "The Burger et al. Dryad CSV was not retrieved. https://datadryad.org/api/v2/files/94072/download returned HTTP 401 (Unauthorized, must have current bearer token), and the public file-stream URL is behind an Anubis challenge that this client did not pass. The pre-registered rule treats a checksum failure of a received file as data-unavailable. No file was received, so there is no checksum to compare. The vertebrate test uses the Tsuboi workbooks, which were the primary dataset. The mammal replication and the Burger sex-clause fallback were not run.",
+    "amphibian: the gram columns are 'Brain weight (g)' and 'Body weight (g)'. They are read as mass in grams. Brain volume (mm3) is not converted. Thresholds are unchanged.",
+    "reptile: the gram columns are 'Brain weight (g)' and 'Body weight (g)'. They are read as mass in grams. Brain volume (mm3) is not converted. Thresholds are unchanged.",
+    "reptile: the combined name column is 'Genus_species', read as genus and species. Thresholds are unchanged.",
+    "teleost: the gram columns are 'Brain weight (g)' and 'Body weight (g)'. They are read as mass in grams. Brain volume (mm3) is not converted. Thresholds are unchanged."
+  ]
 }

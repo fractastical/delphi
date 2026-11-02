@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-29",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-29",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:25Z",
   "hypothesis": "If young honey-bee workers do the outside carrying and older workers stay on indoor work, the age at onset of foraging is in the first week of adult life.",
   "pass_criterion": "Pre-registered. From the Requier et al. individual life-history table, age at onset of foraging (the column whose header contains 'aof', or both 'onset' and 'forag'). Among workers with a finite positive value, let m be the median age in days. The task clause passes if at least 100 workers have a value and m <= 7. The hairiness clause passes only if the same table has a column whose header contains 'hair' or 'seta' and the young group is scored smoother than the old group by the column's own numeric direction, with the direction declared from the header before group means are compared: a higher value means more hair unless the header contains 'wear' or 'loss'. The claim is supported only if the task clause passes and the hairiness clause passes.",
@@ -21,8 +21,9 @@
   ],
   "interpretation": "Young bees do the outer carrying is read as the start of foraging in the first week after emergence. Elder bees do the indoor work is the complement: foraging is not the late-life task. Rough and hairy from staying indoors is a separate clause about hair, and this RFID table is not expected to contain it. The workers are Apis mellifera, which is the honey bee of the claim. One apiary and one year is the scope of the dataset; the verdict is about that measured cohort, not about every honey-bee population.",
   "caveats": [
-    "The figshare file name, size, and MD5 were read from the figshare API before the CSV was downloaded. No age has been read.",
-    "Age at onset of foraging is estimated by the authors' change-point method, not by a human labelling each trip as a forage. That is the measurement the file contains."
+    "Age at onset of foraging is estimated by the authors' change-point method, not by a human labelling each trip as a forage. That is the measurement the file contains.",
+    "One apiary, six cohorts in 2011. AOF is the authors' change-point estimate, not a direct observation that a trip carried food.",
+    "Workers that died without a recorded AOF are omitted from the median, which is the pre-registered population."
   ],
   "registered_files": {
     "requier-2020-figshare-12187398": [
@@ -40,5 +41,59 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-e1fe",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "requier-2020-figshare-12187398",
+      "name": "Data from: Measuring ontogenetic shifts in central-place foragers: a case study with honey bees",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.12187398.v2",
+      "doi": "10.6084/m9.figshare.12187398.v2",
+      "version": "v2",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "dataLHT_Requier et al.csv",
+          "download_url": "https://ndownloader.figshare.com/files/22408710",
+          "retrieved_at": "2026-11-02T00:32:57Z",
+          "byte_size": 171175,
+          "md5": "c8c0b59902fe69705df2a0521615d61c",
+          "sha256": "9f447f1b0cb83c8e69f03a02fa7e6a20bd937146fe7166c246d9e78419867402"
+        }
+      ],
+      "role": "age at onset of foraging for RFID-tagged honey-bee workers"
+    }
+  ],
+  "method": "Downloaded the Requier life-history CSV, checked MD5 and byte size, and read the AOF column (age at onset of foraging, described by the deposit as days). The median is among workers with a positive finite AOF. No hair or seta column is present, so the hairiness clause is unmeasured. AFE and LSP medians are reported and do not set the verdict.",
+  "measured": {
+    "value": 19.0,
+    "unit": "days, median age at onset of foraging",
+    "n": 451,
+    "uncertainty": null,
+    "extra": {
+      "fraction_aof_at_or_under_7_days": 0.011086474501108648,
+      "aof_column": "AOF",
+      "delimiter": ";",
+      "unit_note": null,
+      "hairiness_measured": false,
+      "other_columns_not_used_for_verdict": {
+        "AFE": {
+          "n": 0,
+          "median": null,
+          "used_for_verdict": false
+        },
+        "LSP": {
+          "n": 0,
+          "median": null,
+          "used_for_verdict": false
+        }
+      }
+    }
+  },
+  "verdict": "refutes",
+  "data_kind": "biological",
+  "confidence": 0.75,
+  "results_summary": [
+    "Workers with AOF: n=451. Median age at onset of foraging: 19.0 days. Share with AOF <= 7 days: 0.011086474501108648.",
+    "Hairiness is not in the file. The verdict follows the task-assignment clause only."
+  ]
 }

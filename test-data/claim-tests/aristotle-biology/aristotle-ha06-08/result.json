@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha06-08",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-08",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:25Z",
   "hypothesis": "If very few birds propagate within their first year, then the share of bird species with female age at maturity under 365 days is under one tenth.",
   "pass_criterion": "Pre-registered. From AnAge build 15, class Aves (the class field, lowercased, is aves or birds or bird), species with female maturity in days strictly greater than 0. Let p be the share of those species whose female maturity is strictly under 365 days. The claim is supported if p < 0.10 and the number of species is at least 80. Male maturity and unsexed maturity are reported and are not substituted for female maturity.",
@@ -22,8 +22,9 @@
   ],
   "interpretation": "Propagate within their first year is read as female age at sexual maturity under 365 days. AnAge records maturity, not the age of the first successful clutch in the wild; that mapping is stated here and is not changed if the proportion is high or low. The scope is birds generally, so the denominator is every AnAge bird with the field filled, not a subset of large birds.",
   "caveats": [
-    "The AnAge zip has not been downloaded in this session. The SHA-256 and byte size below are copied from the earlier organism record at test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json, which says the zip was retrieved on 2026-10-31T05:07:12Z. This test re-downloads the zip and checks that checksum. No maturity value has been read.",
-    "Age at maturity is an imperfect stand-in for age at first breeding. Captive and wild records are pooled as AnAge publishes them."
+    "Age at maturity is an imperfect stand-in for age at first breeding. Captive and wild records are pooled as AnAge publishes them.",
+    "AnAge female maturity mixes wild and captive records and is age at sexual maturity, not the age of the first wild clutch.",
+    "426 of 864 species are coded at exactly 365.0 days. The pre-registered cut is strictly under 365 days, so those species are not counted as breeding in the first year. The share at or under 365 days is 525/864 and is not used for the verdict."
   ],
   "registered_files": {
     "anage-build-15": [
@@ -42,5 +43,53 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-e1fe",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "anage-build-15",
+      "name": "AnAge: The Animal Ageing and Longevity Database, build 15",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "doi": "10.1093/nar/gks1155",
+      "version": "build 15",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:32:56Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        }
+      ],
+      "role": "female age at maturity for birds",
+      "prior_record": "test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json"
+    }
+  ],
+  "method": "Downloaded the AnAge build 15 zip, checked SHA-256 and byte size, and read anage_data.txt. Among rows with Class Aves and Female maturity (days) > 0, p is the share under 365 days. Male maturity and the earliest of the two sexes are reported and do not set the verdict.",
+  "measured": {
+    "value": 0.11458333333333333,
+    "unit": "share of bird species with female maturity under 365 days",
+    "n": 864,
+    "uncertainty": null,
+    "extra": {
+      "n_under_365": 99,
+      "n_exactly_365": 426,
+      "n_at_or_under_365": 525,
+      "share_at_or_under_365_not_used_for_verdict": 0.6076388888888888,
+      "median_female_maturity_days": 365.0,
+      "male_share_under_365": 0.05307262569832402,
+      "n_male": 716,
+      "earliest_sex_share_under_365": 0.11778290993071594,
+      "n_earliest": 866,
+      "secondary_not_used_for_verdict": true
+    }
+  },
+  "verdict": "mixed",
+  "data_kind": "biological",
+  "confidence": 0.5,
+  "results_summary": [
+    "AnAge birds with female maturity: n=864. Share under 365 days: 0.1146.",
+    "Median female maturity 365.0 days. Male share under 365 days 0.0531 (n=716), not used for the verdict.",
+    "426 of 864 species are coded at exactly 365.0 days. The share at or under 365 days is 525/864 and is not used for the verdict."
+  ]
 }

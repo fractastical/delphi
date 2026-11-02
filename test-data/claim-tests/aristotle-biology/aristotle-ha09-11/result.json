@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha09-11",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-11",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "preregistered_at": "2026-11-02T00:24:25Z",
   "hypothesis": "If every web-footed bird lives near the sea, a river, or a pool, then every species in the pre-registered fully web-footed families has at least one recorded habitat among wetland, riverine, coastal, and open sea.",
   "pass_criterion": "Pre-registered. Web-footed families, fixed before any habitat value is read, are the families whose feet are palmate, totipalmate, or lobate in standard avian anatomy: Anatidae, Podicipedidae, Gaviidae, Spheniscidae, Diomedeidae, Procellariidae, Hydrobatidae, Oceanitidae, Pelecanoididae, Pelecanidae, Sulidae, Phalacrocoracidae, Anhingidae, Fregatidae, Phaethontidae, Phoenicopteridae, Laridae, Stercorariidae, Alcidae. A species is in the set if any family field equals one of these names, case-insensitive, or begins with that name followed by a space or parenthesis. Water habitats are the BIRDBASE codes W (wetland), RV (riverine/riparian), C (coastal), and SE (open sea or pelagic), as defined in the data paper's habitat dictionary. A species with at least one recognized habitat code (F, BM, WD, SH, SV, G, PL, R, D, A, RV, C, W, SE, O) is an exception if none of its habitat codes is in {W, RV, C, SE}. Clause passes only if the number of species in the web-footed set with at least one habitat code is at least 200 and the number of exceptions is 0.",
@@ -22,9 +22,10 @@
   ],
   "interpretation": "Web-footed is read as fully webbed swimming feet (palmate, totipalmate, or lobate), which is the structure Aristotle contrasts with birds that do not resort to water. Near the sea, rivers, or pools is read as any recorded use of coastal, pelagic, riverine, or wetland habitat, not as a distance-to-water measurement, which this table does not contain. Families in which only some species are fully webbed are left out so that a terrestrial stilt cannot be counted as web-footed, and a webbed avocet cannot be counted as a counterexample, on the back of a family label.",
   "caveats": [
-    "The figshare file name, size, and MD5 were read from the figshare API before the workbook was downloaded. No species habitat value has been read.",
     "The family list is a morphological coding, not a measurement from this workbook. It can mis-assign a species if a taxonomy uses an unfamiliar family name; unmatched web-footed species would then be omitted rather than counted as exceptions.",
-    "Habitat codes come from the data dictionary in Şekercioğlu et al., Scientific Data (2025), doi:10.1038/s41597-025-05615-3, which was read as a code list and not as species rows."
+    "Habitat codes come from the data dictionary in \u015eekercio\u011flu et al., Scientific Data (2025), doi:10.1038/s41597-025-05615-3, which was read as a code list and not as species rows.",
+    "A positive rank means the compilers recorded that habitat, not that a GPS fix fell within a set distance of water.",
+    "Semipalmate families and Anhimidae and Anseranatidae stay outside the set, as registered, so they cannot create exceptions."
   ],
   "registered_files": {
     "birdbase-2025-figshare-27051040": [
@@ -42,5 +43,165 @@
     "model": "grok-4.7",
     "run": "cursor/aristotle-biology-claim-tests-e1fe",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "birdbase-2025-figshare-27051040",
+      "name": "BIRDBASE: avian biogeography, conservation, ecology and life history traits",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.27051040.v1",
+      "doi": "10.6084/m9.figshare.27051040.v1",
+      "version": "v2025.1",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx",
+          "download_url": "https://ndownloader.figshare.com/files/55634729",
+          "retrieved_at": "2026-11-02T00:32:57Z",
+          "byte_size": 6683628,
+          "md5": "36d53d59af1e449db1fc4c30062d9d1f",
+          "sha256": "cccb01fe229c7b39156639e001098b29880fa1c91d294c17cb74a4a76381276b"
+        }
+      ],
+      "role": "habitat ranks and family names for bird species"
+    }
+  ],
+  "method": "Downloaded the BIRDBASE workbook, checked MD5 and byte size, and read the Data sheet. A species entered the web-footed set when any of the four family columns matched the pre-registered list. It uses a habitat when that habitat column is a positive rank. An exception has at least one habitat rank and none of RV, C, W, or SE. The share whose rank-1 habitat is a water code is descriptive and does not set the verdict.",
+  "measured": {
+    "value": 0.0050933786078098476,
+    "unit": "share of web-footed species with no wetland, river, coast, or open-sea habitat",
+    "n": 589,
+    "uncertainty": null,
+    "extra": {
+      "n_exceptions": 3,
+      "primary_rank1_n": 589,
+      "primary_rank1_water_n": 569,
+      "primary_rank1_water_share": 0.966044142614601,
+      "by_family": {
+        "Anatidae": {
+          "n": 175,
+          "exceptions": 3
+        },
+        "Podicipedidae": {
+          "n": 24,
+          "exceptions": 0
+        },
+        "Phoenicopteridae": {
+          "n": 6,
+          "exceptions": 0
+        },
+        "Laridae": {
+          "n": 106,
+          "exceptions": 0
+        },
+        "Stercorariidae": {
+          "n": 7,
+          "exceptions": 0
+        },
+        "Alcidae": {
+          "n": 25,
+          "exceptions": 0
+        },
+        "Phaethontidae": {
+          "n": 3,
+          "exceptions": 0
+        },
+        "Gaviidae": {
+          "n": 5,
+          "exceptions": 0
+        },
+        "Spheniscidae": {
+          "n": 19,
+          "exceptions": 0
+        },
+        "Oceanitidae": {
+          "n": 10,
+          "exceptions": 0
+        },
+        "Diomedeidae": {
+          "n": 22,
+          "exceptions": 0
+        },
+        "Hydrobatidae": {
+          "n": 18,
+          "exceptions": 0
+        },
+        "Procellariidae": {
+          "n": 101,
+          "exceptions": 0
+        },
+        "Fregatidae": {
+          "n": 5,
+          "exceptions": 0
+        },
+        "Sulidae": {
+          "n": 11,
+          "exceptions": 0
+        },
+        "Anhingidae": {
+          "n": 4,
+          "exceptions": 0
+        },
+        "Phalacrocoracidae": {
+          "n": 40,
+          "exceptions": 0
+        },
+        "Pelecanidae": {
+          "n": 8,
+          "exceptions": 0
+        }
+      },
+      "exception_examples": [
+        {
+          "name": "Branta sandvicensis",
+          "families": [
+            "Anatidae",
+            "Anatidae",
+            "Anatidae",
+            "Anatidae"
+          ],
+          "habitats": [
+            "SH",
+            "G",
+            "R"
+          ]
+        },
+        {
+          "name": "Chloephaga picta",
+          "families": [
+            "Anatidae",
+            "Anatidae",
+            "Anatidae",
+            "Anatidae"
+          ],
+          "habitats": [
+            "G",
+            "A"
+          ]
+        },
+        {
+          "name": "Chenonetta finschi",
+          "families": [
+            "Anatidae",
+            "Anatidae"
+          ],
+          "habitats": [
+            "F",
+            "SH",
+            "G"
+          ]
+        }
+      ],
+      "n_exception_examples_truncated": 0
+    }
+  },
+  "verdict": "mixed",
+  "data_kind": "biological",
+  "confidence": 0.65,
+  "deviations": [
+    "Habitat codes are separate columns (F, BM, WD, SH, SV, G, PL, R, D, A, RV, C, W, SE, O) holding a numeric preference rank, not tokens packed into one cell. A species uses a habitat when that column is a positive number. The water set remains {W, RV, C, SE}. The header row is the second row of the Data sheet; the first row is a group label. Thresholds are unchanged."
+  ],
+  "results_summary": [
+    "Web-footed species with a habitat rank: n=589. Exceptions with no water habitat: 3. Rate: 0.0050933786078098476.",
+    "Among species with a rank of 1, 569 of 589 have a water code as that primary rank (descriptive)."
+  ]
 }
