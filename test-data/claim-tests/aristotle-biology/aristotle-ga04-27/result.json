@@ -1,0 +1,211 @@
+{
+  "claim_id": "aristotle-ga04-27",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-27",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If horses and their kin carry their young for a year, humans for at most ten months, and elephants for two years, the AnAge gestation values for Equus, Homo sapiens and the living elephants will fall in those intervals.",
+  "pass_criterion": "Pre-registered. A solar year is 365.25 days. The slack on a figure given in years is one mean Gregorian month, 365.25/12 = 30.4375 days, because the same sentence uses the month as its finer unit. A synodic month is 29.53059 days, used only for the human clause, which is stated in months. The horse clause passes if the median AnAge gestation of genus Equus lies in [334.8125, 395.6875] days. The human clause passes if the Homo sapiens value is at most ten synodic months, 295.3059 days, and at least eight, 236.2447 days, so that 'ten months at the outside' is an upper bound in the neighborhood of a long human pregnancy rather than any shorter number. The elephant clause passes if the median gestation of Loxodonta and Elephas lies in [700.0625, 760.9375] days. A single species is its own median. Supports only if all three clauses pass.",
+  "fail_criterion": "Pre-registered. A clause fails if its median lies outside the interval above. Refutes if every clause that has a value fails. Mixed if at least one clause passes and at least one fails. Inconclusive with reason data-unavailable if any clause has no numeric gestation and no clause fails. Confidence is 0.8 when all three clauses have a value and the verdict is supports or refutes, 0.7 when the verdict is mixed and all three have a value, and 0.45 when the verdict is inconclusive.",
+  "planned_datasets": [
+    "anage-gestation"
+  ],
+  "test_contract": {
+    "expected_observation": "Equus gestation is within one month of a year, human gestation is between eight and ten synodic months, and living-elephant gestation is within one month of two years.",
+    "disconfirming_observation": "The median gestation for one or more of those groups falls outside the interval fixed above.",
+    "admissible_datasets": "A public species-level life-history table that reports gestation length in days for Equus, Homo sapiens, Loxodonta and Elephas, compiled independently of Aristotle. A blank cell is a missing value, not a zero.",
+    "inference_method": "Read the gestation/incubation column, take the median within each group named above, and compare it with the pre-registered intervals. No interval is widened after the values are seen. Relative error may be reported beside the verdict and does not change it."
+  },
+  "interpretation": "Horses and their kin are genus Equus. Elephants are the living genera Loxodonta and Elephas. 'A year' and 'two years' are solar years, allowed to miss by one month. 'Ten months at the outside' is read as a lunar-month upper bound, which is the classical month, together with a floor of eight lunar months so a much shorter pregnancy cannot pass merely by being under the cap. The AnAge column is named gestation/incubation; for these therian genera the number is used as gestation length.",
+  "caveats": [
+    "The AnAge file had not been opened when this registration was committed. The windows are the stated round numbers plus or minus one month, not a tolerance chosen to match a textbook figure.",
+    "One compilation is the planned source. A second gestation table was not given a URL that had been checked to resolve, so it is not part of this registration.",
+    "The Equus clause is the median of 7 species (299.0 to 406.0 days). Species at the ends of that range fall outside the one-year window. The pre-registered rule uses the median and was not changed."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-906a",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.7,
+  "datasets": [
+    {
+      "id": "anage-gestation",
+      "name": "AnAge: The Animal Ageing and Longevity Database, species build",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "dataset.zip retrieved 2026-11-02",
+      "license": "HAGR license, free to use with attribution",
+      "files": [
+        {
+          "name": "dataset.zip",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:35:35Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630"
+        },
+        {
+          "name": "anage_data.txt",
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:35:35Z",
+          "byte_size": 786146,
+          "sha256": "98867969fbd4d0bed6bab415c2715bb19079dbd7f92bdc26e5961856aa1c1519"
+        }
+      ],
+      "role": "gestation length in days for Equus, Homo sapiens, Loxodonta and Elephas"
+    }
+  ],
+  "measured": {
+    "value": 2,
+    "unit": "clauses passing (Equus year, human ten months, elephant two years)",
+    "n": 10,
+    "uncertainty": null,
+    "extra": {
+      "column": "Gestation/Incubation (days)",
+      "clauses": {
+        "equus": {
+          "status": "pass",
+          "n": 7,
+          "median_days": 359.0,
+          "min_days": 299.0,
+          "max_days": 406.0,
+          "window": [
+            334.8125,
+            395.6875
+          ],
+          "signed_error_days": -6.25
+        },
+        "human": {
+          "status": "pass",
+          "n": 1,
+          "median_days": 280.0,
+          "min_days": 280.0,
+          "max_days": 280.0,
+          "window": [
+            236.24472,
+            295.3059
+          ],
+          "signed_error_days": 14.22469000000001
+        },
+        "elephant": {
+          "status": "fail",
+          "n": 2,
+          "median_days": 657.0,
+          "min_days": 644.0,
+          "max_days": 670.0,
+          "window": [
+            700.0625,
+            760.9375
+          ],
+          "signed_error_days": -73.5
+        }
+      },
+      "species": [
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "asinus",
+          "common_name": "African wild ass",
+          "gestation_days": 359.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "caballus",
+          "common_name": "Horse",
+          "gestation_days": 337.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "grevyi",
+          "common_name": "Grevy's zebra",
+          "gestation_days": 406.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "hemionus",
+          "common_name": "Kulan",
+          "gestation_days": 339.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "kiang",
+          "common_name": "Kiang",
+          "gestation_days": 299.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "quagga",
+          "common_name": "Quagga",
+          "gestation_days": 365.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "equus",
+          "genus": "Equus",
+          "species": "zebra",
+          "common_name": "Mountain zebra",
+          "gestation_days": 362.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "human",
+          "genus": "Homo",
+          "species": "sapiens",
+          "common_name": "Human",
+          "gestation_days": 280.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "elephant",
+          "genus": "Elephas",
+          "species": "maximus",
+          "common_name": "Asiatic elephant",
+          "gestation_days": 644.0,
+          "column": "Gestation/Incubation (days)"
+        },
+        {
+          "group": "elephant",
+          "genus": "Loxodonta",
+          "species": "africana",
+          "common_name": "African bush elephant",
+          "gestation_days": 670.0,
+          "column": "Gestation/Incubation (days)"
+        }
+      ],
+      "windows_days": {
+        "equus": [
+          334.8125,
+          395.6875
+        ],
+        "human": [
+          236.24472,
+          295.3059
+        ],
+        "elephant": [
+          700.0625,
+          760.9375
+        ]
+      }
+    }
+  },
+  "method": "Downloaded the AnAge species zip and read column 'Gestation/Incubation (days)'. Equus species, Homo sapiens, and Loxodonta plus Elephas were kept. The median of the positive numeric values in each group was compared with the interval committed in pass_criterion. A blank cell was treated as missing. The verdict follows the pre-registered conjunction: all three clauses must pass to support.",
+  "results_summary": [
+    "equus: pass, median 359.0 days, n 7",
+    "human: pass, median 280.0 days, n 1",
+    "elephant: fail, median 657.0 days, n 2",
+    "Verdict mixed, clauses passing 2 of 3."
+  ]
+}

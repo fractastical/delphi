@@ -1,0 +1,88 @@
+{
+  "claim_id": "aristotle-ha06-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-18",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "hypothesis": "If every cetacean gives birth to live young and none lays eggs, the WoRMS mode-of-reproduction trait for accepted extant cetacean species will be viviparous throughout, including both dolphins and whales.",
+  "pass_criterion": "Pre-registered. Supports if at least 15 accepted extant species placed in Cetacea have a WoRMS 'Modes of reproduction' value, every such value is viviparous, none is oviparous or ovoviviparous, and the species with a value include at least one in Delphinidae and at least one in a whale family (Balaenidae, Balaenopteridae, Eschrichtiidae, Neobalaenidae, Physeteridae, Kogiidae, Ziphiidae, or Monodontidae). A value counts as viviparous only when its text matches viviparous or live-bearing and does not match oviparous or ovoviviparous. Oviparous matches egg-laying or oviparous and does not match ovoviviparous.",
+  "fail_criterion": "Pre-registered. Refutes if any accepted extant cetacean species is recorded as oviparous or egg-laying. Mixed if the recorded modes include ovoviviparous, or any other mode that is neither viviparous nor oviparous, and none is oviparous. Inconclusive with reason underpowered if fewer than 15 species carry the trait, none is oviparous, and Cetacea itself has no taxon-wide viviparous attribute. A taxon-wide viviparous attribute on Cetacea, with no species recorded as oviparous, supports at confidence 0.5 when species coverage is below 15. Inconclusive with reason data-unavailable if the WoRMS checklist or the attribute service cannot be retrieved, or if the attribute name is absent from the service. Confidence is 0.85 when the species-level pass rule is met or when a species is oviparous, and 0.6 when the verdict is mixed.",
+  "planned_datasets": [
+    "worms-cetacea-modes-of-reproduction"
+  ],
+  "test_contract": {
+    "expected_observation": "Accepted extant cetacean species, dolphins and whales included, are coded viviparous, meaning they produce live young rather than laying eggs.",
+    "disconfirming_observation": "At least one accepted extant cetacean species is coded as egg-laying or oviparous.",
+    "admissible_datasets": "A public taxonomic checklist of Cetacea with a reproductive-mode field filled from marine-species trait records, not from Aristotle's text. Fossil and extinct taxa are out of scope. A group-level annotation is admissible only as the weak case named in the fail criterion.",
+    "inference_method": "Enumerate accepted extant species under Cetacea, read the Modes of reproduction attribute, and apply the string classes and thresholds in the pass and fail criteria. No species is inferred to be viviparous merely because it is classified as a mammal."
+  },
+  "interpretation": "Cetaceans are the animals Aristotle groups as having a blow-hole instead of gills: dolphins, whales and the rest of that group. The claim tested is that they are viviparous and carry an embryo rather than eggs. Viviparous is not relaxed to ovoviviparous. The blow-hole is treated as his definition of the group, not as a second measurement.",
+  "caveats": [
+    "No reproductive-mode table had been downloaded when this file was committed. Thresholds come from the claim (all of them are viviparous; an egg-layer would refute it) and from a coverage floor of 15 species so that a handful of records cannot settle a universal.",
+    "The checklist walk returned 94 accepted species and 0 reproduction-mode records. An empty trait is a property of this source, not an inference that the species lays eggs or gives birth."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "Grok 4.7",
+    "run": "cursor/aristotle-biology-claims-906a",
+    "date": "2026-11-01"
+  },
+  "data_kind": "biological",
+  "verdict": "inconclusive",
+  "confidence": 0.8,
+  "reason": "underpowered",
+  "datasets": [
+    {
+      "id": "worms-cetacea-modes-of-reproduction",
+      "name": "World Register of Marine Species, Cetacea checklist and Marine Species Traits attributes",
+      "landing_url": "https://www.marinespecies.org/aphia.php?p=taxdetails&id=2688",
+      "doi": null,
+      "version": "live REST, retrieved 2026-11-02",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "AphiaChildrenByAphiaID pages under Cetacea, concatenated in path order",
+          "download_url": "https://www.marinespecies.org/rest/AphiaChildrenByAphiaID/2688?marine_only=false&offset=1",
+          "retrieved_at": "2026-11-02T00:28:12Z",
+          "byte_size": 1020049,
+          "sha256": "6c5b83e5b82548222f7f394b02ec8e76485393dd552f94da6b3b2b36b126a049"
+        },
+        {
+          "name": "AphiaAttributesByAphiaID for Cetacea and each accepted species, concatenated in AphiaID order",
+          "download_url": "https://www.marinespecies.org/rest/AphiaAttributesByAphiaID/2688",
+          "retrieved_at": "2026-11-02T00:28:12Z",
+          "byte_size": 956824,
+          "sha256": "b769fb5661686b5aebdf07ad6014738efbfb9c704b2956d6b6b32a7be4a8e9ec"
+        }
+      ],
+      "role": "accepted cetacean species and the Modes of reproduction trait where WoRMS has recorded it"
+    }
+  ],
+  "measured": {
+    "value": 0,
+    "unit": "accepted extant cetacean species with a WoRMS mode of reproduction",
+    "n": 94,
+    "uncertainty": null,
+    "extra": {
+      "accepted_extant_species": 94,
+      "species_with_mode": 0,
+      "viviparous_species": 0,
+      "oviparous_species": 0,
+      "ovoviviparous_species": 0,
+      "other_mode_species": 0,
+      "families_with_a_mode": [],
+      "delphinidae_coded": false,
+      "whale_family_coded": false,
+      "cetacea_group_modes": [],
+      "attribute_errors": [],
+      "coded_species": []
+    }
+  },
+  "method": "Accepted children of Cetacea (AphiaID 2688) were walked through the WoRMS REST service. Unaccepted names and records with isExtinct = 1 were dropped. For Cetacea itself and for every accepted species reached, AphiaAttributesByAphiaID was read and measurement type 'Modes of reproduction' was classified as viviparous, oviparous, ovoviviparous or other by the pre-registered string rules. Being a mammal was not counted as viviparity. The pass and fail thresholds in this file were then applied.",
+  "results_summary": [
+    "Accepted species reached: 94. Species with a mode of reproduction: 0.",
+    "Among coded species, viviparous 0, oviparous 0, ovoviviparous 0, other 0.",
+    "Cetacea group-level modes: none. Attribute errors: 0.",
+    "Verdict inconclusive (underpowered) at confidence 0.8."
+  ]
+}
