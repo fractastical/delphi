@@ -1,0 +1,35 @@
+{
+  "claim_id": "aristotle-ha05-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha05-03",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "hypothesis": "If the claim holds, every shark and dogfish species that has been scored for specialized sex organs has two claspers in the male and none in the female.",
+  "pass_criterion": "Pre-registered (supports). Using FishBase v25.04 morphdat.SexualAttributes joined to species and families: restrict to class Elasmobranchii, excluding batoid orders (order scientific name matching rajiformes|myliobatiformes|torpediniformes|rhinopristiformes|rhinobatiformes|pristiformes|platyrhiniformes, or order common name matching rays, skates, guitarfish, sawfish, or torpedo). A species is scored if at least one morphdat row has non-empty SexualAttributes. A row is a male-clasper code if the lowercased value contains 'clasper' and a male marker ('(m)' or the word male) and does not match 'one clasper', 'single clasper', or 'unpaired clasper'. A row is disconfirming if it matches those unpaired phrases, or contains 'clasper' together with a female marker ('(f)' or 'female') and no male marker, or is non-empty and contains neither 'clasper' nor an explicit statement that the character was not examined. A species passes if it has at least one male-clasper row and no disconfirming row; otherwise, if it is scored, it fails. Supports only if the number of scored shark species is at least 30 and the pass rate is at least 0.95.",
+  "fail_criterion": "Pre-registered (refutes). The pass rate among scored shark species is below 0.80, or at least three scored species are disconfirming because claspers are coded for females, coded as unpaired, or the specialized-organ field is filled without claspers. If the pass rate is at least 0.80 and below 0.95, the verdict is mixed (the quote's 'in some species' can hold while the claim's 'all species' does not). If no row contains the token clasper, the verdict is inconclusive with reason data-unavailable. If the token occurs but fewer than 30 shark species are scored, the verdict is inconclusive with reason underpowered.",
+  "planned_datasets": [
+    "fishbase-v25.04-morphdat",
+    "fishbase-v25.04-species",
+    "fishbase-v25.04-families",
+    "fishbase-v25.04-orders",
+    "fishbase-v25.04-classes"
+  ],
+  "test_contract": {
+    "expected_observation": "In scored sharks and dogfish, the specialized sex-organ field records claspers as a male character, which is FishBase's name for the paired appendages by the vent, and does not record them for females.",
+    "disconfirming_observation": "A substantial share of scored shark or dogfish species lack a male-clasper code, or any species is coded with claspers in females or with a single unpaired clasper.",
+    "admissible_datasets": "A public species-level compilation of chondrichthyan external anatomy, assembled independently of Aristotle's text, that scores specialized sex organs for both sexes and can be restricted to sharks rather than rays. Family and order tables are used only to apply that scope.",
+    "inference_method": "Species-level pass rate on the pre-registered male-clasper code, among Elasmobranchii excluding batoids, with thresholds 0.95 (supports), below 0.80 (refutes), and the interval between them mixed. Unscored species are excluded from the rate, not counted as failures. Holocephalans are reported and not included in the rate."
+  },
+  "interpretation": "The quote says cartilaginous fishes 'in some species' show this male character; the claim sentence extends it to all sharks and dogfish. Both readings are scored by the same pass rate: at least 0.95 supports both, 0.80 to 0.95 is mixed, below 0.80 refutes the universal claim. 'Two appendages hanging down near the vent' is mapped to FishBase SexualAttributes values containing claspers marked male. The database does not count the appendages; the plural organ name is accepted unless the text says one, single, or unpaired. Rays are outside the claim's 'sharks and dogfish' and are excluded. Dogfish are sharks in this table and are not separated. This does not test whether the appendages are intromittent organs, only whether the sex difference is recorded.",
+  "caveats": [
+    "Before this registration, only parquet column names were read (footer schema of FishBase v25.04 morphdat, species, families, orders, and classes). No SexualAttributes values and no species counts were read.",
+    "A web-search snippet of the FishBase morphology page for Raja clavata, a ray, displayed 'Specialized organs: claspers (m)'. That one rendered page identified the field. It is not a shark and is not part of the measured sample.",
+    "Blank SexualAttributes is treated as unscored. A filled value that never mentions claspers is treated as a scored absence, which can refute the universal claim if it is common."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-claim-tests-ec43",
+    "date": "2026-11-01"
+  }
+}
