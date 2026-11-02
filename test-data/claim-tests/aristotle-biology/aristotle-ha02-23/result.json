@@ -1,0 +1,127 @@
+{
+  "claim_id": "aristotle-ha02-23",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-23",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If no fish and no bird has kidneys or a urinary bladder, then a fish anatomy ontology that records adult structures will not contain a kidney or a urinary bladder, and a vertebrate renal ontology will not assert either organ in birds.",
+  "pass_criterion": "Pre-registered. A pass requires positive evidence of absence, not a missing string: the zebrafish anatomy file has no adult term whose name or synonym is exactly 'kidney' or exactly 'urinary bladder', AND the Uberon renal subset asserts absence (never_in_taxon, or an equivalent negative taxon axiom) of both kidney and urinary bladder for Aves. Swim bladder and gas bladder are not urinary bladders and never count.",
+  "fail_criterion": "Pre-registered. The universal is refuted if the zebrafish adult anatomy contains an exact term 'kidney' or 'urinary bladder', or if the Uberon renal subset positively asserts a kidney or a urinary bladder in Aves or Gallus. A missing term is not evidence of absence: if neither file positively shows an organ and neither positively asserts absence, the verdict is inconclusive with reason not-operationalizable. If the zebrafish file cannot be downloaded, the verdict is inconclusive with reason data-unavailable. Quadruped oviparous animals are outside the claim and are not scored.",
+  "planned_datasets": [
+    "zfin-zebrafish-anatomy",
+    "uberon-renal-minimal"
+  ],
+  "interpretation": "The claim is the anatomical universal in the claim record: fishes and birds lack kidneys and lack a urinary bladder. 'Is known to have' is read as a claim about the animals, not as a claim about what Aristotle's contemporaries had heard. One adult fish with a kidney is enough to refute that universal. The zebrafish anatomy ontology is a curated inventory of one fish, Danio rerio. Birds are scored only from taxon axioms in the Uberon renal subset, not from the mere existence of a general kidney class.",
+  "test_contract": {
+    "expected_observation": "No adult zebrafish anatomy term is exactly kidney or urinary bladder, and the renal ontology asserts that birds lack both.",
+    "disconfirming_observation": "An adult zebrafish term named kidney or urinary bladder, or a positive axiom that a bird has either organ.",
+    "admissible_datasets": "Public anatomical ontologies whose terms are structures of fishes or that carry taxon axioms for birds, licensed for reuse, independent of Aristotle's text. Swim-bladder terms are inadmissible as bladders. A term's absence is inadmissible as proof the organ is absent.",
+    "inference_method": "Exact name or synonym match, restricted to structures whose end stage is the adult stage (the stage named Adult, or else the stage with the greatest end hour). Any single positive presence refutes the universal. Positive taxon absence of both organs, with no positive presence, would support it. Otherwise the test cannot decide."
+  },
+  "caveats": [
+    "While checking URLs, the ZFIN page for the term kidney was visible, and a review abstract mentioning avian kidneys was returned by search. Neither is the dataset. The verdict uses the downloaded files only.",
+    "A single model species can refute a universal and cannot confirm one."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.84,
+  "data_kind": "biological",
+  "method": "Counted exact adult zebrafish terms named kidney or urinary bladder, ignoring the swim bladder, and read Uberon renal-minimal taxon axioms for Aves or Gallus. Any positive presence refutes the universal. Support would require positive absence axioms for both organs and no fish term. A missing string is not absence.",
+  "datasets": [
+    {
+      "id": "zfin-zebrafish-anatomy",
+      "name": "ZFIN zebrafish anatomy terms, synonyms and stages",
+      "landing_url": "https://zfin.org/downloads",
+      "doi": null,
+      "version": "live download",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://zfin.org/downloads/anatomy_item.txt",
+          "retrieved_at": "2026-11-02T00:40:56Z",
+          "byte_size": 226263,
+          "sha256": "b5d296611d1b28992f6ff7a576da45c598611de98d308bd8cbddb5ccd49de7f1",
+          "name": "anatomy_item.txt"
+        },
+        {
+          "download_url": "https://zfin.org/downloads/anatomy_synonyms.txt",
+          "retrieved_at": "2026-11-02T00:40:57Z",
+          "byte_size": 160562,
+          "sha256": "bde4adf702730ab7c928a539d558d69949805bc2024a5e7de23d090fb886a75d",
+          "name": "anatomy_synonyms.txt"
+        },
+        {
+          "download_url": "https://zfin.org/downloads/stage_ontology.txt",
+          "retrieved_at": "2026-11-02T00:40:57Z",
+          "byte_size": 2766,
+          "sha256": "5be4ad7a51ee159098497a22c17819d04a19025c22078f0161f87c9aa557299c",
+          "name": "stage_ontology.txt"
+        }
+      ],
+      "role": "adult kidney and urinary bladder terms in Danio rerio"
+    },
+    {
+      "id": "uberon-renal-minimal",
+      "name": "Uberon renal-minimal subset",
+      "landing_url": "https://obophenotype.github.io/uberon/current_release/",
+      "doi": null,
+      "version": "current purl subset",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "http://purl.obolibrary.org/obo/uberon/subsets/renal-minimal.obo",
+          "retrieved_at": "2026-11-02T00:40:57Z",
+          "byte_size": 482883,
+          "sha256": "cf22255b87059b3775f2a3eea9c782b45b38a4702eb487b3b3fbe8550540d929",
+          "name": "renal-minimal.obo"
+        }
+      ],
+      "role": "taxon axioms for kidney and urinary bladder in birds"
+    }
+  ],
+  "measured": {
+    "value": 1,
+    "unit": "positive kidney or urinary-bladder records in fish or birds",
+    "n": 3113,
+    "uncertainty": "exact term match plus taxon axioms",
+    "extra": {
+      "adult_stage_id": "ZDB-STAGE-010723-39",
+      "adult_stage_name": "Adult",
+      "fish_adult_hits": [
+        {
+          "id": "ZFA:0000529",
+          "name": "kidney",
+          "end": "ZDB-STAGE-010723-39",
+          "matched": [
+            "kidney"
+          ],
+          "adult": true
+        }
+      ],
+      "fish_other_hits": [],
+      "bird": {
+        "present": [],
+        "absent": [],
+        "notes": [
+          {
+            "organ": "urinary bladder",
+            "relation": "never in taxon",
+            "target": "NCBITaxon:8782",
+            "comment": "",
+            "scored": false,
+            "why": "the taxon id is not named Aves or Gallus in this file"
+          }
+        ]
+      }
+    }
+  },
+  "results_summary": [
+    "fish adult hits 1; bird present []; bird absent []."
+  ]
+}

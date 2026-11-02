@@ -1,0 +1,134 @@
+{
+  "claim_id": "aristotle-ga04-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga04-22",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If women develop more slowly before birth and then reach puberty and old age sooner than men, girls are smaller at birth than boys, female maturity is earlier than male maturity, and female life expectancy is shorter than male life expectancy in most countries.",
+  "pass_criterion": "Pre-registered. All three scored clauses must support. (P) Size at birth: in the WHO weight-for-age z-score tables, birth to 13 weeks, the female median at week 0 is strictly less than the male median at week 0. This is size attained by birth, not gestational duration; duration is not scored. (U) Puberty: in AnAge, Homo sapiens female maturity in days is strictly less than male maturity in days. (O) Old age, read as the life course ending sooner: in the World Bank life expectancy at birth for a pre-set year, female expectancy is strictly less than male expectancy in at least 90 percent of countries that have both values. The year is the first of 2022, 2021, 2020, 2019 with at least 100 such countries. Aggregates with an empty ISO3 code are dropped. Prime of life is not scored.",
+  "fail_criterion": "Pre-registered. The claim is refuted only if every scored clause refutes: female birth median >= male; female maturity > male maturity; and female life expectancy exceeds male life expectancy in at least 90 percent of countries. If some scored clauses support and some refute, the verdict is mixed. If fewer than two clauses can be measured, the verdict is inconclusive with reason data-unavailable. A tie on maturity, or a life-expectancy share between 10 and 90 percent in either direction, makes that clause mixed and the whole verdict mixed unless another clause is unmeasured and only one remains.",
+  "planned_datasets": [
+    "who-wfa-0-13-weeks",
+    "anage-hagr",
+    "worldbank-life-expectancy-sex"
+  ],
+  "interpretation": "The claim is about humans. 'Develops more slowly in the womb' is scored only as size at the same postnatal age zero in a growth standard, which is a size proxy, not time in the womb. 'Puberty' is the AnAge female and male maturity ages for Homo sapiens. 'Old age' is scored as which sex dies sooner, using period life expectancy at birth. A reading on which old age means menopause rather than death is not tested, because no menopause table is in the plan. 'Prime of life' has no pre-registered marker and is not tested.",
+  "test_contract": {
+    "expected_observation": "Girls' median birth weight is below boys', women reach the maturity age in AnAge sooner than men, and women have shorter life expectancy than men in at least 90 percent of countries.",
+    "disconfirming_observation": "Girls are not smaller at birth, women mature later, or women live longer in at least 90 percent of countries. Disagreement among these three is a mixed claim, not a pass.",
+    "admissible_datasets": "Public human demographic or growth-standard tables with sex separated, downloadable without an account, independent of Aristotle. Life expectancy must be at birth and by sex. Countries, not regional aggregates, are the units for the old-age clause.",
+    "inference_method": "Three pre-registered comparisons. Birth: female median < male median at week 0. Maturity: female days < male days for the single Homo sapiens row. Old age: share of countries with female expectancy < male expectancy, threshold 0.90, year chosen by the fixed fallback list. The conjunction passes only if all three support and fails only if all three refute."
+  },
+  "caveats": [
+    "A WHO boys chart snippet showed a week-0 median of 3.3464 kg while the file URL was being checked. The girls table was not opened. Both medians used in the verdict are read by the script from the xlsx files.",
+    "Life expectancy is not the age at which senescence begins. The menopause reading is untested.",
+    "AnAge maturity is one curated point for the species, not a cohort this test sampled."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  },
+  "verdict": "mixed",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "method": "Read WHO weight-for-age week-0 LMS medians for girls and boys, AnAge female and male maturity for Homo sapiens, and World Bank male and female life expectancy at birth for the first of 2022–2019 with at least 100 countries. The conjunction is supported only if all three clauses support and refuted only if all three refute. Prime of life and gestational duration were not scored.",
+  "datasets": [
+    {
+      "id": "who-wfa-0-13-weeks",
+      "name": "WHO Child Growth Standards weight-for-age, birth to 13 weeks",
+      "landing_url": "https://www.who.int/tools/child-growth-standards/standards/weight-for-age",
+      "doi": null,
+      "version": "z-score tables",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://cdn.who.int/media/docs/default-source/child-growth/child-growth-standards/indicators/weight-for-age/wfa_boys_0-to-13-weeks_zscores.xlsx?sfvrsn=6e3a980f_7",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 10912,
+          "sha256": "eac5c0eebccdacec6e8b4c09e58823f1bb065c1fe7dc647f82c5f7ec3391024e",
+          "name": "wfa_boys_0-to-13-weeks_zscores.xlsx"
+        },
+        {
+          "download_url": "https://cdn.who.int/media/docs/default-source/child-growth/child-growth-standards/indicators/weight-for-age/wfa_girls_0-to-13-weeks_zscores.xlsx?sfvrsn=c4f4ba9f_7",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 10927,
+          "sha256": "df731cbdfe797d4ebd9d626ae19c16eec639f04137ae52aec4c00347b78186ed",
+          "name": "wfa_girls_0-to-13-weeks_zscores.xlsx"
+        }
+      ],
+      "role": "sex-specific median weight at week 0"
+    },
+    {
+      "id": "anage-hagr",
+      "name": "AnAge Homo sapiens maturity ages",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "anage_data.txt",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+          "name": "dataset.zip"
+        }
+      ],
+      "role": "female and male maturity in days"
+    },
+    {
+      "id": "worldbank-life-expectancy-sex",
+      "name": "World Bank life expectancy at birth by sex",
+      "landing_url": "https://data.worldbank.org/indicator/SP.DYN.LE00.FE.IN",
+      "doi": null,
+      "version": "2022",
+      "license": null,
+      "files": [
+        {
+          "download_url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.FE.IN?date=2022&format=json&per_page=20000",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 61266,
+          "sha256": "85af43137ff150a5a176bf4ee1b22ddf16c63bf359fb63ece44df89df2e7acb4",
+          "name": "SP.DYN.LE00.FE.IN-2022.json"
+        },
+        {
+          "download_url": "https://api.worldbank.org/v2/country/all/indicator/SP.DYN.LE00.MA.IN?date=2022&format=json&per_page=20000",
+          "retrieved_at": "2026-11-02T00:36:15Z",
+          "byte_size": 60735,
+          "sha256": "9d3d1e5b3c41adbe07f10c4437b0e74bf5e7c913cec6529774a58dc832645891",
+          "name": "SP.DYN.LE00.MA.IN-2022.json"
+        }
+      ],
+      "role": "female and male period life expectancy at birth"
+    }
+  ],
+  "measured": {
+    "value": 4.979,
+    "unit": "median female minus male life expectancy at birth, years",
+    "n": 261,
+    "uncertainty": "World Bank point estimates; median of country gaps",
+    "extra": {
+      "size_clause": "supports",
+      "girl_birth_median_kg": 3.2322,
+      "boy_birth_median_kg": 3.3464,
+      "median_column": {
+        "girls": "m",
+        "boys": "m"
+      },
+      "puberty_clause": "mixed",
+      "female_maturity_days": 4745.0,
+      "male_maturity_days": 4745.0,
+      "old_age_clause": "refutes",
+      "year": "2022",
+      "countries_female_le_shorter": 0,
+      "countries_female_le_longer": 261,
+      "countries_tie": 0
+    }
+  },
+  "results_summary": [
+    "size supports; puberty mixed; old age refutes; year 2022; countries 261."
+  ]
+}

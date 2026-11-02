@@ -1,0 +1,529 @@
+{
+  "claim_id": "aristotle-ha06-39",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-39",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the bear cub is the smallest newborn relative to its mother among animals, then among mammals with both a neonate mass and an adult mass the brown bear Ursus arctos has a strictly smaller neonate/adult mass ratio than every other species, and that cub's mass lies between the adult mass of the house mouse and the adult mass of the least weasel.",
+  "pass_criterion": "Pre-registered. Primary dataset PanTHERIA WR05 (columns 5-1 adult body mass and 5-3 neonate body mass; missing code -999; EXT columns ignored). Keep species with both masses > 0 and neonate mass < adult mass. Pass only if Ursus arctos is present and its ratio is strictly smaller than every other species in that set. The absolute-size bracket also has to hold on the same file: Ursus arctos neonate mass > adult mass of Mus musculus and < adult mass of Mustela nivalis (if Mustela nivalis has no adult mass, Mustela erminea). Born-blind proxy, scored only if 2-1 AgeatEyeOpening_d is present for Ursus arctos: a value > 0 counts as eyes opening after birth. AnAge (birth weight and adult weight, Class Mammalia, same positivity filter) is a replication: if it also contains Ursus arctos and at least 30 qualifying species, it must agree that Ursus arctos is strictly smallest. Hair and unformed organs are not in either table and are not scored.",
+  "fail_criterion": "Pre-registered. The superlative is refuted if any other species in the PanTHERIA qualifying set has a strictly smaller ratio than Ursus arctos. A tie with any other species is not a pass (mixed: not uniquely smallest). If the superlative passes but the mouse/weasel bracket fails, the verdict is mixed. If the superlative passes and AgeatEyeOpening_d is 0, the verdict is mixed. If PanTHERIA and a qualifying AnAge replication disagree on whether any other species is smaller, the verdict is mixed. If Ursus arctos lacks either mass, or fewer than 30 PanTHERIA species qualify, the verdict is inconclusive with reason data-unavailable or underpowered. The placental-only ranking (dropping orders Didelphimorphia, Paucituberculata, Microbiotheria, Notoryctemorphia, Dasyuromorphia, Peramelemorphia, Diprotodontia, Monotremata, Marsupialia) is reported and does not change the verdict.",
+  "planned_datasets": [
+    "pantheria-wr05-2008",
+    "anage-hagr"
+  ],
+  "interpretation": "The claim's 'she-bear' is Ursus arctos, the bear of Aristotle's Mediterranean scope, and the claim record's scope is brown bear versus mammals generally, so every qualifying mammal counts, including marsupials and other bears. 'Smallest in proportion to the mother' is neonate mass divided by adult body mass. Adult mass is not sex-specific in these tables and is used as the maternal-mass proxy for every species alike. 'Larger than a mouse but smaller than a weasel' compares the cub's mass with adult Mus musculus and adult Mustela nivalis. 'Blind' is read only as eyes still shut at birth (age at eye opening > 0). Hairlessness and unformed organs are not in the tables.",
+  "test_contract": {
+    "expected_observation": "Ursus arctos has the unique minimum neonate/adult mass ratio among mammals with both masses, and its neonate mass sits between the adult masses of Mus musculus and Mustela nivalis.",
+    "disconfirming_observation": "Any other mammal species with both masses has a strictly smaller neonate/adult ratio, or the cub's mass falls outside the mouse-to-weasel interval.",
+    "admissible_datasets": "Published species-level mammal life-history tables with neonate mass and adult mass, measured independently of Aristotle, openly downloadable, missing values explicitly coded. Extinct-only estimate columns are not used. Non-mammals are outside the tables and are not imputed.",
+    "inference_method": "Ratio = neonate mass / adult mass on the filtered species set. The superlative passes only if the Ursus arctos ratio is strictly less than every other species. AnAge must agree when it has the bear and at least 30 species. Ties, bracket failure, eye-opening of 0, and replication disagreement are mixed. A pre-registered placental subset is descriptive only."
+  },
+  "caveats": [
+    "Before this registration, the PanTHERIA metadata (column names and the missing code -999) and the AnAge column list and licence page were read. No species-level mass was read. A column-sum printed in the PanTHERIA metadata for the WR93 file was not used.",
+    "Marsupials are in the primary set on purpose. Excluding them after seeing the ranking is not allowed.",
+    "Adult body mass is not female mass, so the ratio is not literally cub/mother.",
+    "Hair and anatomical incompleteness are untested."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "data_kind": "biological",
+  "method": "Downloaded PanTHERIA WR05 and the AnAge zip, dropped non-positive masses and neonate masses at least as large as adult mass, and ranked neonate/adult ratios. The verdict follows the pre-registered rule: a strictly smaller non-bear refutes, a tie or a failed size bracket or eyes open at birth or a disagreeing AnAge replication is mixed, and a unique minimum with the side clauses holding or untested supports. The placental subset is stored and does not vote.",
+  "datasets": [
+    {
+      "id": "pantheria-wr05-2008",
+      "name": "PanTHERIA 1.0 WR05 species-level mammal life-history table",
+      "landing_url": "https://esapubs.org/archive/ecol/E090/184/",
+      "doi": "10.1890/08-1494.1",
+      "version": "1.0_WR05_Aug2008",
+      "license": "No copyright restriction stated in the Ecological Archives metadata; citation requested",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+          "retrieved_at": "2026-11-02T00:36:13Z",
+          "byte_size": 2359096,
+          "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a",
+          "name": "PanTHERIA_1-0_WR05_Aug2008.txt"
+        }
+      ],
+      "role": "neonate mass, adult mass and age at eye opening"
+    },
+    {
+      "id": "anage-hagr",
+      "name": "AnAge build, birth weight and adult weight",
+      "landing_url": "https://genomics.senescence.info/species/index.html",
+      "doi": null,
+      "version": "anage_data.txt",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://genomics.senescence.info/species/dataset.zip",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 169150,
+          "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+          "name": "dataset.zip"
+        }
+      ],
+      "role": "replication of neonate/adult ratios, and adult masses for mouse and weasel if PanTHERIA lacks them"
+    }
+  ],
+  "measured": {
+    "value": 0.002547,
+    "unit": "neonate mass / adult mass, Ursus arctos, PanTHERIA",
+    "n": 1069,
+    "uncertainty": "ratio of published point masses; adult mass is not sex-specific",
+    "extra": {
+      "pantheria": {
+        "label": "pantheria",
+        "status": "refutes",
+        "n": 1069,
+        "rank": 56,
+        "bear": {
+          "binomial": "Ursus arctos",
+          "ratio": 0.002547233012800102,
+          "neonate_g": 499.99,
+          "adult_g": 196287.5,
+          "eye": 31.82
+        },
+        "n_smaller": 55,
+        "smaller": [
+          {
+            "binomial": "Sarcophilus harrisii",
+            "order": "Dasyuromorphia",
+            "ratio": 2e-06
+          },
+          {
+            "binomial": "Dasyurus geoffroii",
+            "order": "Dasyuromorphia",
+            "ratio": 9e-06
+          },
+          {
+            "binomial": "Dasyurus viverrinus",
+            "order": "Dasyuromorphia",
+            "ratio": 9e-06
+          },
+          {
+            "binomial": "Lasiorhinus latifrons",
+            "order": "Diprotodontia",
+            "ratio": 1.9e-05
+          },
+          {
+            "binomial": "Vombatus ursinus",
+            "order": "Diprotodontia",
+            "ratio": 1.9e-05
+          },
+          {
+            "binomial": "Macropus rufus",
+            "order": "Diprotodontia",
+            "ratio": 2.1e-05
+          },
+          {
+            "binomial": "Macropus giganteus",
+            "order": "Diprotodontia",
+            "ratio": 2.5e-05
+          },
+          {
+            "binomial": "Macropus antilopinus",
+            "order": "Diprotodontia",
+            "ratio": 2.6e-05
+          },
+          {
+            "binomial": "Macropus robustus",
+            "order": "Diprotodontia",
+            "ratio": 2.7e-05
+          },
+          {
+            "binomial": "Macropus rufogriseus",
+            "order": "Diprotodontia",
+            "ratio": 3.1e-05
+          },
+          {
+            "binomial": "Macropus fuliginosus",
+            "order": "Diprotodontia",
+            "ratio": 3.4e-05
+          },
+          {
+            "binomial": "Wallabia bicolor",
+            "order": "Diprotodontia",
+            "ratio": 4e-05
+          },
+          {
+            "binomial": "Macropus agilis",
+            "order": "Diprotodontia",
+            "ratio": 5.3e-05
+          },
+          {
+            "binomial": "Phascolarctos cinereus",
+            "order": "Diprotodontia",
+            "ratio": 5.5e-05
+          },
+          {
+            "binomial": "Petrogale xanthopus",
+            "order": "Diprotodontia",
+            "ratio": 5.6e-05
+          }
+        ],
+        "tied": [],
+        "smallest": [
+          {
+            "binomial": "Sarcophilus harrisii",
+            "order": "Dasyuromorphia",
+            "ratio": 2e-06,
+            "neonate_g": 0.02,
+            "adult_g": 8202.25
+          },
+          {
+            "binomial": "Dasyurus geoffroii",
+            "order": "Dasyuromorphia",
+            "ratio": 9e-06,
+            "neonate_g": 0.01,
+            "adult_g": 1106.62
+          },
+          {
+            "binomial": "Dasyurus viverrinus",
+            "order": "Dasyuromorphia",
+            "ratio": 9e-06,
+            "neonate_g": 0.01,
+            "adult_g": 1101.49
+          },
+          {
+            "binomial": "Lasiorhinus latifrons",
+            "order": "Diprotodontia",
+            "ratio": 1.9e-05,
+            "neonate_g": 0.49,
+            "adult_g": 26163.8
+          },
+          {
+            "binomial": "Vombatus ursinus",
+            "order": "Diprotodontia",
+            "ratio": 1.9e-05,
+            "neonate_g": 0.49,
+            "adult_g": 26000.0
+          },
+          {
+            "binomial": "Macropus rufus",
+            "order": "Diprotodontia",
+            "ratio": 2.1e-05,
+            "neonate_g": 0.81,
+            "adult_g": 38968.39
+          },
+          {
+            "binomial": "Macropus giganteus",
+            "order": "Diprotodontia",
+            "ratio": 2.5e-05,
+            "neonate_g": 0.84,
+            "adult_g": 33409.89
+          },
+          {
+            "binomial": "Macropus antilopinus",
+            "order": "Diprotodontia",
+            "ratio": 2.6e-05,
+            "neonate_g": 0.7,
+            "adult_g": 27250.1
+          },
+          {
+            "binomial": "Macropus robustus",
+            "order": "Diprotodontia",
+            "ratio": 2.7e-05,
+            "neonate_g": 0.7,
+            "adult_g": 25978.92
+          },
+          {
+            "binomial": "Macropus rufogriseus",
+            "order": "Diprotodontia",
+            "ratio": 3.1e-05,
+            "neonate_g": 0.53,
+            "adult_g": 16850.0
+          },
+          {
+            "binomial": "Macropus fuliginosus",
+            "order": "Diprotodontia",
+            "ratio": 3.4e-05,
+            "neonate_g": 0.86,
+            "adult_g": 25564.7
+          },
+          {
+            "binomial": "Wallabia bicolor",
+            "order": "Diprotodontia",
+            "ratio": 4e-05,
+            "neonate_g": 0.6,
+            "adult_g": 14999.95
+          }
+        ],
+        "placental": {
+          "status": "refutes",
+          "n": 1016,
+          "n_smaller": 2,
+          "smallest": [
+            {
+              "binomial": "Ailuropoda melanoleuca",
+              "ratio": 0.000885
+            },
+            {
+              "binomial": "Ursus maritimus",
+              "ratio": 0.001804
+            },
+            {
+              "binomial": "Ursus arctos",
+              "ratio": 0.002547
+            },
+            {
+              "binomial": "Tremarctos ornatus",
+              "ratio": 0.002598
+            },
+            {
+              "binomial": "Ursus americanus",
+              "ratio": 0.002661
+            },
+            {
+              "binomial": "Priodontes maximus",
+              "ratio": 0.00278
+            },
+            {
+              "binomial": "Mustela eversmanii",
+              "ratio": 0.002963
+            },
+            {
+              "binomial": "Ursus thibetanus",
+              "ratio": 0.003585
+            }
+          ]
+        }
+      },
+      "anage": {
+        "label": "anage",
+        "status": "refutes",
+        "n": 851,
+        "rank": 56,
+        "bear": {
+          "binomial": "Ursus arctos",
+          "ratio": 0.0018378378378378379,
+          "neonate_g": 510.0,
+          "adult_g": 277500.0,
+          "eye": null
+        },
+        "n_smaller": 55,
+        "smaller": [
+          {
+            "binomial": "Sarcophilus harrisii",
+            "order": "Dasyuromorphia",
+            "ratio": 4e-06
+          },
+          {
+            "binomial": "Dasyurus geoffroii",
+            "order": "Dasyuromorphia",
+            "ratio": 1.2e-05
+          },
+          {
+            "binomial": "Macropus antilopinus",
+            "order": "Diprotodontia",
+            "ratio": 1.4e-05
+          },
+          {
+            "binomial": "Macropus rufus",
+            "order": "Diprotodontia",
+            "ratio": 1.4e-05
+          },
+          {
+            "binomial": "Macropus giganteus",
+            "order": "Diprotodontia",
+            "ratio": 1.8e-05
+          },
+          {
+            "binomial": "Dasyurus viverrinus",
+            "order": "Dasyuromorphia",
+            "ratio": 1.8e-05
+          },
+          {
+            "binomial": "Lasiorhinus latifrons",
+            "order": "Diprotodontia",
+            "ratio": 2e-05
+          },
+          {
+            "binomial": "Vombatus ursinus",
+            "order": "Diprotodontia",
+            "ratio": 2e-05
+          },
+          {
+            "binomial": "Macropus robustus",
+            "order": "Diprotodontia",
+            "ratio": 2.3e-05
+          },
+          {
+            "binomial": "Macropus fuliginosus",
+            "order": "Diprotodontia",
+            "ratio": 3.3e-05
+          },
+          {
+            "binomial": "Macropus rufogriseus",
+            "order": "Diprotodontia",
+            "ratio": 3.7e-05
+          },
+          {
+            "binomial": "Phascolarctos cinereus",
+            "order": "Diprotodontia",
+            "ratio": 3.9e-05
+          },
+          {
+            "binomial": "Macropus agilis",
+            "order": "Diprotodontia",
+            "ratio": 4e-05
+          },
+          {
+            "binomial": "Wallabia bicolor",
+            "order": "Diprotodontia",
+            "ratio": 4.2e-05
+          },
+          {
+            "binomial": "Didelphis virginiana",
+            "order": "Didelphimorphia",
+            "ratio": 4.9e-05
+          }
+        ],
+        "tied": [],
+        "smallest": [
+          {
+            "binomial": "Sarcophilus harrisii",
+            "order": "Dasyuromorphia",
+            "ratio": 4e-06,
+            "neonate_g": 0.0235,
+            "adult_g": 6500.0
+          },
+          {
+            "binomial": "Dasyurus geoffroii",
+            "order": "Dasyuromorphia",
+            "ratio": 1.2e-05,
+            "neonate_g": 0.011,
+            "adult_g": 890.0
+          },
+          {
+            "binomial": "Macropus antilopinus",
+            "order": "Diprotodontia",
+            "ratio": 1.4e-05,
+            "neonate_g": 0.703,
+            "adult_g": 49500.0
+          },
+          {
+            "binomial": "Macropus rufus",
+            "order": "Diprotodontia",
+            "ratio": 1.4e-05,
+            "neonate_g": 0.784,
+            "adult_g": 55000.0
+          },
+          {
+            "binomial": "Macropus giganteus",
+            "order": "Diprotodontia",
+            "ratio": 1.8e-05,
+            "neonate_g": 0.89867,
+            "adult_g": 49500.0
+          },
+          {
+            "binomial": "Dasyurus viverrinus",
+            "order": "Dasyuromorphia",
+            "ratio": 1.8e-05,
+            "neonate_g": 0.02,
+            "adult_g": 1090.0
+          },
+          {
+            "binomial": "Lasiorhinus latifrons",
+            "order": "Diprotodontia",
+            "ratio": 2e-05,
+            "neonate_g": 0.5,
+            "adult_g": 25500.0
+          },
+          {
+            "binomial": "Vombatus ursinus",
+            "order": "Diprotodontia",
+            "ratio": 2e-05,
+            "neonate_g": 0.5,
+            "adult_g": 25500.0
+          },
+          {
+            "binomial": "Macropus robustus",
+            "order": "Diprotodontia",
+            "ratio": 2.3e-05,
+            "neonate_g": 0.703,
+            "adult_g": 30000.0
+          },
+          {
+            "binomial": "Macropus fuliginosus",
+            "order": "Diprotodontia",
+            "ratio": 3.3e-05,
+            "neonate_g": 0.93433,
+            "adult_g": 28250.0
+          },
+          {
+            "binomial": "Macropus rufogriseus",
+            "order": "Diprotodontia",
+            "ratio": 3.7e-05,
+            "neonate_g": 0.598,
+            "adult_g": 16200.0
+          },
+          {
+            "binomial": "Phascolarctos cinereus",
+            "order": "Diprotodontia",
+            "ratio": 3.9e-05,
+            "neonate_g": 0.36,
+            "adult_g": 9300.0
+          }
+        ],
+        "placental": {
+          "status": "refutes",
+          "n": 798,
+          "n_smaller": 3,
+          "smallest": [
+            {
+              "binomial": "Ailuropoda melanoleuca",
+              "ratio": 0.000936
+            },
+            {
+              "binomial": "Ursus maritimus",
+              "ratio": 0.0014
+            },
+            {
+              "binomial": "Ursus americanus",
+              "ratio": 0.001799
+            },
+            {
+              "binomial": "Ursus arctos",
+              "ratio": 0.001838
+            },
+            {
+              "binomial": "Priodontes maximus",
+              "ratio": 0.001883
+            },
+            {
+              "binomial": "Tremarctos ornatus",
+              "ratio": 0.002929
+            },
+            {
+              "binomial": "Petaurista leucogenys",
+              "ratio": 0.00303
+            },
+            {
+              "binomial": "Melursus ursinus",
+              "ratio": 0.004
+            }
+          ]
+        }
+      },
+      "anage_used_in_verdict": true,
+      "bracket": "refutes",
+      "weasel_species": "Mustela nivalis",
+      "mouse_adult_g": 19.3,
+      "weasel_adult_g": 78.45,
+      "eye_opening_days": 31.82,
+      "eye_clause": "supports",
+      "anage_inner_file": "anage_data.txt"
+    }
+  },
+  "results_summary": [
+    "At least one other mammal in PanTHERIA has a strictly smaller neonate/adult ratio than Ursus arctos."
+  ]
+}

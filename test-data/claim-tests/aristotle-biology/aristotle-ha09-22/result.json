@@ -1,0 +1,111 @@
+{
+  "claim_id": "aristotle-ha09-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-22",
+  "project": "aristotle-biology",
+  "status": "complete",
+  "preregistered_at": "2026-11-02T00:30:00Z",
+  "hypothesis": "If the octopus matches the colour of adjacent stones when hunting and when alarmed, a quantitative camouflage study of Octopus will report a positive association between the animal's body pattern and nearby objects, stronger than a match to the wide background, in those contexts.",
+  "pass_criterion": "Pre-registered. From the Results section of Josef et al. 2012, PLOS ONE 10.1371/journal.pone.0037579, the script extracts sentences that contain a correlation or a distance comparison and a p-value. A nearby sentence (adjacent, nearby, local, immediate, nearest, or specific object) supports the match if it reports r > 0, or R^2 > 0, with p < 0.05, or a distance/dissimilarity to nearby objects that is lower than to the wider background with p < 0.05. The match clause passes if at least one such nearby statistic supports and none of the nearby statistics contradict it (r <= 0 or p >= 0.05 for a nearby correlation). Hunting and alarm are scored only if the Results text names both a prey/foraging condition and an alarm/threat condition; otherwise those contexts are untested and do not block a pass of the match clause. Figures are not measured.",
+  "fail_criterion": "Pre-registered. The match clause is refuted if every extracted nearby correlation has r <= 0 or p >= 0.05, or the text reports a significantly closer match to the wide background than to nearby objects. If the Results HTML contains no parseable nearby correlation or distance comparison, the verdict is inconclusive with reason data-unavailable. The script must not have a number typed in by hand. If the match clause passes and the two contexts were actually tested and only one matches, the verdict is mixed.",
+  "planned_datasets": [
+    "josef-2012-plosone-0037579"
+  ],
+  "interpretation": "Aristotle's octopus is read as Octopus, with Octopus vulgaris the Mediterranean species. The planned study photographs camouflaged O. vulgaris and O. cyanea and compares body pattern with nearby objects and with the wider field. That is background matching while the animal is still. It is not a separate hunting trial and not a separate alarm trial unless the Results text says so. Colour, texture and pattern are not separated if the paper's statistic is a pattern correlation. The statistic has to be extracted from the file.",
+  "test_contract": {
+    "expected_observation": "A reported correlation of octopus body pattern with nearby objects is positive and significant, or the distance to nearby objects is significantly smaller than the distance to the wide background.",
+    "disconfirming_observation": "Nearby correlations are absent, non-positive, or not significant, or the animal matches the wide field better than nearby objects.",
+    "admissible_datasets": "The publisher HTML of a public peer-reviewed study that measured octopus pattern against adjacent substrate, CC BY, with the numbers in the text. Images are not re-analysed. Occurrence databases without pattern measurements are not admissible.",
+    "inference_method": "Regex extraction of r, R^2 and p-values from Results sentences classified as nearby or wide by the pre-registered word lists. Thresholds are r > 0 and p < 0.05, or a stated lower nearby distance at p < 0.05. No hand-entered statistic. Unparseable Results yield data-unavailable."
+  },
+  "caveats": [
+    "The paper's topic, species and methods headings were visible while confirming the URL. Result statistics were not read before registration.",
+    "A still camouflaged animal is not automatically either hunting or alarmed. Those contexts stay untested unless the Results name them."
+  ],
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-tests-305c",
+    "date": "2026-11-01"
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.75,
+  "data_kind": "none",
+  "method": "Downloaded the PLOS ONE HTML for Josef et al. 2012 and extracted Results sentences. A nearby sentence supports the match only if it reports r > 0, or a positive R^2, at p < 0.05, or a lower distance to nearby objects at p < 0.05. No statistic was typed in by hand. Hunting and alarm were scored only as whether both words appear. Figures were not measured.",
+  "datasets": [
+    {
+      "id": "josef-2012-plosone-0037579",
+      "name": "Josef et al. 2012, Camouflaging in a complex environment",
+      "landing_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0037579",
+      "doi": "10.1371/journal.pone.0037579",
+      "version": "PLOS ONE 7(5): e37579",
+      "license": "CC BY",
+      "files": [
+        {
+          "download_url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0037579",
+          "retrieved_at": "2026-11-02T00:36:14Z",
+          "byte_size": 178675,
+          "sha256": "e2e0a20c5ea0f86910525b67b0aef8e93fe83e26399bc48540beeec50482566b",
+          "name": "article.html"
+        }
+      ],
+      "role": "published image-analysis results for Octopus vulgaris and Octopus cyanea"
+    }
+  ],
+  "measured": {
+    "value": 0,
+    "unit": "nearby Results sentences with r > 0 or a lower distance at p < 0.05",
+    "n": 2,
+    "uncertainty": "regex extraction from publisher HTML; figures were not measured",
+    "extra": {
+      "results_characters": 1749,
+      "contexts_both_named": false,
+      "sentences": [
+        {
+          "sentence": "When squares containing most of the octopuses' mantles were compared to equally sized areas by examining the entire image at single pixel intervals, areas of high resemblance were detected ( Figure 1B, 1D ).",
+          "kind": "wide",
+          "r": [],
+          "r2": [],
+          "p": [],
+          "supports": false,
+          "contradicts": false
+        },
+        {
+          "sentence": "These high resemblance areas matched distinct features and objects in the immediate surroundings but not the entire viewed area or large portions of it.",
+          "kind": "nearby",
+          "r": [],
+          "r2": [],
+          "p": [],
+          "supports": false,
+          "contradicts": false
+        },
+        {
+          "sentence": "“Multi-point”\n\n Analysing the same 11 images of free ranging octopuses using the multi-point method ( Figure 2c ) showed that a) octopuses displayed body patterns significantly different from each other (Kruskal Wallis test; P<0.01), b) octopus body patterns resembled specific structures in their immediate surroundings (Mann Whitney U test n = 30, P>0.05), and c) such similarity was not found when comparing the octopuses to the ‘general substrate’ sections in the images (P<0.01).",
+          "kind": "nearby",
+          "r": [],
+          "r2": [],
+          "p": [
+            [
+              "<",
+              0.01
+            ],
+            [
+              ">",
+              0.05
+            ],
+            [
+              "<",
+              0.01
+            ]
+          ],
+          "supports": false,
+          "contradicts": false
+        }
+      ]
+    }
+  },
+  "results_summary": [
+    "verdict inconclusive; nearby sentences 2; supporting sentences 0; both contexts named False."
+  ],
+  "reason": "data-unavailable"
+}
