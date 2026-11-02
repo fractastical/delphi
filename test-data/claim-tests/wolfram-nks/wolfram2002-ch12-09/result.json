@@ -2,9 +2,9 @@
   "claim_id": "wolfram2002-ch12-09",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-09",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "For every elementary rule in {0, 90, 110, 204} and every initial state of a cyclic width-5 line, the real equation formed by summing the squares of the exponential-Diophantine history residuals with sin(pi*t)^2 and sin(pi*H)^2 has a solution if and only if the cellular automaton reaches the all-zero configuration in finitely many steps, and the integer solution's base-32 digits are that history; a pure polynomial equation does not impose the same integrality constraint.",
-  "pass_criterion": "Pre-registered. Cyclic elementary cellular automata, width w=5, B=32, rules 0, 90, 110 and 204 (Wolfram numbering), all 32 initial integers c. Direct evolution uses the 8-neighborhood truth table. The history integer of a run that first hits 0 at time t is H = sum_{k=0}^{t} r_k * B^k, with r_0=c, r_t=0 and r_k nonzero for k<t. The residuals, all required to be zero, are: H mod B - c; the base-B digits of H through t disagreeing with the truth-table step; the leading digit being nonzero when it should be the final zero row; and, for the trigonometric constraint, t and H not integers. sin(pi*n)=0 for integer n is the algebraic identity (e^{i*pi*n}=(-1)^n), cross-checked by math.sin on n=0..1000. Because the ring has 32 states, a configuration that has not hit 0 within 32 steps is on a cycle that never hits 0, so there is no solution at any larger t. PASS (supports) if (A) for all 128 instances, a real solution of the trigonometric equation exists exactly when the automaton hits 0, and every such solution with t<=32 decodes to the simulated first-hit history (0 mismatches); (B) Sturm's theorem and exact rational bisection agree on the number of distinct real roots of every univariate polynomial of degree at most 4 with coefficients in {-1,0,1} (243 polynomials, including those of lower degree); (C) the separation instance holds: x^2-2=0 has two real roots and no integer root (rational-root candidates ±1, ±2 all fail), so sin(pi*x)^2+(x^2-2)^2=0 has no real solution while (x^2-2)^2=0 does.",
+  "pass_criterion": "Pre-registered. Cyclic elementary cellular automata, width w=5, B=32, rules 0, 90, 110 and 204 (Wolfram numbering), all 32 initial integers c. Direct evolution uses the 8-neighborhood truth table. The history integer of a run that first hits 0 at time t is H = sum_{k=0}^{t} r_k * B^k, with r_0=c, r_t=0 and r_k nonzero for k<t. The residuals, all required to be zero, are: H mod B - c; the base-B digits of H through t disagreeing with the truth-table step; the leading digit being nonzero when it should be the final zero row; and, for the trigonometric constraint, t and H not integers. sin(pi*n)=0 for integer n is the algebraic identity (e^{i*pi*n}=(-1)^n), cross-checked by math.sin on n=0..1000. Because the ring has 32 states, a configuration that has not hit 0 within 32 steps is on a cycle that never hits 0, so there is no solution at any larger t. PASS (supports) if (A) for all 128 instances, a real solution of the trigonometric equation exists exactly when the automaton hits 0, and every such solution with t<=32 decodes to the simulated first-hit history (0 mismatches); (B) Sturm's theorem and exact rational bisection agree on the number of distinct real roots of every univariate polynomial of degree at most 4 with coefficients in {-1,0,1} (243 polynomials, including those of lower degree); (C) the separation instance holds: x^2-2=0 has two real roots and no integer root (rational-root candidates \u00b11, \u00b12 all fail), so sin(pi*x)^2+(x^2-2)^2=0 has no real solution while (x^2-2)^2=0 does.",
   "fail_criterion": "Pre-registered. REFUTES if (A) fails on at least one instance while a second, array-based implementation of the same truth table agrees with the digit stepper (the equation then does not track the automaton). INCONCLUSIVE with reason 'other' if the two cellular-automaton implementations disagree, or if the Sturm count and the isolating-interval count disagree on any polynomial (the polynomial decision procedure is then not certified). The existential wording of the claim is not refuted by an implementation error; that outcome is inconclusive, not a refutation.",
   "planned_datasets": [
     "trig-equation-cyclic-eca-width5-generator"
@@ -22,5 +22,79 @@
     "model": "grok-4.7",
     "run": "cursor/wolfram-nks-ch12-31-to-ch11-12-bd47",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "trig-equation-cyclic-eca-width5-generator",
+      "name": "Cyclic elementary rules 0, 90, 110 and 204 on width 5, all 32 initial states, plus the 243 univariate polynomials of degree at most 4 with coefficients in {-1,0,1}",
+      "landing_url": "https://www.wolframscience.com/nks/p731--the-validity-of-the-principle/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "elementary cellular automata, Wolfram numbering, cyclic boundary, width 5; neighborhood (left, center, right) = (bit i+1, bit i, bit i-1) mod 5; history integer base 32. Polynomials are the full coefficient box, generated in the script.",
+      "files": [],
+      "role": "the automaton histories and the polynomial class named in the pass criterion"
+    }
+  ],
+  "method": "analysis.py evolves each of the 128 instances with an integer stepper and an array stepper that must agree. A configuration that has not hit 0 within 32 steps has repeated a state, so it never hits 0. For a hit at time t the history integer is checked digit by digit against the truth table, including the final 0 and the absence of an earlier 0. sin(pi*n)=0 for integer n is used as the algebraic identity; math.sin on n=0..1000 is only a float cross-check. Distinct real roots of each polynomial are counted by Sturm's theorem and by exact rational bisection. An exact root is bracketed by shrinking the sample until the Sturm variation across the bracket is 1, so the split cannot step over a nearby root. The separation instance is x^2-2 together with the rational-root candidates plus or minus 1 and plus or minus 2.",
+  "measured": {
+    "value": 0,
+    "unit": "mismatches between solvability of the trigonometric history equation and die-out, out of 128 instances",
+    "n": 128,
+    "uncertainty": "exact",
+    "extra": {
+      "width": 5,
+      "instances": 128,
+      "hit_zero": 67,
+      "mismatches": 0,
+      "stepper_disagreements": 0,
+      "by_rule": {
+        "0": {
+          "died": 32,
+          "never": 0
+        },
+        "90": {
+          "died": 2,
+          "never": 30
+        },
+        "110": {
+          "died": 32,
+          "never": 0
+        },
+        "204": {
+          "died": 1,
+          "never": 31
+        }
+      },
+      "polynomial_box": {
+        "polynomials": 243,
+        "identically_zero": 1,
+        "disagreements": 0,
+        "distinct_real_roots_sum": 348
+      },
+      "separation": {
+        "polynomial": "x^2 - 2",
+        "sturm_real_roots": 2,
+        "rational_root_candidates_that_vanish": [],
+        "trig_equation_sin2_plus_poly2_has_real_solution": false,
+        "pure_polynomial_has_real_solution": true
+      },
+      "float_sin_crosscheck": {
+        "n_max": 1000,
+        "max_abs_math_sin_pi_n": 3.4493976816137795e-13,
+        "sin_pi_half": 1.0
+      }
+    }
+  },
+  "data_kind": "computational",
+  "verdict": "supports",
+  "confidence": 0.9,
+  "caveats": [
+    "The cellular automaton is a cyclic line of 5 cells. 'Ever hits zero' is an unbounded-time question with a 32-state certificate; it is a finite-state stand-in for the unbounded evolution named in the claim.",
+    "The polynomial half is the univariate class of degree at most 4 with coefficients in {-1,0,1}, decided by Sturm's theorem. Multivariate polynomial equations were not enumerated.",
+    "The sine constraint is the algebraic identity sin(pi*n)=0 for integer n. The largest absolute value of math.sin(pi*n) for n=0..1000 was 3.4493976816137795e-13, recorded as a float cross-check.",
+    "On this ring, rule 110 reached zero from all 32 initial states and rule 90 from 2 of 32. Those are counts for width 5, not a statement about the infinite line.",
+    "A computation shows the mathematics, not that organisms follow it."
+  ]
 }

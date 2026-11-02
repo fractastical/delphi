@@ -2,7 +2,7 @@
   "claim_id": "wolfram2002-ch12-34",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-34",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The exponential Diophantine system transcribed from the NKS note on p. 1160 has, for each width and step count in the grid, a solution whose decoded rows are exactly the zero-boundary rule-110 evolution of a width-x1 initial condition, and the note's bitwise formula matches the rule-110 truth table.",
   "pass_criterion": "Pre-registered. The published system is transcribed from the data-c2c-inline Mathematica of https://www.wolframscience.com/nks/notes-12-9--universal-diophantine-equation/ as: (1) 1+x4+x12 = 2^((1+x3)*(x1+2*x3)); (2) x2+x13 = 2^(x1); (3) 1+x5+x14 = 2^(x1); (4) 2^(x3)*x5 + 2^(x1+2*x3)*x6 + 2^(x1+x3)*x15 + x16 = x4; (5) 1+x15+x17 = 2^(x3); (6) 1+x16+x18 = 2^(x3); (7) 2^(1+x3*(1+x1+2*x3))*(x2-1) - x10 + x11 = 2*x4; together with x7=BitAnd[x6,2*x6], x8=BitOr[x6,2*x6], x9=BitAnd[x6,2*x7], x19=BitOr[x6,2*x7], x10=BitAnd[x9,2*x8], x11=BitOr[x9,2*x8]. All variables are non-negative integers. The bitwise step is BitXor[BitAnd[a,2a,4a], BitOr[2a,4a]]. Grid: width x1 from 1 through 6, step count T=x3 from 1 through 4, initial integer n from 0 through 2^(x1)-1, encoded as x2=n+1 (so x2 runs from 1 through 2^(x1) and equation (2) allows it). The candidate witness packs prior rows into x6 by placing row k of the bitwise evolution of n at bit shift 1+(T-1-k)*(x1+2*T+1), and is accepted only if every published equation holds and the low x1+2*T bits of x4 equal the state after T bitwise steps. PASS (supports) if this witness works for every grid point, a one-bit flip of that final field makes equation (7) fail at every grid point, exhaustive search finds exactly one x6 for every x1<=3, T<=2 and every n, the bitwise step matches the rule-110 truth table on all 8 neighborhoods under one fixed alignment, and the low field also equals the T-step evolution of the integer x2 itself. The binomial identity in the same note, n=2^b+1 and (n+1)^b = n^c*(a+d*n)+e with e<n^c and a<n, must recover a=C(b,c) for all 0<=c<=b<=8 and must reject a=C(b,c)+1; Lucas' criterion (C(x,y) odd iff y is a submask of x) must agree with binomial parity for x<=32. Those two checks are required for a supports verdict because they are the note's reduction from bitwise operations to an exponential Diophantine equation.",
   "fail_criterion": "Pre-registered. MIXED if the witness satisfies the published system and matches the bitwise evolution of n=x2-1 on every grid point, the corruption and uniqueness checks pass, and the truth-table, binomial and Lucas checks pass, but the low field differs from the evolution of the bit string of x2 on at least one grid point. REFUTES if the bitwise formula matches the rule-110 table but neither the evolution of n=x2-1 nor the evolution of x2 agrees with the solved x4 on a majority of grid points, or if the exhaustive small rectangle contains a grid point with two distinct solutions x4. INCONCLUSIVE with reason 'other' if the truth-table alignment fails or the binomial identity fails the range above (the transcription or the reduction would then be in doubt) or if more than 5 percent of grid points cannot be checked in exact integers.",
@@ -15,12 +15,75 @@
     "admissible_datasets": "Exact integer solutions of the equation transcribed from the NKS note, compared with evolution under the note's own bitwise formula and under the elementary rule-110 truth table. No external dataset.",
     "inference_method": "A closed-form witness is substituted into every published equation. Supports requires agreement with the bits of x2; agreement only with x2-1 is the pre-registered mixed outcome; failure of both correspondences on a majority of the grid refutes."
   },
-  "interpretation": "The claim (NKS pp. 785-786) is that an exponential Diophantine equation can be built whose solutions emulate rule 110, and that, because rule 110 is universal, arithmetic therefore supports universality and so Gödel's theorem. The computation tests the emulation. The row packing was read off solutions of the transcribed system at widths up to 3 and at most 3 steps, then frozen; the verdict grid is wider than that derivation sample and includes it. Universality of rule 110 (Cook's theorem) and the existence of a specific sentence independent of Peano arithmetic are not re-proved here. A computation shows the arithmetic, not that organisms follow it.",
+  "interpretation": "The claim (NKS pp. 785-786) is that an exponential Diophantine equation can be built whose solutions emulate rule 110, and that, because rule 110 is universal, arithmetic therefore supports universality and so G\u00f6del's theorem. The computation tests the emulation. The row packing was read off solutions of the transcribed system at widths up to 3 and at most 3 steps, then frozen; the verdict grid is wider than that derivation sample and includes it. Universality of rule 110 (Cook's theorem) and the existence of a specific sentence independent of Peano arithmetic are not re-proved here. A computation shows the arithmetic, not that organisms follow it.",
   "created": "2026-11-01",
   "agent": {
     "kind": "cloud-agent",
     "model": "grok-4.7",
     "run": "cursor/wolfram-nks-ch12-31-to-ch11-12-bd47",
     "date": "2026-11-01"
-  }
+  },
+  "datasets": [
+    {
+      "id": "nks-p1160-rule110-exponential-diophantine-generator",
+      "name": "Exact non-negative integer solutions of the exponential Diophantine system transcribed from the NKS note, grid x1=1..6, T=1..4, every width-x1 initial condition",
+      "landing_url": "https://www.wolframscience.com/nks/notes-12-9--universal-diophantine-equation/",
+      "doi": null,
+      "version": "generated",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "bitwise step BitXor[BitAnd[a,2a,4a], BitOr[2a,4a]], zero-padded; initial condition n = x2-1 with x2 from 1 through 2^(x1); rows of the evolution of n packed into x6 at bit shift 1+(T-1-k)*(x1+2*T+1). Equations (1)-(7) are the transcription in the pass criterion. Binomial identity n=2^b+1 for b<=8; Lucas parity for x<=32.",
+      "files": [],
+      "role": "the integer solutions compared with rule 110"
+    }
+  ],
+  "method": "analysis.py checks the bitwise step against the rule-110 truth table on every bit of every integer from 0 through 4095. For each grid point it substitutes the packed witness into equations (1)-(7) and compares the low x1+2*T bits of x4 with T steps of n=x2-1, with T steps of the integer x2, and with T steps of the low x1 bits of x2. A one-bit flip of x4 is substituted into equation (7). For x1<=3 and T<=2 every admissible x6 below 2^(T*(x1+2*T)) is scanned. The binomial identity and Lucas' criterion are evaluated in exact integers.",
+  "measured": {
+    "value": 0,
+    "unit": "grid points whose solved low field equals the T-step evolution of the bits of the integer x2, out of 504",
+    "n": 504,
+    "uncertainty": "exact",
+    "extra": {
+      "truth_table": {
+        "neighborhoods_checked": 49152,
+        "mismatches": 0,
+        "wolfram_code": 110
+      },
+      "grid": {
+        "x1": "1..6",
+        "T": "1..4",
+        "points": 504,
+        "witness_matches_evolution_of_x2_minus_1": 504,
+        "witness_matches_evolution_of_integer_x2": 0,
+        "witness_matches_evolution_of_low_x1_bits_of_x2": 0,
+        "one_bit_flip_breaks_eq7": 504,
+        "failure_reasons": {}
+      },
+      "uniqueness_x1_le_3_T_le_2": {
+        "points": 28,
+        "exactly_one_x6": 28,
+        "that_x6_is_the_witness": 28,
+        "more_than_one": 0
+      },
+      "binomial_identity_b_le_8": {
+        "pairs": 45,
+        "recovered": 45,
+        "bad": 0,
+        "false_accept_of_binomial_plus_one": 0
+      },
+      "lucas_parity_x_le_32": {
+        "pairs": 561,
+        "mismatches": 0
+      }
+    }
+  },
+  "data_kind": "computational",
+  "verdict": "mixed",
+  "confidence": 0.9,
+  "caveats": [
+    "On all 504 grid points the published system has a solution whose low field is the rule-110 evolution of n=x2-1, and x2 runs from 1 through 2^(x1), so n runs through every width-x1 string. On 0 of 504 points does that field equal the evolution of the integer x2, and on 0 of 504 does it equal the evolution of the low x1 bits of x2. The pre-registered rule scores this mixed: the emulation holds for x2-1, and the caption's 'digit sequence of x2' does not match.",
+    "The row packing was read off solutions at widths up to 3 and at most 3 steps, then frozen in the pre-registration. The verdict grid is x1=1..6 and T=1..4, which includes that sample and is wider than it. The small rectangle x1<=3, T<=2 has exactly one x6 on each of its 28 points, and that x6 is the witness.",
+    "Universality of rule 110 and a specific sentence independent of Peano arithmetic were not proved. The binomial and Lucas checks are the note's reduction from the bitwise step to an exponential Diophantine condition, on the pre-registered ranges b<=8 and x<=32.",
+    "A computation shows the mathematics, not that organisms follow it."
+  ]
 }
