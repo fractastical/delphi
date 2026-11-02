@@ -2,7 +2,7 @@
   "claim_id": "aristotle-ha02-25",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha02-25",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, snake rib counts are thirty: in a published table of snake vertebral or rib counts, the median count is between 28 and 32 and at least 80 percent of the counts fall in that band.",
   "pass_criterion": "Pre-registered (claim supported). From the vertebral-count table in Szyndlar and Georgalis, Vertebrate Zoology 73 (2023), e101372, using one count per species (the mean of individuals if a species has several, otherwise the stated count). The count is a rib count if the table gives ribs; otherwise it is the precloacal or trunk vertebral count, used as the count of rib-bearing segments. The claim is supported only if at least 10 species have a count, the median is between 28 and 32 inclusive, and at least 80 percent of species counts are between 28 and 32 inclusive.",
   "fail_criterion": "Pre-registered (claim refuted). With at least 10 species, the claim is refuted if the median is outside 28-32 or if fewer than 50 percent of species counts are inside 28-32. If both the support rule and the refute rule fail (for example the median is inside 28-32 but only 60 percent of species are), the verdict is mixed. If fewer than 10 species counts can be extracted, or the PDF cannot be downloaded, the verdict is inconclusive with reason underpowered or data-unavailable. A checksum mismatch on a re-download against the first retrieval is data-unavailable.",
@@ -19,7 +19,8 @@
   "confidence_rule_preregistered": "Refuted or supported with at least 30 species: 0.8. With 10 to 29 species: 0.6. Mixed: 0.5. Inconclusive underpowered: 0.4. Data-unavailable: 0.35.",
   "caveats": [
     "Criteria were written before the PDF was downloaded and before any vertebral count was read. The article landing page was fetched only to find the PDF URL.",
-    "The paper's abstract, seen in a search snippet, already states a wide range of vertebral counts. The band 28-32 is the claim's number, not a threshold fit to that range. The verdict uses the table in the file, not the abstract."
+    "The paper's abstract, seen in a search snippet, already states a wide range of vertebral counts. The band 28-32 is the claim's number, not a threshold fit to that range. The verdict uses the table in the file, not the abstract.",
+    "The atlas counts non-caenophidian snakes, not every snake. Trunk counts include the atlas and axis. Uncertain counts marked with a question mark were not used. Literature ranges written as prose ('155-162 trunk vertebrae') were not parsed; only the plus-notation skeleton counts were."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -27,5 +28,119 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claim-tests-2a8b",
     "date": "2026-11-01"
-  }
+  },
+  "verdict": "refutes",
+  "confidence": 0.8,
+  "data_kind": "biological",
+  "measured": {
+    "value": 219.5,
+    "unit": "median of species-mean trunk vertebral counts",
+    "n": 86,
+    "uncertainty": "species means 138 to 355; 0/86 inside 28-32",
+    "extra": {
+      "fraction_inside_28_32": 0.0,
+      "n_inside_28_32": 0,
+      "n_skeletons": 136,
+      "n_skipped": 17,
+      "skip_reasons": {
+        "author marked the count uncertain": 5,
+        "instructional example": 2,
+        "no binomial in the preceding window": 10
+      },
+      "species_means_minus_2_inside_28_32": 0,
+      "smallest_species_means": [
+        {
+          "genus": "Amerotyphlops",
+          "species": "brongersmianus",
+          "n_skeletons": 1,
+          "mean_trunk": 138.0,
+          "min_trunk": 138,
+          "max_trunk": 138
+        },
+        {
+          "genus": "Uropeltis",
+          "species": "arcticeps",
+          "n_skeletons": 1,
+          "mean_trunk": 149.0,
+          "min_trunk": 149,
+          "max_trunk": 149
+        },
+        {
+          "genus": "Trachyboa",
+          "species": "gularis",
+          "n_skeletons": 1,
+          "mean_trunk": 154.0,
+          "min_trunk": 154,
+          "max_trunk": 154
+        },
+        {
+          "genus": "Tropidophis",
+          "species": "greenwayi",
+          "n_skeletons": 1,
+          "mean_trunk": 156.0,
+          "min_trunk": 156,
+          "max_trunk": 156
+        },
+        {
+          "genus": "Platyplectrurus",
+          "species": "trilineatus",
+          "n_skeletons": 1,
+          "mean_trunk": 157.0,
+          "min_trunk": 157,
+          "max_trunk": 157
+        },
+        {
+          "genus": "Epacrophis",
+          "species": "boulengeri",
+          "n_skeletons": 1,
+          "mean_trunk": 160.0,
+          "min_trunk": 160,
+          "max_trunk": 160
+        },
+        {
+          "genus": "Eryx",
+          "species": "jaculus",
+          "n_skeletons": 1,
+          "mean_trunk": 160.0,
+          "min_trunk": 160,
+          "max_trunk": 160
+        },
+        {
+          "genus": "Tetracheilostoma",
+          "species": "bilineatum",
+          "n_skeletons": 2,
+          "mean_trunk": 160.0,
+          "min_trunk": 159,
+          "max_trunk": 161
+        }
+      ]
+    }
+  },
+  "method": "Downloaded the PDF and checked its SHA-256. Text was extracted with pypdf. Counts use the paper's notation trunk+cloacal+caudal. A count was dropped if a question mark in the preceding 15 characters marked it uncertain, or if it sat in an instructional 'for instance' sentence. The binomial in the preceding 220 characters, ignoring ordinary English capitals, received the count. Species means were compared with the pre-registered band 28-32.",
+  "results_summary": [
+    "86 species, 136 skeleton counts, median species-mean trunk count 219.5.",
+    "Species inside 28-32: 0 of 86. Smallest species mean: Amerotyphlops brongersmianus 138.",
+    "Subtracting 2 for an atlas and axis without ribs still leaves 0 species inside 28-32.",
+    "Skipped triples: {'author marked the count uncertain': 5, 'instructional example': 2, 'no binomial in the preceding window': 10}."
+  ],
+  "datasets": [
+    {
+      "id": "szyndlar-georgalis-2023-vz-73-e101372-pdf",
+      "name": "An illustrated atlas of the vertebral morphology of extant non-caenophidian snakes",
+      "landing_url": "https://doi.org/10.3897/vz.73.e101372",
+      "doi": "10.3897/vz.73.e101372",
+      "version": "Vertebrate Zoology 73: 717-886 (2023)",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "vz.73.e101372.pdf",
+          "download_url": "https://vertebrate-zoology.arphahub.com/article/101372/download/pdf/913073",
+          "retrieved_at": "2026-11-02T00:41:49Z",
+          "byte_size": 97641788,
+          "sha256": "012892cf3b2eb7bbb30852439c28fbee01eb50cff8c51d9e49881fd30bd2b8a7"
+        }
+      ],
+      "role": "per-skeleton trunk, cloacal and caudal vertebral counts for non-caenophidian snakes"
+    }
+  ]
 }
