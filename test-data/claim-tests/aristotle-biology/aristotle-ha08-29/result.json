@@ -1,0 +1,34 @@
+{
+  "claim_id": "aristotle-ha08-29",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-29",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "created": "2026-11-01",
+  "hypothesis": "If the claim holds, crabs, crawfish and lobsters each shed the exoskeleton more than once as they grow, rather than casting it a single time.",
+  "pass_criterion": "Pre-registered support rule, one clause per group. Crab: in the snow-crab growth sheet, the instar index (the column that numbers successive instars, not a 0/1 flag for the terminal molt) reaches at least 3. Reaching the third instar takes at least two molts. Crawfish: in the Cambarus survey, animals whose carapace hardness is the README's soft class (EHS 0/1) have carapace lengths with maximum/minimum at least 1.5, and at least 5 soft animals are below the median carapace length of all measured animals and at least 5 are above it. Lobster: in the Homarus americanus fishery sheet, rows coded as recently molted have carapace lengths with maximum/minimum at least 1.5, and at least 5 of those rows are below the sample median length and at least 5 are above it. Recently molted means, in this order: a shell or hardness column whose value matches soft, paper, or EHS 0; otherwise a molt-stage column whose value matches postmolt, soft, or the stage letters A or B. The claim is supported only when all three clauses pass. A terminal-molt flag equal to 1 does not fail the crab clause: a last molt can follow a series of earlier molts.",
+  "fail_criterion": "Pre-registered refutation rule. The crab clause fails if an instar column is present and its maximum is 1. The crawfish clause fails if at least 10 soft animals are measured and the ratio of their maximum to minimum carapace length is below 1.10. The lobster clause fails if at least 30 recently molted animals are measured and that ratio is below 1.10. Any failed clause refutes the claim. If no clause fails and any clause is underpowered (crawfish: fewer than 5 soft animals; lobster: fewer than 30 recently molted animals; crab: an instar column exists but has no numeric index), the verdict is inconclusive with reason underpowered. If a planned file cannot be downloaded, the verdict is inconclusive with reason data-unavailable. If a file downloads but the named column is absent, that clause is unmeasured; if no clause then fails and at least one clause passes while another is unmeasured, the verdict is mixed. If every clause is unmeasured, the verdict is inconclusive with reason other. A ratio between 1.10 and 1.50, with the sample-size minimum met, is neither a pass nor a fail: that clause is intermediate, and the verdict is mixed if no clause fails.",
+  "planned_datasets": [
+    "figshare-4037664-snow-crab-growth",
+    "dryad-qjq2bvqqq-cambarus-sinking-creek",
+    "zenodo-6588031-homarus-moult"
+  ],
+  "test_contract": {
+    "expected_observation": "A crab growth series contains a third instar or later, and both a crayfish sample and a lobster sample include recently molted animals at widely different body sizes, including both below and above the sample's median size.",
+    "disconfirming_observation": "The crab series never passes the first instar, or every recently molted crayfish, or every recently molted lobster, is essentially the same size, as if the shell were cast once.",
+    "admissible_datasets": "Open measurements of a crab, a crawfish or crayfish, and a lobster, taken independently of Aristotle, that either number successive instars or record shell condition together with body size. A login wall does not count. A 0/1 terminal-molt flag without an instar index does not by itself show whether earlier molts occurred.",
+    "inference_method": "Score the three clauses in pass_criterion and fail_criterion. Support requires all three to pass. Any fail refutes. Intermediate ratios and a mix of pass with unmeasured give mixed. Underpowered and missing files give the inconclusive reasons named in fail_criterion. Size ratios use positive lengths only. The crawfish median is the median carapace length of every animal with a length, not only the soft ones. The lobster median is the median carapace length of every animal with a length."
+  },
+  "interpretation": "The claim is that these animals shed repeatedly, not a count of the exact number of molts and not a denial that growth eventually stops. 'Crabs' are read as a brachyuran, here the snow crab Chionoecetes opilio. 'Lobsters' are read as the clawed lobster Homarus americanus. 'Crawfish' is read as a freshwater crayfish, Cambarus appalachiensis. In Aristotle the marine crawfish is often the spiny lobster; a freshwater crayfish is the animal the English word crawfish names, and the test says so. A soft shell is a recent ecdysis. Soft shells at both small and large sizes mean ecdysis is not a single event at one size. An instar number of 3 or more means the crab has molted to get from one instar to the next at least twice.",
+  "caveats": [
+    "Before this registration the figshare, Dryad and Zenodo file names and byte sizes were read, and the Cambarus README was read for the hardness codes. The snow-crab workbook, the Cambarus CSV and the lobster CSV were not opened. No instar number, length or hardness value was computed.",
+    "The snow-crab landing page says the sheet compiles carapace width at instars 1 through 13 and that a separate number counts the terminal molt. A pass on the crab clause is therefore the expected direction. The threshold used here is 3, and the terminal-molt flag is not the instar index.",
+    "Cross-sectional soft shells are not a diary of one animal. They show that molting occurs at more than one size. They do not count the lifetime total for a named individual.",
+    "The lobster file is a fishery sample of legal-sized and sublegal animals. It can show repeated molting across the sizes that were landed. It cannot show the larval molts."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7-high-fast",
+    "run": "cursor/aristotle-biology-claim-tests-957f",
+    "date": "2026-11-01"
+  }
+}
