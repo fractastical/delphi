@@ -1,0 +1,57 @@
+{
+  "claim_id": "aristotle-ga01-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ga01-22",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:25Z",
+  "hypothesis": "If large animals have few young and small animals have many, litter or clutch size declines with adult body mass across amniotes, and does not rise with body mass in fishes.",
+  "pass_criterion": "Pre-registered. From AnAge build 15, species with body mass in grams > 0 and litter or clutch size > 0. Body mass is the column whose header is 'Body mass (g)' if present, otherwise 'Adult weight (g)'. Litter or clutch size is the column whose header contains 'Litter' and 'Clutch'. Amniote classes, matched on the lowercased class field, are mammalia, mammals, mammal, aves, birds, bird, reptilia, reptiles, reptile. Let rho_A and p_A be the Spearman correlation of log10(body mass) with log10(litter or clutch size) on the amniote rows. The amniote pattern is 'negative' if the number of amniote species is at least 100, rho_A <= -0.20, and p_A < 0.01. It is 'positive' if n >= 100, rho_A >= 0.20, and p_A < 0.01. Otherwise, if n >= 100, it is 'flat'. A fish class is one whose lowercased name is actinopterygii, chondrichthyes, osteichthyes, teleostei, sarcopterygii, cephalaspidomorphi, myxini, agnatha, chondrostei, holostei, fish, fishes, or pisces, or whose name contains 'fish', 'shark', or 'ray'. The fish pattern uses the same rho cuts when at least 30 fish species qualify, and is 'absent' otherwise. The claim is supported only if the amniote pattern is 'negative', the fish pattern is not 'positive', fewer than two amniote classes with at least 30 species have rho > 0 and p < 0.05, and the PanTHERIA mammal replication is not a significant positive (defined in the fail criterion).",
+  "fail_criterion": "Pre-registered. Verdict 'refutes' if the amniote pattern is 'positive'. Verdict 'mixed' if the amniote pattern is 'flat', or if it is 'negative' and the fish pattern is 'positive', or if it is 'negative' and two or more amniote classes with n >= 30 have rho > 0 and p < 0.05. PanTHERIA mammals (adult body mass in grams > 0 and litter size > 0; -999 and non-positive values are missing) are a replication: if that file matches its checksum, n >= 100, rho > 0, and p < 0.01, a negative amniote pattern is downgraded to 'mixed'. Verdict 'inconclusive' with reason 'underpowered' if fewer than 100 amniotes have both fields, and with reason 'data-unavailable' if the AnAge checksum fails or the mass or litter column cannot be identified. A failed PanTHERIA checksum drops the replication and does not by itself make the test inconclusive. Annual fecundity is not the verdict quantity: the sentence says few young, read as litter or clutch size per reproductive event.",
+  "planned_datasets": [
+    "anage-build-15",
+    "pantheria-1-0-wr05-aug2008"
+  ],
+  "test_contract": {
+    "expected_observation": "Across birds, mammals, and reptiles, log litter or clutch size falls with log adult body mass with Spearman rho at most -0.20, and fishes do not show a clear rise of offspring number with body mass.",
+    "disconfirming_observation": "A Spearman rho of at least +0.20 for amniotes, or a negative amniote relationship accompanied by a clear positive relationship in fishes or in the mammal replication.",
+    "admissible_datasets": "Published species-level tables of adult body mass and litter or clutch size, compiled independently of Aristotle. Invertebrates other than any fishes AnAge already contains are not added from a second source after the result is known. The Myhrvold amniote CSV returned HTTP 404 at the ecological-archives URL on 2026-11-02T00:21:31Z and is not used.",
+    "inference_method": "Spearman rank correlation of log10 body mass with log10 litter or clutch size, two-sided, effect-size cuts at -0.20 and +0.20, with class-wise and fish splits as pre-registered. Ordinary least-squares slope is reported and is not the verdict."
+  },
+  "secondary_analyses_descriptive": [
+    "OLS slope of log10(litter or clutch size) on log10(body mass) for amniotes, each amniote class, fishes, and PanTHERIA mammals.",
+    "Amphibians, if present as their own class, with the same correlation, not used for the verdict."
+  ],
+  "interpretation": "Few young and many young are read as litter or clutch size, the number of offspring in one reproductive event, not as lifetime fecundity and not as offspring mass. Large and small are adult body mass. Animals generally is tested first in amniotes, the classes AnAge covers densely, and the fish split is pre-registered because a pattern that reverses in fishes would not be a pattern for animals generally. Phylogenetic non-independence is only partly handled, by requiring the sign inside classes rather than by a phylogenetic regression. No tree is part of this registration.",
+  "caveats": [
+    "Checksums are copied from prior organism records and have not been re-hashed in this session: test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json and test-data/organisms/thompson-growth-form/ch04-05/datasets/pantheria-1-0-wr05-aug2008.json. No body mass or litter size has been read.",
+    "AnAge samples are uneven across classes. A mammal-heavy table can dominate the pooled correlation; the class-wise rule is there for that reason.",
+    "Spearman correlation is not a phylogenetic contrast. Related species are not independent observations."
+  ],
+  "registered_files": {
+    "anage-build-15": [
+      {
+        "name": "dataset.zip",
+        "download_url": "https://genomics.senescence.info/species/dataset.zip",
+        "byte_size": 169150,
+        "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+        "prior_record": "test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json"
+      }
+    ],
+    "pantheria-1-0-wr05-aug2008": [
+      {
+        "name": "PanTHERIA_1-0_WR05_Aug2008.txt",
+        "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+        "byte_size": 2359096,
+        "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a",
+        "prior_record": "test-data/organisms/thompson-growth-form/ch04-05/datasets/pantheria-1-0-wr05-aug2008.json"
+      }
+    ]
+  },
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-e1fe",
+    "date": "2026-11-01"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "claim_id": "aristotle-ha08-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha08-19",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:25Z",
+  "hypothesis": "If camels have been known to live to about a hundred years, the longest curated maximum longevity for the genus Camelus is at least 90 years.",
+  "pass_criterion": "Pre-registered. Let M be the maximum, in years, of maximum-longevity records for genus Camelus (AnAge genus field equal to Camelus, case-insensitive; PanTHERIA binomial beginning with 'Camelus '). AnAge 'Maximum longevity (yrs)' is already in years. PanTHERIA's MaxLongevity field is in months and is divided by 12. Non-positive values and -999 are missing. The hundred-year clause would be supported only if M >= 90. The about-thirty clause is not identifiable from a maximum, so this test has no path to verdict 'supports': a maximum near 100 would leave the ordinary lifespan unmeasured.",
+  "fail_criterion": "Pre-registered. Verdict 'refutes' if M < 60: the compilations whose purpose is to record the longest known lives do not contain a camel longevity within 40 years of a hundred, so the claim that instances of age 100 have been known is not in these records. Verdict 'mixed' if 60 <= M < 90 (a long life, short of a hundred) or if M >= 90 (the century clause is consistent with the records and the about-thirty clause is unmeasured). Verdict 'inconclusive' with reason 'data-unavailable' if neither file yields a positive Camelus longevity, a file fails its registered checksum, or the longevity column cannot be identified. Lama, Vicugna, and other camelids are not camels for this claim. M is the maximum across species and across the two sources, because the claim is about instances that have been known, and the longer curated record is the relevant one.",
+  "planned_datasets": [
+    "anage-build-15",
+    "pantheria-1-0-wr05-aug2008"
+  ],
+  "test_contract": {
+    "expected_observation": "A curated maximum longevity for Camelus of at least 90 years, which would match the claim that some camels have reached about a hundred. The ordinary figure of about thirty years is not expected to be visible in a maximum.",
+    "disconfirming_observation": "Every curated Camelus maximum strictly below 60 years.",
+    "admissible_datasets": "Published species-level longevity compilations that record a maximum, not an anecdote retold from Aristotle. Genus Camelus only.",
+    "inference_method": "The maximum of the recorded maxima, in years. Cuts at 60 and 90 years. No average is taken, and a maximum inside 20 to 45 years is reported only as descriptively compatible with an ordinary life near thirty years."
+  },
+  "secondary_analyses_descriptive": [
+    "Each Camelus species' maximum in each source, and whether that species' value falls in [20, 45] years. Not used to pass the claim."
+  ],
+  "interpretation": "Camels are the genus Camelus (dromedary, Bactrian, and wild Bactrian if present), not the wider camelid family and not the ostrich once called Struthio camelus. About thirty years is an ordinary lifespan. To the age of a hundred is an extreme recorded age. AnAge and PanTHERIA publish maxima. A maximum can refute a claimed extreme. It cannot by itself confirm that the ordinary lifespan is thirty years, and the verdict rules above say so.",
+  "caveats": [
+    "Neither file has been downloaded in this session. Checksums are copied from prior organism records: test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json (zip SHA-256, retrieved 2026-10-31T05:07:12Z) and test-data/organisms/thompson-growth-form/ch04-05/datasets/pantheria-1-0-wr05-aug2008.json (text SHA-256, retrieved 2026-10-31T04:49:24Z). Those records do not contain a camel longevity. No Camelus number has been read.",
+    "Absence of a hundred-year record in these compilations is evidence about curated maxima. It is not a logical proof that no camel has ever been said to reach that age."
+  ],
+  "registered_files": {
+    "anage-build-15": [
+      {
+        "name": "dataset.zip",
+        "download_url": "https://genomics.senescence.info/species/dataset.zip",
+        "byte_size": 169150,
+        "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+        "prior_record": "test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json"
+      }
+    ],
+    "pantheria-1-0-wr05-aug2008": [
+      {
+        "name": "PanTHERIA_1-0_WR05_Aug2008.txt",
+        "download_url": "https://esapubs.org/archive/ecol/E090/184/PanTHERIA_1-0_WR05_Aug2008.txt",
+        "byte_size": 2359096,
+        "sha256": "36e64314cae0394a966a63b949504d1975ac5c5629e05e36c1b139b3348f044a",
+        "prior_record": "test-data/organisms/thompson-growth-form/ch04-05/datasets/pantheria-1-0-wr05-aug2008.json"
+      }
+    ]
+  },
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-e1fe",
+    "date": "2026-11-01"
+  }
+}

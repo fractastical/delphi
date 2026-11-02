@@ -1,0 +1,46 @@
+{
+  "claim_id": "aristotle-ha06-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha06-08",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:25Z",
+  "hypothesis": "If very few birds propagate within their first year, then the share of bird species with female age at maturity under 365 days is under one tenth.",
+  "pass_criterion": "Pre-registered. From AnAge build 15, class Aves (the class field, lowercased, is aves or birds or bird), species with female maturity in days strictly greater than 0. Let p be the share of those species whose female maturity is strictly under 365 days. The claim is supported if p < 0.10 and the number of species is at least 80. Male maturity and unsexed maturity are reported and are not substituted for female maturity.",
+  "fail_criterion": "Pre-registered. The claim is refuted if p >= 0.25 and the number of species is at least 80. The verdict is 'mixed' if 0.10 <= p < 0.25 with at least 80 species: more than very few, and still a minority. The verdict is 'inconclusive' with reason 'underpowered' if fewer than 80 bird species have a positive female maturity, and with reason 'data-unavailable' if the zip checksum does not match the registered SHA-256, or the class or female-maturity column cannot be identified. Very few is not defined by Aristotle; the 0.10 and 0.25 cuts are this test's reading of that phrase and were fixed before the column was opened.",
+  "planned_datasets": [
+    "anage-build-15"
+  ],
+  "test_contract": {
+    "expected_observation": "Fewer than ten percent of bird species with a recorded female age at maturity mature before one year of age.",
+    "disconfirming_observation": "At least a quarter of those species have female maturity under 365 days.",
+    "admissible_datasets": "A published species-level life-history table with female age at maturity in days and a class label for birds, compiled independently of Aristotle. The Amniote Life-History Database (Myhrvold et al. 2015) was the assessors' other candidate; a HEAD request to https://esapubs.org/archive/ecol/E096/269/Amniote_Database_Aug_2015.csv on 2026-11-02T00:21:31Z returned HTTP 404, so it is not an admissible file for this run.",
+    "inference_method": "Proportion of Aves rows with female maturity days in (0, 365), among rows with female maturity days > 0. Thresholds 0.10 (support) and 0.25 (refute), minimum n = 80."
+  },
+  "secondary_analyses_descriptive": [
+    "The same proportion using male maturity, and using the earliest of the female, male, and unsexed maturity fields when any is positive. Not used for the verdict.",
+    "The median female maturity in days."
+  ],
+  "interpretation": "Propagate within their first year is read as female age at sexual maturity under 365 days. AnAge records maturity, not the age of the first successful clutch in the wild; that mapping is stated here and is not changed if the proportion is high or low. The scope is birds generally, so the denominator is every AnAge bird with the field filled, not a subset of large birds.",
+  "caveats": [
+    "The AnAge zip has not been downloaded in this session. The SHA-256 and byte size below are copied from the earlier organism record at test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json, which says the zip was retrieved on 2026-10-31T05:07:12Z. This test re-downloads the zip and checks that checksum. No maturity value has been read.",
+    "Age at maturity is an imperfect stand-in for age at first breeding. Captive and wild records are pooled as AnAge publishes them."
+  ],
+  "registered_files": {
+    "anage-build-15": [
+      {
+        "name": "dataset.zip",
+        "download_url": "https://genomics.senescence.info/species/dataset.zip",
+        "byte_size": 169150,
+        "sha256": "e3ddb66e32e973a79932859ba53013e8f60d957c6ec01c6eb573e3ea3018d630",
+        "prior_record": "test-data/organisms/thompson-growth-form/ch08/datasets/anage-build-15.json"
+      }
+    ]
+  },
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-e1fe",
+    "date": "2026-11-01"
+  }
+}

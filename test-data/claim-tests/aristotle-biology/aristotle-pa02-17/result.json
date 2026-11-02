@@ -1,0 +1,50 @@
+{
+  "claim_id": "aristotle-pa02-17",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa02-17",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:25Z",
+  "hypothesis": "If man has the largest brain in proportion to his size, the species-median brain-mass/body-mass ratio of Homo sapiens is strictly greater than that of every other vertebrate species in the compilation; and if the brain is larger in men than in women, mean adult male human brain mass exceeds mean adult female human brain mass.",
+  "pass_criterion": "Pre-registered. Clause A (proportion to size), primary dataset the six Tsuboi et al. class workbooks pooled: for each species, the median of row-wise brain-mass/body-mass ratios among rows with brain mass > 0, body mass in (0.05 g, 2e8 g), and ratio < 0.5. Homo sapiens is identified by genus Homo and species sapiens (or a binomial equal to Homo sapiens), case-insensitive. When an age-class column exists and at least one row for that species is adult (the age text contains adult or mature, and does not contain juvenile, fetus, foetus, embryo, neonat, subadult, or young), only those adult rows enter that species' median; otherwise all valid rows do. Clause A passes only if at least 100 non-human species have a median and the human median is strictly greater than every one of them. Clause B (men larger than women): among adult Homo sapiens rows in the same workbooks with sex male versus female (a value containing female is female; a value containing male and not female is male; mixed, both, unknown, and blank are dropped), n >= 10 for each sex, male mean brain mass > female mean brain mass, (male mean - female mean) / female mean >= 0.05, and a two-sided Welch t-test p < 0.05. If Tsuboi does not supply 10 adults of each sex, the same numerical rule is applied to Burger et al. rows for Homo sapiens when that file has sex-specific human rows. The claim is supported only if both clauses pass.",
+  "fail_criterion": "Pre-registered. Clause A fails if any non-human species has a median ratio greater than or equal to the human median. Clause B fails if both sexes have n >= 10 and the pass inequalities are not all met. Verdict 'refutes' if both clauses fail, or if clause A fails and clause B cannot be measured. Verdict 'mixed' if exactly one measured clause passes and the other fails, or if clause A passes and clause B cannot be measured (the sex half of the sentence is then untested). Verdict 'inconclusive' with reason 'underpowered' if fewer than 100 non-human species have a ratio, and with reason 'data-unavailable' if Homo sapiens is absent, a required file fails its registered checksum, or brain mass and body mass columns cannot be identified. A mammal-only result in which humans rank first does not pass clause A: the claim says all animals, operationalized here as vertebrates (Aristotle's sanguineous animals, the animals he says have a brain).",
+  "planned_datasets": [
+    "tsuboi-2018-figshare-6803276",
+    "burger-2019-dryad-2r62k7s"
+  ],
+  "test_contract": {
+    "expected_observation": "Homo sapiens has the strictly highest species-median brain/body mass ratio among vertebrates with both measurements, and adult men have a larger mean brain mass than adult women by at least five percent.",
+    "disconfirming_observation": "Any vertebrate species whose median brain/body ratio is at least as high as the human median, or an adult human sample of at least ten of each sex in which men are not larger by the pre-registered margin.",
+    "admissible_datasets": "Published, openly licensed compilations of brain mass and body mass measured independently of Aristotle's text, covering vertebrates rather than a single order, with sex recorded on human rows if the sex clause is to be measured. Endocranial volume is not converted to mass for the verdict.",
+    "inference_method": "Species median of the arithmetic brain/body ratio; the human median must be strictly maximal. The sex clause is a Welch t-test on adult brain mass with a five-percent relative floor. An allometric residual (encephalization) is computed and reported and does not enter the verdict, because the sentence says in proportion to size, which is the ratio."
+  },
+  "secondary_analyses_descriptive": [
+    "Ordinary least-squares residual of log10(brain mass) on log10(body mass) across species medians, and the human residual's rank. Reported only. Not used for the verdict.",
+    "The same ratio ranking restricted to mammals, and the same ranking in the Burger mammal file, as a replication. A disagreement is reported. The verdict uses the pooled vertebrate file."
+  ],
+  "interpretation": "In proportion to his size is read as the arithmetic ratio of brain mass to body mass, not as an encephalization residual and not as absolute brain mass. The sex clause is read as absolute brain mass, because the quote says the brain is larger in men than in women and does not repeat in proportion for that contrast. Scope is vertebrates: in the same chapter Aristotle says bloodless animals have no brain except by analogy, so invertebrates are outside the comparison he is making. Rows are specimen or study observations as published; the species summary is a median so one study does not dominate.",
+  "caveats": [
+    "File names, byte sizes, and MD5 checksums below were taken from the figshare and Dryad APIs before any workbook or CSV was downloaded. No brain or body mass value has been read.",
+    "The Burger abstract states a mammal brain-body slope. That slope is not a measurement in this test and is not used.",
+    "The ecological-archives amniote life-history file was not part of this test. A HEAD request to https://esapubs.org/archive/ecol/E096/269/Amniote_Database_Aug_2015.csv on 2026-11-02T00:21:31Z returned HTTP 404."
+  ],
+  "registered_files": {
+    "tsuboi-2018-figshare-6803276": [
+      {"name": "Tsuboi_etal_NEE_amphibian.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384062", "byte_size": 89709, "md5": "542544a1b13e50d197b7a7fbc609ab06"},
+      {"name": "Tsuboi_etal_NEE_bird.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384068", "byte_size": 1126942, "md5": "b3d6fd8e0f4395b11b691e99e7e14628"},
+      {"name": "Tsuboi_etal_NEE_mammal.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384065", "byte_size": 373510, "md5": "ad4c91be6e79e8d1c3ff03f5ab946ae6"},
+      {"name": "Tsuboi_etal_NEE_reptile.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384071", "byte_size": 56289, "md5": "cbc361b0a39de5af885544e9921d96fb"},
+      {"name": "Tsuboi_etal_NEE_shark_ray.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384074", "byte_size": 86236, "md5": "fa1aabc4e3f72383fdfa17a950b82aa4"},
+      {"name": "Tsuboi_etal_NEE_teleost.xlsx", "download_url": "https://ndownloader.figshare.com/files/12384077", "byte_size": 310372, "md5": "b45ba45ea145674c65e7cc67d308e457"}
+    ],
+    "burger-2019-dryad-2r62k7s": [
+      {"name": "BrainAllometry_Supplement_Data.csv", "download_url": "https://datadryad.org/api/v2/files/94072/download", "byte_size": 203795, "md5": "3a68156bcdbc6531895c51fdaf2fb111"}
+    ]
+  },
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-e1fe",
+    "date": "2026-11-01"
+  }
+}

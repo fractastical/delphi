@@ -1,0 +1,46 @@
+{
+  "claim_id": "aristotle-ha09-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-ha09-11",
+  "project": "aristotle-biology",
+  "status": "preregistered",
+  "preregistered_at": "2026-11-02T00:24:25Z",
+  "hypothesis": "If every web-footed bird lives near the sea, a river, or a pool, then every species in the pre-registered fully web-footed families has at least one recorded habitat among wetland, riverine, coastal, and open sea.",
+  "pass_criterion": "Pre-registered. Web-footed families, fixed before any habitat value is read, are the families whose feet are palmate, totipalmate, or lobate in standard avian anatomy: Anatidae, Podicipedidae, Gaviidae, Spheniscidae, Diomedeidae, Procellariidae, Hydrobatidae, Oceanitidae, Pelecanoididae, Pelecanidae, Sulidae, Phalacrocoracidae, Anhingidae, Fregatidae, Phaethontidae, Phoenicopteridae, Laridae, Stercorariidae, Alcidae. A species is in the set if any family field equals one of these names, case-insensitive, or begins with that name followed by a space or parenthesis. Water habitats are the BIRDBASE codes W (wetland), RV (riverine/riparian), C (coastal), and SE (open sea or pelagic), as defined in the data paper's habitat dictionary. A species with at least one recognized habitat code (F, BM, WD, SH, SV, G, PL, R, D, A, RV, C, W, SE, O) is an exception if none of its habitat codes is in {W, RV, C, SE}. Clause passes only if the number of species in the web-footed set with at least one habitat code is at least 200 and the number of exceptions is 0.",
+  "fail_criterion": "Pre-registered. The claim is refuted if that species count is at least 200 and the exception rate is at least 0.05. The verdict is 'mixed' if the count is at least 200 and the exception rate is greater than 0 and below 0.05: the association would then hold for most species, and the words without exception would not. The verdict is 'inconclusive' with reason 'underpowered' if fewer than 200 web-footed species have a habitat code, with reason 'data-unavailable' if the workbook fails its checksum or no habitat column and no family column can be identified, and with reason 'other' if the family column exists but matches none of the pre-registered names. Semipalmate families (including Charadriidae, Scolopacidae, and Recurvirostridae) and the weakly webbed Anhimidae and Anseranatidae are not in the set; they are not counted either as support or as exceptions. Primary habitat is reported and is not the verdict: the sentence says live near water, not that water is the only habitat.",
+  "planned_datasets": [
+    "birdbase-2025-figshare-27051040"
+  ],
+  "test_contract": {
+    "expected_observation": "Every species in the pre-registered palmate, totipalmate, and lobate families that has a habitat code uses wetland, river, coast, or open sea as at least one of its habitats.",
+    "disconfirming_observation": "At least five percent of those species have a recorded habitat list containing none of those four water codes.",
+    "admissible_datasets": "A species-level, openly licensed bird-trait table that records habitat with a published code list, joined to family names. Foot webbing is not a column in this table; the family list above is the morphological coding and was fixed before habitat values were read. AVONET was not used because it has no foot-webbing field.",
+    "inference_method": "Exception rate: web-footed species whose habitat codes miss {W, RV, C, SE}, divided by web-footed species with at least one habitat code. Thresholds 0 and 0.05, with a minimum of 200 species."
+  },
+  "secondary_analyses_descriptive": [
+    "Share of the web-footed set whose primary habitat code, if a primary column is identifiable, is in {W, RV, C, SE}. Not used for the verdict.",
+    "Exception rate within each pre-registered family with at least five coded species. Not used for the verdict."
+  ],
+  "interpretation": "Web-footed is read as fully webbed swimming feet (palmate, totipalmate, or lobate), which is the structure Aristotle contrasts with birds that do not resort to water. Near the sea, rivers, or pools is read as any recorded use of coastal, pelagic, riverine, or wetland habitat, not as a distance-to-water measurement, which this table does not contain. Families in which only some species are fully webbed are left out so that a terrestrial stilt cannot be counted as web-footed, and a webbed avocet cannot be counted as a counterexample, on the back of a family label.",
+  "caveats": [
+    "The figshare file name, size, and MD5 were read from the figshare API before the workbook was downloaded. No species habitat value has been read.",
+    "The family list is a morphological coding, not a measurement from this workbook. It can mis-assign a species if a taxonomy uses an unfamiliar family name; unmatched web-footed species would then be omitted rather than counted as exceptions.",
+    "Habitat codes come from the data dictionary in Şekercioğlu et al., Scientific Data (2025), doi:10.1038/s41597-025-05615-3, which was read as a code list and not as species rows."
+  ],
+  "registered_files": {
+    "birdbase-2025-figshare-27051040": [
+      {
+        "name": "BIRDBASE v2025.1 Sekercioglu et al. Final.xlsx",
+        "download_url": "https://ndownloader.figshare.com/files/55634729",
+        "byte_size": 6683628,
+        "md5": "36d53d59af1e449db1fc4c30062d9d1f"
+      }
+    ]
+  },
+  "created": "2026-11-01",
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "grok-4.7",
+    "run": "cursor/aristotle-biology-claim-tests-e1fe",
+    "date": "2026-11-01"
+  }
+}
