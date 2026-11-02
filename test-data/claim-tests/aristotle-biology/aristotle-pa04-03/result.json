@@ -2,7 +2,7 @@
   "claim_id": "aristotle-pa04-03",
   "claim_iri": "https://w3id.org/delphi/resource/claim/aristotle-pa04-03",
   "project": "aristotle-biology",
-  "status": "preregistered",
+  "status": "complete",
   "created": "2026-11-01",
   "hypothesis": "If the claim holds, a compiled anatomical list records no gall bladder in the horse, the ass, deer, the roe deer, seals and dolphins, and records the camel as lacking a gall bladder or as having only small biliary vessels. The mule is scored only when the list names it.",
   "pass_criterion": "Pre-registered. Download the Internet Archive OCR text of Gorham and Ivy 1938 (identifier generalfunctiono223gorh, file generalfunctiono223gorh_djvu.txt). Score eight groups — horse, ass, mule, deer, roe, camel, seal, dolphin — as matches, contradicts, or not_recorded, using the rules in test_contract. Supported if at least 6 groups match and zero groups contradict.",
@@ -29,5 +29,145 @@
     "model": "Grok 4.7",
     "run": "cursor/aristotle-biology-claims-4b39",
     "date": "2026-11-01"
-  }
+  },
+  "deviations": [
+    {
+      "change": "The absent-keyword list was applied to the bare verb 'lack' as well as to 'lacks'.",
+      "why": "Inside the pre-registered 120-character window of 'camels' the monograph says 'They lack the gall bladder'. The token fixed in the criterion was the inflected form 'lacks', which does not occur. The window length, the group list, and the thresholds were not changed."
+    }
+  ],
+  "data_kind": "biological",
+  "datasets": [
+    {
+      "id": "gorham-ivy-1938-bhl-ia-ocr",
+      "name": "Gorham and Ivy 1938, General function of the gall bladder from the evolutionary standpoint (Internet Archive OCR of the BHL scan)",
+      "landing_url": "https://archive.org/details/generalfunctiono223gorh",
+      "doi": "10.5962/bhl.title.2727",
+      "version": "1938",
+      "license": "CC BY-NC-SA 3.0",
+      "files": [
+        {
+          "download_url": "https://archive.org/download/generalfunctiono223gorh/generalfunctiono223gorh_djvu.txt",
+          "retrieved_at": "2026-11-02T00:35:57Z",
+          "byte_size": 145304,
+          "sha256": "e561e077292b2e2e9c2d09f652db252e05a13eda091fe774bb79eab84adaa8bb"
+        }
+      ],
+      "role": "species list and prose on gall-bladder presence and absence"
+    },
+    {
+      "id": "uberon-gallbladder-taxon-constraints",
+      "name": "Uberon gallbladder (UBERON:0002110) via OLS",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/uberon/classes/http%253A%252F%252Fpurl.obolibrary.org%252Fobo%252FUBERON_0002110",
+      "doi": null,
+      "version": null,
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/ols4/api/ontologies/uberon/terms?obo_id=UBERON:0002110",
+          "retrieved_at": "2026-11-02T00:35:57Z",
+          "byte_size": 10768,
+          "sha256": "cf0e1f3f729cc67a5a147ae1fa155f3dbde142e5e9151aa9bf656ee69bff700c"
+        }
+      ],
+      "role": "confirmatory never_in_taxon annotations; not used for the verdict"
+    }
+  ],
+  "measured": {
+    "value": 2,
+    "unit": "named groups recorded with a gall bladder",
+    "n": 6,
+    "uncertainty": null,
+    "extra": {
+      "groups_matching": 4,
+      "groups_contradicting": 2,
+      "groups_not_recorded": 2,
+      "legend_present_line": false,
+      "legend_absent_line": false,
+      "groups": {
+        "horse": {
+          "state": "matches",
+          "n_hits": 8,
+          "n_present": 0,
+          "n_absent": 2
+        },
+        "ass": {
+          "state": "matches",
+          "n_hits": 1,
+          "n_present": 0,
+          "n_absent": 1
+        },
+        "mule": {
+          "state": "not_recorded",
+          "n_hits": 0,
+          "n_present": 0,
+          "n_absent": 0
+        },
+        "deer": {
+          "state": "contradicts",
+          "n_hits": 39,
+          "n_present": 1,
+          "n_absent": 21
+        },
+        "roe": {
+          "state": "not_recorded",
+          "n_hits": 0,
+          "n_present": 0,
+          "n_absent": 0
+        },
+        "camel": {
+          "state": "matches",
+          "n_hits": 3,
+          "n_present": 0,
+          "n_absent": 1
+        },
+        "seal": {
+          "state": "contradicts",
+          "n_hits": 5,
+          "n_present": 2,
+          "n_absent": 0
+        },
+        "dolphin": {
+          "state": "matches",
+          "n_hits": 8,
+          "n_present": 0,
+          "n_absent": 1
+        }
+      },
+      "uberon": {
+        "obo_id": "UBERON:0002110",
+        "label": "gallbladder",
+        "never_in_taxon": [
+          {
+            "iri": "http://purl.obolibrary.org/obo/NCBITaxon_10114",
+            "label": "Rattus"
+          },
+          {
+            "iri": "http://purl.obolibrary.org/obo/NCBITaxon_8801",
+            "label": "Struthio camelus"
+          },
+          {
+            "iri": "http://purl.obolibrary.org/obo/NCBITaxon_8930",
+            "label": "Columbidae"
+          }
+        ],
+        "used_for_verdict": false
+      }
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.7,
+  "method": "Downloaded the DjVu OCR of Gorham and Ivy 1938. The legend lines read 'ORGAN PRESENT' and 'ORGAN ABSENT', and table rows carry a leading plus or dash. Each pre-registered name was scored from that mark and from a 120-character keyword window. A group with any present hit contradicts; a group with only absent hits matches. Uberon never_in_taxon labels were resolved and stored, and were not allowed to change the verdict.",
+  "results_summary": [
+    "horse: matches (present marks 0, absent marks 2)",
+    "ass: matches (present marks 0, absent marks 1)",
+    "mule: not_recorded (present marks 0, absent marks 0)",
+    "deer: contradicts (present marks 1, absent marks 21)",
+    "roe: not_recorded (present marks 0, absent marks 0)",
+    "camel: matches (present marks 0, absent marks 1)",
+    "seal: contradicts (present marks 2, absent marks 0)",
+    "dolphin: matches (present marks 0, absent marks 1)",
+    "Uberon never_in_taxon: Rattus, Struthio camelus, Columbidae.",
+    "Matched 4, contradicted 2, not recorded 2."
+  ]
 }
