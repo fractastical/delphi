@@ -2,7 +2,7 @@
   "claim_id": "levin-2022-grn-learning-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, then under the paper's six-pulse habituation protocol every BioModels pathway model that integrates has at least one stimulus–response pair whose mean expression falls by a factor of 1/1.5 at each successive lengthening pulse, and that pair is between 1% and 50% of the pairs tested in that model.",
   "pass_criterion": "Pre-registered, before any BioModels file or the supplement archive was opened. Let T be the number of testable models (defined in test_contract). Let Z be how many of them have zero habituating pairs. A model fraction is the number of habituating pairs divided by the number of finite pairs evaluated. Supports only if all of: (S1) the engagement check passes; (S2) T >= 20; (S3) Z = 0; (S4) every testable model's fraction lies in [0.01, 0.50].",
   "fail_criterion": "Pre-registered. If the engagement check fails, the verdict is inconclusive with reason other, whatever the habituation counts are. If fewer than 15 of the Table S1 model files can be downloaded, inconclusive with reason data-unavailable. If files download but T < 20, inconclusive with reason underpowered. If the engagement check passes and T >= 20, refutes if Z >= 4 or more than half of the testable models have a fraction outside [0.01, 0.50]; otherwise, if S3 or S4 fails, the verdict is mixed. A descriptive count of pairs that also meet a stricter successive ratio of 1/2 is recorded and does not decide the verdict.",
@@ -18,7 +18,11 @@
   },
   "interpretation": "The claim calls habituation 'a progressive 50% drop' and the source sentence says 'decrease in expression by 50% (i.e., a ratio of 1:1.5)'. The methods equation is the fraction 1/1.5 applied to successive stimulation-window means (MathML ids mm41 and mm42 in the Europe PMC full text), which is a drop to two-thirds, not to one-half. The verdict uses 1/1.5, because that is the criterion that the stated 27-model count was computed with. A true half-drop (ratio 1/2) is reported beside it and does not decide the verdict. 'Testable' in the claim is the authors' MATLAB subset (27 of 35); here it is every Table S1 model that integrates under the rules in the contract, so T need not equal 27 for a support. The continuous clamp (species held at the target, derivative not applied) is the intervention their MATLAB loop approximated by re-integrating and resetting; the chunk length '(10)' in that workaround is not multiplied into the epoch durations. This is a simulation of published ODE models. It does not measure pharmacoresistance in organisms.",
   "caveats": [
-    "Registration written on 2026-11-01 before any BioModels SBML file was fetched and before the supplement zip was downloaded. The zip URL was checked with an HTTP HEAD only (content-type application/zip, content-length 2886027). Methods formulas were read from the already-vendored paper text and from Europe PMC full text XML PMC9820177, which contains no Table S1 identifiers and no per-model habituation counts."
+    "Registration written on 2026-11-01 before any BioModels file was fetched and before the supplement zip was downloaded. The zip URL was checked with an HTTP HEAD only (content-type application/zip, content-length 2886027). Methods formulas were read from the already-vendored paper text and from Europe PMC full text XML PMC9820177, which contains no Table S1 identifiers and no per-model habituation counts.",
+    "This is a simulation of published ODE models. It shows whether the habituation inequality appears in those equations under the stated clamp. It is not a measurement of pharmacoresistance in organisms.",
+    "The continuous clamp replaces the paper's MATLAB loop, which reset the stimulus every short solver call because ode23tb cannot edit a trajectory mid-call. Epoch lengths use the methods' step counts at h = 0.01 (50 to 100 time units), not 5000 separate solver calls. A reading in which each of those steps lasted 10 time units was not run.",
+    "SBFC writes some assignments on the same line as a % comment, after a tab, and places a few assignment rules after the reactions that use them. Those statements were restored and literal constants were moved above the reactions so the exported file can execute. BIOMD0000000024 contains delay(), which the exporter does not implement, and BIOMD0000000539's export refers to reaction_production_A without defining it. Both are not testable and are not counted as failures.",
+    "Of 33 testable models, 18 had no habituating pair and 4 more had a pair but a share below 1% (0.32% to 0.38%). Eleven models fell inside 1–50%. Engagement held in 32 of 33 models (a first pulse moved some response by at least 1.5-fold), including 17 of the 18 models with zero habituation, so the zeros are not a failure of the clamp to move the network. BIOMD0000000483 had no 1.5-fold response in any pair."
   ],
   "created": "2026-11-01",
   "agent": {
@@ -26,5 +30,629 @@
     "model": "Grok 4.7",
     "run": "cursor/levin-grn-learning-tests-8733",
     "date": "2026-11-01"
-  }
+  },
+  "data_kind": "computational",
+  "verdict": "refutes",
+  "confidence": 0.5,
+  "datasets": [
+    {
+      "id": "biswas-2023-ijms-supplement-table-s1",
+      "name": "Table S1 of Biswas, Clawson and Levin 2023 (supplement zip)",
+      "landing_url": "https://doi.org/10.3390/ijms24010285",
+      "doi": "10.3390/ijms24010285",
+      "version": "ijms-24-00285-s001",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "name": "ijms-24-00285-s001.zip",
+          "download_url": "https://mdpi-res.com/d_attachment/ijms/ijms-24-00285/article_deploy/ijms-24-00285-s001.zip",
+          "retrieved_at": "2026-11-02T00:22:18Z",
+          "byte_size": 2886027,
+          "sha256": "292a7f33bcb3a9589614507114de8c1a7a5f5d8bc11e382d546c3d08da381e39"
+        }
+      ],
+      "role": "identifies the 35 BioModels IDs; only Table S1 (page 1) was read"
+    },
+    {
+      "id": "biomodels-octave-table-s1",
+      "name": "BioModels Octave exports for the 35 Table S1 identifiers",
+      "landing_url": "https://www.ebi.ac.uk/biomodels/",
+      "doi": null,
+      "version": "live archive retrieved 2026-11-02",
+      "license": null,
+      "generator": "analysis.py",
+      "program_family": "SBFC Octave export of each curated BioModels SBML model; integrated with scipy LSODA",
+      "files": [
+        {
+          "name": "BIOMD0000000001.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000001?filename=BIOMD0000000001.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 9355,
+          "sha256": "1368c168d14118d4d1b891fe838daca3a17cbe07315eaa45802d450e533c880e"
+        },
+        {
+          "name": "BIOMD0000000002.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000002?filename=BIOMD0000000002.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 9386,
+          "sha256": "eccc4805a70801a853b62d30c250773584487ee83d3eef37b58775646cde0e77"
+        },
+        {
+          "name": "BIOMD0000000003.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000003?filename=BIOMD0000000003.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5039,
+          "sha256": "5a6951d93c1a39aa04e6ed5517b2870e3428a8018369121f3b9117b05511b59b"
+        },
+        {
+          "name": "BIOMD0000000004.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000004?filename=BIOMD0000000004.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5495,
+          "sha256": "7cb2c3764c8fd1d3d8f6aa0c2b97538b9fb180e4e544270713e54f4a668aa870"
+        },
+        {
+          "name": "BIOMD0000000005.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000005?filename=BIOMD0000000005.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5796,
+          "sha256": "b2386011e60f9098b43d9334bba8264b0cb2a41e7debceb76ef978918e005074"
+        },
+        {
+          "name": "BIOMD0000000006.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000006?filename=BIOMD0000000006.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 3669,
+          "sha256": "0d1877dae5a4858b3fe9db99ecaea1838db02fa1200566db089d1dd7a9e8339b"
+        },
+        {
+          "name": "BIOMD0000000010.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000010?filename=BIOMD0000000010.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 6538,
+          "sha256": "495acf54a654951a8b62873adec089386d015c361e17387c79674e6c94562318"
+        },
+        {
+          "name": "BIOMD0000000069.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000069?filename=BIOMD0000000069.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 6429,
+          "sha256": "55ec39f7eb3b43853c6435280a915bff223ba1b3e694779ef68032fdebee67eb"
+        },
+        {
+          "name": "BIOMD0000000016.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000016?filename=BIOMD0000000016.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 6368,
+          "sha256": "f37a2cc98e3de7dfe227fe803cadbb0cab74d30c33622eb94ad7b8b593716690"
+        },
+        {
+          "name": "BIOMD0000000017.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000017?filename=BIOMD0000000017.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 14485,
+          "sha256": "24a6bd2df775167d5896e57584c7d357afabf739f9cc5cb4a8d2bc626c67f30a"
+        },
+        {
+          "name": "BIOMD0000000022.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000022?filename=BIOMD0000000022.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 16207,
+          "sha256": "51d44f8bbbb408e6760d5dc654e1d5c3aac47eb6509d2e7c6f81e74ff803654d"
+        },
+        {
+          "name": "BIOMD0000000021.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000021?filename=BIOMD0000000021.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 13226,
+          "sha256": "75e8b6680325f4c28ddbcee2b13867e1937ac303b47ffe3a00fec84427d790a7"
+        },
+        {
+          "name": "BIOMD0000000023.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000023?filename=BIOMD0000000023.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 11896,
+          "sha256": "2dc0487db58e9cca5a512b8df7336a41f96b4a1e67c0123a31e1501139ae36d5"
+        },
+        {
+          "name": "BIOMD0000000024.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000024?filename=BIOMD0000000024.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 3780,
+          "sha256": "8f7eda8c3e869f6592d70ad66af3f599614fc694c16793286beb35c9a5748cab"
+        },
+        {
+          "name": "BIOMD0000000026.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000026?filename=BIOMD0000000026.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 6394,
+          "sha256": "14bd281b53dcfa65cb3ac95bf863fb8d38dcb9e607844457ef93ac0b14b50034"
+        },
+        {
+          "name": "BIOMD0000000027.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000027?filename=BIOMD0000000027.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 4297,
+          "sha256": "663a6e3cddc3e182176b31fe9534958fc01f387f56549bddbd49fbdee42a210f"
+        },
+        {
+          "name": "BIOMD0000000483.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000483?filename=BIOMD0000000483.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 4773,
+          "sha256": "a205d1356426a52efe7a0628ab996effa748b739699ba15bcf8b9f6b2182ca95"
+        },
+        {
+          "name": "BIOMD0000000029.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000029?filename=BIOMD0000000029.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5857,
+          "sha256": "c316411a0f741fee354d5260d1c0aef575dce8829fa805f3f358c6a60f9dfbbf"
+        },
+        {
+          "name": "BIOMD0000000031.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000031?filename=BIOMD0000000031.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 4307,
+          "sha256": "00ad27827d5858ba8fb5e3148f0e1cfb5436338a58984e49850303565d81c228"
+        },
+        {
+          "name": "BIOMD0000000631.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000631?filename=BIOMD0000000631.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 11556,
+          "sha256": "bc56dc283bdeaed71bd531e8e444ec1bc999311020510df3d0ce9e5a457e715a"
+        },
+        {
+          "name": "BIOMD0000000203.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000203?filename=BIOMD0000000203.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 7793,
+          "sha256": "dc37ade9e8c305e1eaef87efaa4d5fe1a28ef902258ae8e0d6557c40816883aa"
+        },
+        {
+          "name": "BIOMD0000000204.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000204?filename=BIOMD0000000204.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 7790,
+          "sha256": "e09725d94a4f21b10843d0e92bea9eddd60284a0c8818d59b26a363d8f437bc4"
+        },
+        {
+          "name": "BIOMD0000000209.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000209?filename=BIOMD0000000209.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 10808,
+          "sha256": "157f665b0e2e0ee630bf7d069b95ab52b941f7e4c2548f1b4f94bba0f862e0ea"
+        },
+        {
+          "name": "BIOMD0000000210.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000210?filename=BIOMD0000000210.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 10116,
+          "sha256": "b9f0a37442f8dc0962cb4cef40b6ce17db4f07d1b4d8d796114440960beef63a"
+        },
+        {
+          "name": "BIOMD0000000539.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000539?filename=BIOMD0000000539.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5740,
+          "sha256": "4388e9f8e66f710598cb458ba4f56217de35270c3852708ecfef0038d3bd2e38"
+        },
+        {
+          "name": "BIOMD0000000664.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000664?filename=BIOMD0000000664.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 8274,
+          "sha256": "1cc3d2032cb009c94b47ea44a81c19923ea5fccc8cf980d4488810b3daeb1d5e"
+        },
+        {
+          "name": "BIOMD0000000275.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000275?filename=BIOMD0000000275.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5841,
+          "sha256": "6b2895934cff0fc27ec53340d7dc1cfd301c6da95ce9050975baa241bffdbdfe"
+        },
+        {
+          "name": "BIOMD0000000697.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000697?filename=BIOMD0000000697.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 16535,
+          "sha256": "327372d1d8d10556cf8ff4da838ac86902985e2ef5c93e197b47033043ee946b"
+        },
+        {
+          "name": "BIOMD0000000600.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000600?filename=BIOMD0000000600.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 10178,
+          "sha256": "4336aa5f8b79fef624b4d1f03d83b4028139917a2e76790fddb5ba20dead36c5"
+        },
+        {
+          "name": "BIOMD0000000039.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000039?filename=BIOMD0000000039.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 5161,
+          "sha256": "236f5993d488df3287a7832ef6a4d306465a9e7197f12731a8fb614b09754222"
+        },
+        {
+          "name": "BIOMD0000000050.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000050?filename=BIOMD0000000050.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 6954,
+          "sha256": "8ff0a2c63751c664dc80c2a0b2d22ca1ba8130bba41a0e4668193c1ccfa5a17b"
+        },
+        {
+          "name": "BIOMD0000000035.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000035?filename=BIOMD0000000035.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 7172,
+          "sha256": "79863dcc688590e15887a439b2496ca8781c38ed813e8f25dbaf2ca50e33c16b"
+        },
+        {
+          "name": "BIOMD0000000036.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000036?filename=BIOMD0000000036.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 4204,
+          "sha256": "b9cf845388a50fd3c706a59c9440c230dc6ad0526841579c77ae53759eb2d964"
+        },
+        {
+          "name": "BIOMD0000000037.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000037?filename=BIOMD0000000037.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 7243,
+          "sha256": "92a0c319f5f9e480a86452163f1b264cf02c1d049d90aeb9fa893c96cd930572"
+        },
+        {
+          "name": "BIOMD0000000038.m",
+          "download_url": "https://www.ebi.ac.uk/biomodels/model/download/BIOMD0000000038?filename=BIOMD0000000038.m",
+          "retrieved_at": "2026-11-02T00:50:45Z",
+          "byte_size": 7840,
+          "sha256": "3e1499d2226515a88ec04ff0c5e1ffb1fad3ab7c9ebe171ac8a0b1f19966a021"
+        }
+      ],
+      "role": "ODE right-hand sides and initial conditions for the habituation screen"
+    }
+  ],
+  "method": "Downloaded each Table S1 model's public Octave export and integrated it with scipy.integrate.solve_ivp (LSODA, rtol 1e-4, atol 1e-7, max_step 0.5). After a 0–100 relax, every ordered pair of species was driven with six clamped pulses of lengths 50, 60, 70, 80, 90 and 100, each followed by an unclamped relax of the same length. Up-clamp is 100 times the relax maximum; down-clamp is the relax minimum divided by 100. A pair habituates when each successive pulse-mean of the response is at most 1/1.5 of the previous mean and the first mean exceeds 1e-12. The pre-registered rule in pass_criterion and fail_criterion was applied to those counts without a change of threshold.",
+  "measured": {
+    "value": 15,
+    "unit": "testable models with at least one habituating pair",
+    "n": 33,
+    "uncertainty": "deterministic given the solver tolerances; no sampling error",
+    "extra": {
+      "preregistered_decision": {
+        "T": 33,
+        "Z": 18,
+        "outside_band": 22,
+        "engaged_models": 32,
+        "downloaded": 35
+      },
+      "fractions": [
+        {
+          "id": "BIOMD0000000001",
+          "n_species": 12,
+          "n_habituating": 0,
+          "n_finite": 264,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 48
+        },
+        {
+          "id": "BIOMD0000000002",
+          "n_species": 13,
+          "n_habituating": 1,
+          "n_finite": 312,
+          "fraction": 0.003205128205128205,
+          "fraction_successive_half": 0.003205128205128205,
+          "n_regulating_pairs": 13
+        },
+        {
+          "id": "BIOMD0000000003",
+          "n_species": 3,
+          "n_habituating": 0,
+          "n_finite": 12,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 12
+        },
+        {
+          "id": "BIOMD0000000004",
+          "n_species": 5,
+          "n_habituating": 0,
+          "n_finite": 40,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 31
+        },
+        {
+          "id": "BIOMD0000000005",
+          "n_species": 9,
+          "n_habituating": 2,
+          "n_finite": 128,
+          "fraction": 0.015625,
+          "fraction_successive_half": 0.015625,
+          "n_regulating_pairs": 66
+        },
+        {
+          "id": "BIOMD0000000006",
+          "n_species": 6,
+          "n_habituating": 0,
+          "n_finite": 55,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 25
+        },
+        {
+          "id": "BIOMD0000000010",
+          "n_species": 8,
+          "n_habituating": 0,
+          "n_finite": 112,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 42
+        },
+        {
+          "id": "BIOMD0000000069",
+          "n_species": 10,
+          "n_habituating": 11,
+          "n_finite": 171,
+          "fraction": 0.06432748538011696,
+          "fraction_successive_half": 0.04093567251461988,
+          "n_regulating_pairs": 98
+        },
+        {
+          "id": "BIOMD0000000016",
+          "n_species": 6,
+          "n_habituating": 2,
+          "n_finite": 60,
+          "fraction": 0.03333333333333333,
+          "fraction_successive_half": 0.03333333333333333,
+          "n_regulating_pairs": 48
+        },
+        {
+          "id": "BIOMD0000000017",
+          "n_species": 18,
+          "n_habituating": 0,
+          "n_finite": 612,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 102
+        },
+        {
+          "id": "BIOMD0000000022",
+          "n_species": 11,
+          "n_habituating": 0,
+          "n_finite": 220,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 166
+        },
+        {
+          "id": "BIOMD0000000021",
+          "n_species": 10,
+          "n_habituating": 0,
+          "n_finite": 180,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 164
+        },
+        {
+          "id": "BIOMD0000000023",
+          "n_species": 13,
+          "n_habituating": 0,
+          "n_finite": 312,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 15
+        },
+        {
+          "id": "BIOMD0000000026",
+          "n_species": 11,
+          "n_habituating": 28,
+          "n_finite": 220,
+          "fraction": 0.12727272727272726,
+          "fraction_successive_half": 0.07727272727272727,
+          "n_regulating_pairs": 139
+        },
+        {
+          "id": "BIOMD0000000027",
+          "n_species": 3,
+          "n_habituating": 0,
+          "n_finite": 12,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 6
+        },
+        {
+          "id": "BIOMD0000000483",
+          "n_species": 8,
+          "n_habituating": 0,
+          "n_finite": 112,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 0
+        },
+        {
+          "id": "BIOMD0000000029",
+          "n_species": 4,
+          "n_habituating": 3,
+          "n_finite": 24,
+          "fraction": 0.125,
+          "fraction_successive_half": 0.125,
+          "n_regulating_pairs": 10
+        },
+        {
+          "id": "BIOMD0000000031",
+          "n_species": 3,
+          "n_habituating": 1,
+          "n_finite": 12,
+          "fraction": 0.08333333333333333,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 6
+        },
+        {
+          "id": "BIOMD0000000631",
+          "n_species": 12,
+          "n_habituating": 0,
+          "n_finite": 264,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 174
+        },
+        {
+          "id": "BIOMD0000000203",
+          "n_species": 12,
+          "n_habituating": 1,
+          "n_finite": 264,
+          "fraction": 0.003787878787878788,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 26
+        },
+        {
+          "id": "BIOMD0000000204",
+          "n_species": 12,
+          "n_habituating": 1,
+          "n_finite": 264,
+          "fraction": 0.003787878787878788,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 24
+        },
+        {
+          "id": "BIOMD0000000209",
+          "n_species": 20,
+          "n_habituating": 0,
+          "n_finite": 760,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 28
+        },
+        {
+          "id": "BIOMD0000000210",
+          "n_species": 18,
+          "n_habituating": 0,
+          "n_finite": 612,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 14
+        },
+        {
+          "id": "BIOMD0000000664",
+          "n_species": 8,
+          "n_habituating": 35,
+          "n_finite": 112,
+          "fraction": 0.3125,
+          "fraction_successive_half": 0.30357142857142855,
+          "n_regulating_pairs": 69
+        },
+        {
+          "id": "BIOMD0000000275",
+          "n_species": 5,
+          "n_habituating": 0,
+          "n_finite": 40,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 23
+        },
+        {
+          "id": "BIOMD0000000697",
+          "n_species": 15,
+          "n_habituating": 20,
+          "n_finite": 420,
+          "fraction": 0.047619047619047616,
+          "fraction_successive_half": 0.03571428571428571,
+          "n_regulating_pairs": 111
+        },
+        {
+          "id": "BIOMD0000000600",
+          "n_species": 17,
+          "n_habituating": 2,
+          "n_finite": 544,
+          "fraction": 0.003676470588235294,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 318
+        },
+        {
+          "id": "BIOMD0000000039",
+          "n_species": 5,
+          "n_habituating": 3,
+          "n_finite": 40,
+          "fraction": 0.075,
+          "fraction_successive_half": 0.025,
+          "n_regulating_pairs": 20
+        },
+        {
+          "id": "BIOMD0000000050",
+          "n_species": 14,
+          "n_habituating": 100,
+          "n_finite": 364,
+          "fraction": 0.27472527472527475,
+          "fraction_successive_half": 0.27197802197802196,
+          "n_regulating_pairs": 164
+        },
+        {
+          "id": "BIOMD0000000035",
+          "n_species": 10,
+          "n_habituating": 0,
+          "n_finite": 171,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 121
+        },
+        {
+          "id": "BIOMD0000000036",
+          "n_species": 2,
+          "n_habituating": 0,
+          "n_finite": 4,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 4
+        },
+        {
+          "id": "BIOMD0000000037",
+          "n_species": 12,
+          "n_habituating": 79,
+          "n_finite": 264,
+          "fraction": 0.29924242424242425,
+          "fraction_successive_half": 0.29545454545454547,
+          "n_regulating_pairs": 102
+        },
+        {
+          "id": "BIOMD0000000038",
+          "n_species": 17,
+          "n_habituating": 0,
+          "n_finite": 512,
+          "fraction": 0.0,
+          "fraction_successive_half": 0.0,
+          "n_regulating_pairs": 248
+        }
+      ],
+      "not_testable": [
+        {
+          "id": "BIOMD0000000024",
+          "reason": "translate: delay() is present; the Octave export does not implement it"
+        },
+        {
+          "id": "BIOMD0000000539",
+          "reason": "relax: name 'reaction_production_A' is not defined"
+        }
+      ]
+    }
+  },
+  "results_summary": [
+    "33 of 35 Table S1 models were testable (7493 finite stimulus-response pairs). 15 had at least one habituating pair; Z=18 had none. 22 models had a habituating share outside 1-50% (the 18 zeros plus BIOMD0000000002, BIOMD0000000203, BIOMD0000000204 and BIOMD0000000600, each under 1%).",
+    "Engagement passed: 32 of 33 testable models had at least one pair whose first pulse changed the response by a factor of 1.5 or more. The pre-registered rule therefore refutes (Z>=4 and a majority outside the band).",
+    "A successive half-drop (ratio 1/2), recorded and not used for the verdict, occurred in 259 of 7493 finite pairs and in 11 models.",
+    "Not testable, and not counted as failures: BIOMD0000000024 (delay() in the Octave export) and BIOMD0000000539 (reaction_production_A is referenced but never defined)."
+  ],
+  "deviations": [
+    {
+      "date": "2026-11-01",
+      "what": "Each Table S1 model was integrated from its public BioModels Octave export, not by loading the SBML into a separate simulator.",
+      "why": "Section 4.1 says the authors solved the Octave file after a small conversion to MATLAB. That export is the ODE they integrated. The allowed libraries are numpy, scipy and requests, which do not include an SBML engine. Pass and fail thresholds were not changed."
+    },
+    {
+      "date": "2026-11-01",
+      "what": "A right-hand-side evaluation cap of 8000 calls per epoch treats that epoch as non-finite.",
+      "why": "LSODA can stall on a bad Jacobian (observed on BIOMD0000000005). Pairs that do not finish are already outside the pre-registered finite-pair denominator. The habituation inequality was not changed. With the cap, BIOMD0000000005 finished with 128 of 144 pairs finite."
+    }
+  ]
 }
