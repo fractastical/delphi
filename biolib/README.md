@@ -103,5 +103,6 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) and [`AI-POLICY.md`](AI-POLICY.md).
 
 ## License
 
-Not yet chosen. Mathlib and Physlib use Apache-2.0; the delphi repositories carry no license file today, so
-until one is added, these files are all-rights-reserved by default and contributions cannot be accepted.
+Not yet chosen; the decision, with Apache-2.0 proposed, is
+[fractastical/delphi#15](https://github.com/fractastical/delphi/issues/15). Until a license file is added these files are
+all-rights-reserved by default and contributions cannot be accepted.
