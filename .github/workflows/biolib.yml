@@ -1,0 +1,28 @@
+name: biolib
+
+on:
+  push:
+    paths: ["biolib/**", ".github/workflows/biolib.yml"]
+  pull_request:
+    paths: ["biolib/**", ".github/workflows/biolib.yml"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: biolib
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: biolib
+          use-mathlib-cache: true
+          build: true
+          test: false
+      - name: axiom audit
+        run: lake env lean scripts/axioms.lean
+      - name: provenance is current
+        run: |
+          python3 -c "import json; p=json.load(open('PROVENANCE.json')); print(len(p['modules']), 'modules from', p['source_commit'][:12])"
+          test "$(find Biolib BiolibAlpha -name '*.lean' ! -name Informal.lean | wc -l)" -eq "$(python3 -c "import json; print(len(json.load(open('PROVENANCE.json'))['modules']))")"

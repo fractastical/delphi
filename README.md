@@ -10,7 +10,7 @@
 
 This repository is the public project page: the README and the [swarm record](swarm/README.md). The working tree is private at [fractastical/delphi_private](https://github.com/fractastical/delphi_private).
 
-**Contents:** [Goal](#goal) · [How we won](#how-we-won) · [How it works](#how-it-works)
+**Contents:** [Goal](#goal) · [Biolib](#biolib) · [How we won](#how-we-won) · [How it works](#how-it-works)
 
 ## Goal
 
@@ -23,6 +23,17 @@ Find the **fundamental theorems of biology**: general laws that hold across orga
 - publish every step as a [nanopublication](https://nanopub.net/), so each claim, test and assessment can be cited, queried and challenged.
 
 A machine-checked proof shows a theorem follows from its assumptions, not that living systems satisfy them; that is for evidence to settle. No claim here is promoted to a theorem *of biology*: the theorems are theorems about models, assessor scores are elicited opinions of models and never promote a claim, refuted and inconclusive results are published beside supported ones, and most claims are neither proved nor tested. That gap is the work.
+
+## Biolib
+
+[`biolib/`](biolib/) is the project's Lean 4 library, organized by biology the way
+[Physlib](https://github.com/leanprover-community/physlib) is organized by physics: `Biolib/` (reviewed:
+accepted laws and Lean-checked claims) and `BiolibAlpha/` (candidate, contested, certificates), with
+informal results waiting to be formalized in `Biolib/Meta/Informal.lean`. Every theorem is about a model
+with named hypotheses and no `axiom`; `lake build` then `lake env lean scripts/axioms.lean` checks every
+theorem against Lean's three standard axioms. Counts and the module table are generated in
+[`biolib/STATUS.md`](biolib/STATUS.md); each module records the origin path and commit it was copied from
+([`PROVENANCE.json`](biolib/PROVENANCE.json)).
 
 ## How we won
 
