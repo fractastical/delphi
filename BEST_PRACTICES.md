@@ -30,6 +30,9 @@ is not a reason to skip the checks below. Publish to the test registry and promo
     timestamp. The step waits until that URI is in the manifest and the commit is pushed.
 12. **Log which agent did which task.** One append-only line per task: time, agent name,
     model if known, the task in one sentence, and where the result is. A failed task stays.
+13. **Causal links use the Relation Ontology, and molecular chains are linked to, not
+    copied.** An RO IRI for every causal edge; an INDRA statement hash, GO-CAM model or
+    SIGNOR record for the mechanism, fetched live and dated.
 
 ## 1. Use the 12-step loop where possible
 
@@ -474,6 +477,43 @@ not one of those sessions writes its log next to the work (for example beside a 
 test) or, when the work is posted on the forum, includes the new lines in that post. The
 forum name on a post is the public half of the same record, not a substitute for the log
 of agents that never posted.
+
+## 13. Causal links: use the Relation Ontology, and link out to the graphs that curate them
+
+Other biology knowledge graphs already represent causal chains, all at the molecular
+level: [GO-CAM](https://wiki.geneontology.org/Annotation_Relations) (chains of gene-product
+activities), [INDRA CoGEx](https://github.com/gyorilab/indra_cogex) (signed, literature-mined
+statements with evidence counts and PMIDs) and [SIGNOR](https://signor.uniroma2.it/)
+(manually curated signed signalling edges). Two rules follow.
+
+- **Every causal edge carries a Relation Ontology predicate, never a term of our own.**
+  GO-CAM and RO's own
+  [causal relations](https://oborel.github.io/obo-relations/causal-relations/) draw from the
+  `causally upstream of or within` branch (`RO:0002418`): `causally upstream of`
+  (`RO:0002411`), `causally upstream of, positive effect` (`RO:0002304`) / `negative effect`
+  (`RO:0002305`), `directly positively regulates` (`RO:0002629`) / `directly negatively
+  regulates` (`RO:0002630`), `provides input for` (`RO:0002413`). Pick the weakest relation
+  the evidence supports: `causally upstream of` when the sign is unknown, the signed form
+  when the sign is known, a `regulates` form only when the mechanism is known. RO defines
+  these over processes, so the same predicates serve a molecular edge and an
+  organism-level one (a bioelectric prepattern upstream of a morphological outcome). CiTO
+  stays for relations between *records* (`cito:supports`, `cito:disagreesWith`); RO is for
+  relations between the *things the records are about*. Between whole claims, prefer
+  `skos:closeMatch` / `skos:exactMatch` for "the same regularity in another source". This is
+  section 9's reuse rule applied to causation.
+- **Link to a molecular chain; do not republish it.** When a claim rests on a mechanism
+  that INDRA, GO-CAM or SIGNOR already curates, the record points at it: the INDRA statement
+  hash with its PMIDs, the GO-CAM model id, or the SIGNOR record, with the grounding used
+  (`hgnc:`, UBERON, GO, ChEBI IRIs) and the retrieval date. Fetch the chain live when it is
+  needed (`indra-cogex` MCP, `AGENTS.md`). Copying their edges into our nanopubs adds no
+  evidence, goes stale, and hides where the curation happened.
+
+A chain fetched from one of these graphs is an observation someone else reported, graded by
+their evidence count. In our vocabulary it is motivation or prior art for a claim test,
+never evidence that the organism-level claim holds, and it never changes a verdict. The
+edge nobody else curates, a mechanism linked across scales to a regularity about form,
+behaviour or selection, is the one worth asserting here, with its agent, its reading of the
+claim, and its evidence item like any other record.
 
 ## Solvers
 
